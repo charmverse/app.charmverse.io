@@ -68,7 +68,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
-    else if (user && !user?.addresses.some(a => lowerCaseEqual(a, account))) {
+    else if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
       await charmClient.logout();
       setUser(null);
     }
