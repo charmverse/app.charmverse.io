@@ -92,7 +92,7 @@ class CharmClient {
     });
   }
 
-  updateUser (data: Partial<User> & { addresses?: string[] }) {
+  updateUser (data: Partial<User>) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 

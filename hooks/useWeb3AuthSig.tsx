@@ -5,9 +5,8 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { box } from 'tweetnacl';
-import naclUtil from 'tweetnacl-util';
 import { lowerCaseEqual } from 'lib/utilities/strings';
+import log from 'lib/log';
 import { ExternalServiceError } from '../lib/utilities/errors';
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { Web3Connection } from '../components/_app/Web3ConnectionManager';
@@ -39,22 +38,22 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
-  /**
-   * Retrieve signature from localstorage for a specific wallet address
-   * @param account
-   * @returns
-   */
   function getStoredSignature (walletAddress: string) {
     const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${walletAddress}`);
 
     if (stored) {
-      return JSON.parse(stored) as AuthSig;
+      try {
+        const parsed = JSON.parse(stored) as AuthSig;
+        return parsed;
+      }
+      catch (e) {
+        log.error('Error parsing stored signature', e);
+        return null;
+      }
     }
     else {
       return null;
-
     }
-
   }
 
   function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
@@ -75,16 +74,9 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     //  Automagic lit signature update only
-
     if (account) {
-
-      try {
-        const storedWalletSignature = JSON.parse(window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`) as string) as AuthSig;
-        setSignature(storedWalletSignature);
-      }
-      catch (err) {
-        setSignature(null);
-      }
+      const storedWalletSignature = getStoredSignature(account);
+      setSignature(storedWalletSignature);
     }
     else {
       setSignature(null);
