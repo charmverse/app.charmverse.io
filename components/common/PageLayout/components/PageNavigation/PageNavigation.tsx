@@ -6,7 +6,7 @@ import TreeView from '@mui/lab/TreeView';
 import charmClient from 'charmClient';
 import { checkForEmpty } from 'components/common/CharmEditor/utils';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import { getKey, useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPageWithPermissions, NewPageInput } from 'lib/pages';
@@ -96,7 +96,6 @@ function PageNavigation ({
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
-
   const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
     .map((page): MenuNode => ({
       id: page.id,
@@ -208,6 +207,37 @@ function PageNavigation ({
       });
 
   }, [pages]);
+
+  const pageNavigationElement = document.querySelector('.page-navigation');
+  const treeViewElement = pageNavigationElement?.querySelector('.MuiTreeView-root');
+  const pageSidebarChildrenCount = treeViewElement?.children.length;
+
+  useEffect(() => {
+    // Need to wait for the child nodes to appear before we can start scrolling
+    if (pageNavigationElement && pageSidebarChildrenCount !== 0) {
+      const sidebarScrollTop = localStorage.getItem(getKey('sidebar-scroll-top'));
+      if (sidebarScrollTop) {
+        pageNavigationElement.scrollBy({
+          top: Number(sidebarScrollTop)
+        });
+      }
+      // If there are no scroll value stored on ls
+      // We use the router's pageId to scroll to the correct place
+      else {
+        const { pageId } = router.query;
+        if (pageId) {
+          const anchor = document.querySelector(`a[href^="/${space?.domain}/${pageId}"]`);
+          if (anchor) {
+            setTimeout(() => {
+              anchor.scrollIntoView({
+                behavior: 'smooth'
+              });
+            });
+          }
+        }
+      }
+    }
+  }, [pageSidebarChildrenCount]);
 
   useEffect(() => {
     const currentPage = pages[currentPageId];

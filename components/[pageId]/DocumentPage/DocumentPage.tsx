@@ -86,17 +86,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     }
   }, [page.bountyId]);
 
-  useEffect(() => {
-    const anchor = document.querySelector(`a[href="/${currentSpace?.domain}/${page.path}"]`);
-    if (anchor) {
-      setTimeout(() => {
-        anchor.scrollIntoView({
-          behavior: 'smooth'
-        });
-      }, 1000);
-    }
-  }, []);
-
   const cannotComment = readOnly || !pagePermissions?.comment;
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
 

@@ -8,13 +8,12 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import IconButton from '@mui/material/IconButton';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
-import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
 import type { Page, PageType } from '@prisma/client';
-import { isTouchScreen } from 'lib/browser';
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -23,11 +22,14 @@ import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/em
 import TreeItemContent from 'components/common/TreeItemContent';
 import type { Identifier } from 'dnd-core';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { isTouchScreen } from 'lib/browser';
 import type { IPageWithPermissions } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -187,6 +189,10 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
+    const pageNavigationElement = document.querySelector('.page-navigation');
+    if (pageNavigationElement) {
+      localStorage.setItem(getKey('sidebar-scroll-top'), pageNavigationElement.scrollTop.toString());
+    }
     event.stopPropagation();
   }, []);
 
