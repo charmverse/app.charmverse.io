@@ -27,7 +27,7 @@ describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly crea
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const userCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const userCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-default-public-pages`)
@@ -48,7 +48,7 @@ describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly crea
       permissionConfigurationMode: 'collaborative'
     });
 
-    const userCookie = await loginUser(extraAdminUser.wallets[0].address);
+    const userCookie = await loginUser(extraAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${extraSpace.id}/set-default-public-pages`)

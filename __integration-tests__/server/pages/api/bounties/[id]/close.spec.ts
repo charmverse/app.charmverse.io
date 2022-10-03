@@ -83,7 +83,7 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       isAdmin: false
     });
 
-    const extraNonAdminUserCookie = await loginUser(extraNonAdminUser.wallets[0].address);
+    const extraNonAdminUserCookie = await loginUser(extraNonAdminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

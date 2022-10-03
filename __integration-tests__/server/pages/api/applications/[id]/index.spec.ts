@@ -28,7 +28,7 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser.wallets[0].address);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
@@ -82,7 +82,7 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser.wallets[0].address);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: otherUser.id,

@@ -123,7 +123,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
       isAdmin: false
     });
 
-    const nonAdminCookie = await loginUser(extraNonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(extraNonAdminUser.id);
 
     const bounty = await generateBounty({
       createdBy: user.id,

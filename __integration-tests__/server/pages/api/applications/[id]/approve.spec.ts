@@ -15,7 +15,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(generated.user.wallets[0].address);
+  nonAdminCookie = await loginUser(generated.user.id);
 });
 
 describe('POST /api/applications/{applicationId}/approve - accept an application to become a submitter', () => {
@@ -24,7 +24,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = await loginUser(reviewer.wallets[0].address);
+    const reviewerCookie = await loginUser(reviewer.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -66,7 +66,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminCookie = await loginUser(admin.wallets[0].address);
+    const adminCookie = await loginUser(admin.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -92,7 +92,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
       spaceId: nonAdminUserSpace.id
     });
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

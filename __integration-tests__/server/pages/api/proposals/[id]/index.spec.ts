@@ -216,7 +216,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
     const nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const pageWithProposal = await createProposalTemplate({
       spaceId: adminSpace.id,

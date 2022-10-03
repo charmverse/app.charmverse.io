@@ -46,7 +46,7 @@ describe('GET /api/votes/[id] - Get a single vote', () => {
 describe('PUT /api/votes/[id] - Update a single vote', () => {
   it('Should update vote if the user has create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -95,7 +95,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 
   it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -119,7 +119,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 describe('DELETE /api/votes/[id] - Delete a single vote', () => {
   it('Should delete vote if the user has create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -166,7 +166,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
 
   it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id

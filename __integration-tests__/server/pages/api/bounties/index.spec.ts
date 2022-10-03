@@ -125,7 +125,7 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
 
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const otherUserCookie = await loginUser(otherUser.wallets[0].address);
+    const otherUserCookie = await loginUser(otherUser.id);
 
     await prisma.space.update({
       where: {
@@ -296,7 +296,7 @@ describe('POST /api/bounties - create a bounty', () => {
       userId: differentUser.id
     });
 
-    const cookie = await loginUser(differentUser.wallets[0].address);
+    const cookie = await loginUser(differentUser.id);
 
     const createdBounty = (await request(baseUrl)
       .post('/api/bounties')

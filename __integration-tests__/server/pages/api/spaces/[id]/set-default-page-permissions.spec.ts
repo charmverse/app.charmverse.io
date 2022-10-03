@@ -57,7 +57,7 @@ describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page 
       permissionConfigurationMode: 'collaborative'
     });
 
-    const userCookie = await loginUser(extraAdminUser.wallets[0].address);
+    const userCookie = await loginUser(extraAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${extraSpace.id}/set-default-page-permissions`)

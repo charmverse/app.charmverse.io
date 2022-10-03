@@ -28,7 +28,7 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const userCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const userCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-permissions-mode`)

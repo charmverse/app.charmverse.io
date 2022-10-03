@@ -38,7 +38,7 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
 
   it('should fail if the user is not a space admin and respond with 401', async () => {
 
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,

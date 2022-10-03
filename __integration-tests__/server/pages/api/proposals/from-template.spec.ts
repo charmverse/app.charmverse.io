@@ -17,7 +17,7 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       operations: ['createVote']
     });
 
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
@@ -95,7 +95,7 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
   it('should copy a proposal template if the user does not have createVote space permission and respond with 401', async () => {
 
     const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await prisma.spacePermission.deleteMany({
       where: {

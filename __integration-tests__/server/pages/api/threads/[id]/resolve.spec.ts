@@ -58,7 +58,7 @@ describe('PUT /api/threads/{id} - update a comment', () => {
       isAdmin: false
     });
 
-    const otherAdminCookie = await loginUser(otherAdminUser.wallets[0].address);
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',

@@ -99,7 +99,7 @@ describe('POST /api/permissions/space/{spaceId}/remove - Remove space permission
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/remove`)

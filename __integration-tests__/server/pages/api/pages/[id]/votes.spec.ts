@@ -87,7 +87,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(userNotInSpace.wallets[0].address))
+      .set('Cookie', await loginUser(userNotInSpace.id))
       .expect(404);
   });
 });

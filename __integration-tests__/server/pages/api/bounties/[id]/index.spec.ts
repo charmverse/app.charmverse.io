@@ -21,7 +21,7 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
@@ -111,7 +111,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const randomSpaceUserCookie = await loginUser(randomSpaceUser.wallets[0].address);
+    const randomSpaceUserCookie = await loginUser(randomSpaceUser.id);
 
     const createdBounty = await createBounty({
       createdBy: adminUser.id,
@@ -140,7 +140,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator.wallets[0].address);
+    const bountyCreatorCookie = await loginUser(bountyCreator.id);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,
@@ -179,7 +179,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator.wallets[0].address);
+    const bountyCreatorCookie = await loginUser(bountyCreator.id);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,

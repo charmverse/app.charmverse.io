@@ -73,7 +73,7 @@ describe('POST /api/votes - Create a new poll', () => {
   it('Should create the poll if the user is an admin for the page and respond 201', async () => {
 
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const nonAdminUserCookie = await loginUser(nonAdminUser.wallets[0].address);
+    const nonAdminUserCookie = await loginUser(nonAdminUser.id);
 
     const pageForVote = await createPage({
       createdBy: nonAdminUser.id,
@@ -136,7 +136,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 
-    const authorCookie = await loginUser(author.wallets[0].address);
+    const authorCookie = await loginUser(author.id);
 
     const { page: resultPage } = await createProposal({
       createdBy: author.id,
@@ -193,7 +193,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ isAdmin: false, spaceId: authorSpace.id });
-    const otherUserCookie = await loginUser(otherUser.wallets[0].address);
+    const otherUserCookie = await loginUser(otherUser.id);
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 

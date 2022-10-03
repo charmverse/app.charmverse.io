@@ -22,7 +22,7 @@ beforeAll(async () => {
     spaceId: space.id
   });
 
-  nonAdminUserCookie = await loginUser(nonAdminUser.wallets[0].address);
+  nonAdminUserCookie = await loginUser(nonAdminUser.id);
   adminUserCookie = await loginUser(adminUser.id);
 
 });

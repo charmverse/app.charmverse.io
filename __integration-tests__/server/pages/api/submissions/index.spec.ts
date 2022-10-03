@@ -46,7 +46,7 @@ describe('POST /api/submissions - create a submission', () => {
       resourceId: bounty.id
     });
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     const createdSubmission = (await request(baseUrl)
       .post('/api/submissions')
@@ -77,7 +77,7 @@ describe('POST /api/submissions - create a submission', () => {
       submissionContent
     };
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     await request(baseUrl)
       .post('/api/submissions')

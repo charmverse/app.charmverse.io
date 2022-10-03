@@ -26,7 +26,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,
@@ -59,7 +59,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     // Bounty with a base permission set
     const bounty = await generateBounty({

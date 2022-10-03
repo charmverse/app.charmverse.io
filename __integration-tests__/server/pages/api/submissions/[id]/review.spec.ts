@@ -16,7 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser.wallets[0].address);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
@@ -25,7 +25,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = await loginUser(reviewer.wallets[0].address);
+    const reviewerCookie = await loginUser(reviewer.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

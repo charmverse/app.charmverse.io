@@ -78,7 +78,7 @@ describe('POST /api/applications - create an application', () => {
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser.wallets[0].address);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
@@ -162,7 +162,7 @@ describe('POST /api/applications - create an application', () => {
       message: 'I\'m volunteering for this as it\'s in my field of expertise'
     };
 
-    const extraUserCookie = await loginUser(extraUser.wallets[0].address);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     await request(baseUrl)
       .post('/api/applications')
