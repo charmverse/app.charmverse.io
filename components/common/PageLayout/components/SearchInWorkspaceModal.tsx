@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
@@ -9,12 +9,42 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import Popper from '@mui/material/Popper';
-import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import type { PageMeta } from 'lib/pages';
+import charmClient from 'charmClient';
+import log from 'lib/log';
+import throttle from 'lodash/throttle';
+import { isTruthy } from 'lib/utilities/types';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
+enum ResultType {
+  page = 'page',
+  bounty = 'bounty'
+}
+
+type SearchResultItem = {
+  name: string;
+  link: string;
+  type: ResultType;
+  path? :string;
+  id: string;
+};
+
+const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
+  .MuiInput-root {
+    marginTop: 0px;
+    paddingRight: 0px !important;
+  }
+  label: {
+    transform: inherit;
+  }
+  .MuiAutocomplete-endAdornment {
+    display: none;
+  }
+`;
 
 const StyledPopper = styled(Popper)`
   position: initial !important;
@@ -63,19 +93,6 @@ const StyledTypographyPath = styled(Typography)`
     font-style: italic;
 `;
 
-enum ResultType {
-  page = 'page',
-  bounty = 'bounty'
-}
-
-type SearchResultItem = {
-    name: string;
-    link: string;
-    type: ResultType;
-    path? :string;
-    id: string;
-  };
-
 type SearchInWorkspaceModalProps = {
     close: () => void;
     isOpen: boolean;
@@ -85,49 +102,43 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const router = useRouter();
   const { pages } = usePages();
-  const { bounties } = useBounties();
+  const [space] = useCurrentSpace();
   const [isSearching, setIsSearching] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [options, setOptions] = useState<SearchResultItem[]>([]);
 
-  const pageList = Object.values(pages);
+  const throttledSearch = throttle(getSearchResults, 200);
 
-  const getPagePath = (page: PageMeta) => {
-    if (!pages) return '';
+  useEffect(() => {
 
-    const pathElements: string[] = [];
-    let currentPage: PageMeta | undefined = { ...page };
-
-    while (currentPage && currentPage.parentId) {
-      const pageId: string = currentPage.parentId;
-      currentPage = pageList.find(p => p && p.id === pageId);
-      if (currentPage) {
-        pathElements.unshift(currentPage.title);
-      }
+    if (!space) {
+      return;
     }
 
-    return pathElements.join(' / ');
-  };
+    if (inputValue.replace(/\s/, '') === '') {
+      setOptions([]);
+      return undefined;
+    }
 
-  const pageSearchResultItems: SearchResultItem[] = pageList
-    .filter((page): page is PageMeta => !!page)
-    .map(page => ({
-      name: page.title || 'Untitled',
-      path: getPagePath(page),
-      link: `/${router.query.domain}/${page.path}`,
-      type: ResultType.page,
-      id: page.id
-    }));
+    const allPages = Object.values(pages).filter(isTruthy);
 
-  const bountySearchResultItems: SearchResultItem[] = bounties.map(bounty => ({
-    name: bounty.page?.title || '',
-    link: `/${router.query.domain}/${bounty.page?.id}`,
-    type: ResultType.bounty,
-    id: bounty.id
-  }));
+    throttledSearch({
+      query: inputValue,
+      spaceId: space.id,
+      spaceDomain: router.query.domain as string,
+      allPages
+    })
+      ?.then((results) => {
+        setOptions(results);
+      })
+      .catch(err => {
+        log.error('Error searching for pages', err);
+      });
 
-  const searchResultItems: SearchResultItem[] = [
-    ...pageSearchResultItems,
-    ...bountySearchResultItems
-  ].sort((item1, item2) => item1.name > item2.name ? 1 : -1);
+    return () => {
+      throttledSearch.cancel();
+    };
+  }, [!!space, inputValue]);
 
   return (
     <Modal
@@ -138,35 +149,30 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
       size='large'
     >
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
-      <Autocomplete
-        options={searchResultItems}
+      <StyledAutocomplete
+        options={options}
         noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
         fullWidth
         onInputChange={(_event, newInputValue) => {
           setIsSearching(!!newInputValue);
+          setInputValue(newInputValue);
         }}
-        onChange={(_e, item) => router.push(item.link)}
+        onChange={(_e, item) => {
+          if (item) {
+            router.push((item as SearchResultItem).link);
+          }
+        }}
         getOptionLabel={option => typeof option === 'object' ? option.name : option}
         open={isSearching}
         disablePortal
         disableClearable
-        sx={{
-          '& .MuiInput-root': {
-            marginTop: '0px',
-            paddingRight: '0px !important'
-          },
-          '& label': {
-            transform: 'inherit'
-          },
-          '& .MuiAutocomplete-endAdornment': {
-            display: 'none'
-          }
-        }}
+        // disable filtering when doing async search (see MUI docs)
+        filterOptions={x => x}
         PopperComponent={StyledPopper}
-        renderOption={(listItemProps, option: SearchResultItem, { inputValue }) => {
-          const matches = match(option.name, inputValue, { insideWords: true, findAllOccurrences: true });
+        renderOption={(listItemProps, option: SearchResultItem, state) => {
+          const matches = match(option.name, state.inputValue, { insideWords: true, findAllOccurrences: true });
           const parts = parse(option.name, matches);
 
           return (
@@ -219,6 +225,34 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
       />
     </Modal>
   );
+}
+
+function getSearchResults (params: { spaceDomain: string, spaceId: string, query: string, allPages: PageMeta[] }): Promise<SearchResultItem[]> {
+  return charmClient.pages.searchPages(params.spaceId, params.query)
+    .then(pages => pages.map(page => ({
+      name: page.title || 'Untitled',
+      path: getPagePath(page, params.allPages),
+      link: `/${params.spaceDomain}/${page.path}`,
+      type: ResultType.page,
+      id: page.id
+    }))
+      .sort((item1, item2) => item1.name > item2.name ? 1 : -1));
+}
+
+function getPagePath (page: PageMeta, pageList: PageMeta[] = []): string {
+
+  const pathElements: string[] = [];
+  let currentPage: PageMeta | undefined = { ...page };
+
+  while (currentPage && currentPage.parentId) {
+    const pageId: string = currentPage.parentId;
+    currentPage = pageList.find(p => p && p.id === pageId);
+    if (currentPage) {
+      pathElements.unshift(currentPage.title);
+    }
+  }
+
+  return pathElements.join(' / ');
 }
 
 export default SearchInWorkspaceModal;

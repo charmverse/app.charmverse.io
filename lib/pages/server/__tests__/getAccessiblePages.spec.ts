@@ -148,4 +148,17 @@ describe('getAccessiblePages', () => {
 
   });
 
+  it('Should return a page based on search', async () => {
+
+    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    // Page without any permission
+    const pageToFind = await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Momma' });
+    await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Papa' });
+
+    const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
+    expect(pages.map(p => p.id)).toEqual([pageToFind.id]);
+
+  });
+
 });
