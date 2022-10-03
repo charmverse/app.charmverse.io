@@ -14,13 +14,31 @@ import { v4 } from 'uuid';
 import { Wallet } from 'ethers';
 import { readFileSync } from 'fs';
 import { createPage } from 'testing/setupDatabase';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 
 export { baseUrl } from 'testing/mockApiCall';
 
-export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
-  walletAddress?: string; }): Promise<LoggedInUser> {
+export async function mockAuthSig ({ address, page }: { address: string, page: BrowserPage }): Promise<AuthSig> {
 
-  return browserPage.request.post(`${baseUrl}/api/profile`, {
+  await page.waitForURL(baseUrl);
+
+  const authSig = {
+    address,
+    derivedVia: 'charmverse-mock',
+    sig: 'signature',
+    signedMessage: 'signed message'
+  };
+
+  // Approach to setting localstorage found here https://github.com/microsoft/playwright/issues/6258#issuecomment-824314544
+  await page.evaluate(`window.localStorage.setItem('charm.v1.wallet-auth-sig-${address}', '${JSON.stringify(authSig)}')`);
+
+  return authSig;
+}
+
+export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
+  walletAddress: string; }): Promise<LoggedInUser> {
+
+  return browserPage.request.post(`${baseUrl}/api/profile/dev`, {
     data: {
       address: walletAddress
     }
@@ -215,9 +233,10 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
 
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
 // optionally pass in a context object to be available to the callback
-export async function mockWeb3<T = any> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
+export async function mockWeb3<T> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
   callback ||= context as (context: T) => void;
   context = typeof context === 'function' ? {} as T : context;
+
   await page.addInitScript({
     content:
       `${readFileSync(
@@ -234,6 +253,8 @@ export async function mockWeb3<T = any> (page: BrowserPage, context: T | ((conte
         window.ethereum.send = (method, opts) => {
           return window.ethereum.request({ method }, opts);
         };
+
+
 
       `
       + `(${callback.toString()})(${JSON.stringify(context)});`

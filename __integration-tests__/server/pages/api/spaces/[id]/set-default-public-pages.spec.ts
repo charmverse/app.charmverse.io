@@ -10,7 +10,7 @@ describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly crea
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const userCookie = await loginUser(adminUser.wallets[0].address);
+    const userCookie = await loginUser(adminUser.id);
 
     const updatedSpace = (await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-default-public-pages`)

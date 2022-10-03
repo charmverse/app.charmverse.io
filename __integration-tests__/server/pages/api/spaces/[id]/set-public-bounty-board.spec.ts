@@ -23,7 +23,7 @@ beforeAll(async () => {
   });
 
   nonAdminUserCookie = await loginUser(nonAdminUser.wallets[0].address);
-  adminUserCookie = await loginUser(adminUser.wallets[0].address);
+  adminUserCookie = await loginUser(adminUser.id);
 
 });
 

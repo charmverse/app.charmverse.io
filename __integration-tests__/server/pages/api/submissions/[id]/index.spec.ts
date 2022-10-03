@@ -2,7 +2,7 @@
 import type { Application, Space, User } from '@prisma/client';
 import request from 'supertest';
 import { generateSubmissionContent } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import type { LoggedInUser } from 'models';
 
@@ -15,11 +15,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('PUT /api/submissions/{submissionId} - update a submission', () => {

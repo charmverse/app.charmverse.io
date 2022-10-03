@@ -18,20 +18,12 @@ beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
   nonAdminUser = generated1.user;
   nonAdminUserSpace = generated1.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const generated2 = await generateUserAndSpaceWithApiToken(undefined, true);
   adminUser = generated2.user;
   adminUserSpace = generated2.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page permission level for a space', () => {

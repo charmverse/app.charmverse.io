@@ -2,9 +2,10 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { areEqual as areFilterClausesEqual, FilterClause } from '../../blocks/filterClause';
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { FilterClause } from '../../blocks/filterClause';
+import { areEqual as areFilterClausesEqual } from '../../blocks/filterClause';
 import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
@@ -16,10 +17,10 @@ import MenuWrapper from '../../widgets/menuWrapper';
 import FilterValue from './filterValue';
 
 type Props = {
-    board: Board
-    view: BoardView
-    conditionClicked: (optionId: string, filter: FilterClause) => void
-    filter: FilterClause
+    board: Board;
+    view: BoardView;
+    conditionClicked: (optionId: string, filter: FilterClause) => void;
+    filter: FilterClause;
 }
 
 function FilterEntry (props: Props): JSX.Element {
@@ -85,11 +86,11 @@ function FilterEntry (props: Props): JSX.Element {
       </MenuWrapper>
       {template
                 && (
-                <FilterValue
-                  filter={filter}
-                  template={template}
-                  view={view}
-                />
+                  <FilterValue
+                    filter={filter}
+                    template={template}
+                    view={view}
+                  />
                 )}
       <div className='octo-spacer' />
       <Button

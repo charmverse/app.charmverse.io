@@ -53,7 +53,7 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
   it('should copy a proposal template if the user is an admin, even if the space has no createVote permissions and respond with 201', async () => {
 
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     await prisma.spacePermission.deleteMany({
       where: {

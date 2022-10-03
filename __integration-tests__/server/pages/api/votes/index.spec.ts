@@ -32,7 +32,7 @@ beforeAll(async () => {
     spaceId: space.id
   });
 
-  userCookie = await loginUser(user.wallets[0].address);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {
@@ -167,7 +167,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const { page: resultPage } = await createProposal({
       createdBy: author.id,

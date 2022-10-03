@@ -61,7 +61,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminUserCookie = await loginUser(adminUser.wallets[0].address);
+    const adminUserCookie = await loginUser(adminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -87,7 +87,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const userCookie = await loginUser(user.wallets[0].address);
+    const userCookie = await loginUser(user.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

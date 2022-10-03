@@ -28,11 +28,13 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { validate } from 'uuid';
+import { lowerCaseEqual } from '../../lib/utilities/strings';
 import PublicBountiesPage from './PublicBountiesPage';
 
 const LayoutContainer = styled.div`
@@ -44,6 +46,7 @@ export default function PublicPage () {
 
   const { account } = useWeb3React();
   const { setUser } = useUser();
+  const { walletAuthSignature } = useWeb3AuthSig();
 
   const theme = useTheme();
   const colorMode = useColorMode();
@@ -117,13 +120,13 @@ export default function PublicPage () {
   }, []);
 
   useEffect(() => {
-    if (account) {
-      charmClient.login(account)
+    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.address)) {
+      charmClient.login({ address: account, walletSignature: walletAuthSignature })
         .then(loggedInUser => {
           setUser(loggedInUser);
         })
         .catch(() => {
-          charmClient.createUser({ address: account })
+          charmClient.createUser({ address: account, walletSignature: walletAuthSignature })
             .then(loggedInUser => {
               setUser(loggedInUser);
             }).catch(() => {

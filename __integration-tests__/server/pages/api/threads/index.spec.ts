@@ -26,7 +26,7 @@ beforeAll(async () => {
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser.wallets[0].address);
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('POST /api/threads - create a thread', () => {

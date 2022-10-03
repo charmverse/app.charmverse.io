@@ -12,7 +12,7 @@ import { prisma } from 'db';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import type { DiscordServerRole } from 'lib/discord/interface';
-import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
@@ -84,7 +84,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let avatar: string | null = null;
   if (avatarUrl) {
     try {
-      ({ url: avatar } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: avatarUrl }), url: avatarUrl }));
+      ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
     }
     catch (err) {
       log.warn('Error while uploading avatar to S3', err);

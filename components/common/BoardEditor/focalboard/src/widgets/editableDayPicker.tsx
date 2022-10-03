@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { DateTime } from 'luxon';
 
@@ -8,9 +9,9 @@ import { Utils } from '../utils';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
-    className: string
-    value: string
-    onChange: (value: string | undefined) => void
+    className: string;
+    value: string;
+    onChange: (value: string | undefined) => void;
 }
 
 const parseValue = (value: string): Date | undefined => {

@@ -10,7 +10,7 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const userCookie = await loginUser(adminUser.wallets[0].address);
+    const userCookie = await loginUser(adminUser.id);
 
     const update: Pick<SpacePermissionConfigurationUpdate, 'permissionConfigurationMode'> = {
       permissionConfigurationMode: 'readOnly'

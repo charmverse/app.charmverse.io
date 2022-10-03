@@ -30,7 +30,7 @@ beforeAll(async () => {
     userVotes: ['3']
   });
 
-  userCookie = await loginUser(user.wallets[0].address);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes/[id] - Get a single vote', () => {
@@ -73,7 +73,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 
   it('Should update vote if the user is an admin of the page space and respond 200', async () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -144,7 +144,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
 
   it('Should update vote if the user is an admin of the page space and respond 200', async () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id

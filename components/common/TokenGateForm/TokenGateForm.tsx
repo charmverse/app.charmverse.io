@@ -2,18 +2,17 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
+import type { AuthSig } from '../../../lib/blockchain/interfaces';
 import TokenGateOption from './TokenGateOption';
 
 interface Props {
@@ -24,10 +23,9 @@ interface Props {
 
 export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel }: Props) {
 
-  const { account, chainId } = useWeb3React();
   const { showMessage } = useSnackbar();
   const [spaces, setSpaces] = useSpaces();
-  const { user, setUser } = useUser();
+  const { user, loginFromWeb3Account, refreshUserWithWeb3Account } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -58,15 +56,16 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
   }, [spaceDomain]);
 
-  async function generateAuthSignature () {
+  async function evaluateEligibility (authSig: AuthSig) {
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
 
-    const chain = getLitChainFromChainId(chainId);
+    if (!user) {
+      await loginFromWeb3Account();
+    }
 
     try {
-      const authSig = await checkAndSignAuthMessage({ chain });
       const verifyResult = await charmClient.evalueTokenGateEligibility({
         authSig,
         spaceIdOrDomain: spaceDomain
@@ -85,6 +84,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   async function onSubmit () {
     setJoiningSpace(true);
+
     try {
       await charmClient.verifyTokenGate({
         commit: true,
@@ -98,19 +98,16 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
+
+      await refreshUserWithWeb3Account();
+
       const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
-
-      // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login(account as string);
-
-      setUser(refreshedProfile);
 
       // Refresh spaces as otherwise the redirect will not work
       if (!spaceExists) {
         setSpaces([...spaces, tokenGateResult?.space as Space]);
       }
       onSuccess(tokenGateResult?.space as Space);
-      // onSuccess(tokenGateResult?.space as Space);
     }
     catch (err: any) {
       showMessage(err?.message ?? (err ?? 'An unknown error occurred'), 'error');
@@ -178,9 +175,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid item>
         {
           !tokenGateResult?.canJoinSpace ? (
-            <PrimaryButton disabled={verifyingGates} size='large' fullWidth type='submit' onClick={generateAuthSignature}>
-              Verify wallet
-            </PrimaryButton>
+            <WalletSign signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
           ) : (
             <PrimaryButton
               size='large'

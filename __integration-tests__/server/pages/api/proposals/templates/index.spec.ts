@@ -22,7 +22,7 @@ beforeAll(async () => {
 describe('POST /api/proposals/templates - Create a proposal from a template', () => {
   it('should create a proposal template if the user is a space admin and respond with 201', async () => {
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const proposalTemplate = (await request(baseUrl)
       .post('/api/proposals/templates')

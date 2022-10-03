@@ -6,7 +6,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { FilterClause } from '../../blocks/filterClause';
+import type { FilterClause } from '../../blocks/filterClause';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 

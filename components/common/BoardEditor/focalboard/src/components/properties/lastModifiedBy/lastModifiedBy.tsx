@@ -2,7 +2,7 @@
 import { useContributors } from 'hooks/useContributors';
 
 type Props = {
-  updatedBy: string
+  updatedBy: string;
 }
 
 function LastModifiedBy (props: Props): JSX.Element {

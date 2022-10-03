@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 
 import messages_ca from '../i18n/ca.json';
 import messages_de from '../i18n/de.json';
@@ -21,7 +22,7 @@ import { UserSettings } from './userSettings';
 
 const supportedLanguages = ['ca', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'oc', 'pt-br', 'ru', 'sv', 'tr', 'zh-cn', 'zh-tw'];
 
-export function getMessages (lang: string): {[key: string]: string} {
+export function getMessages (lang: string): { [key: string]: string } {
   switch (lang) {
     case 'ca':
       return messages_ca;
@@ -57,8 +58,9 @@ export function getMessages (lang: string): {[key: string]: string} {
       return messages_zhHans;
     case 'zh-tw':
       return messages_zhHans;
+    default:
+      return messages_en;
   }
-  return messages_en;
 }
 export function getCurrentLanguage (): string {
   let lang = UserSettings.language;

@@ -22,7 +22,7 @@ beforeAll(async () => {
 describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal template', () => {
   it('should delete a proposal template if the user is a space admin and respond with 200', async () => {
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,

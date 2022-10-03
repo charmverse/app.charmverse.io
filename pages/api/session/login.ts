@@ -6,15 +6,23 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { LoggedInUser } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import type { AuthSig } from 'lib/blockchain/interfaces';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { getAddress, toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
+import { SiweMessage } from 'lit-siwe';
+import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireKeys(['address'], 'body'))
+  .use(requireWalletSignature)
   .post(login);
 
-async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
-  const { address } = req.body;
+async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+  const { address } = req.body as Web3LoginRequest;
+
   const user = await prisma.user.findFirst({
     where: {
       wallets: {

@@ -20,21 +20,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('PUT /api/threads/{id} - update a comment', () => {
@@ -121,11 +113,7 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       isAdmin: false
     });
 
-    const otherAdminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: otherAdminUser.wallets[0].address
-      })).headers['set-cookie'][0];
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',

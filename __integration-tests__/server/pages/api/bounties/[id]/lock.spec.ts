@@ -16,11 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('POST /api/bounties/{submissionId}/lock - close a bounty to new submissions and applications', () => {
@@ -62,7 +58,7 @@ describe('POST /api/bounties/{submissionId}/lock - close a bounty to new submiss
       isAdmin: true
     });
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

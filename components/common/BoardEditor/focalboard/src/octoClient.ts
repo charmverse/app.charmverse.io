@@ -1,11 +1,12 @@
-import { Block, BlockPatch } from './blocks/block';
-import { ISharing } from './blocks/sharing';
+import type { Block } from './blocks/block';
+import { BlockPatch } from './blocks/block';
+import type { ISharing } from './blocks/sharing';
 import { OctoUtils } from './octoUtils';
-import { IUser } from './user';
+import type { IUser } from './user';
 import { Utils } from './utils';
-import { ClientConfig } from './config/clientConfig';
+import type { ClientConfig } from './config/clientConfig';
 import { UserSettings } from './userSettings';
-import { Subscription } from './wsclient';
+import type { Subscription } from './wsclient';
 
 //
 // OctoClient is the client interface to the server APIs
@@ -62,7 +63,7 @@ class OctoClient {
     return json;
   }
 
-  async register (email: string, username: string, password: string, token?: string): Promise<{code: number, json: {error?: string}}> {
+  async register (email: string, username: string, password: string, token?: string): Promise<{ code: number, json: { error?: string } }> {
     const path = '/api/focalboard/register';
     const body = JSON.stringify({ email, username, password, token });
     const response = await fetch(this.getBaseURL() + path, {
@@ -70,11 +71,11 @@ class OctoClient {
       headers: this.headers(),
       body
     });
-    const json = (await this.getJson(response, {})) as {error?: string};
+    const json = (await this.getJson(response, {})) as { error?: string };
     return { code: response.status, json };
   }
 
-  async changePassword (userId: string, oldPassword: string, newPassword: string): Promise<{code: number, json: {error?: string}}> {
+  async changePassword (userId: string, oldPassword: string, newPassword: string): Promise<{ code: number, json: { error?: string } }> {
     const path = `/api/focalboard/users/${encodeURIComponent(userId)}/changepassword`;
     const body = JSON.stringify({ oldPassword, newPassword });
     const response = await fetch(this.getBaseURL() + path, {
@@ -82,7 +83,7 @@ class OctoClient {
       headers: this.headers(),
       body
     });
-    const json = (await this.getJson(response, {})) as {error?: string};
+    const json = (await this.getJson(response, {})) as { error?: string };
     return { code: response.status, json };
   }
 
@@ -128,7 +129,8 @@ class OctoClient {
     return user;
   }
 
-  async getSubtree (rootId?: string, levels = 2, workspaceID?: string): Promise<Block[]> {
+  async getSubtree (rootId?: string, levels?: number, workspaceID?: string): Promise<Block[]> {
+    levels ||= 2;
     let path = `${this.workspacePath(workspaceID)}/blocks/${encodeURIComponent(rootId || '')}/subtree?l=${levels}`;
     const readToken = Utils.getReadToken();
     if (readToken) {

@@ -14,7 +14,7 @@ beforeAll(async () => {
   const { space: generatedSpace, user: generatedUser } = await generateUserAndSpaceWithApiToken(undefined, true);
   user = generatedUser;
   space = generatedSpace;
-  userCookie = await loginUser(user.wallets[0].address);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/spaces/[id]/votes - Get all the votes for a specific space', () => {

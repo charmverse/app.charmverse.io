@@ -8,7 +8,7 @@ import { act } from 'react-dom/test-utils';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import { CommentBlock } from '../../blocks/commentBlock';
+import type { CommentBlock } from '../../blocks/commentBlock';
 
 import { mockDOM, wrapIntl } from '../../testUtils';
 

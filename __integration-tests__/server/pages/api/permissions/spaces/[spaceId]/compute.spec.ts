@@ -34,7 +34,7 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     // No need to assign permissions
     const computedPermissions = (await request(baseUrl)

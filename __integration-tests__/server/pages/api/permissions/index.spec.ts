@@ -16,7 +16,7 @@ beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, false);
   user = generated.user;
   space = generated.space;
-  userCookie = await loginUser(user.wallets[0].address);
+  userCookie = await loginUser(user.id);
   role = await generateRole({
     createdBy: user.id,
     spaceId: space.id

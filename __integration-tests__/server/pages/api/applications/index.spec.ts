@@ -19,11 +19,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('GET /api/applications - retrieve all applications for a bounty', () => {

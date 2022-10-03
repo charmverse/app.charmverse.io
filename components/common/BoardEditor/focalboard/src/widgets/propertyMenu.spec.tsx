@@ -10,7 +10,7 @@ import PropertyMenu from './propertyMenu';
 describe('widgets/PropertyMenu', () => {
   beforeEach(() => {
     // Quick fix to disregard console error when unmounting a component
-    console.error = jest.fn();
+
     document.execCommand = jest.fn();
   });
 

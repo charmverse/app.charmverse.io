@@ -1,14 +1,14 @@
 export type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 
 type DragAndDropRearrangeData = {
-    contentOrder: (string | string[])[],
-    srcBlockId: string,
-    srcBlockX: number,
-    srcBlockY: number,
-    dstBlockX: number,
-    dstBlockY: number,
-    dstBlockId: string,
-    moveTo: Position,
+    contentOrder: (string | string[])[];
+    srcBlockId: string;
+    srcBlockX: number;
+    srcBlockY: number;
+    dstBlockX: number;
+    dstBlockY: number;
+    dstBlockId: string;
+    moveTo: Position;
 }
 
 export const dragAndDropRearrange = (data: DragAndDropRearrangeData): (string | string[])[] => {

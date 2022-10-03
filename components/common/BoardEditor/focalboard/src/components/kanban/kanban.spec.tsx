@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import { mutator } from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../../testUtils';
@@ -73,7 +73,6 @@ describe('src/component/kanban/kanban', () => {
   };
   const store = mockStateStore([], state);
   beforeAll(() => {
-    console.error = jest.fn();
     mockDOM();
   });
   beforeEach(jest.resetAllMocks);

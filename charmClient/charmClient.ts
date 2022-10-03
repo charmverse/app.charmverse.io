@@ -10,6 +10,7 @@ import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -64,9 +65,10 @@ class CharmClient {
 
   tasks = new TasksApi();
 
-  async login (address: string) {
+  async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
-      address
+      address,
+      walletSignature
     });
     return user;
   }
@@ -83,9 +85,10 @@ class CharmClient {
     return http.GET<PublicUser>(`/api/public/profile/${path}`);
   }
 
-  createUser ({ address }: { address: string }) {
+  createUser ({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
-      address
+      address,
+      walletSignature
     });
   }
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import type { LoggedInUser } from 'models';
 
@@ -14,11 +14,7 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 });
@@ -47,11 +43,7 @@ describe('PUT /api/comments/{id} - update a comment', () => {
       isAdmin: true
     });
 
-    const otherAdminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: otherAdminUser.wallets[0].address
-      })).headers['set-cookie'][0];
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
@@ -92,11 +84,7 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
       isAdmin: true
     });
 
-    const otherAdminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: otherAdminUser.wallets[0].address
-      })).headers['set-cookie'][0];
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',

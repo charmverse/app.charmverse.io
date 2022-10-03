@@ -27,7 +27,7 @@ beforeAll(async () => {
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser.wallets[0].address);
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {

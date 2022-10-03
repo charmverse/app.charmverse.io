@@ -21,21 +21,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.wallets[0].address
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {

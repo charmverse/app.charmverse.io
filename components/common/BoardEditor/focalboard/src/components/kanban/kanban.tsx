@@ -1,7 +1,8 @@
 /* eslint-disable max-lines */
 // import Button from '../../widgets/buttons/button'
 import React, { useCallback, useState } from 'react';
-import { FormattedMessage, injectIntl, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
 
@@ -10,13 +11,14 @@ import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
-import mutator, { BlockChange } from '../../mutator';
+import { isTouchScreen } from 'lib/browser';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import type { BlockChange } from '../../mutator';
+import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 // import Button from '../../widgets/buttons/button'
-import { isTouchScreen } from 'lib/browser';
 import { Constants } from '../../constants';
 
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
@@ -28,10 +30,10 @@ import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 
 type Position = 'left' | 'right' | 'above' | 'below' | 'aboveRow' | 'belowRow'
 interface NewGroupTextFieldProps {
-  onClick: (groupName: string) => void
+  onClick: (groupName: string) => void;
 }
 
-function NewGroupTextField(props: NewGroupTextFieldProps) {
+function NewGroupTextField (props: NewGroupTextFieldProps) {
   const { onClick } = props;
   const [groupName, setGroupName] = useState('');
   return (
@@ -61,27 +63,29 @@ function NewGroupTextField(props: NewGroupTextFieldProps) {
 }
 
 type Props = {
-  board: Board
-  activeView: BoardView
-  cards: Card[]
-  groupByProperty?: IPropertyTemplate
-  visibleGroups: BoardGroup[]
-  hiddenGroups: BoardGroup[]
-  selectedCardIds: string[]
-  intl: IntlShape
-  readOnly: boolean
-  onCardClicked: (e: React.MouseEvent, card: Card) => void
-  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>
-  showCard: (cardId?: string) => void
+  board: Board;
+  activeView: BoardView;
+  cards: Card[];
+  groupByProperty?: IPropertyTemplate;
+  visibleGroups: BoardGroup[];
+  hiddenGroups: BoardGroup[];
+  selectedCardIds: string[];
+  intl: IntlShape;
+  readOnly: boolean;
+  onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
+  showCard: (cardId?: string) => void;
 }
 
-function Kanban(props: Props) {
+function Kanban (props: Props) {
   const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
 
-  const visiblePropertyTemplates = activeView.fields.visiblePropertyIds.map((id) => board.fields.cardProperties.find((t) => t.id === id)).filter((i) => i) as IPropertyTemplate[];
+  const visiblePropertyTemplates = activeView.fields.visiblePropertyIds.map(
+    (id) => board.fields.cardProperties.find((t) => t.id === id)
+  ).filter((i) => i) as IPropertyTemplate[];
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId);
 
@@ -313,11 +317,9 @@ function Kanban(props: Props) {
             >
               {group.cards.map((card) => (
                 <KanbanCard
-
                   card={card}
                   board={board}
                   visiblePropertyTemplates={visiblePropertyTemplates}
-                  visibleBadges={visibleBadges}
                   key={card.id}
                   readOnly={props.readOnly}
                   isSelected={props.selectedCardIds.includes(card.id)}

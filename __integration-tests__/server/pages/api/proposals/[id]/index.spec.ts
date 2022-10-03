@@ -25,17 +25,9 @@ beforeAll(async () => {
   reviewer = generated2.user;
   space = generated1.space;
 
-  authorCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: author.wallets[0].address
-    })).headers['set-cookie'][0];
+  authorCookie = await loginUser(author.id);
 
-  reviewerCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: reviewer.wallets[0].address
-    })).headers['set-cookie'][0];
+  reviewerCookie = await loginUser(reviewer.id);
 
   await prisma.spaceRole.create({
     data: {
@@ -122,7 +114,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal if the user is an author', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const role = await generateRole({
       spaceId: adminSpace.id,
@@ -160,7 +152,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal if the user is an admin', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const proposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
@@ -188,7 +180,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
   it('should update a proposal template if the user is a space admin', async () => {
 
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const role = await generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
 

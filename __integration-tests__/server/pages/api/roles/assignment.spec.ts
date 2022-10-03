@@ -25,7 +25,7 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
       userId: extraUser.id
     };
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const updatedRole = (await request(baseUrl)
       .post('/api/roles/assignment')
@@ -88,7 +88,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     await assignRole(roleAssignment);
 
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     const updatedRole = (await request(baseUrl)
       .delete('/api/roles/assignment')

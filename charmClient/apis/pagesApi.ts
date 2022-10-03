@@ -9,7 +9,12 @@ export interface UpdateProfileItemRequest {
 export class PagesApi {
   getPages (spaceId: string) {
     // meta=true - TEMP param to keep backward compatibility with old clients
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages?meta=true`);
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true });
+  }
+
+  searchPages (spaceId: string, search: string) {
+    // meta=true - TEMP param to keep backward compatibility with old clients
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, search });
   }
 
   getPage (pageIdOrPath: string, spaceId?: string) {
@@ -21,7 +26,7 @@ export class PagesApi {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  getPageDetails (pageIdOrPath: string, spaceId?:string) {
+  getPageDetails (pageIdOrPath: string, spaceId?: string) {
     return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details?spaceId=${spaceId}`);
   }
 }

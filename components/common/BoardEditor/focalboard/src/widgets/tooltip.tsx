@@ -1,9 +1,9 @@
 import React from 'react';
 
 type Props = {
-    title: string
-    children: React.ReactNode
-    placement?: 'top'|'left'|'right'|'bottom'
+    title: string;
+    children: React.ReactNode;
+    placement?: 'top'|'left'|'right'|'bottom';
 }
 
 // Adds tooltip div over children elements, the popup will

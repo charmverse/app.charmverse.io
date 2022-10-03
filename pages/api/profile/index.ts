@@ -10,11 +10,12 @@ import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .post(createUser)
+  .post(requireWalletSignature, createUser)
   .use(requireUser)
   .get(getUser)
   .put(updateUser);

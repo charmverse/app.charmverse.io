@@ -19,17 +19,9 @@ beforeAll(async () => {
   reviewer = generated2.user;
   space = generated1.space;
 
-  authorCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: author.wallets[0].address
-    })).headers['set-cookie'][0];
+  authorCookie = await loginUser(author.id);
 
-  reviewerCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: reviewer.wallets[0].address
-    })).headers['set-cookie'][0];
+  reviewerCookie = await loginUser(reviewer.id);
 
   await prisma.spaceRole.create({
     data: {
@@ -50,7 +42,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     });
 
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser.wallets[0].address);
+    const adminCookie = await loginUser(adminUser.id);
 
     (await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)

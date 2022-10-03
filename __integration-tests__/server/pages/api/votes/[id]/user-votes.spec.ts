@@ -27,7 +27,7 @@ beforeAll(async () => {
     userVotes: ['3']
   });
 
-  userCookie = await loginUser(user.wallets[0].address);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes/[id]/user-votes - Get all the user votes casted for an individual vote', () => {
