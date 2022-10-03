@@ -39,14 +39,14 @@ APP_STAGING_DIR="/var/app/staging/"              # this is where amazon puts app
 
 
 # Only do this if there are mustash template secrets in the .env file
-if grep "{{resolve:secretsmanager:" $APP_STAGING_DIR/.env; then 
+if grep "{{pull:secretsmanager:" $APP_STAGING_DIR/.env; then 
 
     # generate a new file without the mustash template holders
-    grep -v "resolve:secretsmanager" $APP_STAGING_DIR/.env > $APP_STAGING_DIR/.env.new
+    grep -v "pull:secretsmanager" $APP_STAGING_DIR/.env > $APP_STAGING_DIR/.env.new
 
-    pattern='^(.+):.*resolve:secretsmanager:(.*):SecretString:([^:]+)}}'
-    grep "resolve:secretsmanager" $APP_STAGING_DIR/.env | while read -r line; do
-    #grep "resolve:secretsmanager" 00_env_vars.config | while read -r line; do
+    pattern='^(.+):.*pull:secretsmanager:(.*):SecretString:([^:]+)}}'
+    grep "pull:secretsmanager" $APP_STAGING_DIR/.env | while read -r line; do
+    #grep "pull:secretsmanager" 00_env_vars.config | while read -r line; do
         [[ $line =~ $pattern ]] && { 
             export env_var_name=${BASH_REMATCH[1]}
             secret_name=${BASH_REMATCH[2]}
