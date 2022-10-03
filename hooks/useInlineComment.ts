@@ -1,8 +1,10 @@
 import type { Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
+
 import { extractTextFromSelection } from 'lib/inline-comments/extractTextFromSelection';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
+
 import { useContributors } from './useContributors';
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';

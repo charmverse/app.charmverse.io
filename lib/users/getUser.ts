@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import type { LoggedInUser } from 'models';

@@ -1,6 +1,6 @@
-import type { ComponentProps } from 'react';
 import { Chip } from '@mui/material';
 import type { VoteStatus } from '@prisma/client';
+import type { ComponentProps } from 'react';
 
 const VoteStatusConfig: Record<VoteStatus | 'Draft', { label: string, color: ComponentProps<typeof Chip>['color'] }> = {
   Cancelled: {

@@ -1,11 +1,11 @@
 
-import { prisma } from 'db';
 import type { Role, Space, SpaceRole, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { createUserFromWallet } from 'lib/users/createUser';
 
+import { prisma } from 'db';
+import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user1: LoggedInUser;
 let user2: LoggedInUser;

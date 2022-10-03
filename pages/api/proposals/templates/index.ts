@@ -1,11 +1,12 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateProposalTemplateInput } from 'lib/templates/proposals/createProposalTemplate';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

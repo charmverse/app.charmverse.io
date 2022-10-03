@@ -1,5 +1,9 @@
 import HowToVote from '@mui/icons-material/HowToVote';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import { DateTime } from 'luxon';
+import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { VoteDetailProps } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
@@ -9,10 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { DateTime } from 'luxon';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
-import { useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined;

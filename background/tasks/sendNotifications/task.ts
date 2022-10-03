@@ -1,6 +1,7 @@
 
 import log from 'lib/log';
 import { count } from 'lib/metrics';
+
 import { sendUserNotifications } from './sendNotifications';
 
 export default async function task () {

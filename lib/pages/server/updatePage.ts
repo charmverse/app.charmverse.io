@@ -1,9 +1,10 @@
-import { prisma } from 'db';
 import type { PageType, Prisma } from '@prisma/client';
-import type { IPageWithPermissions } from 'lib/pages/server';
+
+import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import type { PageContent } from 'models';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import type { IPageWithPermissions } from 'lib/pages/server';
+import type { PageContent } from 'models';
 
 type CurrentPageData = {
   id: string;

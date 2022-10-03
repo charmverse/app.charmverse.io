@@ -1,9 +1,10 @@
-import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 import type { Page, Space, Vote } from '@prisma/client';
-import type { LoggedInUser } from 'models';
+import request from 'supertest';
 import { v4 } from 'uuid';
+
+import type { LoggedInUser } from 'models';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
 let space: Space;

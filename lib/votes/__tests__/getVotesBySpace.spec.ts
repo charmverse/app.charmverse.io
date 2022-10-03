@@ -1,5 +1,6 @@
 import { upsertPermission } from 'lib/permissions/pages';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { getVotesBySpace } from '../getVotesBySpace';
 
 describe('getVotesBySpace', () => {

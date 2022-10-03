@@ -1,11 +1,11 @@
 import type { IntlShape } from 'react-intl';
 
-import type { BoardView } from './blocks/boardView';
 import type { Board, IPropertyTemplate } from './blocks/board';
+import type { BoardView } from './blocks/boardView';
 import type { Card } from './blocks/card';
 import { OctoUtils } from './octoUtils';
-import { Utils } from './utils';
 import type { IAppWindow } from './types';
+import { Utils } from './utils';
 
 declare let window: IAppWindow;
 

@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
+import request from 'supertest';
+import { v4 } from 'uuid';
+
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import type { IPagePermissionToCreate, IPagePermissionWithSource } from 'lib/permissions/pages';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import type { LoggedInUser } from 'models';
 
 let user: LoggedInUser;
 let space: Space;

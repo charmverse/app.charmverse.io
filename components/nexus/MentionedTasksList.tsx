@@ -3,15 +3,16 @@ import BountyIcon from '@mui/icons-material/RequestPage';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Alert, Box, Card, Grid, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { useEffect } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import type { MentionedTask } from 'lib/mentions/interfaces';
-import { DateTime } from 'luxon';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
-import { useEffect } from 'react';
-import type { KeyedMutator } from 'swr';
 
 function MentionedTaskRow (
   {

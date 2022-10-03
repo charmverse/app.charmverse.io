@@ -1,10 +1,11 @@
 /* eslint-disable no-plusplus */
+import { DateTime } from 'luxon';
 import { marked } from 'marked';
 import type { IntlShape } from 'react-intl';
-import { DateTime } from 'luxon';
 import { v4 as uuid } from 'uuid';
 
 import log from 'lib/log';
+
 import type { Block } from './blocks/block';
 import { createBoard } from './blocks/board';
 import { createBoardView } from './blocks/boardView';

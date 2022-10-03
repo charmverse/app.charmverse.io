@@ -1,28 +1,31 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import type { ButtonProps, SxProps } from '@mui/material';
-import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import Button from 'components/common/Button';
-import type { CommentWithUser } from 'lib/comments/interfaces';
-import UserDisplay from 'components/common/UserDisplay';
-import { usePages } from 'hooks/usePages';
-import { useThreads } from 'hooks/useThreads';
-import { useUser } from 'hooks/useUser';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import type { MouseEvent } from 'react';
-import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import type { PageContent } from 'models';
-import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
-import { useEditorViewContext } from '@bangle.dev/react';
-import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
+import type { ButtonProps, SxProps } from '@mui/material';
 import type { BoxProps } from '@mui/system';
+import { DateTime } from 'luxon';
+import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import type { MouseEvent } from 'react';
+import { forwardRef, memo, useRef, useEffect, useState } from 'react';
+
+import Button from 'components/common/Button';
+import UserDisplay from 'components/common/UserDisplay';
+import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
+import type { CommentWithUser } from 'lib/comments/interfaces';
+import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { PageContent } from 'models';
+
 import InlineCharmEditor from '../InlineCharmEditor';
+
 import { scrollToThread } from './inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`

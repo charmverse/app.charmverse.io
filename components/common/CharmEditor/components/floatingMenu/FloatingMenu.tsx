@@ -1,7 +1,9 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
+
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
+
 import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';

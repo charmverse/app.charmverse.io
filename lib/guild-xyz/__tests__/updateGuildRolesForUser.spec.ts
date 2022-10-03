@@ -1,7 +1,8 @@
 
-import { prisma } from 'db';
 import type { Role, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 
 let user: User;

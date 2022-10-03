@@ -1,7 +1,6 @@
 
-import type { IntlShape } from 'react-intl';
-
 import { DateUtils } from 'react-day-picker';
+import type { IntlShape } from 'react-intl';
 
 import type { Block } from './blocks/block';
 import { createBlock } from './blocks/block';
@@ -11,12 +10,12 @@ import type { BoardView } from './blocks/boardView';
 import { createBoardView } from './blocks/boardView';
 import type { Card } from './blocks/card';
 import { createCard } from './blocks/card';
-import { createCommentBlock } from './blocks/commentBlock';
 import { createCheckboxBlock } from './blocks/checkboxBlock';
+import { createCommentBlock } from './blocks/commentBlock';
 import { createDividerBlock } from './blocks/dividerBlock';
+import type { FilterCondition } from './blocks/filterClause';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
-import type { FilterCondition } from './blocks/filterClause';
 import { Utils } from './utils';
 
 class OctoUtils {

@@ -1,11 +1,10 @@
 
+import LinkIcon from '@mui/icons-material/Link';
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import LinkIcon from '@mui/icons-material/Link';
-import Editable from '../../../widgets/editable';
-
 import { Utils } from '../../../utils';
+import Editable from '../../../widgets/editable';
 
 type Props = {
     value: string;

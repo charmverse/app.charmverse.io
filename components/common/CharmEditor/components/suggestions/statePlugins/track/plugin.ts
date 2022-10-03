@@ -1,9 +1,10 @@
 import type { NodeSelection } from '@bangle.dev/pm';
 import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
 
+import type { TrackAttribute } from '../../track/interfaces';
+
 import { findSelectedChanges } from './findSelectedChanges';
 import { deactivateAllSelectedChanges } from './helpers';
-import type { TrackAttribute } from '../../track/interfaces';
 
 export const key = new PluginKey('track');
 export const selectedInsertionSpec = {};

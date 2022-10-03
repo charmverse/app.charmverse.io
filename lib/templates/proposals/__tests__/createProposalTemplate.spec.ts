@@ -1,4 +1,5 @@
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { createProposalTemplate } from '../createProposalTemplate';
 
 describe('createProposalTemplate', () => {

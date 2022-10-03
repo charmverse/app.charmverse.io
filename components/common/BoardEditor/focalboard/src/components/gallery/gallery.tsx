@@ -1,10 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Constants } from '../../constants';
-import type { Card } from '../../blocks/card';
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 

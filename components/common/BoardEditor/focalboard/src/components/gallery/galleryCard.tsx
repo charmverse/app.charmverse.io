@@ -1,16 +1,17 @@
-import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import { usePages } from 'hooks/usePages';
-import { mutate } from 'swr';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { isTouchScreen } from 'lib/browser';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import React from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { mutate } from 'swr';
+
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { isTouchScreen } from 'lib/browser';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';

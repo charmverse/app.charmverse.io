@@ -1,4 +1,5 @@
 import type { Block, Page, PagePermission, Space } from '@prisma/client';
+
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';

@@ -1,12 +1,13 @@
-import charmClient from 'charmClient';
-import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import debounce from 'lodash/debounce';
-import type { PageContent } from 'models';
 import { useCallback, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
+
+import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
+import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import type { PageContent } from 'models';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
   const { data: pageDetails, error, mutate: mutateDetails } = useSWR(pageIdOrPath ? `pages/details/${pageIdOrPath}` : null, () => charmClient.pages.getPageDetails(pageIdOrPath, spaceId));

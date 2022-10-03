@@ -4,9 +4,11 @@ import { keymap } from '@bangle.dev/pm';
 import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
-import { safeRequestAnimationFrame } from '../../utils';
+
 import { keybindings } from '../../keybindings';
+import { safeRequestAnimationFrame } from '../../utils';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+
 import { paletteMarkName, palettePluginKey, trigger } from './config';
 
 const {

@@ -1,6 +1,8 @@
 import type { Space, User } from '@prisma/client';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { assignRole } from '../assignRole';
 import { countRoleMembers } from '../countRoleMembers';
 

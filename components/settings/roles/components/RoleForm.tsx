@@ -4,12 +4,13 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import type { Role } from '@prisma/client';
-import Button from 'components/common/Button';
-import useRoles from 'hooks/useRoles';
-import type { ISystemError } from 'lib/utilities/errors';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+
+import Button from 'components/common/Button';
+import useRoles from 'hooks/useRoles';
+import type { ISystemError } from 'lib/utilities/errors';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')

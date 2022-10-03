@@ -1,7 +1,10 @@
 import type { Bounty } from '@prisma/client';
+
 import type { RoleupWithMembers } from 'lib/roles/interfaces';
+
 import { humaniseList, upperCaseFirstCharacter } from '../../utilities/strings';
 import type { TargetPermissionGroup } from '../interfaces';
+
 import type { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
 
 /**

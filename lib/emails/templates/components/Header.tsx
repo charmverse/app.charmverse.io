@@ -1,9 +1,9 @@
 
-import React from 'react';
 import {
   MjmlText,
   MjmlImage
 } from 'mjml-react';
+import React from 'react';
 import { } from 'theme/colors';
 
 const domain = process.env.DOMAIN;

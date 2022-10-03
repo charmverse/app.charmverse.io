@@ -4,6 +4,7 @@ import { TextField, Typography } from '@mui/material';
 import { TextSelection } from 'prosemirror-state';
 import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
+
 import { isTouchScreen } from 'lib/browser';
 
 const StyledPageTitle = styled(TextField)`

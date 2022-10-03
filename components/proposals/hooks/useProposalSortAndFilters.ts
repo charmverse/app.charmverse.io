@@ -1,7 +1,8 @@
-import type { ProposalFilter, ProposalSort } from 'components/proposals/components/ProposalsViewOptions';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { usePages } from 'hooks/usePages';
 import { useState } from 'react';
+
+import type { ProposalFilter, ProposalSort } from 'components/proposals/components/ProposalsViewOptions';
+import { usePages } from 'hooks/usePages';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export function useProposalSortAndFilters (proposals: ProposalWithUsers[]) {
   const [proposalSort, setProposalSort] = useState<ProposalSort>('latest_created');

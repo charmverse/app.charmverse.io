@@ -1,14 +1,16 @@
 import type { PagePermission, PagePermissionLevel, Space, User } from '@prisma/client';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
+import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { PageNotFoundError } from 'lib/pages/server';
-import { v4 } from 'uuid';
+import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
 import { ExpectedAnError } from 'testing/errors';
-import { prisma } from 'db';
-import { setupPermissionsAfterPageCreated } from '../page-created';
-import { toggleSpaceDefaultPublicPage } from '../../actions/toggleSpaceDefaultPublicPage';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { deletePagePermission } from '../../actions';
+import { toggleSpaceDefaultPublicPage } from '../../actions/toggleSpaceDefaultPublicPage';
+import { setupPermissionsAfterPageCreated } from '../page-created';
 
 let user1: User;
 let spaceWithDefaultPagePermissionGroup: Space;

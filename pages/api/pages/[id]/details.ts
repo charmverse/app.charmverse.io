@@ -1,11 +1,12 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PageDetails } from 'lib/pages';
 import { getPageDetails } from 'lib/pages/server/getPageDetails';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

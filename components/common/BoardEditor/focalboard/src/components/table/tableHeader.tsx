@@ -1,21 +1,21 @@
-import React from 'react';
 
-import { Typography } from '@mui/material';
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import { Typography } from '@mui/material';
+import React from 'react';
+
 import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import { Constants } from '../../constants';
-import type { Card } from '../../blocks/card';
 import type { BoardView } from '../../blocks/boardView';
-import MenuWrapper from '../../widgets/menuWrapper';
-import Label from '../../widgets/label';
+import type { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import { Utils } from '../../utils';
+import Label from '../../widgets/label';
+import MenuWrapper from '../../widgets/menuWrapper';
+import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 import HorizontalGrip from './horizontalGrip';
-
 import TableHeaderMenu from './tableHeaderMenu';
-import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 type Props = {
     readOnly: boolean;

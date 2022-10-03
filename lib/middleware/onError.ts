@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import log from 'lib/log';
-import { SystemError } from 'lib/utilities/errors';
 import { UnknownError } from 'lib/middleware';
+import { SystemError } from 'lib/utilities/errors';
 
 export function onError (err: any, req: NextApiRequest, res: NextApiResponse) {
 

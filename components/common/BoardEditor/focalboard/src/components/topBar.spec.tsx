@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 
-import { wrapDNDIntl } from '../testUtils';
 import { Constants } from '../constants';
+import { wrapDNDIntl } from '../testUtils';
 import { Utils } from '../utils';
 
 import TopBar from './topBar';

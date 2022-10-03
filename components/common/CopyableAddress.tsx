@@ -1,8 +1,10 @@
+import styled from '@emotion/styled';
+import Tooltip from '@mui/material/Tooltip';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Tooltip from '@mui/material/Tooltip';
+
 import { shortenHex } from 'lib/utilities/strings';
-import styled from '@emotion/styled';
+
 import Button from './Button';
 
 const StyledButton = styled(Button)`

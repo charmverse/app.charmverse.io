@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-import type { ISystemError } from 'lib/utilities/errors';
+
 import { ApiError } from 'lib/middleware';
+import type { ISystemError } from 'lib/utilities/errors';
 
 /**
  * Generates a request handler that checks for target keys

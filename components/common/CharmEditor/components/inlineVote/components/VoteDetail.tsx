@@ -2,21 +2,22 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Box, Button, Card, Chip, Divider, FormControl, FormControlLabel, List, ListItem, ListItemText, Radio, RadioGroup, Typography } from '@mui/material';
+import type { UserVote } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import React from 'react';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import Modal from 'components/common/Modal';
+import useTasks from 'components/nexus/hooks/useTasks';
+import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
 import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
-import { DateTime } from 'luxon';
-import React from 'react';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import useSWR from 'swr';
-import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
-import type { UserVote } from '@prisma/client';
-import useTasks from 'components/nexus/hooks/useTasks';
 
 export interface VoteDetailProps {
   vote: ExtendedVote;

@@ -1,12 +1,11 @@
 
+import { Duration } from 'luxon';
 import type { IntlShape } from 'react-intl';
 
-import { Duration } from 'luxon';
-
-import type { Card } from '../../blocks/card';
 import type { IPropertyTemplate } from '../../blocks/board';
-import { Utils } from '../../utils';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
+import { Utils } from '../../utils';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 
 const ROUNDED_DECIMAL_PLACES = 2;

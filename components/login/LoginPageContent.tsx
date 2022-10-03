@@ -2,10 +2,13 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
 import splashImage from 'public/images/artwork/world.png';
+
 import type { AuthSig } from '../../lib/blockchain/interfaces';
+
 import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`

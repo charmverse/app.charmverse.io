@@ -1,4 +1,5 @@
 import type { ProfileItem } from '@prisma/client';
+
 import * as http from 'adapters/http';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';

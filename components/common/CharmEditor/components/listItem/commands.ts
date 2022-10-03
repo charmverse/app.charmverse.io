@@ -21,6 +21,7 @@ import {
   TextSelection,
   wrapInList as pmWrapInList
 } from '@bangle.dev/pm';
+import type { MoveDirection } from '@bangle.dev/pm-commands';
 import {
   compose,
   extendDispatch,
@@ -42,7 +43,7 @@ import {
   validListParent,
   validPos
 } from '@bangle.dev/utils';
-import type { MoveDirection } from '@bangle.dev/pm-commands';
+
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';
 

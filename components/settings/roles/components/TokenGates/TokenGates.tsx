@@ -4,6 +4,15 @@ import { Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
+import type { ResourceId, SigningConditions } from 'lit-js-sdk';
+import LitShareModal from 'lit-share-modal-v3-react-17';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import useSWR from 'swr';
+import { v4 as uuid } from 'uuid';
+
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -13,15 +22,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
-import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import LitShareModal from 'lit-share-modal-v3-react-17';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import useSWR from 'swr';
-import { v4 as uuid } from 'uuid';
+
 import Legend from '../../../Legend';
+
 import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`

@@ -1,8 +1,9 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+
 import { upsertPermission } from 'lib/permissions/pages';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
   it('should get votes of a page for the admin user and return it, responding with 200', async () => {

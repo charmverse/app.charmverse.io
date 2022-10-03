@@ -1,4 +1,5 @@
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { getVote } from '../getVote';
 
 describe('getVote', () => {

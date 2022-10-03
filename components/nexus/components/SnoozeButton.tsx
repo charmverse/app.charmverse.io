@@ -5,15 +5,17 @@ import SnoozeIcon from '@mui/icons-material/Snooze';
 import { Box, IconButton, Menu, MenuItem, TextField } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
+import { DateTime } from 'luxon';
+import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect, useRef, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { DateTime } from 'luxon';
-import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { LoggedInUser } from 'models';
-import { useEffect, useRef, useState } from 'react';
+
 import useTasksState from '../hooks/useTasksState';
 
 export default function SnoozeButton () {

@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
+
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
+
 import { MissingDataError } from '../utilities/errors';
 
 export type Web3LoginRequest = {

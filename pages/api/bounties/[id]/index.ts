@@ -1,4 +1,7 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import type { UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
 import { getBounty, updateBountySettings } from 'lib/bounties';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
@@ -6,8 +9,6 @@ import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middlewar
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

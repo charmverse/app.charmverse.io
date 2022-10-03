@@ -1,11 +1,14 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useContributors } from 'hooks/useContributors';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { Contributor } from 'models';
-import { useState } from 'react';
+
 import Legend from '../Legend';
+
 import type { RoleAction } from './ContributorListItem';
 import ContributorListItem from './ContributorListItem';
 

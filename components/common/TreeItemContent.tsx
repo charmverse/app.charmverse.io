@@ -1,9 +1,9 @@
 // The following was pulled from https://github.com/mui/material-ui/blob/master/packages/mui-lab/src/TreeItem/TreeItemContent.js because there's no way to import from the module
 
-import * as React from 'react';
-import clsx from 'clsx';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import { useTreeItem } from '@mui/lab/TreeItem';
+import clsx from 'clsx';
+import * as React from 'react';
 
 const TreeItemContent = React.forwardRef<HTMLDivElement, TreeItemContentProps>((props, ref) => {
   const {

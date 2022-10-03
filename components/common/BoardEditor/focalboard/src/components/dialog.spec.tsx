@@ -1,14 +1,11 @@
 
 import '@testing-library/jest-dom';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { render, screen } from '@testing-library/react';
-
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import userEvent from '@testing-library/user-event';
-
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { wrapDNDIntl } from '../testUtils';
-
 import Menu from '../widgets/menu';
 
 import Dialog from './dialog';

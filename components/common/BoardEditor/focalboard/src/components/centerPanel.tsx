@@ -1,29 +1,31 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
-import { Box } from '@mui/material';
-import { useRouter } from 'next/router';
-import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
-import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import CallMadeIcon from '@mui/icons-material/CallMade';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
-import { usePages } from 'hooks/usePages';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import Button from 'components/common/Button';
-import { createBoardView } from 'lib/focalboard/boardView';
 import Hotkeys from 'react-hot-keys';
-import { mutate } from 'swr';
-import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
-import dynamic from 'next/dynamic';
+import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
+import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
+import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
+
 import { BlockIcons } from '../blockIcons';
 import type { Block } from '../blocks/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board';
@@ -36,14 +38,15 @@ import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
 import { UserSettings } from '../userSettings';
 import { Utils } from '../utils';
+
+import AddViewMenu from './addViewMenu';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
+import SourceSelection from './SourceSelection';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
-import ViewTitle, { InlineViewTitle } from './viewTitle';
-import AddViewMenu from './addViewMenu';
-import SourceSelection from './SourceSelection';
 import ViewSidebar from './viewSidebar/viewSidebar';
+import ViewTitle, { InlineViewTitle } from './viewTitle';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 

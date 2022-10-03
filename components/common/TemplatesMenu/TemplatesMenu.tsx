@@ -1,13 +1,15 @@
 import { useTheme } from '@emotion/react';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import MenuItem from '@mui/material/MenuItem';
-import { AddIcon } from 'components/common/Icons/AddIcon';
-import { fancyTrim } from 'lib/utilities/strings';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
+
+import { AddIcon } from 'components/common/Icons/AddIcon';
 import type { PageMeta } from 'lib/pages';
+import { fancyTrim } from 'lib/utilities/strings';
+
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
 
 /**

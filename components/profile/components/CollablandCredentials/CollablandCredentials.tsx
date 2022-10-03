@@ -1,8 +1,10 @@
 import { Box, Stack, Typography } from '@mui/material';
+import Image from 'next/image';
+
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
-import Image from 'next/image';
 import collablandLogo from 'public/images/collabland_logo.jpeg';
+
 import { useCollablandCredentials } from '../../hooks/useCollablandCredentials';
 
 export default function CollablandCredentials ({ error }: { error?: any }) {

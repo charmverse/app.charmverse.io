@@ -1,11 +1,11 @@
 import type { Block } from './blocks/block';
 import { BlockPatch } from './blocks/block';
 import type { ISharing } from './blocks/sharing';
+import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
 import type { IUser } from './user';
-import { Utils } from './utils';
-import type { ClientConfig } from './config/clientConfig';
 import { UserSettings } from './userSettings';
+import { Utils } from './utils';
 import type { Subscription } from './wsclient';
 
 //

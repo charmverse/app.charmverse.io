@@ -1,11 +1,14 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+
 import type { BoardView } from '../blocks/boardView';
 import { createBoardView } from '../blocks/boardView';
+
 import { getCurrentBoard } from './boards';
-import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
+
+import type { RootState } from './index';
 
 type ViewsState = {
     current: string;

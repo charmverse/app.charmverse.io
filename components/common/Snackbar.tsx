@@ -1,13 +1,14 @@
+import ClearIcon from '@mui/icons-material/Clear';
 import type { AlertColor, AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
 import type { SnackbarOrigin, SnackbarProps } from '@mui/material/Snackbar';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect } from 'react';
+
+import { useSnackbar } from 'hooks/useSnackbar';
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;

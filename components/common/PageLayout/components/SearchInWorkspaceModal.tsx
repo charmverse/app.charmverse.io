@@ -1,24 +1,25 @@
-import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { ListItem, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
-import Popper from '@mui/material/Popper';
-import { usePages } from 'hooks/usePages';
-import { useRouter } from 'next/router';
-import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-import type { PageMeta } from 'lib/pages';
-import charmClient from 'charmClient';
-import log from 'lib/log';
+import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
-import { isTruthy } from 'lib/utilities/types';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+
+import charmClient from 'charmClient';
+import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import log from 'lib/log';
+import type { PageMeta } from 'lib/pages';
+import { isTruthy } from 'lib/utilities/types';
 
 enum ResultType {
   page = 'page',

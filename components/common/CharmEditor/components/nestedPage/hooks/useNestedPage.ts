@@ -1,12 +1,13 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
-import { useCallback } from 'react';
-import { usePages } from 'hooks/usePages';
-import { addPage } from 'lib/pages';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
 import type { Page } from '@prisma/client';
+import { useRouter } from 'next/router';
+import { useCallback } from 'react';
+
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import { addPage } from 'lib/pages';
 
 export default function useNestedPage () {
   const [space] = useCurrentSpace();

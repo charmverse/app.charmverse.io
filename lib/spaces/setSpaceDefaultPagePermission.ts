@@ -1,4 +1,5 @@
 import type { PagePermissionLevel, Space } from '@prisma/client';
+
 import { prisma } from 'db';
 import { SpaceNotFoundError } from 'lib/public-api';
 

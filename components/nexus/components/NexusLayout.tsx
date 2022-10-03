@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
 import PageLayout from 'components/common/PageLayout';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useUser } from 'hooks/useUser';
-import type { ReactNode } from 'react';
+
 import NexusSidebar from './NexusSidebar';
 
 const emptySidebar = () => <div></div>;

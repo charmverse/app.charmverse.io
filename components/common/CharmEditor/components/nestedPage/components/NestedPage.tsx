@@ -1,12 +1,13 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
+
+import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PageContent } from 'models';
-import Link from 'components/common/Link';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import type { PageContent } from 'models';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;

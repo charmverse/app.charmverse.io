@@ -1,7 +1,8 @@
 import { SpaceOperation } from '@prisma/client';
+import request from 'supertest';
+
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

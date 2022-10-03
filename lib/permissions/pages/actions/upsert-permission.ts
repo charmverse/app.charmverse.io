@@ -1,5 +1,6 @@
 import type { Page, Prisma } from '@prisma/client';
 import { PagePermissionLevel } from '@prisma/client';
+
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
 import { flattenTree } from 'lib/pages/mapPageTree';
@@ -8,8 +9,10 @@ import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+
 import { CannotInheritOutsideTreeError, InvalidPermissionLevelError, PermissionNotFoundError, SelfInheritancePermissionError } from '../errors';
 import type { IPagePermissionToCreate, IPagePermissionWithSource } from '../page-permission-interfaces';
+
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 import { hasSameOrMorePermissions } from './has-same-or-more-permissions';
 
