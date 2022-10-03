@@ -1,5 +1,5 @@
 
-import { IViewType } from '../blocks/boardView';
+import type { IViewType } from '../blocks/boardView';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';

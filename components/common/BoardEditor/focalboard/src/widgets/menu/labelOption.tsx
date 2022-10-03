@@ -1,8 +1,8 @@
 import React from 'react';
 
 type LabelOptionProps = {
-    icon?: string
-    children: React.ReactNode
+    icon?: string;
+    children: React.ReactNode;
 }
 
 function LabelOption (props: LabelOptionProps): JSX.Element {

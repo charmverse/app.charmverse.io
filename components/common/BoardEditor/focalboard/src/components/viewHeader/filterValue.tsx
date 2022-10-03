@@ -1,7 +1,7 @@
 
-import { IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { FilterClause } from '../../blocks/filterClause';
+import type { IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { FilterClause } from '../../blocks/filterClause';
 import { createFilterGroup } from '../../blocks/filterGroup';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -10,9 +10,9 @@ import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    view: BoardView
-    filter: FilterClause
-    template: IPropertyTemplate
+    view: BoardView;
+    filter: FilterClause;
+    template: IPropertyTemplate;
 }
 
 const filterValue = (props: Props): JSX.Element|null => {

@@ -1,7 +1,8 @@
 
 import { useEffect, useCallback } from 'react';
 
-import { ImageBlock, createImageBlock } from '../../blocks/imageBlock';
+import type { ImageBlock } from '../../blocks/imageBlock';
+import { createImageBlock } from '../../blocks/imageBlock';
 import octoClient from '../../octoClient';
 import mutator from '../../mutator';
 
@@ -25,6 +26,7 @@ export default function useImagePaste (cardId: string, contentOrder: (string | s
     const blocksToInsert: ImageBlock[] = [];
     for (const fileId of uploaded) {
       if (!fileId) {
+        // eslint-disable-next-line no-continue
         continue;
       }
       const block = createImageBlock();

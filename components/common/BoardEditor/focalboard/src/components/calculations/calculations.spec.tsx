@@ -3,7 +3,7 @@ import { createIntl } from 'react-intl';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 
-import { IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyTemplate } from '../../blocks/board';
 
 import Calculations from './calculations';
 

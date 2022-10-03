@@ -20,7 +20,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import { useColorMode } from 'context/darkMode';
@@ -55,7 +54,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -85,7 +84,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(basePage as Page);
+    if (!basePage) {
+      return;
+    }
+
+    // getPage to get content
+    const page = await charmClient.pages.getPage(basePage.id);
+    const markdownContent = await generateMarkdown(page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
@@ -107,6 +112,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isFullWidth = basePage?.fullWidth ?? false;
   const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const onSwitchChange = () => {
+    if (basePage) {
+      updatePage({
+        id: basePage?.id,
+        fullWidth: !isFullWidth
+      });
+    }
+  };
 
   const documentOptions = (
     <List dense>
@@ -141,12 +155,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
-        <ListItemButton>
-          <PublishToSnapshot
-            pageId={basePage.id}
-            renderContent={({ label, onClick }) => <ListItemText primary={label} onClick={onClick} />}
-          />
-        </ListItemButton>
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
       )}
       <Divider />
       <ListItemButton onClick={() => {
@@ -205,14 +222,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <Switch
               size='small'
               checked={isFullWidth}
-              onChange={async () => {
-                await charmClient.updatePage({
-                  id: basePage?.id,
-                  fullWidth: !isFullWidth
-                });
-                // @ts-ignore
-                setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
-              }}
+              onChange={onSwitchChange}
             />
           )}
           label={<Typography variant='body2'>Full Width</Typography>}
@@ -258,7 +268,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
 
           {

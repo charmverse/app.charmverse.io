@@ -1,8 +1,8 @@
 import { Delete } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import { IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
+import type { IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
@@ -37,7 +37,7 @@ function GroupByOptions (props: LayoutOptionsProps) {
         >
           <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
           <ListItemText>{property.name}</ListItemText>
-          {groupByProperty?.id === property.id ? <CheckOutlinedIcon fontSize="small"/> : null}
+          {groupByProperty?.id === property.id ? <CheckOutlinedIcon fontSize='small' /> : null}
         </MenuItem>
       ))}
       {!hasPropertiesToGroupBy && (

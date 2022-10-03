@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DownIcon } from 'components/common/Icons/DownIcon';
@@ -12,6 +11,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -24,18 +24,18 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const isAdmin = useIsAdmin();
-  const { setPages, pages } = usePages();
+  const { mutatePagesRemove, mutatePage, pages } = usePages();
   const { mutate } = useTasks();
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
-  const [proposalTemplates, setProposalTemplates] = useState<Page[]>([]);
+  const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
 
   useEffect(() => {
     if (pages) {
-      setProposalTemplates(Object.values(pages).filter(p => p?.type === 'proposal_template') as Page[]);
+      setProposalTemplates(Object.values(pages).filter(p => p?.type === 'proposal_template') as PageMeta[]);
     }
 
   }, [pages]);
@@ -46,10 +46,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
     await charmClient.deletePage(templateId);
     setProposalTemplates(proposalTemplates.filter(p => p.id !== templateId));
 
-    setPages(_pages => {
-      delete _pages[templateId];
-      return _pages;
-    });
+    mutatePagesRemove([templateId]);
   }
 
   async function createProposalFromTemplate (templateId: string) {
@@ -60,11 +57,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       });
 
       mutateProposals();
-
-      setPages(_pages => {
-        _pages[newProposal.id] = newProposal;
-        return _pages;
-      });
+      mutatePage(newProposal);
 
       showPage({
         pageId: newProposal.id
@@ -76,10 +69,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
     if (currentSpace) {
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
-      setPages(_pages => ({
-        ..._pages,
-        [newTemplate.id]: newTemplate
-      }));
+      mutatePage(newTemplate);
       showPage({
         pageId: newTemplate.id
       });
@@ -94,10 +84,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
         type: 'proposal'
       });
 
-      setPages(_pages => ({
-        ..._pages,
-        [newPage.id]: newPage
-      }));
+      mutatePage(newPage);
 
       mutateProposals();
       mutate();

@@ -1,5 +1,8 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback } from 'react';
-import { injectIntl, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import Button from 'components/common/Button';
 import { Add } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
@@ -9,10 +12,11 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import styled from '@emotion/styled';
-import { SxProps } from '@mui/system';
-import { Block } from '../blocks/block';
-import { Board, IPropertyTemplate } from '../blocks/board';
-import { BoardView, createBoardView } from '../blocks/boardView';
+import type { SxProps } from '@mui/system';
+import type { Block } from '../blocks/block';
+import type { Board, IPropertyTemplate } from '../blocks/board';
+import type { BoardView } from '../blocks/boardView';
+import { createBoardView } from '../blocks/boardView';
 import { Constants } from '../constants';
 import mutator from '../mutator';
 import { Utils } from '../utils';
@@ -22,14 +26,14 @@ import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
 
 type AddViewProps = {
-  board: Board,
-  activeView?: BoardView,
-  views: BoardView[],
-  intl: IntlShape,
-  showLabel?: boolean,
-  showView: (viewId: string) => void,
-  sx?: SxProps
-  onClick?: () => void
+  board: Board;
+  activeView?: BoardView;
+  views: BoardView[];
+  intl: IntlShape;
+  showLabel?: boolean;
+  showView: (viewId: string) => void;
+  sx?: SxProps;
+  onClick?: () => void;
 }
 
 function AddViewMenu (props: AddViewProps) {

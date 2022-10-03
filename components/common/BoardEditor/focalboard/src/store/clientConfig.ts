@@ -1,9 +1,10 @@
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { ClientConfig } from '../config/clientConfig';
+import type { ClientConfig } from '../config/clientConfig';
 
-import { default as client } from '../octoClient';
+import client from '../octoClient';
 
 import type { RootState } from './index';
 
@@ -14,7 +15,7 @@ export const fetchClientConfig = createAsyncThunk(
 
 const clientConfigSlice = createSlice({
   name: 'config',
-  initialState: { value: { telemetry: false, telemetryid: '', enablePublicSharedBoards: false, featureFlags: {} } } as {value: ClientConfig},
+  initialState: { value: { telemetry: false, telemetryid: '', enablePublicSharedBoards: false, featureFlags: {} } } as { value: ClientConfig },
   reducers: {
     setClientConfig: (state, action: PayloadAction<ClientConfig>) => {
       state.value = action.payload;

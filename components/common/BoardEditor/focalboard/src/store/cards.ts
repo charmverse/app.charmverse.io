@@ -1,11 +1,12 @@
 
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Board } from '../blocks/board';
-import { BoardView } from '../blocks/boardView';
-import { Card } from '../blocks/card';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
+import type { Board } from '../blocks/board';
+import type { BoardView } from '../blocks/boardView';
+import type { Card } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
-import { IUser } from '../user';
+import type { IUser } from '../user';
 import { Utils } from '../utils';
 import { getCurrentBoard, getBoard } from './boards';
 import type { RootState } from './index';
@@ -15,9 +16,9 @@ import { getWorkspaceUsers } from './users';
 import { getCurrentView, getView } from './views';
 
 type CardsState = {
-    current: string
-    cards: {[key: string]: Card}
-    templates: {[key: string]: Card}
+    current: string;
+    cards: { [key: string]: Card };
+    templates: { [key: string]: Card };
 }
 
 const cardsSlice = createSlice({
@@ -50,6 +51,14 @@ const cardsSlice = createSlice({
           state.cards[card.id] = card;
         }
       }
+    },
+    updateCard: (state, { payload }: PayloadAction<Partial<Card>>) => {
+      if (payload.id) {
+        const card = state.cards[payload.id];
+        if (card) {
+          state.cards[payload.id] = { ...card, ...payload };
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -68,7 +77,7 @@ const cardsSlice = createSlice({
     builder.addCase(initialLoad.fulfilled, (state, action) => {
       state.cards = {};
       state.templates = {};
-      const boardsRecord: {[key: string]: Board} = {};
+      const boardsRecord: { [key: string]: Board } = {};
 
       action.payload.blocks.forEach(block => {
         if (block.type === 'board') {
@@ -95,10 +104,10 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { updateCards, addCard, addTemplate, setCurrent } = cardsSlice.actions;
+export const { updateCards, updateCard, addCard, addTemplate, setCurrent } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
-export const getCards = (state: RootState): {[key: string]: Card} => state.cards.cards;
+export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
 
 export const getSortedCards = createSelector(
   getCards,
@@ -107,7 +116,7 @@ export const getSortedCards = createSelector(
   }
 );
 
-export const getTemplates = (state: RootState): {[key: string]: Card} => state.cards.templates;
+export const getTemplates = (state: RootState): { [key: string]: Card } => state.cards.templates;
 
 export const getSortedTemplates = createSelector(
   getTemplates,
@@ -125,14 +134,14 @@ export function getCard (cardId: string): (state: RootState) => Card|undefined {
 export const getCurrentBoardCards = createSelector(
   (state: RootState) => state.boards.current,
   getCards,
-  (boardId: string, cards: {[key: string]: Card}) => {
+  (boardId: string, cards: { [key: string]: Card }) => {
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
 
 export const getBoardCards = (boardId: string) => createSelector(
   getCards,
-  (cards: {[key: string]: Card}) => {
+  (cards: { [key: string]: Card }) => {
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
@@ -181,7 +190,7 @@ function manualOrder (activeView: BoardView, cardA: Card, cardB: Card) {
   return indexA - indexB;
 }
 
-function sortCards (cards: Card[], board: Board, activeView: BoardView, usersById: {[key: string]: IUser}): Card[] {
+function sortCards (cards: Card[], board: Board, activeView: BoardView, usersById: { [key: string]: IUser }): Card[] {
   if (!activeView) {
     return cards;
   }
@@ -278,7 +287,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
             bValue = template.options.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
           }
 
-          if (result == 0) {
+          if (result === 0) {
             result = (aValue as string).localeCompare(bValue as string);
           }
         }

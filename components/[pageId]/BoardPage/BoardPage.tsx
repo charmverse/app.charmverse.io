@@ -11,6 +11,7 @@ import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'com
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { silentlyUpdateURL } from 'lib/browser';
+import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import type { Page } from 'models';
@@ -24,7 +25,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
  */
 
 interface Props {
-  page: Page;
+  page: PageMeta;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
   pagePermissions?: IPagePermissionFlags;
@@ -127,7 +128,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
           <CenterPanel
-            clientConfig={clientConfig}
             readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
@@ -141,7 +141,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
                 key={shownCardId}
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
-                showCard={(cardId) => showCard(cardId)}
                 readOnly={readOnly}
               />
             </RootPortal>

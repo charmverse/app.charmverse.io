@@ -7,7 +7,7 @@ import '@testing-library/jest-dom';
 
 import userEvent from '@testing-library/user-event';
 
-import { FilterClause } from '../../blocks/filterClause';
+import type { FilterClause } from '../../blocks/filterClause';
 
 import mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';

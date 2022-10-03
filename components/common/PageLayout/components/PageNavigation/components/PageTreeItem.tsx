@@ -14,7 +14,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { Page, PageType } from '@prisma/client';
-import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -26,10 +25,8 @@ import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/browser';
-import type { IPageWithPermissions } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -222,26 +219,17 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
 }
 
 function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
-  const { setPages } = usePages();
+  const { updatePage } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
-      await charmClient.updatePage({
-        id: pageId,
-        icon: emoji
-      });
-      setPages(_pages => ({
-        ..._pages,
-        [pageId]: {
-          ..._pages[pageId] as IPageWithPermissions,
-          icon: emoji
-        }
-      }));
+      updatePage({ id: pageId, icon: emoji });
+
       if (pageType === 'board') {
         mutator.changeIcon(pageId, emoji, emoji);
       }
     }
     popupState.close();
-  }, [pageId, setPages]);
+  }, [pageId, updatePage]);
 
   return (
     <Menu
@@ -324,7 +312,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         />
       );
     }
-  }, [labelIcon, pageType]);
+  }, [labelIcon, pageType, isEmptyContent]);
 
   const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);

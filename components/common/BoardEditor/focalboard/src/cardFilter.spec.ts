@@ -5,7 +5,7 @@ import { createFilterGroup } from './blocks/filterGroup';
 import { CardFilter } from './cardFilter';
 import { TestBlockFactory } from './test/testBlockFactory';
 import { Utils } from './utils';
-import { IPropertyTemplate } from './blocks/board';
+import type { IPropertyTemplate } from './blocks/board';
 
 jest.mock('./utils');
 const mockedUtils = jest.mocked(Utils, true);

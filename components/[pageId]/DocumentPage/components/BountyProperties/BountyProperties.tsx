@@ -49,7 +49,7 @@ export default function BountyProperties (props: {
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { setPages, pages } = usePages();
+  const { mutatePage, pages } = usePages();
 
   const router = useRouter();
 
@@ -139,12 +139,7 @@ export default function BountyProperties (props: {
     if (currentBounty) {
       const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      setPages(_pages => ({ ..._pages,
-        [pageId]: {
-          ..._pages[pageId]!,
-          bountyId: createdBounty.id
-        }
-      }));
+      mutatePage({ id: pageId, bountyId: createdBounty.id });
       cancelDraftBounty();
     }
   }
@@ -362,7 +357,7 @@ export default function BountyProperties (props: {
             </div>
             <TextField
               required
-              value={currentBounty?.maxSubmissions}
+              defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
               inputProps={{ step: 1, min: 1 }}
