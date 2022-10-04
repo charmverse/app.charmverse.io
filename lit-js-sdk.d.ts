@@ -1,5 +1,5 @@
-import * as React from 'react';
 import type { Web3Provider } from '@ethersproject/providers';
+import * as React from 'react';
 
 declare module 'lit-js-sdk' {
 

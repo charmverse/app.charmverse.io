@@ -1,5 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
+
 import { markName } from './inlineComment.constants';
 
 export function spec (): RawSpecs {

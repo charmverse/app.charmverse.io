@@ -1,9 +1,10 @@
 import { Button } from '@mui/material';
 import { Box } from '@mui/system';
+import type { ReactNode } from 'react';
+
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import type { ReactNode } from 'react';
 
 interface PdfSelectorProps {
   autoOpen?: boolean;

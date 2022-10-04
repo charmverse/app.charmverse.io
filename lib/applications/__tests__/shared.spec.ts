@@ -1,6 +1,8 @@
 import type { ApplicationStatus, Space, User } from '@prisma/client';
 import { BountyStatus } from '@prisma/client';
+
 import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionIsEditable, submissionsCapReached } from '../shared';
 
 let user: User;

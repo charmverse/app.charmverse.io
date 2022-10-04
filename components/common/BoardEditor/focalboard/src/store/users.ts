@@ -4,9 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import client from '../octoClient';
 import type { IUser } from '../user';
-
 import { Utils } from '../utils';
-
 import type { Subscription } from '../wsclient';
 
 import { initialLoad } from './initialLoad';

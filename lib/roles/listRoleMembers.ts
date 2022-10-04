@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
+
 import type { RoleMembersQuery, RoleWithMembers } from './interfaces';
 
 export async function listRoleMembers ({ roleId }: RoleMembersQuery): Promise<RoleWithMembers> {

@@ -1,7 +1,7 @@
 
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
+import { Box, Typography } from '@mui/material';
 
 const EmptyVoteContainerBox = styled(Box)`
   position: relative;

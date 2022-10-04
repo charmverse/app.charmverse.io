@@ -15,6 +15,7 @@ interface NestedMemberships {
 export interface LoggedInUser extends User {
   favorites: { pageId: string }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
+  wallets: { address: string }[];
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;

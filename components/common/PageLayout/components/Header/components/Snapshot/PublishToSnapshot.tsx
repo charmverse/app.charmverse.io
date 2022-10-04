@@ -1,5 +1,9 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -8,9 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal } from 'lib/snapshot';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+
 import PublishingForm from './PublishingForm';
 
 export default function PublishToSnapshot ({ pageId, renderContent }: {

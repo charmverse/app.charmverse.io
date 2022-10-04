@@ -1,11 +1,13 @@
 
 import type { PagePermission } from '@prisma/client';
+
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { upsertPermission } from '../../actions/upsert-permission';
 import { setupPermissionsAfterPageRepositioned } from '../page-repositioned';
 

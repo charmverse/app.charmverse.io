@@ -1,7 +1,9 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+
 import PrimaryButton from 'components/common/PrimaryButton';
+
 import { CenteredBox } from './components/CenteredBox';
 
 export default function InviteLinkPageError () {

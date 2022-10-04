@@ -1,8 +1,11 @@
 import type { Space } from '@prisma/client';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -10,8 +13,6 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
 
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
@@ -59,7 +60,7 @@ export default function LoginPage () {
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
       if (user && (isLogInWithDiscord
-        || (account && user.addresses.some(a => a === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
+        || (account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
         redirectUserAfterLogin();
       }
       else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {

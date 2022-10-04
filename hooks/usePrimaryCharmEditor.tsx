@@ -1,6 +1,7 @@
+import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
-import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons-material';
+
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const EDIT_MODES = ['editing', 'suggesting', 'viewing'] as const;

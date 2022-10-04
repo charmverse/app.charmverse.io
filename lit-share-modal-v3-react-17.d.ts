@@ -1,5 +1,5 @@
-import type * as React from 'react';
 import type { SigningConditions } from 'lit-js-sdk';
+import type * as React from 'react';
 
 declare module 'lit-share-modal-v3-react-17' {
 

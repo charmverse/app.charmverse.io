@@ -1,7 +1,9 @@
 import { getAddress, verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
+
 import { InvalidInputError } from '../utilities/errors';
 import { lowerCaseEqual } from '../utilities/strings';
+
 import type { AuthSig } from './interfaces';
 
 /**

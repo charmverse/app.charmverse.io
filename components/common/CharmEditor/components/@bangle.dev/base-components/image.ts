@@ -1,5 +1,4 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import type {
   Command,
   EditorView,
@@ -14,6 +13,8 @@ import {
   PluginKey
 } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
+
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

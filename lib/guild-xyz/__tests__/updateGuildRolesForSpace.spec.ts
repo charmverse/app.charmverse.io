@@ -1,12 +1,14 @@
 
-import { prisma } from 'db';
 import type { Role, Space, SpaceRole, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { createUserFromWallet } from 'lib/users/createUser';
 
-let user1: User;
-let user2: User;
+import { prisma } from 'db';
+import { createUserFromWallet } from 'lib/users/createUser';
+import type { LoggedInUser } from 'models';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+let user1: LoggedInUser;
+let user2: LoggedInUser;
 let space: Space;
 let user1SpaceRole: SpaceRole;
 let user2SpaceRole: SpaceRole;
@@ -120,7 +122,7 @@ it('Should correctly update guild roles for space', async () => {
   jest.mock('@guildxyz/sdk', () => ({
     user: {
       getMemberships: (address: string) => {
-        if (address === user1.addresses[0]) {
+        if (address === user1.wallets[0].address) {
           return [{
             roleids: ['G1R1']
           }, {

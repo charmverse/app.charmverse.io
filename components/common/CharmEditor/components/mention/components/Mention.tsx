@@ -1,12 +1,14 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
+
+import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import Link from 'components/common/Link';
-import type { ReactNode } from 'react';
+
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
 const MentionContainer = styled(Link)`

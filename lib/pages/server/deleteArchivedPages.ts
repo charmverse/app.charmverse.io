@@ -1,5 +1,6 @@
-import { prisma } from 'db';
 import { DateTime } from 'luxon';
+
+import { prisma } from 'db';
 
 export async function deleteArchivedPages (maxDay: number) {
   const whereQuery = {

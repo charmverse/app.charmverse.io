@@ -1,11 +1,12 @@
-import charmClient from 'charmClient';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { LoggedInUser } from 'models';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
+import charmClient from 'charmClient';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { LoggedInUser } from 'models';
 
 type IContext = {
   user: LoggedInUser | null;
@@ -68,7 +69,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
-    else if (user && !user?.addresses.some(a => lowerCaseEqual(a, account))) {
+    else if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
       await charmClient.logout();
       setUser(null);
     }

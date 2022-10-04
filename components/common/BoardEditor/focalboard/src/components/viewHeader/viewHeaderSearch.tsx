@@ -4,11 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import Button from '../../widgets/buttons/button';
-import Editable from '../../widgets/editable';
-
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { getSearchText, setSearchText } from '../../store/searchText';
+import Button from '../../widgets/buttons/button';
+import Editable from '../../widgets/editable';
 
 function ViewHeaderSearch (): JSX.Element {
   const searchText = useAppSelector<string>(getSearchText);

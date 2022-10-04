@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 
-import { Constants } from '../../../constants';
-
 import type { Board, IPropertyTemplate } from '../../../blocks/board';
 import { createBoard } from '../../../blocks/board';
-
-import mutator from '../../../mutator';
-import Calculation from '../../calculations/calculation';
-import { columnWidth } from '../tableRow';
 import type { BoardView } from '../../../blocks/boardView';
 import type { Card } from '../../../blocks/card';
+import { Constants } from '../../../constants';
+import mutator from '../../../mutator';
+import Calculation from '../../calculations/calculation';
 import { Options } from '../../calculations/options';
+import { columnWidth } from '../tableRow';
 
 import { TableCalculationOptions } from './tableCalculationOptions';
 

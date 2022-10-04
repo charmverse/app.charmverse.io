@@ -1,4 +1,5 @@
 import type { PageContent } from 'models';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 

@@ -3,14 +3,14 @@ import { FormattedMessage } from 'react-intl';
 
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { isTouchScreen } from 'lib/browser';
-import type { Card } from '../../blocks/card';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
+import { useSortable } from '../../hooks/sortable';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
-import { useSortable } from '../../hooks/sortable';
-
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {

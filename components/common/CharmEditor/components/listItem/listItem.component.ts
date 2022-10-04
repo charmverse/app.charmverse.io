@@ -8,6 +8,13 @@ import {
   chainCommands,
   keymap
 } from '@bangle.dev/pm';
+import type { MoveDirection } from '@bangle.dev/pm-commands';
+import {
+  copyEmptyCommand,
+  cutEmptyCommand,
+  moveNode,
+  parentHasDirectParentOfType
+} from '@bangle.dev/pm-commands';
 import {
   browser,
   domSerializationHelpers,
@@ -17,13 +24,7 @@ import {
 } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
-import type { MoveDirection } from '@bangle.dev/pm-commands';
-import {
-  copyEmptyCommand,
-  cutEmptyCommand,
-  moveNode,
-  parentHasDirectParentOfType
-} from '@bangle.dev/pm-commands';
+
 import {
   backspaceKeyCommand,
   enterKeyCommand,

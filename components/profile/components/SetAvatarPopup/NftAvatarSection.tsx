@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
-import { useMyNfts } from 'hooks/useMyNfts';
 
 import NftAvatarGallery from 'components/profile/components/NftAvatarGallery';
+import { useMyNfts } from 'hooks/useMyNfts';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
 

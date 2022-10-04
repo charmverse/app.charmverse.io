@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import request from 'supertest';
+
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole } from 'lib/roles';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -25,7 +26,7 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
       userId: extraUser.id
     };
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const updatedRole = (await request(baseUrl)
       .post('/api/roles/assignment')
@@ -55,7 +56,7 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
       userId: extraUser.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post('/api/roles/assignment')
@@ -88,7 +89,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     await assignRole(roleAssignment);
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const updatedRole = (await request(baseUrl)
       .delete('/api/roles/assignment')
@@ -118,7 +119,7 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
       userId: extraUser.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .delete('/api/roles/assignment')

@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import Avatar from '@mui/material/Avatar';
-import { stringToColor } from 'lib/utilities/strings';
 import React from 'react';
+
+import { stringToColor } from 'lib/utilities/strings';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';

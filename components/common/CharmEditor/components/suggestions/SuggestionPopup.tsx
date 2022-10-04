@@ -1,16 +1,18 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { Box, ClickAwayListener, Grow } from '@mui/material';
-import { createPortal } from 'react-dom';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
+import { createPortal } from 'react-dom';
+
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { getEventsFromDoc } from './getEvents';
+
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import type { SuggestionPluginState } from './suggestions.plugins';
 import { ThreadContainer } from '../inlineComment/inlineComment.components';
 
+import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';
+import type { SuggestionPluginState } from './suggestions.plugins';
 
 export default function SuggestionsPopup ({ pluginKey, readOnly }: { pluginKey: PluginKey<SuggestionPluginState>, readOnly: boolean }) {
   const view = useEditorViewContext();

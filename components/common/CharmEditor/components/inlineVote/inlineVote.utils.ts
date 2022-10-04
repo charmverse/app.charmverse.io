@@ -1,5 +1,6 @@
 import type { Command, EditorState } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
+
 import { markName } from './inlineVote.constants';
 
 const getMarkFromState = (state: EditorState) => state.schema.marks[markName];

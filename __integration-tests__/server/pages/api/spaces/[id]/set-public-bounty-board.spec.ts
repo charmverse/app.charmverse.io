@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import request from 'supertest';
+
+import type { PublicBountyToggle } from 'lib/spaces/interfaces';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserCookie: string;
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserCookie: string;
 let space: Space;
 
@@ -21,8 +23,8 @@ beforeAll(async () => {
     spaceId: space.id
   });
 
-  nonAdminUserCookie = await loginUser(nonAdminUser);
-  adminUserCookie = await loginUser(adminUser);
+  nonAdminUserCookie = await loginUser(nonAdminUser.id);
+  adminUserCookie = await loginUser(adminUser.id);
 
 });
 

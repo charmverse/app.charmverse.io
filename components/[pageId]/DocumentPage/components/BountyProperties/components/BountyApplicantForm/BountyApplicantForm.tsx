@@ -1,10 +1,12 @@
 import { Box, Button, Tooltip } from '@mui/material';
 import type { Application, Bounty } from '@prisma/client';
+import { useState } from 'react';
+
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import { useState } from 'react';
+
 import ApplicationInput from './components/ApplicationInput';
 import SubmissionInput from './components/SubmissionInput';
 

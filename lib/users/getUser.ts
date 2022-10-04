@@ -1,11 +1,10 @@
-import type { Prisma, User } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import type { LoggedInUser } from 'models';
 
-type UserIdentifiers = Extract<keyof User, 'id' | 'addresses'>
-
-export async function getUserProfile (key: UserIdentifiers, value: string): Promise<LoggedInUser> {
+export async function getUserProfile (key: 'id' | 'addresses', value: string): Promise<LoggedInUser> {
 
   const query: Prisma.UserWhereInput = {};
 
@@ -16,8 +15,10 @@ export async function getUserProfile (key: UserIdentifiers, value: string): Prom
   }
 
   if (key === 'addresses') {
-    query.addresses = {
-      has: value
+    query.wallets = {
+      some: {
+        address: value
+      }
     };
   }
   else {

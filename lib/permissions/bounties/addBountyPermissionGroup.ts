@@ -1,11 +1,14 @@
 import type { Prisma } from '@prisma/client';
 import { BountyPermissionLevel } from '@prisma/client';
+
 import { prisma } from 'db';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { hasAccessToSpace } from 'lib/middleware';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+
+import { assigneeGroupIsValid } from '../validateAssigneeGroup';
+
 import type { BountyPermissionAssignment, BountyPermissions } from './interfaces';
 import { mapBountyPermissions } from './mapBountyPermissions';
-import { assigneeGroupIsValid } from '../validateAssigneeGroup';
 
 export async function addBountyPermissionGroup ({
   assignee,

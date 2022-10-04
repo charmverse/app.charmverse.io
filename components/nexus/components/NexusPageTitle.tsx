@@ -1,10 +1,11 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
 
 export default function PageTitle ({ subPage }: { subPage?: string }) {
   const MyNexus = 'My Nexus';

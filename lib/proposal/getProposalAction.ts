@@ -1,4 +1,5 @@
 import type { ProposalStatus } from '@prisma/client';
+
 import type { ProposalTask } from './getProposalTasks';
 
 export function getProposalAction ({

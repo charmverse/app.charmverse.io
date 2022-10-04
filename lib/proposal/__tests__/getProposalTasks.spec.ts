@@ -1,8 +1,10 @@
 import type { SpaceRole } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {

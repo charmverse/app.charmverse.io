@@ -1,12 +1,19 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import MoonIcon from '@mui/icons-material/DarkMode';
-import SunIcon from '@mui/icons-material/WbSunny';
 import EditIcon from '@mui/icons-material/Edit';
+import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { validate } from 'uuid';
+
 import charmClient from 'charmClient';
+import BoardPage from 'components/[pageId]/BoardPage';
+import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -21,8 +28,6 @@ import { StyledToolbar } from 'components/common/PageLayout/components/Header';
 import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { AppBar, HeaderSpacer } from 'components/common/PageLayout/PageLayout';
-import BoardPage from 'components/[pageId]/BoardPage';
-import DocumentPage from 'components/[pageId]/DocumentPage';
 import { useColorMode } from 'context/darkMode';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -31,11 +36,9 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { findParentOfType } from 'lib/pages/findParentOfType';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { validate } from 'uuid';
+
 import { lowerCaseEqual } from '../../lib/utilities/strings';
+
 import PublicBountiesPage from './PublicBountiesPage';
 
 const LayoutContainer = styled.div`

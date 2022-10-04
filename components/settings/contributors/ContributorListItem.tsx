@@ -6,11 +6,12 @@ import { Box, TableCell, TableRow, Typography } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { Contributor } from 'models';
 
 export const StyledRow = styled(Box)`

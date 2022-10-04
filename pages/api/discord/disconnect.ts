@@ -1,13 +1,14 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { shortenHex } from 'lib/utilities/strings';
-import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
+import getENSName from 'lib/blockchain/getENSName';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import getENSName from 'lib/blockchain/getENSName';
 
 const handler = nc({
   onError,
@@ -22,7 +23,8 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
       id: req.session.user.id
     },
     include: {
-      telegramUser: true
+      telegramUser: true,
+      wallets: true
     }
   });
 
@@ -32,7 +34,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  if (user.addresses.length === 0) {
+  if (user.wallets.length === 0) {
     return res.status(400).json({
       error: 'You must have at least a single address'
     });
@@ -53,8 +55,8 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
   let newIdentityProvider: IdentityType;
 
   let ens: string | null = null;
-  if (user.addresses[0]) {
-    ens = await getENSName(user.addresses[0]);
+  if (user.wallets[0].address) {
+    ens = await getENSName(user.wallets[0].address);
   }
 
   if (ens) {
@@ -67,7 +69,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     newIdentityProvider = IDENTITY_TYPES[2];
   }
   else {
-    newUserName = shortenHex(user.addresses[0]);
+    newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
   }
 

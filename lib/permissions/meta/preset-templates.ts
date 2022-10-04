@@ -1,6 +1,8 @@
 import type { SpaceOperation, SpacePermissionConfigurationMode } from '@prisma/client';
-import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
+
 import { spaceOperationLabels } from '../spaces/mapping';
+
+import type { SpaceConfigurationPreset, SpacePermissionTemplate } from './interfaces';
 
 const readOnly: SpacePermissionTemplate = {
   spaceOperations: {

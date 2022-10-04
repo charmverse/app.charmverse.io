@@ -1,13 +1,14 @@
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Box, Typography } from '@mui/material';
 import type { FC } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { Contributor } from 'models';
+
 import type { Block } from '../../blocks/block';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';

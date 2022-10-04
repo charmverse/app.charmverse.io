@@ -1,10 +1,12 @@
 import type { SxProps, Theme } from '@mui/system';
+import { useContext, useEffect, useState, useRef } from 'react';
+
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useContext, useEffect, useState, useRef } from 'react';
+
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {

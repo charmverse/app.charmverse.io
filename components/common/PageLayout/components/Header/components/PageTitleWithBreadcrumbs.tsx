@@ -1,13 +1,15 @@
 import styled from '@emotion/styled';
-import type { PageType } from '@prisma/client';
 import { Box, Typography, CircularProgress } from '@mui/material';
-import Link from 'components/common/Link';
-import { usePageTitle } from 'hooks/usePageTitle';
-import { usePages } from 'hooks/usePages';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+import type { PageType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { usePageTitle } from 'hooks/usePageTitle';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+
 import { StyledPageIcon } from '../../PageIcon';
 
 const NEXUS_ROUTES = ['/nexus', '/profile', '/integrations'];

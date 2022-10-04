@@ -1,16 +1,18 @@
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { prisma } from 'db';
+import getENSName from 'lib/blockchain/getENSName';
+import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
+import { sessionUserRelations } from 'lib/session/config';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
-import getENSName from 'lib/blockchain/getENSName';
-import { sessionUserRelations } from 'lib/session/config';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
     where: {
-      addresses: {
-        has: address
+      wallets: {
+        some: {
+          address
+        }
       }
     },
     include: sessionUserRelations
@@ -27,10 +29,14 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
 
     const newUser = await prisma.user.create({
       data: {
-        addresses: [address],
         identityType: IDENTITY_TYPES[0],
         username,
-        path: isUserPathAvailable ? userPath : null
+        path: isUserPathAvailable ? userPath : null,
+        wallets: {
+          create: {
+            address
+          }
+        }
       },
       include: sessionUserRelations
     });

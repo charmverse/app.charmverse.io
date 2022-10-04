@@ -1,30 +1,31 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { IconButton, Tooltip } from '@mui/material';
-import Button from 'components/common/Button';
-import Link from 'components/common/Link';
+import { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Page } from '@prisma/client';
-import { usePages } from 'hooks/usePages';
 import { mutate } from 'swr';
+
+import Button from 'components/common/Button';
+import Link from 'components/common/Link';
+import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
-import ViewTabs from './viewTabs';
-
 import { mutator } from '../../mutator';
-import ModalWrapper from '../modalWrapper';
-
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
+import ModalWrapper from '../modalWrapper';
+
 import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
+import ViewTabs from './viewTabs';
 
 type Props = {
   activeBoard?: Board;

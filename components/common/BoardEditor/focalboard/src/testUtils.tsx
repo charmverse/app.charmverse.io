@@ -1,10 +1,10 @@
-import { IntlProvider } from 'react-intl';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { IntlProvider } from 'react-intl';
+import type { Middleware } from 'redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import configureStore from 'redux-mock-store';
-import type { Middleware } from 'redux';
 
 import type { Block } from './blocks/block';
 

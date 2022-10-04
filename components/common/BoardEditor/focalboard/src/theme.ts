@@ -1,12 +1,12 @@
 
 import type { CSSObject } from '@emotion/serialize';
-import isEqual from 'lodash/isEqual';
 import color from 'color';
+import isEqual from 'lodash/isEqual';
+
 import * as colors from 'theme/colors';
 
-import { Utils } from './utils';
-
 import { UserSettings } from './userSettings';
+import { Utils } from './utils';
 
 let activeThemeName: string;
 

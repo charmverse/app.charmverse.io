@@ -1,6 +1,5 @@
-import PageLayout from './PageLayout';
-
 import ScrollableWindow from './components/ScrollableWindow';
+import PageLayout from './PageLayout';
 
 export { ScrollableWindow };
 

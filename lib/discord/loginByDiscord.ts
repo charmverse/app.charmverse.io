@@ -1,11 +1,12 @@
-import { prisma } from 'db';
-import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { sessionUserRelations } from 'lib/session/config';
 import { v4 as uuid } from 'uuid';
-import { IDENTITY_TYPES } from 'models';
-import { postToDiscord } from 'lib/log/userEvents';
+
+import { prisma } from 'db';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
+import { postToDiscord } from 'lib/log/userEvents';
+import { sessionUserRelations } from 'lib/session/config';
+import { IDENTITY_TYPES } from 'models';
 
 export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
 

@@ -1,10 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import type { NftData } from 'lib/blockchain/interfaces';
 import { getNFTs } from 'lib/blockchain/nfts';
-import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,22 +29,14 @@ async function getNFTsMiddleware (req: NextApiRequest, res: NextApiResponse<NftD
     }
   })).map(p => p.id);
 
-  const user = await prisma.user.findUnique({
+  const wallets = await prisma.userWallet.findMany({
     where: {
-      id: userId
-    },
-    select: {
-      addresses: true
+      userId
     }
   });
 
-  if (!user) {
-    throw new InvalidStateError('User not found');
-  }
-
-  const { addresses } = user;
   const mappedNfts = (await Promise.all(
-    supportedMainnets.map(mainnetChainId => getNFTs(addresses, mainnetChainId))
+    supportedMainnets.map(mainnetChainId => getNFTs(wallets.map(w => w.address), mainnetChainId))
   )).flat();
 
   res.status(200).json(mappedNfts.map(nft => ({

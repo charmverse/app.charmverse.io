@@ -7,9 +7,10 @@ import {
   keymap,
   wrappingInputRule
 } from '@bangle.dev/pm';
-import type Token from 'markdown-it/lib/token';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
+import type Token from 'markdown-it/lib/token';
+
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';
 

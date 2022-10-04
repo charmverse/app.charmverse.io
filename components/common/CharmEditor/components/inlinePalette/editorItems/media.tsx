@@ -9,8 +9,10 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
 import { TextSelection } from 'prosemirror-state';
+
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
+
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';

@@ -1,6 +1,8 @@
 import type { Application } from '@prisma/client';
+
 import { prisma } from 'db';
 import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
+
 import { getApplication } from '../getApplication';
 import type { SubmissionUpdateData } from '../interfaces';
 import { submissionIsEditable } from '../shared';

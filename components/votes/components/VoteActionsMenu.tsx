@@ -1,11 +1,12 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
-import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useUser } from 'hooks/useUser';
+import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import type { VoteContext } from '@prisma/client';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
   deleteVote?: (voteId: string) => Promise<void>;

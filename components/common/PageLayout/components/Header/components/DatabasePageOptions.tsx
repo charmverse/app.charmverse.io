@@ -3,20 +3,21 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
-import { usePages } from 'hooks/usePages';
-import { isTruthy } from 'lib/utilities/types';
+
 import type { Board } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/src/csvExporter';
+import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { usePages } from 'hooks/usePages';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   closeMenu: () => void;

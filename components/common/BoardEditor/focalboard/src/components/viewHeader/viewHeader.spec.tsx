@@ -7,7 +7,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import '@testing-library/jest-dom';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import ViewHeader from './viewHeader';

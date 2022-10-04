@@ -1,22 +1,20 @@
+import type { CSSObject } from '@emotion/serialize';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import type { ActionMeta, OnChangeValue, Options } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import type { CSSObject } from '@emotion/serialize';
-
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import type { IPropertyOption } from '../blocks/board';
 import { Constants } from '../constants';
-
 import { getSelectBaseStyle } from '../theme';
 
-import Menu from './menu';
-import MenuWrapper from './menuWrapper';
 import IconButton from './buttons/iconButton';
 import Label from './label';
+import Menu from './menu';
+import MenuWrapper from './menuWrapper';
 
 interface FormatOptionLabelMeta<Option> {
   context: 'menu' | 'value';

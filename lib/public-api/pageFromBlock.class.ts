@@ -1,5 +1,6 @@
 
 import type { Block } from '@prisma/client';
+
 import type { Page, PageContentFormats, PageProperty } from './interfaces';
 
 /**

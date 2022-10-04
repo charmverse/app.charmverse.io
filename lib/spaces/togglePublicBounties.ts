@@ -1,10 +1,13 @@
 import type { Prisma, Space } from '@prisma/client';
-import { prisma } from 'db';
 import { v4, validate } from 'uuid';
-import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
+
+import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
+import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
+
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
+
 import type { PublicBountyToggle } from './interfaces';
 
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<false>):
