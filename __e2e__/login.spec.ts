@@ -1,7 +1,8 @@
 import { chromium, test } from '@playwright/test';
 import type { Browser } from '@playwright/test';
 
-import { baseUrl } from './config';
+import { baseUrl } from 'config/constants';
+
 import { generateUserAndSpace } from './utils/mocks';
 import { mockWeb3 } from './utils/web3';
 

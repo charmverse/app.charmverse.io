@@ -4,7 +4,6 @@ import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { generateSignaturePayload } from 'lib/blockchain/signAndVerify';
 import { baseUrl } from 'testing/mockApiCall';
 

@@ -2,10 +2,10 @@ import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import type { Page } from '@prisma/client';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 
-import { baseUrl } from './config';
 import { createUserAndSpace } from './utils/mocks';
 import { mockWeb3 } from './utils/web3';
 

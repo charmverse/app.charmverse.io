@@ -4,6 +4,7 @@ import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
@@ -14,8 +15,6 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
-
-import { baseUrl } from '../config';
 
 export async function createUser ({ browserPage, address }: { browserPage: BrowserPage, address: string }): Promise<LoggedInUser> {
 

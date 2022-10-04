@@ -1,7 +1,8 @@
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 
-import { baseUrl } from './config';
+import { baseUrl } from 'config/constants';
+
 import { createUserAndSpace, generateBounty } from './utils/mocks';
 
 let browser: Browser;
