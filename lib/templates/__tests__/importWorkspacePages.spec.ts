@@ -114,9 +114,6 @@ describe('importWorkspacePages', () => {
 
     const stringifiedData = JSON.stringify(data, null, 2);
     jest.spyOn(fs, 'readFile').mockImplementation(() => Promise.resolve(stringifiedData));
-    // path.join(__dirname, 'exports', `${exportName}.json`);
-
-    // exportedFilePath = path;
 
     await importWorkspacePages({
       targetSpaceIdOrDomain: targetSpace.domain,
