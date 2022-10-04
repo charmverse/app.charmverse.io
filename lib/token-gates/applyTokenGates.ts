@@ -7,7 +7,9 @@ import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 import type { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
-export async function applyTokenGates ({ spaceId, userId, tokens, commit }: TokenGateVerification): Promise<TokenGateVerificationResult> {
+export async function applyTokenGates ({
+  spaceId, userId, tokens, commit, joinType = 'token_gate'
+}: TokenGateVerification): Promise<TokenGateVerificationResult> {
 
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
@@ -97,7 +99,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   };
 
   trackUserAction('token_gate_verification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
-  trackUserAction('join_a_workspace', { spaceId, spaceName: space.name, userId, source: 'token_gate' });
+  trackUserAction('join_a_workspace', { spaceId, spaceName: space.name, userId, source: joinType });
 
   if (!commit) {
     return returnValue;
