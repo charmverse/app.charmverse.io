@@ -6,7 +6,6 @@ import {
   darkTheme as originalDarkTheme,
   lightTheme as originalLightTheme
 } from 'components/common/BoardEditor/focalboard/src/theme';
-
 import type { BrandColorScheme } from 'theme/colors';
 import { darkModeColors, lightModeColors } from 'theme/colors';
 

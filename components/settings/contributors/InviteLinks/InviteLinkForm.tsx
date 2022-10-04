@@ -4,12 +4,13 @@ import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 export const schema = yup.object({
   maxAgeMinutes: yup.number().required(),

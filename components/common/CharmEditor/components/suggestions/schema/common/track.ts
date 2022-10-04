@@ -1,5 +1,5 @@
-import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
+import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
 
 // for implementations of parseDOM by other components
 export function parseTracks (str: string) {

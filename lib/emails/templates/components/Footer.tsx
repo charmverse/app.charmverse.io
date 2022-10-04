@@ -5,6 +5,7 @@ import {
   MjmlColumn, MjmlSection, MjmlText
 } from 'mjml-react';
 import type { ReactNode } from 'react';
+
 import { greyColor2 } from 'theme/colors';
 
 export default function Footer () {

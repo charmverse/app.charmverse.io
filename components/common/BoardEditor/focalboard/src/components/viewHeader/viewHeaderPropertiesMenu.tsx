@@ -10,8 +10,9 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
-import { SvgIconProps } from '@mui/material';
-import { PropertyType } from '../../blocks/board';
+import type { SvgIconProps } from '@mui/material';
+
+import type { PropertyType } from '../../blocks/board';
 
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
   switch (propertyType) {
@@ -30,5 +31,6 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'updatedBy': return <PersonIcon fontSize='small' {...props} />;
     case 'updatedTime': return <AccessTimeIcon fontSize='small' {...props} />;
     case 'url': return <LinkIcon fontSize='small' {...props} />;
+    default: return null;
   }
 };

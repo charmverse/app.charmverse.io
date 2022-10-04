@@ -1,13 +1,14 @@
-import { Block, createBlock } from './block';
-import { ContentBlock } from './contentBlock';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { ContentBlock } from './contentBlock';
 
 type ImageBlockFields = {
-    fileId: string
+    fileId: string;
 }
 
 type ImageBlock = ContentBlock & {
-    type: 'image'
-    fields: ImageBlockFields
+    type: 'image';
+    fields: ImageBlockFields;
 }
 
 function createImageBlock (block?: Block): ImageBlock {

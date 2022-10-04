@@ -1,12 +1,14 @@
-import type { Prisma } from '@prisma/client';
-import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import type { Prisma } from '@prisma/client';
+import { useRouter } from 'next/router';
+
+import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import CreateSpaceForm from 'components/common/CreateSpaceForm';
-import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+
 import { AlternateRouteButton } from './join';
 
 export default function CreateSpace () {

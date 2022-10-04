@@ -1,18 +1,20 @@
 import type { Mark, MarkType, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-
 import { Box } from '@mui/system';
-import { Modal } from 'components/common/Modal';
-import { useVotes } from 'hooks/useVotes';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { NodeWithPos } from 'prosemirror-utils';
 import { findChildrenByMark } from 'prosemirror-utils';
 import { useEffect, useRef } from 'react';
+
+import { Modal } from 'components/common/Modal';
+import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useVotes } from 'hooks/useVotes';
+
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import VoteDetail from './VoteDetail';
 import { markName } from '../inlineVote.constants';
 import type { InlineVotePluginState } from '../inlineVote.plugins';
+
+import VoteDetail from './VoteDetail';
 
 export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<InlineVotePluginState> }) {
   const view = useEditorViewContext();

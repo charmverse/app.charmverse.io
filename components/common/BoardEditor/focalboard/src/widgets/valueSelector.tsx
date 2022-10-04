@@ -1,22 +1,20 @@
+import type { CSSObject } from '@emotion/serialize';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { ActionMeta, OnChangeValue, Options } from 'react-select';
+import type { ActionMeta, OnChangeValue, Options } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import { CSSObject } from '@emotion/serialize';
-
-import { IPropertyOption } from '../blocks/board';
+import type { IPropertyOption } from '../blocks/board';
 import { Constants } from '../constants';
-
 import { getSelectBaseStyle } from '../theme';
 
+import IconButton from './buttons/iconButton';
+import Label from './label';
 import Menu from './menu';
 import MenuWrapper from './menuWrapper';
-import IconButton from './buttons/iconButton';
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import Label from './label';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 interface FormatOptionLabelMeta<Option> {
   context: 'menu' | 'value';
@@ -25,25 +23,25 @@ interface FormatOptionLabelMeta<Option> {
 }
 
 type Props = {
-  options: IPropertyOption[]
-  value?: IPropertyOption | IPropertyOption[]
-  emptyValue: string
-  onCreate: (value: string) => void
-  onChange: (value: string | string[]) => void
-  onChangeColor: (option: IPropertyOption, color: string) => void
-  onDeleteOption: (option: IPropertyOption) => void
-  isMulti?: boolean
-  onDeleteValue?: (value: IPropertyOption) => void
-  onBlur?: () => void
+  options: IPropertyOption[];
+  value?: IPropertyOption | IPropertyOption[];
+  emptyValue: string;
+  onCreate: (value: string) => void;
+  onChange: (value: string | string[]) => void;
+  onChangeColor: (option: IPropertyOption, color: string) => void;
+  onDeleteOption: (option: IPropertyOption) => void;
+  isMulti?: boolean;
+  onDeleteValue?: (value: IPropertyOption) => void;
+  onBlur?: () => void;
 }
 
 type LabelProps = {
-  option: IPropertyOption
-  meta: FormatOptionLabelMeta<IPropertyOption>
-  onChangeColor: (option: IPropertyOption, color: string) => void
-  onDeleteOption: (option: IPropertyOption) => void
-  onDeleteValue?: (value: IPropertyOption) => void
-  isMulti?: boolean
+  option: IPropertyOption;
+  meta: FormatOptionLabelMeta<IPropertyOption>;
+  onChangeColor: (option: IPropertyOption, color: string) => void;
+  onDeleteOption: (option: IPropertyOption) => void;
+  onDeleteValue?: (value: IPropertyOption) => void;
+  isMulti?: boolean;
 }
 
 const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
@@ -64,7 +62,7 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
           && (
             <IconButton
               onClick={() => onDeleteValue(option)}
-              icon={<CloseOutlinedIcon fontSize="small" />}
+              icon={<CloseOutlinedIcon fontSize='small' />}
               title='Clear'
               className='margin-left delete-value'
             />
@@ -85,7 +83,7 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
         <Menu position='bottom'>
           <Menu.Text
             id='delete'
-            icon={<DeleteOutlinedIcon fontSize="small" />}
+            icon={<DeleteOutlinedIcon fontSize='small' />}
             name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
             onClick={() => props.onDeleteOption(option)}
           />
@@ -159,7 +157,7 @@ const valueSelectorStyle = {
   })
 };
 
-function ValueSelector(props: Props): JSX.Element {
+function ValueSelector (props: Props): JSX.Element {
   const intl = useIntl();
   return (
     <CreatableSelect
@@ -170,6 +168,7 @@ function ValueSelector(props: Props): JSX.Element {
       isMulti={props.isMulti}
       isClearable={true}
       styles={valueSelectorStyle}
+      // eslint-disable-next-line react/no-unstable-nested-components
       formatOptionLabel={(option: IPropertyOption, meta: FormatOptionLabelMeta<IPropertyOption>) => (
         <ValueSelectorLabel
           option={option}

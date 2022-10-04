@@ -5,6 +5,10 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import type { Space } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { ChangeEvent, ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
@@ -13,9 +17,6 @@ import { DialogTitle } from 'components/common/Modal';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { useSpaces } from 'hooks/useSpaces';
 import type { PublicSpaceInfo } from 'lib/spaces/interfaces';
-import { useRouter } from 'next/router';
-import type { ChangeEvent, ReactNode } from 'react';
-import { useEffect, useState } from 'react';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const [spaces] = useSpaces();

@@ -1,8 +1,8 @@
-import { memo } from 'react';
+import { useTheme } from '@emotion/react';
+import { Box } from '@mui/material';
 import type { SxProps } from '@mui/system';
 import { alpha } from '@mui/system';
-import { Box } from '@mui/material';
-import { useTheme } from '@emotion/react';
+import { memo } from 'react';
 
 function PlaceHolder ({ show, text = "Type '/' for commands", sx }: { sx?: SxProps, text?: string, show: boolean }) {
   const theme = useTheme();

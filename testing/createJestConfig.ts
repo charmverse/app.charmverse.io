@@ -1,6 +1,7 @@
 
-import nextJest from 'next/jest';
 import * as path from 'path';
+
+import nextJest from 'next/jest';
 
 import { esmModules } from '../next.base';
 

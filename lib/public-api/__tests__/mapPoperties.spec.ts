@@ -1,7 +1,8 @@
 import { ExpectedAnError } from 'testing/errors';
+
+import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, UnsupportedKeysError } from '../errors';
 import type { PageProperty } from '../interfaces';
 import { mapProperties } from '../mapProperties';
-import { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, UnsupportedKeysError } from '../errors';
 
 const exampleBoardSchema: PageProperty [ ] = [{
   id: '87b42bed-1dbe-4491-9b6e-fc4c45caa81e',

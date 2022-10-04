@@ -1,19 +1,21 @@
-import React, { FC } from 'react';
-import { useIntl } from 'react-intl';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Typography } from '@mui/material';
+import type { FC } from 'react';
+import React from 'react';
+import { useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { Block } from '../../blocks/block';
+import type { Contributor } from 'models';
+
+import type { Block } from '../../blocks/block';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
-import { Contributor } from 'models';
 
 type Props = {
   comment: Block;
@@ -21,7 +23,7 @@ type Props = {
   readOnly: boolean;
 }
 
-const Comment: FC<Props> = (props: Props) => {
+function Comment (props: Props) {
   const { comment, contributor } = props;
   const intl = useIntl();
   const html = comment.title && Utils.htmlFromMarkdown(comment.title);
@@ -72,6 +74,6 @@ const Comment: FC<Props> = (props: Props) => {
       </Box>
     </div>
   );
-};
+}
 
 export default Comment;

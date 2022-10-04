@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import type { ReactNode } from 'react';
+
 import type { InitialAvatarProps } from './Avatar';
 import Avatar from './Avatar';
 

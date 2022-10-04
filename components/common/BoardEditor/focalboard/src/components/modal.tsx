@@ -1,15 +1,13 @@
+import CloseIcon from '@mui/icons-material/Close';
 import { ClickAwayListener } from '@mui/material';
 import React, { useRef, useEffect } from 'react';
 
 import IconButton from '../widgets/buttons/iconButton';
-import CloseIcon from '@mui/icons-material/Close';
-
-
 
 type Props = {
-    onClose: () => void
-    position?: 'top'|'bottom'|'bottom-right'
-    children: React.ReactNode
+    onClose: () => void;
+    position?: 'top'|'bottom'|'bottom-right';
+    children: React.ReactNode;
 }
 
 const Modal = React.memo((props: Props): JSX.Element => {
@@ -26,7 +24,7 @@ const Modal = React.memo((props: Props): JSX.Element => {
         <div className='toolbar hideOnWidescreen'>
           <IconButton
             onClick={() => onClose()}
-            icon={<CloseIcon fontSize='small'/>}
+            icon={<CloseIcon fontSize='small' />}
             title='Close'
           />
         </div>

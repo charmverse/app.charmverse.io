@@ -1,34 +1,36 @@
 
-import { Block, createBlock } from './block';
-import { FilterGroup, createFilterGroup } from './filterGroup';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { FilterGroup } from './filterGroup';
+import { createFilterGroup } from './filterGroup';
 
 type IViewType = 'board' | 'table' | 'gallery' | 'calendar'
 type ISortOption = { propertyId: '__title' | string, reversed: boolean }
 
 type KanbanCalculationFields = {
-    calculation: string
-    propertyId: string
+    calculation: string;
+    propertyId: string;
 }
 
 type BoardViewFields = {
-    viewType: IViewType
-    groupById?: string
-    dateDisplayPropertyId?: string
-    sortOptions: ISortOption[]
-    visiblePropertyIds: string[]
-    visibleOptionIds: string[]
-    hiddenOptionIds: string[]
-    collapsedOptionIds: string[]
-    filter: FilterGroup
-    cardOrder: string[]
-    columnWidths: Record<string, number>
-    columnCalculations: Record<string, string>
-    kanbanCalculations: Record<string, KanbanCalculationFields>
-    defaultTemplateId: string
+    viewType: IViewType;
+    groupById?: string;
+    dateDisplayPropertyId?: string;
+    sortOptions: ISortOption[];
+    visiblePropertyIds: string[];
+    visibleOptionIds: string[];
+    hiddenOptionIds: string[];
+    collapsedOptionIds: string[];
+    filter: FilterGroup;
+    cardOrder: string[];
+    columnWidths: Record<string, number>;
+    columnCalculations: Record<string, string>;
+    kanbanCalculations: Record<string, KanbanCalculationFields>;
+    defaultTemplateId: string;
 }
 
 type BoardView = Block & {
-    fields: BoardViewFields
+    fields: BoardViewFields;
 }
 
 function createBoardView (block?: Block): BoardView {
@@ -50,7 +52,7 @@ function createBoardView (block?: Block): BoardView {
       columnCalculations: { ...(block?.fields.columnCalculations) || {} },
       kanbanCalculations: { ...(block?.fields.kanbanCalculations) || {} },
       defaultTemplateId: block?.fields.defaultTemplateId || '',
-      linkedSourceId: block?.fields.linkedSourceId ?? null,
+      linkedSourceId: block?.fields.linkedSourceId ?? null
     }
   };
 }

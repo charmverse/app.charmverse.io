@@ -1,16 +1,18 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { EditorState } from '@bangle.dev/pm';
-import { Box, Stack } from '@mui/material';
+import { useEditorViewContext } from '@bangle.dev/react';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
+import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
+
 import Button from 'components/common/Button';
-import { useUser } from 'hooks/useUser';
-import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
-import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
 import type { TrackedEvent } from 'components/common/CharmEditor/components/suggestions/getEvents';
 import { getEventsFromDoc } from 'components/common/CharmEditor/components/suggestions/getEvents';
-import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
 import { activateTrack } from 'components/common/CharmEditor/components/suggestions/statePlugins/track/helpers';
+import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
+import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
+import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
+import { useUser } from 'hooks/useUser';
+
 import { NoCommentsMessage } from './CommentsSidebar';
 
 export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {

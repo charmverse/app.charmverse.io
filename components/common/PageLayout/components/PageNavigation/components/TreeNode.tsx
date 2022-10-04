@@ -1,16 +1,18 @@
 
+import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
+import { useCallback, useRef, memo, useEffect } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import type { Page } from 'models';
-import { useCallback, useRef, memo, useEffect } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
 import { greyColor2 } from 'theme/colors';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
-import { useTreeItem } from '@mui/lab/TreeItem';
-import PageTreeItem from './PageTreeItem';
+
 import BoardViewTreeItem from './BoardViewTreeItem';
+import PageTreeItem from './PageTreeItem';
 
 export type MenuNode = Pick<Page, 'id' | 'spaceId' | 'title' | 'icon' | 'index' | 'parentId' | 'path' | 'type' | 'createdAt' | 'deletedAt'> & { isEmptyContent?: boolean };
 

@@ -1,8 +1,10 @@
 import type { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { resolvePageTree } from 'lib/pages/server';
-import { v4 } from 'uuid';
+
 import { comparePermissionLevels } from '../permissions/pages';
 
 type ProposalParticipant = 'author' | 'reviewer' | 'community';

@@ -1,13 +1,14 @@
-import type { ReactNode } from 'react';
-import type { Page } from '@prisma/client';
 import styled from '@emotion/styled';
-import DatabaseIcon from '@mui/icons-material/TableChart';
 import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
 import EmptyPageIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import DatabaseIcon from '@mui/icons-material/TableChart';
+import ProposalIcon from '@mui/icons-material/TaskOutlined';
+import type { Page } from '@prisma/client';
+import type { ReactNode } from 'react';
+
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
-import ProposalIcon from '@mui/icons-material/TaskOutlined';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};

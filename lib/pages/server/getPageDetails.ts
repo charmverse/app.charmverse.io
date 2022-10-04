@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client';
-import { prisma } from 'db';
 import { validate } from 'uuid';
+
+import { prisma } from 'db';
+
 import type { PageDetails } from '../interfaces';
 
 export async function getPageDetails (pageIdOrPath: string, spaceId?: string): Promise<PageDetails | null> {

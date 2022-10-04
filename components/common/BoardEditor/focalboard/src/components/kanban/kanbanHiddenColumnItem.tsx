@@ -1,23 +1,23 @@
 /* eslint-disable max-lines */
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useDrop } from 'react-dnd';
-import { IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
-import { BoardGroup } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import type { BoardGroup } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    activeView: BoardView
-    group: BoardGroup
-    intl: IntlShape
-    readOnly: boolean
-    onDrop: (card: Card) => void
+    activeView: BoardView;
+    group: BoardGroup;
+    intl: IntlShape;
+    readOnly: boolean;
+    onDrop: (card: Card) => void;
 }
 
 export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
@@ -55,7 +55,7 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
         <Menu>
           <Menu.Text
             id='show'
-            icon={<VisibilityOutlinedIcon fontSize="small" />}
+            icon={<VisibilityOutlinedIcon fontSize='small' />}
             name={intl.formatMessage({ id: 'BoardComponent.show', defaultMessage: 'Show' })}
             onClick={() => mutator.unhideViewColumn(activeView, group.option.id)}
           />

@@ -1,6 +1,8 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -9,7 +11,7 @@ import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
 import { isTruthy } from 'lib/utilities/types';
 import type { ExtendedVote } from 'lib/votes/interfaces';
-import { useEffect, useState } from 'react';
+
 import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
 import PageActionToggle from './PageActionToggle';
 

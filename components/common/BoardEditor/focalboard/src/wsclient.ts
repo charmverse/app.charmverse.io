@@ -1,40 +1,40 @@
+/* eslint-disable no-use-before-define */
 
-import { ClientConfig } from './config/clientConfig';
-
-import { Utils } from './utils';
-import { Block } from './blocks/block';
+import type { Block } from './blocks/block';
+import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
+import { Utils } from './utils';
 
 // These are outgoing commands to the server
 type WSCommand = {
-    action: string
-    workspaceId?: string
-    readToken?: string
-    blockIds?: string[]
+    action: string;
+    workspaceId?: string;
+    readToken?: string;
+    blockIds?: string[];
 }
 
 // These are messages from the server
 type WSMessage = {
-    action?: string
-    block?: Block
-    error?: string
-}
-
-type WSSubscriptionMsg = {
-    action?: string
-    subscription?: Subscription
-    error?: string
+    action?: string;
+    block?: Block;
+    error?: string;
 }
 
 export interface Subscription {
-    blockId: string
-    workspaceId: string
-    subscriberId: string
-    blockType: string
-    subscriberType: string
-    notifiedAt?: number
-    createdAt?: number
-    deletedAt?: number
+  blockId: string;
+  workspaceId: string;
+  subscriberId: string;
+  blockType: string;
+  subscriberType: string;
+  notifiedAt?: number;
+  createdAt?: number;
+  deletedAt?: number;
+}
+
+type WSSubscriptionMsg = {
+    action?: string;
+    subscription?: Subscription;
+    error?: string;
 }
 
 export const ACTION_UPDATE_BLOCK = 'UPDATE_BLOCK';
@@ -49,11 +49,11 @@ export const ACTION_UPDATE_SUBSCRIPTION = 'UPDATE_SUBSCRIPTION';
 // The Mattermost websocket client interface
 export interface MMWebSocketClient {
     conn: WebSocket | null;
-    sendMessage(action: string, data: any, responseCallback?: () => void): void /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    setFirstConnectCallback(callback: () => void): void
-    setReconnectCallback(callback: () => void): void
-    setErrorCallback(callback: (event: Event) => void): void
-    setCloseCallback(callback: (connectFailCount: number) => void): void
+    sendMessage(action: string, data: any, responseCallback?: () => void): void; /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    setFirstConnectCallback(callback: () => void): void;
+    setReconnectCallback(callback: () => void): void;
+    setErrorCallback(callback: (event: Event) => void): void;
+    setCloseCallback(callback: (connectFailCount: number) => void): void;
 }
 
 type OnChangeHandler = (client: WSClient, blocks: Block[]) => void

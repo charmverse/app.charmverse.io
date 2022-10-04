@@ -1,5 +1,7 @@
 import { htmlToText } from 'html-to-text';
+
 import log from 'lib/log';
+
 import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 
 export interface EmailRecipient {

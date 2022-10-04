@@ -1,21 +1,17 @@
 
-import React from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-import { fireEvent, render } from '@testing-library/react';
-import configureStore from 'redux-mock-store';
 import '@testing-library/jest-dom';
-
 import 'isomorphic-fetch';
-
-import { act } from 'react-dom/test-utils';
-
+import { fireEvent, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { act } from 'react-dom/test-utils';
+import { Provider as ReduxProvider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 
-import userEvent from '@testing-library/user-event';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { FetchMock } from '../../test/fetchMock';
+import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
 import TableRows from './tableRows';

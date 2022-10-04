@@ -1,21 +1,18 @@
 
+import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { render } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
-import '@testing-library/jest-dom';
 
 import 'isomorphic-fetch';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
+import type { BoardView } from '../../blocks/boardView';
 import { FetchMock } from '../../test/fetchMock';
-import { BoardView } from '../../blocks/boardView';
-
-import { IUser } from '../../user';
-
-import { Utils, IDType } from '../../utils';
-
+import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
+import type { IUser } from '../../user';
+import { Utils, IDType } from '../../utils';
 
 import Table from './table';
 

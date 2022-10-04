@@ -5,6 +5,10 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import type { PaymentMethod } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { FormError } from 'components/common/form/FormError.class';
@@ -15,9 +19,6 @@ import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { ISystemError } from 'lib/utilities/errors';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 export type FormMode = 'create' | 'update';
 

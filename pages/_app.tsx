@@ -1,42 +1,54 @@
+import createCache from '@emotion/cache';
+import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
+import { Web3Provider } from '@ethersproject/providers';
+import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import type { PaletteMode } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import IconButton from '@mui/material/IconButton';
+import { ThemeProvider } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import createCache from '@emotion/cache';
-import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
-import type { PaletteMode } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { Web3ReactProvider } from '@web3-react/core';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ReactDndProvider from 'components/common/ReactDndProvider';
-import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import RouteGuard from 'components/common/RouteGuard';
-import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
-import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
+import type { ReactElement, ReactNode } from 'react';
+
+import charmClient from 'charmClient';
+import GlobalComponents from 'components/_app/GlobalComponents';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
-import Snackbar from 'components/common/Snackbar';
+import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
+import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
+import ReactDndProvider from 'components/common/ReactDndProvider';
+import RouteGuard from 'components/common/RouteGuard';
+import Snackbar from 'components/common/Snackbar';
+import { isDev } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
+import { ContributorsProvider } from 'hooks/useContributors';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PagesProvider } from 'hooks/usePages';
-import { ContributorsProvider } from 'hooks/useContributors';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
+import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
+import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
+import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
-import { SnackbarProvider } from 'hooks/useSnackbar';
-import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { createThemeLightSensitive } from 'theme';
+import cssVariables from 'theme/cssVariables';
+import { setDarkMode } from 'theme/darkMode';
+import {
+  darkTheme,
+  lightTheme
+} from 'theme/focalboard/theme';
 
 import '@skiff-org/prosemirror-tables/style/tables.css';
 import '@skiff-org/prosemirror-tables/style/table-popup.css';
@@ -122,18 +134,7 @@ import 'theme/focalboard/focalboard.typography.scss';
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
 import 'theme/lit-protocol/lit-protocol.scss';
 import 'react-resizable/css/styles.css';
-import { createThemeLightSensitive } from 'theme';
-import {
-  darkTheme,
-  lightTheme
-} from 'theme/focalboard/theme';
-import { setDarkMode } from 'theme/darkMode';
-import cssVariables from 'theme/cssVariables';
 import 'theme/styles.scss';
-
-import charmClient from 'charmClient';
-import GlobalComponents from 'components/_app/GlobalComponents';
-import { isDev } from 'config/constants';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 
@@ -215,38 +216,40 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
             <Web3ReactProvider getLibrary={getLibrary}>
               <Web3ConnectionManager>
-                <ReactDndProvider>
-                  <DataProviders>
-                    <FocalBoardProvider>
-                      <IntlProvider>
-                        <SnackbarProvider>
-                          <PageMetaTags />
-                          <CssBaseline enableColorScheme={true} />
-                          <Global styles={cssVariables} />
-                          <RouteGuard>
-                            <ErrorBoundary>
-                              <Snackbar
-                                isOpen={isOldBuild}
-                                message='New CharmVerse platform update available. Please refresh.'
-                                actions={[
-                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                ]}
-                                origin={{ vertical: 'top', horizontal: 'center' }}
-                                severity='warning'
-                                handleClose={() => setIsOldBuild(false)}
-                              />
-                              {getLayout(<Component {...pageProps} />)}
+                <Web3AccountProvider>
+                  <ReactDndProvider>
+                    <DataProviders>
+                      <FocalBoardProvider>
+                        <IntlProvider>
+                          <SnackbarProvider>
+                            <PageMetaTags />
+                            <CssBaseline enableColorScheme={true} />
+                            <Global styles={cssVariables} />
+                            <RouteGuard>
+                              <ErrorBoundary>
+                                <Snackbar
+                                  isOpen={isOldBuild}
+                                  message='New CharmVerse platform update available. Please refresh.'
+                                  actions={[
+                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  ]}
+                                  origin={{ vertical: 'top', horizontal: 'center' }}
+                                  severity='warning'
+                                  handleClose={() => setIsOldBuild(false)}
+                                />
+                                {getLayout(<Component {...pageProps} />)}
 
-                              <GlobalComponents />
-                            </ErrorBoundary>
-                          </RouteGuard>
-                        </SnackbarProvider>
-                      </IntlProvider>
-                    </FocalBoardProvider>
-                  </DataProviders>
-                </ReactDndProvider>
+                                <GlobalComponents />
+                              </ErrorBoundary>
+                            </RouteGuard>
+                          </SnackbarProvider>
+                        </IntlProvider>
+                      </FocalBoardProvider>
+                    </DataProviders>
+                  </ReactDndProvider>
+                </Web3AccountProvider>
               </Web3ConnectionManager>
             </Web3ReactProvider>
           </LocalizationProvider>
@@ -259,6 +262,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
+
     <UserProvider>
       <SpacesProvider>
         <ContributorsProvider>
@@ -276,6 +280,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
         </ContributorsProvider>
       </SpacesProvider>
     </UserProvider>
+
   );
 }
 

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
+import request from 'supertest';
+
 import type { SubmissionReview } from 'lib/applications/interfaces';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -15,7 +17,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
@@ -24,7 +26,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = await loginUser(reviewer);
+    const reviewerCookie = await loginUser(reviewer.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -60,7 +62,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminUserCookie = await loginUser(adminUser);
+    const adminUserCookie = await loginUser(adminUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -86,7 +88,7 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
 
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

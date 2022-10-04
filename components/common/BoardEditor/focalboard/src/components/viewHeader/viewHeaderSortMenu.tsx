@@ -1,21 +1,22 @@
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
-import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import Button from 'components/common/Button';
-import { IPropertyTemplate } from '../../blocks/board';
-import { BoardView, ISortOption } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+
+import type { IPropertyTemplate } from '../../blocks/board';
+import type { BoardView, ISortOption } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    properties: readonly IPropertyTemplate[]
-    activeView: BoardView
-    orderedCards: Card[]
+    properties: readonly IPropertyTemplate[];
+    activeView: BoardView;
+    orderedCards: Card[];
 }
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
@@ -63,21 +64,21 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
       <Menu>
         {(activeView.fields.sortOptions?.length > 0)
                 && (
-                <>
-                  <Menu.Text
-                    id='manual'
-                    name='Manual'
-                    onClick={onManualSort}
-                  />
+                  <>
+                    <Menu.Text
+                      id='manual'
+                      name='Manual'
+                      onClick={onManualSort}
+                    />
 
-                  <Menu.Text
-                    id='revert'
-                    name='Revert'
-                    onClick={onRevertSort}
-                  />
+                    <Menu.Text
+                      id='revert'
+                      name='Revert'
+                      onClick={onRevertSort}
+                    />
 
-                  <Menu.Separator />
-                </>
+                    <Menu.Separator />
+                  </>
                 )}
 
         {sortDisplayOptions?.map((option) => {
@@ -85,7 +86,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
           if (activeView.fields.sortOptions?.length > 0) {
             const sortOption = activeView.fields.sortOptions[0];
             if (sortOption.propertyId === option.id) {
-              rightIcon = sortOption.reversed ? <ArrowDownwardOutlinedIcon fontSize='small'/> : <ArrowUpwardOutlinedIcon fontSize='small' />;
+              rightIcon = sortOption.reversed ? <ArrowDownwardOutlinedIcon fontSize='small' /> : <ArrowUpwardOutlinedIcon fontSize='small' />;
             }
           }
           return (

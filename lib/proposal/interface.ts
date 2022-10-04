@@ -1,4 +1,5 @@
 import type { Proposal, ProposalAuthor, ProposalReviewer } from '@prisma/client';
+
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
 export interface ProposalReviewerInput {

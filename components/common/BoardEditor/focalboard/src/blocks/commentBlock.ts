@@ -1,9 +1,11 @@
-import { Block, createBlock } from './block';
-import { PageContent } from 'models';
+import type { PageContent } from 'models';
+
+import type { Block } from './block';
+import { createBlock } from './block';
 
 type CommentBlock = Block & {
-  type: 'comment'
-  fields: { content?: PageContent } // note: the 'text' value is saved as block.title
+  type: 'comment';
+  fields: { content?: PageContent }; // note: the 'text' value is saved as block.title
 }
 
 function createCommentBlock (block?: Block): CommentBlock {

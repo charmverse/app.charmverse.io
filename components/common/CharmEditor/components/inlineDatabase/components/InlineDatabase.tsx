@@ -2,6 +2,10 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -11,9 +15,6 @@ import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
@@ -147,21 +148,20 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     <>
       <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
         <CenterPanel
+          // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl
-          onViewTabClick={(viewId) => {
+          onViewTabClick={(viewId: string) => {
             setCurrentViewId(viewId);
           }}
-          onDeleteView={(viewId) => {
+          onDeleteView={(viewId: string) => {
             setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
           }}
           hideBanner
-          clientConfig={clientConfig}
           readOnly={readOnly}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
           showCard={showCard}
-          showInlineTitle={true}
           activeView={currentView}
           views={views}
           // Show more tabs on shared inline database as the space gets increased
@@ -174,7 +174,6 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             key={shownCardId}
             cardId={shownCardId}
             onClose={() => showCard(undefined)}
-            showCard={(cardId) => showCard(cardId)}
             readOnly={readOnly}
           />
         </RootPortal>

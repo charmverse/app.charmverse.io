@@ -3,10 +3,11 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import KeyIcon from '@mui/icons-material/Key';
 import { Box, Divider, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
+import Link from 'next/link';
+
 import Avatar from 'components/common/Avatar';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useUser } from 'hooks/useUser';
-import Link from 'next/link';
 
 const TasksPageHeaderContainer = styled.div`
   display: flex;

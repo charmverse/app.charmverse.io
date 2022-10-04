@@ -1,7 +1,9 @@
 
 import type { UserVote, Vote, VoteOptions } from '@prisma/client';
+
 import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
+
 import { isVotingClosed } from './utils';
 
 export async function castVote (choice: string, vote: Vote & { voteOptions: VoteOptions[] }, userId: string): Promise<UserVote> {

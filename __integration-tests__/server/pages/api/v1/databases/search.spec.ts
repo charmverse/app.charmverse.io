@@ -1,12 +1,12 @@
 import type { Page, Space, SpaceApiToken, User } from '@prisma/client';
+import request from 'supertest';
+import { v4 } from 'uuid';
+
 import type { InvalidCustomPropertyKeyError, InvalidCustomPropertyValueError, Page as ApiPage, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase, createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { uniqueValues } from 'lib/utilities/array';
-import request from 'supertest';
-// eslint-disable-next-line @next/next/no-server-import-in-page
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 
 let database: Page;
 let user: User;

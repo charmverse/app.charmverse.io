@@ -1,27 +1,28 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, List, ListItemButton, ListItemText } from '@mui/material';
 import type { Page } from '@prisma/client';
-import charmClient from 'charmClient';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import Button from 'components/common/Button';
-import DocumentPage from 'components/[pageId]/DocumentPage';
-import { usePages } from 'hooks/usePages';
-import log from 'lib/log';
-import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useMemo } from 'react';
-import DeleteIcon from '@mui/icons-material/Delete';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import type { BountyWithDetails } from 'lib/bounties';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useBounties } from 'hooks/useBounties';
-import type { PageMeta, PageUpdates } from 'lib/pages';
+
+import charmClient from 'charmClient';
+import DocumentPage from 'components/[pageId]/DocumentPage';
+import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import Button from 'components/common/Button';
+import { useBounties } from 'hooks/useBounties';
+import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { BountyWithDetails } from 'lib/bounties';
+import log from 'lib/log';
+import type { PageMeta, PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 interface Props {
   page?: PageMeta | null;

@@ -1,17 +1,19 @@
 
-import { Page } from '@prisma/client'
-import DocumentPage from 'components/[pageId]/DocumentPage'
-import { usePages } from 'hooks/usePages'
-import log from 'lib/log'
-import debouncePromise from 'lib/utilities/debouncePromise'
-import { useCallback, useEffect, useRef } from 'react'
-import { Card } from '../../blocks/card'
+import type { Page } from '@prisma/client';
+import { useCallback, useEffect, useRef } from 'react';
+
+import DocumentPage from 'components/[pageId]/DocumentPage';
+import { usePages } from 'hooks/usePages';
+import log from 'lib/log';
+import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
-import { PageUpdates } from 'lib/pages'
+import debouncePromise from 'lib/utilities/debouncePromise';
+
+import type { Card } from '../../blocks/card';
 
 type Props = {
-    card: Card
-    readOnly: boolean
+    card: Card;
+    readOnly: boolean;
 }
 
 function CardDetail (props: Props): JSX.Element|null {

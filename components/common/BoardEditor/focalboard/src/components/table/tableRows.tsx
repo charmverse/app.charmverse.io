@@ -1,29 +1,27 @@
 import React from 'react';
-import { useDragLayer } from 'react-dnd';
-import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
 import { usePages } from 'hooks/usePages';
-import { PageContent } from 'models';
-import { Card } from '../../blocks/card';
-import { Board } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
+
+import type { Board } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 
 import TableRow from './tableRow';
 
 type Props = {
-    board: Board
-    activeView: BoardView
-    columnRefs: Map<string, React.RefObject<HTMLDivElement>>
-    cards: readonly Card[]
-    offset: number,
-    resizingColumn: string,
-    selectedCardIds: string[]
-    readOnly: boolean
-    cardIdToFocusOnRender: string
-    showCard: (cardId?: string) => void
-    addCard: (groupByOptionId?: string) => Promise<void>
-    onCardClicked: (e: React.MouseEvent, card: Card) => void
-    onDrop: (srcCard: Card, dstCard: Card) => void
+    board: Board;
+    activeView: BoardView;
+    columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+    cards: readonly Card[];
+    offset: number;
+    resizingColumn: string;
+    selectedCardIds: string[];
+    readOnly: boolean;
+    cardIdToFocusOnRender: string;
+    showCard: (cardId?: string) => void;
+    addCard: (groupByOptionId?: string) => Promise<void>;
+    onCardClicked: (e: React.MouseEvent, card: Card) => void;
+    onDrop: (srcCard: Card, dstCard: Card) => void;
 }
 
 function TableRows (props: Props): JSX.Element {
@@ -34,7 +32,7 @@ function TableRows (props: Props): JSX.Element {
     await updatePage({ id: cardId, title });
 
     if (saveType === 'onEnter') {
-      const card = cards.find(card => card.id === cardId);
+      const card = cards.find(c => c.id === cardId);
       if (card && cards.length > 0 && cards[cards.length - 1] === card) {
         props.addCard(activeView.fields.groupById ? card.fields.properties[activeView.fields.groupById!] as string : '');
       }

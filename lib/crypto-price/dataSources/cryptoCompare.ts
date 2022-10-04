@@ -1,6 +1,7 @@
 
-import fetch from 'adapters/http/fetch';
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
+
+import fetch from 'adapters/http/fetch';
 
 export function getPriceFromCryptoCompare (
   base: CryptoCurrency | string,

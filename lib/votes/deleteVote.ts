@@ -1,7 +1,9 @@
 import type { Vote } from '@prisma/client';
+
 import { prisma } from 'db';
 import log from 'lib/log';
 import { UndesirableOperationError } from 'lib/utilities/errors';
+
 import { getVote } from './getVote';
 
 export async function deleteVote (id: string, userId: string): Promise<Vote | null> {

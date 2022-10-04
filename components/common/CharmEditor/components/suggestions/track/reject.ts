@@ -1,8 +1,8 @@
 import type { EditorView } from '@bangle.dev/pm';
 import { Mapping, AddMarkStep, RemoveMarkStep } from '@bangle.dev/pm';
 
-import { deactivateAllSelectedChanges } from './helpers';
 import { deleteNode } from './delete';
+import { deactivateAllSelectedChanges } from './helpers';
 import type { TrackAttribute } from './interfaces';
 
 export function reject (type: string, pos: number, view: EditorView) {

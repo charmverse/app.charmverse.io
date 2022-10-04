@@ -1,5 +1,7 @@
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
+
 import { getTimeDifference } from 'lib/utilities/dates';
+
 import { getPriceFromCoinMarketCap, getPriceFromCryptoCompare } from './dataSources';
 
 class PricingCache {

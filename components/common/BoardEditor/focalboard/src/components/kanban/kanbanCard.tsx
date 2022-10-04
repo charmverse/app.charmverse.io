@@ -1,46 +1,49 @@
 import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box } from '@mui/material';
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
-import { useRouter } from 'next/router';
 import Link from '@mui/material/Link';
+import type { CryptoCurrency } from 'connectors';
+import { TokenLogoPaths } from 'connectors';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+import { mutate } from 'swr';
+
+import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { CryptoCurrency, TokenLogoPaths } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/browser';
 import { PageContent } from 'models';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
-import { mutate } from 'swr';
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { Card } from '../../blocks/card';
+
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import IconButton from '../../widgets/buttons/iconButton';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import LinkIcon from '@mui/icons-material/Link';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
-import ConfirmationDialogBox, { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
+import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
+import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
-  card: Card
-  board: Board
-  visiblePropertyTemplates: IPropertyTemplate[]
-  isSelected: boolean
-  visibleBadges: boolean
-  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
-  readOnly: boolean
-  onDrop: (srcCard: Card, dstCard: Card) => void
-  showCard: (cardId?: string) => void
-  isManualSort: boolean
+  card: Card;
+  board: Board;
+  visiblePropertyTemplates: IPropertyTemplate[];
+  isSelected: boolean;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  readOnly: boolean;
+  onDrop: (srcCard: Card, dstCard: Card) => void;
+  showCard: (cardId?: string) => void;
+  isManualSort: boolean;
 }
 
 const BountyFooter = styled.div`
@@ -79,7 +82,7 @@ const KanbanCard = React.memo((props: Props) => {
   const cardPage = pages[card.id];
 
   const router = useRouter();
-  const domain = router.query.domain  || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
+  const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
 
   // Check if the current user is an admin, admin means implicit full access
@@ -126,72 +129,71 @@ const KanbanCard = React.memo((props: Props) => {
           style={{ opacity: isDragging ? 0.5 : 1 }}
           onClick={(e) => {
             e.preventDefault();
-            if(props.onClick) {
+            if (props.onClick) {
               props.onClick(e);
             }
-          }
-        }
+          }}
           data-test={`kanban-card-${card.id}`}
         >
           {!props.readOnly
             && (
-            <MenuWrapper
-              className='optionsMenu'
-              stopPropagationOnToggle={true}
-            >
-              <IconButton icon={<MoreHorizIcon />} />
-              <Menu position='bottom-start'>
-                {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
-                <Menu.Text
-                  icon={<DeleteOutlineIcon />}
-                  id='delete'
-                  name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
-                  onClick={handleDeleteButtonOnClick}
-                />
-                )}
-                <Menu.Text
-                  icon={<DuplicateIcon color='secondary' fontSize='small' />}
-                  id='duplicate'
-                  name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
-                  onClick={() => {
-                    if (pages[card.id] && space) {
-                      mutator.duplicateCard(
-                        {
-                          cardId: card.id,
-                          board,
-                          cardPage: pages[card.id]!,
-                          afterRedo: async (newCardId) => {
-                            props.showCard(newCardId);
-                            mutate(`pages/${space.id}`);
-                          },
-                          beforeUndo: async () => {
-                            props.showCard(undefined);
+              <MenuWrapper
+                className='optionsMenu'
+                stopPropagationOnToggle={true}
+              >
+                <IconButton icon={<MoreHorizIcon />} />
+                <Menu position='bottom-start'>
+                  {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
+                    <Menu.Text
+                      icon={<DeleteOutlineIcon />}
+                      id='delete'
+                      name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
+                      onClick={handleDeleteButtonOnClick}
+                    />
+                  )}
+                  <Menu.Text
+                    icon={<DuplicateIcon color='secondary' fontSize='small' />}
+                    id='duplicate'
+                    name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
+                    onClick={() => {
+                      if (pages[card.id] && space) {
+                        mutator.duplicateCard(
+                          {
+                            cardId: card.id,
+                            board,
+                            cardPage: pages[card.id]!,
+                            afterRedo: async (newCardId) => {
+                              props.showCard(newCardId);
+                              mutate(`pages/${space.id}`);
+                            },
+                            beforeUndo: async () => {
+                              props.showCard(undefined);
+                            }
                           }
-                        }
-                      );
-                    }
-                  }}
-                />
-                <Menu.Text
-                  icon={<LinkIcon />}
-                  id='copy'
-                  name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
-                  onClick={() => {
-                    let cardLink = window.location.href;
+                        );
+                      }
+                    }}
+                  />
+                  <Menu.Text
+                    icon={<LinkIcon />}
+                    id='copy'
+                    name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
+                    onClick={() => {
+                      let cardLink = window.location.href;
 
-                    const queryString = new URLSearchParams(window.location.search);
-                    if (queryString.get('cardId') !== card.id) {
-                      const newUrl = new URL(window.location.toString());
-                      newUrl.searchParams.set('cardId', card.id);
-                      cardLink = newUrl.toString();
-                    }
+                      const queryString = new URLSearchParams(window.location.search);
+                      if (queryString.get('cardId') !== card.id) {
+                        const newUrl = new URL(window.location.toString());
+                        newUrl.searchParams.set('cardId', card.id);
+                        cardLink = newUrl.toString();
+                      }
 
-                    Utils.copyTextToClipboard(cardLink);
-                    showMessage('Copied card link to clipboard', 'success');
-                  }}
-                />
-              </Menu>
-            </MenuWrapper>
+                      Utils.copyTextToClipboard(cardLink);
+                      showMessage('Copied card link to clipboard', 'success');
+                    }}
+                  />
+                </Menu>
+              </MenuWrapper>
             )}
 
           <div className='octo-icontitle'>
@@ -222,33 +224,33 @@ const KanbanCard = React.memo((props: Props) => {
             </Tooltip>
           ))}
           {linkedBounty && (
-          <BountyFooter>
-            <Box sx={{
-              display: 'flex',
-              gap: 0.25
-            }}
-            >
-              <CurrencyIcon>
-                {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-                <img
-                  loading='lazy'
-                  height={20}
-                  src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
-                />
-                )}
-              </CurrencyIcon>
+            <BountyFooter>
               <Box sx={{
                 display: 'flex',
                 gap: 0.25
               }}
               >
-                <Box component='span'>
-                  {linkedBounty.rewardAmount}
+                <CurrencyIcon>
+                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
+                    <img
+                      loading='lazy'
+                      height={20}
+                      src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
+                    />
+                  )}
+                </CurrencyIcon>
+                <Box sx={{
+                  display: 'flex',
+                  gap: 0.25
+                }}
+                >
+                  <Box component='span'>
+                    {linkedBounty.rewardAmount}
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-            <BountyStatusChip status={linkedBounty.status} />
-          </BountyFooter>
+              <BountyStatusChip status={linkedBounty.status} />
+            </BountyFooter>
           )}
         </div>
       </Link>

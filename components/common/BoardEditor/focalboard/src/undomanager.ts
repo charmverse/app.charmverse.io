@@ -1,10 +1,10 @@
 interface UndoCommand {
-    checkpoint: number
-    undo: (value?: any) => Promise<void>
-    redo: () => Promise<void>
-    description?: string
-    groupId?: string
-    value?: any
+    checkpoint: number;
+    undo: (value?: any) => Promise<void>;
+    redo: () => Promise<void>;
+    description?: string;
+    groupId?: string;
+    value?: any;
 }
 
 //
@@ -77,8 +77,8 @@ class UndoManager {
 
   registerUndo (
     command: {
-            undo: (value?: any) => Promise<void>,
-            redo: () => Promise<void>
+            undo: (value?: any) => Promise<void>;
+            redo: () => Promise<void>;
         },
     description?: string,
     groupId?: string,

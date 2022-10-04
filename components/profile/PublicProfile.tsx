@@ -1,9 +1,11 @@
 import { Chip, Divider, Stack, Typography } from '@mui/material';
+import { useEffect } from 'react';
+import useSWRImmutable from 'swr/immutable';
+
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
-import { useEffect } from 'react';
-import useSWRImmutable from 'swr/immutable';
+
 import AggregatedData from './components/AggregatedData';
 import type { Collectable } from './components/CollectibleRow';
 import CollectableRow from './components/CollectibleRow';

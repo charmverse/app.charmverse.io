@@ -1,4 +1,5 @@
 import type { PagePermission } from '@prisma/client';
+
 import type { IPagePermissionToCreate } from '../page-permission-interfaces';
 
 /**

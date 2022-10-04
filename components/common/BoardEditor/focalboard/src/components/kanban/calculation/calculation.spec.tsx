@@ -1,9 +1,7 @@
+import { render } from '@testing-library/react';
 import React from 'react';
 
-import { render } from '@testing-library/react';
-
 import { TestBlockFactory } from '../../../test/testBlockFactory';
-
 import { wrapIntl } from '../../../testUtils';
 
 import { KanbanCalculation } from './calculation';

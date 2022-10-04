@@ -12,16 +12,21 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { MouseEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { injectIntl, IntlShape } from 'react-intl';
-import { BoardView, createBoardView } from '../../blocks/boardView';
+import type { IntlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
+
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
+
+import type { BoardView } from '../../blocks/boardView';
+import { createBoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { iconForViewType } from '../viewMenu';
@@ -33,24 +38,37 @@ const StyledButton = styled(Button)`
     width: 20px;
     height: 20px;
   }
-`
+`;
 
 interface ViewTabsProps {
   intl: IntlShape;
-  viewsBoardId: string
-  activeView?: BoardView | null
+  viewsBoardId: string;
+  activeView?: BoardView | null;
   readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
-  addViewButton?: ReactNode
-  onViewTabClick?: (viewId: string) => void
-  onDeleteView?: (viewId: string) => void
-  disableUpdatingUrl?: boolean
-  maxTabsShown: number
-  openViewOptions: () => void
+  addViewButton?: ReactNode;
+  onViewTabClick?: (viewId: string) => void;
+  onDeleteView?: (viewId: string) => void;
+  disableUpdatingUrl?: boolean;
+  maxTabsShown: number;
+  openViewOptions: () => void;
 }
 
-function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick, disableUpdatingUrl, addViewButton, viewsBoardId, activeView, intl, readOnly, showView, views }: ViewTabsProps) {
+function ViewTabs (props: ViewTabsProps) {
+  const {
+    onDeleteView,
+    openViewOptions,
+    maxTabsShown,
+    onViewTabClick,
+    disableUpdatingUrl,
+    addViewButton,
+    viewsBoardId,
+    activeView,
+    intl,
+    readOnly,
+    showView,
+    views: viewsProp } = props;
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -60,7 +78,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-  views = views.filter(view => !view.fields.inline)
+  const views = viewsProp.filter(view => !view.fields.inline);
   // Find the index of the current view
   const currentViewIndex = views.findIndex(view => view.id === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
@@ -86,7 +104,8 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
   function handleViewClick (event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     const view = views.find(v => v.id === event.currentTarget.id);
-    view && onViewTabClick?.(view.id)
+    // eslint-disable-next-line no-unused-expressions
+    view && onViewTabClick?.(view.id);
     if (readOnly) return;
     if (event.currentTarget.id === activeView?.id) {
       event.preventDefault();
@@ -140,8 +159,8 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
 
     const nextView = views.find((o) => o !== dropdownView);
     await mutator.deleteBlock(dropdownView, 'delete view');
-    onDeleteView?.(dropdownView.id)
-    setAnchorEl(null)
+    onDeleteView?.(dropdownView.id);
+    setAnchorEl(null);
     if (nextView) {
       showView(nextView.id);
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: nextView.id }));
@@ -199,7 +218,7 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
               >
                 {view.title}
               </StyledButton>
-          )}
+            )}
             sx={{ p: 0, mb: '5px' }}
             value={view.id}
           />
@@ -242,10 +261,10 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
           <ListItemText>{duplicateViewText}</ListItemText>
         </MenuItem>
         {views.length !== 1 && (
-        <MenuItem dense onClick={handleDeleteView}>
-          <ListItemIcon><DeleteOutlineIcon fontSize='small' /></ListItemIcon>
-          <ListItemText>{deleteViewText}</ListItemText>
-        </MenuItem>
+          <MenuItem dense onClick={handleDeleteView}>
+            <ListItemIcon><DeleteOutlineIcon fontSize='small' /></ListItemIcon>
+            <ListItemText>{deleteViewText}</ListItemText>
+          </MenuItem>
         )}
       </Menu>
 
@@ -260,19 +279,28 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
         }}
         >
           {restViews.map(view => {
-            const content = <MenuItem onClick={() => {
-              onViewTabClick?.(view.id)
-              showViewsMenuState.onClose()
-            }} component='a' key={view.id} dense>
-              <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-              <ListItemText>{view.title}</ListItemText>
-            </MenuItem>
-            return disableUpdatingUrl ? content : <Link
-            href={getViewUrl(view.id)}
-            passHref
-          >
-            {content}
-          </Link>
+            const content = (
+              <MenuItem
+                onClick={() => {
+                  onViewTabClick?.(view.id);
+                  showViewsMenuState.onClose();
+                }}
+                component='a'
+                key={view.id}
+                dense
+              >
+                <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+                <ListItemText>{view.title}</ListItemText>
+              </MenuItem>
+            );
+            return disableUpdatingUrl ? content : (
+              <Link
+                href={getViewUrl(view.id)}
+                passHref
+              >
+                {content}
+              </Link>
+            );
           })}
         </Box>
         <Divider />
@@ -290,12 +318,12 @@ function ViewTabs ({ onDeleteView, openViewOptions, maxTabsShown, onViewTabClick
       </Menu>
 
       {/* Form to rename views */}
-      {<Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
+      <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
         <form onSubmit={handleSubmit(saveViewTitle)}>
           <TextField {...register('title')} autoFocus />
           <Button type='submit'>Save</Button>
         </form>
-      </Modal>}
+      </Modal>
     </>
   );
 }

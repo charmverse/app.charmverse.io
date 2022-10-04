@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
+
 import type { ProposalWithUsers } from './interface';
 
 export async function getProposalsBySpace ({ spaceId, userId }: {

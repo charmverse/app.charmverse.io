@@ -1,17 +1,18 @@
+import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import type { PaymentMethod } from '@prisma/client';
 import type { CryptoCurrency } from 'connectors';
 import { CryptoCurrencies } from 'connectors';
-import Modal from 'components/common/Modal';
-import { useEffect, useState } from 'react';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { PaymentMethod } from '@prisma/client';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import AddIcon from '@mui/icons-material/Add';
-import TokenLogo from 'components/common/TokenLogo';
-import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { useEffect, useState } from 'react';
+
 import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
+import Modal from 'components/common/Modal';
+import TokenLogo from 'components/common/TokenLogo';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 
 export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;

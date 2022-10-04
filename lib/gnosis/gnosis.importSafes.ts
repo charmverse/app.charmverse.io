@@ -1,6 +1,8 @@
 
 import type { Signer } from 'ethers';
+
 import charmClient from 'charmClient';
+
 import { getSafesForAddresses } from './gnosis';
 
 interface ImportSafeProps {

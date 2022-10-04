@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@prisma/client';
-import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';
 import request from 'supertest';
+
+import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -10,7 +11,7 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const userCookie = await loginUser(adminUser);
+    const userCookie = await loginUser(adminUser.id);
 
     const update: Pick<SpacePermissionConfigurationUpdate, 'permissionConfigurationMode'> = {
       permissionConfigurationMode: 'readOnly'
@@ -28,7 +29,7 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
-    const userCookie = await loginUser(nonAdminUser);
+    const userCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-permissions-mode`)

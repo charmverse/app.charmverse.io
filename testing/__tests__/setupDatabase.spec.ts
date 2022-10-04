@@ -49,7 +49,7 @@ describe('generateUserAndSpaceWithApiToken', () => {
 
     expect(generated.space.id).not.toEqual(generated2.space.id);
 
-    expect(generated.user.addresses[0]).not.toEqual(generated2.user.addresses[0]);
+    expect(generated.user.wallets[0].address).not.toEqual(generated2.user.wallets[0].address);
   });
 
 });

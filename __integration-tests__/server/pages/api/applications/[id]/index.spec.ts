@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Application, Space, User } from '@prisma/client';
+import request from 'supertest';
+
 import type { ApplicationCreationData, ApplicationUpdateData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -15,11 +17,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('PUT /api/applications/{applicationId} - update an application', () => {
@@ -31,7 +29,7 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
@@ -85,7 +83,7 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: otherUser.id,

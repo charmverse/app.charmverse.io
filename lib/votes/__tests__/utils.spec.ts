@@ -1,4 +1,5 @@
 import type { Vote } from '@prisma/client';
+
 import { VOTE_STATUS } from '../interfaces';
 import { isVotingClosed } from '../utils';
 

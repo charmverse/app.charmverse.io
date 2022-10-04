@@ -1,14 +1,16 @@
 /* eslint-disable max-lines */
-import { useEffect, useRef, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import { FormattedMessage, IntlShape } from 'react-intl';
-
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import { useEffect, useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
@@ -16,25 +18,22 @@ import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
 import { KanbanCalculation } from './calculation/calculation';
 
-
-
 type Props = {
-  board: Board
-  activeView: BoardView
-  group: BoardGroup
-  groupByProperty?: IPropertyTemplate
-  intl: IntlShape
-  readOnly: boolean
-  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>
-  propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>
-  onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void
-  calculationMenuOpen: boolean
-  onCalculationMenuOpen: () => void
-  onCalculationMenuClose: () => void
+  board: Board;
+  activeView: BoardView;
+  group: BoardGroup;
+  groupByProperty?: IPropertyTemplate;
+  intl: IntlShape;
+  readOnly: boolean;
+  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>;
+  propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
+  onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void;
+  calculationMenuOpen: boolean;
+  onCalculationMenuOpen: () => void;
+  onCalculationMenuClose: () => void;
 }
 
 const defaultCalculation = 'count';
@@ -42,7 +41,7 @@ const defaultProperty: IPropertyTemplate = {
   id: Constants.titleColumnId
 } as IPropertyTemplate;
 
-export default function KanbanColumnHeader(props: Props): JSX.Element {
+export default function KanbanColumnHeader (props: Props): JSX.Element {
   const { board, activeView, intl, group, groupByProperty } = props;
   const [groupTitle, setGroupTitle] = useState(group.option.value);
 
@@ -77,7 +76,9 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
 
   const groupCalculation = props.activeView.fields.kanbanCalculations[props.group.option.id];
   const calculationValue = groupCalculation ? groupCalculation.calculation : defaultCalculation;
-  const calculationProperty = groupCalculation ? props.board.fields.cardProperties.find((property) => property.id === groupCalculation.propertyId) || defaultProperty : defaultProperty;
+  const calculationProperty = groupCalculation
+    ? props.board.fields.cardProperties.find((property) => property.id === groupCalculation.propertyId) || defaultProperty
+    : defaultProperty;
 
   return (
     <div
@@ -159,7 +160,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               <Menu>
                 <Menu.Text
                   id='hide'
-                  icon={<VisibilityOffOutlinedIcon fontSize="small"/>}
+                  icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                   name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                   onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
                 />

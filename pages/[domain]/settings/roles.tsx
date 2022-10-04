@@ -1,7 +1,8 @@
-import SettingsLayout from 'components/settings/Layout';
 import type { ReactElement } from 'react';
-import { setTitle } from 'hooks/usePageTitle';
+
+import SettingsLayout from 'components/settings/Layout';
 import RoleAssignment from 'components/settings/roles/RoleSettings';
+import { setTitle } from 'hooks/usePageTitle';
 
 export default function RoleSettings () {
   setTitle('Roles & Permissions');

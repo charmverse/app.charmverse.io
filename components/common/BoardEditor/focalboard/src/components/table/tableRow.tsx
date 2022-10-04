@@ -2,36 +2,36 @@ import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import { Card } from '../../blocks/card';
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { Constants } from '../../constants';
-import Button from '../../widgets/buttons/button';
-import Editable from '../../widgets/editable';
-import { useSortable } from '../../hooks/sortable';
 import { isTouchScreen } from 'lib/browser';
 
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
+import { useSortable } from '../../hooks/sortable';
+import Button from '../../widgets/buttons/button';
+import Editable from '../../widgets/editable';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
-    hasContent?: boolean
-    board: Board
-    activeView: BoardView
-    card: Card
-    pageIcon?: string | null
-    pageTitle: string
-    isSelected: boolean
-    focusOnMount: boolean
-    showCard: (cardId: string) => void
-    readOnly: boolean
-    offset: number
-    pageUpdatedAt: string
-    pageUpdatedBy: string
-    resizingColumn: string
-    columnRefs: Map<string, React.RefObject<HTMLDivElement>>
-    onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void
-    onDrop: (srcCard: Card, dstCard: Card) => void
-    saveTitle: (saveType: string, cardId: string, title: string) => void
+    hasContent?: boolean;
+    board: Board;
+    activeView: BoardView;
+    card: Card;
+    pageIcon?: string | null;
+    pageTitle: string;
+    isSelected: boolean;
+    focusOnMount: boolean;
+    showCard: (cardId: string) => void;
+    readOnly: boolean;
+    offset: number;
+    pageUpdatedAt: string;
+    pageUpdatedBy: string;
+    resizingColumn: string;
+    columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+    onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void;
+    onDrop: (srcCard: Card, dstCard: Card) => void;
+    saveTitle: (saveType: string, cardId: string, title: string) => void;
 }
 
 export const columnWidth = (resizingColumn: string, columnWidths: Record<string, number>, offset: number, templateId: string): number => {

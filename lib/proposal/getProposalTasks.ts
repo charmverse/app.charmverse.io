@@ -1,7 +1,9 @@
 import type { Page, Proposal, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
-import { v4 } from 'uuid';
+
 import { getProposalAction } from './getProposalAction';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';

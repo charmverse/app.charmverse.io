@@ -2,9 +2,10 @@ import Safe from '@gnosis.pm/safe-core-sdk';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
+
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
-import { useEffect, useState } from 'react';
 
 export default function useSafes (safeAddresses: string[]) {
 

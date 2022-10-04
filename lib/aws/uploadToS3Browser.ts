@@ -4,6 +4,7 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+
 import charmClient from 'charmClient';
 
 export async function uploadToS3 (file: File) {

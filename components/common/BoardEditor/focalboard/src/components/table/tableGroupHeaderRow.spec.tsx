@@ -1,17 +1,14 @@
 
-import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import 'isomorphic-fetch';
-
+import { fireEvent, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { act } from 'react-dom/test-utils';
 
-import userEvent from '@testing-library/user-event';
-
-import { wrapDNDIntl } from '../../testUtils';
-
 import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl } from '../../testUtils';
 
 import TableGroupHeaderRowElement from './tableGroupHeaderRow';
 

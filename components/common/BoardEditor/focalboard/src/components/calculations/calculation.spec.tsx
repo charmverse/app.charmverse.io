@@ -1,12 +1,10 @@
-import React from 'react';
 
 import { render } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapIntl } from '../../testUtils';
-
 import { TableCalculationOptions } from '../table/calculation/tableCalculationOptions';
 
 import Calculation from './calculation';

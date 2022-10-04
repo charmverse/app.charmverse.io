@@ -3,13 +3,15 @@ import type {
   Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
+import type { FiatCurrency, IPairQuote } from 'connectors';
+
 import * as http from 'adapters/http';
 import { PagesApi } from 'charmClient/apis/pagesApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
-import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -33,6 +35,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
@@ -64,9 +67,10 @@ class CharmClient {
 
   tasks = new TasksApi();
 
-  async login (address: string) {
+  async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
-      address
+      address,
+      walletSignature
     });
     return user;
   }
@@ -83,9 +87,10 @@ class CharmClient {
     return http.GET<PublicUser>(`/api/public/profile/${path}`);
   }
 
-  createUser ({ address }: { address: string }) {
+  createUser ({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
-      address
+      address,
+      walletSignature
     });
   }
 

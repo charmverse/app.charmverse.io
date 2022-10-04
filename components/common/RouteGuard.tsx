@@ -1,26 +1,26 @@
-import type { ReactNode } from 'react';
-import { useState, useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useWeb3React } from '@web3-react/core';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import type { User } from '@prisma/client';
-import { getKey } from 'hooks/useLocalStorage';
-import { useUser } from 'hooks/useUser';
-import { useSpaces } from 'hooks/useSpaces';
-import { isSpaceDomain } from 'lib/spaces';
-import charmClient from 'charmClient';
 import type { UrlObject } from 'url';
+
+import type { User } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
+import { getKey } from 'hooks/useLocalStorage';
+import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
+import { isSpaceDomain } from 'lib/spaces';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'invite', 'share', 'api-docs', 'u'];
+const publicPages = ['/', 'share', 'api-docs', 'u'];
 const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
-  const { triedEager } = useContext(Web3Connection);
-  const { account } = useWeb3React();
+  const { account, walletAuthSignature, triedEager } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
   const [spaces,, isSpacesLoaded] = useSpaces();
   const isWalletLoading = (!triedEager && !account);
@@ -45,12 +45,14 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+
     // wait to listen to events until data is loaded
     if (isLoading) {
       return;
     }
 
     async function authCheckAndRedirect (path: string) {
+
       const result = await authCheck(path);
 
       setAuthorized(result.authorized);
@@ -81,10 +83,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, account, user, spaces]);
+  }, [isLoading, account, walletAuthSignature, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
+
     const path = url.split('?')[0];
 
     const firstPathSegment = path.split('/').filter(pathElem => {
@@ -99,7 +102,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
-    else if (!user && !account) {
+    else if ((!user && !account)) {
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
@@ -109,36 +112,17 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
         }
       };
     }
-    // condition: no session, but a wallet is connected
-    else if (!user && account) {
-      log.info('[RouteGuard]: log in user by wallet address');
-      const _user = await charmClient.login(account).catch(() => null);
-      if (_user) {
-        return { authorized: true, user: _user };
-      }
-      else {
-        const __user = await charmClient.createUser({ address: account });
-        return { authorized: true, user: __user };
-      }
-    }
-    // condition: user connected but the wallet address is new
-    else if (user && account && !user.addresses.includes(account)) {
-      log.info('[RouteGuard]: unknown address');
-      const _user = await charmClient.login(account).catch(() => null);
-      // log in existing user
-      if (_user) {
-        return { authorized: true, user: _user };
-      }
-      // add the address to current profile
-      else if (user.addresses.length === 0) {
-        const __user = await charmClient.updateUser({ addresses: [account] });
-        return { authorized: true, user: __user };
-      }
-      // create a new user
-      else {
-        const __user = await charmClient.createUser({ address: account });
-        return { authorized: true, user: __user };
-      }
+    // condition: account but no valid wallet signature
+    else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
+
+      return {
+        authorized: true,
+        redirect: {
+          pathname: '/',
+          query: { returnUrl: router.asPath }
+        }
+      };
+
     }
     // condition: user accesses account pages (profile, tasks)
     else if (accountPages.some(basePath => firstPathSegment === basePath)) {

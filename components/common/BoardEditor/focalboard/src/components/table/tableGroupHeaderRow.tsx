@@ -1,34 +1,35 @@
 /* eslint-disable max-lines */
+
+import AddIcon from '@mui/icons-material/Add';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
 import { Constants } from '../../constants';
-import { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import IconButton from '../../widgets/buttons/iconButton';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
 import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
-import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-  board: Board
-  activeView: BoardView
-  group: BoardGroup
-  groupByProperty?: IPropertyTemplate
-  readOnly: boolean
-  hideGroup: (groupByOptionId: string) => void
-  addCard: (groupByOptionId?: string) => Promise<void>
-  propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>
-  onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void
+  board: Board;
+  activeView: BoardView;
+  group: BoardGroup;
+  groupByProperty?: IPropertyTemplate;
+  readOnly: boolean;
+  hideGroup: (groupByOptionId: string) => void;
+  addCard: (groupByOptionId?: string) => Promise<void>;
+  propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
+  onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
 }
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
@@ -67,7 +68,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
         <IconButton
           icon={<ArrowDropDownOutlinedIcon fontSize='small' />}
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
-          className={'hello-world'}
+          className='hello-world'
         />
 
         {!group.option.id
@@ -118,7 +119,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               <Menu>
                 <Menu.Text
                   id='hide'
-                  icon={<VisibilityOffOutlinedIcon fontSize="small" />}
+                  icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                   name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                   onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
                 />

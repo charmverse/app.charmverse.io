@@ -3,10 +3,10 @@ import React from 'react';
 import { Constants } from '../constants';
 
 type Props = {
-    color?: string
-    title?: string
-    children: React.ReactNode
-    className?: string
+    color?: string;
+    title?: string;
+    children: React.ReactNode;
+    className?: string;
 }
 
 // Switch is an on-off style switch / checkbox

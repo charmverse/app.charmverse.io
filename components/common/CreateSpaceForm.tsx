@@ -1,23 +1,24 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { IconButton, Tooltip, InputAdornment } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { IconButton, Tooltip, InputAdornment } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import TextField from '@mui/material/TextField';
-import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
-import { useUser } from 'hooks/useUser';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import type { Prisma } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
-import { DOMAIN_BLACKLIST } from 'lib/spaces';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
+import FieldLabel from 'components/common/form/FieldLabel';
+import { DialogTitle } from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
+import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
+import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({

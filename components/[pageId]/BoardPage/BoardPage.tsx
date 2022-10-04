@@ -1,3 +1,7 @@
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
@@ -15,9 +19,6 @@ import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import type { Page } from 'models';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 /**
  *
@@ -128,7 +129,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
           <CenterPanel
-            clientConfig={clientConfig}
             readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
@@ -142,7 +142,6 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
                 key={shownCardId}
                 cardId={shownCardId}
                 onClose={() => showCard(undefined)}
-                showCard={(cardId) => showCard(cardId)}
                 readOnly={readOnly}
               />
             </RootPortal>

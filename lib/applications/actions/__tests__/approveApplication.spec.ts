@@ -1,10 +1,12 @@
 
 import type { Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { createBounty, updateBountySettings } from 'lib/bounties';
 import { LimitReachedError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { approveApplication } from '../approveApplication';
 import { createApplication } from '../createApplication';
 

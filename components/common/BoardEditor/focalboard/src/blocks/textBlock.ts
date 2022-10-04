@@ -1,8 +1,9 @@
-import { ContentBlock } from './contentBlock';
-import { Block, createBlock } from './block';
+import type { Block } from './block';
+import { createBlock } from './block';
+import type { ContentBlock } from './contentBlock';
 
 export type TextBlock = ContentBlock & {
-    type: 'text'
+    type: 'text';
 }
 
 function createTextBlock (block?: Block): TextBlock {

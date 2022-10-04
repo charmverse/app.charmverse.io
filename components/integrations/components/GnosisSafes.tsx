@@ -1,23 +1,24 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
-import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
-import { useRouter } from 'next/router';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import Button from 'components/common/Button';
-import Link from 'components/common/Link';
-import Legend from 'components/settings/Legend';
-import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { shortenHex } from 'lib/utilities/strings';
-import charmClient from 'charmClient';
+import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { getChainById } from 'connectors';
-import useGnosisSigner from 'hooks/useWeb3Signer';
-import { useUser } from 'hooks/useUser';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
+import Link from 'components/common/Link';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import Legend from 'components/settings/Legend';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
+import { useUser } from 'hooks/useUser';
+import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
+import { shortenHex } from 'lib/utilities/strings';
 
 interface Safe {
   id: string;
@@ -48,7 +49,7 @@ export default function GnosisSafesList () {
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.addresses,
+          addresses: user.wallets.map(w => w.address),
           getWalletName
         });
         await mutate();

@@ -1,23 +1,22 @@
 import { useIntl } from 'react-intl';
 
-import { IPropertyTemplate } from '../../../blocks/board';
-import { Card } from '../../../blocks/card';
+import type { IPropertyTemplate } from '../../../blocks/board';
+import type { Card } from '../../../blocks/card';
 import Button from '../../../widgets/buttons/button';
-
 import Calculations from '../../calculations/calculations';
 
 import { KanbanCalculationOptions } from './calculationOptions';
 
 type Props = {
-    cards: Card[]
-    cardProperties: IPropertyTemplate[]
-    menuOpen: boolean
-    onMenuClose: () => void
-    onMenuOpen: () => void
-    onChange: (data: { calculation: string, propertyId: string }) => void
-    value: string
-    property: IPropertyTemplate
-    readOnly: boolean
+    cards: Card[];
+    cardProperties: IPropertyTemplate[];
+    menuOpen: boolean;
+    onMenuClose: () => void;
+    onMenuOpen: () => void;
+    onChange: (data: { calculation: string, propertyId: string }) => void;
+    value: string;
+    property: IPropertyTemplate;
+    readOnly: boolean;
 }
 
 function KanbanCalculation (props: Props): JSX.Element {
@@ -35,16 +34,16 @@ function KanbanCalculation (props: Props): JSX.Element {
 
       {
                 !props.readOnly && props.menuOpen && (
-                <KanbanCalculationOptions
-                  value={props.value}
-                  property={props.property}
-                  menuOpen={props.menuOpen}
-                  onChange={(data: { calculation: string, propertyId: string }) => {
-                    props.onChange(data);
-                    props.onMenuClose();
-                  }}
-                  cardProperties={props.cardProperties}
-                />
+                  <KanbanCalculationOptions
+                    value={props.value}
+                    property={props.property}
+                    menuOpen={props.menuOpen}
+                    onChange={(data: { calculation: string, propertyId: string }) => {
+                      props.onChange(data);
+                      props.onMenuClose();
+                    }}
+                    cardProperties={props.cardProperties}
+                  />
                 )
             }
     </div>
@@ -52,6 +51,6 @@ function KanbanCalculation (props: Props): JSX.Element {
 }
 
 export {
-    KanbanCalculation
+  KanbanCalculation
 };
 

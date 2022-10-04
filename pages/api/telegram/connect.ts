@@ -1,12 +1,13 @@
 import type { TelegramUser, User } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
-import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { IDENTITY_TYPES } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc({
   onError,
@@ -49,7 +50,8 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
     };
 
     if (telegramAccount.photo_url) {
-      const { url } = await uploadToS3({ fileName: getUserS3Folder({ userId, url: telegramAccount.photo_url }), url: telegramAccount.photo_url });
+      const pathInS3 = getUserS3FilePath({ userId, url: telegramAccount.photo_url });
+      const { url } = await uploadUrlToS3({ pathInS3, url: telegramAccount.photo_url });
       userFields.avatar = url;
     }
 

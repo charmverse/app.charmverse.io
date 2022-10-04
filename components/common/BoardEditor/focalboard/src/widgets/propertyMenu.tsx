@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useIntl, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import { PropertyType } from '../blocks/board';
+import type { PropertyType } from '../blocks/board';
 import { Utils } from '../utils';
+
 import Menu from './menu';
 
 type Props = {
-    propertyId: string
-    propertyName: string
-    propertyType: PropertyType
-    onTypeAndNameChanged: (newType: PropertyType, newName: string) => void
-    onDelete: (id: string) => void
+    propertyId: string;
+    propertyName: string;
+    propertyType: PropertyType;
+    onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+    onDelete: (id: string) => void;
 }
 
 export function typeDisplayName (intl: IntlShape, type: PropertyType): string {
@@ -58,8 +60,8 @@ export const propertyTypesList: PropertyType[] = [
 ];
 
 type TypesProps = {
-    label: string
-    onTypeSelected: (type: PropertyType) => void
+    label: string;
+    onTypeSelected: (type: PropertyType) => void;
 }
 
 export function PropertyTypes (props: TypesProps): JSX.Element {

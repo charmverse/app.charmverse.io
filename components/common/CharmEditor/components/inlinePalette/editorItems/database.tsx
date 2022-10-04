@@ -1,8 +1,10 @@
-import { rafCommandExec } from '@bangle.dev/utils';
 import type { EditorState } from '@bangle.dev/pm';
-import type { PageType } from '@prisma/client';
+import { rafCommandExec } from '@bangle.dev/utils';
 import DatabaseIcon from '@mui/icons-material/TableChart';
+import type { PageType } from '@prisma/client';
+
 import { addPage } from 'lib/pages';
+
 import { insertNode } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';

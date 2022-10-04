@@ -1,11 +1,13 @@
-import type { Space, User } from '@prisma/client';
-import type { PageWithProposal } from 'lib/pages';
+import type { Space } from '@prisma/client';
 import request from 'supertest';
+
+import type { PageWithProposal } from 'lib/pages';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let adminUser: User;
-let nonAdminUser: User;
+let adminUser: LoggedInUser;
+let nonAdminUser: LoggedInUser;
 let space: Space;
 
 beforeAll(async () => {
@@ -21,7 +23,7 @@ beforeAll(async () => {
 describe('POST /api/proposals/templates - Create a proposal from a template', () => {
   it('should create a proposal template if the user is a space admin and respond with 201', async () => {
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const proposalTemplate = (await request(baseUrl)
       .post('/api/proposals/templates')
@@ -36,7 +38,7 @@ describe('POST /api/proposals/templates - Create a proposal from a template', ()
 
   it('should fail if the user is not a space admin and respond with 401', async () => {
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post('/api/proposals/templates')

@@ -1,6 +1,8 @@
 import type { Space } from '@prisma/client';
-import { prisma } from 'db';
 import { validate } from 'uuid';
+
+import { prisma } from 'db';
+
 import { PublicSpaceInfo } from './interfaces';
 
 /**
