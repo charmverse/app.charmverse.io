@@ -186,7 +186,7 @@ export default function PublicPage () {
                 {/** Link to editable page */}
                 {userCanEdit && hasShareInPath && (
                   <Tooltip title='Edit' arrow placement='top'>
-                    <Button href={editString} color='secondary' size='small' variant='outlined' sx={{ minWidth: 50 }}>
+                    <Button href={editString} color='secondary' size='small' variant='text' sx={{ minWidth: 50 }}>
                       <EditIcon color='secondary' fontSize='small' />
                     </Button>
                   </Tooltip>
