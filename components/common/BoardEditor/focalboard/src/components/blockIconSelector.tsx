@@ -1,22 +1,23 @@
-import { Page } from '@prisma/client';
+/* eslint-disable no-unused-expressions */
+import type { Page } from '@prisma/client';
 import PageIcon from 'components/common/Emoji';
 import React, { useCallback } from 'react';
 import { useIntl } from 'react-intl';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import { BlockIcons } from '../blockIcons';
-import { Board } from '../blocks/board';
-import { Card } from '../blocks/card';
+import type { Board } from '../blocks/board';
+import type { Card } from '../blocks/card';
 import mutator from '../mutator';
 import EmojiPicker from '../widgets/emojiPicker';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Menu from '../widgets/menu';
 import MenuWrapper from '../widgets/menuWrapper';
-import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 
 type Props = {
-    block: Board|Card
-    size?: 's' | 'm' | 'l'
-    readOnly?: boolean
-    setPage?: (page: Partial<Page>) => void
+    block: Board|Card;
+    size?: 's' | 'm' | 'l';
+    readOnly?: boolean;
+    setPage?: (page: Partial<Page>) => void;
 }
 
 const BlockIconSelector = React.memo((props: Props) => {
@@ -49,39 +50,39 @@ const BlockIconSelector = React.memo((props: Props) => {
       {props.readOnly && iconElement}
       {!props.readOnly
             && (
-            <MenuWrapper>
-              {iconElement}
-              <Menu>
-                <Menu.Text
-                  id='random'
-                  icon={<EmojiEmotionsOutlinedIcon />}
-                  name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
-                  onClick={() => {
-                    setPage && setPage({ icon: onAddRandomIcon() });
-                  }}
-                />
-                <Menu.SubMenu
-                  id='pick'
-                  icon={<EmojiEmotionsOutlinedIcon />}
-                  name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
-                >
-                  <EmojiPicker onSelect={(emoji) => {
-                    onSelectEmoji(emoji);
-                    setPage && setPage({ icon: emoji });
-                  }}
+              <MenuWrapper>
+                {iconElement}
+                <Menu>
+                  <Menu.Text
+                    id='random'
+                    icon={<EmojiEmotionsOutlinedIcon />}
+                    name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
+                    onClick={() => {
+                      setPage && setPage({ icon: onAddRandomIcon() });
+                    }}
                   />
-                </Menu.SubMenu>
-                <Menu.Text
-                  id='remove'
-                  icon={<DeleteOutlineIcon fontSize='small' />}
-                  name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
-                  onClick={() => {
-                    onRemoveIcon();
-                    setPage && setPage({ icon: null });
-                  }}
-                />
-              </Menu>
-            </MenuWrapper>
+                  <Menu.SubMenu
+                    id='pick'
+                    icon={<EmojiEmotionsOutlinedIcon />}
+                    name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
+                  >
+                    <EmojiPicker onSelect={(emoji) => {
+                      onSelectEmoji(emoji);
+                      setPage && setPage({ icon: emoji });
+                    }}
+                    />
+                  </Menu.SubMenu>
+                  <Menu.Text
+                    id='remove'
+                    icon={<DeleteOutlineIcon fontSize='small' />}
+                    name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
+                    onClick={() => {
+                      onRemoveIcon();
+                      setPage && setPage({ icon: null });
+                    }}
+                  />
+                </Menu>
+              </MenuWrapper>
             )}
     </div>
   );

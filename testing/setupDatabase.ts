@@ -14,14 +14,20 @@ import type { LoggedInUser } from 'models';
 import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
 import { v4 } from 'uuid';
+import { Wallet } from 'ethers';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
-      addresses: [v4()],
       identityType: IDENTITY_TYPES[1],
       username: 'Username',
+      wallets: {
+        create: {
+          address: Wallet.createRandom().address
+        }
+      },
       spaceRoles: {
         create: {
           space: {
@@ -43,7 +49,8 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
             }
           }
         }
-      }
+      },
+      wallets: true
     }
   });
 }
@@ -212,6 +219,14 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
   });
 }
 
+type BountyAndApplicationProps = {
+  applicationStatus: ApplicationStatus;
+  bountyCap: number | null;
+  userId: string;
+  spaceId: string;
+  bountyStatus?: BountyStatus;
+}
+
 export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus }:
   { applicationStatus: ApplicationStatus; bountyCap: number | null; userId: string; spaceId: string; bountyStatus?: BountyStatus;
     // This should be deleted on future PR. Left for backwards compatibility for now
@@ -234,7 +249,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     }
   }) as BountyWithDetails;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
   const createdApp = await prisma.application.create({
     data: {
@@ -249,7 +264,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
           id: createdBounty.id
         }
       },
-      walletAddress: user?.addresses?.[0],
+      walletAddress: user?.wallets[0]?.address,
       message: 'I can do this!',
       // Other important variable
       status: applicationStatus
@@ -298,7 +313,7 @@ export async function generateRoleWithSpaceRole ({ spaceRoleId, spaceId, created
 }
 
 export function createPage (options: Partial<Page> & Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }): Promise<IPageWithPermissions> {
-  return prisma.page.create({
+  return createPageDb({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
@@ -392,7 +407,7 @@ export async function createProposalWithUsers ({ proposalStatus = 'private_draft
 } & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
   const proposalId = v4();
 
-  const proposalPage = await prisma.page.create({
+  const proposalPage: PageWithProposal = await createPageDb({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -553,7 +568,7 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
   Promise<PageWithProposal> {
   const proposalId = v4();
 
-  return prisma.page.create({
+  return createPageDb({
     data: {
       id: proposalId,
       contentText: '',
@@ -618,7 +633,7 @@ export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
   return prisma.$transaction([
-    ...pageArgs.map(p => prisma.page.create(p)),
+    ...pageArgs.map(p => createPageDb(p)),
     prisma.block.createMany(blockArgs)
   ]).then(result => result[0] as Page);
 }

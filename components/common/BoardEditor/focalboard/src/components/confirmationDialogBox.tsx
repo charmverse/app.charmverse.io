@@ -7,15 +7,15 @@ import Button from '../widgets/buttons/button';
 import Dialog from './dialog';
 
 type ConfirmationDialogBoxProps = {
-    heading: string
-    subText?: string
-    confirmButtonText?: string
-    onConfirm: () => void
-    onClose: () => void
+    heading: string;
+    subText?: string;
+    confirmButtonText?: string;
+    onConfirm: () => void;
+    onClose: () => void;
 }
 
 type Props = {
-    dialogBox: ConfirmationDialogBoxProps
+    dialogBox: ConfirmationDialogBoxProps;
 }
 
 export function ConfirmationDialogBox (props: Props) {
@@ -55,10 +55,10 @@ export function ConfirmationDialogBox (props: Props) {
           >
             { props.dialogBox.confirmButtonText
                         || (
-                        <FormattedMessage
-                          id='ConfirmationDialog.confirm-action'
-                          defaultMessage='Confirm'
-                        />
+                          <FormattedMessage
+                            id='ConfirmationDialog.confirm-action'
+                            defaultMessage='Confirm'
+                          />
                         )}
           </Button>
         </div>

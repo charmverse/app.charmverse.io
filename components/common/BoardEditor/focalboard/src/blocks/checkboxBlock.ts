@@ -1,8 +1,9 @@
-import { ContentBlock } from './contentBlock';
-import { Block, createBlock } from './block';
+import type { ContentBlock } from './contentBlock';
+import type { Block } from './block';
+import { createBlock } from './block';
 
 type CheckboxBlock = ContentBlock & {
-    type: 'checkbox'
+    type: 'checkbox';
 }
 
 function createCheckboxBlock (block?: Block): CheckboxBlock {

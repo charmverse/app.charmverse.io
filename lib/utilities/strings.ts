@@ -138,3 +138,7 @@ export function conditionalPlural ({ word = '', count = 1 }: { word: string, cou
   }
   return word;
 }
+
+export function lowerCaseEqual (firstString?: string | null, secondString?: string | null): boolean {
+  return firstString?.toLowerCase() === secondString?.toLowerCase();
+}

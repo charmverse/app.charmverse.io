@@ -53,7 +53,6 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
           readOnly={false}
           offset={0}
           resizingColumn=''
@@ -78,7 +77,6 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
           readOnly={true}
           offset={0}
           resizingColumn=''
@@ -103,7 +101,6 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
           readOnly={false}
           offset={0}
           resizingColumn=''
@@ -131,7 +128,6 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
           readOnly={false}
           offset={0}
           resizingColumn=''

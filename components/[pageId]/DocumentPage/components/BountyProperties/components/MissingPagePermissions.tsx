@@ -1,19 +1,15 @@
 import type { BountyPermissionLevel } from '@prisma/client';
-import { Bounty } from '@prisma/client';
 import type { BountyPermissions } from 'lib/bounties';
-import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
 import useRoles from 'hooks/useRoles';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { useContributors } from 'hooks/useContributors';
 
 interface Props {
   bountyPermissions: Partial<BountyPermissions>;
-  pagePermissions: IPagePermissionWithSource[];
+  pagePermissions: PagePermissionMeta[];
   target: Extract<BountyPermissionLevel, 'reviewer' | 'submitter'>;
 }
 

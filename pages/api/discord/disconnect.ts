@@ -22,7 +22,8 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
       id: req.session.user.id
     },
     include: {
-      telegramUser: true
+      telegramUser: true,
+      wallets: true
     }
   });
 
@@ -32,7 +33,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     });
   }
 
-  if (user.addresses.length === 0) {
+  if (user.wallets.length === 0) {
     return res.status(400).json({
       error: 'You must have at least a single address'
     });
@@ -53,8 +54,8 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
   let newIdentityProvider: IdentityType;
 
   let ens: string | null = null;
-  if (user.addresses[0]) {
-    ens = await getENSName(user.addresses[0]);
+  if (user.wallets[0].address) {
+    ens = await getENSName(user.wallets[0].address);
   }
 
   if (ens) {
@@ -67,7 +68,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     newIdentityProvider = IDENTITY_TYPES[2];
   }
   else {
-    newUserName = shortenHex(user.addresses[0]);
+    newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
   }
 

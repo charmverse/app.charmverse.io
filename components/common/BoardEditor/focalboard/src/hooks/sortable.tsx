@@ -1,15 +1,10 @@
-import React, { useRef } from 'react';
-import { useDrag, useDrop, DragElementWrapper, DragSourceOptions, DragPreviewOptions } from 'react-dnd';
+import type React from 'react';
+import { useRef } from 'react';
+import type { DragElementWrapper, DragSourceOptions, DragPreviewOptions } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
-import { IContentBlockWithCords } from '../blocks/contentBlock';
-import { Block } from '../blocks/block';
-
-interface ISortableWithGripItem {
-    block: Block | Block[],
-    cords: {x: number, y?: number, z?: number}
-}
-
-function useSortableBase<T> (itemType: string, item: T, enabled: boolean, handler: (src: T, st: T) => void): [boolean, boolean, DragElementWrapper<DragSourceOptions>, DragElementWrapper<DragSourceOptions>, DragElementWrapper<DragPreviewOptions>] {
+function useSortableBase<T> (itemType: string, item: T, enabled: boolean, handler: (src: T, st: T) => void):
+  [boolean, boolean, DragElementWrapper<DragSourceOptions>, DragElementWrapper<DragSourceOptions>, DragElementWrapper<DragPreviewOptions>] {
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: itemType,
     item,
@@ -32,18 +27,10 @@ function useSortableBase<T> (itemType: string, item: T, enabled: boolean, handle
   return [isDragging, isOver, drag, drop, preview];
 }
 
-export function useSortable<T> (itemType: string, item: T, enabled: boolean, handler: (src: T, st: T) => void): [boolean, boolean, React.RefObject<HTMLDivElement>] {
+export function useSortable<T> (itemType: string, item: T, enabled: boolean, handler: (src: T, st: T) => void):
+[boolean, boolean, React.RefObject<HTMLDivElement>] {
   const ref = useRef<HTMLDivElement>(null);
   const [isDragging, isOver, drag, drop] = useSortableBase(itemType, item, enabled, handler);
   drop(drag(ref));
   return [isDragging, isOver, ref];
-}
-
-export function useSortableWithGrip (itemType: string, item: ISortableWithGripItem, enabled: boolean, handler: (src: IContentBlockWithCords, st: IContentBlockWithCords) => void): [boolean, boolean, React.RefObject<HTMLDivElement>, React.RefObject<HTMLDivElement>] {
-  const ref = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [isDragging, isOver, drag, drop, preview] = useSortableBase(itemType, item as IContentBlockWithCords, enabled, handler);
-  drag(ref);
-  drop(preview(previewRef));
-  return [isDragging, isOver, ref, previewRef];
 }

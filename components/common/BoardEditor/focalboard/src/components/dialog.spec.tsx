@@ -6,12 +6,10 @@ import React from 'react';
 
 import userEvent from '@testing-library/user-event';
 
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { wrapDNDIntl } from '../testUtils';
 
 import Menu from '../widgets/menu';
-
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-
 
 import Dialog from './dialog';
 
@@ -79,7 +77,7 @@ describe('components/dialog', () => {
               }}
             />
           </Menu>
-)}
+        )}
       >
         <div id='test' />
       </Dialog>
@@ -105,7 +103,7 @@ describe('components/dialog', () => {
               }}
             />
           </Menu>
-)}
+        )}
       >
         <div id='test' />
       </Dialog>

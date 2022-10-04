@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { usePages } from 'hooks/usePages';
 import type { PageContent } from 'models';
@@ -93,7 +93,7 @@ export function InlineCommentSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const { extractTextFromSelection } = useInlineComment();
   const { setThreads } = useThreads();
   const { currentPageId } = usePages();
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
 
     if (!isEmpty) {

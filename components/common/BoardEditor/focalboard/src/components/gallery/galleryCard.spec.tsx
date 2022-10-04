@@ -6,7 +6,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import userEvent from '@testing-library/user-event';
 
-import { MockStoreEnhanced } from 'redux-mock-store';
+import type { MockStoreEnhanced } from 'redux-mock-store';
 
 import { wrapDNDIntl, mockStateStore } from '../../testUtils';
 

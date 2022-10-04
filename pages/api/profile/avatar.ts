@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { getUserS3Folder, uploadToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import * as alchemyApi from 'lib/blockchain/provider/alchemy';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
@@ -39,8 +39,8 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const user = await getUserProfile('id', req.session.user.id);
     const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
 
-    const isOwner = user?.addresses.some(a => {
-      return owners.find(o => o.toLowerCase() === a.toLowerCase());
+    const isOwner = user?.wallets.some(a => {
+      return owners.find(o => o.toLowerCase() === a.address.toLowerCase());
     });
 
     if (!isOwner) {
@@ -50,8 +50,8 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const nft = await getNFT(updatedContract, updatedTokenId, avatarChain);
 
     if (nft.image) {
-      const fileName = getUserS3Folder({ userId, url: getFilenameWithExtension(nft.image) });
-      const { url } = await uploadToS3({ fileName, url: nft.image });
+      const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(nft.image) });
+      const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });
       avatarUrl = url;
     }
 

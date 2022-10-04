@@ -81,11 +81,13 @@ export interface AvailableResourcesRequest {
   publicOnly?: boolean;
 }
 
+export type PagePermissionMeta = Omit<PagePermission, 'inheritedFromPermission'>;
+
 export interface BountyPagePermissionIntersectionQuery {
   bountyOperations: BountyOperation[];
   bountyPermissions: Partial<BountyPermissions>;
   pageOperations: PageOperations[];
-  pagePermissions: PagePermission[];
+  pagePermissions: PagePermissionMeta[];
   roleups: (RoleupWithMembers | RoleWithMembers)[];
 }
 

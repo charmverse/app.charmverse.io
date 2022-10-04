@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { createIntl } from 'react-intl';
 
-import { PropertyType } from '../../blocks/board';
+import type { PropertyType } from '../../blocks/board';
 import { wrapIntl } from '../../testUtils';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import mutator from '../../mutator';

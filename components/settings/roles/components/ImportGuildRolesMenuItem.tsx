@@ -20,7 +20,7 @@ export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => 
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
   const [space] = useCurrentSpace();
   const { user: currentUser } = useUser();
-  const addresses = currentUser?.addresses ?? [];
+  const addresses = currentUser?.wallets.map(w => w.address) ?? [];
   const { showMessage } = useSnackbar();
 
   useEffect(() => {

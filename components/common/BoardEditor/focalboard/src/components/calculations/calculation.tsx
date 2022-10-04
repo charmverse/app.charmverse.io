@@ -1,29 +1,30 @@
-import React, { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { Card } from '../../blocks/card';
-
-import { IPropertyTemplate } from '../../blocks/board';
-
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import type { Card } from '../../blocks/card';
 
+import type { IPropertyTemplate } from '../../blocks/board';
 
-import { CommonCalculationOptionProps, Options, optionDisplayNameString } from './options';
+import type { CommonCalculationOptionProps } from './options';
+import { Options, optionDisplayNameString } from './options';
 
 import Calculations from './calculations';
 
 type Props = {
-    style: CSSProperties
-    class: string
-    value: string
-    menuOpen: boolean
-    onMenuClose: () => void
-    onMenuOpen: () => void
-    onChange: (value: string) => void
-    cards: readonly Card[]
-    property: IPropertyTemplate
-    hovered: boolean
-    optionsComponent: React.ComponentType<CommonCalculationOptionProps>
+  style: CSSProperties;
+  class: string;
+  value: string;
+  menuOpen: boolean;
+  onMenuClose: () => void;
+  onMenuOpen: () => void;
+  onChange: (value: string) => void;
+  cards: readonly Card[];
+  property: IPropertyTemplate;
+  hovered: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  optionsComponent: React.ComponentType<CommonCalculationOptionProps>;
 }
 
 function Calculation (props: Props): JSX.Element {
@@ -37,7 +38,6 @@ function Calculation (props: Props): JSX.Element {
       menuOpen={props.menuOpen}
       onClose={props.onMenuClose}
       onChange={props.onChange}
-      property={props.property}
     />
   );
 
@@ -50,14 +50,15 @@ function Calculation (props: Props): JSX.Element {
       className={`Calculation ${value} ${props.class} ${props.menuOpen ? 'menuOpen' : ''} ${props.hovered ? 'hovered' : ''}`}
       style={props.style}
       onClick={() => (props.menuOpen ? props.onMenuClose() : props.onMenuOpen())}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       onBlur={props.onMenuClose}
     >
       {
                 props.menuOpen && (
-                <div>
-                  {option}
-                </div>
+                  <div>
+                    {option}
+                  </div>
                 )
             }
 
@@ -73,9 +74,9 @@ function Calculation (props: Props): JSX.Element {
       {
                 value !== Options.none.value
                 && (
-                <span className='calculationValue'>
-                  {Calculations[value] ? Calculations[value](props.cards, props.property, intl) : ''}
-                </span>
+                  <span className='calculationValue'>
+                    {Calculations[value] ? Calculations[value](props.cards, props.property, intl) : ''}
+                  </span>
                 )
             }
 

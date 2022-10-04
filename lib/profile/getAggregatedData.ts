@@ -4,7 +4,6 @@ import { getAllOrganizations, getProfile } from 'lib/deepdao/client';
 import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { combineCommunityData } from './combineCommunityData';
 import type { ProfileBountyEvent, UserCommunity } from './interfaces';
@@ -15,18 +14,14 @@ export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'tot
 };
 
 export async function getAggregatedData (userId: string, apiToken?: string): Promise<AggregatedProfileData> {
-  const user = await prisma.user.findFirst({
+  const wallets = await prisma.userWallet.findMany({
     where: {
-      id: userId as string
+      userId
     }
   });
 
-  if (!user) {
-    throw new DataNotFoundError();
-  }
-
   const profiles = (await Promise.all(
-    user.addresses.map(address => getProfile(address, apiToken)
+    wallets.map(({ address }) => getProfile(address, apiToken)
       .catch(error => {
         log.error('Error calling DEEP DAO API', error);
         return null;
@@ -42,7 +37,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     getAllOrganizations(apiToken),
     prisma.bounty.findMany({
       where: {
-        createdBy: user.id
+        createdBy: userId
       },
       include: {
         page: true,
@@ -65,7 +60,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         }
       }
     }),
-    getSpacesOfUser(user.id)
+    getSpacesOfUser(userId)
   ]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
@@ -92,7 +87,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       },
       userVotes: {
         some: {
-          userId: user.id
+          userId
         }
       }
     },
@@ -109,7 +104,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       createdAt: true,
       userVotes: {
         where: {
-          userId: user.id
+          userId
         },
         select: {
           choice: true
@@ -137,7 +132,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
   const charmVerseCommunities: UserCommunity[] = userWorkspaces.map(userWorkspace => ({
     id: userWorkspace.id,
     isHidden: hiddenItems.includes(userWorkspace.id),
-    joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === user.id)?.createdAt.toISOString(),
+    joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === userId)?.createdAt.toISOString(),
     name: userWorkspace.name,
     logo: userWorkspace.spaceImage
   }));

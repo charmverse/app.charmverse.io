@@ -3,10 +3,11 @@ import type { Space, User } from '@prisma/client';
 import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -15,11 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty to new submissions and applications', () => {
@@ -28,11 +25,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
 
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: admin.addresses[0]
-      })).headers['set-cookie'][0];
+    const adminCookie = await loginUser(admin.id);
 
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,
@@ -58,11 +51,7 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
 
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: admin.addresses[0]
-      })).headers['set-cookie'][0];
+    const adminCookie = await loginUser(admin.id);
 
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,

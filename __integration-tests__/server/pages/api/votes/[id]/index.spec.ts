@@ -1,12 +1,13 @@
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import type { Page, Space, User, Vote } from '@prisma/client';
+import type { Page, Space, Vote } from '@prisma/client';
+import type { LoggedInUser } from 'models';
 import { v4 } from 'uuid';
 
 let page: Page;
 let space: Space;
-let user: User;
+let user: LoggedInUser;
 let vote: Vote;
 
 let userCookie: string;
@@ -29,7 +30,7 @@ beforeAll(async () => {
     userVotes: ['3']
   });
 
-  userCookie = await loginUser(user);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes/[id] - Get a single vote', () => {
@@ -45,7 +46,7 @@ describe('GET /api/votes/[id] - Get a single vote', () => {
 describe('PUT /api/votes/[id] - Update a single vote', () => {
   it('Should update vote if the user has create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -72,7 +73,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 
   it('Should update vote if the user is an admin of the page space and respond 200', async () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -94,7 +95,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 
   it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -118,7 +119,7 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
 describe('DELETE /api/votes/[id] - Delete a single vote', () => {
   it('Should delete vote if the user has create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -143,7 +144,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
 
   it('Should update vote if the user is an admin of the page space and respond 200', async () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -165,7 +166,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
 
   it('Should not update vote if the user does not have create_poll permission for the page and respond 200', async () => {
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id

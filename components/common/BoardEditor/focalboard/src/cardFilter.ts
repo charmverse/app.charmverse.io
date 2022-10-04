@@ -1,7 +1,8 @@
-import { IPropertyTemplate } from './blocks/board';
-import { Card } from './blocks/card';
-import { FilterClause } from './blocks/filterClause';
-import { FilterGroup, isAFilterGroupInstance } from './blocks/filterGroup';
+import type { IPropertyTemplate } from './blocks/board';
+import type { Card } from './blocks/card';
+import type { FilterClause } from './blocks/filterClause';
+import type { FilterGroup } from './blocks/filterGroup';
+import { isAFilterGroupInstance } from './blocks/filterGroup';
 import { Utils } from './utils';
 
 class CardFilter {
@@ -13,7 +14,7 @@ class CardFilter {
     const { filters } = filterGroup;
 
     if (filterGroup.filters.length < 1) {
-      return true;	// No filters = always met
+      return true; // No filters = always met
     }
 
     if (filterGroup.operation === 'or') {
@@ -49,13 +50,13 @@ class CardFilter {
       case 'includes': {
         if (filter.values?.length < 1) {
           break;
-        }		// No values = ignore clause (always met)
+        } // No values = ignore clause (always met)
         return (filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) !== undefined);
       }
       case 'notIncludes': {
         if (filter.values?.length < 1) {
           break;
-        }		// No values = ignore clause (always met)
+        } // No values = ignore clause (always met)
         return (filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) === undefined);
       }
       case 'isEmpty': {

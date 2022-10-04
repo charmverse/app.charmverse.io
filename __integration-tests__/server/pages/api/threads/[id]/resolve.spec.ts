@@ -5,12 +5,13 @@ import { upsertPermission } from 'lib/permissions/pages';
 import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import type { LoggedInUser } from 'models';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -19,21 +20,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: nonAdminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: adminUser.addresses[0]
-    })).headers['set-cookie'][0];
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('PUT /api/threads/{id} - update a comment', () => {
@@ -65,7 +58,7 @@ describe('PUT /api/threads/{id} - update a comment', () => {
       isAdmin: false
     });
 
-    const otherAdminCookie = await loginUser(otherAdminUser);
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
@@ -120,11 +113,7 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       isAdmin: false
     });
 
-    const otherAdminCookie = (await request(baseUrl)
-      .post('/api/session/login')
-      .send({
-        address: otherAdminUser.addresses[0]
-      })).headers['set-cookie'][0];
+    const otherAdminCookie = await loginUser(otherAdminUser.id);
 
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',

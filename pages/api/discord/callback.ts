@@ -33,7 +33,7 @@ handler.get(async (req, res) => {
     try {
       const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host });
       req.session.user = { id: user.id };
-      await updateGuildRolesForUser(user.addresses, user.spaceRoles);
+      await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
     }
     catch (error) {
       log.warn('Error while connecting to Discord', error);

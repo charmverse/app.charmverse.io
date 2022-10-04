@@ -28,7 +28,7 @@ function WrappedUserDetails () {
       updatedAt: new Date(),
       identityType: IDENTITY_TYPES[1],
       username: 'test.ens',
-      addresses: ['0x0000000000000000000000000000000000000000']
+      wallets: [{ address: '0x0000000000000000000000000000000000000000' }]
     } as LoggedInUser,
     updateUser: () => {}
   };

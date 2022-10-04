@@ -4,9 +4,10 @@ import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createProposalWithUsers, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import type { LoggedInUser } from 'models';
 
-let author: User;
-let reviewer: User;
+let author: LoggedInUser;
+let reviewer: LoggedInUser;
 let space: Space;
 let authorCookie: string;
 let reviewerCookie: string;
@@ -18,17 +19,9 @@ beforeAll(async () => {
   reviewer = generated2.user;
   space = generated1.space;
 
-  authorCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: author.addresses[0]
-    })).headers['set-cookie'][0];
+  authorCookie = await loginUser(author.id);
 
-  reviewerCookie = (await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: reviewer.addresses[0]
-    })).headers['set-cookie'][0];
+  reviewerCookie = await loginUser(reviewer.id);
 
   await prisma.spaceRole.create({
     data: {
@@ -49,7 +42,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     });
 
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     (await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)

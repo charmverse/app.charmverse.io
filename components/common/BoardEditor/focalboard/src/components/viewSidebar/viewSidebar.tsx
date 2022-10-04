@@ -7,12 +7,12 @@ import BackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
+import { capitalize } from 'lodash';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
 import GroupOptions from './viewGroupOptions';
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView } from '../../blocks/boardView';
-import { capitalize } from 'lodash';
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
 
 interface Props {
   board: Board;
@@ -45,7 +45,7 @@ export default function ViewOptionsSidebar (props: Props) {
 
   const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
 
-  function goBack() {
+  function goBack () {
     setSidebarView(initialState);
   }
 
@@ -54,7 +54,7 @@ export default function ViewOptionsSidebar (props: Props) {
     if (!props.isOpen) {
       setSidebarView(initialState);
     }
-  }, [props.isOpen])
+  }, [props.isOpen]);
 
   const currentGroup = props.board.fields.cardProperties.find(prop => prop.id === props.groupByProperty?.id)?.name;
   const currentLayout = props.view.fields.viewType;
@@ -81,12 +81,14 @@ export default function ViewOptionsSidebar (props: Props) {
                 title='Properties'
                 value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
               />
-              {withGroupBy && <MenuRow
-                onClick={() => setSidebarView('group-by')}
-                icon={<GroupIcon color='secondary' />}
-                title='Group'
-                value={currentGroup ?? 'None'}
-              />}
+              {withGroupBy && (
+                <MenuRow
+                  onClick={() => setSidebarView('group-by')}
+                  icon={<GroupIcon color='secondary' />}
+                  title='Group'
+                  value={currentGroup ?? 'None'}
+                />
+              )}
             </>
           )}
           {sidebarView === 'layout' && (
@@ -113,7 +115,7 @@ export default function ViewOptionsSidebar (props: Props) {
           )}
         </StyledSidebar>
       </Collapse>
-          </ClickAwayListener>
+    </ClickAwayListener>
   );
 }
 

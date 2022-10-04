@@ -29,10 +29,10 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: s
     commentId: null,
     type: 'page',
     createdBy: {
+      addresses: [],
       id: v4(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      addresses: [],
       email: '',
       username: '',
       avatar: '',

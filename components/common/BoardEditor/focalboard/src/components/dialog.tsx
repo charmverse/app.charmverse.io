@@ -4,18 +4,18 @@ import { useIntl } from 'react-intl';
 
 import CloseIcon from '@mui/icons-material/Close';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import MuiIconButton from "@mui/material/IconButton";
+import MuiIconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import PopperPopup from 'components/common/PopperPopup';
 import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {
-  children: React.ReactNode
-  toolsMenu?: React.ReactNode // some dialogs may not  require a toolmenu
-  toolbar?: React.ReactNode
-  hideCloseButton?: boolean
-  className?: string
-  onClose: () => void,
+  children: React.ReactNode;
+  toolsMenu?: React.ReactNode; // some dialogs may not  require a toolmenu
+  toolbar?: React.ReactNode;
+  hideCloseButton?: boolean;
+  className?: string;
+  onClose: () => void;
 }
 
 const Dialog = React.memo((props: Props) => {
@@ -60,8 +60,8 @@ const Dialog = React.memo((props: Props) => {
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu && (
                 <PopperPopup closeOnClick popupContent={toolsMenu}>
-                  <MuiIconButton size="small">
-                    <MoreHorizIcon fontSize="small" />
+                  <MuiIconButton size='small'>
+                    <MoreHorizIcon fontSize='small' />
                   </MuiIconButton>
                 </PopperPopup>
               )}
@@ -70,7 +70,7 @@ const Dialog = React.memo((props: Props) => {
           </div>
         </div>
       </div>
-    </Modal >
+    </Modal>
   );
 });
 

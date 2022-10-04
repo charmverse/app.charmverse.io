@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
 }
 
 datasource db {
@@ -216,6 +216,8 @@ model Page {
   title              String
   content            Json?
   contentText        String
+  galleryImage       String?
+  hasContent         Boolean          @default(false)
   headerImage        String?
   icon               String?
   path               String
@@ -349,6 +351,13 @@ model User {
   proposalsReviewed ProposalReviewer[]
   reviewedProposals Proposal[]
   workspaceEvents   WorkspaceEvent[]
+  wallets           UserWallet[]
+}
+
+model UserWallet {
+  address String @unique
+  userId  String @db.Uuid
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserNotificationState {

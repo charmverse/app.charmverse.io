@@ -4,7 +4,7 @@ import React from 'react';
 import UserProperty from '../user/user';
 
 type Props = {
-    userID: string
+    userID: string;
 }
 
 function CreatedBy (props: Props): JSX.Element {

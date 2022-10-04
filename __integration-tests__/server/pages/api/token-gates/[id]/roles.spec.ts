@@ -2,14 +2,15 @@ import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/clie
 import { SpaceRole } from '@prisma/client';
 import { createUserFromWallet } from 'lib/users/createUser';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 import { prisma } from 'db';
+import type { LoggedInUser } from 'models';
 
 // User 1 is admin
-let user1: User;
-let user2: User;
+let user1: LoggedInUser;
+let user2: LoggedInUser;
 let space: Space;
 let cookie1: string;
 let cookie2: string;
@@ -92,29 +93,19 @@ beforeAll(async () => {
     }
   });
 
-  const loggedInResponse1 = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user1.addresses[0]
-    });
-  const loggedInResponse2 = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user2.addresses[0]
-    });
+  cookie1 = await loginUser(user1.id);
+  cookie2 = await loginUser(user2.id);
 
-  cookie1 = loggedInResponse1.headers['set-cookie'][0];
-  cookie2 = loggedInResponse2.headers['set-cookie'][0];
 });
 
-describe('first', () => {
-  it('Should fail if correct keys aren\'t provided in body', async () => {
+describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', () => {
+  it('Should fail if correct keys are not provided in body', async () => {
     const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie1).send({});
     expect(response.statusCode).toBe(400);
     expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value');
   });
 
-  it('Should fail if the user isn\'t an admin of the space', async () => {
+  it('Should fail if the user is not an admin of the space', async () => {
     const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie2).send({ spaceId: space.id, roleIds: [] });
     expect(response.statusCode).toBe(401);
     expect(response.body.message).toBe('Only space administrators can perform this action');

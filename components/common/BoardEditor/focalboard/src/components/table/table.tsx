@@ -4,9 +4,10 @@ import { FormattedMessage } from 'react-intl';
 import { useDragLayer, useDrop } from 'react-dnd';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
-import { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
-import { createBoardView, BoardView } from '../../blocks/boardView';
-import { Card } from '../../blocks/card';
+import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import { createBoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -19,21 +20,21 @@ import TableGroup from './tableGroup';
 import CalculationRow from './calculation/calculationRow';
 
 type Props = {
-  selectedCardIds: string[]
-  board: Board
-  cards: Card[]
-  activeView: BoardView
-  views: BoardView[]
-  visibleGroups: BoardGroup[]
-  groupByProperty?: IPropertyTemplate
-  readOnly: boolean
-  cardIdToFocusOnRender: string
-  showCard: (cardId?: string) => void
-  addCard: (groupByOptionId?: string) => Promise<void>
-  onCardClicked: (e: React.MouseEvent, card: Card) => void
+  selectedCardIds: string[];
+  board: Board;
+  cards: Card[];
+  activeView: BoardView;
+  views: BoardView[];
+  visibleGroups: BoardGroup[];
+  groupByProperty?: IPropertyTemplate;
+  readOnly: boolean;
+  cardIdToFocusOnRender: string;
+  showCard: (cardId?: string) => void;
+  addCard: (groupByOptionId?: string) => Promise<void>;
+  onCardClicked: (e: React.MouseEvent, card: Card) => void;
 }
 
-function Table(props: Props): JSX.Element {
+function Table (props: Props): JSX.Element {
   const { board, cards, activeView, visibleGroups, groupByProperty, views } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -119,11 +120,6 @@ function Table(props: Props): JSX.Element {
     }
   }, [activeView, visibleGroups]);
 
-  const onDropToCard = useCallback((srcCard: Card, dstCard: Card) => {
-    Utils.log(`onDropToCard: ${dstCard.title}`);
-    onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-  }, [activeView]);
-
   const onDropToGroup = useCallback((srcCard: Card, groupID: string, dstCardID: string) => {
     Utils.log(`onDropToGroup: ${srcCard.title}`);
     const { selectedCardIds } = props;
@@ -185,6 +181,11 @@ function Table(props: Props): JSX.Element {
       });
     }
   }, [activeView, cards, props.selectedCardIds, groupByProperty]);
+
+  const onDropToCard = useCallback((srcCard: Card, dstCard: Card) => {
+    Utils.log(`onDropToCard: ${dstCard.title}`);
+    onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+  }, [activeView]);
 
   const propertyNameChanged = useCallback(async (option: IPropertyOption, text: string): Promise<void> => {
     await mutator.changePropertyOptionValue(board, groupByProperty!, option, text);

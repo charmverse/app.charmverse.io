@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import Mutator from '../../mutator';
 import { Utils } from '../../utils';
 
-import { IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyTemplate } from '../../blocks/board';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 

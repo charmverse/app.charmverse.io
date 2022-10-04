@@ -299,7 +299,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.addresses
+          addresses: user.wallets.map(wallet => wallet.address)
         });
         const safes = await mutate();
         await mutateTasks();
