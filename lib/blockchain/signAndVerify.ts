@@ -25,7 +25,7 @@ export type SignaturePayload = {
   issuedAt?: string;
 };
 
-function generateSignaturePayload ({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
+export function generateSignaturePayload ({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
 
   const domain = host.match('https') ? host.split('https://')[1] : host.split('http://')[1];
   const uri = host;
@@ -50,9 +50,9 @@ export type SignatureVerification = {
  */
 export function isValidWalletSignature ({ address, host, signature }: SignatureVerification): boolean {
 
-  if (process.env.APP_ENV === 'test' && signature.testMode) {
-    return true;
-  }
+  // if (process.env.APP_ENV === 'test' && signature.testMode) {
+  //   return true;
+  // }
 
   if (!address || !host || !signature) {
     throw new InvalidInputError('A wallet address, host and signature are required');
@@ -62,10 +62,8 @@ export function isValidWalletSignature ({ address, host, signature }: SignatureV
   const nonce = signature.signedMessage.split('Nonce:')[1]?.split('\n')[0]?.trim();
   const issuedAt = signature.signedMessage.split('Issued At:')[1]?.split('\n')[0]?.trim();
 
-  let payload = generateSignaturePayload({ address, chainId: parseInt(chainId), host });
-
-  payload = {
-    ...payload,
+  const payload = {
+    ...generateSignaturePayload({ address, chainId: parseInt(chainId), host }),
     nonce,
     issuedAt
   };

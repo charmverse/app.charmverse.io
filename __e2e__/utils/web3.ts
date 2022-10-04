@@ -1,10 +1,11 @@
 import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
-import type { ethers as EthersType } from 'ethers';
-import type { SiweMessage } from 'lit-siwe';
+import { Wallet } from 'ethers';
+import { SiweMessage } from 'lit-siwe';
 
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { generateSignaturePayload } from 'lib/blockchain/signAndVerify';
 import { baseUrl } from 'testing/mockApiCall';
 
 type MockOptions = {
@@ -54,8 +55,18 @@ type InitParams<T> = {
   context: T;
 }
 
+type MockWeb3Options<T> = {
+  page: BrowserPage;
+  context: T;
+  init (params: InitParams<T>): void;
+}
+
+type MockSignatureInput = { walletAddress: string, chainId?: number, privateKey: string };
+
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-export async function mockWeb3<T> ({ page, context, init }: { page: BrowserPage, context: T, init (params: InitParams<T>): void }) {
+export async function mockWeb3<T extends Partial<MockSignatureInput>> ({ page, context, init }: MockWeb3Options<T>) {
+
+  const walletSig = context.walletAddress && context.privateKey ? await mockWalletSignature(context as MockSignatureInput) : null;
 
   await page.addInitScript({
     content:
@@ -78,24 +89,33 @@ export async function mockWeb3<T> ({ page, context, init }: { page: BrowserPage,
           return window.ethereum.request({ method }, opts);
         };
 
+        ${walletSig ? `window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.walletAddress}', '${walletSig}');` : ''}
+
       `
       + `(${init.toString()})({ ethers, Web3Mock, context: ${JSON.stringify(context)} });`
   });
 }
 
-export async function mockAuthSig ({ address, page }: { address: string, page: BrowserPage }): Promise<AuthSig> {
+export async function mockWalletSignature ({ walletAddress, chainId = 1, privateKey }: MockSignatureInput) {
 
-  await page.waitForURL(baseUrl);
+  const payload = generateSignaturePayload({ address: walletAddress, chainId, host: baseUrl });
+  const message = new SiweMessage(payload);
+  const prepared = message.prepareMessage();
+
+  // sign message
+  const etherswallet = new Wallet(privateKey);
+
+  const signedMessage = await etherswallet.signMessage(prepared);
 
   const authSig = {
-    address,
+    address: walletAddress,
     derivedVia: 'charmverse-mock',
-    sig: 'signature',
-    signedMessage: 'signed message'
+    sig: signedMessage,
+    signedMessage: prepared
   };
 
-  // Approach to setting localstorage found here https://github.com/microsoft/playwright/issues/6258#issuecomment-824314544
-  await page.evaluate(`window.localStorage.setItem('charm.v1.wallet-auth-sig-${address}', '${JSON.stringify(authSig)}')`);
+  // \n characters are not parseable by default
+  const sanitizedString = JSON.stringify(authSig).replace(/\\n/g, '\\\\n');
 
-  return authSig;
+  return sanitizedString;
 }
