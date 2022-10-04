@@ -1,17 +1,13 @@
-
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { alpha } from '@mui/system';
 import Tooltip from '@mui/material/Tooltip';
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 import SvgIcon from '@mui/material/SvgIcon';
 import { useRouter } from 'next/router';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useUser } from 'hooks/useUser';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getChainById } from 'connectors';
 import { useContext } from 'react';
@@ -60,12 +56,6 @@ function Account (): JSX.Element {
 
   const networkModalState = usePopupState({ variant: 'popover', popupId: 'network-modal' });
   const { user, isLoaded } = useUser();
-  const [space] = useCurrentSpace();
-  const userHasSpace = user?.spaceRoles.find(role => role.spaceId === space?.id);
-  const isUserAdminOfSpace = !!userHasSpace?.isAdmin;
-  const hasShareInPath = router.asPath.split('/')[1] === 'share';
-  const editString = router.asPath.replace('/share', '');
-  const onEdithandler = () => router.push(editString);
 
   if (typeof window === 'undefined') {
     return (
@@ -82,7 +72,7 @@ function Account (): JSX.Element {
           {
             // This is a quick fix for making the public pages and bounties an acquisition channel.
             // We would still show the "Join" in the classic Charmverse signup page.
-            hasShareInPath ? 'Try CharmVerse' : 'Join CharmVerse'
+            router.asPath.split('/')[1] === 'share' ? 'Try CharmVerse' : 'Join CharmVerse'
           }
         </AccountButton>
       </AccountCard>
@@ -107,39 +97,30 @@ function Account (): JSX.Element {
   const chain = chainId ? getChainById(chainId) : null;
 
   return (
-    <>
-      {isUserAdminOfSpace && hasShareInPath && (
-        <Tooltip title='Edit' arrow placement='top'>
-          <IconButton sx={{ mx: 1 }} onClick={onEdithandler} color='inherit'>
-            <EditIcon color='secondary' />
-          </IconButton>
-        </Tooltip>
-      )}
-      <AccountCard>
-        <StyledButtonGroup variant='contained' disableElevation>
-          {isConnectedWithWallet && (
-            <Tooltip title={chain?.chainName ?? ''} arrow>
-              <NetworkButton onClick={networkModalState.open}>
-                <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <img alt='' src={chain?.iconUrl} style={{ height: '100%' }} />
-                </SvgIcon>
-              </NetworkButton>
-            </Tooltip>
-          )}
-          <AccountButton
-            href='/profile'
-            sx={isConnectedWithWallet ? ({
-              borderTopLeftRadius: '0 !important',
-              borderBottomLeftRadius: '0 !important'
-            }) : {}}
-            endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
-          >
-            {user?.username}
-          </AccountButton>
-        </StyledButtonGroup>
-        <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />
-      </AccountCard>
-    </>
+    <AccountCard>
+      <StyledButtonGroup variant='contained' disableElevation>
+        {isConnectedWithWallet && (
+          <Tooltip title={chain?.chainName ?? ''} arrow>
+            <NetworkButton onClick={networkModalState.open}>
+              <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
+                <img alt='' src={chain?.iconUrl} style={{ height: '100%' }} />
+              </SvgIcon>
+            </NetworkButton>
+          </Tooltip>
+        )}
+        <AccountButton
+          href='/profile'
+          sx={isConnectedWithWallet ? ({
+            borderTopLeftRadius: '0 !important',
+            borderBottomLeftRadius: '0 !important'
+          }) : {}}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
+        >
+          {user?.username}
+        </AccountButton>
+      </StyledButtonGroup>
+      <NetworkModal isOpen={networkModalState.isOpen} onClose={networkModalState.close} />
+    </AccountCard>
   );
 }
 
