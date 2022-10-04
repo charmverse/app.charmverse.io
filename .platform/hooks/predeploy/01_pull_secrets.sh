@@ -27,9 +27,6 @@ if grep "{{pull:secretsmanager:" $APP_STAGING_DIR/.env; then
                            | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
 
             echo "$env_var_name=\"$secret_value\"" >> .env.new
-            # yq -I 4 -i 'with(.option_settings."aws:elasticbeanstalk:application:environment";
-            #               .[env(env_var_name)] = env(secret_value) | . style="double" )
-            #            ' $APP_STAGING_DIR/.env.new
         }
 
     done
