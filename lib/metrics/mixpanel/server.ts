@@ -33,7 +33,7 @@ export function updateTrackUserProfile (user: LoggedInUser) {
     $created: user.createdAt,
     $name: user.username,
     'Is Connected to Discord': !!user.discordUser,
-    'Is Connected via Wallet': !!user.addresses.length,
+    'Is Connected via Wallet': !!user.wallets.length,
     'Workspaces Joined': user.spaceRoles.map(sr => sr.spaceId)
   };
 
