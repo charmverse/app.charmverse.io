@@ -1,9 +1,10 @@
 import { useTheme } from '@emotion/react';
-import { useColorMode } from 'context/darkMode';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 import { createSwaggerSpec } from 'next-swagger-doc';
-import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
+
+import { useColorMode } from 'context/darkMode';
 
 import 'swagger-ui-react/swagger-ui.css';
 

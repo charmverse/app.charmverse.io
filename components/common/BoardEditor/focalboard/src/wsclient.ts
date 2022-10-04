@@ -1,10 +1,9 @@
 /* eslint-disable no-use-before-define */
 
-import type { ClientConfig } from './config/clientConfig';
-
-import { Utils } from './utils';
 import type { Block } from './blocks/block';
+import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
+import { Utils } from './utils';
 
 // These are outgoing commands to the server
 type WSCommand = {

@@ -2,6 +2,7 @@
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utilities/errors';
+
 import { aggregateVoteResult } from './aggregateVoteResult';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';

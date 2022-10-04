@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Chip, InputLabel, MenuItem, Select } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
+
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';

@@ -1,23 +1,24 @@
 /* eslint-disable max-lines */
+
+import AddIcon from '@mui/icons-material/Add';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { Constants } from '../../constants';
 import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
+import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import IconButton from '../../widgets/buttons/iconButton';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
 import Editable from '../../widgets/editable';
 import Label from '../../widgets/label';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
   board: Board;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { createNanoEvents } from 'nanoevents';
+import React, { useState, useEffect } from 'react';
 
 export type FlashMessage = {
     content: React.ReactNode;

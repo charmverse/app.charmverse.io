@@ -1,9 +1,8 @@
 
 import { createIntl } from 'react-intl';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import type { IPropertyTemplate } from '../../blocks/board';
+import { TestBlockFactory } from '../../test/testBlockFactory';
 
 import Calculations from './calculations';
 

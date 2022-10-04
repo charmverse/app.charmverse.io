@@ -1,6 +1,7 @@
 import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
+
 import type { BrandColor } from './colors';
 import {
   backgroundColor,

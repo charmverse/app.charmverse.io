@@ -3,10 +3,10 @@ import type { FC } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { Constants } from '../../constants';
 import type { Board } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 

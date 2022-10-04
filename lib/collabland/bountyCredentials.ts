@@ -1,5 +1,7 @@
 import type { Bounty, Page } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import * as client from './collablandClient';
 
 const DOMAIN = process.env.DOMAIN || 'https://test.charmverse.io';

@@ -1,8 +1,10 @@
+import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { prisma } from 'db';
+
 import { deleteVote } from '../deleteVote';
 
 describe('deleteVote', () => {

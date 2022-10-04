@@ -1,7 +1,9 @@
-import { isDev } from 'config/constants';
 import { capitalize } from 'lodash';
 import Mixpanel from 'mixpanel';
+
+import { isDev } from 'config/constants';
 import type { LoggedInUser } from 'models';
+
 import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from './interfaces/index';
 
 let mixpanelInstance: Mixpanel.Mixpanel | null = null;

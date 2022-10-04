@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import type { IPropertyTemplate } from '../../../blocks/board';
 import type { Card } from '../../../blocks/card';
 import Button from '../../../widgets/buttons/button';
-
 import Calculations from '../../calculations/calculations';
 
 import { KanbanCalculationOptions } from './calculationOptions';

@@ -5,6 +5,7 @@ import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
 import log from 'lib/log';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { isTruthy } from 'lib/utilities/types';
+
 import { combineCommunityData } from './combineCommunityData';
 import type { ProfileBountyEvent, UserCommunity } from './interfaces';
 

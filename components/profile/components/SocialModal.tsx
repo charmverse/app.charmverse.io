@@ -4,12 +4,14 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box, Grid, SvgIcon, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import Button from 'components/common/Button';
-import { DialogTitle, Modal } from 'components/common/Modal';
-import DiscordIcon from 'public/images/discord_logo.svg';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
+import DiscordIcon from 'public/images/discord_logo.svg';
+
 import type { Social } from '../interfaces';
 
 export const schema = yup.object({

@@ -1,4 +1,5 @@
 import type { BountyOperation, BountyPermissionLevel } from '@prisma/client';
+
 import type { UserPermissionFlags, TargetPermissionGroup, Resource, AssignablePermissionGroupsWithPublic } from '../interfaces';
 
 export type BountyPermissionFlags = UserPermissionFlags<BountyOperation>

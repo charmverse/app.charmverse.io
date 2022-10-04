@@ -1,6 +1,6 @@
 
-import { Box, Typography } from '@mui/material';
 import { MessageOutlined } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 
 export function RowDecoration ({ count, icon: Icon }: { count: number, icon: any }) {
   return (

@@ -2,6 +2,8 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -11,8 +13,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
-import { useEffect, useState } from 'react';
+
 import type { AuthSig } from '../../../lib/blockchain/interfaces';
+
 import TokenGateOption from './TokenGateOption';
 
 interface Props {

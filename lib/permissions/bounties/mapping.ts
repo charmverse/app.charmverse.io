@@ -1,5 +1,6 @@
 import type { BountyOperation } from '@prisma/client';
 import { BountyPermissionLevel } from '@prisma/client';
+
 import type { OperationGroupMapping } from '../interfaces';
 
 export function bountyPermissionLevels () {

@@ -1,12 +1,15 @@
-import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import type { ProposalStatus, Prisma } from '@prisma/client';
-import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
+
+import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import type { PageContent } from 'models';
 import { createPage } from 'lib/pages/server/createPage';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
+import type { PageContent } from 'models';
+
 import { getPagePath } from '../pages';
+
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 type PageProps = 'createdBy' | 'spaceId';
 type OptionalPageProps = 'content' | 'contentText' | 'title';

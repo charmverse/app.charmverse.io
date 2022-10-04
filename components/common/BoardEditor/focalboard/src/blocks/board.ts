@@ -1,5 +1,7 @@
 import type { PageContent } from 'models';
+
 import { IDType, Utils } from '../utils';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 import type { Card } from './card';

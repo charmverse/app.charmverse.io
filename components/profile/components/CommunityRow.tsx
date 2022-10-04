@@ -12,13 +12,15 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Collapse, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
 import type { ProfileBountyEvent, UserCommunity } from 'lib/profile/interfaces';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+
 import { ProfileItemContainer } from './CollectibleRow';
 
 const TASK_TABS = [

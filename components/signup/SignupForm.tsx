@@ -4,11 +4,11 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Link from 'components/common/Link';
-import Image from 'components/common/Image';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { useRouter } from 'next/router';
 
+import Image from 'components/common/Image';
+import Link from 'components/common/Link';
+import PrimaryButton from 'components/common/PrimaryButton';
 import { useUser } from 'hooks/useUser';
 import gatesImage from 'public/images/artwork/gates.png';
 import rocketImage from 'public/images/artwork/rocket.png';

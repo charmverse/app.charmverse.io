@@ -1,10 +1,12 @@
 import type { Role } from '@prisma/client';
+import { verifyJwt } from 'lit-js-sdk';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/server';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import { verifyJwt } from 'lit-js-sdk';
-import { v4 } from 'uuid';
+
 import type { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
 export async function applyTokenGates ({

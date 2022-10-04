@@ -1,8 +1,9 @@
 import type { Page } from '@prisma/client';
+import request from 'supertest';
+
 import { prisma } from 'db';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

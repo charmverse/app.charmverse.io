@@ -2,7 +2,6 @@
 
 import type { Block } from './blocks/block';
 import { OctoUtils } from './octoUtils';
-
 import { TestBlockFactory } from './test/testBlockFactory';
 
 test('duplicateBlockTree: Board', async () => {

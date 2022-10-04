@@ -6,6 +6,10 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { useWeb3React } from '@web3-react/core';
+import { getChainById } from 'connectors';
+import { DateTime } from 'luxon';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
@@ -14,14 +18,12 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
-import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
-import { getChainById } from 'connectors';
-import type { PageMeta } from 'lib/pages';
+
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 

@@ -1,8 +1,14 @@
+import { readFileSync } from 'fs';
+
 import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
+import { Wallet } from 'ethers';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
-import { getBountyOrThrow } from 'lib/bounties/getBounty';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
+import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
@@ -10,11 +16,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { baseUrl } from 'testing/mockApiCall';
-import { v4 } from 'uuid';
-import { Wallet } from 'ethers';
-import { readFileSync } from 'fs';
 import { createPage } from 'testing/setupDatabase';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 
 export { baseUrl } from 'testing/mockApiCall';
 

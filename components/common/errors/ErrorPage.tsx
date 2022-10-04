@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 import Bolt from 'public/images/lightning_bolt.svg';
 

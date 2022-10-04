@@ -1,4 +1,5 @@
 import type { Block } from '@prisma/client';
+
 import type { IPageWithPermissions, PageNodeWithChildren } from 'lib/pages';
 
 export interface PageWithBlocks {

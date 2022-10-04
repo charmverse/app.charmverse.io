@@ -1,10 +1,12 @@
 /* eslint-disable no-loop-func */
 import type { Role, Space, User } from '@prisma/client';
+
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import { typedKeys } from 'lib/utilities/objects';
 import { createPage, generateProposal, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import type { ProposalReviewerInput, ProposalWithUsers } from '../interface';
 import { proposalPermissionMapping, syncProposalPermissions } from '../syncProposalPermissions';
 

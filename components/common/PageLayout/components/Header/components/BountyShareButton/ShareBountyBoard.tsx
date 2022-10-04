@@ -8,13 +8,14 @@ import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import type { SpacePermissionConfigurationMode } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeName } from 'lib/permissions/meta/preset-templates';
-import { useEffect, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const StyledInput = styled(Input)`
   font-size: .8em;

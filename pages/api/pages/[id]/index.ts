@@ -1,5 +1,8 @@
 
 import type { Page } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
@@ -10,8 +13,6 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

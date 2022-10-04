@@ -1,9 +1,11 @@
+import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
 import { ethers } from 'ethers';
-import log from 'lib/log';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
+
 import { prisma } from 'db';
-import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
+import log from 'lib/log';
+
 import type { GnosisTransaction } from './gnosis';
 import { getTransactionsforSafes } from './gnosis';
 

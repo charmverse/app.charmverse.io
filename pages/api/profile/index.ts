@@ -1,17 +1,18 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { postToDiscord } from 'lib/log/userEvents';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,8 +1,9 @@
-import useIsAdmin from 'hooks/useIsAdmin';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import type { NewProposalCategory } from 'lib/proposal/interface';
-import useSWR from 'swr';
 
 export function useProposalCategories () {
   const [currentSpace] = useCurrentSpace();

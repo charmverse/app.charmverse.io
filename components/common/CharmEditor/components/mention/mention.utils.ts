@@ -1,8 +1,10 @@
 import type { Command } from '@bangle.dev/pm';
 import { suggestTooltip } from '@bangle.dev/tooltip';
-import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
 import type { PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
+
+import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
+
 import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention (key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {

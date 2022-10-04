@@ -1,5 +1,6 @@
 import type { Mapping, Node, Transaction } from '@bangle.dev/pm';
 import { ReplaceStep, ReplaceAroundStep, replaceStep, Slice, Selection, TextSelection, EditorState, liftListItem } from '@bangle.dev/pm';
+
 import type { TrackAttribute } from './interfaces';
 
 export function deleteNode (tr: Transaction, node: Node, nodePos: number, map: Mapping, accept: boolean) { // Delete a node either because a deletion has been accepted or an insertion rejected.

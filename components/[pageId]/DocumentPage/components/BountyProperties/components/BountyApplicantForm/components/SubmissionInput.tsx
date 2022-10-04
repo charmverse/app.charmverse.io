@@ -1,25 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, FormLabel } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import Collapse from '@mui/material/Collapse';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import type { Application } from '@prisma/client';
-import charmClient from 'charmClient';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { useUser } from 'hooks/useUser';
-import { isValidChainAddress } from 'lib/tokens/validation';
-import type { SystemError } from 'lib/utilities/errors';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+
+import charmClient from 'charmClient';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useUser } from 'hooks/useUser';
 import type { AssignedBountyPermissions } from 'lib/bounties';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { isValidChainAddress } from 'lib/tokens/validation';
+import type { SystemError } from 'lib/utilities/errors';
+
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 const schema = yup.object({

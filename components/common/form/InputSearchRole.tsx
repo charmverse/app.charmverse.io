@@ -1,11 +1,12 @@
 import { Autocomplete, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { Role } from '@prisma/client';
+import type { ComponentProps } from 'react';
+
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useRoles from 'hooks/useRoles';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import type { ComponentProps } from 'react';
 
 interface IRolesFilter {
   mode: 'include' | 'exclude';

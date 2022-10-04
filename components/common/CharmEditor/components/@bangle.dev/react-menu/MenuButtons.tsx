@@ -17,18 +17,20 @@ import {
 } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import React, { useCallback } from 'react';
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import paragraph from '../../paragraph';
-import * as heading from '../../heading';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
+import React, { useCallback } from 'react';
+
 import * as bulletList from '../../bulletList';
+import * as heading from '../../heading';
+import { createInlineComment } from '../../inlineComment';
+import { createInlineVote } from '../../inlineVote';
 import * as orderedList from '../../orderedList';
-import { MenuButton } from './Icon';
+import paragraph from '../../paragraph';
+
 import type { SubMenu } from './floating-menu';
 import { toggleSubMenu } from './floating-menu';
-import { createInlineVote } from '../../inlineVote';
-import { createInlineComment } from '../../inlineComment';
+import { MenuButton } from './Icon';
 
 const {
   defaultKeys: orderedListKeys,

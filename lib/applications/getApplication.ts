@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+
 import type { ApplicationWithBounty } from './interfaces';
 
 export function getApplication (applicationId: string): Promise<ApplicationWithBounty | null> {

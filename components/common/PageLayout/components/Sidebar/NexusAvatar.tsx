@@ -1,10 +1,12 @@
 
 import styled from '@emotion/styled';
-import type { LoggedInUser } from 'models';
-import { useRouter } from 'next/router';
-import Avatar from 'components/common/Avatar';
 import Tooltip from '@mui/material/Tooltip';
+import { useRouter } from 'next/router';
+
+import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import type { LoggedInUser } from 'models';
+
 import NotificationsBadge from './NotificationsBadge';
 
 const AvatarLink = styled(Link)`

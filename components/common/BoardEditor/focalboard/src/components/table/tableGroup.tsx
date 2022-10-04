@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import React from 'react';
-
 import { useDrop } from 'react-dnd';
 
 import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from '../../blocks/board';

@@ -1,7 +1,8 @@
-import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+
 import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
+import { baseUrl } from 'testing/mockApiCall';
+import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/v1/bounties', () => {
   // This test needs to be fixed.

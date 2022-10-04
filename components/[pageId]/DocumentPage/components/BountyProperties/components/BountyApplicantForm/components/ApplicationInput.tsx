@@ -1,20 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { Application } from '@prisma/client';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
 import BountyApplicantStatus from '../../BountyApplicantStatus';
 
 /**

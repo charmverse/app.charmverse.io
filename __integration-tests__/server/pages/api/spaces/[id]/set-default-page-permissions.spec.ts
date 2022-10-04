@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import request from 'supertest';
+
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import type { LoggedInUser } from 'models';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;

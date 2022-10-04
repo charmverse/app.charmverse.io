@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

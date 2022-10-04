@@ -11,6 +11,13 @@ import {
   textblockTypeInputRule,
   TextSelection
 } from '@bangle.dev/pm';
+import {
+  copyEmptyCommand,
+  cutEmptyCommand,
+  jumpToEndOfNode,
+  jumpToStartOfNode,
+  moveNode
+} from '@bangle.dev/pm-commands';
 import type {
   ContentNodeWithPos,
   NodeWithPos } from '@bangle.dev/utils';
@@ -24,13 +31,6 @@ import {
 } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
-import {
-  copyEmptyCommand,
-  cutEmptyCommand,
-  jumpToEndOfNode,
-  jumpToStartOfNode,
-  moveNode
-} from '@bangle.dev/pm-commands';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

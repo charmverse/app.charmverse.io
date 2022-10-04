@@ -1,5 +1,5 @@
-import { ethers } from 'ethers';
 import { getChainById } from 'connectors';
+import { ethers } from 'ethers';
 
 /**
  * See

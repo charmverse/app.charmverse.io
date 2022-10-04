@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 import { hasAccessToSpace } from 'lib/middleware';
 import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/pages/server';
+
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+
 import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
 
 export default function IntlProviderComponent ({ children }: { children: ReactNode }) {

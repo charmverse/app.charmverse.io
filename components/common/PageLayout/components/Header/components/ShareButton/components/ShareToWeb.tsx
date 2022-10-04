@@ -9,14 +9,15 @@ import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { PageType } from '@prisma/client';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const StyledInput = styled(Input)`
   font-size: .8em;

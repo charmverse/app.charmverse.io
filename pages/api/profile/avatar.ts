@@ -1,12 +1,12 @@
-import { prisma } from 'db';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT } from 'lib/blockchain/nfts';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
 import type { UserAvatar } from 'lib/users/interfaces';

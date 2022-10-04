@@ -1,11 +1,11 @@
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { prisma } from 'db';
+import getENSName from 'lib/blockchain/getENSName';
+import { trackUserAction, updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
+import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
+import { sessionUserRelations } from 'lib/session/config';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
-import getENSName from 'lib/blockchain/getENSName';
-import { sessionUserRelations } from 'lib/session/config';
-import { trackUserAction, updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
 
 export async function createUserFromWallet (address: string): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({

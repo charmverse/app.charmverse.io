@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from '../setupDatabase';
 
 describe('generateBoard', () => {

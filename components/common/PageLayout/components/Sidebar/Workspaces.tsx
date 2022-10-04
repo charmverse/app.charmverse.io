@@ -1,26 +1,28 @@
 
 import styled from '@emotion/styled';
-import { Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useRouter } from 'next/router';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import Button from 'components/common/Button';
+import { Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { Prisma } from '@prisma/client';
-import charmClient from 'charmClient';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
+
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
-import { useSpaces } from 'hooks/useSpaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import WorkspaceAvatar from './WorkspaceAvatar';
+
 import NexusAvatar from './NexusAvatar';
+import WorkspaceAvatar from './WorkspaceAvatar';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;

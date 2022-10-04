@@ -1,6 +1,7 @@
 import { Box, Chip } from '@mui/material';
-import { conditionalPlural } from 'lib/utilities/strings';
+
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
+import { conditionalPlural } from 'lib/utilities/strings';
 
 interface BountyReviewersProps {
   maxSubmissions: number;

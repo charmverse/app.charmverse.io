@@ -1,9 +1,12 @@
 import type { Role, SpaceRole } from '@prisma/client';
-import log from 'lib/log';
+
 import { prisma } from 'db';
+import log from 'lib/log';
+
 import { getGuildRoleIds } from '../getGuildRoleIds';
-import { createRoleRecord } from './createRoleRecord';
+
 import { assignRolesToUser } from './assignRolesToUser';
+import { createRoleRecord } from './createRoleRecord';
 import { unassignRolesFromUser } from './unassignRolesFromUser';
 
 export async function updateGuildRolesForUser (addresses: string[], spaceRoles: (Pick<SpaceRole, 'spaceId' | 'id' | 'userId'> & {

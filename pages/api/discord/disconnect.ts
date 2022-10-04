@@ -1,13 +1,14 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { shortenHex } from 'lib/utilities/strings';
-import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
+import getENSName from 'lib/blockchain/getENSName';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import getENSName from 'lib/blockchain/getENSName';
 
 const handler = nc({
   onError,

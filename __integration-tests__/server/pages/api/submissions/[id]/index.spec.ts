@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Application, Space, User } from '@prisma/client';
 import request from 'supertest';
+
+import type { LoggedInUser } from 'models';
 import { generateSubmissionContent } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import type { LoggedInUser } from 'models';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
