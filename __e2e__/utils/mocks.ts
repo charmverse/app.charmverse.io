@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
@@ -6,7 +5,6 @@ import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
@@ -15,27 +13,9 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import { baseUrl } from 'testing/mockApiCall';
 import { createPage } from 'testing/setupDatabase';
 
-export { baseUrl } from 'testing/mockApiCall';
-
-export async function mockAuthSig ({ address, page }: { address: string, page: BrowserPage }): Promise<AuthSig> {
-
-  await page.waitForURL(baseUrl);
-
-  const authSig = {
-    address,
-    derivedVia: 'charmverse-mock',
-    sig: 'signature',
-    signedMessage: 'signed message'
-  };
-
-  // Approach to setting localstorage found here https://github.com/microsoft/playwright/issues/6258#issuecomment-824314544
-  await page.evaluate(`window.localStorage.setItem('charm.v1.wallet-auth-sig-${address}', '${JSON.stringify(authSig)}')`);
-
-  return authSig;
-}
+import { baseUrl } from '../config';
 
 export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
   walletAddress: string; }): Promise<LoggedInUser> {
@@ -231,34 +211,4 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
     space,
     walletAddress
   };
-}
-
-// load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-// optionally pass in a context object to be available to the callback
-export async function mockWeb3<T> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
-  callback ||= context as (context: T) => void;
-  context = typeof context === 'function' ? {} as T : context;
-
-  await page.addInitScript({
-    content:
-      `${readFileSync(
-        require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
-        'utf-8'
-      )}\n`
-      + `
-
-        Web3Mock.mock('ethereum');
-
-        // mock deprecatd apis not handled by web3-mock
-        window.ethereum.enable = () => Promise.resolve();
-
-        window.ethereum.send = (method, opts) => {
-          return window.ethereum.request({ method }, opts);
-        };
-
-
-
-      `
-      + `(${callback.toString()})(${JSON.stringify(context)});`
-  });
 }

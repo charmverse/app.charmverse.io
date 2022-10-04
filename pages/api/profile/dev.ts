@@ -7,7 +7,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
 
-const isTestEnv = process.env.ENABLE_TEST_LOGIN === 'true';
+const isTestEnv = process.env.APP_ENV === 'test';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

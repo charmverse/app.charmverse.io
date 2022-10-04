@@ -30,4 +30,5 @@ export interface AuthSig {
   derivedVia: string;
   signedMessage: string;
   address: string;
+  testMode?: boolean;
 }

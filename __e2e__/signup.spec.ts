@@ -18,16 +18,19 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
   const walletAddress = Wallet.createRandom().address;
 
-  await mockWeb3(page, { walletAddress }, context => {
+  await mockWeb3({
+    page,
+    context: { walletAddress },
+    init: (Web3Mock, context) => {
 
-    // @ts-ignore
-    Web3Mock.mock({
-      blockchain: 'ethereum',
-      accounts: {
-        return: [context.walletAddress]
-      }
-    });
+      Web3Mock.mock({
+        blockchain: 'ethereum',
+        accounts: {
+          return: [context.walletAddress]
+        }
+      });
 
+    }
   });
 
   const uniqueDomain = Math.random().toString().replace('.', '');
