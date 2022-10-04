@@ -17,12 +17,11 @@ import { createPage } from 'testing/setupDatabase';
 
 import { baseUrl } from '../config';
 
-export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
-  walletAddress: string; }): Promise<LoggedInUser> {
+export async function createUser ({ browserPage, address }: { browserPage: BrowserPage, address: string }): Promise<LoggedInUser> {
 
   return browserPage.request.post(`${baseUrl}/api/profile/dev`, {
     data: {
-      address: walletAddress
+      address
     }
   }).then(res => res.json());
 }
@@ -66,19 +65,22 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  */
 export async function createUserAndSpace ({
   browserPage,
-  walletAddress = Wallet.createRandom().address,
+  address,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
-  walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, walletAddress?: string, space: Space, pages: IPageWithPermissions[] }> {
-  const user = await createUser({ browserPage, walletAddress });
+  address?: string;
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, address: string, privateKey: string, space: Space, pages: IPageWithPermissions[] }> {
+  const wallet = Wallet.createRandom();
+  address ||= wallet.address;
+  const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
-    walletAddress,
+    address,
+    privateKey: wallet.privateKey,
     user,
     pages
   };

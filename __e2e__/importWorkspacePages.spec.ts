@@ -5,7 +5,8 @@ import type { Block, Page } from '@prisma/client';
 import { prisma } from 'db';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
-import { baseUrl, createUserAndSpace } from './utils';
+import { baseUrl } from './config';
+import { createUserAndSpace } from './utils/mocks';
 
 let browser: Browser;
 
