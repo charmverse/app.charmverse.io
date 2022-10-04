@@ -22,7 +22,7 @@ export default function LoginPage () {
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
   const { user, isLoaded, loginFromWeb3Account } = useUser();
-  const [spaces,, isSpacesLoaded] = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';

@@ -39,7 +39,7 @@ export default function Workspaces () {
 
   const router = useRouter();
   const [space] = useCurrentSpace();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, setSpaces } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user, setUser } = useUser();
 

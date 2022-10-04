@@ -19,7 +19,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import type { PublicSpaceInfo } from 'lib/spaces/interfaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
-  const [spaces] = useSpaces();
+  const { spaces } = useSpaces();
   const showMySpacesLink = spaces.length > 0;
   return (
     <Box display='flex' alignItems='center' justifyContent={showMySpacesLink ? 'space-between' : 'center'}>
@@ -42,7 +42,7 @@ function stripUrlParts (maybeUrl: string) {
 export default function CreateSpace () {
 
   const router = useRouter();
-  const [spaces] = useSpaces();
+  const { spaces } = useSpaces();
   const [spaceDomain, setSpaceDomain] = useState<string>('');
   const [spaceInfo, setSpaceInfo] = useState<PublicSpaceInfo | null>(null);
   const [userInputStatus, setStatus] = useState('');

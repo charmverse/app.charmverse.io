@@ -7,9 +7,13 @@ import charmClient from 'charmClient';
 
 import { useUser } from './useUser';
 
-type IContext = [spaces: Space[], setSpaces: (spaces: Space[]) => void, isLoaded: boolean];
+type IContext = {
+  spaces: Space[];
+  setSpaces: (spaces: Space[]) => void;
+  isLoaded: boolean;
+};
 
-export const SpacesContext = createContext<Readonly<IContext>>([[], () => undefined, false]);
+export const SpacesContext = createContext<Readonly<IContext>>({ spaces: [], setSpaces: () => undefined, isLoaded: false });
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
 
@@ -33,7 +37,7 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const value = useMemo(() => [spaces, setSpaces, isLoaded] as IContext, [spaces, isLoaded]);
+  const value = useMemo(() => ({ spaces, setSpaces, isLoaded }) as IContext, [spaces, isLoaded]);
 
   return (
     <SpacesContext.Provider value={value}>

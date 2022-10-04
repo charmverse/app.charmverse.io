@@ -22,7 +22,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { account, walletAuthSignature, triedEager } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
-  const [spaces,, isSpacesLoaded] = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = !isLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
