@@ -89,6 +89,7 @@ export async function mockWeb3<T extends Partial<MockSignatureInput>> ({ page, c
           return window.ethereum.request({ method }, opts);
         };
 
+        // mock wallet signature
         ${walletSig ? `window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.walletAddress}', '${walletSig}');` : ''}
 
       `
