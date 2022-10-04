@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+import fs from 'node:fs/promises';
 import { exportWorkspacePages } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
 
@@ -16,6 +17,7 @@ let page_1_1_1: IPageWithPermissions;
 let boardPage: Page;
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;
+let exportedFilePath: string;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
@@ -66,6 +68,13 @@ beforeAll(async () => {
 });
 
 describe('importWorkspacePages', () => {
+  afterEach(async () => {
+    if (exportedFilePath) {
+      await fs.unlink(exportedFilePath);
+      exportedFilePath = '';
+    }
+  });
+
   it('should import data from the export function into the target workspace', async () => {
 
     const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
@@ -101,10 +110,12 @@ describe('importWorkspacePages', () => {
 
     const exportName = `test-${v4()}`;
 
-    await exportWorkspacePages({
+    const { path } = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain,
       exportName
     });
+
+    exportedFilePath = path;
 
     await importWorkspacePages({
       targetSpaceIdOrDomain: targetSpace.domain,

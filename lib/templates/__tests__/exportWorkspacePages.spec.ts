@@ -13,6 +13,7 @@ let root_1: IPageWithPermissions;
 let page_1_1: IPageWithPermissions;
 let page_1_1_1: IPageWithPermissions;
 let boardPage: Page;
+let exportedFilePath: string;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
@@ -51,6 +52,13 @@ beforeAll(async () => {
 });
 
 describe('exportWorkspacePages', () => {
+  afterEach(async () => {
+    if (exportedFilePath) {
+      await fs.unlink(exportedFilePath);
+      exportedFilePath = '';
+    }
+  });
+
   it('should export the pages within a workspace to a list of root pages, and their children as a recursive tree structure', async () => {
 
     const { data } = await exportWorkspacePages({
@@ -204,6 +212,8 @@ describe('exportWorkspacePages', () => {
       sourceSpaceIdOrDomain: space.id,
       exportName
     });
+
+    exportedFilePath = exportedPath;
 
     const file = await fs.readFile(exportedPath, 'utf8');
 
