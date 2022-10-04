@@ -1,2 +1,2 @@
 
-export { baseUrl } from 'testing/mockApiCall';
+export const baseUrl = process.env.DOMAIN as string;
