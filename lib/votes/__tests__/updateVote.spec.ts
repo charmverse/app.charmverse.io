@@ -1,8 +1,10 @@
 import type { VoteContext, VoteStatus } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { updateVote } from '../updateVote';
 
 async function setupVoteData (params?: { context?: VoteContext, status?: VoteStatus }) {

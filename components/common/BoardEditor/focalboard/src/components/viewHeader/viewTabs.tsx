@@ -12,9 +12,6 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -23,6 +20,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
+
+import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
+
 import type { BoardView } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';

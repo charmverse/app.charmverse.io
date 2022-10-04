@@ -2,17 +2,19 @@
 import { Checkbox, List, ListItem, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { UserGnosisSafe } from '@prisma/client';
+import { getChainById } from 'connectors';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect, useState } from 'react';
+
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { getChainById } from 'connectors';
 import { useContributors } from 'hooks/useContributors';
 import type { TransactionWithMetadata } from 'hooks/useMultiBountyPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import type { BountyWithDetails } from 'lib/bounties';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+
 import { BountyAmount } from './BountyStatusBadge';
 import MultiPaymentButton from './MultiPaymentButton';
 

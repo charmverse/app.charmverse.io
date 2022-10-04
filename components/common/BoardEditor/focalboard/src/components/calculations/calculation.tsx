@@ -1,16 +1,14 @@
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import type { CSSProperties } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import type { IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-
+import Calculations from './calculations';
 import type { CommonCalculationOptionProps } from './options';
 import { Options, optionDisplayNameString } from './options';
-
-import Calculations from './calculations';
 
 type Props = {
   style: CSSProperties;

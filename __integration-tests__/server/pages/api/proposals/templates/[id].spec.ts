@@ -1,9 +1,10 @@
 import type { Space } from '@prisma/client';
-import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
 import request from 'supertest';
+
+import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import type { LoggedInUser } from 'models';
 
 let adminUser: LoggedInUser;
 let nonAdminUser: LoggedInUser;

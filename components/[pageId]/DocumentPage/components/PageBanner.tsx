@@ -1,8 +1,9 @@
-import { memo } from 'react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { memo } from 'react';
+
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import { randomIntFromInterval } from 'lib/utilities/random';
 

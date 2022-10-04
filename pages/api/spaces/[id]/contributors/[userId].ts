@@ -1,11 +1,12 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { AdministratorOnlyError, UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from 'lib/users/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

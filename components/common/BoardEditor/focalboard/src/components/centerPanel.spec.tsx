@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
-import { TestBlockFactory } from '../test/testBlockFactory';
 import type { IPropertyTemplate } from '../blocks/board';
-import { Utils } from '../utils';
-import Mutator from '../mutator';
 import { Constants } from '../constants';
+import Mutator from '../mutator';
+import { TestBlockFactory } from '../test/testBlockFactory';
+import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
+import { Utils } from '../utils';
 
 import CenterPanel from './centerPanel';
 

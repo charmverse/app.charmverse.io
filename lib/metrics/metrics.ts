@@ -1,4 +1,5 @@
 import StatsD from 'hot-shots';
+
 import log from 'lib/log';
 
 const dogstatsd = new StatsD({

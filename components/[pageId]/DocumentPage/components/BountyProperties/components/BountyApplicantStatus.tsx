@@ -1,9 +1,10 @@
 
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Tooltip, Typography } from '@mui/material';
-import Link from 'components/common/Link';
-import { getChainExplorerLink } from 'connectors';
 import type { Application } from '@prisma/client';
+import { getChainExplorerLink } from 'connectors';
+
+import Link from 'components/common/Link';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 
 interface Props {

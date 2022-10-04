@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 import { Box, Button } from '@mui/material';
-import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
+
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 
 const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
   position: fixed;

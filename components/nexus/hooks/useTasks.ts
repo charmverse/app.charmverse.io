@@ -1,6 +1,7 @@
+import useSWRImmutable from 'swr/immutable';
+
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
-import useSWRImmutable from 'swr/immutable';
 
 export default function useTasks () {
   const { user } = useUser();

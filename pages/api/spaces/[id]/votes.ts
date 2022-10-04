@@ -1,9 +1,10 @@
-import { getVotesBySpace } from 'lib/votes';
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
+import type { Vote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import type { Vote } from '@prisma/client';
+
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { getVotesBySpace } from 'lib/votes';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

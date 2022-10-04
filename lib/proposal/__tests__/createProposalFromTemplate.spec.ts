@@ -1,7 +1,9 @@
 import type { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, generateSpaceUser } from 'testing/setupDatabase';
-import { InsecureOperationError } from 'lib/utilities/errors';
+
 import { prisma } from 'db';
+import { InsecureOperationError } from 'lib/utilities/errors';
+import { generateUserAndSpaceWithApiToken, generateSpaceUser } from 'testing/setupDatabase';
+
 import { createProposal } from '../createProposal';
 import { createProposalFromTemplate } from '../createProposalFromTemplate';
 

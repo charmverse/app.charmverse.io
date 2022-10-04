@@ -1,5 +1,7 @@
-import log from 'lib/log';
 import cron from 'node-cron';
+
+import log from 'lib/log';
+
 import app from './server/app';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as notificationTask } from './tasks/sendNotifications';

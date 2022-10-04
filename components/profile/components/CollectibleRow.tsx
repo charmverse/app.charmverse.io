@@ -3,6 +3,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+
 import Avatar from 'components/common/Avatar';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 

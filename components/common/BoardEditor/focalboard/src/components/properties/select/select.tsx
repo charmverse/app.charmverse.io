@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 
 import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
-
 import Label from '../../../widgets/label';
 import ValueSelector from '../../../widgets/valueSelector';
 

@@ -9,8 +9,9 @@ import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { ReactNode } from 'react';
+
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
 const PROPOSAL_STATUS_ICONS : Record<ProposalStatus, ReactNode> = {

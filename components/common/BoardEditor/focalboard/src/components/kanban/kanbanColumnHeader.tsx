@@ -1,13 +1,13 @@
 /* eslint-disable max-lines */
+import AddIcon from '@mui/icons-material/Add';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';

@@ -3,9 +3,9 @@ import { NodeView } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorState, EditorView, Transaction } from '@bangle.dev/pm';
 import { chainCommands, createParagraphNear, keymap, newlineInCode, splitBlock } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
-import log from 'lib/log';
-
 import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
+
+import log from 'lib/log';
 
 export function rowSpec (): RawSpecs {
   return {

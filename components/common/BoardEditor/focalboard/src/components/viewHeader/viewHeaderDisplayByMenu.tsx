@@ -1,9 +1,10 @@
 
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
-import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+
 import type { IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';

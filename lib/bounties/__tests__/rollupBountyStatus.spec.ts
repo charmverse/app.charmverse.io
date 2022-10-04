@@ -1,9 +1,11 @@
 
 import type { Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { rollupBountyStatus } from '../rollupBountyStatus';
 
 let user: User;

@@ -1,7 +1,9 @@
 import type { Command, EditorState } from '@bangle.dev/pm';
 import { toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+
 import { createHighlightDomElement } from 'lib/browser';
+
 import { markName } from './inlineComment.constants';
 
 const getMarkFromState = (state: EditorState) => state.schema.marks[markName];

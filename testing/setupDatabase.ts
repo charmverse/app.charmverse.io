@@ -1,8 +1,13 @@
 import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import { Wallet } from 'ethers';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
@@ -11,11 +16,8 @@ import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
-import { v4 } from 'uuid';
-import { Wallet } from 'ethers';
-import { createPage as createPageDb } from 'lib/pages/server/createPage';
+
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {

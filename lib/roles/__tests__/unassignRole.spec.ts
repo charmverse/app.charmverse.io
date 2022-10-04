@@ -1,10 +1,12 @@
 
 import type { Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { assignRole } from 'lib/roles';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { unassignRole } from '../unassignRole';
 
 let user: User;

@@ -1,18 +1,20 @@
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import type { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
-import charmClient from 'charmClient';
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
+import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
+
+import charmClient from 'charmClient';
+import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
-import { useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
+
 import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
 

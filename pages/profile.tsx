@@ -1,8 +1,9 @@
 import type { ReactElement } from 'react';
-import NexusPageTitle from 'components/nexus/components/NexusPageTitle';
+
 import PageLayout from 'components/nexus/components/NexusLayout';
-import { setTitle } from 'hooks/usePageTitle';
+import NexusPageTitle from 'components/nexus/components/NexusPageTitle';
 import PublicProfile from 'components/profile';
+import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 
 export default function PublicProfilePage () {

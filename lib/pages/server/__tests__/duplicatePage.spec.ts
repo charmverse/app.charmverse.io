@@ -1,8 +1,10 @@
 import type { Block, Page } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { ExpectedAnError } from 'testing/errors';
 import { createBlock, createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { duplicatePage } from '../duplicatePage';
 import { PageNotFoundError } from '../errors';
 

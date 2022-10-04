@@ -1,8 +1,8 @@
 import FormControl from '@mui/material/FormControl';
-import type { SelectProps } from '@mui/material/Select';
-import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import type { SelectProps } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import { useEffect, useState } from 'react';
 
 export interface Props extends Omit<SelectProps, 'onChange'> {

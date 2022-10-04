@@ -1,5 +1,6 @@
 
 import type { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User, Page } from '@prisma/client';
+
 import type { UserPermissionFlags } from '../interfaces';
 
 export type PageOperationType = keyof typeof PageOperationEnum

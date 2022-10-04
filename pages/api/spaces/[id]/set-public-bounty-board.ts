@@ -1,12 +1,13 @@
 
 import type { Space } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
+import { prisma } from 'db';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import { togglePublicBounties } from 'lib/spaces/togglePublicBounties';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { prisma } from 'db';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

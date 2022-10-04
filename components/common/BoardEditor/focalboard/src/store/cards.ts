@@ -1,6 +1,7 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+
 import type { Board } from '../blocks/board';
 import type { BoardView } from '../blocks/boardView';
 import type { Card } from '../blocks/card';
@@ -8,12 +9,14 @@ import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import type { IUser } from '../user';
 import { Utils } from '../utils';
+
 import { getCurrentBoard, getBoard } from './boards';
-import type { RootState } from './index';
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 import { getSearchText } from './searchText';
 import { getWorkspaceUsers } from './users';
 import { getCurrentView, getView } from './views';
+
+import type { RootState } from './index';
 
 type CardsState = {
     current: string;

@@ -1,6 +1,8 @@
 import type { User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { prisma } from 'db';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { getSpacesOfUser } from '../getSpacesOfUser';
 
 let user: User;

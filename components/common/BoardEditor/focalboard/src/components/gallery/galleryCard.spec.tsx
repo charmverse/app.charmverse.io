@@ -1,22 +1,15 @@
 
-import React from 'react';
 import { act, render, screen } from '@testing-library/react';
-
-import { Provider as ReduxProvider } from 'react-redux';
-
 import userEvent from '@testing-library/user-event';
-
+import React from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 
-import { wrapDNDIntl, mockStateStore } from '../../testUtils';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import mutator from '../../mutator';
-
-import { Utils } from '../../utils';
-
 import octoClient from '../../octoClient';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl, mockStateStore } from '../../testUtils';
+import { Utils } from '../../utils';
 
 import GalleryCard from './galleryCard';
 

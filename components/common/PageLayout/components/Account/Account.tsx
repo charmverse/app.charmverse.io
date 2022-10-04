@@ -1,19 +1,20 @@
 
+import styled from '@emotion/styled';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { alpha } from '@mui/system';
+import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
+import { alpha } from '@mui/system';
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
+import { getChainById } from 'connectors';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useContext } from 'react';
+
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
-import SvgIcon from '@mui/material/SvgIcon';
-import { useRouter } from 'next/router';
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useUser } from 'hooks/useUser';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
-import { getChainById } from 'connectors';
-import { useContext } from 'react';
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal';
-import styled from '@emotion/styled';
+import { useUser } from 'hooks/useUser';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 const AccountCard = styled.div`

@@ -2,6 +2,11 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import type { PaymentMethod } from '@prisma/client';
+import type { CryptoCurrency } from 'connectors';
+import { getChainById } from 'connectors';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -10,8 +15,6 @@ import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain'
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import type { CryptoCurrency } from 'connectors';
-import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -22,14 +25,13 @@ import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFiel
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
 import BountyPropertiesHeader from './components/BountyPropertiesHeader';
+import { BountySignupButton } from './components/BountySignupButton';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
 import MissingPagePermissions from './components/MissingPagePermissions';
-import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
   readOnly?: boolean;

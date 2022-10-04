@@ -1,6 +1,7 @@
 import { Delete } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+
 import type { IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';

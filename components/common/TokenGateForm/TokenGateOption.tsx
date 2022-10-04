@@ -7,10 +7,11 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { SxProps, Theme } from '@mui/system';
 import { useWeb3React } from '@web3-react/core';
-import LoadingComponent from 'components/common/LoadingComponent';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
+
+import LoadingComponent from 'components/common/LoadingComponent';
+import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 interface Props {
   tokenGate: TokenGateWithRoles;

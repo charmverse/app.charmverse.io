@@ -1,10 +1,11 @@
 import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
 import {
   isTouchDevice,
   safeScrollIntoViewIfNeeded
 } from 'lib/browser';
-import { Box } from '@mui/material';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface InlinePaletteRowProps {
   dataId: string;

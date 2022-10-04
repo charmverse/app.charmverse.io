@@ -1,6 +1,8 @@
 import type { SpaceRole } from '@prisma/client';
+
 import { prisma } from 'db';
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
+
 import type { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 

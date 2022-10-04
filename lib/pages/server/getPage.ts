@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client';
-import { prisma } from 'db';
 import { validate } from 'uuid';
+
+import { prisma } from 'db';
+
 import type { IPageWithPermissions } from '../interfaces';
 
 export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<IPageWithPermissions | null> {

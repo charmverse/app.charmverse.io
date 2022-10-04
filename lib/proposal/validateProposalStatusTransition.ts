@@ -1,5 +1,7 @@
 import type { ProposalStatus } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import type { ProposalWithUsers } from './interface';
 import type { ProposalUserGroup } from './proposalStatusTransition';
 import { proposalStatusTransitionPermission } from './proposalStatusTransition';

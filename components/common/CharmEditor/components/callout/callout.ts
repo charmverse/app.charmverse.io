@@ -1,4 +1,5 @@
 import { NodeView, type BaseRawNodeSpec, type RawPlugins } from '@bangle.dev/core';
+
 import { spec as quoteSpec } from '../quote';
 
 const name = 'blockquote';

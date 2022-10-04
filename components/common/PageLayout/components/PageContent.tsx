@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
 import styled from '@emotion/styled';
+import type { ReactNode } from 'react';
+
 import ScrollableWindow from './ScrollableWindow';
 
 const StyledBox = styled.div(({ theme }) => `

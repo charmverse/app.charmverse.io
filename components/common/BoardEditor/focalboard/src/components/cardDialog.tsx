@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
+
 import PageDialog from 'components/common/PageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
-import { useMemo } from 'react';
+
 import { getCard } from '../store/cards';
 import { useAppSelector } from '../store/hooks';
 

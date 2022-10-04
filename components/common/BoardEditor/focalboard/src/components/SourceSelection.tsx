@@ -1,12 +1,13 @@
-import { Box, Collapse, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
-import Button from 'components/common/Button';
+import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import styled from '@emotion/styled';
-import { usePages } from 'hooks/usePages';
+import { Box, Collapse, IconButton, ListItemIcon, MenuItem, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
+
+import Button from 'components/common/Button';
 import PagesList from 'components/common/CharmEditor/components/PageList';
+import { usePages } from 'hooks/usePages';
 import { isTruthy } from 'lib/utilities/types';
 
 type SidebarState = 'select-source' | null;

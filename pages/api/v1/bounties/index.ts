@@ -1,9 +1,10 @@
 
 import type { BountyStatus } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+
+import { prisma } from 'db';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

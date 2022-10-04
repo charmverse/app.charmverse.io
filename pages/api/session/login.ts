@@ -1,18 +1,19 @@
-import { prisma } from 'db';
-import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { onError, onNoMatch, requireKeys, ActionNotPermittedError } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
-import { withSessionRoute } from 'lib/session/withSession';
-import type { LoggedInUser } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { getAddress, toUtf8Bytes, verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
+import { prisma } from 'db';
+import type { AuthSig } from 'lib/blockchain/interfaces';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { onError, onNoMatch, requireKeys, ActionNotPermittedError } from 'lib/middleware';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
+import { sessionUserRelations } from 'lib/session/config';
+import { withSessionRoute } from 'lib/session/withSession';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

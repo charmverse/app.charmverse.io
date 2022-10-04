@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import request from 'supertest';
+
 import type { IPageWithPermissions } from 'lib/pages';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

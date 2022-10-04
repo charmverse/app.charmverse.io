@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+
 import type { ProposalCategory } from './interface';
 
 export function updateProposalCategory (id: string, data: Partial<ProposalCategory>) {

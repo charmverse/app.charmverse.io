@@ -1,17 +1,17 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { RateReviewOutlined } from '@mui/icons-material';
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -20,22 +20,24 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useRef, useState } from 'react';
+
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import ShareButton from './components/ShareButton';
+
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
-import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import EditingModeToggle from './components/EditingModeToggle';
+import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import ShareButton from './components/ShareButton';
 
 export const headerHeight = 56;
 

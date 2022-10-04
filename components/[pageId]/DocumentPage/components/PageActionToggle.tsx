@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton } from '@mui/material';
+
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
 export default function PageActionToggle () {

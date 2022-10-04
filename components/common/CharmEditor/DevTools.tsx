@@ -1,6 +1,6 @@
 
-import { applyDevTools } from 'prosemirror-dev-tools';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { applyDevTools } from 'prosemirror-dev-tools';
 import { useEffect } from 'react';
 
 // A React componenet that loads the prosemirror dev tools

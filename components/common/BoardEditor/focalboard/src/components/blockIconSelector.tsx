@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-expressions */
-import type { Page } from '@prisma/client';
-import PageIcon from 'components/common/Emoji';
-import React, { useCallback } from 'react';
-import { useIntl } from 'react-intl';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+import type { Page } from '@prisma/client';
+import React, { useCallback } from 'react';
+import { useIntl } from 'react-intl';
+
+import PageIcon from 'components/common/Emoji';
+
 import { BlockIcons } from '../blockIcons';
 import type { Board } from '../blocks/board';
 import type { Card } from '../blocks/card';

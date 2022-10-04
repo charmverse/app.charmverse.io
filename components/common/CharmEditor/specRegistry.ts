@@ -8,36 +8,38 @@ import {
   underline
 } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
+
 import type { PageContent } from 'models';
+
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
+import * as bulletList from './components/bulletList';
+import * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
 import { cryptoPriceSpec } from './components/CryptoPrice';
-import * as inlineDatabase from './components/inlineDatabase';
 import * as disclosure from './components/disclosure';
+import * as emoji from './components/emojiSuggest';
+import * as heading from './components/heading';
+import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
-import * as callout from './components/callout';
+import * as inlineComment from './components/inlineComment';
+import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
+import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
-import * as inlineComment from './components/inlineComment';
 import { nestedPageSpec } from './components/nestedPage';
+import * as orderedList from './components/orderedList';
+import paragraph from './components/paragraph';
 import * as quote from './components/quote';
 import { imageSpec } from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
-import * as emoji from './components/emojiSuggest';
-import * as tabIndent from './components/tabIndent';
-import * as horizontalRule from './components/horizontalRule';
-import * as bulletList from './components/bulletList';
-import * as orderedList from './components/orderedList';
-import * as heading from './components/heading';
-import * as listItem from './components/listItem/listItem';
-import * as table from './components/table';
-import paragraph from './components/paragraph';
 import {
   deletion,
   insertion,
   formatChange
 } from './components/suggestions/schema/common/track';
+import * as tabIndent from './components/tabIndent';
+import * as table from './components/table';
 
 export interface ICharmEditorOutput {
   doc: PageContent;

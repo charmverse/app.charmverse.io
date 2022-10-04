@@ -1,6 +1,7 @@
 import type { EditorState, Node } from '@bangle.dev/pm';
-import type { TrackAttribute, TrackType } from './track/interfaces';
+
 import { getSelectedChanges } from './statePlugins/track';
+import type { TrackAttribute, TrackType } from './track/interfaces';
 
 type TrackAttribute2 = {
   type: TrackAttribute['type'];

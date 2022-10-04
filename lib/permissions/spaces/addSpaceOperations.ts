@@ -1,14 +1,17 @@
-import { prisma } from 'db';
 import { Prisma, SpaceOperation } from '@prisma/client';
-import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uniqueValues } from 'lib/utilities/array';
+
+import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
+import { uniqueValues } from 'lib/utilities/array';
+import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+
 import { InvalidPermissionGranteeError } from '../errors';
 import type { AssignablePermissionGroups } from '../interfaces';
+
+import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 import type { SpacePermissionFlags, SpacePermissionModification } from './interfaces';
 import { SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
-import { computeGroupSpacePermissions } from './computeGroupSpacePermissions';
 
 export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'> ({
   forSpaceId,

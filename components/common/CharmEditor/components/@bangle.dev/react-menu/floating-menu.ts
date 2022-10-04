@@ -4,6 +4,7 @@ import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import { querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } from '@bangle.dev/tooltip/selection-tooltip';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PluginKey } from 'prosemirror-state';
+
 import { markName as inlineCommentMarkName } from '../../inlineComment/inlineComment.constants';
 import { markName as inlineVoteMarkName } from '../../inlineVote/inlineVote.constants';
 

@@ -1,5 +1,6 @@
-import charmClient from 'charmClient';
 import useSWR from 'swr';
+
+import charmClient from 'charmClient';
 
 export const useMyNfts = (userId: string) => {
   const { data, error: serverError } = useSWR(userId && `/nfts/list/${userId}`, () => charmClient.blockchain.listNFTs(userId));

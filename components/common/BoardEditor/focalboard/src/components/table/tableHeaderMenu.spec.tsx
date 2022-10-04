@@ -1,17 +1,14 @@
 
-import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-
-import '@testing-library/jest-dom';
-import { wrapIntl } from '../../testUtils';
-
 import 'isomorphic-fetch';
+import '@testing-library/jest-dom';
+import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { FetchMock } from '../../test/fetchMock';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapIntl } from '../../testUtils';
 
 import TableHeaderMenu from './tableHeaderMenu';
 

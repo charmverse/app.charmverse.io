@@ -1,7 +1,8 @@
 import { prisma } from 'db';
 import { countValidSubmissions } from 'lib/applications/shared';
-import { includePagePermissions } from 'lib/pages/server';
 import type { BountyWithDetails } from 'lib/bounties';
+import { includePagePermissions } from 'lib/pages/server';
+
 import { getBountyOrThrow } from './getBounty';
 
 export async function closeOutBounty (bountyId: string): Promise<BountyWithDetails> {

@@ -4,6 +4,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
+
 import { updateInlineVote } from '../inlineVote.utils';
 
 export default function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {

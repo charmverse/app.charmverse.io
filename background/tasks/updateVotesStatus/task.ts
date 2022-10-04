@@ -1,6 +1,7 @@
 
 import log from 'lib/log';
 import { count } from 'lib/metrics';
+
 import updateVoteStatus from './updateVoteStatus';
 
 export default async function task () {

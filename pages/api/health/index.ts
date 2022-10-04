@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import log from 'lib/log';
 import { gauge, count } from 'lib/metrics';
 
