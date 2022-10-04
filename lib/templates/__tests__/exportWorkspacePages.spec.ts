@@ -7,13 +7,14 @@ import fs from 'node:fs/promises';
 import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { exportWorkspacePages } from '../exportWorkspacePages';
 
+jest.mock('node:fs/promises');
+
 let space: Space;
 let user: User;
 let root_1: IPageWithPermissions;
 let page_1_1: IPageWithPermissions;
 let page_1_1_1: IPageWithPermissions;
 let boardPage: Page;
-let exportedFilePath: string;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
@@ -52,12 +53,6 @@ beforeAll(async () => {
 });
 
 describe('exportWorkspacePages', () => {
-  afterEach(async () => {
-    if (exportedFilePath) {
-      await fs.unlink(exportedFilePath);
-      exportedFilePath = '';
-    }
-  });
 
   it('should export the pages within a workspace to a list of root pages, and their children as a recursive tree structure', async () => {
 
@@ -213,13 +208,8 @@ describe('exportWorkspacePages', () => {
       exportName
     });
 
-    exportedFilePath = exportedPath;
-
-    const file = await fs.readFile(exportedPath, 'utf8');
-
     const stringifiedData = JSON.stringify(data, null, 2);
-
-    expect(file).toEqual(stringifiedData);
+    expect(fs.writeFile).toHaveBeenCalledWith(exportedPath, stringifiedData);
   });
 
 });

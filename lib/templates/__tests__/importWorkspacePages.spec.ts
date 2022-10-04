@@ -9,6 +9,8 @@ import fs from 'node:fs/promises';
 import { exportWorkspacePages } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
 
+jest.mock('node:fs/promises');
+
 let space: Space;
 let user: User;
 let root_1: IPageWithPermissions;
@@ -17,7 +19,6 @@ let page_1_1_1: IPageWithPermissions;
 let boardPage: Page;
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;
-let exportedFilePath: string;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
@@ -68,13 +69,6 @@ beforeAll(async () => {
 });
 
 describe('importWorkspacePages', () => {
-  afterEach(async () => {
-    if (exportedFilePath) {
-      await fs.unlink(exportedFilePath);
-      exportedFilePath = '';
-    }
-  });
-
   it('should import data from the export function into the target workspace', async () => {
 
     const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
@@ -110,12 +104,16 @@ describe('importWorkspacePages', () => {
 
     const exportName = `test-${v4()}`;
 
-    const { path } = await exportWorkspacePages({
+    const { data, path } = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain,
       exportName
     });
 
-    exportedFilePath = path;
+    const stringifiedData = JSON.stringify(data, null, 2);
+    jest.spyOn(fs, 'readFile').mockImplementation(() => Promise.resolve(stringifiedData));
+    // path.join(__dirname, 'exports', `${exportName}.json`);
+
+    // exportedFilePath = path;
 
     await importWorkspacePages({
       targetSpaceIdOrDomain: targetSpace.domain,
@@ -134,6 +132,7 @@ describe('importWorkspacePages', () => {
       }
     });
 
+    expect(fs.readFile).toHaveBeenCalledWith(path, 'utf-8');
     expect(pages.length).toBe(totalSourcePages);
     expect(blocks.length).toBe(totalSourceBlocks);
   });
