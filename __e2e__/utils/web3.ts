@@ -57,16 +57,21 @@ type InitParams<T> = {
 
 type MockWeb3Options<T> = {
   page: BrowserPage;
-  context: T;
+  context?: Partial<T>;
   init (params: InitParams<T>): void;
 }
 
-type MockSignatureInput = { walletAddress: string, chainId?: number, privateKey: string };
+type MockContext = { address: string, chainId?: number, privateKey: string };
 
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-export async function mockWeb3<T extends Partial<MockSignatureInput>> ({ page, context, init }: MockWeb3Options<T>) {
+export async function mockWeb3<T extends MockContext> ({ page, context, init }: MockWeb3Options<T>) {
 
-  const walletSig = context.walletAddress && context.privateKey ? await mockWalletSignature(context as MockSignatureInput) : null;
+  const wallet = Wallet.createRandom();
+  context ||= {} as T;
+  context.address ||= wallet.address;
+  context.privateKey ||= wallet.privateKey;
+
+  const walletSig = await mockWalletSignature(context as MockContext);
 
   await page.addInitScript({
     content:
@@ -90,16 +95,16 @@ export async function mockWeb3<T extends Partial<MockSignatureInput>> ({ page, c
         };
 
         // mock wallet signature
-        ${walletSig ? `window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.walletAddress}', '${walletSig}');` : ''}
+        window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.address}', '${walletSig}');
 
       `
       + `(${init.toString()})({ ethers, Web3Mock, context: ${JSON.stringify(context)} });`
   });
 }
 
-export async function mockWalletSignature ({ walletAddress, chainId = 1, privateKey }: MockSignatureInput) {
+async function mockWalletSignature ({ address, chainId = 1, privateKey }: MockContext) {
 
-  const payload = generateSignaturePayload({ address: walletAddress, chainId, host: baseUrl });
+  const payload = generateSignaturePayload({ address, chainId, host: baseUrl });
   const message = new SiweMessage(payload);
   const prepared = message.prepareMessage();
 
@@ -109,7 +114,7 @@ export async function mockWalletSignature ({ walletAddress, chainId = 1, private
   const signedMessage = await etherswallet.signMessage(prepared);
 
   const authSig = {
-    address: walletAddress,
+    address,
     derivedVia: 'charmverse-mock',
     sig: signedMessage,
     signedMessage: prepared

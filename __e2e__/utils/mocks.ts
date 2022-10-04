@@ -159,11 +159,15 @@ export async function generateBounty ({ content = undefined, contentText = '', s
 }
 
 interface CreateUserAndSpaceOptions {
-  walletAddress?: string;
+  address?: string;
   isAdmin?: boolean;
 }
-export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.createRandom().address }: CreateUserAndSpaceOptions = {}) {
-  const user = await createUserFromWallet(walletAddress);
+export async function generateUserAndSpace ({ isAdmin, address }: CreateUserAndSpaceOptions = {}) {
+
+  const wallet = Wallet.createRandom();
+  address ||= wallet.address;
+
+  const user = await createUserFromWallet(address);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
@@ -209,6 +213,7 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
     page,
     user,
     space,
-    walletAddress
+    address,
+    privateKey: wallet.privateKey
   };
 }

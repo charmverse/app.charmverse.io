@@ -1,10 +1,9 @@
 import { chromium, test } from '@playwright/test';
 import type { Browser } from '@playwright/test';
-import { Wallet } from 'ethers';
 
 import { baseUrl } from './config';
 import { generateUserAndSpace } from './utils/mocks';
-import { mockWeb3, mockWalletSignature } from './utils/web3';
+import { mockWeb3 } from './utils/web3';
 
 let browser: Browser;
 
@@ -18,20 +17,17 @@ test('login - allows user to login and see their workspace', async () => {
   const sandbox = await browser.newContext();
   const page = await sandbox.newPage();
 
-  const privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
-  const wallet = new Wallet(privateKey);
-
-  const { space, page: docPage, walletAddress } = await generateUserAndSpace({ walletAddress: wallet.address });
+  const { space, page: docPage, address, privateKey } = await generateUserAndSpace();
 
   await mockWeb3({
     page,
-    context: { privateKey, walletAddress },
+    context: { privateKey, address },
     init: ({ Web3Mock, context }) => {
 
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {
-          return: [context.walletAddress]
+          return: [context.address]
         }
       });
 
