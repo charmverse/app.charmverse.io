@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
+
 import { isTouchScreen } from 'lib/browser';
 
 // ignore events inside prosemirror unless we are also inside an inline database

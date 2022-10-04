@@ -1,5 +1,6 @@
 
 import type { UserVote } from '@prisma/client';
+
 import * as http from 'adapters/http';
 import type { ExtendedVote, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 

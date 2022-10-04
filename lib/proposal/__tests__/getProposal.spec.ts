@@ -1,6 +1,8 @@
 import { v4 } from 'uuid';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { createProposal } from '../createProposal';
 import { getProposal } from '../getProposal';
 

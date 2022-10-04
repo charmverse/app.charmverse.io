@@ -1,12 +1,14 @@
 
 import type { PaymentMethod, Prisma } from '@prisma/client';
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
+
 import { InvalidInputError } from '../../../lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

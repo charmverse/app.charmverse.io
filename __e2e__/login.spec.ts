@@ -1,5 +1,6 @@
 import { chromium, test } from '@playwright/test';
 import type { Browser } from '@playwright/test';
+
 import { baseUrl, generateUserAndSpace, mockWeb3 } from './utils';
 
 let browser: Browser;

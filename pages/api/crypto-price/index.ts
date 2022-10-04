@@ -1,10 +1,11 @@
 
 import type { FiatCurrency } from 'connectors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { pricingGetter } from 'lib/crypto-price/getters';
 import { onError, onNoMatch, requireUserOrSharePage } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

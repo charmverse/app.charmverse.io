@@ -1,15 +1,18 @@
 import type { GetGuildsResponse } from '@guildxyz/sdk';
 import { guild, user } from '@guildxyz/sdk';
 import { Box, MenuItem, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
 import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
+
 import { PimpedButton, StyledSpinner } from '../../../common/Button';
+
 import GuildsAutocomplete from './GuildsAutocomplete';
 
 export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => void }) {

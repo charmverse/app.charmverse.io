@@ -1,5 +1,6 @@
-import { InvalidInputError } from 'lib/utilities/errors';
 import { prisma } from 'db';
+import { InvalidInputError } from 'lib/utilities/errors';
+
 import type { ThreadStatusUpdate, ThreadWithCommentsAndAuthors } from './interfaces';
 import { ThreadStatus } from './interfaces';
 

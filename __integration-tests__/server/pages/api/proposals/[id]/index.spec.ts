@@ -1,16 +1,17 @@
 import type { Space, User } from '@prisma/client';
-import { prisma } from 'db';
-import { upsertPermission } from 'lib/permissions/pages';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import type { PageWithProposal } from 'lib/pages';
+import { upsertPermission } from 'lib/permissions/pages';
+import { createProposal } from 'lib/proposal/createProposal';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import { createProposal } from 'lib/proposal/createProposal';
-import type { PageWithProposal } from 'lib/pages';
 import type { LoggedInUser } from 'models';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let author: LoggedInUser;
 let reviewer: LoggedInUser;

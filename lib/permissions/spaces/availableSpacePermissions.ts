@@ -1,4 +1,5 @@
 import { SpaceOperation } from '@prisma/client';
+
 import type { UserPermissionFlags } from '../interfaces';
 import { Permissions } from '../permissions.class';
 

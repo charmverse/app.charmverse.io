@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, Thread, User } from '@prisma/client';
-import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import request from 'supertest';
+
+import { upsertPermission } from 'lib/permissions/pages';
+import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import type { LoggedInUser } from 'models';
-import { upsertPermission } from 'lib/permissions/pages';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;

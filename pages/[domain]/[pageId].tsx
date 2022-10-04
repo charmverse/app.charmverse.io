@@ -1,9 +1,10 @@
 
-import getPageLayout from 'components/common/PageLayout/getLayout';
+import { useRouter } from 'next/router';
+
 import EditorPage from 'components/[pageId]/EditorPage/EditorPage';
+import getPageLayout from 'components/common/PageLayout/getLayout';
 import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
-import { useRouter } from 'next/router';
 
 export default function BlocksEditorPage () {
 

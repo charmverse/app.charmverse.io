@@ -1,17 +1,19 @@
 import type { Vote } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
+import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   getVote as getVoteService,
   updateVote as updateVoteService,
   deleteVote as deleteVoteService
 } from 'lib/votes';
-import nc from 'next-connect';
 import type { UpdateVoteDTO } from 'lib/votes/interfaces';
-import { prisma } from 'db';
-import { DataNotFoundError, UnauthorisedActionError } from '../../../../lib/utilities/errors';
+
 import { computeUserPagePermissions } from '../../../../lib/permissions/pages';
+import { DataNotFoundError, UnauthorisedActionError } from '../../../../lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

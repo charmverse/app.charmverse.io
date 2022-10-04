@@ -1,10 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteProposalCategory } from 'lib/proposal/deleteProposalCategory';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { updateProposalCategory } from 'lib/proposal/updateProposalCategory';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

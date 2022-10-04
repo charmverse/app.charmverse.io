@@ -1,5 +1,7 @@
 import type { BountyOperation, PageOperations, PagePermission, Role, Space, User } from '@prisma/client';
+
 import type { RoleupWithMembers, RoleWithMembers } from 'lib/roles';
+
 import type { BountyPermissions } from './bounties';
 
 export type Resource = {

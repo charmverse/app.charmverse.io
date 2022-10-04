@@ -2,6 +2,7 @@
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { upsertPermission } from '../../actions/upsert-permission';
 import { setupPermissionsAfterPagePermissionAdded } from '../page-permission-added';
 

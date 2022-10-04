@@ -1,7 +1,7 @@
 
-import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
 import styled from '@emotion/styled';
+import CircularProgress from '@mui/material/CircularProgress';
+import React from 'react';
 
 export const LoadingIcon = styled(CircularProgress)`
   color: #ccc;

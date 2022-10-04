@@ -1,24 +1,26 @@
 import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box } from '@mui/material';
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
-import { useRouter } from 'next/router';
 import Link from '@mui/material/Link';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+import { mutate } from 'swr';
+
+import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
+import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/browser';
 import { PageContent } from 'models';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
-import { mutate } from 'swr';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import LinkIcon from '@mui/icons-material/Link';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';

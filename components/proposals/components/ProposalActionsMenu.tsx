@@ -2,10 +2,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+
 import useTasks from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
 interface VoteActionsProps {
   deleteProposal: (voteId: string) => Promise<void>;

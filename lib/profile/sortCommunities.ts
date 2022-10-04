@@ -1,5 +1,6 @@
 import type { CommunityDetails } from 'components/profile/components/CommunityRow';
 import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+
 import type { UserCommunity } from './interfaces';
 
 export function sortCommunities ({ communities, proposals, votes }: {

@@ -2,12 +2,10 @@
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import 'isomorphic-fetch';
-
+import { createMemoryHistory } from 'history';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
-
 import configureStore from 'redux-mock-store';
 
 import { FetchMock } from '../test/fetchMock';

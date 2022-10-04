@@ -1,7 +1,9 @@
 import type { Space, SpaceOperation, SpacePermission } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { addSpaceOperations } from '../addSpaceOperations';
 import { removeSpaceOperations } from '../removeSpaceOperations';
 

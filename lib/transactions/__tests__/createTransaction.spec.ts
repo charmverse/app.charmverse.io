@@ -1,10 +1,11 @@
 import type { Application, Bounty, Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { createSubmission } from 'lib/applications/actions';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 
 let user: User;
 let space: Space;

@@ -1,10 +1,11 @@
 import type { Space, User } from '@prisma/client';
-import { prisma } from 'db';
 import request from 'supertest';
+import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createProposalWithUsers, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import type { LoggedInUser } from 'models';
 
 let author: LoggedInUser;
 let reviewer: LoggedInUser;

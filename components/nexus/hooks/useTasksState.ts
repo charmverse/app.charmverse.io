@@ -1,6 +1,7 @@
 
-import useSWR from 'swr';
 import { DateTime } from 'luxon';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 
 export default function useTasks () {

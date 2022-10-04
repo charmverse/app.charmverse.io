@@ -1,10 +1,12 @@
+import crypto from 'node:crypto';
+
 import type { Space, SpaceApiToken, User } from '@prisma/client';
-import { prisma } from 'db';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-import crypto from 'node:crypto';
-import { ApiError } from 'lib/middleware/errors';
+
+import { prisma } from 'db';
 import log from 'lib/log';
+import { ApiError } from 'lib/middleware/errors';
 import { IDENTITY_TYPES } from 'models';
 
 declare module 'http' {

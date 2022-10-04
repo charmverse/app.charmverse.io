@@ -6,10 +6,12 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
-import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+
+import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
+
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';

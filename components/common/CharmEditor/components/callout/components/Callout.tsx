@@ -3,12 +3,13 @@ import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, Menu } from '@mui/material';
-import { getTwitterEmoji } from 'components/common/Emoji';
+import { alpha } from '@mui/system';
 import type { BaseEmoji } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
-import { alpha } from '@mui/system';
+
+import { getTwitterEmoji } from 'components/common/Emoji';
 
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};

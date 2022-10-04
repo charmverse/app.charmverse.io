@@ -1,6 +1,7 @@
-import { Selection, TextSelection } from 'prosemirror-state';
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping, CellSelection } from '@bangle.dev/pm';
+import { Selection, TextSelection } from 'prosemirror-state';
+
 import type { TrackAttribute } from './interfaces';
 
 const SUPPORTED_MARKS = ['italic', 'bold', 'code', 'underline'];

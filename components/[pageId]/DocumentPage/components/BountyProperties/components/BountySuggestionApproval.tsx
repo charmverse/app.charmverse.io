@@ -3,11 +3,12 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { Bounty } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+
 import charmClient from 'charmClient';
 import { Modal } from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import useIsAdmin from 'hooks/useIsAdmin';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 
 interface Props {
   bounty: Bounty;

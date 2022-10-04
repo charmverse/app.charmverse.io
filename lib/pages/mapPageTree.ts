@@ -1,5 +1,7 @@
-import { DataNotFoundError } from 'lib/utilities/errors';
 import sortBy from 'lodash/sortBy';
+
+import { DataNotFoundError } from 'lib/utilities/errors';
+
 import type { PageNode, PageNodeWithChildren, PageTreeMappingInput, TargetPageTree } from './interfaces';
 
 export function sortNodes <T> (nodes: PageNode<T>[]) {

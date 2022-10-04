@@ -1,6 +1,7 @@
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { Box } from '@mui/material';
 import React from 'react';
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+
 import IconButton from '../../widgets/buttons/iconButton';
 
 type Props = {

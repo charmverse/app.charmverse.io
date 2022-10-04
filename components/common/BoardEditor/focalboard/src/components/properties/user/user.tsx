@@ -1,10 +1,10 @@
 
-import Select from 'react-select';
 import type { CSSObject } from '@emotion/serialize';
+import Select from 'react-select';
 
+import UserDisplay from 'components/common/UserDisplay';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
-import UserDisplay from 'components/common/UserDisplay';
 
 import { getSelectBaseStyle } from '../../../theme';
 

@@ -1,6 +1,7 @@
-import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
-import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
+
+import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import Button from 'components/common/Button';
 
 interface Props {

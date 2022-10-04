@@ -4,25 +4,26 @@ import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
-import charmClient from 'charmClient';
+import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
+import type { MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
+import useSWR from 'swr';
+
+import charmClient from 'charmClient';
 import { useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/strings';
-import type { MouseEvent } from 'react';
-import { useMemo, useState } from 'react';
-import useSWR from 'swr';
-import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import ERC20ABI from 'abis/ERC20ABI.json';
 
 interface Props {
   receiver: string;

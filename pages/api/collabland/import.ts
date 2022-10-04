@@ -1,11 +1,12 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
+
 import type { CredentialsResult } from 'lib/collabland';
 import { getCredentials } from 'lib/collabland';
 import log from 'lib/log';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,5 +1,5 @@
-import Chip from '@mui/material/Chip';
 import styled from '@emotion/styled';
+import Chip from '@mui/material/Chip';
 
 // Use this element to surround just an icon with the Chip component
 

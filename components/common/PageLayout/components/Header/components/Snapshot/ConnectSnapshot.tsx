@@ -2,6 +2,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -10,9 +14,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
 import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 export const schema = yup.object({
   snapshotDomain: yup.string().required().test('checkDomain', 'Snapshot domain not found', async (domain) => {

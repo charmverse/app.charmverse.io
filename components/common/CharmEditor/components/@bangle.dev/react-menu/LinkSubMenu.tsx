@@ -7,8 +7,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
-import { MenuInput } from 'components/common/MenuInput';
 import React, { useRef, useState } from 'react';
+
+import { MenuInput } from 'components/common/MenuInput';
+
 import { MenuButton } from './Icon';
 
 export function LinkSubMenu ({ showMessage, getIsTop = () => true }: { showMessage: (msg: string) => void, getIsTop?: () => boolean }) {

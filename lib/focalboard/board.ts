@@ -1,5 +1,7 @@
-import type { PageContent } from 'models';
 import { v4 } from 'uuid';
+
+import type { PageContent } from 'models';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 import type { Card } from './card';

@@ -9,7 +9,6 @@ import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGr
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-
 import Modal from '../modal';
 
 import FilterEntry from './filterEntry';

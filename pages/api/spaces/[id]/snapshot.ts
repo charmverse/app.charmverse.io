@@ -1,10 +1,11 @@
 
 import type { Space } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 import { getSnapshotSpace } from 'lib/snapshot/get-space';
 import { DataNotFoundError } from 'lib/utilities/errors';
 

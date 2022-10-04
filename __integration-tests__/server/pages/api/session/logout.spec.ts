@@ -1,6 +1,7 @@
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+
 import { ironOptions } from 'lib/session/config';
+import { baseUrl } from 'testing/mockApiCall';
 
 // These API calls should succeed without needed a user account
 describe('POST /api/session/logout - Log out user', () => {

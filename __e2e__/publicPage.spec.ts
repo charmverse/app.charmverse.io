@@ -1,8 +1,10 @@
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
-import { prisma } from 'db';
 import type { Page } from '@prisma/client';
+
+import { prisma } from 'db';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
+
 import { createUserAndSpace, baseUrl, mockWeb3, mockAuthSig } from './utils';
 
 let browser: Browser;

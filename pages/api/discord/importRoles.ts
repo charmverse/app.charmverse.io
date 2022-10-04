@@ -1,3 +1,6 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
@@ -6,8 +9,6 @@ import type { DiscordServerRole } from 'lib/discord/interface';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc({
   onError,

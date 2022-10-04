@@ -1,4 +1,5 @@
 import type { EditorView } from '@bangle.dev/pm';
+
 import type { PageMeta } from 'lib/pages';
 import type { Contributor } from 'models/User';
 

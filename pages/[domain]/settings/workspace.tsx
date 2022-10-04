@@ -3,6 +3,12 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, FormHelperText, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import type { ReactElement } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { FormValues } from 'components/common/CreateSpaceForm';
@@ -17,16 +23,11 @@ import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePreventReload } from 'hooks/usePreventReload';
 import { setTitle } from 'hooks/usePageTitle';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import type { ReactElement } from 'react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 export default function WorkspaceSettings () {
 

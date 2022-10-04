@@ -1,15 +1,18 @@
 import { verifyMessage } from '@ethersproject/wallet';
 import { useWeb3React } from '@web3-react/core';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
-import { ExternalServiceError } from '../lib/utilities/errors';
-import { PREFIX, useLocalStorage } from './useLocalStorage';
+import { lowerCaseEqual } from 'lib/utilities/strings';
+
 import { Web3Connection } from '../components/_app/Web3ConnectionManager';
+import { ExternalServiceError } from '../lib/utilities/errors';
+
+import { PREFIX, useLocalStorage } from './useLocalStorage';
 
 type IContext = {
   account?: string | null;

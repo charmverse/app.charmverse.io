@@ -1,4 +1,10 @@
+import type { UrlObject } from 'url';
+
 import type { User } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -6,10 +12,6 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'share', 'api-docs', 'u'];
