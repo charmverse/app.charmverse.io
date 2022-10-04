@@ -102,6 +102,7 @@ export async function mockWeb3<T extends MockContext> ({ page, context, init }: 
   });
 }
 
+// mock the result of the wallet signature, this gets checked on login by the backend
 async function mockWalletSignature ({ address, chainId = 1, privateKey }: MockContext) {
 
   const payload = generateSignaturePayload({ address, chainId, host: baseUrl });
