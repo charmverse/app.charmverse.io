@@ -1,6 +1,7 @@
 import type { Page, Prisma } from '@prisma/client';
 import { PagePermissionLevel } from '@prisma/client';
 
+import type { OptionalTransaction, TransactionClient } from 'db';
 import { prisma } from 'db';
 import { hasAccessToSpace } from 'lib/middleware';
 import { flattenTree } from 'lib/pages/mapPageTree';
@@ -133,7 +134,7 @@ async function validateInheritanceRelationship (
   return canInherit;
 }
 
-async function validatePermissionToCreate (pageId: string, permission: IPagePermissionToCreate) {
+async function validatePermissionToCreate (pageId: string, permission: IPagePermissionToCreate, tx?: TransactionClient = prisma) {
   // This in enforced by prisma. For readability, we add this condition here
   if (!permission.permissionLevel || !PagePermissionLevel[permission.permissionLevel]) {
     throw new InvalidPermissionLevelError(permission.permissionLevel);
@@ -150,7 +151,7 @@ async function validatePermissionToCreate (pageId: string, permission: IPagePerm
   }
 
   // Load the page space ID
-  const pageSpaceId = await prisma.page.findUnique({
+  const pageSpaceId = await tx.page.findUnique({
     where: {
       id: pageId
     },
@@ -164,7 +165,7 @@ async function validatePermissionToCreate (pageId: string, permission: IPagePerm
 
   }
   else if (permission.roleId) {
-    const role = await prisma.role.findUnique({
+    const role = await tx.role.findUnique({
       where: {
         id: permission.roleId
       },
@@ -197,12 +198,14 @@ async function validatePermissionToCreate (pageId: string, permission: IPagePerm
 export async function upsertPermission (
   pageId: string,
   permission: IPagePermissionToCreate | string,
-  resolvedPageTree?: TargetPageTreeWithFlatChildren<PageNodeWithPermissions>
+  resolvedPageTree?: TargetPageTreeWithFlatChildren<PageNodeWithPermissions>,
+  tx: TransactionClient = prisma
 ): Promise<IPagePermissionWithSource> {
 
   // Pre-compute this only once
   resolvedPageTree = (resolvedPageTree ?? await resolvePageTree({
-    pageId
+    pageId,
+    tx
   }).then(tree => {
     return {
       parents: tree.parents,
@@ -220,7 +223,7 @@ export async function upsertPermission (
   if (typeof permission === 'string') {
 
     // Lookup permission in the database
-    const sourcePermission = await prisma.pagePermission.findUnique({
+    const sourcePermission = await tx.pagePermission.findUnique({
       where: {
         id: permission
       },

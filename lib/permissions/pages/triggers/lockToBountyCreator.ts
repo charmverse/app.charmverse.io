@@ -32,13 +32,17 @@ export async function lockToBountyCreator ({ pageId }: { pageId: string }): Prom
     };
   }), { id: v4(), inheritedFromPermission: null, pageId, permissionLevel: 'full_access', public: null, roleId: null, permissions: [], spaceId: null, userId: page.bounty?.createdBy }];
 
-  const pageTree = await resolvePageTree({
-    pageId,
-    flattenChildren: true
-  });
+  await prisma.$transaction(async (tx) => {
 
-  await prisma.$transaction(async () => {
-    await Promise.all(toModify.map(p => upsertPermission(pageId, p, pageTree)));
+    const pageTree = await resolvePageTree({
+      pageId,
+      flattenChildren: true,
+      tx
+    });
+
+    for (const permission of toModify) {
+      await upsertPermission(pageId, permission, pageTree, tx);
+    }
     await setupPermissionsAfterPageRepositioned(pageId);
   });
 

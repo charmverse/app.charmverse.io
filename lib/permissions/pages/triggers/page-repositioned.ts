@@ -1,3 +1,4 @@
+import type { TransactionClient } from 'db';
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { IPageWithPermissions, PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
@@ -10,8 +11,9 @@ import { findExistingPermissionForGroup, hasSameOrMorePermissions, replaceIllega
  *
  * @abstract This function used to implement alot more. It has been left as a wrapper around the newly provided replaceIllegalPermissions to keep the codebase clean, and allow for additional changes to behaviour in future
  */
-export async function setupPermissionsAfterPageRepositioned (pageId: string | IPageWithPermissions): Promise<IPageWithPermissions> {
-  const page = typeof pageId === 'string' ? await prisma.page.findUnique({
+export async function setupPermissionsAfterPageRepositioned (pageId: string | IPageWithPermissions, tx: TransactionClient = prisma)
+: Promise<IPageWithPermissions> {
+  const page = typeof pageId === 'string' ? await tx.page.findUnique({
     where: {
       id: pageId
     },
@@ -26,7 +28,7 @@ export async function setupPermissionsAfterPageRepositioned (pageId: string | IP
     throw new PageNotFoundError(pageId as string);
   }
 
-  const updatedPage = await replaceIllegalPermissions({ pageId: page.id });
+  const updatedPage = await replaceIllegalPermissions({ pageId: page.id, tx });
 
   if (updatedPage.parentId) {
     const parent = await prisma.page.findUnique({
