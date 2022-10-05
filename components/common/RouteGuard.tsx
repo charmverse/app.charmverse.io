@@ -102,7 +102,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
-    if (!user) {
+    else if (!user) {
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
