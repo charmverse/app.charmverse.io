@@ -28,11 +28,11 @@ export default function LoginPage () {
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
-  useEffect(() => {
-    setTitleState('Welcome');
-  }, []);
+  const isLoggedIn = !!user;
+  const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);
+  const isVerificationStep = !!account && !walletIsVerified;
 
-  function redirectUserAfterLogin () {
+  function redirectToDefaultPage () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }
@@ -49,28 +49,29 @@ export default function LoginPage () {
     }
   }
 
-  async function loginUser () {
+  async function loginFromWeb3 () {
     await loginFromWeb3Account();
-    redirectUserAfterLogin();
+    redirectToDefaultPage();
   }
 
   useEffect(() => {
+    setTitleState('Welcome');
+  }, []);
 
-    // console.log('Data loaded', user, isDataLoaded)
-    // redirect user once they can be redirected
+  useEffect(() => {
     if (isDataLoaded) {
-      // redirect once account exists (user has connected wallet)
-      if ((user && ((account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account))))
-        // If the user has discord connected and no wallet
-        || (user?.discordUser && !user.wallets.length)
-      ) {
-        redirectUserAfterLogin();
+      // redirect once user is logged in unless we are verifying their wallet
+      if (isLoggedIn && !isVerificationStep) {
+        redirectToDefaultPage();
+      }
+      else if (!isLoggedIn && walletIsVerified) {
+        loginFromWeb3();
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [account, walletAuthSignature, isDataLoaded, user]);
+  }, [isDataLoaded, isLoggedIn, isVerificationStep]);
 
   if (!showLogin) {
     return null;
@@ -81,7 +82,7 @@ export default function LoginPage () {
       <>
         <LoginPageContent walletSigned={() => {
           showMessage('Wallet verified. Logging you in', 'success');
-          loginUser();
+          loginFromWeb3();
         }}
         />
         <Footer />
