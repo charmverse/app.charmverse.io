@@ -60,6 +60,18 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }
 
+  function getCharmUser () {
+    setIsLoaded(false);
+    // try retrieving the user from session
+    charmClient.getUser()
+      .then(_user => {
+        setUser(_user);
+      })
+      .finally(() => {
+        setIsLoaded(true);
+      });
+  }
+
   /**
    * Used to sync current user with current web 3 account
    *
@@ -74,22 +86,16 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setUser(null);
     }
     else {
-      setIsLoaded(false);
-      // try retrieving the user from session
-      charmClient.getUser()
-        .then(_user => {
-          setUser(_user);
-        })
-        .finally(() => {
-          setIsLoaded(true);
-        });
+      getCharmUser();
     }
   }
 
   useEffect(() => {
-
     if (account) {
       refreshUserWithWeb3Account();
+    }
+    else {
+      getCharmUser();
     }
   }, [account]);
 
