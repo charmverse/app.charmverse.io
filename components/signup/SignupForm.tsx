@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
 
 import Image from 'components/common/Image';
 import Link from 'components/common/Link';
@@ -41,7 +40,6 @@ const ImageContainer = styled.div`
 
 export default function SignupPageContent () {
 
-  const router = useRouter();
   const { user } = useUser();
 
   const welcomeMessage = `Welcome, ${user && user.username}!`;
@@ -52,9 +50,6 @@ export default function SignupPageContent () {
         <Typography gutterBottom variant='h1' sx={{ fontSize: '2.5rem' }} align='center'>
           {welcomeMessage}
         </Typography>
-        {/* <Typography variant='h2' align='center'>
-          Choose your adventure:
-        </Typography> */}
       </Box>
       <Grid container spacing={6} alignItems='stretch' sx={{ mb: 6 }}>
         <Grid item xs sx={{ height: '100%', margin: 'auto' }}>
