@@ -1,10 +1,11 @@
+import { prisma } from 'db';
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { prisma } from 'db';
+
+import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
-import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 
 describe('getAccessiblePages', () => {
 

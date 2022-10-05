@@ -3,6 +3,9 @@ import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
@@ -11,8 +14,6 @@ import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utilities/types';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
 
 const Center = styled.div`
   position: absolute;

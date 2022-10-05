@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import type { Role, Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { SelfInheritancePermissionError } from '../../errors';
 import { upsertPermission } from '../upsert-permission';
 

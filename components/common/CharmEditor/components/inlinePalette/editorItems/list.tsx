@@ -4,6 +4,7 @@ import { rafCommandExec } from '@bangle.dev/utils';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
+
 import * as bulletList from '../../bulletList';
 import * as orderedList from '../../orderedList';
 import { palettePluginKey } from '../config';

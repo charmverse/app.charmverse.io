@@ -2,14 +2,13 @@
 import '@testing-library/jest-dom';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import mutator from '../mutator';
-import { Utils } from '../utils';
 import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
+import { Utils } from '../utils';
 
 import CardDialog from './cardDialog';
 

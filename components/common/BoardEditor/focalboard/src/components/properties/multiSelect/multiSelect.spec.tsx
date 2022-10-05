@@ -1,7 +1,8 @@
-import React from 'react';
+
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 
 import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';

@@ -1,19 +1,17 @@
+import { DateTime } from 'luxon';
 import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 import { DateUtils } from 'react-day-picker';
 import DayPicker from 'react-day-picker/DayPicker';
+import { useIntl } from 'react-intl';
 
-import { DateTime } from 'luxon';
-
+import { Utils } from '../../../utils';
+import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
 import SwitchOption from '../../../widgets/menu/switchOption';
-import Button from '../../../widgets/buttons/button';
-
 import Modal from '../../modal';
 import ModalWrapper from '../../modalWrapper';
 
 import 'react-day-picker/lib/style.css';
-import { Utils } from '../../../utils';
 
 type Props = {
     className: string;

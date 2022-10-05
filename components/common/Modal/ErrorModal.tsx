@@ -1,5 +1,6 @@
-import type { ComponentProps } from 'react';
 import Alert from '@mui/material/Alert';
+import type { ComponentProps } from 'react';
+
 import { Modal, DialogTitle } from './Modal';
 
 export default function ErrorModal ({ message, title, ...props }: { message: string, title?: string } & Omit<ComponentProps<typeof Modal>, 'children'>) {

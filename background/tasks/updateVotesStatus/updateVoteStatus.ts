@@ -1,4 +1,5 @@
 import type { UserVote, Vote, VoteOptions } from '@prisma/client';
+
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';

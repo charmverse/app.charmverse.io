@@ -4,11 +4,12 @@
 
 import type { STSClientConfig } from '@aws-sdk/client-sts';
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+
+import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 type NextRouteHandler = (
   req: NextApiRequest,

@@ -5,6 +5,9 @@ import { Menu, MenuItem } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { SpacePermissionConfigurationMode } from '@prisma/client';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
@@ -12,8 +15,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 
 interface Props {
   permissionModeSelected?: (mode: SpacePermissionConfigurationMode) => void;

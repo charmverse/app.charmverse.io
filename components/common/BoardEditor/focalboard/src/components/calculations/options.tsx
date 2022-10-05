@@ -1,11 +1,10 @@
-import Select, { components } from 'react-select';
 
 import type { CSSObject } from '@emotion/serialize';
-
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
+import Select, { components } from 'react-select';
 
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getSelectBaseStyle } from '../../theme';
 
 type Option = {

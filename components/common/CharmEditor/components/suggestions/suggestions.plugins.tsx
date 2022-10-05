@@ -1,12 +1,14 @@
 import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
-import { RateReviewOutlined } from '@mui/icons-material';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
+import { RateReviewOutlined } from '@mui/icons-material';
 import reactDOM from 'react-dom';
+
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
+
 import { getEventsFromDoc } from './getEvents';
 import { trackPlugin } from './statePlugins/track';
-import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 export interface SuggestionPluginState {
   tooltipContentDOM: HTMLElement;

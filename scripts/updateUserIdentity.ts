@@ -1,5 +1,5 @@
 import getENSName from 'lib/blockchain/getENSName';
-import { IdentityType, IDENTITY_TYPES, LoggedInUser } from 'models';
+import { IdentityType, IDENTITY_TYPES } from 'models';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { TelegramAccount } from 'pages/api/telegram/connect';
 import { shortenHex } from 'lib/utilities/strings';
@@ -8,13 +8,14 @@ import { prisma } from '../db';
 
 (async () => {
 
-  const users: Partial<LoggedInUser>[] = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       identityType: null
     },
     include: {
       discordUser: true,
-      telegramUser: true
+      telegramUser: true,
+      wallets: true
     }
   });
 
@@ -23,13 +24,14 @@ import { prisma } from '../db';
   let ensFound = 0;
 
   await Promise.all(users.map(async user => {
-    if (!user.addresses?.length) {
+    if (!user.wallets.length) {
       return;
     }
-    const address = user.addresses[0];
+    const address = user.wallets[0].address;
     const ens = await getENSName(address);
 
     if (ens) {
+      // @ts-ignore
       user.ensName = ens || undefined;
       ensFound += 1;
     }
@@ -45,7 +47,7 @@ import { prisma } from '../db';
 
   await prisma.$transaction(
     users.map((user) => {
-      if (!user.username && user.addresses?.[0]) {
+      if (!user.username && user.wallets[0]?.address) {
 
         identityTypes.wallet += 1;
 
@@ -55,7 +57,8 @@ import { prisma } from '../db';
           },
           data: {
             identityType: IDENTITY_TYPES[0],
-            username: user.ensName || shortenHex(user.addresses[0])
+            // @ts-ignore
+            username: user.ensName || shortenHex(user.wallets[0].address)
           }
         });
       }

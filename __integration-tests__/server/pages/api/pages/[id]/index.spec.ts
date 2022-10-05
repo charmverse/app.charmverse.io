@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import request from 'supertest';
+
 import type { IPageWithPermissions } from 'lib/pages';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -22,7 +23,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       userId: adminUser.id
     });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const body = (await request(baseUrl)
       .put(`/api/pages/${template.id}`)
@@ -40,7 +41,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       userId: nonAdminUser.id
     });
 
-    const adminCookie = await loginUser(nonAdminUser);
+    const adminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .put(`/api/pages/${template.id}`)

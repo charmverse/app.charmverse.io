@@ -1,11 +1,12 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Chip, IconButton, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { HTMLAttributes } from 'react';
 import { useEffect, useRef, useMemo, useState } from 'react';
+
+import type { NewProposalCategory, ProposalCategory } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 type TempOption = NewProposalCategory & {
   inputValue: string;

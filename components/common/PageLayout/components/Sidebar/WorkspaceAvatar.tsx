@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+
 import Avatar from 'components/common/Avatar';
 
 const StyledAvatar = styled(Avatar)<{ active: boolean }>`

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-
-import { FormattedMessage } from 'react-intl';
 import { useDragLayer, useDrop } from 'react-dnd';
+import { FormattedMessage } from 'react-intl';
+
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
@@ -10,14 +10,14 @@ import { createBoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
+import { Utils } from '../../utils';
 
+import CalculationRow from './calculation/calculationRow';
+import TableGroup from './tableGroup';
 import TableHeaders from './tableHeaders';
 import TableRows from './tableRows';
-import TableGroup from './tableGroup';
-import CalculationRow from './calculation/calculationRow';
 
 type Props = {
   selectedCardIds: string[];

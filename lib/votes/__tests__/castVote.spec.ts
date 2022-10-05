@@ -1,6 +1,8 @@
+import { v4 } from 'uuid';
+
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { castVote } from '../castVote';
 
 describe('castVote', () => {

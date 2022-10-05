@@ -1,6 +1,7 @@
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo } from 'react';
+
 import { useSpaces } from './useSpaces';
 
 export function useCurrentSpace () {

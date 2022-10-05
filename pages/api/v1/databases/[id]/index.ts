@@ -1,13 +1,14 @@
 
 import type { Block } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+import { validate } from 'uuid';
+
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { DatabasePage } from 'lib/public-api';
 import { DatabasePageNotFoundError } from 'lib/public-api';
 import { filterObjectKeys } from 'lib/utilities/objects';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import { validate } from 'uuid';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

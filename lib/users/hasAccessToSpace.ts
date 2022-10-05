@@ -1,7 +1,9 @@
 import type { SpaceRole } from '@prisma/client';
+
 import { prisma } from 'db';
 import type { SystemError } from 'lib/utilities/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
+
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from './errors';
 
 interface Input {

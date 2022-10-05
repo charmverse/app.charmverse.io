@@ -1,7 +1,9 @@
 import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
+
 import type { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';

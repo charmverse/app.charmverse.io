@@ -1,5 +1,8 @@
 
 import type { Page, Prisma } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
@@ -16,8 +19,6 @@ import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { PageContent } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

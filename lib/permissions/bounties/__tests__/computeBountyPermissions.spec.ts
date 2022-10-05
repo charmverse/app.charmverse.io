@@ -1,9 +1,11 @@
 
 import { BountyOperation } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { assignRole } from 'lib/roles';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { computeBountyPermissions } from '../computeBountyPermissions';
 import { bountyPermissionMapping } from '../mapping';

@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import request from 'supertest';
+
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -17,12 +19,12 @@ beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
   nonAdminUser = generated1.user;
   nonAdminUserSpace = generated1.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const generated2 = await generateUserAndSpaceWithApiToken(undefined, true);
   adminUser = generated2.user;
   adminUserSpace = generated2.space;
-  adminCookie = await loginUser(adminUser);
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page permission level for a space', () => {
@@ -56,7 +58,7 @@ describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page 
       permissionConfigurationMode: 'collaborative'
     });
 
-    const userCookie = await loginUser(extraAdminUser);
+    const userCookie = await loginUser(extraAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/spaces/${extraSpace.id}/set-default-page-permissions`)

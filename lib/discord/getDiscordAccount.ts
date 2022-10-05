@@ -1,4 +1,5 @@
 import * as http from 'adapters/http';
+
 import { getDiscordToken } from './getDiscordToken';
 
 export interface DiscordAccount {

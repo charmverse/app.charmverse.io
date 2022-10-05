@@ -1,16 +1,19 @@
 
-import { v4 as uuid } from 'uuid';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Alert, Card, Collapse, FormLabel, IconButton, Box, Tooltip, TableCell, TableRow, Typography } from '@mui/material';
-import Button from 'components/common/Button';
-import Modal from 'components/common/Modal';
-import Link from 'components/common/Link';
+import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+
+import charmClient from 'charmClient';
 import type { CommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import { createCommentBlock } from 'components/common/BoardEditor/focalboard/src/blocks/commentBlock';
 import { NewCommentInput } from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import type { SystemError } from 'lib/utilities/errors';
+import Button from 'components/common/Button';
+import Link from 'components/common/Link';
+import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
 import { useContributors } from 'hooks/useContributors';
@@ -19,13 +22,13 @@ import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import { useEffect, useState } from 'react';
-import charmClient from 'charmClient';
+import type { SystemError } from 'lib/utilities/errors';
 import { shortenHex } from 'lib/utilities/strings';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
 import BountyApplicantStatus from '../BountyApplicantStatus';
+
 import BountyApplicantActions from './BountyApplicantActions';
 
 interface Props {

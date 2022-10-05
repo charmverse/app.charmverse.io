@@ -1,12 +1,11 @@
 
 import React from 'react';
-
 import { useIntl } from 'react-intl';
 
-import { Card } from '../../../blocks/card';
 import { Block } from '../../../blocks/block';
-import { ContentBlock } from '../../../blocks/contentBlock';
+import { Card } from '../../../blocks/card';
 import { CommentBlock } from '../../../blocks/commentBlock';
+import { ContentBlock } from '../../../blocks/contentBlock';
 import { Utils } from '../../../utils';
 
 type Props = {

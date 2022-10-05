@@ -5,6 +5,10 @@ import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicat
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
 import type { Page } from '@prisma/client';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import reactDOM from 'react-dom';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -12,9 +16,7 @@ import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import log from 'lib/log';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import reactDOM from 'react-dom';
-import { mutate } from 'swr';
+
 import type { PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {

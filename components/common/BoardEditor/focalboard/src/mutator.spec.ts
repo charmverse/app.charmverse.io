@@ -1,8 +1,8 @@
 
-import mutator from './mutator';
-import { TestBlockFactory } from './test/testBlockFactory';
 import 'isomorphic-fetch';
+import mutator from './mutator';
 import { FetchMock } from './test/fetchMock';
+import { TestBlockFactory } from './test/testBlockFactory';
 import { mockDOM } from './testUtils';
 
 global.fetch = FetchMock.fn;

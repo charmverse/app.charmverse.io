@@ -1,6 +1,8 @@
 import { prisma } from 'db';
 import log from 'lib/log';
+
 import { getGuildRoleIds } from '../getGuildRoleIds';
+
 import { assignRolesToUser } from './assignRolesToUser';
 import { createRoleRecord } from './createRoleRecord';
 import { unassignRolesFromUser } from './unassignRolesFromUser';
@@ -15,7 +17,7 @@ export async function updateGuildRolesForSpace (spaceId: string) {
       id: true,
       user: {
         select: {
-          addresses: true
+          wallets: true
         }
       },
       spaceRoleToRole: {
@@ -34,7 +36,7 @@ export async function updateGuildRolesForSpace (spaceId: string) {
   const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceId);
   for (const spaceRole of spaceRoles) {
     try {
-      const addresses = spaceRole.user.addresses;
+      const addresses = spaceRole.user.wallets.map(w => w.address);
       // Only proceed further if the user has at least a single address
       if (addresses.length > 0) {
         const userGuildRoleIds = await getGuildRoleIds(addresses);

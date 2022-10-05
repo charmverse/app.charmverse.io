@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import Popper from '@mui/material/Popper';
 import styled from '@emotion/styled';
+import Popper from '@mui/material/Popper';
+import { useEffect, useRef, useState } from 'react';
+
+import ColorOption from './colorOption';
+import LabelOption from './labelOption';
+import { useMenuContext } from './menuContext';
 import SeparatorOption from './separatorOption';
+import SubMenuOption from './subMenuOption';
 import SwitchOption from './switchOption';
 import TextOption from './textOption';
-import ColorOption from './colorOption';
-import SubMenuOption from './subMenuOption';
-import LabelOption from './labelOption';
-
-import { useMenuContext } from './menuContext';
 
 type Props = {
     children: React.ReactNode;

@@ -7,25 +7,27 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import debounce from 'lodash/debounce';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
+import styled from '@emotion/styled';
+import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
 import { useState } from 'react';
-import styled from '@emotion/styled';
+
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import type { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import * as floatingMenu from './components/floatingMenu';
-import EmojiSuggest, * as emoji from './components/emojiSuggest';
-import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
-import * as tabIndent from './components/tabIndent';
-import Placeholder from './components/Placeholder';
+import type { PageContent } from 'models';
+
 import { userDataPlugin } from './components/charm/charm.plugins';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import * as floatingMenu from './components/floatingMenu';
+import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import Placeholder from './components/Placeholder';
+import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
   doc: PageContent;

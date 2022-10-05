@@ -2,6 +2,8 @@ import type { EditorState, EditorView, Node, Mark, Transaction } from '@bangle.d
 import { Decoration, DecorationSet, Selection } from '@bangle.dev/pm';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
+import type { TrackAttribute } from '../../track/interfaces';
+
 import {
   key,
   selectedInsertionSpec,
@@ -9,8 +11,6 @@ import {
   selectedChangeFormatSpec,
   selectedChangeBlockSpec
 } from './plugin';
-
-import type { TrackAttribute } from '../../track/interfaces';
 
 export function activateTrack (view: EditorView, type: string, pos: number) {
 

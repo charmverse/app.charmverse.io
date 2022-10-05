@@ -1,16 +1,18 @@
 import type { Page } from '@prisma/client';
+import log from 'loglevel';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import log from 'loglevel';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
-import type { PageUpdates } from 'lib/pages';
+
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 

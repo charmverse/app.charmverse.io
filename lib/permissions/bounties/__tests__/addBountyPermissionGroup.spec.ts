@@ -1,11 +1,13 @@
 import type { BountyPermission, Space, User } from '@prisma/client';
 import { BountyPermissionLevel } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 
 let user: User;

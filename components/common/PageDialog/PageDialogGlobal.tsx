@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { useBounties } from 'hooks/useBounties';
 import log from 'lib/log';
-import PageDialog from './PageDialog';
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
+
 import { usePageDialog } from './hooks/usePageDialog';
+import PageDialog from './PageDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PageDialogGlobal () {

@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Application, Space, User } from '@prisma/client';
+import request from 'supertest';
+import { v4 } from 'uuid';
+
 import type { ApplicationCreationData } from 'lib/applications/interfaces';
 import { createBounty } from 'lib/bounties';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateBountyWithSingleApplication, generateSpaceUser, generateTransaction, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -18,7 +20,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('GET /api/applications - retrieve all applications for a bounty', () => {
@@ -77,7 +79,7 @@ describe('POST /api/applications - create an application', () => {
       isAdmin: false
     });
 
-    const submitterCookie = await loginUser(submitterUser);
+    const submitterCookie = await loginUser(submitterUser.id);
 
     const bounty = await createBounty({
       createdBy: nonAdminUser.id,
@@ -161,7 +163,7 @@ describe('POST /api/applications - create an application', () => {
       message: 'I\'m volunteering for this as it\'s in my field of expertise'
     };
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     await request(baseUrl)
       .post('/api/applications')

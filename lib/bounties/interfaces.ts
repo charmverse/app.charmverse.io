@@ -1,7 +1,9 @@
 import type { Bounty, PageType, Application } from '@prisma/client';
+
+import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import type { BountyPermissions, BountySubmitter } from 'lib/permissions/bounties';
 import type { Roleup } from 'lib/roles/interfaces';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
+
 import type { Resource } from '../permissions/interfaces';
 
 // Re-export bounty permissions interfaces for convenience

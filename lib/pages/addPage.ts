@@ -1,4 +1,8 @@
 import type { Page } from '@prisma/client';
+import type { NextRouter } from 'next/router';
+import { mutate } from 'swr';
+import { v4 } from 'uuid';
+
 import charmClient from 'charmClient';
 import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
@@ -8,9 +12,7 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { NextRouter } from 'next/router';
-import { mutate } from 'swr';
-import { v4 } from 'uuid';
+
 import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 

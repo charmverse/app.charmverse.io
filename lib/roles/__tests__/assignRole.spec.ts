@@ -1,10 +1,12 @@
 
 import type { Space, User } from '@prisma/client';
 import { SpacePermission } from '@prisma/client';
-import { prisma } from 'db';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import { assignRole } from 'lib/roles';
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { ExpectedAnError } from '../../../testing/errors';
 import { DataNotFoundError, InsecureOperationError } from '../../utilities/errors';
 

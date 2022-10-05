@@ -3,11 +3,9 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { wrapIntl, mockStateStore } from '../../testUtils';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import mutator from '../../mutator';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapIntl, mockStateStore } from '../../testUtils';
 
 import Comment from './comment';
 

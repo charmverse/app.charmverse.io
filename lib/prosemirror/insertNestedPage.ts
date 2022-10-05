@@ -1,6 +1,7 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { TextSelection } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
+
 import { hideSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { replaceSuggestionMarkWith } from 'components/common/CharmEditor/components/inlinePalette';
 import type { NestedPagePluginState } from 'components/common/CharmEditor/components/nestedPage';

@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
 import { BountyPermissionLevel } from '@prisma/client';
+import request from 'supertest';
+
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import { typedKeys } from 'lib/utilities/objects';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
@@ -16,7 +18,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 });
 
 describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individual permissions for a bounty', () => {
@@ -25,7 +27,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,
@@ -58,7 +60,7 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
 
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     // Bounty with a base permission set
     const bounty = await generateBounty({

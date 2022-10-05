@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PagePermission, Role, Space, User } from '@prisma/client';
-import { prisma } from 'db';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { hasSameOrMorePermissions, comparePermissionLevels } from '../has-same-or-more-permissions';
 import { upsertPermission } from '../upsert-permission';
 

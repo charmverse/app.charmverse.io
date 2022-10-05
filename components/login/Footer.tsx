@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { Container } from './LoginPageContent';

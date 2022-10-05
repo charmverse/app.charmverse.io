@@ -1,5 +1,5 @@
-import Mailgun from 'mailgun.js';
 import formData from 'form-data';
+import Mailgun from 'mailgun.js';
 
 export const API_KEY = process.env.MAILGUN_KEY as string | undefined;
 export const DOMAIN = process.env.MAILGUN_DOMAIN as string;

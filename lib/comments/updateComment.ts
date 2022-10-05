@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+
 import type { CommentUpdate, CommentWithUser } from './interfaces';
 
 export async function updateComment ({ content, id }: CommentUpdate): Promise<CommentWithUser> {

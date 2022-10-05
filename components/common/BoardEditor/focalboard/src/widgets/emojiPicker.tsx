@@ -1,9 +1,9 @@
+import type { BaseEmoji } from 'emoji-mart';
+import { Picker } from 'emoji-mart';
 import type { FC } from 'react';
 import React from 'react';
 
 import 'emoji-mart/css/emoji-mart.css';
-import type { BaseEmoji } from 'emoji-mart';
-import { Picker } from 'emoji-mart';
 
 type Props = {
     onSelect: (emoji: string) => void;

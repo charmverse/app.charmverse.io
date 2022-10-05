@@ -9,6 +9,10 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
+import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
+import { useEffect, useState } from 'react';
+import { mutate } from 'swr';
+
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
 import ButtonChip from 'components/common/ButtonChip';
@@ -18,9 +22,7 @@ import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
-import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
-import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
+
 import type { TestResult } from './TestConnectionModal';
 import TestConnectionModal from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';

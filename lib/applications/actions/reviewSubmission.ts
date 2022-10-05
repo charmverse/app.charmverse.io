@@ -1,6 +1,8 @@
 import type { Application, ApplicationStatus } from '@prisma/client';
+
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
+
 import { getApplication } from '../getApplication';
 import type { ReviewDecision, SubmissionReview } from '../interfaces';
 

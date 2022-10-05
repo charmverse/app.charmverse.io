@@ -4,6 +4,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
@@ -12,8 +15,6 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
   full_access: 'Workspace members can edit pages, share them with the public and manage permissions.',

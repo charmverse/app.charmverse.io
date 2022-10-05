@@ -1,13 +1,14 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { v4 } from 'uuid';
+
 import { upsertPermission } from 'lib/permissions/pages';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
   it('should get votes of a page for the admin user and return it, responding with 200', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -46,7 +47,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(user))
+      .set('Cookie', await loginUser(user.id))
       .expect(200);
   });
 
@@ -66,7 +67,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(user))
+      .set('Cookie', await loginUser(user.id))
       .expect(404);
   });
 
@@ -87,7 +88,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
 
     await request(baseUrl)
       .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', await loginUser(userNotInSpace))
+      .set('Cookie', await loginUser(userNotInSpace.id))
       .expect(404);
   });
 });

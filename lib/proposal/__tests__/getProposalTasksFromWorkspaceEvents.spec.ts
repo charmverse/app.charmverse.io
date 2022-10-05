@@ -1,7 +1,9 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import type { ProposalTask } from '../getProposalTasks';
 import { getProposalTasksFromWorkspaceEvents } from '../getProposalTasksFromWorkspaceEvents';
 import { updateProposalStatus } from '../updateProposalStatus';

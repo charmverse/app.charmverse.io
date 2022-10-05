@@ -1,4 +1,5 @@
 import log from 'lib/log';
+
 import type { ExtendedPoap } from './interfaces';
 
 const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;

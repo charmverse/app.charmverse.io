@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useContributors } from 'hooks/useContributors';
-import { useUser } from 'hooks/useUser';
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useContributors } from 'hooks/useContributors';
+import { useUser } from 'hooks/useUser';
+
 import type { CommentBlock } from '../../blocks/commentBlock';
 import { createCommentBlock } from '../../blocks/commentBlock';
 import mutator from '../../mutator';

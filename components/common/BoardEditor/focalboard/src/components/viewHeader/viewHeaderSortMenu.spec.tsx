@@ -1,15 +1,13 @@
+
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
-
-import { mockStateStore, wrapIntl } from '../../testUtils';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import mutator from '../../mutator';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import ViewHeaderSortMenu from './viewHeaderSortMenu';
 

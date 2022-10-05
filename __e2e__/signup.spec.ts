@@ -1,7 +1,9 @@
 import { chromium, test } from '@playwright/test';
 import type { Browser } from '@playwright/test';
-import { Wallet } from 'ethers';
-import { baseUrl, mockWeb3 } from './utils';
+
+import { baseUrl } from 'config/constants';
+
+import { mockWeb3 } from './utils/web3';
 
 let browser: Browser;
 
@@ -15,18 +17,18 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   const sandbox = await browser.newContext();
   const page = await sandbox.newPage();
 
-  const walletAddress = Wallet.createRandom().address;
+  await mockWeb3({
+    page,
+    init: ({ Web3Mock, context }) => {
 
-  await mockWeb3(page, { walletAddress }, context => {
+      Web3Mock.mock({
+        blockchain: 'ethereum',
+        accounts: {
+          return: [context.address]
+        }
+      });
 
-    // @ts-ignore
-    Web3Mock.mock({
-      blockchain: 'ethereum',
-      accounts: {
-        return: [context.walletAddress]
-      }
-    });
-
+    }
   });
 
   const uniqueDomain = Math.random().toString().replace('.', '');

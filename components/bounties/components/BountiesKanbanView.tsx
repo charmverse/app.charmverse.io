@@ -1,13 +1,15 @@
 import { Box, Typography } from '@mui/material';
 import type { BountyStatus } from '@prisma/client';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import { usePages } from 'hooks/usePages';
-import { silentlyUpdateURL } from 'lib/browser';
-import { getUriWithParam } from 'lib/utilities/strings';
-import type { BountyWithDetails } from 'lib/bounties';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { usePages } from 'hooks/usePages';
+import type { BountyWithDetails } from 'lib/bounties';
+import { silentlyUpdateURL } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
+import { getUriWithParam } from 'lib/utilities/strings';
+
 import BountyCard from './BountyCard';
 import { BountyStatusChip } from './BountyStatusBadge';
 

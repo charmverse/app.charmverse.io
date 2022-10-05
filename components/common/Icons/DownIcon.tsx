@@ -1,6 +1,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Box from '@mui/material/Box';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
+
 import { IconWrapper } from './IconWrapper';
 
 interface Props {

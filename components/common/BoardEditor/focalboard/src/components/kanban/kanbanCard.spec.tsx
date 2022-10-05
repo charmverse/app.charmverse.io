@@ -1,17 +1,14 @@
 import '@testing-library/jest-dom';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-
 import { Provider as ReduxProvider } from 'react-redux';
 
-import userEvent from '@testing-library/user-event';
-
-import Mutator from '../../mutator';
-import { Utils } from '../../utils';
-
 import type { IPropertyTemplate } from '../../blocks/board';
+import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';
+import { Utils } from '../../utils';
 
 import KanbanCard from './kanbanCard';
 

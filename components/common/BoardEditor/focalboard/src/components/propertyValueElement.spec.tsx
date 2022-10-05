@@ -1,13 +1,13 @@
 
-import React from 'react';
-import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
-import { wrapDNDIntl } from '../testUtils';
 import 'isomorphic-fetch';
 import type { IPropertyTemplate, IPropertyOption } from '../blocks/board';
 import { TestBlockFactory } from '../test/testBlockFactory';
+import { wrapDNDIntl } from '../testUtils';
 
 import PropertyValueElement from './propertyValueElement';
 

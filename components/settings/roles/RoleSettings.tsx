@@ -3,6 +3,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { SpacePermissionConfigurationMode } from '@prisma/client';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useRef, useState } from 'react';
+
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
@@ -12,8 +15,7 @@ import ImportGuildRolesMenuItem from 'components/settings/roles/components/Impor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+
 import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
 import RoleForm from './components/RoleForm';
 import RoleRow from './components/RoleRow';

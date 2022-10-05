@@ -1,5 +1,6 @@
-import { SystemError } from 'lib/utilities/errors';
 import { PagePermissionLevel } from '@prisma/client';
+
+import { SystemError } from 'lib/utilities/errors';
 
 export class PermissionNotFoundError extends SystemError {
 

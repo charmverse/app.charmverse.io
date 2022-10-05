@@ -1,26 +1,24 @@
 /* eslint-disable max-lines */
 // import Button from '../../widgets/buttons/button'
-import React, { useCallback, useState } from 'react';
-import type { IntlShape } from 'react-intl';
-import { FormattedMessage, injectIntl } from 'react-intl';
-
-import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
-
 import { Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useCallback, useState } from 'react';
+import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+
 import { isTouchScreen } from 'lib/browser';
+
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
+import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
-// import Button from '../../widgets/buttons/button'
-import { Constants } from '../../constants';
-
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
 import KanbanCard from './kanbanCard';

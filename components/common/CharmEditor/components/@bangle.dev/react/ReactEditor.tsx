@@ -11,12 +11,15 @@ import { objectUid } from '@bangle.dev/utils';
 import type { ReactNode, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
-import { isTouchScreen } from 'lib/browser';
+
 import { useUser } from 'hooks/useUser';
+import { isTouchScreen } from 'lib/browser';
 import log from 'lib/log';
+
+import { amendTransaction } from '../../suggestions/track/amendTransaction';
+
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
-import { amendTransaction } from '../../suggestions/track/amendTransaction';
 
 interface BangleEditorProps<PluginMetadata = any>
   extends CoreBangleEditorProps<PluginMetadata> {
