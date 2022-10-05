@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
@@ -15,9 +15,20 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
 
-  const { user } = useUser();
+  const { user, setUser, setIsLoaded } = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account, walletAuthSignature } = useWeb3AuthSig();
+
+  useEffect(() => {
+    // try retrieving the user from session
+    charmClient.getUser()
+      .then(_user => {
+        setUser(_user);
+      })
+      .finally(() => {
+        setIsLoaded(true);
+      });
+  }, []);
 
   async function joinSpace () {
     if (!user && account && walletAuthSignature) {

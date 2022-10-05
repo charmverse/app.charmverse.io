@@ -94,7 +94,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       // Only get segments that evaluate to some value
       return pathElem;
     })[0] ?? '/';
-
     const spaceDomain = path.split('/')[1];
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
@@ -110,6 +109,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           authorized: true
         };
       }
+      // Logged out user has landed on a workspace url, redirect user to /join page
       else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
         return {
           authorized: false,
