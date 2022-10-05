@@ -59,8 +59,11 @@ export default function LoginPage () {
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if (user && (isLogInWithDiscord
-        || (account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
+      if ((user && (isLogInWithDiscord
+        || (account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account))))
+        // If the user has discord connected
+        || (user?.discordUser)
+      ) {
         redirectUserAfterLogin();
       }
       else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
