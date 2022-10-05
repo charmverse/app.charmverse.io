@@ -8,7 +8,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
-import { trackUserAction } from 'lib/metrics/mixpanel/server';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';

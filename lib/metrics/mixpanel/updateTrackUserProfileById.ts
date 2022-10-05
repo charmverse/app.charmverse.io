@@ -1,4 +1,5 @@
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
+
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { getUserProfile } from 'lib/users/getUser';
 
 export async function updateTrackUserProfileById (userId: string) {

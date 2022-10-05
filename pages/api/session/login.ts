@@ -4,7 +4,8 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { trackUserAction, updateTrackUserProfile } from 'lib/metrics/mixpanel/server';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';

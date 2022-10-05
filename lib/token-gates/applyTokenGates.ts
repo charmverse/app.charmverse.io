@@ -3,7 +3,7 @@ import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { trackUserAction } from 'lib/metrics/mixpanel/server';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 

@@ -7,7 +7,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
-import { trackUserAction } from 'lib/metrics/mixpanel/server';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

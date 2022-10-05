@@ -1,4 +1,4 @@
-import { eventNameToHumanFormat, paramsToHumanFormat } from 'lib/metrics/mixpanel/server';
+import { eventNameToHumanFormat, paramsToHumanFormat } from 'lib/metrics/mixpanel/utils';
 
 describe('mixpanel/eventNameToHumanFormat', () => {
   it('Should return event name in human readable format (capitalize, with spaces)', async () => {
