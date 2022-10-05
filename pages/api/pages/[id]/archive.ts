@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
@@ -71,6 +72,11 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
       await setupPermissionsAfterPageRepositioned(pageId);
     }
   }
+
+  if (archive) {
+    trackPageAction('archive_page', userId, pageId);
+  }
+
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
 
