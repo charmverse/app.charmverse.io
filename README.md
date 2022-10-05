@@ -213,7 +213,7 @@ dotenv -e .env.local -- npm run notifications:debug
 # Stuff related to running in Elastic Beanstalk
 ## Adding a new secret to Beanstalk app & environment:
 
-1. Create the secret:
+_Create the secret:_
 
   Secret names have the following format:
   `/io.cv.app/<env>/<secret name>`
@@ -235,7 +235,7 @@ dotenv -e .env.local -- npm run notifications:debug
 
   ```
 
-1. Add template mustache to pull secrets when deploying:
+_Add template mustache to pull secrets when deploying:_
   
   In `.ebextensions/00_env_vars.config` add the mustache placeholder lines so beanstalk can pull the secret and
   set it to the right environment variable. 
@@ -253,7 +253,7 @@ dotenv -e .env.local -- npm run notifications:debug
         DISCORD_OAUTH_CLIENT_SECRET: "{{pull:secretsmanager:/io.cv.app/shared/discord:SecretString:discord_oauth_client_secret}}"
   ```
 
-  _NOTE:_
+_NOTE:_
 
   This template placeholder format mimics that of Cloudformation mustache placeholder to pull secrets from secrets manager:
   ```{{resolve:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}.  # does not work!```
