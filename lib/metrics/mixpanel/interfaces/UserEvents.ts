@@ -1,6 +1,8 @@
-import type { BaseEvent, SpaceEvent } from 'lib/metrics/mixpanel/interfaces';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 import type { IdentityType } from 'models/User';
+
+import type { BaseEvent } from './BaseEvent';
+import type { SpaceEvent } from './SpaceEvent';
 
 export interface UserCreatedEvent extends BaseEvent {
   identityType: IdentityType;
@@ -15,7 +17,7 @@ export interface SpaceJoined extends SpaceEvent {
   source: 'invite_link' | TokenGateJoinType;
 }
 
-export interface UserEvents {
+export interface UserEventMap {
   sign_up: UserCreatedEvent;
   sign_in: UserCreatedEvent;
   load_a_workspace: SpaceEvent;

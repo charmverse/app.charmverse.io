@@ -1,8 +1,7 @@
 import type { ProposalStatus } from '@prisma/client';
 
-import type { SpaceEvent } from 'lib/metrics/mixpanel/interfaces';
-
-import type { ResourceEvent } from './index';
+import type { ResourceEvent } from './ResourceEvent';
+import type { SpaceEvent } from './SpaceEvent';
 
 interface ProposalEvent extends SpaceEvent, ResourceEvent {}
 
@@ -14,7 +13,7 @@ interface ProposalVoteCastedEvent extends ProposalEvent {
   platform: 'charmverse' | 'snapshot';
 }
 
-export interface ProposalEvents {
+export interface ProposalEventMap {
   new_proposal_created: ProposalEvent;
   new_proposal_stage: ProposalStatusUpdatedEvent;
   new_vote_created : ProposalVoteCastedEvent;

@@ -1,8 +1,9 @@
-import type { ResourceEvent, SpaceEvent } from 'lib/metrics/mixpanel/interfaces';
+import type { ResourceEvent } from './ResourceEvent';
+import type { SpaceEvent } from './SpaceEvent';
 
 type PageEvent = SpaceEvent & ResourceEvent;
 
-export interface PageEvents {
+export interface PageEventMap {
   page_load: PageEvent;
   archive_page: PageEvent;
   delete_page: PageEvent;
@@ -11,4 +12,4 @@ export interface PageEvents {
   edit_page: PageEvent;
 }
 
-export type PageEventNames = keyof PageEvents;
+export type PageEventNames = keyof PageEventMap;

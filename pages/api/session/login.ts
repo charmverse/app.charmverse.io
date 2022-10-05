@@ -41,7 +41,6 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
 
-  updateTrackUserProfile(user);
   trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });
 
   return res.status(200).json(user);

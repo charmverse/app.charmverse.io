@@ -73,7 +73,7 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  trackPageAction(archive ? 'archive_page' : 'restore_page', userId, pageId);
+  trackPageAction(archive ? 'archive_page' : 'restore_page', { userId, pageId });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

@@ -144,7 +144,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
-  trackPageAction('delete_page', userId, pageId);
+  trackPageAction('delete_page', { userId, pageId });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

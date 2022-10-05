@@ -1,21 +1,8 @@
 
-import type { PageEvents } from 'lib/metrics/mixpanel/interfaces/PageEvents';
+import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvents';
 
-import type { ProposalEvents } from './ProposalEvents';
-import type { UserEvents } from './UserEvents';
-
-export interface BaseEvent {
-  userId: string;
-}
-
-export interface ResourceEvent extends BaseEvent {
-  resourceId: string;
-}
-
-export interface SpaceEvent extends BaseEvent {
-  spaceId: string;
-  spaceName?: string;
-}
+import type { ProposalEventMap } from './ProposalEvents';
+import type { UserEventMap } from './UserEvents';
 
 export interface MixpanelTrackBase {
   // distinct_id - property name required by mixpanel to identify unique users
@@ -30,7 +17,7 @@ export interface MixpanelUserProfile {
   spaces?: string[];
 }
 
-export type MixpanelEvent = UserEvents & ProposalEvents & PageEvents
+export type MixpanelEventMap = UserEventMap & ProposalEventMap & PageEventMap
 
-export type MixpanelEventName = keyof MixpanelEvent
+export type MixpanelEventName = keyof MixpanelEventMap
 
