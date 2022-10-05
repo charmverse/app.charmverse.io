@@ -208,7 +208,7 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
   };
 }
 
-export async function replaceIllegalPermissions ({ pageId, tx }: { pageId: string } & Transaction):
+export async function replaceIllegalPermissions ({ pageId, tx }: { pageId: string } & OptionalTransaction):
  Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> & { tree: TargetPageTree<PageNodeWithPermissions> }> {
 
   if (!tx) {
