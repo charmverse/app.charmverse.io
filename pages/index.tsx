@@ -56,24 +56,21 @@ export default function LoginPage () {
 
   useEffect(() => {
 
-    // redirect user once wallet is connected
+    // console.log('Data loaded', user, isDataLoaded)
+    // redirect user once they can be redirected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)
-      if ((user && (isLogInWithDiscord
-        || (account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account))))
-        // If the user has discord connected
-        || (user?.discordUser)
+      if ((user && ((account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account))))
+        // If the user has discord connected and no wallet
+        || (user?.discordUser && !account && !user.wallets.length)
       ) {
         redirectUserAfterLogin();
-      }
-      else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-        loginUser();
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [account, walletAuthSignature, isDataLoaded]);
+  }, [account, walletAuthSignature, isDataLoaded, user]);
 
   if (!showLogin) {
     return null;
