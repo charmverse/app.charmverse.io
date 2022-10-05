@@ -5,6 +5,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { Web3Connection } from '../_app/Web3ConnectionManager';
@@ -57,7 +58,10 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
       sign()
         .then(signSuccess)
-        .catch(() => showMessage('Wallet signature failed', 'warning'))
+        .catch(error => {
+          log.error('Error requesting wallet signature', error);
+          showMessage('Wallet signature failed', 'warning');
+        })
         .finally(() => setIsSigning(false));
     }
   }

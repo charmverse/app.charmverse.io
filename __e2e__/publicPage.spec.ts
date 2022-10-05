@@ -2,10 +2,12 @@ import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import type { Page } from '@prisma/client';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 
-import { createUserAndSpace, baseUrl, mockWeb3, mockAuthSig } from './utils';
+import { createUserAndSpace } from './utils/mocks';
+import { mockWeb3 } from './utils/web3';
 
 let browser: Browser;
 
@@ -27,21 +29,22 @@ test.describe.serial('Make a page public and visit it', async () => {
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await userContext.newPage();
 
-    const { space, pages: spacePages, walletAddress } = await createUserAndSpace({ browserPage: page });
+    const { space, pages: spacePages, address, privateKey } = await createUserAndSpace({ browserPage: page });
 
-    await mockWeb3(page, { walletAddress }, context => {
+    await mockWeb3({
+      page,
+      context: { address, privateKey },
+      init: ({ Web3Mock, context }) => {
 
-      // @ts-ignore
-      Web3Mock.mock({
-        blockchain: 'ethereum',
-        accounts: {
-          return: [context.walletAddress]
-        }
-      });
+        Web3Mock.mock({
+          blockchain: 'ethereum',
+          accounts: {
+            return: [context.address]
+          }
+        });
 
+      }
     });
-
-    mockAuthSig({ address: walletAddress as string, page });
 
     pages = spacePages;
 
