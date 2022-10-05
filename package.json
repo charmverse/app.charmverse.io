@@ -16,7 +16,7 @@
     "migrate:prod": "prisma migrate deploy",
     "migrate:staging": "npx dotenv -e .env.staging -- prisma migrate deploy",
     "server:dev": "next dev",
-    "debug:e2e": "dotenv -e .env.test.local -- npx playwright test **YOUR_TEST_PATH.spec.ts** --headed --timeout=0",
+    "debug:e2e": "dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
     "notifications:debug": "ts-node ./scripts/readNotifications.ts",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
