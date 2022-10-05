@@ -80,11 +80,7 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent walletSigned={() => {
-          showMessage('Wallet verified. Logging you in', 'success');
-          loginFromWeb3();
-        }}
-        />
+        <LoginPageContent walletSigned={loginFromWeb3} />
         <Footer />
       </>
     )
