@@ -20,12 +20,16 @@ if grep "{{pull:secretsmanager:" $APP_STAGING_DIR/.env; then
             secret_name=${BASH_REMATCH[2]}
             secret_json_key=${BASH_REMATCH[3]}
 
-            export secret_value=$(aws secretsmanager get-secret-value         \
+            export secret_value=$(aws secretsmanager get-secret-value  \
                                         --region us-east-1             \
                                         --secret-id "$secret_name"     \
                                         --query "SecretString"         \
                            | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
 
+            [ -z "$secret_value" ] && {
+                echo "$secret_name or $secret_json_key not found."
+                secret_value="SECRET_NOT_FOUND"
+            }
             echo "$env_var_name=\"$secret_value\"" >> .env.new
         }
 
