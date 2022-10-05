@@ -168,9 +168,11 @@ $ npm run test:server
 ```
 
 **Client-side testing**
+
 On the client side, we have tests written with `react-testing-library`. In order to run them, please go through the following section.
 
 __Info for running individual tests__
+
 If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner]
 
 In .vscode/settings.json, add:
@@ -183,7 +185,17 @@ You can then run the individual tests.
 
 This will also work for the API integration tests, but you must make sure your server is up and running.
 
+**E2E testing**
 
+We use `playwright` for end-to-end testing.
+To run all tests use `npm run test:e2e`
+
+__Info for running individual e2e in chromium browser__
+
+There is util command that will allow you to run single test in a spawned chromium broser for easier debugging. 
+Command to use: `npm run debug:e2e __e2e__/YOUR_TEST_FILE.spec.ts`
+
+i.e: `npm run debug:e2e __e2e__/login.spec.ts`
 
 ### Theming
 
