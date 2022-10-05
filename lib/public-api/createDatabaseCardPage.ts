@@ -1,8 +1,11 @@
 import type { Page } from '@prisma/client';
-import { prisma } from 'db';
 import { v4, validate } from 'uuid';
+
+import { prisma } from 'db';
+import { createPage } from 'lib/pages/server/createPage';
+import { getPagePath } from 'lib/pages/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { getPagePath } from 'lib/pages';
+
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
@@ -11,7 +14,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
 
   const boardId = v4();
 
-  const database = await prisma.page.create({
+  const database = await createPage({
     data: {
       id: boardId,
       title: 'Example title',
@@ -59,7 +62,7 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
   return database;
 }
 
-export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {properties: Record<string, string>}): Promise<PageFromBlock> {
+export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & { properties: Record<string, string> }): Promise<PageFromBlock> {
 
   const isValidUUid = validate(pageInfo.boardId);
 
@@ -112,7 +115,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
     }
   });
 
-  await prisma.page.create({
+  await createPage({
     data: {
       author: {
         connect: {
@@ -128,6 +131,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
         }
       },
       content: { type: 'doc', content: [] },
+      hasContent: false,
       contentText: '',
       path: getPagePath(),
       type: 'card',

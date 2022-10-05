@@ -1,28 +1,31 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import type { ButtonProps, SxProps } from '@mui/material';
-import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import Button from 'components/common/Button';
-import type { CommentWithUser } from 'lib/comments/interfaces';
-import UserDisplay from 'components/common/UserDisplay';
-import { usePages } from 'hooks/usePages';
-import { useThreads } from 'hooks/useThreads';
-import { useUser } from 'hooks/useUser';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
-import type { MouseEvent } from 'react';
-import { forwardRef, memo, useRef, useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import type { PageContent } from 'models';
-import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
-import { useEditorViewContext } from '@bangle.dev/react';
-import { DateTime } from 'luxon';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
+import type { ButtonProps, SxProps } from '@mui/material';
 import type { BoxProps } from '@mui/system';
+import { DateTime } from 'luxon';
+import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
+import type { MouseEvent } from 'react';
+import { forwardRef, memo, useRef, useEffect, useState } from 'react';
+
+import Button from 'components/common/Button';
+import UserDisplay from 'components/common/UserDisplay';
+import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
+import type { CommentWithUser } from 'lib/comments/interfaces';
+import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { PageContent } from 'models';
+
 import InlineCharmEditor from '../InlineCharmEditor';
-import { checkForEmpty } from '../utils';
+
 import { scrollToThread } from './inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
@@ -64,7 +67,7 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
   }
 `;
 
-function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: {disabled?: boolean, onClick: ButtonProps['onClick'], text: string} & ButtonProps) {
+function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...props }: { disabled?: boolean, onClick: ButtonProps['onClick'], text: string } & ButtonProps) {
   return (
     <Button
       disabled={disabled}
@@ -84,10 +87,10 @@ function ThreadHeaderButton ({ disabled = false, onClick, text, startIcon, ...pr
 
 function AddCommentCharmEditor (
   { sx, threadId, disabled, onClick, readOnly }:
-  {onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps}
+  { onClick: (cb: () => void) => void, readOnly: boolean, disabled: boolean, threadId: string, sx: SxProps }
 ) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
 
@@ -130,9 +133,9 @@ function AddCommentCharmEditor (
   );
 }
 
-function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: {disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void}) {
+function EditCommentCharmEditor ({ disabled, isEditable, threadId, commentId, onContainerClick, onSave, onCancel }: { disabled: boolean, isEditable: boolean, onCancel: ButtonProps['onClick'], threadId: string, commentId: string, onContainerClick: BoxProps['onClick'], onSave: (cb: () => Promise<void>) => void }) {
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const { editComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
   const comment = thread.comments.find(_comment => _comment.id === commentId) as CommentWithUser;
@@ -343,14 +346,23 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                   <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                 </Box>
                 <div>
-                  {commentIndex === 0 ? (
-                    <Box display='flex' alignItems='center' gap={1}>
+                  <Box display='flex' alignItems='center' gap={1}>
+
+                    {commentIndex === 0 && (
+
                       <ThreadHeaderButton
                         text={thread.resolved ? 'Un-resolve' : 'Resolve'}
                         disabled={isMutating || !permissions.comment}
                         onClick={toggleResolved}
                       />
+
+                    )}
+
+                    {
+                    comment.userId === user?.id && (
                       <IconButton
+                        // Show the context menu next to resolve
+                        className={commentIndex === 0 ? '' : 'comment-actions'}
                         size='small'
                         onClick={(e: any) => {
                           onClickCommentActions(e, comment);
@@ -358,19 +370,10 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
                       >
                         <MoreHorizIcon fontSize='small' />
                       </IconButton>
-                    </Box>
-                  ) : (comment.userId === user?.id && permissions.comment)
-                  && (
-                    <IconButton
-                      className='comment-actions'
-                      size='small'
-                      onClick={(e: any) => {
-                        onClickCommentActions(e, comment);
-                      }}
-                    >
-                      <MoreHorizIcon fontSize='small' />
-                    </IconButton>
-                  )}
+                    )
+                  }
+
+                  </Box>
                 </div>
               </Box>
               {commentIndex === 0 && (

@@ -1,9 +1,10 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,8 +34,8 @@ async function getTasksState (req: NextApiRequest, res: NextApiResponse<GetTasks
 }
 
 export interface UpdateTasksState {
-  snoozeMessage: string | null
-  snoozeFor: Date | null
+  snoozeMessage: string | null;
+  snoozeFor: Date | null;
 }
 
 async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {

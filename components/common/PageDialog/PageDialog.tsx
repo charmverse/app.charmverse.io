@@ -1,30 +1,31 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, List, ListItemButton, ListItemText } from '@mui/material';
 import type { Page } from '@prisma/client';
-import charmClient from 'charmClient';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import Button from 'components/common/Button';
-import DocumentPage from 'components/[pageId]/DocumentPage';
-import { usePages } from 'hooks/usePages';
-import log from 'lib/log';
-import debouncePromise from 'lib/utilities/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useMemo } from 'react';
-import DeleteIcon from '@mui/icons-material/Delete';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import type { BountyWithDetails } from 'models';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useBounties } from 'hooks/useBounties';
-import type { IPageWithPermissions } from 'lib/pages';
+
+import charmClient from 'charmClient';
+import DocumentPage from 'components/[pageId]/DocumentPage';
+import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
+import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import Button from 'components/common/Button';
+import { useBounties } from 'hooks/useBounties';
+import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { BountyWithDetails } from 'lib/bounties';
+import log from 'lib/log';
+import type { PageMeta, PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 interface Props {
-  page?: IPageWithPermissions | null;
+  page?: PageMeta | null;
   onClose: () => void;
   readOnly?: boolean;
   bounty?: BountyWithDetails | null;
@@ -38,7 +39,7 @@ export default function PageDialog (props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { refreshBounty } = useBounties();
-  const { currentPageId, setCurrentPageId, setPages, getPagePermissions, deletePage, pages } = usePages();
+  const { currentPageId, setCurrentPageId, updatePage, getPagePermissions, deletePage, pages } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   const { showMessage } = useSnackbar();
   // extract domain from shared pages: /share/<domain>/<page_path>
@@ -88,12 +89,8 @@ export default function PageDialog (props: Props) {
     };
   }, [page?.id]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    const updatedPage = await charmClient.updatePage(updates);
-    setPages((_pages) => ({
-      ..._pages,
-      [updatedPage.id]: updatedPage
-    }));
+  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
+    await updatePage(updates);
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {
@@ -139,7 +136,7 @@ export default function PageDialog (props: Props) {
               )}
               <ListItemButton
                 onClick={() => {
-                  Utils.copyTextToClipboard(window.location.href);
+                  Utils.copyTextToClipboard(window.location.origin + fullPageUrl);
                   showMessage('Copied card link to clipboard', 'success');
                 }}
               >

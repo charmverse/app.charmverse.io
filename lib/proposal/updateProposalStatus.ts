@@ -1,7 +1,9 @@
 import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import { MissingDataError } from 'lib/utilities/errors';
+
 import type { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
@@ -11,12 +13,12 @@ export async function updateProposalStatus ({
   newStatus,
   userId
 }: {
-  userId: string
-  newStatus: ProposalStatus,
-  proposal: ProposalWithUsers | string
+  userId: string;
+  newStatus: ProposalStatus;
+  proposal: ProposalWithUsers | string;
 }): Promise<{
-  proposal: ProposalWithUsers,
-  workspaceEvent: WorkspaceEvent
+  proposal: ProposalWithUsers;
+  workspaceEvent: WorkspaceEvent;
 }> {
 
   if (typeof proposal === 'string') {

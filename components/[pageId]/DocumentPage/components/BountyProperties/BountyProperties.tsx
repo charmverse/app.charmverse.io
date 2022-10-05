@@ -2,6 +2,11 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, Divider, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import type { PaymentMethod } from '@prisma/client';
+import type { CryptoCurrency } from 'connectors';
+import { getChainById } from 'connectors';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
@@ -10,35 +15,30 @@ import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain'
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
-import type { CryptoCurrency } from 'connectors';
-import { getChainById } from 'connectors';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/interfaces';
-import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields } from 'lib/bounties';
-import type { BountyCreationData } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyPermissions, UpdateableBountyFields, BountyCreationData, BountyWithDetails } from 'lib/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
 import { isTruthy } from 'lib/utilities/types';
-import type { BountyWithDetails } from 'models';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import BountyApplicantForm from './components/BountyApplicantForm';
 import BountyApplicantsTable from './components/BountyApplicantsTable';
 import BountyPropertiesHeader from './components/BountyPropertiesHeader';
+import { BountySignupButton } from './components/BountySignupButton';
 import BountySuggestionApproval from './components/BountySuggestionApproval';
 import MissingPagePermissions from './components/MissingPagePermissions';
-import { BountySignupButton } from './components/BountySignupButton';
 
 export default function BountyProperties (props: {
-  readOnly?: boolean,
-  bountyId: string | null,
-  pageId: string,
-  permissions: AssignedBountyPermissions | null,
-  refreshBountyPermissions: (bountyId: string) => void
+  readOnly?: boolean;
+  bountyId: string | null;
+  pageId: string;
+  permissions: AssignedBountyPermissions | null;
+  refreshBountyPermissions: (bountyId: string) => void;
 }) {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;
   const [paymentMethods] = usePaymentMethods();
@@ -51,7 +51,7 @@ export default function BountyProperties (props: {
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { setPages, pages } = usePages();
+  const { mutatePage, pages } = usePages();
 
   const router = useRouter();
 
@@ -141,12 +141,7 @@ export default function BountyProperties (props: {
     if (currentBounty) {
       const createdBounty = await charmClient.bounties.createBounty(currentBounty);
       setBounties((_bounties) => [..._bounties, createdBounty]);
-      setPages(_pages => ({ ..._pages,
-        [pageId]: {
-          ..._pages[pageId]!,
-          bountyId: createdBounty.id
-        }
-      }));
+      mutatePage({ id: pageId, bountyId: createdBounty.id });
       cancelDraftBounty();
     }
   }
@@ -364,7 +359,7 @@ export default function BountyProperties (props: {
             </div>
             <TextField
               required
-              value={currentBounty?.maxSubmissions}
+              defaultValue={currentBounty?.maxSubmissions}
               type='number'
               size='small'
               inputProps={{ step: 1, min: 1 }}
@@ -524,10 +519,10 @@ function rollupPermissions ({
   assignedRoleSubmitters,
   spaceId
 }: {
-  selectedReviewerUsers: string[],
-  selectedReviewerRoles: string[],
-  assignedRoleSubmitters: string[],
-  spaceId: string
+  selectedReviewerUsers: string[];
+  selectedReviewerRoles: string[];
+  assignedRoleSubmitters: string[];
+  spaceId: string;
 }): Pick<BountyPermissions, 'reviewer' | 'submitter'> {
   const reviewers = [
     ...selectedReviewerUsers.map(uid => {

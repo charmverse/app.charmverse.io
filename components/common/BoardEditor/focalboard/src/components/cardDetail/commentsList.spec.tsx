@@ -1,18 +1,14 @@
-import React from 'react';
-import 'isomorphic-fetch';
 
 import { render } from '@testing-library/react';
-
+import 'isomorphic-fetch';
+import React from 'react';
 import { act } from 'react-dom/test-utils';
-
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import { CommentBlock } from '../../blocks/commentBlock';
-
-import { mockDOM, wrapIntl } from '../../testUtils';
-
+import type { CommentBlock } from '../../blocks/commentBlock';
 import { FetchMock } from '../../test/fetchMock';
+import { mockDOM, wrapIntl } from '../../testUtils';
 
 import CommentsList from './commentsList';
 
@@ -59,7 +55,7 @@ describe('components/cardDetail/CommentsList', () => {
             comments={[comment1, comment2]}
             rootId='root_id'
             cardId='card_id'
-            readonly={false}
+            readOnly={false}
           />
         )}
       </ReduxProvider>
@@ -100,7 +96,7 @@ describe('components/cardDetail/CommentsList', () => {
             comments={[comment1, comment2]}
             rootId='root_id'
             cardId='card_id'
-            readonly={true}
+            readOnly={true}
           />
         )}
       </ReduxProvider>

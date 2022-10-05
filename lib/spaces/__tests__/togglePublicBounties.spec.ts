@@ -1,11 +1,13 @@
 import type { PageType, Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { createPage, generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { togglePublicBounties } from '../togglePublicBounties';
 
-type SyntheticBountyInput = {id: string, type: PageType, pagePermissions: Prisma.PagePermissionCreateManyPageInput[]}
+type SyntheticBountyInput = { id: string, type: PageType, pagePermissions: Prisma.PagePermissionCreateManyPageInput[] }
 
 describe('togglePublicBounties', () => {
 

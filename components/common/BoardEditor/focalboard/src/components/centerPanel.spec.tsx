@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
-import { TestBlockFactory } from '../test/testBlockFactory';
-import { IPropertyTemplate } from '../blocks/board';
-import { Utils } from '../utils';
-import Mutator from '../mutator';
+import type { IPropertyTemplate } from '../blocks/board';
 import { Constants } from '../constants';
+import Mutator from '../mutator';
+import { TestBlockFactory } from '../test/testBlockFactory';
+import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
+import { Utils } from '../utils';
 
 import CenterPanel from './centerPanel';
 
@@ -101,7 +101,7 @@ describe('components/centerPanel', () => {
   const store = mockStateStore([], state);
   beforeAll(() => {
     mockDOM();
-    console.error = jest.fn();
+
   });
   beforeEach(() => {
     activeView.fields.viewType = 'board';
@@ -116,7 +116,7 @@ describe('components/centerPanel', () => {
           views={[activeView]}
           board={board}
           activeView={activeView}
-          readonly={false}
+          readOnly={false}
           showCard={jest.fn()}
           groupByProperty={groupProperty}
         />
@@ -134,7 +134,7 @@ describe('components/centerPanel', () => {
           views={[activeView]}
           board={board}
           activeView={activeView}
-          readonly={false}
+          readOnly={false}
           showCard={jest.fn()}
           groupByProperty={groupProperty}
         />
@@ -152,7 +152,7 @@ describe('components/centerPanel', () => {
           views={[activeView]}
           board={board}
           activeView={activeView}
-          readonly={false}
+          readOnly={false}
           showCard={jest.fn()}
           groupByProperty={groupProperty}
         />
@@ -171,7 +171,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -201,7 +201,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={true}
+            readOnly={true}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -223,7 +223,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -249,7 +249,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -282,7 +282,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -307,7 +307,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -333,7 +333,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={mockedShowCard}
             groupByProperty={groupProperty}
           />
@@ -357,7 +357,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -378,7 +378,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -402,7 +402,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />
@@ -427,7 +427,7 @@ describe('components/centerPanel', () => {
             views={[activeView]}
             board={board}
             activeView={activeView}
-            readonly={false}
+            readOnly={false}
             showCard={jest.fn()}
             groupByProperty={groupProperty}
           />

@@ -1,17 +1,14 @@
 import '@testing-library/jest-dom';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-
 import { Provider as ReduxProvider } from 'react-redux';
 
-import userEvent from '@testing-library/user-event';
-
+import type { IPropertyTemplate } from '../../blocks/board';
 import Mutator from '../../mutator';
-import { Utils } from '../../utils';
-
-import { IPropertyTemplate } from '../../blocks/board';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';
+import { Utils } from '../../utils';
 
 import KanbanCard from './kanbanCard';
 
@@ -61,7 +58,7 @@ describe('src/components/kanban/kanbanCard', () => {
           visiblePropertyTemplates={[propertyTemplate]}
           visibleBadges={false}
           isSelected={false}
-          readonly={false}
+          readOnly={false}
           onDrop={jest.fn()}
           showCard={jest.fn()}
           isManualSort={false}
@@ -79,7 +76,7 @@ describe('src/components/kanban/kanbanCard', () => {
           visiblePropertyTemplates={[propertyTemplate]}
           visibleBadges={false}
           isSelected={false}
-          readonly={true}
+          readOnly={true}
           onDrop={jest.fn()}
           showCard={jest.fn()}
           isManualSort={false}
@@ -97,7 +94,7 @@ describe('src/components/kanban/kanbanCard', () => {
           visiblePropertyTemplates={[propertyTemplate]}
           visibleBadges={false}
           isSelected={false}
-          readonly={false}
+          readOnly={false}
           onDrop={jest.fn()}
           showCard={jest.fn()}
           isManualSort={false}
@@ -133,7 +130,7 @@ describe('src/components/kanban/kanbanCard', () => {
           visiblePropertyTemplates={[propertyTemplate]}
           visibleBadges={false}
           isSelected={false}
-          readonly={false}
+          readOnly={false}
           onDrop={jest.fn()}
           showCard={jest.fn()}
           isManualSort={false}
@@ -159,7 +156,7 @@ describe('src/components/kanban/kanbanCard', () => {
           visiblePropertyTemplates={[propertyTemplate]}
           visibleBadges={false}
           isSelected={false}
-          readonly={false}
+          readOnly={false}
           onDrop={jest.fn()}
           showCard={jest.fn()}
           isManualSort={false}

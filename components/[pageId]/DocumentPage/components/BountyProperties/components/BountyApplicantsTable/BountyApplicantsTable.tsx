@@ -10,20 +10,21 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { countValidSubmissions, submissionsCapReached as submissionsCapReachedFn } from 'lib/applications/shared';
-import type { AssignedBountyPermissions } from 'lib/bounties/interfaces';
+import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { isBountyLockable } from 'lib/bounties/shared';
-import type { BountyWithDetails } from 'models';
-import { useEffect, useState } from 'react';
+
 import BountyApplicantTableRow from './BountyApplicantTableRow';
 
 interface Props {
-  bounty: BountyWithDetails
-  permissions: AssignedBountyPermissions
+  bounty: BountyWithDetails;
+  permissions: AssignedBountyPermissions;
 }
 
 export default function BountySubmissionsTable ({ bounty, permissions }: Props) {

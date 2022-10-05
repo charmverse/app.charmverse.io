@@ -1,20 +1,22 @@
 import { useTheme } from '@emotion/react';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import MenuItem from '@mui/material/MenuItem';
-import type { Page } from '@prisma/client';
-import { AddIcon } from 'components/common/Icons/AddIcon';
-import { fancyTrim } from 'lib/utilities/strings';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
+
+import { AddIcon } from 'components/common/Icons/AddIcon';
+import type { PageMeta } from 'lib/pages';
+import { fancyTrim } from 'lib/utilities/strings';
+
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
 
 /**
  * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
  */
 interface Props {
-  pages: Page[];
+  pages: PageMeta[];
   createTemplate: () => void;
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
@@ -94,14 +96,13 @@ export function TemplatesMenu ({
 }
       {
     enableNewTemplates && (
-      <>
-        <Divider />
-        <MenuItem dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+      [
+        <Divider key='templates-menu-divider' />,
+        <MenuItem key='templates-menu-new-item' dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
           <AddIcon />
           <ListItemText>New template</ListItemText>
         </MenuItem>
-      </>
-
+      ]
     )
   }
     </Menu>

@@ -1,6 +1,8 @@
 import type { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { prisma } from 'db';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { createProposal } from '../createProposal';
 import { proposalPermissionMapping } from '../syncProposalPermissions';
 

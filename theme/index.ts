@@ -1,6 +1,7 @@
 import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { darken } from '@mui/system';
+
 import type { BrandColor } from './colors';
 import {
   backgroundColor,
@@ -21,25 +22,25 @@ type FocalBoardColors = typeof darkThemeFocalBoard;
 
 interface CustomColors extends FocalBoardColors, Record<BrandColor, any> {
   settingsHeader: {
-    background: string
+    background: string;
   };
   sidebar: {
     avatarHighlight: string;
     background: string;
   };
   code: {
-    color: string
-    background: string
-  },
+    color: string;
+    background: string;
+  };
   emoji: {
-    hoverBackground: string
-  },
+    hoverBackground: string;
+  };
   templateBanner: {
     background: string;
     text: string;
     highlightedText: string;
     fontSize: string;
-  }
+  };
 }
 
 // define custom colors: https://material-ui.com/customization/palette/
@@ -62,8 +63,8 @@ declare module '@mui/material/styles/createPalette' {
 
   }
   interface TypeBackground {
-    light: string
-    dark: string
+    light: string;
+    dark: string;
   }
 }
 

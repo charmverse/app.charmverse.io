@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { createIntl } from 'react-intl';
 
-import { IPropertyOption } from '../../blocks/board';
+import type { IPropertyOption } from '../../blocks/board';
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
@@ -25,7 +25,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
     color: 'propColorDefault'
   };
   beforeAll(() => {
-    console.error = jest.fn();
+
   });
   test('should match snapshot', () => {
     const { container } = render(wrapDNDIntl(
@@ -35,7 +35,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -50,7 +50,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={true}
+        readOnly={true}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -65,7 +65,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />
@@ -83,7 +83,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
           option,
           cards: [card]
         }}
-        readonly={false}
+        readOnly={false}
         onDrop={jest.fn()}
         intl={intl}
       />

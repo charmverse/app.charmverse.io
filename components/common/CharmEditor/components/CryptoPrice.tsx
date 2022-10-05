@@ -1,20 +1,21 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
-import Button from 'components/common/Button';
-import Autorenew from '@mui/icons-material/Autorenew';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
+import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
-import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
 import { CryptoCurrencies, getChainById } from 'connectors';
-import { formatMoney } from 'lib/utilities/formatting';
-import { RelativeTime } from 'components/common/RelativeTime';
-import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
+import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
+import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
 
 /**
@@ -59,9 +60,9 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   preset?: Partial<{
     base: CryptoCurrency | null;
     quote: FiatCurrency | null;
-  }>,
-  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void),
-  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void)
+  }>;
+  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void);
+  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void);
 }) {
 
   const [loading, setLoadingState] = useState(false);

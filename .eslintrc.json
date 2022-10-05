@@ -5,6 +5,9 @@
     "es2021": true,
     "node": true
   },
+  "settings": {
+    "import/internal-regex": "^(adapters|background|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)"
+  },
   "extends": [
     "plugin:react/recommended",
     "airbnb",
@@ -24,6 +27,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/forbid-prop-types": 0,
     "@next/next/no-img-element": "off",
     "@typescript-eslint/array-type": "error",
     "@typescript-eslint/ban-ts-comment": "off",
@@ -37,6 +41,25 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "comma",
+          "requireLast": false
+        },
+        "multilineDetection": "brackets"
+      }
+    ],
+    "@typescript-eslint/object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "brace-style": [
@@ -56,6 +79,25 @@
       "error",
       {
         "devDependencies": true
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always",
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "object",
+          "parent",
+          "sibling",
+          "index"
+        ]
       }
     ],
     "jsx-a11y/anchor-is-valid": "off",

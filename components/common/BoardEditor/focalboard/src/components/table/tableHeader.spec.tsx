@@ -1,12 +1,11 @@
 
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 import '@testing-library/jest-dom';
 
 import 'isomorphic-fetch';
-import { wrapDNDIntl } from '../../testUtils';
-
 import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl } from '../../testUtils';
 
 import TableHeader from './tableHeader';
 
@@ -21,7 +20,7 @@ describe('components/table/TableHeaderMenu', () => {
     const onAutoSizeColumn = jest.fn();
     const component = wrapDNDIntl(
       <TableHeader
-        readonly={false}
+        readOnly={false}
         sorted='none'
         name='my Name'
         board={board}

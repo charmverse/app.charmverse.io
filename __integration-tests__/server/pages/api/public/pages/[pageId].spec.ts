@@ -1,7 +1,8 @@
 import type { Page, Space, User } from '@prisma/client';
+import request from 'supertest';
+
 import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
-import request from 'supertest';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -38,7 +39,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
 
     const foundPage = (await request(baseUrl)
       .get(`/api/public/pages/${page.id}`)
-      .expect(200)).body as {page: Page};
+      .expect(200)).body as { page: Page };
 
     expect(foundPage.page.contentText).toBe(exampleText);
 
@@ -66,7 +67,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
 
     const foundPage = (await request(baseUrl)
       .get(`/api/public/pages/${nonAdminUserSpace.domain}/${pagePath}`)
-      .expect(200)).body as {page: Page};
+      .expect(200)).body as { page: Page };
 
     expect(foundPage.page.contentText).toBe(exampleText);
 

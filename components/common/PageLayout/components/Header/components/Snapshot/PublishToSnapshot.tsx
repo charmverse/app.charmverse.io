@@ -1,6 +1,9 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import ListItemText from '@mui/material/ListItemText';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -9,12 +12,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal } from 'lib/snapshot';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
-  const { pages, setPages } = usePages();
+export default function PublishToSnapshot ({ pageId, renderContent }: {
+  renderContent: (props: { onClick?: () => void, label: string, icon: ReactNode }) => ReactNode; pageId: string;
+}) {
+  const { pages, mutatePage } = usePages();
   const page = pages[pageId]!;
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
@@ -32,10 +36,7 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
 
     if (!snapshotProposal) {
       const pageWithoutSnapshotId = await charmClient.updatePageSnapshotData(page.id, { snapshotProposalId: null });
-      setPages({
-        ...pages,
-        [page.id]: pageWithoutSnapshotId
-      });
+      mutatePage(pageWithoutSnapshotId);
     }
 
     setProposal(snapshotProposal);
@@ -57,23 +58,21 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
       {
       checkingProposal && (
         <>
-          <LoadingIcon size={18} sx={{ mr: 1 }} />
-          <ListItemText primary='Checking proposal' />
+          {renderContent({
+            label: 'Checking proposal',
+            icon: <LoadingIcon size={18} sx={{ mr: 1 }} />
+          })}
         </>
       )
     }
       {
       !checkingProposal && !proposal && (
         <>
-          <PublishIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-            onClick={open}
-          />
-          <ListItemText onClick={open} primary='Publish to Snapshot' />
-
+          {renderContent({
+            label: 'Publish to Snapshot',
+            onClick: open,
+            icon: <PublishIcon fontSize='small' sx={{ mr: 1 }} />
+          })}
           <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
             <PublishingForm onSubmit={close} page={page} />
           </Modal>
@@ -83,16 +82,10 @@ export default function PublishToSnapshot ({ pageId }: {pageId: string}) {
       {
       !checkingProposal && proposal && (
         <Link sx={{ display: 'flex', verticalAlign: 'center' }} color='textPrimary' external target='_blank' href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}>
-          <ExitToAppIcon
-            fontSize='small'
-            sx={{
-              m: 'auto',
-              mr: 1
-            }}
-
-          />
-          <ListItemText primary='View on Snapshot' />
-
+          {renderContent({
+            label: 'View on Snapshot',
+            icon: <ExitToAppIcon fontSize='small' sx={{ m: 'auto', mr: 1 }} />
+          })}
         </Link>
       )
     }

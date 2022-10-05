@@ -1,15 +1,16 @@
 import { Button, TextField } from '@mui/material';
 import { Box } from '@mui/system';
-import MultiTabs from 'components/common/MultiTabs';
-import PopperPopup from 'components/common/PopperPopup';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
+import MultiTabs from 'components/common/MultiTabs';
+import PopperPopup from 'components/common/PopperPopup';
+
 interface IFrameSelectorProps {
-  onIFrameSelect: (videoSrc: string) => void
-  children: ReactNode
-  tabs?: [string, ReactNode][]
-  type: 'embed' | 'video'
+  onIFrameSelect: (videoSrc: string) => void;
+  children: ReactNode;
+  tabs?: [string, ReactNode][];
+  type: 'embed' | 'video';
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {

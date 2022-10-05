@@ -1,11 +1,12 @@
 
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import BountiesPage from 'components/bounties/BountiesPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { BountyWithDetails } from 'models';
-import { useEffect, useState } from 'react';
+import type { BountyWithDetails } from 'lib/bounties';
 
 export default function PublicBountiesPage () {
 

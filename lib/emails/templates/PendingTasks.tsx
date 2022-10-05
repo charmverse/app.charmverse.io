@@ -1,4 +1,9 @@
 import type { User } from '@prisma/client';
+import { DateTime } from 'luxon';
+import {
+  MjmlColumn, MjmlDivider, MjmlSection, MjmlText
+} from 'mjml-react';
+
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
@@ -7,11 +12,8 @@ import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEve
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { shortenHex } from 'lib/utilities/strings';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { DateTime } from 'luxon';
-import {
-  MjmlColumn, MjmlDivider, MjmlSection, MjmlText
-} from 'mjml-react';
 import { darkModeColors, greyColor2, lightModeColors } from 'theme/colors';
+
 import { EmailWrapper, Feedback, Footer, Header } from './components';
 
 const charmverseUrl = process.env.DOMAIN;
@@ -24,10 +26,10 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: MentionedTask[]
-  totalTasks: number
-  voteTasks: VoteTask[]
-  proposalTasks: ProposalTask[]
+  mentionedTasks: MentionedTask[];
+  totalTasks: number;
+  voteTasks: VoteTask[];
+  proposalTasks: ProposalTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }

@@ -3,7 +3,9 @@ import type { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import type { ReactNode } from 'react';
 import { useCallback, useState, memo, useRef } from 'react';
+
 import BlockAligner from '../BlockAligner';
+
 import HorizontalResizer from './HorizontalResizer';
 
 interface ResizableProps {

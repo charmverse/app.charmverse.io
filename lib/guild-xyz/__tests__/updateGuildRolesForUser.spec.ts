@@ -1,7 +1,8 @@
 
-import { prisma } from 'db';
 import type { Role, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 
 let user: User;
@@ -151,6 +152,7 @@ it('Should correctly update guild roles for space', async () => {
       id: user.id
     },
     include: {
+      wallets: true,
       spaceRoles: {
         include: {
           spaceRoleToRole: {
@@ -163,7 +165,9 @@ it('Should correctly update guild roles for space', async () => {
     }
   });
 
-  await updateGuildRolesForUser(profile!.addresses, profile!.spaceRoles);
+  if (profile) {
+    await updateGuildRolesForUser(profile.wallets.map(w => w.address), profile.spaceRoles);
+  }
 
   // Check if the roles were created correctly mapped
   const s1gr1 = await prisma.spaceRoleToRole.findFirst({

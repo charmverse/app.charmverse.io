@@ -1,15 +1,13 @@
 
+import '@testing-library/jest-dom';
+import 'isomorphic-fetch';
+import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { render } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 
-import '@testing-library/jest-dom';
-import { wrapDNDIntl } from '../../testUtils';
-
-import 'isomorphic-fetch';
-
 import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl } from '../../testUtils';
 
 import TableRow from './tableRow';
 
@@ -53,8 +51,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
-          readonly={false}
+          readOnly={false}
           offset={0}
           resizingColumn=''
           columnRefs={new Map()}
@@ -78,8 +75,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
-          readonly={true}
+          readOnly={true}
           offset={0}
           resizingColumn=''
           columnRefs={new Map()}
@@ -103,8 +99,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
-          readonly={false}
+          readOnly={false}
           offset={0}
           resizingColumn=''
           columnRefs={new Map()}
@@ -131,8 +126,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-
-          readonly={false}
+          readOnly={false}
           offset={0}
           resizingColumn=''
           columnRefs={new Map()}
@@ -158,7 +152,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-          readonly={false}
+          readOnly={false}
           offset={0}
           resizingColumn=''
           columnRefs={new Map()}
@@ -184,7 +178,7 @@ describe('components/table/TableRow', () => {
           focusOnMount={false}
           onSaveWithEnter={jest.fn()}
           showCard={jest.fn()}
-          readonly={false}
+          readOnly={false}
           offset={0}
           resizingColumn='property1'
           columnRefs={new Map()}

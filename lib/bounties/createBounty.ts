@@ -1,11 +1,13 @@
 import type { BountyStatus, Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
+import { NotFoundError } from 'lib/middleware';
+import { getPagePath } from 'lib/pages/utils';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
-import { v4 } from 'uuid';
-import { getPagePath } from 'lib/pages';
-import { NotFoundError } from 'lib/middleware';
+
 import { getBountyOrThrow } from './getBounty';
 import type { BountyCreationData } from './interfaces';
 

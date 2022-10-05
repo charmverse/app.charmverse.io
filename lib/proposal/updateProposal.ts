@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+
 import type { ProposalReviewerInput, ProposalWithUsers } from './interface';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 

@@ -2,19 +2,20 @@ import styled from '@emotion/styled';
 import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
 import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
+import { useMemo } from 'react';
+
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import { useMemo } from 'react';
 
 /**
  * @renderSelected Show selected options in the options menu. Default is true.
  */
 interface Props {
-  onChange: (roleIds: string[]) => void
-  selectedRoleIds: string[]
-  onDelete: (roleId: string) => void
+  onChange: (roleIds: string[]) => void;
+  selectedRoleIds: string[];
+  onDelete: (roleId: string) => void;
 }
 
 const StyledFormControl = styled(FormControl)`

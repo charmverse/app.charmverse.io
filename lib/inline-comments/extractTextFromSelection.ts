@@ -1,8 +1,9 @@
 import type { EditorView } from '@bangle.dev/pm';
-import type { Page } from '@prisma/client';
+
+import type { PageMeta } from 'lib/pages';
 import type { Contributor } from 'models/User';
 
-export function extractTextFromSelection (view: EditorView, contributors: Contributor[], pages: Record<string, Page | undefined>) {
+export function extractTextFromSelection (view: EditorView, contributors: Contributor[], pages: Record<string, PageMeta | undefined>) {
   // Get the context from current selection
   const cutDoc = view.state.doc.cut(view.state.selection.from, view.state.selection.to);
   let textContent = '';

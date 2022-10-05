@@ -1,16 +1,12 @@
 
-import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import userEvent from '@testing-library/user-event';
-
 import '@testing-library/jest-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import mutator from '../mutator';
-
-import { wrapIntl } from '../testUtils';
-
 import { TestBlockFactory } from '../test/testBlockFactory';
+import { wrapIntl } from '../testUtils';
 
 import BlockIconSelector from './blockIconSelector';
 
@@ -58,7 +54,7 @@ describe('components/blockIconSelector', () => {
     const { container } = render(wrapIntl(
       <BlockIconSelector
         block={board}
-        readonly={true}
+        readOnly={true}
       />
     ));
     expect(container).toMatchSnapshot();

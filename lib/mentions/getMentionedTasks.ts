@@ -1,14 +1,16 @@
 import type { Page, Space } from '@prisma/client';
+import { uniq } from 'lodash';
+
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { shortenHex } from 'lib/utilities/strings';
 import type { PageContent, User } from 'models';
-import { uniq } from 'lodash';
+
 import type { MentionedTask } from './interfaces';
 
 export type MentionedTasksGroup = {
-  marked: MentionedTask[],
-  unmarked: MentionedTask[]
+  marked: MentionedTask[];
+  unmarked: MentionedTask[];
 }
 
 type Mention = Omit<MentionedTask, 'createdBy'> & { userId: string };

@@ -1,4 +1,5 @@
 import type { PagePermission, Prisma } from '@prisma/client';
+
 import { InvalidPermissionGranteeError } from '../../errors';
 
 /**
@@ -6,7 +7,7 @@ import { InvalidPermissionGranteeError } from '../../errors';
  * @inheritFrom Set this to true to establish an inheritance reference
  */
 export function copyPagePermission ({ pagePermission, newPageId, inheritFrom }:
-   {pagePermission: PagePermission, newPageId: string, inheritFrom: boolean}):
+   { pagePermission: PagePermission, newPageId: string, inheritFrom: boolean }):
 Prisma.PagePermissionCreateInput {
 
   // Ensure only one group is assigned to this permission
@@ -53,7 +54,7 @@ Prisma.PagePermissionCreateInput {
 }
 
 export function copyAllPagePermissions ({ permissions, newPageId, inheritFrom }:
-  {permissions: PagePermission[], newPageId: string, inheritFrom: boolean}):
+  { permissions: PagePermission[], newPageId: string, inheritFrom: boolean }):
 Prisma.PagePermissionCreateManyArgs {
   return {
     data: permissions.map(p => {

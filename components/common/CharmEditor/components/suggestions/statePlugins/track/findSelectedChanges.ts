@@ -1,10 +1,12 @@
 import type { EditorState, Mark } from '@bangle.dev/pm';
+
+import type { TrackAttribute } from '../../track/interfaces';
+
 import {
   getFromToMark
 } from './helpers';
-import type { TrackAttribute } from '../../track/interfaces';
 
-type SelectedChange = { from: any; to: any; } | null;
+type SelectedChange = { from: any, to: any } | null;
 interface SelectedChanges {
   insertion: SelectedChange;
   deletion: SelectedChange;

@@ -2,14 +2,13 @@
 import '@testing-library/jest-dom';
 import { act, render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import mutator from '../mutator';
-import { Utils } from '../utils';
 import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapIntl } from '../testUtils';
+import { Utils } from '../utils';
 
 import ViewTitle from './viewTitle';
 
@@ -52,7 +51,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -69,7 +68,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={true}
+            readOnly={true}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -87,7 +86,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -108,7 +107,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -129,7 +128,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>
@@ -148,7 +147,7 @@ describe('components/viewTitle', () => {
         <ReduxProvider store={store}>
           <ViewTitle
             board={board}
-            readonly={false}
+            readOnly={false}
             setPage={() => {}}
           />
         </ReduxProvider>

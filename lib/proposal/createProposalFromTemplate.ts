@@ -1,7 +1,9 @@
 import type { Prisma } from '@prisma/client';
+
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
-import { getProposal } from './getProposal';
+
 import { createProposal } from './createProposal';
+import { getProposal } from './getProposal';
 
 export interface CreateProposalFromTemplateInput {
   spaceId: string;

@@ -6,10 +6,12 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
-import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+
+import { useUser } from 'hooks/useUser';
+import { silentlyUpdateURL } from 'lib/browser';
+
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
@@ -61,7 +63,7 @@ export default function TasksPage () {
   const router = useRouter();
   const { user } = useUser();
   const [currentTaskType, setCurrentTaskType] = useState<TaskType>((router.query?.task ?? 'multisig') as TaskType);
-  const { error, mutate: mutateTasks, tasks } = useTasks();
+  const { error, mutate: mutateTasks, tasks, gnosisTasks, gnosisTasksServerError, mutateGnosisTasks } = useTasks();
   const theme = useTheme();
 
   const userNotificationState = user?.notificationState;
@@ -70,7 +72,7 @@ export default function TasksPage () {
     && new Date(userNotificationState.snoozedUntil) > new Date();
 
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
-    multisig: (tasks && !hasSnoozedNotifications) ? tasks.gnosis.length : 0,
+    multisig: (gnosisTasks && !hasSnoozedNotifications) ? gnosisTasks.length : 0,
     vote: tasks ? tasks.votes.length : 0,
     discussion: tasks ? tasks.mentioned.unmarked.length : 0,
     proposal: tasks ? tasks.proposals.unmarked.length : 0
@@ -160,7 +162,7 @@ export default function TasksPage () {
         ))}
       </Tabs>
       {
-        currentTaskType === 'multisig' && <GnosisTasksList error={error} mutateTasks={mutateTasks} tasks={tasks} />
+        currentTaskType === 'multisig' && <GnosisTasksList error={gnosisTasksServerError} mutateTasks={mutateGnosisTasks} tasks={gnosisTasks} />
       }
       {
         currentTaskType === 'discussion' && <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />

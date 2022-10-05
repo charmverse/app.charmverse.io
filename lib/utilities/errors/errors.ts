@@ -22,12 +22,12 @@ type ErrorType = keyof typeof ErrorCodes
  * @error used for providing structured JSON or a stack trace
  */
 export interface ISystemError<E = any> {
-  code: number,
-  errorType: ErrorType
-  message: string,
-  errorConstructor: string
-  severity: ErrorSeverity
-  error: E
+  code: number;
+  errorType: ErrorType;
+  message: string;
+  errorConstructor: string;
+  severity: ErrorSeverity;
+  error: E;
 }
 
 export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> & Partial<Pick<ISystemError<E>, 'severity' | 'error'>>
@@ -125,6 +125,26 @@ export class UndesirableOperationError extends SystemError {
     super({
       message,
       errorType: 'Undesirable operation',
+      severity: 'warning'
+    });
+  }
+}
+
+export class MissingWeb3AccountError extends SystemError {
+  constructor () {
+    super({
+      message: 'No connected wallet detected. This is required to proceed.',
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+}
+
+export class MissingWeb3SignatureError extends SystemError {
+  constructor () {
+    super({
+      message: 'This operation requires a signature from your connected wallet.',
+      errorType: 'Insecure operation',
       severity: 'warning'
     });
   }

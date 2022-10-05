@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Mjml,
   MjmlHead,
@@ -11,9 +10,11 @@ import {
   MjmlAttributes,
   MjmlButton
 } from 'mjml-react';
+import React from 'react';
 
-import { lightGreyColor, primaryTextColor } from 'theme/colors';
 import { fontFamily } from 'theme';
+import { lightGreyColor, primaryTextColor } from 'theme/colors';
+
 import styles from '../theme/styles';
 
 interface Props {

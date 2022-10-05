@@ -1,7 +1,9 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { FloatingMenu } from '@bangle.dev/react-menu';
+
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
+
 import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
@@ -33,7 +35,7 @@ export default function FloatingMenuComponent (
     <FloatingMenu
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
-        const { type } = menuType as {type: SubMenu};
+        const { type } = menuType as { type: SubMenu };
         if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>

@@ -11,6 +11,13 @@ import {
   textblockTypeInputRule,
   TextSelection
 } from '@bangle.dev/pm';
+import {
+  copyEmptyCommand,
+  cutEmptyCommand,
+  jumpToEndOfNode,
+  jumpToStartOfNode,
+  moveNode
+} from '@bangle.dev/pm-commands';
 import type {
   ContentNodeWithPos,
   NodeWithPos } from '@bangle.dev/utils';
@@ -24,13 +31,6 @@ import {
 } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
-import {
-  copyEmptyCommand,
-  cutEmptyCommand,
-  jumpToEndOfNode,
-  jumpToStartOfNode,
-  moveNode
-} from '@bangle.dev/pm-commands';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -471,8 +471,8 @@ function isCollapsible (match: ContentNodeWithPos) {
 
 function findCollapseFragment (matchNode: Node, doc: Node) {
   // Find the last child that will be inside of the collapse
-  let start: { index: number; offset: number; node: Node } | undefined;
-  let end: { index: number; offset: number; node: Node } | undefined;
+  let start: { index: number, offset: number, node: Node } | undefined;
+  let end: { index: number, offset: number, node: Node } | undefined;
   let isDone = false;
 
   const breakCriteria = (node: Node) => {

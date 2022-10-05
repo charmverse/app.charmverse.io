@@ -2,10 +2,10 @@
 import type { DeleteObjectCommandInput } from '@aws-sdk/client-s3';
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

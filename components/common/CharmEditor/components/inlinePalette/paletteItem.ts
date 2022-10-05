@@ -1,5 +1,6 @@
 import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@prisma/client';
+
 import type { InlinePaletteItem } from './hooks';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
@@ -20,7 +21,7 @@ export interface PaletteItemTypeNoGroup {
   uid: string;
   title: string;
   type?: string;
-  requiredSpacePermission?: SpaceOperation,
+  requiredSpacePermission?: SpaceOperation;
   description: string;
   keywords?: string[];
   disabled?: ((state: EditorState<any>) => boolean) | boolean;

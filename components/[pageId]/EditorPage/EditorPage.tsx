@@ -1,20 +1,23 @@
 import type { Page } from '@prisma/client';
+import log from 'loglevel';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import charmClient from 'charmClient';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import log from 'loglevel';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+
 import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { pages, currentPageId, setCurrentPageId, setPages, getPagePermissions } = usePages();
+  const { pages, setCurrentPageId, mutatePage, getPagePermissions, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -33,9 +36,9 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setIsAccessDenied(false);
       if (pageId && pagesLoaded && space) {
         try {
-          const page = await charmClient.getPage(pageId, space.id);
+          const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
-            setPages((_pages) => ({ ..._pages, [page.id]: page }));
+            mutatePage(page);
             setPageNotFound(false);
             setCurrentPageId(page.id);
             setTitleState(page.title);
@@ -81,13 +84,9 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     };
   }, [currentPagePermissions]);
 
-  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
+  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     setPageProps({ isSaving: true });
-    const updatedPage = await charmClient.updatePage(updates);
-    setPages((_pages) => ({
-      ..._pages,
-      [pageId]: updatedPage
-    }));
+    const updatedPage = await updatePage(updates);
     return updatedPage;
   }, 500);
 
@@ -113,7 +112,6 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     () => pages[pageId],
     [
       pageId,
-      JSON.stringify(currentPage?.content),
       currentPage?.headerImage,
       currentPage?.icon,
       currentPage?.title,

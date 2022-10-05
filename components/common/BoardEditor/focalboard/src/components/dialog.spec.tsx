@@ -1,16 +1,12 @@
 
 import '@testing-library/jest-dom';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { render, screen } from '@testing-library/react';
-
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import userEvent from '@testing-library/user-event';
-
 import { wrapDNDIntl } from '../testUtils';
-
 import Menu from '../widgets/menu';
-
-import OptionsIcon from '../widgets/icons/options';
 
 import Dialog from './dialog';
 
@@ -48,7 +44,7 @@ describe('components/dialog', () => {
         <Menu position='left'>
           <Menu.Text
             id='test'
-            icon={<OptionsIcon />}
+            icon={<MoreHorizIcon fontSize='small' />}
             name='Test'
             onClick={async () => {
               jest.fn();
@@ -71,14 +67,14 @@ describe('components/dialog', () => {
           <Menu position='left'>
             <Menu.Text
               id='test'
-              icon={<OptionsIcon />}
+              icon={<MoreHorizIcon fontSize='small' />}
               name='Test'
               onClick={async () => {
                 onTest();
               }}
             />
           </Menu>
-)}
+        )}
       >
         <div id='test' />
       </Dialog>
@@ -97,14 +93,14 @@ describe('components/dialog', () => {
           <Menu position='left'>
             <Menu.Text
               id='test'
-              icon={<OptionsIcon />}
+              icon={<MoreHorizIcon fontSize='small' />}
               name='Test'
               onClick={async () => {
                 jest.fn();
               }}
             />
           </Menu>
-)}
+        )}
       >
         <div id='test' />
       </Dialog>

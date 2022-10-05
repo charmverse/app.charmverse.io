@@ -1,10 +1,13 @@
 import type { Prisma, Space } from '@prisma/client';
+import { v4, validate } from 'uuid';
+
 import { prisma } from 'db';
 import type { PageNodeWithChildren, PageNodeWithPermissions } from 'lib/pages';
 import { multiResolvePageTree } from 'lib/pages/server/resolvePageTree';
-import { hasSameOrMorePermissions } from 'lib/permissions/pages';
-import { v4, validate } from 'uuid';
+import { hasSameOrMorePermissions, IPagePermissionWithSource } from 'lib/permissions/pages';
+
 import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
+
 import type { PublicBountyToggle } from './interfaces';
 
 async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<false>):
@@ -86,8 +89,8 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
     { node,
       bountyPageId
     } : {
-      node: PageNodeWithChildren<PageNodeWithPermissions>,
-      bountyPageId: string
+      node: PageNodeWithChildren<PageNodeWithPermissions>;
+      bountyPageId: string;
     }
   ): void {
     node.children?.forEach(child => {

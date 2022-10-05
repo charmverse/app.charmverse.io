@@ -1,35 +1,34 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from 'components/common/Button';
-import type { BountyWithDetails } from 'models';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { BountyPermissions } from 'lib/bounties';
-import type { PagePermission } from '@prisma/client';
-import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
-import type { BountyPagePermissionIntersection } from 'lib/permissions/interfaces';
-import useRoles from 'hooks/useRoles';
-import charmClient from 'charmClient';
-import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+
+import charmClient from 'charmClient';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import Button from 'components/common/Button';
+import { usePages } from 'hooks/usePages';
+import useRoles from 'hooks/useRoles';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
+import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
+import type { BountyPagePermissionIntersection, PagePermissionMeta } from 'lib/permissions/interfaces';
 
 /**
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
-  bounty: BountyWithDetails,
-  bountyPermissions?: Partial<BountyPermissions>,
-  pagePermissions?: PagePermission[]
-  pageId: string
+  bounty: BountyWithDetails;
+  bountyPermissions?: Partial<BountyPermissions>;
+  pagePermissions?: PagePermissionMeta[];
+  pageId: string;
 }
 
 export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pagePermissions, pageId }: Props) {
 
   const { roleups } = useRoles();
-  const { pages, setPages } = usePages();
+  const { pages, mutatePage } = usePages();
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
@@ -48,10 +47,7 @@ export default function BountyPropertiesHeader ({ bounty, bountyPermissions, pag
     charmClient.restrictPagePermissions({
       pageId
     }).then(page => {
-      setPages({
-        ...pages,
-        [page.id]: page
-      });
+      mutatePage(page);
       showMessage('Page permissions updated', 'success');
     })
       .finally(() => setUpdatingPermissions(false));

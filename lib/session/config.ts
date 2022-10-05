@@ -2,7 +2,7 @@
 declare module 'iron-session' {
   interface IronSessionData {
     // this data is only useful for authentication - it is not kept up-to-date!
-    user: { id: string, addresses: string[] };
+    user: { id: string };
   }
 }
 
@@ -39,5 +39,6 @@ export const sessionUserRelations = {
   },
   discordUser: true,
   telegramUser: true,
-  notificationState: true
+  notificationState: true,
+  wallets: true
 } as const;

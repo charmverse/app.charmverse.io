@@ -1,17 +1,22 @@
 import { Box, CardHeader, Typography } from '@mui/material';
-import type { Page } from '@prisma/client';
-import { fancyTrim } from 'lib/utilities/strings';
-import type { BountyWithDetails } from 'models';
 import { memo } from 'react';
+
+import { usePageDetails } from 'hooks/usePageDetails';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { PageMeta } from 'lib/pages';
+import { fancyTrim } from 'lib/utilities/strings';
+
 import BountyStatusBadge from './BountyStatusBadge';
 
 interface Props {
   bounty: BountyWithDetails;
-  page: Page;
+  page: PageMeta;
   onClick?: () => void;
 }
 
 function BountyCard ({ bounty, page, onClick }: Props) {
+  const { pageDetails } = usePageDetails(page?.id);
+
   return (
     <Box
       onClick={onClick}
@@ -34,7 +39,7 @@ function BountyCard ({ bounty, page, onClick }: Props) {
         <CardHeader title={page?.title || 'Untitled'} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
         <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>
-            {fancyTrim(page?.contentText, 50)}
+            {fancyTrim(pageDetails?.contentText, 50)}
           </Typography>
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>

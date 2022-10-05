@@ -1,7 +1,9 @@
 import type { Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { InsecureOperationError, InvalidInputError, MissingDataError } from '../../../utilities/errors';
 import { InvalidPermissionGranteeError } from '../../errors';
 import { addSpaceOperations } from '../addSpaceOperations';

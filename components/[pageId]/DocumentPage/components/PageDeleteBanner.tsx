@@ -1,13 +1,14 @@
 import styled from '@emotion/styled';
 import { Box, Button } from '@mui/material';
-import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
-const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+
+const StyledPageDeleteBanner = styled(Box)<{ card?: boolean }>`
   position: fixed;
   top: ${({ card }) => card ? '50px' : '55px'};
   width: ${({ card }) => card ? '100%' : 'calc(100% - 300px)'};
@@ -18,7 +19,7 @@ const StyledPageDeleteBanner = styled(Box)<{card?: boolean}>`
   padding: ${({ theme }) => theme.spacing(1)};
 `;
 
-export default function PageDeleteBanner ({ pageId }: {pageId: string}) {
+export default function PageDeleteBanner ({ pageId }: { pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
   const [space] = useCurrentSpace();
   const router = useRouter();

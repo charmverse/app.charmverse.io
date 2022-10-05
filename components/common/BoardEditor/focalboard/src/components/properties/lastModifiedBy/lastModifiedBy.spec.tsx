@@ -1,16 +1,13 @@
 
+import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-
-import { render } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 
-import { createCard } from '../../../blocks/card';
-import { IUser } from '../../../user';
-
 import { createBoard } from '../../../blocks/board';
-
+import { createCard } from '../../../blocks/card';
 import { createCommentBlock } from '../../../blocks/commentBlock';
+import type { IUser } from '../../../user';
 
 import LastModifiedBy from './lastModifiedBy';
 

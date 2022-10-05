@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
-import { Card } from '../../blocks/card';
+import type { Card } from '../../blocks/card';
 
 type Props = {
-    onDrop: (card: Card) => void
-    children: React.ReactNode
+    onDrop: (card: Card) => void;
+    children: React.ReactNode;
 }
 
 const KanbanColumn = React.memo((props: Props) => {

@@ -1,5 +1,6 @@
 import type { BountyPermission } from '@prisma/client';
 import { v4 } from 'uuid';
+
 import { mapBountyPermissions } from '../mapBountyPermissions';
 
 // In this test suite, we only need the permission level and assignee

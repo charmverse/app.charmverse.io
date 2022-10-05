@@ -2,16 +2,18 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
+import Head from 'next/head';
+import * as React from 'react';
+
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
-import { VotesProvider } from 'hooks/useVotes';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
-import Head from 'next/head';
-import * as React from 'react';
+import { VotesProvider } from 'hooks/useVotes';
 import { isSmallScreen } from 'lib/browser';
+
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import Header, { headerHeight } from './components/Header';
 import PageContainer from './components/PageContainer';
@@ -86,7 +88,7 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element)
+  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element);
   sidebarWidth?: number;
 }
 

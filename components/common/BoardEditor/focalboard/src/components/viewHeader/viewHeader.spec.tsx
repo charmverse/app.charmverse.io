@@ -7,7 +7,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import '@testing-library/jest-dom';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import ViewHeader from './viewHeader';
@@ -65,7 +64,7 @@ describe('components/viewHeader/viewHeader', () => {
             addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
-            readonly={false}
+            readOnly={false}
           />
         </ReduxProvider>
       )
@@ -86,7 +85,7 @@ describe('components/viewHeader/viewHeader', () => {
             addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
-            readonly={true}
+            readOnly={true}
           />
         </ReduxProvider>
       )

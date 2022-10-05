@@ -1,8 +1,8 @@
 import Typography from '@mui/material/Typography';
 
 interface Props {
-  children: React.ReactNode
-  onClick?: () => void
+  children: React.ReactNode;
+  onClick?: () => void;
 }
 
 export function IconWrapper ({ children, onClick = () => null }: Props) {

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
+import request from 'supertest';
+
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -15,7 +16,7 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   nonAdminUserSpace = generated.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(generated.user.id);
 });
 
 describe('POST /api/applications/{applicationId}/approve - accept an application to become a submitter', () => {
@@ -24,7 +25,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
-    const reviewerCookie = await loginUser(reviewer);
+    const reviewerCookie = await loginUser(reviewer.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -66,7 +67,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
 
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
-    const adminCookie = await loginUser(admin);
+    const adminCookie = await loginUser(admin.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
@@ -92,7 +93,7 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
       spaceId: nonAdminUserSpace.id
     });
 
-    const extraUserCookie = await loginUser(extraUser);
+    const extraUserCookie = await loginUser(extraUser.id);
 
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,

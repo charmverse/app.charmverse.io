@@ -1,17 +1,19 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
 import type { Block, PageType } from '@prisma/client';
+import { validate } from 'uuid';
+
 import { prisma } from 'db';
 import type { PageNodeWithChildren } from 'lib/pages';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import path from 'node:path';
-import { validate } from 'uuid';
 
-import fs from 'node:fs/promises';
 import type { ExportedPage, WorkspaceExport } from './interfaces';
 
 export interface ExportWorkspacePage {
   sourceSpaceIdOrDomain: string;
-  exportName?: string
+  exportName?: string;
 }
 
 const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 'proposal_template'];
@@ -20,11 +22,11 @@ const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 
  * @abstract Does not currently support bounty or proposal pages
  */
 export async function exportWorkspacePages ({ sourceSpaceIdOrDomain }: Pick<ExportWorkspacePage, 'sourceSpaceIdOrDomain'>):
-  Promise<{data: WorkspaceExport}>
+  Promise<{ data: WorkspaceExport }>
 export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: Required<ExportWorkspacePage>
-): Promise<{data: WorkspaceExport, path: string}>
+): Promise<{ data: WorkspaceExport, path: string }>
 export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: ExportWorkspacePage):
-  Promise<{data: WorkspaceExport, path?: string}> {
+  Promise<{ data: WorkspaceExport, path?: string }> {
 
   const isUuid = validate(sourceSpaceIdOrDomain);
 
@@ -71,7 +73,7 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
    * Mutates the given node to provision its block data
    */
   async function recursiveResolveBlocks ({ node }:
-    {node: PageNodeWithChildren<ExportedPage>}): Promise<void> {
+    { node: PageNodeWithChildren<ExportedPage> }): Promise<void> {
 
     // eslint-disable-next-line no-console
     // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);

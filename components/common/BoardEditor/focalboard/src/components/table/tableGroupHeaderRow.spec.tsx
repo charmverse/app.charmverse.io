@@ -1,17 +1,14 @@
 
-import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import 'isomorphic-fetch';
-
+import { fireEvent, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { act } from 'react-dom/test-utils';
 
-import userEvent from '@testing-library/user-event';
-
-import { wrapDNDIntl } from '../../testUtils';
-
 import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapDNDIntl } from '../../testUtils';
 
 import TableGroupHeaderRowElement from './tableGroupHeaderRow';
 
@@ -45,7 +42,7 @@ test('should match snapshot, no groups', async () => {
       board={board}
       activeView={view}
       group={boardTreeNoGroup}
-      readonly={false}
+      readOnly={false}
       hideGroup={jest.fn()}
       addCard={jest.fn()}
       propertyNameChanged={jest.fn()}
@@ -68,7 +65,7 @@ test('should match snapshot with Group', async () => {
       board={board}
       activeView={view}
       group={boardTreeGroup}
-      readonly={false}
+      readOnly={false}
       hideGroup={jest.fn()}
       addCard={jest.fn()}
       propertyNameChanged={jest.fn()}
@@ -85,7 +82,7 @@ test('should match snapshot on read only', async () => {
       board={board}
       activeView={view}
       group={boardTreeGroup}
-      readonly={true}
+      readOnly={true}
       hideGroup={jest.fn()}
       addCard={jest.fn()}
       propertyNameChanged={jest.fn()}
@@ -107,7 +104,7 @@ test('should match snapshot, hide group', async () => {
       board={board}
       activeView={collapsedOptionsView}
       group={boardTreeGroup}
-      readonly={false}
+      readOnly={false}
       hideGroup={hideGroup}
       addCard={jest.fn()}
       propertyNameChanged={jest.fn()}
@@ -134,7 +131,7 @@ test('should match snapshot, add new', async () => {
       board={board}
       activeView={view}
       group={boardTreeGroup}
-      readonly={false}
+      readOnly={false}
       hideGroup={jest.fn()}
       addCard={addNew}
       propertyNameChanged={jest.fn()}
@@ -160,7 +157,7 @@ test('should match snapshot, edit title', async () => {
       board={board}
       activeView={view}
       group={boardTreeGroup}
-      readonly={false}
+      readOnly={false}
       hideGroup={jest.fn()}
       addCard={jest.fn()}
       propertyNameChanged={jest.fn()}

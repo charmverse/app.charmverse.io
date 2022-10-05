@@ -1,18 +1,18 @@
 
-import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import { useEffect, useState } from 'react';
 
 export type ErrorInfo = {
-  title: string
-  description: string
+  title: string;
+  description: string;
 }
 
 type Props<ErrorType> = {
-  error?: ErrorType
-  processError: (error: ErrorType) => ErrorInfo
+  error?: ErrorType;
+  processError: (error: ErrorType) => ErrorInfo;
 }
 
 // tailing comma for generics to sidestep the JSX ambiguity

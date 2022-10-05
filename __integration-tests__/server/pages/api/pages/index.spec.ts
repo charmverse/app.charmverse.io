@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import request from 'supertest';
+import { v4 } from 'uuid';
+
 import type { IPageWithPermissions } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 
 describe('POST /api/pages - create page', () => {
 
@@ -19,7 +20,7 @@ describe('POST /api/pages - create page', () => {
       operations: ['createPage']
     });
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,
@@ -30,7 +31,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions};
+      .expect(201) as { body: IPageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -42,7 +43,7 @@ describe('POST /api/pages - create page', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,
@@ -53,7 +54,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions};
+      .expect(201) as { body: IPageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -65,7 +66,7 @@ describe('POST /api/pages - create page', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,
@@ -83,7 +84,7 @@ describe('POST /api/pages - create page', () => {
   it('should prevent creation of proposal templates', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     await addSpaceOperations({
       forSpaceId: space.id,
@@ -116,7 +117,7 @@ describe('POST /api/pages - create proposal page', () => {
       operations: ['createVote']
     });
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,
@@ -128,7 +129,7 @@ describe('POST /api/pages - create proposal page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions};
+      .expect(201) as { body: IPageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -140,7 +141,7 @@ describe('POST /api/pages - create proposal page', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,
@@ -152,7 +153,7 @@ describe('POST /api/pages - create proposal page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201) as {body: IPageWithPermissions};
+      .expect(201) as { body: IPageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -164,7 +165,7 @@ describe('POST /api/pages - create proposal page', () => {
 
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
 
-    const userCookie = await loginUser(user);
+    const userCookie = await loginUser(user.id);
 
     const pageToCreate = generatePageToCreateStub({
       userId: user.id,

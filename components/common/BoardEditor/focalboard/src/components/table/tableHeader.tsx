@@ -1,39 +1,39 @@
+
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import { Typography } from '@mui/material';
 import React from 'react';
 
-import { Typography } from '@mui/material';
-import { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
+import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
-import { Card } from '../../blocks/card';
-import { BoardView } from '../../blocks/boardView';
-import SortDownIcon from '../../widgets/icons/sortDown';
-import SortUpIcon from '../../widgets/icons/sortUp';
-import MenuWrapper from '../../widgets/menuWrapper';
-import Label from '../../widgets/label';
 import { useSortable } from '../../hooks/sortable';
 import { Utils } from '../../utils';
-
-import HorizontalGrip from './horizontalGrip';
-
-import TableHeaderMenu from './tableHeaderMenu';
+import Label from '../../widgets/label';
+import MenuWrapper from '../../widgets/menuWrapper';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
+import HorizontalGrip from './horizontalGrip';
+import TableHeaderMenu from './tableHeaderMenu';
+
 type Props = {
-    readonly: boolean
-    sorted: 'up'|'down'|'none'
-    name: React.ReactNode
-    board: Board
-    activeView: BoardView
-    cards: Card[]
-    views: BoardView[]
-    template: IPropertyTemplate
-    offset: number
-    type: PropertyType
-    onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void
-    onAutoSizeColumn: (columnID: string, headerWidth: number) => void
+    readOnly: boolean;
+    sorted: 'up'|'down'|'none';
+    name: React.ReactNode;
+    board: Board;
+    activeView: BoardView;
+    cards: Card[];
+    views: BoardView[];
+    template: IPropertyTemplate;
+    offset: number;
+    type: PropertyType;
+    onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+    onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 }
 
 function TableHeader (props: Props): JSX.Element {
-  const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readonly, props.onDrop);
+  const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readOnly, props.onDrop);
   const columnWidth = (templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (props.activeView.fields.columnWidths[templateId] || 0) + props.offset);
   };
@@ -59,7 +59,7 @@ function TableHeader (props: Props): JSX.Element {
       style={{ overflow: 'unset', width: columnWidth(props.template.id), opacity: isDragging ? 0.5 : 1 }}
       ref={props.template.id === Constants.titleColumnId ? () => null : columnRef}
     >
-      <MenuWrapper disabled={props.readonly}>
+      <MenuWrapper disabled={props.readOnly}>
         <Label>
           <div style={{ marginRight: 4, display: 'flex' }}>{iconForPropertyType(props.type, {
             sx: {
@@ -69,8 +69,8 @@ function TableHeader (props: Props): JSX.Element {
           })}
           </div>
           <Typography component='div' variant='subtitle1'>{props.name}</Typography>
-          {props.sorted === 'up' && <SortUpIcon />}
-          {props.sorted === 'down' && <SortDownIcon />}
+          {props.sorted === 'up' && <ArrowUpwardOutlinedIcon />}
+          {props.sorted === 'down' && <ArrowDownwardOutlinedIcon />}
         </Label>
         <TableHeaderMenu
           board={props.board}
@@ -83,12 +83,12 @@ function TableHeader (props: Props): JSX.Element {
 
       <div className='octo-spacer' />
 
-      {!props.readonly
+      {!props.readOnly
                 && (
-                <HorizontalGrip
-                  templateId={props.template.id}
-                  onAutoSizeColumn={onAutoSizeColumn}
-                />
+                  <HorizontalGrip
+                    templateId={props.template.id}
+                    onAutoSizeColumn={onAutoSizeColumn}
+                  />
                 )}
     </div>
   );

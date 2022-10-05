@@ -3,21 +3,24 @@ import { Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
-import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
-import { extractInlineVoteRows } from 'lib/inline-votes/findTotalInlineVotes';
 import reactDOM from 'react-dom';
+
+import { extractInlineVoteRows } from 'lib/inline-votes/findTotalInlineVotes';
+import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { markName } from './inlineVote.constants';
+
 import RowDecoration from './components/InlineVoteRowDecoration';
+import { markName } from './inlineVote.constants';
 
 export interface InlineVotePluginState {
-  tooltipContentDOM: HTMLElement
-  show: boolean
-  ids: string[]
+  tooltipContentDOM: HTMLElement;
+  show: boolean;
+  ids: string[];
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [

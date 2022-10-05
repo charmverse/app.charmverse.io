@@ -7,11 +7,11 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import { TextSelection } from 'prosemirror-state';
-import paragraph from '../../paragraph';
-import * as bulletList from '../../bulletList';
-import * as orderedList from '../../orderedList';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
+import * as bulletList from '../../bulletList';
+import * as orderedList from '../../orderedList';
+import paragraph from '../../paragraph';
 import {
   isList
 } from '../commands';

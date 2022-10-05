@@ -1,11 +1,10 @@
 
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
-
 import { FormattedMessage } from 'react-intl';
 
-import HelpIcon from '../widgets/icons/help';
-import { Utils } from '../utils';
 import { Constants } from '../constants';
+import { Utils } from '../utils';
 
 const TopBar = React.memo((): JSX.Element => {
   if (Utils.isFocalboardPlugin()) {
@@ -58,7 +57,7 @@ const TopBar = React.memo((): JSX.Element => {
         target='_blank'
         rel='noreferrer'
       >
-        <HelpIcon />
+        <HelpOutlineIcon fontSize='small' />
       </a>
     </div>
   );

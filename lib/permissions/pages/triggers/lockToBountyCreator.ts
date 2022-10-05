@@ -1,13 +1,16 @@
-import type { IPageWithPermissions } from 'lib/pages';
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { getPage, resolvePageTree } from 'lib/pages/server';
 import type { PagePermission, PagePermissionLevel } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import type { IPageWithPermissions } from 'lib/pages';
+import { getPage, resolvePageTree } from 'lib/pages/server';
+import { DataNotFoundError } from 'lib/utilities/errors';
+
 import { upsertPermission } from '../actions';
+
 import { setupPermissionsAfterPageRepositioned } from './page-repositioned';
 
-export async function lockToBountyCreator ({ pageId }: {pageId: string}): Promise<IPageWithPermissions> {
+export async function lockToBountyCreator ({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
   const page = await prisma.page.findUnique({
     where: {
       id: pageId

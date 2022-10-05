@@ -1,15 +1,7 @@
-import type { PageContent } from 'models';
-import { safeInsert } from '@bangle.dev/utils';
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
+import { safeInsert } from '@bangle.dev/utils';
 
-export function checkForEmpty (content: PageContent | null) {
-  return !content?.content
-  || content.content.length === 0
-  || (content.content.length === 1
-      // These nodes dont contain any content so there is no content field
-      && !content.content[0]?.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page)/)
-      && (!content.content[0].content?.length));
-}
+import type { PageContent } from 'models';
 
 export function insertNode (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();

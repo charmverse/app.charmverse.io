@@ -1,14 +1,14 @@
 
-import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import React from 'react';
 import { createIntl } from 'react-intl';
 
-import { PropertyType } from '../../blocks/board';
-import { wrapIntl } from '../../testUtils';
-import { TestBlockFactory } from '../../test/testBlockFactory';
+import type { PropertyType } from '../../blocks/board';
 import mutator from '../../mutator';
+import { TestBlockFactory } from '../../test/testBlockFactory';
+import { wrapIntl } from '../../testUtils';
 import { propertyTypesList, typeDisplayName } from '../../widgets/propertyMenu';
 
 import CardDetailProperties from './cardDetailProperties';
@@ -74,7 +74,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         pageUpdatedBy=''
         activeView={view}
         views={views}
-        readonly={false}
+        readOnly={false}
       />
     ));
 

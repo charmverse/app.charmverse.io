@@ -1,15 +1,16 @@
 import { Autocomplete, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { Role } from '@prisma/client';
+import type { ComponentProps } from 'react';
+
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useRoles from 'hooks/useRoles';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import type { ComponentProps } from 'react';
 
 interface IRolesFilter {
-  mode: 'include' | 'exclude',
-  userIds: string[]
+  mode: 'include' | 'exclude';
+  userIds: string[];
 }
 
 type ReducedRole = Role | ListSpaceRolesResponse
@@ -83,9 +84,9 @@ function InputSearchRoleBase ({
 }
 
 interface IInputSearchRoleProps {
-  onChange: (id: string) => void
-  defaultValue?: string
-  showWarningOnNoRoles?: boolean
+  onChange: (id: string) => void;
+  defaultValue?: string;
+  showWarningOnNoRoles?: boolean;
 }
 
 export function InputSearchRole (props: IInputSearchRoleProps) {
@@ -99,11 +100,11 @@ export function InputSearchRole (props: IInputSearchRoleProps) {
 }
 
 interface IInputSearchRoleMultipleProps extends Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange' | 'defaultValue'>> {
-  onChange: (id: string[]) => void
-  defaultValue?: string[]
-  filter?: IRolesFilter
-  disableCloseOnSelect?: boolean
-  showWarningOnNoRoles?: boolean
+  onChange: (id: string[]) => void;
+  defaultValue?: string[];
+  filter?: IRolesFilter;
+  disableCloseOnSelect?: boolean;
+  showWarningOnNoRoles?: boolean;
 }
 
 export function InputSearchRoleMultiple ({

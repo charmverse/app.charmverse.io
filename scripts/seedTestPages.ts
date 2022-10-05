@@ -4,6 +4,7 @@ import { pageStubToCreate } from 'testing/generate-page-stub';
 import {prisma} from 'db'
 import { DataNotFoundError } from 'lib/utilities/errors'
 import { Prisma } from '@prisma/client';
+import { createPage } from 'lib/pages/server/createPage';
 
 /**
  * @nestedPercent The percentage of pages that should have a parent. This is a number between 0 and 100. Defaults to 30
@@ -43,7 +44,7 @@ export async function seedTestPages({spaceDomain, nestedPercent = 50, pagesToCre
   }))
 
   await prisma.$transaction([
-    ...pageInputs.map(page => prisma.page.create({data: page})),
+    ...pageInputs.map(page => createPage({data: page})),
     prisma.pagePermission.createMany({
       data: permissionInputs
     })
@@ -81,11 +82,11 @@ export async function seedTestBoards({spaceDomain, boardCount = 1, cardCount}: {
   }))
 
   await prisma.$transaction([
-    ...pageCreateArgs.map(p => prisma.page.create(p)),
+    ...pageCreateArgs.map(p => createPage(p)),
     prisma.pagePermission.createMany({
       data: permissionInputs
     }),
-    ...blockCreateArgs.map(b => prisma.block.createMany(b)) 
+    ...blockCreateArgs.map(b => prisma.block.createMany(b))
   ]);
 
   console.log('Created:')

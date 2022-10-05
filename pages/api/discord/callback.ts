@@ -1,11 +1,12 @@
-import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import loginByDiscord from 'lib/discord/loginByDiscord';
-import log from 'lib/log';
-import { withSessionRoute } from 'lib/session/withSession';
-import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import Cookies from 'cookies';
+import nc from 'next-connect';
+
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
+import loginByDiscord from 'lib/discord/loginByDiscord';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import log from 'lib/log';
+import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc({
   onError,
@@ -32,11 +33,8 @@ handler.get(async (req, res) => {
   if (type === 'login') {
     try {
       const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host });
-      // strip out large fields so we dont break the cookie
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { discordUser, spaceRoles, telegramUser, ...userData } = user;
-      req.session.user = userData;
-      await updateGuildRolesForUser(userData.addresses, spaceRoles);
+      req.session.user = { id: user.id };
+      await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
     }
     catch (error) {
       log.warn('Error while connecting to Discord', error);

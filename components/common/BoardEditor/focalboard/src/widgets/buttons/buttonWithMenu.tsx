@@ -1,14 +1,15 @@
-import React from 'react';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import Box from '@mui/material/Box';
-import DropdownIcon from '../icons/dropdown';
-import MenuWrapper from '../menuWrapper';
+import React from 'react';
+
 import Button from 'components/common/Button';
 
+import MenuWrapper from '../menuWrapper';
+
 type Props = {
-    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
-    children?: React.ReactNode
-    title?: string
-    text: React.ReactNode
+    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+    children?: React.ReactNode;
+    text: React.ReactNode;
 }
 
 function ButtonWithMenu (props: Props): JSX.Element {
@@ -21,10 +22,10 @@ function ButtonWithMenu (props: Props): JSX.Element {
       {props.text}
       <MenuWrapper stopPropagationOnToggle={true}>
         <Box
-          sx={{pl: 1}}
+          sx={{ pl: 1 }}
           className='button-dropdown'
         >
-          <DropdownIcon  />
+          <ArrowDropDownOutlinedIcon fontSize='small' />
         </Box>
         {props.children}
       </MenuWrapper>

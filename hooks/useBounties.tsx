@@ -1,9 +1,10 @@
-import charmClient from 'charmClient';
-import useRefState from 'hooks/useRefState';
-import type { BountyCreationData, UpdateableBountyFields } from 'lib/bounties/interfaces';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import type { BountyWithDetails } from '../models';
+
+import charmClient from 'charmClient';
+import useRefState from 'hooks/useRefState';
+import type { BountyCreationData, UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
+
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 

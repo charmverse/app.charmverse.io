@@ -1,4 +1,7 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
@@ -6,8 +9,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,7 +16,7 @@ handler.use(requireUser)
   .put(requireKeys(['resolved'], 'body'), resolveThread);
 
 export interface ResolveThreadRequest {
-  resolved: boolean
+  resolved: boolean;
 }
 
 async function resolveThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {

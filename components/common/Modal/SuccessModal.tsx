@@ -1,6 +1,7 @@
-import type { ComponentProps } from 'react';
-import { Box } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { Box } from '@mui/material';
+import type { ComponentProps } from 'react';
+
 import { Modal, DialogTitle } from './Modal';
 
 export default function SuccessModal ({ title, ...props }: { title?: string } & Omit<ComponentProps<typeof Modal>, 'children'>) {

@@ -1,13 +1,14 @@
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import type { ModalProps } from 'components/common/Modal';
-import { Modal } from 'components/common/Modal';
-import Button from 'components/common/Button';
 import type { ReactNode } from 'react';
 
+import Button from 'components/common/Button';
+import type { ModalProps } from 'components/common/Modal';
+import { Modal } from 'components/common/Modal';
+
 type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
-  question: string | ReactNode,
+  question: string | ReactNode;
   buttonText?: string;
   title?: string;
   onConfirm: () => void;

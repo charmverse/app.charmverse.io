@@ -1,7 +1,9 @@
 import type { Block, Page, PageType, Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import type { PageWithBlocks } from 'lib/templates/interfaces';
 import { typedKeys } from 'lib/utilities/objects';
-import { v4 } from 'uuid';
+
 import { pageContentStub } from './generate-page-stub';
 
 /**
@@ -15,8 +17,8 @@ import { pageContentStub } from './generate-page-stub';
  *
  */
 export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 2, addPageContent }:
-  {createdBy: string, spaceId: string, parentId?: string, cardCount? : number, addPageContent?: boolean}):
-{pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs} {
+  { createdBy: string, spaceId: string, parentId?: string, cardCount? : number, addPageContent?: boolean }):
+{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs } {
 
   const boardId = v4();
 
@@ -31,6 +33,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
     updatedBy: createdBy,
     title: 'My blog',
     content: null,
+    hasContent: false,
     contentText: '',
     headerImage: null,
     icon: '📝',
@@ -312,7 +315,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
       children,
       content,
       ...pageWithoutExtraProps
-    } = page as any as Page & PageWithBlocks & {children: any};
+    } = page as any as Page & PageWithBlocks & { children: any };
 
     // Prisma throws if passing null creation values
     typedKeys(pageWithoutExtraProps).forEach(key => {

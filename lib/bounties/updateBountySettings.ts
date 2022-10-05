@@ -1,8 +1,10 @@
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import { DataNotFoundError, InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
+
 import { countValidSubmissions } from '../applications/shared';
 import { setBountyPermissions } from '../permissions/bounties';
+
 import { getBountyOrThrow } from './getBounty';
 import type { BountyUpdate } from './interfaces';
 

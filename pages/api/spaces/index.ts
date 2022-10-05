@@ -1,17 +1,20 @@
 
+import path from 'node:path';
+
+import type { Prisma, Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import type { Prisma, Space } from '@prisma/client';
+
 import { prisma } from 'db';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
+import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
-import path from 'node:path';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -61,7 +64,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   await prisma.$transaction([
     ...seedPagesTransactionInput.blocksToCreate.map(input => prisma.block.create({ data: input })),
-    ...seedPagesTransactionInput.pagesToCreate.map(input => prisma.page.create({ data: input })),
+    ...seedPagesTransactionInput.pagesToCreate.map(input => createPage({ data: input })),
     ...defaultCategories.map(input => prisma.proposalCategory.create({ data: input }))
   ]);
 

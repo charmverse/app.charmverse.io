@@ -1,17 +1,18 @@
+import AddIcon from '@mui/icons-material/Add';
+import { Tooltip } from '@mui/material';
+import { useRouter } from 'next/router';
+import { memo } from 'react';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useRouter } from 'next/router';
-import { Tooltip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { usePages } from 'hooks/usePages';
-import { StyledIconButton } from 'components/common/PageLayout/components/NewPageMenu';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { mutate } from 'swr';
-import { memo } from 'react';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { StyledIconButton } from 'components/common/PageLayout/components/NewPageMenu';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 
-function AddNewCard ({ pageId }: {pageId: string}) {
+function AddNewCard ({ pageId }: { pageId: string }) {
   const router = useRouter();
   const [space] = useCurrentSpace();
   const { pages } = usePages();

@@ -1,20 +1,22 @@
-import type { User } from '@prisma/client';
 import styled from '@emotion/styled';
 import { Alert, Box, Card, Divider, Grid, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import type { User } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
-import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import { injected, walletConnect, walletLink } from 'connectors';
 import type { ReactNode } from 'react';
 import { useContext, useState } from 'react';
+
+import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
-import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
+
 import DiscordProvider from './DiscordProvider';
+import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 
 const StyledButton = styled(Button)`
   width: 140px;
@@ -129,13 +131,13 @@ export default function IdentityProviders () {
             <Typography color='secondary' variant='button'>
               {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
             </Typography>
-            <Tooltip arrow placement='top' title={user?.addresses.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
+            <Tooltip arrow placement='top' title={user?.wallets.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
               {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
               <div>
                 <StyledButton
                   variant='outlined'
                   color={isConnected ? 'error' : 'primary'}
-                  disabled={isLoggingOut || isLoading || user?.addresses.length === 0}
+                  disabled={isLoggingOut || isLoading || user?.wallets.length === 0}
                   onClick={connect}
                   loading={isLoading}
                 >

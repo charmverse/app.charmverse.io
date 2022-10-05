@@ -1,12 +1,13 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { useMyNfts } from 'hooks/useMyNfts';
 
+import { useMyNfts } from 'hooks/useMyNfts';
 import { useUser } from 'hooks/useUser';
 import type { NftData } from 'lib/blockchain/interfaces';
+
 import NftAvatarGallery from './NftAvatarGallery';
 
 type Props = {
-  onSelect?: (avatar: NftData) => void
+  onSelect?: (avatar: NftData) => void;
   isVisible: boolean;
   onClose: () => void;
   isSaving?: boolean;

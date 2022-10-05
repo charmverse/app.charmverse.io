@@ -1,7 +1,8 @@
 import { getBounty } from 'lib/bounties';
+import type { BountyWithDetails } from 'lib/bounties';
 import { assignRole, listRoleMembers } from 'lib/roles';
-import type { BountyWithDetails } from 'models';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { queryBountyPermissions } from '../bounties';
 import { compareBountyPagePermissions } from '../compareBountyPagePermissions';
 

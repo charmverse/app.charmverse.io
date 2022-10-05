@@ -5,8 +5,11 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import type { Page } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
+import { getChainById } from 'connectors';
+import { DateTime } from 'luxon';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
@@ -15,13 +18,12 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
 import { getSnapshotSpace, SnapshotVotingMode } from 'lib/snapshot';
 import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
-import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
-import { getChainById } from 'connectors';
+
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 
@@ -33,8 +35,8 @@ async function getSnapshotClient () {
 }
 
 interface Props {
-  onSubmit: () => void,
-  page: Page
+  onSubmit: () => void;
+  page: PageMeta;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
@@ -51,7 +53,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   // Ensure we don't show any UI until we are done checking
   const [checksComplete, setChecksComplete] = useState(false);
 
-  const { pages, setPages } = usePages();
+  const { mutatePage } = usePages();
 
   const [configurationError, setConfigurationError] = useState<SystemError | null>(null);
 
@@ -96,7 +98,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
    * Returns markdown content if valid length, or null if not
    */
   async function checkMarkdownLength (): Promise<string | null> {
-    const content = await generateMarkdown(page!, false);
+    const pageWithDetails = await charmClient.pages.getPage(page.id);
+    const content = await generateMarkdown(pageWithDetails, false);
 
     const markdownCharacterLength = content.length;
 
@@ -174,7 +177,8 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     setFormError(null);
     setPublishing(true);
 
-    const content = await generateMarkdown(page!, false);
+    const pageWithDetails = await charmClient.pages.getPage(page.id);
+    const content = await generateMarkdown(pageWithDetails, false);
 
     let receipt: SnapshotReceipt;
 
@@ -222,10 +226,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
       snapshotProposalId: receipt.id
     });
 
-    setPages({
-      ...pages,
-      [page.id]: updatedPage
-    });
+    mutatePage(updatedPage);
 
     onSubmit();
     setPublishing(false);

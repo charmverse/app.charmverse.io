@@ -1,17 +1,20 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import {
+import type {
   Command,
   EditorView,
-  InputRule,
   Node,
-  NodeSelection,
   NodeType,
-  Plugin,
-  PluginKey,
   Schema
 } from '@bangle.dev/pm';
+import {
+  InputRule,
+  NodeSelection,
+  Plugin,
+  PluginKey
+} from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
+
+import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -22,9 +25,9 @@ const name = 'image';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
 export interface ImageNodeSchemaAttrs {
-  caption: null | string
-  src: null | string
-  alt: null | string
+  caption: null | string;
+  src: null | string;
+  alt: null | string;
 }
 
 function specFactory (): RawSpecs {
@@ -232,8 +235,8 @@ function getMatchingItems (
   const accepts = accept
     .toLowerCase()
     .split(',')
-    .map((accept) => {
-      return accept.split('/').map((part) => part.trim());
+    .map((_accept) => {
+      return _accept.split('/').map((part) => part.trim());
     })
     .filter((acceptParts) => acceptParts.length === 2); // Filter invalid values
 
@@ -259,7 +262,7 @@ function getMatchingItems (
     return false;
   };
 
-  results = results = dataItems.filter(predicate);
+  results = dataItems.filter(predicate);
   if (multiple === false) {
     results = [results[0]];
   }

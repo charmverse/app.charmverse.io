@@ -21,7 +21,6 @@ const esmModules = [
   '@hookform/resolvers',
   'lit-share-modal-v3-react-17',
   'uuid',
-  'node-fetch',
   'data-uri-to-buffer',
   'fetch-blob',
   'formdata-polyfill'

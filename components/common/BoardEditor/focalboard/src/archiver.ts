@@ -1,9 +1,10 @@
-import type { IAppWindow } from './types';
-import { ArchiveUtils, ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
-import { Block } from './blocks/block';
-import { Board } from './blocks/board';
+import type { ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
+import { ArchiveUtils } from './blocks/archive';
+import type { Block } from './blocks/block';
+import type { Board } from './blocks/board';
 import { LineReader } from './lineReader';
 import mutator from './mutator';
+import type { IAppWindow } from './types';
 import { Utils } from './utils';
 
 declare let window: IAppWindow;
@@ -31,7 +32,7 @@ class Archiver {
     // link.href = URL.createObjectURL(file)
     link.href = `data:text/json,${encodeURIComponent(content)}`;
     link.download = filename;
-    document.body.appendChild(link);						// FireFox support
+    document.body.appendChild(link); // FireFox support
 
     link.click();
 
@@ -90,6 +91,8 @@ class Archiver {
               }
               break;
             }
+            default:
+              // nothing
           }
         }
       });

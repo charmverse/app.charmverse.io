@@ -1,10 +1,10 @@
 import type { ProposalStatus } from '@prisma/client';
-import * as http from 'adapters/http';
 
-import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import * as http from 'adapters/http';
 import type { IPageWithPermissions } from 'lib/pages';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
+import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 export class ProposalsApi {
   updateProposal ({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
@@ -27,7 +27,7 @@ export class ProposalsApi {
     return http.GET<ProposalCategory[]>(`/api/spaces/${spaceId}/proposal-categories`);
   }
 
-  createProposalTemplate ({ spaceId }: {spaceId: string}): Promise<IPageWithPermissions> {
+  createProposalTemplate ({ spaceId }: { spaceId: string }): Promise<IPageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId });
   }
 
@@ -35,7 +35,7 @@ export class ProposalsApi {
     return http.POST('/api/proposals/from-template', { spaceId, templateId });
   }
 
-  deleteProposalTemplate ({ proposalTemplateId }: {proposalTemplateId: string}): Promise<IPageWithPermissions> {
+  deleteProposalTemplate ({ proposalTemplateId }: { proposalTemplateId: string }): Promise<IPageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 

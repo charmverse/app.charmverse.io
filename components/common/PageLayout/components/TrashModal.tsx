@@ -1,24 +1,25 @@
-import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
-import { usePages } from 'hooks/usePages';
-import { ScrollableModal as Modal } from 'components/common/Modal';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import type { Page, PageContent } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { MouseEvent } from 'react';
-import { memo, useMemo, useState, useCallback, useEffect } from 'react';
+import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
-import { fancyTrim } from 'lib/utilities/strings';
+import { useRouter } from 'next/router';
+import { memo, useMemo, useState, useCallback, useEffect } from 'react';
+import type { MouseEvent } from 'react';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import { mutate } from 'swr';
-import { useRouter } from 'next/router';
+import { ScrollableModal as Modal } from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { fancyTrim } from 'lib/utilities/strings';
+import type { Page } from 'models';
+
 import PageIcon from './PageIcon';
 
-const PageArchivedDate = memo<{date: Date, title: string}>(({ date, title }) => {
+const PageArchivedDate = memo<{ date: Date, title: string }>(({ date, title }) => {
   return (
     <ListItemText secondary={DateTime.fromJSDate(new Date(date)).toRelative({ base: (DateTime.now()) })}>
       {fancyTrim(title, 34) || 'Untitled'}
@@ -28,19 +29,18 @@ const PageArchivedDate = memo<{date: Date, title: string}>(({ date, title }) => 
 
 const ArchivedPageItem = memo<
 {
-  archivedPage: Page,
-  disabled: boolean,
-  onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void,
-  onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void
+  archivedPage: Page;
+  disabled: boolean;
+  onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
+  onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
       const [space] = useCurrentSpace();
-      const isEditorEmpty = checkForEmpty(archivedPage.content as PageContent);
 
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
           <MenuItem component='a' dense disabled={disabled} sx={{ pl: 4 }}>
             <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-              <PageIcon pageType={archivedPage.type} icon={archivedPage.icon} isEditorEmpty={isEditorEmpty} />
+              <PageIcon pageType={archivedPage.type} icon={archivedPage.icon} isEditorEmpty={!archivedPage.hasContent} />
             </ListItemIcon>
             <PageArchivedDate date={archivedPage.deletedAt as Date} title={archivedPage.title} />
             <div onClick={e => e.stopPropagation()}>
@@ -68,12 +68,12 @@ const ArchivedPageItem = memo<
       );
     });
 
-export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, isOpen: boolean}) {
+export default function TrashModal ({ onClose, isOpen }: { onClose: () => void, isOpen: boolean }) {
   const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [space] = useCurrentSpace();
-  const { pages, getPagePermissions, setPages, currentPageId } = usePages();
+  const { pages, getPagePermissions, mutatePagesRemove, currentPageId } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -122,15 +122,8 @@ export default function TrashModal ({ onClose, isOpen }: {onClose: () => void, i
       });
       return { ..._archivedPages };
     });
-    setPages((unArchivedPages) => {
-      // Some deleted pages might still stay on the archived page state
-      deletePageIds.forEach(deletedPageId => {
-        if (unArchivedPages[deletedPageId]) {
-          delete unArchivedPages[deletedPageId];
-        }
-      });
-      return { ...unArchivedPages };
-    });
+
+    mutatePagesRemove(deletePageIds);
     // If the current page has been deleted permanently route to the first alive page
     if (deletePageIds.includes(currentPageId)) {
       router.push(`/${router.query.domain}/${Object.values(pages).find(page => page?.type !== 'card' && page?.deletedAt === null)?.path}`);

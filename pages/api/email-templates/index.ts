@@ -1,19 +1,20 @@
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import * as emails from 'lib/emails/emails';
 import { v4 } from 'uuid';
+
+import * as emails from 'lib/emails/emails';
 import type { MentionedTask } from 'lib/mentions/interfaces';
+import { onError, onNoMatch } from 'lib/middleware';
+import { getPagePath } from 'lib/pages/utils';
+import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { getPagePath } from 'lib/pages';
-import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 
 const handler = nc({
   onError,
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: string, mentionText: string, pageTitle: string}): MentionedTask => {
+const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): MentionedTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
@@ -29,10 +30,10 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
     commentId: null,
     type: 'page',
     createdBy: {
+      addresses: [],
       id: v4(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      addresses: [],
       email: '',
       username: '',
       avatar: '',
@@ -46,7 +47,7 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: {spaceName: st
   };
 };
 
-const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: {voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string}): VoteTask => {
+const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: { voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string }): VoteTask => {
   return {
     deadline,
     id: v4(),

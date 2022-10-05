@@ -1,25 +1,25 @@
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import charmClient from 'charmClient';
-import Loader from 'components/common/Loader';
-import useIsAdmin from 'hooks/useIsAdmin';
-import { useEffect, useState } from 'react';
-
-import { yupResolver } from '@hookform/resolvers/yup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import type { SpaceOperation } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { BooleanSchema } from 'yup';
+import * as yup from 'yup';
+
+import charmClient from 'charmClient';
+import Loader from 'components/common/Loader';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces/client';
 import { AvailableSpacePermissions, spaceOperationLabels, spaceOperations } from 'lib/permissions/spaces/client';
-import { useForm } from 'react-hook-form';
-import type { BooleanSchema } from 'yup';
-import * as yup from 'yup';
 
 const fields: Record<SpaceOperation, BooleanSchema> = spaceOperations().reduce((_schema: Record<SpaceOperation, BooleanSchema>, op) => {
   _schema[op] = yup.boolean();
@@ -35,8 +35,8 @@ type FormValues = yup.InferType<typeof schema>
  */
 interface Props {
   targetGroup: AssignablePermissionGroups;
-  id: string,
-  callback?: () => void
+  id: string;
+  callback?: () => void;
 }
 
 export default function SpacePermissions ({ targetGroup, id, callback = () => null }: Props) {

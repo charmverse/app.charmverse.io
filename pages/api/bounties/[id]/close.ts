@@ -1,14 +1,15 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { closeOutBounty, getBountyOrThrow } from 'lib/bounties';
+import type { BountyWithDetails } from 'lib/bounties';
+import * as collabland from 'lib/collabland';
+import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-import * as collabland from 'lib/collabland';
-import log from 'lib/log';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

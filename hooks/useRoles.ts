@@ -1,8 +1,10 @@
 import type { Role } from '@prisma/client';
-import charmClient from 'charmClient';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
+
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
 import type { RoleupWithMembers } from '../lib/roles';
 
 export default function useRoles () {

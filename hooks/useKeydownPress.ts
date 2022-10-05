@@ -1,10 +1,11 @@
-import { isMac } from 'lib/browser';
 import { useEffect, useMemo } from 'react';
+
+import { isMac } from 'lib/browser';
 
 type KeyConfig = {
   key?: string;
   shift?: boolean;
-  ctrl?: boolean
+  ctrl?: boolean;
 };
 
 export default function useKeydownPress (callback: VoidFunction, { key, ctrl, shift }: KeyConfig = {}) {

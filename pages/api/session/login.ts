@@ -1,37 +1,41 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { LoggedInUser } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireKeys(['address'], 'body'))
+  .use(requireWalletSignature)
   .post(login);
 
 async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body;
+  const { address } = req.body as Web3LoginRequest;
+
   const user = await prisma.user.findFirst({
     where: {
-      addresses: {
-        has: address
+      wallets: {
+        some: {
+          address
+        }
       }
     },
     include: sessionUserRelations
   });
 
   if (!user) {
-    return res.status(401).send({ error: 'No user has been associated with this wallet address' });
+    throw new ActionNotPermittedError('No user has been associated with this wallet address');
   }
 
-  // strip out large fields so we dont break the cookie
-  const { discordUser, spaceRoles, telegramUser, ...userData } = user;
-  req.session.user = userData;
-  await updateGuildRolesForUser(userData.addresses, spaceRoles);
+  req.session.user = { id: user.id };
+  await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
 
   return res.status(200).json(user);

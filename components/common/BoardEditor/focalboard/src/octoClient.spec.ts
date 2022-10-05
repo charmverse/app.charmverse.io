@@ -1,14 +1,11 @@
 // @ts-nocheck
 
-
 // Disable console log
-import { Block } from './blocks/block';
+import type { Block } from './blocks/block';
 import { createBoard } from './blocks/board';
 import octoClient from './octoClient';
 import 'isomorphic-fetch';
 import { FetchMock } from './test/fetchMock';
-
-console.log = jest.fn();
 
 global.fetch = FetchMock.fn;
 

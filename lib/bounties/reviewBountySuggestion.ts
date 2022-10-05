@@ -1,7 +1,8 @@
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import { includePagePermissions } from 'lib/pages/server';
 import { WrongStateError } from 'lib/utilities/errors';
-import type { BountyWithDetails } from 'models';
+
 import { getBountyOrThrow } from './getBounty';
 import type { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction } from './interfaces';
 

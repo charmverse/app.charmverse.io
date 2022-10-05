@@ -1,9 +1,7 @@
+import { render } from '@testing-library/react';
 import React from 'react';
 
-import { render } from '@testing-library/react';
-
 import { TestBlockFactory } from '../../../test/testBlockFactory';
-
 import { wrapIntl } from '../../../testUtils';
 
 import { KanbanCalculation } from './calculation';
@@ -27,7 +25,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onChange={() => {}}
         value='count'
         property={board.fields.cardProperties[0]}
-        readonly={false}
+        readOnly={false}
       />
     ));
 
@@ -46,7 +44,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onChange={() => {}}
         value='count'
         property={board.fields.cardProperties[0]}
-        readonly={false}
+        readOnly={false}
       />
     ));
 
@@ -65,7 +63,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onChange={() => {}}
         value='count'
         property={board.fields.cardProperties[0]}
-        readonly={true}
+        readOnly={true}
       />
     ));
 

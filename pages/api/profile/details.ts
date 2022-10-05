@@ -1,10 +1,11 @@
 
 import type { UserDetails } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -37,7 +38,7 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
   return res.status(200).json(details);
 }
 
-async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | {error: string}>) {
+async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: string }>) {
   const details = await prisma.userDetails.upsert({
     where: {
       id: req.session.user.id

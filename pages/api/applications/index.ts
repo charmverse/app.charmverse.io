@@ -1,5 +1,8 @@
 
 import type { Application } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { createApplication } from 'lib/applications/actions';
@@ -8,8 +11,6 @@ import { requireKeys } from 'lib/middleware/requireKeys';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

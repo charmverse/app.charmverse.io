@@ -1,11 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import Button from 'components/common/Button';
-import { DialogTitle, Modal } from 'components/common/Modal';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+
+import Button from 'components/common/Button';
+import { DialogTitle, Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
   description: yup.string().ensure().trim()
@@ -14,10 +15,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type DescriptionModalProps = {
-    currentDescription: string | null | undefined,
-    save: (description: string) => void,
-    close: () => void,
-    isOpen: boolean,
+    currentDescription: string | null | undefined;
+    save: (description: string) => void;
+    close: () => void;
+    isOpen: boolean;
 };
 
 function DescriptionModal (props: DescriptionModalProps) {

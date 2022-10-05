@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { generatePageNode } from 'testing/generate-stubs';
+
 import { findParentOfType } from '../findParentOfType';
 import type { PageNode, PagesMap, TargetPageTree } from '../interfaces';
 

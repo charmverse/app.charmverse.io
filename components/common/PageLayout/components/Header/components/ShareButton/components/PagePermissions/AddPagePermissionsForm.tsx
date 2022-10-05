@@ -2,6 +2,10 @@
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
@@ -12,9 +16,6 @@ import useRoles from 'hooks/useRoles';
 import type { IPagePermissionToCreate, IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 export const schema = yup.object({
   id: yup.string(),
@@ -22,12 +23,12 @@ export const schema = yup.object({
   permissionLevel: yup.string()
 });
 
-type FormValues = yup.InferType<typeof schema> & {type: 'role' | 'user', permissionLevel: PagePermissionLevelType}
+type FormValues = yup.InferType<typeof schema> & { type: 'role' | 'user', permissionLevel: PagePermissionLevelType }
 
 interface Props {
-  pageId: string
-  existingPermissions: IPagePermissionWithAssignee []
-  permissionsAdded?: () => any
+  pageId: string;
+  existingPermissions: IPagePermissionWithAssignee [];
+  permissionsAdded?: () => any;
 }
 
 export default function AddPagePermissionsForm ({ pageId, existingPermissions = [], permissionsAdded = () => {} }: Props) {
@@ -41,7 +42,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
   const [selectedUserIds, setSelectedUserIds] = useState<string []>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
-  const [permissionBeingAdded, setPermissionBeingAdded] = useState<{index: number, total: number} | null>(null);
+  const [permissionBeingAdded, setPermissionBeingAdded] = useState<{ index: number, total: number } | null>(null);
 
   useEffect(() => {
 
@@ -85,7 +86,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
     ];
 
     async function recursivePermissionAssign ({ currentIndex = 0, total, permissions }:
-      {currentIndex?: number, total: number, permissions: IPagePermissionToCreate[]}): Promise<true> {
+      { currentIndex?: number, total: number, permissions: IPagePermissionToCreate[] }): Promise<true> {
       if (permissions.length === 0) {
         setPermissionBeingAdded(null);
         return true;

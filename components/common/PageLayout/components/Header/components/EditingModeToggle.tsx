@@ -1,7 +1,8 @@
-import { ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
 import { ArrowDropDown } from '@mui/icons-material';
-import Button from 'components/common/Button';
+import { ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+
+import Button from 'components/common/Button';
 import { usePrimaryCharmEditor, EDIT_MODE_CONFIG } from 'hooks/usePrimaryCharmEditor';
 import type { EditMode } from 'hooks/usePrimaryCharmEditor';
 

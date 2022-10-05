@@ -1,7 +1,9 @@
 import type { Application } from '@prisma/client';
+
 import { prisma } from 'db';
 import { getBountyOrThrow } from 'lib/bounties';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
+
 import type { ApplicationCreationData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
 

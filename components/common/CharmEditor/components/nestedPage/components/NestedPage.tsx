@@ -1,12 +1,13 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
+
+import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { PageContent } from 'models';
-import Link from 'components/common/Link';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -38,7 +39,6 @@ export default function NestedPage ({ node }: NodeViewProps) {
   const [space] = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
-  const isEditorEmpty = checkForEmpty(nestedPage?.content as PageContent);
 
   const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
 
@@ -49,7 +49,7 @@ export default function NestedPage ({ node }: NodeViewProps) {
   return (
     <NestedPageContainer href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
       <div>
-        {nestedPage && <PageIcon isEditorEmpty={isEditorEmpty} icon={nestedPage.icon} pageType={nestedPage.type} />}
+        {nestedPage && <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />}
       </div>
       <Typography fontWeight={600}>
         {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}

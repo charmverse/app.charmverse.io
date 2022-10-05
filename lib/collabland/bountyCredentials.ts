@@ -1,5 +1,7 @@
 import type { Bounty, Page } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import * as client from './collablandClient';
 
 const DOMAIN = process.env.DOMAIN || 'https://test.charmverse.io';
@@ -70,7 +72,7 @@ export async function createBountyStartedCredential ({ bountyId, userId }: { bou
 
 }
 
-export async function createBountyCompletedCredential ({ bountyId, userId }: { bountyId: string, userId: string}) {
+export async function createBountyCompletedCredential ({ bountyId, userId }: { bountyId: string, userId: string }) {
 
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {

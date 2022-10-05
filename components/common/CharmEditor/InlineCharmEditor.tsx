@@ -7,29 +7,31 @@ import {
   strike,
   underline
 } from '@bangle.dev/base-components';
-import debounce from 'lodash/debounce';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import { useEditorState } from '@bangle.dev/react';
+import styled from '@emotion/styled';
+import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
 import { useState } from 'react';
-import styled from '@emotion/styled';
+
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
-import type { PageContent } from 'models';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import * as floatingMenu from './components/floatingMenu';
-import EmojiSuggest, * as emoji from './components/emojiSuggest';
-import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
-import * as tabIndent from './components/tabIndent';
-import Placeholder from './components/Placeholder';
-import { checkForEmpty } from './utils';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import type { PageContent } from 'models';
+
 import { userDataPlugin } from './components/charm/charm.plugins';
+import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import * as floatingMenu from './components/floatingMenu';
+import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import Placeholder from './components/Placeholder';
+import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const emojiPluginKey = new PluginKey(emoji.pluginKeyName);
@@ -59,10 +61,10 @@ export function charmEditorPlugins (
     spaceId = null
   }:
     {
-      readOnly?: boolean, onContentChange?: (view: EditorView) => void,
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
+      readOnly?: boolean; onContentChange?: (view: EditorView) => void;
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
     } = {}
 ) {
   return () => [
@@ -146,7 +148,7 @@ export default function CharmEditor (
   const [currentSpace] = useCurrentSpace();
   const { user } = useUser();
 
-  const _isEmpty = !content || checkForEmpty(content);
+  const _isEmpty = !content || checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
@@ -156,7 +158,7 @@ export default function CharmEditor (
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView) {
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
     // @ts-ignore missing types from the @bangle.dev/react package
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);

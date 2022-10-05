@@ -1,8 +1,10 @@
 import type { Space } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { SpaceNotFoundError } from 'lib/public-api';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { setSpaceDefaultPagePermission } from '../setSpaceDefaultPagePermission';
 
 let space: Space;

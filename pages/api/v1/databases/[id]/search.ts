@@ -1,13 +1,14 @@
 
 import type { Prisma, Page as PrismaPage } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { PageContent } from 'models';
-import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
-import { DatabasePageNotFoundError, mapProperties, PageFromBlock, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+
+import { prisma } from 'db';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/pages';
+import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
+import { DatabasePageNotFoundError, mapProperties, PageFromBlock, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
+import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

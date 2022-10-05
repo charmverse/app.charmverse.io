@@ -1,5 +1,7 @@
 import { VoteStatus } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { ExtendedVote } from './interfaces';

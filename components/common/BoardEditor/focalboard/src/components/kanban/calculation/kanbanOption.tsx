@@ -1,18 +1,19 @@
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useState } from 'react';
 
-import { IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyTemplate } from '../../../blocks/board';
 import { Constants } from '../../../constants';
-import ChevronRight from '../../../widgets/icons/chevronRight';
-import { Option as SelectOption, typesByOptions } from '../../calculations/options';
+import type { Option as SelectOption } from '../../calculations/options';
+import { typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
-    cardProperties: IPropertyTemplate[]
-    onChange: (data: {calculation: string, propertyId: string}) => void
-    activeValue: string
-    activeProperty: IPropertyTemplate
+    cardProperties: IPropertyTemplate[];
+    onChange: (data: { calculation: string, propertyId: string }) => void;
+    activeValue: string;
+    activeProperty: IPropertyTemplate;
 }
 
-function Option (props: {data: OptionProps}): JSX.Element {
+function Option (props: { data: OptionProps }): JSX.Element {
   const [submenu, setSubmenu] = useState(false);
   const [height, setHeight] = useState(0);
   const [menuOptionRight, setMenuOptionRight] = useState(0);
@@ -61,17 +62,17 @@ function Option (props: {data: OptionProps}): JSX.Element {
       }}
     >
       <span>
-        {props.data.label} {props.data.value !== 'count' && <ChevronRight />}
+        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
       </span>
 
       {
                 submenu && props.data.value !== 'count' && (
-                <div
-                  className='dropdown-submenu'
-                  style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}
-                >
+                  <div
+                    className='dropdown-submenu'
+                    style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}
+                  >
 
-                  {
+                    {
                             calculationToProperties.get(props.data.value)
                             && calculationToProperties.get(props.data.value)!.map((property) => (
                               <div
@@ -88,7 +89,7 @@ function Option (props: {data: OptionProps}): JSX.Element {
                               </div>
                             ))
                         }
-                </div>
+                  </div>
                 )
             }
     </div>

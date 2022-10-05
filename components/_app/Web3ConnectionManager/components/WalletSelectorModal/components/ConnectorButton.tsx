@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+
 import Button from 'components/common/Button';
 import { greyColor2 } from 'theme/colors';
 
@@ -15,12 +16,12 @@ const ButtonContent = styled.div`
 `;
 
 type Props = {
-  name: string
-  onClick: () => void
-  iconUrl: string
-  disabled: boolean
-  isActive: boolean
-  isLoading: boolean
+  name: string;
+  onClick: () => void;
+  iconUrl: string;
+  disabled: boolean;
+  isActive: boolean;
+  isLoading: boolean;
 }
 
 function ConnectorButton ({

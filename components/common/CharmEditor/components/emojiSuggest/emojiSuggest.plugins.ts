@@ -2,7 +2,9 @@ import type { SpecRegistry } from '@bangle.dev/core';
 import type { Command, EditorState, EditorView, Schema } from '@bangle.dev/pm';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
+
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+
 import { markName } from './emojiSuggest.constants';
 
 export const plugins = pluginsFactory;
@@ -14,7 +16,7 @@ export const commands = {
 function pluginsFactory ({
   key
 }: {
-  key: PluginKey
+  key: PluginKey;
 }) {
   return ({
     specRegistry

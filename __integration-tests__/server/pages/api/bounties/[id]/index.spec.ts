@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Bounty, Space, User } from '@prisma/client';
-import { createBounty } from 'lib/bounties';
-import { addBountyPermissionGroup } from 'lib/permissions/bounties';
-import type { BountyWithDetails } from 'models';
 import request from 'supertest';
+
+import { createBounty } from 'lib/bounties';
+import type { BountyWithDetails } from 'lib/bounties';
+import { addBountyPermissionGroup } from 'lib/permissions/bounties';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let nonAdminUser: User;
+let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: User;
+let adminUser: LoggedInUser;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -20,13 +22,13 @@ beforeAll(async () => {
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser);
+  nonAdminCookie = await loginUser(nonAdminUser.id);
 
   const second = await generateUserAndSpaceWithApiToken();
 
   adminUser = second.user;
   adminUserSpace = second.space;
-  adminCookie = await loginUser(adminUser);
+  adminCookie = await loginUser(adminUser.id);
 });
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
@@ -110,7 +112,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const randomSpaceUserCookie = await loginUser(randomSpaceUser);
+    const randomSpaceUserCookie = await loginUser(randomSpaceUser.id);
 
     const createdBounty = await createBounty({
       createdBy: adminUser.id,
@@ -139,7 +141,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator);
+    const bountyCreatorCookie = await loginUser(bountyCreator.id);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,
@@ -178,7 +180,7 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const bountyCreatorCookie = await loginUser(bountyCreator);
+    const bountyCreatorCookie = await loginUser(bountyCreator.id);
 
     const createdBounty = await createBounty({
       createdBy: bountyCreator.id,

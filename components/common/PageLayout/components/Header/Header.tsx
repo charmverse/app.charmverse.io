@@ -1,17 +1,17 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { RateReviewOutlined } from '@mui/icons-material';
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoonIcon from '@mui/icons-material/DarkMode';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -20,23 +20,24 @@ import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import type { Page } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useRef, useState } from 'react';
+
 import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
+import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
-import ShareButton from './components/ShareButton';
+
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
-import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import EditingModeToggle from './components/EditingModeToggle';
+import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import ShareButton from './components/ShareButton';
 
 export const headerHeight = 56;
 
@@ -55,7 +56,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, setPages, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -85,7 +86,13 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   async function exportMarkdown () {
-    const markdownContent = await generateMarkdown(basePage as Page);
+    if (!basePage) {
+      return;
+    }
+
+    // getPage to get content
+    const page = await charmClient.pages.getPage(basePage.id);
+    const markdownContent = await generateMarkdown(page);
 
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
@@ -107,6 +114,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isFullWidth = basePage?.fullWidth ?? false;
   const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
+
+  const onSwitchChange = () => {
+    if (basePage) {
+      updatePage({
+        id: basePage?.id,
+        fullWidth: !isFullWidth
+      });
+    }
+  };
 
   const documentOptions = (
     <List dense>
@@ -141,9 +157,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       {basePage && (
-        <ListItemButton>
-          <PublishToSnapshot pageId={basePage.id} />
-        </ListItemButton>
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
       )}
       <Divider />
       <ListItemButton onClick={() => {
@@ -202,14 +224,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <Switch
               size='small'
               checked={isFullWidth}
-              onChange={async () => {
-                await charmClient.updatePage({
-                  id: basePage?.id,
-                  fullWidth: !isFullWidth
-                });
-                // @ts-ignore
-                setPages((_pages) => ({ ..._pages, [basePageId]: { ...basePage, fullWidth: !isFullWidth } }));
-              }}
+              onChange={onSwitchChange}
             />
           )}
           label={<Typography variant='body2'>Full Width</Typography>}
@@ -255,7 +270,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         width: '100%'
       }}
       >
-        <PageTitleWithBreadcrumbs pageId={basePage?.id} />
+        <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
 
           {

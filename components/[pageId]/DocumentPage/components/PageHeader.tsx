@@ -1,20 +1,21 @@
 import styled from '@emotion/styled';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
-import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
-import ImageIcon from '@mui/icons-material/Image';
-import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import DeleteIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/delete';
-import FBEmojiIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/emoji';
-import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
-import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
-import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
-import { randomIntFromInterval } from 'lib/utilities/random';
-import type { Page } from 'models';
 import type { ChangeEvent } from 'react';
 import { memo } from 'react';
+
+import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
+import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
+import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
+import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
 import EmojiIcon from 'components/common/Emoji';
+import { randomIntFromInterval } from 'lib/utilities/random';
+import type { Page } from 'models';
+
 import { randomBannerImage } from './PageBanner';
 import PageTitleInput from './PageTitleInput';
 
@@ -55,7 +56,7 @@ const EditorHeader = styled.div`
 `;
 
 interface PageHeaderProps {
-  headerImage: string | null,
+  headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
@@ -90,7 +91,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
             <Menu>
               <Menu.Text
                 id='random'
-                icon={<FBEmojiIcon />}
+                icon={<EmojiEmotionsOutlinedIcon />}
                 name='Random'
                 onClick={() => {
                   updatePageIcon(BlockIcons.shared.randomIcon());
@@ -98,7 +99,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
               />
               <Menu.SubMenu
                 id='pick'
-                icon={<FBEmojiIcon />}
+                icon={<EmojiEmotionsOutlinedIcon />}
                 name='Pick icon'
               >
                 <EmojiPicker onSelect={(emoji) => {
@@ -108,7 +109,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
               </Menu.SubMenu>
               <Menu.Text
                 id='remove'
-                icon={<DeleteIcon />}
+                icon={<DeleteOutlineOutlinedIcon />}
                 name='Remove icon'
                 onClick={() => {
                   updatePageIcon(null);
@@ -120,7 +121,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
         <Controls className='page-controls'>
           {!readOnly && !icon && (
             <PageControlItem onClick={addPageIcon}>
-              <EmojiEmotionsIcon
+              <EmojiEmotionsOutlinedIcon
                 fontSize='small'
                 sx={{ marginRight: 1 }}
               />

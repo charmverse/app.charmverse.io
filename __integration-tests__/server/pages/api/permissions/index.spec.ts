@@ -1,12 +1,14 @@
 import type { Role, Space, User } from '@prisma/client';
+import request from 'supertest';
+
 import { prisma } from 'db';
 import type { IPagePermissionToCreate } from 'lib/permissions/pages';
 import { upsertPermission } from 'lib/permissions/pages';
-import request from 'supertest';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-let user: User;
+let user: LoggedInUser;
 let userCookie: string;
 let space: Space;
 let role: Role;
@@ -15,7 +17,7 @@ beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, false);
   user = generated.user;
   space = generated.space;
-  userCookie = await loginUser(user);
+  userCookie = await loginUser(user.id);
   role = await generateRole({
     createdBy: user.id,
     spaceId: space.id

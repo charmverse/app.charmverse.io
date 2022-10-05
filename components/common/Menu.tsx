@@ -1,11 +1,12 @@
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import { StyledListItemText } from 'components/common/StyledListItemText';
-import { Menu, MenuItem } from '@mui/material';
-import { v4 } from 'uuid';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import Button from 'components/common/Button';
-import Typography from '@mui/material/Typography';
+import { Menu, MenuItem } from '@mui/material';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { v4 } from 'uuid';
+
+import Button from 'components/common/Button';
+import { StyledListItemText } from 'components/common/StyledListItemText';
 
 export interface MenuOption<T = any> {
   value: T;
@@ -14,12 +15,12 @@ export interface MenuOption<T = any> {
 }
 
 interface Props {
-  selectedValue: string,
-  title?: string
-  loading?: boolean,
-  valueUpdated: (value: string) => void,
-  options: MenuOption[]
-  closeOnSelect?: boolean
+  selectedValue: string;
+  title?: string;
+  loading?: boolean;
+  valueUpdated: (value: string) => void;
+  options: MenuOption[];
+  closeOnSelect?: boolean;
 }
 
 export default function SelectMenu ({

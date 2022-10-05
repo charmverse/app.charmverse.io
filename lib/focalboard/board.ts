@@ -1,5 +1,7 @@
-import type { PageContent } from 'models';
 import { v4 } from 'uuid';
+
+import type { PageContent } from 'models';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 import type { Card } from './card';
@@ -7,30 +9,30 @@ import type { Card } from './card';
 type PropertyType = 'text' | 'number' | 'select' | 'multiSelect' | 'date' | 'person' | 'file' | 'checkbox' | 'url' | 'email' | 'phone' | 'createdTime' | 'createdBy' | 'updatedTime' | 'updatedBy'
 
 interface IPropertyOption {
-    id: string
-    value: string
-    color: string
+    id: string;
+    value: string;
+    color: string;
 }
 
 // A template for card properties attached to a board
 interface IPropertyTemplate {
-    id: string
-    name: string
-    type: PropertyType
-    options: IPropertyOption[]
+    id: string;
+    name: string;
+    type: PropertyType;
+    options: IPropertyOption[];
 }
 
 type BoardFields = {
-    icon: string
-    description: PageContent
-    showDescription?: boolean
-    isTemplate?: boolean
-    cardProperties: IPropertyTemplate[]
-    columnCalculations: Record<string, string>
+    icon: string;
+    description: PageContent;
+    showDescription?: boolean;
+    isTemplate?: boolean;
+    cardProperties: IPropertyTemplate[];
+    columnCalculations: Record<string, string>;
 }
 
 type Board = Block & {
-    fields: BoardFields
+    fields: BoardFields;
 }
 
 function createBoard (block?: Partial<Block>, addDefaultProperty?: boolean): Board {
@@ -84,8 +86,8 @@ function createBoard (block?: Partial<Block>, addDefaultProperty?: boolean): Boa
 }
 
 type BoardGroup = {
-    option: IPropertyOption
-    cards: Card[]
+    option: IPropertyOption;
+    cards: Card[];
 }
 
 export { createBoard };

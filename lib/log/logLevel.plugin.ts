@@ -1,7 +1,8 @@
-import * as http from 'adapters/http';
 import type { Logger, LogLevelDesc } from 'loglevel';
 import _log from 'loglevel';
 import { DateTime } from 'luxon';
+
+import * as http from 'adapters/http';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;

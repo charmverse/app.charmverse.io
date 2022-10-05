@@ -3,23 +3,23 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
-import charmClient from 'charmClient';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
-import type { IPageWithPermissions, NewPageInput } from 'lib/pages';
-import { addPageAndRedirect } from 'lib/pages';
-import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
-import { isTruthy } from 'lib/utilities/types';
-import type { Page, PageContent } from 'models';
 import { useRouter } from 'next/router';
-import type { ComponentProps, Dispatch, ReactNode, SetStateAction, SyntheticEvent } from 'react';
+import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 
+import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
+import type { IPageWithPermissions, NewPageInput, PageMeta, PageUpdates } from 'lib/pages';
+import { addPageAndRedirect } from 'lib/pages';
+import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
+import { isTruthy } from 'lib/utilities/types';
+import type { Page } from 'models';
+
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
@@ -29,7 +29,7 @@ const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
   overflow-y: auto;
 `;
 
-export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: string[] = []) {
+export function filterVisiblePages (pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
   return pages
     .filter((page): page is IPageWithPermissions => isTruthy(
       page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))
@@ -37,12 +37,12 @@ export function filterVisiblePages (pages: (Page | undefined)[], rootPageIds: st
 }
 
 type TreeRootProps = {
-  children: ReactNode,
-  isFavorites?: boolean,
-  setPages: Dispatch<SetStateAction<Record<string, IPageWithPermissions | undefined>>>
+  children: ReactNode;
+  isFavorites?: boolean;
+  mutatePage: (page: PageUpdates) => void;
 } & ComponentProps<typeof TreeView>;
 
-function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) {
+function TreeRoot ({ children, mutatePage, isFavorites, ...rest }: TreeRootProps) {
   const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
     accept: 'item',
     drop (item, monitor) {
@@ -50,13 +50,8 @@ function TreeRoot ({ children, setPages, isFavorites, ...rest }: TreeRootProps) 
       if (didDrop || !item.parentId) {
         return;
       }
-      setPages(_pages => ({
-        ..._pages,
-        [item.id]: {
-          ..._pages[item.id]!,
-          parentId: null
-        }
-      }));
+
+      mutatePage({ id: item.id, parentId: null });
     },
     collect: (monitor) => ({
       isOverCurrent: monitor.isOver({ shallow: true }),
@@ -91,7 +86,7 @@ function PageNavigation ({
   rootPageIds
 }: PageNavigationProps) {
   const router = useRouter();
-  const { pages, currentPageId, setPages } = usePages();
+  const { pages, currentPageId, setPages, mutatePage } = usePages();
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
@@ -103,7 +98,7 @@ function PageNavigation ({
       title: page.title,
       icon: page.icon,
       index: page.index,
-      isEmptyContent: checkForEmpty(page.content as PageContent),
+      isEmptyContent: !page.hasContent,
       parentId: page.parentId,
       path: page.path,
       type: page.type,
@@ -139,7 +134,7 @@ function PageNavigation ({
       siblings.forEach((page, _index) => {
         page.index = _index;
         page.parentId = parentId;
-        charmClient.updatePage({
+        charmClient.pages.updatePage({
           id: page.id,
           index: _index,
           parentId
@@ -188,17 +183,9 @@ function PageNavigation ({
     const index = 1000; // send it to the end
     const parentId = (containerItem as MenuNode)?.id ?? null;
 
-    const page = pages[droppedItem.id] as IPageWithPermissions;
+    mutatePage({ id: droppedItem.id, parentId });
 
-    setPages(_pages => ({
-      ..._pages,
-      [droppedItem.id]: {
-        ...page,
-        parentId
-      }
-    }));
-
-    charmClient.updatePage({
+    charmClient.pages.updatePage({
       id: droppedItem.id,
       index, // send it to the end
       parentId
@@ -244,7 +231,7 @@ function PageNavigation ({
 
   return (
     <StyledTreeRoot
-      setPages={setPages}
+      mutatePage={mutatePage}
       expanded={expanded}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}

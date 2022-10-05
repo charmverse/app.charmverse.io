@@ -1,10 +1,10 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
+import React from 'react';
+
+import type { IPropertyTemplate } from '../../blocks/board';
+import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapIntl } from '../../testUtils';
-import { IPropertyTemplate } from '../../blocks/board';
 
 import CalendarView from './fullCalendar';
 
@@ -36,7 +36,7 @@ describe('components/calendar/toolbar', () => {
           board={board}
           activeView={view}
           cards={[card]}
-          readonly={false}
+          readOnly={false}
           showCard={mockShow}
           addCard={mockAdd}
           initialDate={new Date(fifth)}
@@ -54,7 +54,7 @@ describe('components/calendar/toolbar', () => {
           board={board}
           activeView={view}
           cards={[card]}
-          readonly={false}
+          readOnly={false}
           showCard={mockShow}
           addCard={mockAdd}
           initialDate={new Date(fifth)}
@@ -72,7 +72,7 @@ describe('components/calendar/toolbar', () => {
         <CalendarView
           board={board}
           activeView={view}
-          readonly={false}
+          readOnly={false}
           dateDisplayProperty={dateDisplayProperty}
           cards={[card]}
           showCard={mockShow}

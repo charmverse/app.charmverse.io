@@ -8,30 +8,30 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import IconButton from '@mui/material/IconButton';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
-import ListItemButton from '@mui/material/ListItemButton';
 import Tooltip from '@mui/material/Tooltip';
 import type { Page, PageType } from '@prisma/client';
-import { isTouchScreen } from 'lib/browser';
-import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import TreeItemContent from 'components/common/TreeItemContent';
 import type { Identifier } from 'dnd-core';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPageWithPermissions } from 'lib/pages';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
+import TreeItemContent from 'components/common/TreeItemContent';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { isTouchScreen } from 'lib/browser';
 import { greyColor2 } from 'theme/colors';
+
 import AddNewCard from '../../AddNewCard';
 import NewPageMenu from '../../NewPageMenu';
 import { StyledDatabaseIcon, StyledPageIcon } from '../../PageIcon';
@@ -174,7 +174,7 @@ interface PageLinkProps {
   labelIcon?: React.ReactNode;
   pageType?: Page['type']; // optional since we use this for views as well
   pageId?: string;
-  showPicker?: boolean
+  showPicker?: boolean;
 }
 
 export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
@@ -216,26 +216,17 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
 }
 
 function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
-  const { setPages } = usePages();
+  const { updatePage } = usePages();
   const onSelectEmoji = useCallback(async (emoji: string) => {
     if (pageId) {
-      await charmClient.updatePage({
-        id: pageId,
-        icon: emoji
-      });
-      setPages(_pages => ({
-        ..._pages,
-        [pageId]: {
-          ..._pages[pageId] as IPageWithPermissions,
-          icon: emoji
-        }
-      }));
+      updatePage({ id: pageId, icon: emoji });
+
       if (pageType === 'board') {
         mutator.changeIcon(pageId, emoji, emoji);
       }
     }
     popupState.close();
-  }, [pageId, setPages]);
+  }, [pageId, updatePage]);
 
   return (
     <Menu
@@ -318,7 +309,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         />
       );
     }
-  }, [labelIcon, pageType]);
+  }, [labelIcon, pageType, isEmptyContent]);
 
   const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);

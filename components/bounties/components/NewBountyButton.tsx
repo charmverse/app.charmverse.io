@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { BountyWithDetails } from 'models';
+import type { BountyWithDetails } from 'lib/bounties';
 
 export default function NewBountyButton () {
   const { user } = useUser();
@@ -14,7 +14,7 @@ export default function NewBountyButton () {
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
-  const { setPages } = usePages();
+  const { mutatePage } = usePages();
   const { showPage } = usePageDialog();
 
   async function onClickCreate () {
@@ -53,7 +53,7 @@ export default function NewBountyButton () {
           }
         });
       }
-      setPages((pages) => ({ ...pages, [createdBounty.page.id]: createdBounty.page }));
+      mutatePage(createdBounty.page);
       setBounties((bounties) => [...bounties, createdBounty]);
       showPage({
         pageId: createdBounty.page.id,

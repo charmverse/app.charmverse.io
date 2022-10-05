@@ -16,15 +16,20 @@ import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
+import type { CryptoCurrency, FiatCurrency } from 'connectors';
+import debounce from 'lodash/debounce';
+import type { CSSProperties, ReactNode } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useSWRConfig } from 'swr';
+
 import charmClient from 'charmClient';
+import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
+import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
+import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
-import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
-import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
-import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -32,16 +37,11 @@ import { useUser } from 'hooks/useUser';
 import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
-import debounce from 'lodash/debounce';
 import type { PageContent } from 'models';
-import type { CSSProperties, ReactNode } from 'react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useSWRConfig } from 'swr';
-import * as listItem from './components/listItem/listItem';
-import * as orderedList from './components/orderedList';
+
 import * as bulletList from './components/bulletList';
-import * as horizontalRule from './components/horizontalRule';
 import Callout, * as callout from './components/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout';
@@ -51,37 +51,39 @@ import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
+import * as heading from './components/heading';
+import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
 import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
+import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
-import * as heading from './components/heading';
+import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
+import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
+import { getSelectedChanges } from './components/suggestions/statePlugins/track';
+import trackStyles from './components/suggestions/styles';
+import SuggestionsPopup from './components/suggestions/SuggestionPopup';
+import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
+import { rejectAll } from './components/suggestions/track/rejectAll';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
-import { checkForEmpty } from './utils';
-import trackStyles from './components/suggestions/styles';
-import { rejectAll } from './components/suggestions/track/rejectAll';
-import { getSelectedChanges } from './components/suggestions/statePlugins/track';
-import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
-import SuggestionsPopup from './components/suggestions/SuggestionPopup';
-import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
 
 export interface ICharmEditorOutput {
-  doc: PageContent,
-  rawText: string
+  doc: PageContent;
+  rawText: string;
 }
 
 const actionsPluginKey = new PluginKey('row-actions');
@@ -107,16 +109,16 @@ export function charmEditorPlugins (
     username = null
   }:
     {
-      spaceId?: string | null,
-      pageId?: string | null,
-      userId?: string | null,
-      readOnly?: boolean,
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void,
-      onSelectionSet?: (state: EditorState) => void,
-      disablePageSpecificFeatures?: boolean,
-      enableVoting?: boolean,
-      enableComments?: boolean,
-      username?: string | null
+      spaceId?: string | null;
+      pageId?: string | null;
+      userId?: string | null;
+      readOnly?: boolean;
+      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+      onSelectionSet?: (state: EditorState) => void;
+      disablePageSpecificFeatures?: boolean;
+      enableVoting?: boolean;
+      enableComments?: boolean;
+      username?: string | null;
     } = {}
 ): () => RawPlugins[] {
 
@@ -245,7 +247,7 @@ export function charmEditorPlugins (
   return () => basePlugins;
 }
 
-const StyledReactBangleEditor = styled(ReactBangleEditor)<{disablePageSpecificFeatures?: boolean}>`
+const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificFeatures?: boolean }>`
   position: relative;
 
   /** DONT REMOVE THIS STYLING */
@@ -321,13 +323,14 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay']
+  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   pageId: string;
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
+  placeholder?: JSX.Element | undefined | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -364,7 +367,8 @@ function CharmEditor (
     pageId,
     containerWidth,
     pageType,
-    pagePermissions
+    pagePermissions,
+    placeholder
   }:
   CharmEditorProps
 ) {
@@ -372,7 +376,7 @@ function CharmEditor (
   const [currentSpace] = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
-  const _isEmpty = checkForEmpty(content);
+  const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
 
@@ -412,7 +416,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkForEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view, prevDoc);
     }
@@ -501,13 +505,15 @@ function CharmEditor (
         plugins: []
       }}
       placeholderComponent={(
-        <Placeholder
-          sx={{
-            // This fixes the placeholder and cursor not being aligned
-            top: -34
-          }}
-          show={isEmpty && !readOnly}
-        />
+        placeholder || (
+          <Placeholder
+            sx={{
+              // This fixes the placeholder and cursor not being aligned
+              top: -34
+            }}
+            show={isEmpty && !readOnly}
+          />
+        )
       )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {

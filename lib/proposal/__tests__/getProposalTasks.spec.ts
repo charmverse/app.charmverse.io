@@ -1,8 +1,10 @@
 import type { SpaceRole } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { getProposalTasks } from '../getProposalTasks';
 
 describe('getProposalTasks', () => {
@@ -10,7 +12,7 @@ describe('getProposalTasks', () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     // This proposal page was archived, this shouldn't be fetched
-    const archivedProposal = await generateProposal({
+    await generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -20,7 +22,7 @@ describe('getProposalTasks', () => {
     });
 
     const privateDraftProposal1 = await generateProposal({
-      proposalStatus: 'private_draft',
+      proposalStatus: 'discussion',
       spaceId: space.id,
       authors: [user.id],
       reviewers: [],
@@ -32,17 +34,17 @@ describe('getProposalTasks', () => {
     expect(proposalTasks.marked).toEqual(expect.arrayContaining([
       expect.objectContaining({
         status: privateDraftProposal1.proposal?.status,
-        action: 'start_discussion'
+        action: 'start_review'
       })
     ]));
 
   });
 
-  it('Should get draft and private draft proposals where the user is one of the authors', async () => {
+  it('Should not get draft and private draft proposals where the user is one of the authors', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet(v4());
 
-    const draftProposal1 = await generateProposal({
+    await generateProposal({
       proposalStatus: 'draft',
       spaceId: space.id,
       authors: [user.id],
@@ -50,7 +52,7 @@ describe('getProposalTasks', () => {
       userId: user.id
     });
 
-    const privateDraftProposal1 = await generateProposal({
+    await generateProposal({
       proposalStatus: 'private_draft',
       spaceId: space.id,
       authors: [user.id],
@@ -69,16 +71,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: draftProposal1.proposal?.status,
-        action: 'start_discussion'
-      }),
-      expect.objectContaining({
-        status: privateDraftProposal1.proposal?.status,
-        action: 'start_discussion'
-      })
-    ]));
+    expect(proposalTasks.marked.length).toEqual(0);
   });
 
   it('Should get all reviewed proposals where the user is one of the authors', async () => {
@@ -173,6 +166,15 @@ describe('getProposalTasks', () => {
       }
     });
 
+    // This shouldn't be fetched as its private draft
+    await generateProposal({
+      proposalStatus: 'private_draft',
+      spaceId: space.id,
+      authors: [user.id],
+      reviewers: [],
+      userId: user.id
+    });
+
     const discussionProposal1 = await generateProposal({
       proposalStatus: 'discussion',
       spaceId: space.id,
@@ -246,6 +248,13 @@ describe('getProposalTasks', () => {
       expect.objectContaining({
         status: discussionProposal2.proposal?.status,
         action: 'discuss'
+      })
+    ]));
+
+    // Making double sure private draft wasn't fetched
+    expect(proposalTasks.marked).toEqual(expect.not.arrayContaining([
+      expect.objectContaining({
+        status: 'private_draft'
       })
     ]));
   });

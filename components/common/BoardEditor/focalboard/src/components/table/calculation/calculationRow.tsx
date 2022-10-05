@@ -1,35 +1,36 @@
 import React, { useState } from 'react';
 
+import type { Board, IPropertyTemplate } from '../../../blocks/board';
+import { createBoard } from '../../../blocks/board';
+import type { BoardView } from '../../../blocks/boardView';
+import type { Card } from '../../../blocks/card';
 import { Constants } from '../../../constants';
-
-import { Board, createBoard, IPropertyTemplate } from '../../../blocks/board';
-
 import mutator from '../../../mutator';
 import Calculation from '../../calculations/calculation';
-import { columnWidth } from '../tableRow';
-import { BoardView } from '../../../blocks/boardView';
-import { Card } from '../../../blocks/card';
 import { Options } from '../../calculations/options';
+import { columnWidth } from '../tableRow';
 
 import { TableCalculationOptions } from './tableCalculationOptions';
 
 type Props = {
-    board: Board
-    cards: Card[]
-    activeView: BoardView
-    resizingColumn: string
-    offset: number
-    readonly: boolean
+    board: Board;
+    cards: Card[];
+    activeView: BoardView;
+    resizingColumn: string;
+    offset: number;
+    readOnly: boolean;
 }
 
 function CalculationRow (props: Props): JSX.Element {
+
+  const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
+
   const toggleOptions = (templateId: string, show: boolean) => {
     const newShowOptions = new Map<string, boolean>(showOptions);
     newShowOptions.set(templateId, show);
     setShowOptions(newShowOptions);
   };
 
-  const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
   const titleTemplate: IPropertyTemplate = {
     id: Constants.titleColumnId
   } as IPropertyTemplate;
@@ -46,7 +47,7 @@ function CalculationRow (props: Props): JSX.Element {
   return (
     <div
       className='CalculationRow octo-table-row'
-      onMouseEnter={() => setHovered(!props.readonly)}
+      onMouseEnter={() => setHovered(!props.readOnly)}
       onMouseLeave={() => setHovered(false)}
     >
       {
@@ -59,9 +60,9 @@ function CalculationRow (props: Props): JSX.Element {
                     <Calculation
                       key={template.id}
                       style={style}
-                      class={`octo-table-cell ${props.readonly ? 'disabled' : ''}`}
+                      class={`octo-table-cell ${props.readOnly ? 'disabled' : ''}`}
                       value={value}
-                      menuOpen={Boolean(props.readonly ? false : showOptions.get(template.id))}
+                      menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id))}
                       onMenuClose={() => toggleOptions(template.id, false)}
                       onMenuOpen={() => toggleOptions(template.id, true)}
                       onChange={(v: string) => {
@@ -73,9 +74,9 @@ function CalculationRow (props: Props): JSX.Element {
                         setHovered(false);
                       }}
                       cards={props.cards}
-                      property={template}
                       hovered={hovered}
                       optionsComponent={TableCalculationOptions}
+                      property={template}
                     />
                   );
                 })

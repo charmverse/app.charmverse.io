@@ -1,14 +1,16 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import Button from 'components/common/Button';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import type { BountyWithDetails } from 'models';
 import { useMemo } from 'react';
 import { CSVLink } from 'react-csv';
-import MultiPaymentModal from './components/MultiPaymentModal';
-import NewBountyButton from './components/NewBountyButton';
+
+import Button from 'components/common/Button';
+import type { BountyWithDetails } from 'lib/bounties';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
+
 import BountiesEmptyState from './components/BountiesEmptyState';
 import BountiesKanbanView from './components/BountiesKanbanView';
+import MultiPaymentModal from './components/MultiPaymentModal';
+import NewBountyButton from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 

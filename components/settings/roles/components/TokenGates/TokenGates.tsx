@@ -4,15 +4,7 @@ import { Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
-import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import Modal, { ErrorModal } from 'components/common/Modal';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useSnackbar } from 'hooks/useSnackbar';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import { checkAndSignAuthMessage } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3-react-17';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -20,7 +12,19 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
+
+import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import Modal, { ErrorModal } from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { AuthSig } from 'lib/blockchain/interfaces';
+import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
+
 import Legend from '../../../Legend';
+
 import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`
@@ -61,6 +65,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const theme = useTheme();
   const litClient = useLitProtocol();
   const { chainId } = useWeb3React();
+  const { walletAuthSignature } = useWeb3AuthSig();
   const router = useRouter();
   const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -68,7 +73,7 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const [apiError, setApiError] = useState<string>('');
   const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
-  const shareLink = `https://app.charmverse.io/join?domain=${router.query.domain}`;
+  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
@@ -101,11 +106,10 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
 
     const chain = getLitChainFromChainId(chainId);
 
-    const authSig = await checkAndSignAuthMessage({ chain });
     await litClient!.saveSigningCondition({
       ...conditions,
       chain,
-      authSig,
+      authSig: walletAuthSignature as AuthSig,
       resourceId
     });
     await charmClient.saveTokenGate({

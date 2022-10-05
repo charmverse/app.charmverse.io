@@ -1,15 +1,21 @@
 import type { ProposalStatus, Prisma } from '@prisma/client';
-import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
+
+import { prisma } from 'db';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { createPage } from 'lib/pages/server/createPage';
+import type { PageContent } from 'models';
+
 import { getPagePath } from '../pages';
+
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 type PageProps = 'createdBy' | 'spaceId';
 type OptionalPageProps = 'content' | 'contentText' | 'title';
 
 type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
   & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
-type ProposalInput = { reviewers: { roleId?: string; userId?: string }[], categoryId: string | null };
+type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
 
 export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
 
@@ -43,7 +49,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         }
       }
     }),
-    prisma.page.create({
+    createPage({
       data: {
         proposalId,
         contentText: '',
@@ -53,7 +59,8 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         ...pageProps,
         id: proposalId,
         type: 'proposal'
-      }
+      },
+      include: null
     }),
     prisma.workspaceEvent.create({
       data: {
@@ -68,7 +75,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
     })
   ]);
 
-  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+  const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, isNewProposal: true });
 
   await prisma.$transaction([
     prisma.pagePermission.deleteMany(deleteArgs),

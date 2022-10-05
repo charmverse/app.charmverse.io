@@ -1,6 +1,7 @@
 import { MenuItem, SvgIcon } from '@mui/material';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { useRouter } from 'next/router';
+
+import useIsAdmin from 'hooks/useIsAdmin';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 export default function ImportDiscordRolesMenuItem () {

@@ -1,11 +1,12 @@
-import { memo } from 'react';
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import useENSName from 'hooks/useENSName';
 import type { User } from '@prisma/client';
+import { memo } from 'react';
+
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import useENSName from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 interface StyleProps extends BoxProps {
@@ -49,7 +50,7 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  */
 interface UserDisplayProps extends StyleProps {
   user: Omit<User, 'addresses'>;
-  linkToProfile?: boolean
+  linkToProfile?: boolean;
 }
 
 function UserDisplay ({ user, linkToProfile = false, ...props }: UserDisplayProps) {

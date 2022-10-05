@@ -2,11 +2,12 @@
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utilities/errors';
+
 import { aggregateVoteResult } from './aggregateVoteResult';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
-export async function createVote (vote: VoteDTO & {spaceId: string}): Promise<ExtendedVote> {
+export async function createVote (vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
   const { spaceId, createdBy, pageId, title, threshold, description, deadline, type, voteOptions, context } = vote;
 
   const page = await prisma.page.findUnique({

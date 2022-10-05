@@ -1,10 +1,11 @@
+import { prisma } from 'db';
 import type { IPagePermissionWithSource } from 'lib/permissions/pages';
 import { setupPermissionsAfterPagePermissionAdded, upsertPermission } from 'lib/permissions/pages';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { prisma } from 'db';
+
+import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
-import { createProposalTemplate } from '../../../templates/proposals/createProposalTemplate';
 
 describe('getAccessiblePages', () => {
 
@@ -145,6 +146,19 @@ describe('getAccessiblePages', () => {
 
     // We are returning source
     expect(foundInherited.sourcePermission).toBeDefined();
+
+  });
+
+  it('Should return a page based on search', async () => {
+
+    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+
+    // Page without any permission
+    const pageToFind = await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Momma' });
+    await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Papa' });
+
+    const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
+    expect(pages.map(p => p.id)).toEqual([pageToFind.id]);
 
   });
 

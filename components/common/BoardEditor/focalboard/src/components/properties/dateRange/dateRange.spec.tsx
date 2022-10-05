@@ -1,7 +1,7 @@
 
-import React from 'react';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 
 import '@testing-library/jest-dom';
@@ -18,7 +18,7 @@ const June20 = new Date(Date.UTC(new Date().getFullYear(), 5, 20, 12));
 describe('components/properties/dateRange', () => {
   beforeEach(() => {
     // Quick fix to disregard console error when unmounting a component
-    console.error = jest.fn();
+
     document.execCommand = jest.fn();
   });
 

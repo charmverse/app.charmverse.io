@@ -1,9 +1,10 @@
 
 import type { BountyStatus } from '@prisma/client';
-import { prisma } from 'db';
-import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+
+import { prisma } from 'db';
+import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -77,7 +78,7 @@ export interface PublicApiBounty {
   createdAt: string;
   description: string;
   issuer: {
-    address: string
+    address: string;
   };
   reward: {
     amount: number;
@@ -88,7 +89,7 @@ export interface PublicApiBounty {
   title: string;
   url: string;
   recipients: {
-    address: string
+    address: string;
   }[];
 }
 
@@ -139,7 +140,11 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
       } : undefined
     },
     include: {
-      author: true,
+      author: {
+        include: {
+          wallets: true
+        }
+      },
       applications: true,
       space: true,
       page: true
@@ -166,7 +171,7 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
     description: bounty.page?.contentText || '',
     id: bounty.id,
     issuer: {
-      address: bounty.author.addresses[0]
+      address: bounty.author.wallets[0]?.address
     },
     recipients: getRecipients(bounty),
     reward: {

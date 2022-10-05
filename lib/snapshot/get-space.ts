@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+
 import client from './graphql-client';
 import type { SnapshotSpace } from './interfaces';
 

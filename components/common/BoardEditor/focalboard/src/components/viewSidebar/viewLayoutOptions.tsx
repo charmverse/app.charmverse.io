@@ -1,12 +1,15 @@
-import { useCallback } from 'react';
-import { IntlShape, injectIntl } from 'react-intl';
 import { Box, Card, Grid, Typography } from '@mui/material';
-import { Board, IPropertyTemplate } from '../../blocks/board';
-import { BoardView, createBoardView } from '../../blocks/boardView';
-import { updateView } from '../../store/views';
-import {useAppDispatch} from '../../store/hooks'
+import { useCallback } from 'react';
+import type { IntlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
+
+import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { BoardView } from '../../blocks/boardView';
+import { createBoardView } from '../../blocks/boardView';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
+import { useAppDispatch } from '../../store/hooks';
+import { updateView } from '../../store/views';
 import BoardIcon from '../../widgets/icons/board';
 import CalendarIcon from '../../widgets/icons/calendar';
 import GalleryIcon from '../../widgets/icons/gallery';
@@ -39,56 +42,60 @@ function LayoutOptions (props: LayoutOptionsProps) {
   });
 
   const handleAddViewBoard = useCallback(async () => {
-    const newView = createBoardView(activeView)
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'board';
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];
     try {
-      dispatch(updateView(newView))
-      await mutator.updateBlock(newView, activeView, 'change view type')
-    } catch {
-      dispatch(updateView(activeView))
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view type');
+    }
+    catch {
+      dispatch(updateView(activeView));
     }
   }, [activeView]);
 
   const handleAddViewTable = useCallback(async () => {
     const { board } = props;
-    const newView = createBoardView(activeView)
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'table';
     newView.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
     newView.fields.columnWidths = {};
     newView.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];
     try {
-      dispatch(updateView(newView))
-      await mutator.updateBlock(newView, activeView, 'change view type')
-    } catch {
-      dispatch(updateView(activeView))
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view type');
+    }
+    catch {
+      dispatch(updateView(activeView));
     }
   }, [activeView]);
 
   const handleAddViewGallery = useCallback(async () => {
-    const newView = createBoardView(activeView)
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'gallery';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = newView?.fields.cardOrder ?? [];
     try {
-      dispatch(updateView(newView))
-      await mutator.updateBlock(newView, activeView, 'change view type')
-    } catch {
-      dispatch(updateView(activeView))
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view type');
+    }
+    catch {
+      dispatch(updateView(activeView));
     }
   }, [activeView]);
 
   const handleAddViewCalendar = useCallback(async () => {
-    const newView = createBoardView(activeView)
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'calendar';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = activeView?.fields.cardOrder ?? [];
     try {
-      dispatch(updateView(newView))
-      await mutator.updateBlock(newView, activeView, 'change view type')
-    } catch {
-      dispatch(updateView(activeView))
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view type');
+    }
+    catch {
+      dispatch(updateView(activeView));
     }
   }, [activeView]);
 
@@ -127,7 +134,7 @@ function LayoutOption ({ active, onClick, children }: { active?: boolean, onClic
         </Typography>
       </Card>
     </Grid>
-  )
+  );
 
 }
 

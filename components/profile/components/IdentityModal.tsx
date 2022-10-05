@@ -4,22 +4,24 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
+
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import randomName from 'lib/utilities/randomName';
 import type { IdentityType } from 'models';
 import { IDENTITY_TYPES } from 'models';
-import Link from 'next/link';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import MetamaskIcon from 'public/images/metamask.svg';
-import type { ReactNode } from 'react';
-import { useState } from 'react';
+
 import Integration from './Integration';
 
 export type IntegrationModel = {
-  username: string,
-  type: IdentityType,
-  isInUse: boolean,
+  username: string;
+  type: IdentityType;
+  isInUse: boolean;
   icon: ReactNode;
 };
 
@@ -54,12 +56,12 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
 };
 
 type IdentityModalProps = {
-    save: (id: string, identityType: IdentityType) => void,
-    close: () => void,
-    isOpen: boolean,
-    identityTypes: IntegrationModel[],
-    identityType: IdentityType,
-    username: string,
+    save: (id: string, identityType: IdentityType) => void;
+    close: () => void;
+    isOpen: boolean;
+    identityTypes: IntegrationModel[];
+    identityType: IdentityType;
+    username: string;
 };
 
 function IdentityModal (props: IdentityModalProps) {

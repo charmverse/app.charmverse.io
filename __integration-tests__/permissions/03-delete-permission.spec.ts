@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@prisma/client';
-import { prisma } from 'db';
-import type { IPageWithPermissions } from 'lib/pages';
 import request from 'supertest';
-import { generatePageToCreateStub } from 'testing/generate-stubs';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
 
-let user: User;
+import { prisma } from 'db';
+import type { IPageWithPermissions } from 'lib/pages';
+import type { LoggedInUser } from 'models';
+import { generatePageToCreateStub } from 'testing/generate-stubs';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+let user: LoggedInUser;
 let space: Space;
 let cookie: string;
 
@@ -18,13 +20,7 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  const loggedInResponse = await request(baseUrl)
-    .post('/api/session/login')
-    .send({
-      address: user.addresses[0]
-    });
-
-  cookie = loggedInResponse.headers['set-cookie'][0];
+  cookie = await loginUser(user.id);
 
 });
 

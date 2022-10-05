@@ -2,8 +2,9 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import { DialogTitle, Modal } from 'components/common/Modal';
 import type { ComponentProps } from 'react';
+
+import { DialogTitle, Modal } from 'components/common/Modal';
 
 export interface TestResult {
   message?: string;

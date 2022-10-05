@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import FieldLabel from 'components/common/form/FieldLabel';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import { isTruthy } from 'lib/utilities/types';
 import { IconButton } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { useState } from 'react';
+
+import FieldLabel from 'components/common/form/FieldLabel';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
-  onChange: (choices: string []) => void
-  title?: string,
-  minimumOptions?: number,
-  defaultOptions?: string[]
+  onChange: (choices: string []) => void;
+  title?: string;
+  minimumOptions?: number;
+  defaultOptions?: string[];
 }
 
 /**

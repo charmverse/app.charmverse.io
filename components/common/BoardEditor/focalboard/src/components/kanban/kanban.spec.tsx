@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { IPropertyOption, IPropertyTemplate } from '../../blocks/board';
+import type { IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import { mutator } from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../../testUtils';
@@ -73,7 +73,6 @@ describe('src/component/kanban/kanban', () => {
   };
   const store = mockStateStore([], state);
   beforeAll(() => {
-    console.error = jest.fn();
     mockDOM();
   });
   beforeEach(jest.resetAllMocks);
@@ -101,7 +100,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -134,7 +133,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -169,7 +168,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -214,7 +213,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -259,7 +258,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -305,7 +304,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={mockedAddCard}
           showCard={jest.fn()}
@@ -342,7 +341,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -379,7 +378,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}
@@ -423,7 +422,7 @@ describe('src/component/kanban/kanban', () => {
             }
           ]}
           selectedCardIds={[]}
-          readonly={false}
+          readOnly={false}
           onCardClicked={jest.fn()}
           addCard={jest.fn()}
           showCard={jest.fn()}

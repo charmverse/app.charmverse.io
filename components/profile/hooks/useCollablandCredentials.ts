@@ -1,7 +1,8 @@
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { silentlyUpdateURL } from 'lib/browser';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { silentlyUpdateURL } from 'lib/browser';
 
 export function useCollablandCredentials () {
 

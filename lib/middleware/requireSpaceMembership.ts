@@ -1,14 +1,16 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+
 import { prisma } from 'db';
 import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import type { NextHandler } from 'next-connect';
+
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireSpaceMembership (options: {adminOnly: boolean, spaceIdKey?: string} = { adminOnly: false }) {
+export function requireSpaceMembership (options: { adminOnly: boolean, spaceIdKey?: string } = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
 
     // Where to find the space ID

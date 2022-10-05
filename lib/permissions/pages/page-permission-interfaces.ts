@@ -1,5 +1,6 @@
 
 import type { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User, Page } from '@prisma/client';
+
 import type { UserPermissionFlags } from '../interfaces';
 
 export type PageOperationType = keyof typeof PageOperationEnum
@@ -14,7 +15,7 @@ export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>
  * Use for requesting all permissions for a page
  */
 export interface IPagePermissionRequest {
-  pageId: string
+  pageId: string;
 }
 
 /**
@@ -23,7 +24,7 @@ export interface IPagePermissionRequest {
  */
 export interface IPagePermissionUserRequest extends IPagePermissionRequest {
   userId?: string;
-  allowAdminBypass?: boolean
+  allowAdminBypass?: boolean;
 }
 
 /**
@@ -36,17 +37,17 @@ export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inherite
 export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>
 
 export interface IPagePermissionToDelete {
-  permissionId: string
+  permissionId: string;
 }
 
 export interface IPagePermissionWithSource extends PagePermission {
-  sourcePermission: PagePermission | null
+  sourcePermission: PagePermission | null;
 }
 
 export interface IPageWithNestedSpaceRole extends Page {
   space: {
-    spaceRoles: SpaceRole []
-  }
+    spaceRoles: SpaceRole [];
+  };
 }
 
 export interface IPagePermissionWithAssignee extends PagePermission, IPagePermissionWithSource {

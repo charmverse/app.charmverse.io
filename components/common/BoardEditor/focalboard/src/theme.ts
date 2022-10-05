@@ -1,38 +1,38 @@
 
-import { CSSObject } from '@emotion/serialize';
-import isEqual from 'lodash/isEqual';
+import type { CSSObject } from '@emotion/serialize';
 import color from 'color';
+import isEqual from 'lodash/isEqual';
+
 import * as colors from 'theme/colors';
 
-import { Utils } from './utils';
-
 import { UserSettings } from './userSettings';
+import { Utils } from './utils';
 
 let activeThemeName: string;
 
 export type Theme = {
-    mainBg: string,
-    mainFg: string,
-    buttonBg: string,
-    buttonFg: string,
-    sidebarBg: string,
-    sidebarFg: string,
-    sidebarTextActiveBorder: string,
-    sidebarWhiteLogo: string,
+    mainBg: string;
+    mainFg: string;
+    buttonBg: string;
+    buttonFg: string;
+    sidebarBg: string;
+    sidebarFg: string;
+    sidebarTextActiveBorder: string;
+    sidebarWhiteLogo: string;
 
-    link: string,
-    linkVisited: string,
+    link: string;
+    linkVisited: string;
 
-    propDefault: string,
-    propGray: string,
-    propTurquoise: string,
-    propOrange: string,
-    propYellow: string,
-    propTeal: string,
-    propBlue: string,
-    propPurple: string,
-    propPink: string,
-    propRed: string,
+    propDefault: string;
+    propGray: string;
+    propTurquoise: string;
+    propOrange: string;
+    propYellow: string;
+    propTeal: string;
+    propBlue: string;
+    propPurple: string;
+    propPink: string;
+    propRed: string;
 }
 
 export const systemThemeName = 'system-theme';
@@ -41,8 +41,8 @@ export const defaultThemeName = 'default-theme';
 
 export const defaultTheme = {
   mainBg: '255, 255, 255',
-  mainFg: colors.inputBackground,//'63, 67, 80',
-  buttonBg: colors.blueColorRGB,// '80, 170, 221',
+  mainFg: colors.inputBackground, // '63, 67, 80',
+  buttonBg: colors.blueColorRGB, // '80, 170, 221',
   buttonFg: '255, 255, 255',
   sidebarBg: '30, 50, 92',
   sidebarFg: '255, 255, 255',

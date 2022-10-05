@@ -1,14 +1,13 @@
+import type { Space, User, Page, SpaceApiToken } from '@prisma/client';
 import type { Response } from 'supertest';
 import request from 'supertest';
-// eslint-disable-next-line @next/next/no-server-import-in-page
+import { v4 } from 'uuid';
 
+import { prisma } from 'db';
+import type { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
+import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
-import { v4 } from 'uuid';
-import { prisma } from 'db';
-import type { Space, User, Page, SpaceApiToken } from '@prisma/client';
-import type { Page as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 
 let database: Page;
 let user: User;
@@ -16,7 +15,7 @@ let space: Space;
 let apiToken: SpaceApiToken;
 
 // Setup value we can assert against, ignore the rest of the request
-let failedCreateResponse: {body: UnsupportedKeysError};
+let failedCreateResponse: { body: UnsupportedKeysError };
 
 function invalidCreateRequest (): Promise<Response> {
   return request(baseUrl)

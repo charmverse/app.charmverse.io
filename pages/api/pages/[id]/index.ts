@@ -1,16 +1,18 @@
 
 import type { Page } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';
+import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +21,7 @@ handler
   .get(getPageRoute)
   // Only require user on update and delete
   .use(requireUser)
-  .put(updatePage)
+  .put(updatePageHandler)
   .delete(deletePage);
 
 async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
@@ -45,7 +47,7 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWith
   return res.status(200).json(page);
 }
 
-async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
 
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
@@ -110,23 +112,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse<IPageWithPe
     }
   }
 
-  const pageWithPermission = await prisma.page.update({
-    where: {
-      id: pageId
-    },
-    data: {
-      ...req.body,
-      updatedAt: new Date(),
-      updatedBy: userId
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
-      }
-    }
-  });
+  const pageWithPermission = await updatePage(page, userId, req.body);
 
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);

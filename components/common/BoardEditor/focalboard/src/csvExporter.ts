@@ -1,11 +1,11 @@
-import { IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
-import { BoardView } from './blocks/boardView';
-import { Board, IPropertyTemplate } from './blocks/board';
-import { Card } from './blocks/card';
+import type { Board, IPropertyTemplate } from './blocks/board';
+import type { BoardView } from './blocks/boardView';
+import type { Card } from './blocks/card';
 import { OctoUtils } from './octoUtils';
-import { Utils } from './utils';
 import type { IAppWindow } from './types';
+import { Utils } from './utils';
 
 declare let window: IAppWindow;
 
@@ -32,7 +32,7 @@ class CsvExporter {
     link.style.display = 'none';
     link.setAttribute('href', encodedUri);
     link.setAttribute('download', filename);
-    document.body.appendChild(link);						// FireFox support
+    document.body.appendChild(link); // FireFox support
 
     link.click();
 
@@ -50,46 +50,48 @@ class CsvExporter {
 
   private static generateTableArray (board: Board, cards: Card[], viewToExport: BoardView, intl: IntlShape): string[][] {
     const rows: string[][] = [];
-    const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) => viewToExport.fields.visiblePropertyIds.includes(template.id));
+    const visibleProperties = board.fields.cardProperties.filter(
+      (template: IPropertyTemplate) => viewToExport.fields.visiblePropertyIds.includes(template.id)
+    );
 
     if (viewToExport.fields.viewType === 'calendar'
             && viewToExport.fields.dateDisplayPropertyId
             && !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)) {
-      const dateDisplay = board.fields.cardProperties.find((template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id);
+      const dateDisplay = board.fields.cardProperties.find(
+        (template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id
+      );
       if (dateDisplay) {
         visibleProperties.push(dateDisplay);
       }
     }
 
-    {
-      // Header row
-      const row: string[] = [intl.formatMessage({ id: 'TableComponent.name', defaultMessage: 'Name' })];
-      visibleProperties.forEach((template: IPropertyTemplate) => {
-        row.push(template.name);
-      });
-      rows.push(row);
-    }
+    // Header row
+    const row: string[] = [intl.formatMessage({ id: 'TableComponent.name', defaultMessage: 'Name' })];
+    visibleProperties.forEach((template: IPropertyTemplate) => {
+      row.push(template.name);
+    });
+    rows.push(row);
 
     cards.forEach((card) => {
-      const row: string[] = [];
-      row.push(`"${this.encodeText(card.title)}"`);
+      const _row: string[] = [];
+      _row.push(`"${this.encodeText(card.title)}"`);
       visibleProperties.forEach((template: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[template.id];
         const displayValue = (OctoUtils.propertyDisplayValue(card, propertyValue, template, intl) || '') as string;
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';
-          row.push(numericValue);
+          _row.push(numericValue);
         }
         else if (template.type === 'multiSelect') {
           const multiSelectValue = ((displayValue as unknown || []) as string[]).join('|');
-          row.push(multiSelectValue);
+          _row.push(multiSelectValue);
         }
         else {
           // Export as string
-          row.push(`"${this.encodeText(displayValue)}"`);
+          _row.push(`"${this.encodeText(displayValue)}"`);
         }
       });
-      rows.push(row);
+      rows.push(_row);
     });
 
     return rows;

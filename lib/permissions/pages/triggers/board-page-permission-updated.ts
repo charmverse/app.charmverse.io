@@ -1,9 +1,11 @@
 import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+
 import type { BoardPagePermissionUpdated } from '../interfaces';
 
 /**
@@ -12,7 +14,7 @@ import type { BoardPagePermissionUpdated } from '../interfaces';
  * @returns
  */
 export async function generateboardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
- Promise<{updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs}> {
+ Promise<{ updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs }> {
 
   const permissionUpdates: Prisma.PagePermissionUpdateArgs [] = [];
 

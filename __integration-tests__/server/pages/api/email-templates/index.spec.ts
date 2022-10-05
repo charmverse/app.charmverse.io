@@ -1,5 +1,6 @@
 
 import request from 'supertest';
+
 import { baseUrl } from 'testing/mockApiCall';
 
 describe('GET /api/email-templates - renders email templates', () => {

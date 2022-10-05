@@ -2,13 +2,14 @@ import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import FieldLabel from 'components/common/form/FieldLabel';
-import type { SnapshotVotingStrategy } from 'lib/snapshot';
 import { useEffect, useState } from 'react';
 
+import FieldLabel from 'components/common/form/FieldLabel';
+import type { SnapshotVotingStrategy } from 'lib/snapshot';
+
 export interface Props {
-  onChange?: (option: SnapshotVotingStrategy[]) => void
-  strategies: SnapshotVotingStrategy[]
+  onChange?: (option: SnapshotVotingStrategy[]) => void;
+  strategies: SnapshotVotingStrategy[];
 }
 
 const MAX_CONCURRENT_STRATEGIES = 8;

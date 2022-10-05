@@ -1,11 +1,14 @@
 import type { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
+
 import type { IPageWithPermissions, PageNodeWithPermissions, PageTreeResolveInput, TargetPageTree, TargetPageTreeWithFlatChildren } from '../interfaces';
 import { flattenTree, mapTargetPageTree } from '../mapPageTree';
+
 import { PageNotFoundError } from './errors';
 
-function generatePagesQuery ({ spaceId, includeDeletedPages, fullPage }: {spaceId: string, includeDeletedPages?: boolean, fullPage?: boolean}) {
+function generatePagesQuery ({ spaceId, includeDeletedPages, fullPage }: { spaceId: string, includeDeletedPages?: boolean, fullPage?: boolean }) {
 
   const pageQueryContent: Partial<Prisma.PageFindManyArgs> = fullPage ? {
     include: {
@@ -53,14 +56,14 @@ function generatePagesQuery ({ spaceId, includeDeletedPages, fullPage }: {spaceI
  */
 // Normal page node
 export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
-  PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage?: false | undefined}): Promise<TargetPageTree<PageNodeWithPermissions>>
+  PageTreeResolveInput & { flattenChildren?: undefined | false, fullPage?: false | undefined }): Promise<TargetPageTree<PageNodeWithPermissions>>
 export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
-  PageTreeResolveInput & {flattenChildren: true, fullPage?: false | undefined}): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
+  PageTreeResolveInput & { flattenChildren: true, fullPage?: false | undefined }): Promise<TargetPageTreeWithFlatChildren<PageNodeWithPermissions>>
 // Full pages
 export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
-    PageTreeResolveInput & {flattenChildren?: undefined | false, fullPage: true}): Promise<TargetPageTree<IPageWithPermissions>>
+    PageTreeResolveInput & { flattenChildren?: undefined | false, fullPage: true }): Promise<TargetPageTree<IPageWithPermissions>>
 export async function resolvePageTree ({ pageId, flattenChildren, fullPage, pageNodes }:
-    PageTreeResolveInput & {flattenChildren: true, fullPage: true}): Promise<TargetPageTreeWithFlatChildren<IPageWithPermissions>>
+    PageTreeResolveInput & { flattenChildren: true, fullPage: true }): Promise<TargetPageTreeWithFlatChildren<IPageWithPermissions>>
 export async function resolvePageTree ({ pageId, flattenChildren = false, includeDeletedPages = false, fullPage, pageNodes }:
   PageTreeResolveInput):
   Promise<TargetPageTree<PageNodeWithPermissions> | TargetPageTreeWithFlatChildren<PageNodeWithPermissions>> {
@@ -112,7 +115,7 @@ export async function resolvePageTree ({ pageId, flattenChildren = false, includ
 
 }
 
-export type MultiPageTreeResolveInput<F extends boolean | undefined = boolean> = Pick<PageTreeResolveInput, 'includeDeletedPages' | 'fullPage'> & {pageIds: string[], flattenChildren?: F}
+export type MultiPageTreeResolveInput<F extends boolean | undefined = boolean> = Pick<PageTreeResolveInput, 'includeDeletedPages' | 'fullPage'> & { pageIds: string[], flattenChildren?: F }
 
 /**
  * Resolved page trees mapped to the page id

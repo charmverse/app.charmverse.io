@@ -1,12 +1,13 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { deleteComment, updateComment } from 'lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { PageContent } from 'models';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,7 +17,7 @@ handler.use(requireUser)
 
 async function updateCommentController (req: NextApiRequest, res: NextApiResponse) {
   const { content } = req.body as {
-    content: PageContent,
+    content: PageContent;
   };
 
   const commentId = req.query.id as string;

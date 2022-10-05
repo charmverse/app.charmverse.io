@@ -1,14 +1,15 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Alert, Card, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useEffect } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
-import { useEffect } from 'react';
-import type { KeyedMutator } from 'swr';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
@@ -118,16 +119,16 @@ export default function ProposalTasksList ({
   error,
   mutateTasks
 }: {
-  mutateTasks: KeyedMutator<GetTasksResponse>
-  error: any
-  tasks: GetTasksResponse | undefined
+  mutateTasks: KeyedMutator<GetTasksResponse>;
+  error: any;
+  tasks: GetTasksResponse | undefined;
 }) {
   const proposals = tasks?.proposals ? [...tasks.proposals.unmarked, ...tasks.proposals.marked] : [];
 
   useEffect(() => {
     async function main () {
       if (tasks?.proposals && tasks.proposals.unmarked.length !== 0) {
-        await charmClient.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
+        await charmClient.tasks.markTasks(tasks.proposals.unmarked.map(proposal => ({ id: proposal.id, type: 'proposal' })));
         mutateTasks((_tasks) => {
           const unmarked = _tasks?.proposals.unmarked ?? [];
           return _tasks ? {

@@ -1,8 +1,12 @@
-import type { Block, Page, Prisma, Space } from '@prisma/client';
-import { prisma } from 'db';
-import type { PageContent } from 'models';
 import fs from 'node:fs/promises';
+
+import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import type { PageContent } from 'models';
 
 interface AWSAssetUrl {
   oldPageId: string;
@@ -11,10 +15,10 @@ interface AWSAssetUrl {
 }
 
 interface ConverterOutput {
-  blocksToCreate: Prisma.BlockCreateInput[],
-  pagesToCreate: Prisma.PageCreateInput[],
-  oldNewHashmap: Record<string, string>
-  awsAssetUrls: AWSAssetUrl[]
+  blocksToCreate: Prisma.BlockCreateInput[];
+  pagesToCreate: Prisma.PageCreateInput[];
+  oldNewHashmap: Record<string, string>;
+  awsAssetUrls: AWSAssetUrl[];
 }
 
 /**
@@ -32,11 +36,11 @@ async function convertFolderContent ({
   oldNewHashmap,
   awsAssetUrls }:
   {
-    parentPageId?: string | null,
-    entryPath: string,
-    spaceId: string,
-    authorId: string,
-    parentPermissionId?: string
+    parentPageId?: string | null;
+    entryPath: string;
+    spaceId: string;
+    authorId: string;
+    parentPermissionId?: string;
   } & ConverterOutput): Promise<ConverterOutput> {
   // Find the JSON content for the page
   const folderContent = await fs.readdir(entryPath);
@@ -52,6 +56,7 @@ async function convertFolderContent ({
   oldNewHashmap[newPageId] = pageContent.id;
 
   pageContent.id = newPageId;
+  pageContent.galleryImage = getPreviewImageFromContent(pageContent.content as PageContent);
 
   if (pageContent.type === 'board') {
     pageContent.boardId = pageContent.id;
@@ -208,7 +213,7 @@ async function convertFolderContent ({
  */
 export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Assets = false }:
   {
-    folderPath: string, spaceId: string, findS3Assets?: boolean
+    folderPath: string; spaceId: string; findS3Assets?: boolean;
   }): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
   const space = await prisma.space.findUnique({
     where: {

@@ -1,14 +1,16 @@
 
 import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import type { PageType } from '@prisma/client';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
 import { usePages } from 'hooks/usePages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 

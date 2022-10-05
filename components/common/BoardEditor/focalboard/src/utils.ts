@@ -1,15 +1,17 @@
-import { marked } from 'marked';
-import { IntlShape } from 'react-intl';
+/* eslint-disable no-plusplus */
 import { DateTime } from 'luxon';
+import { marked } from 'marked';
+import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import log from 'lib/log';
-import { Block } from './blocks/block';
+
+import type { Block } from './blocks/block';
 import { createBoard } from './blocks/board';
 import { createBoardView } from './blocks/boardView';
 import { createCard } from './blocks/card';
 import { createCommentBlock } from './blocks/commentBlock';
-import type {IAppWindow} from './types';
+import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
 
@@ -52,6 +54,8 @@ class Utils {
       case 'view':
         ret = IDType.View;
         break;
+      default:
+        return ret;
     }
     return ret;
   }
@@ -137,7 +141,7 @@ class Utils {
     return 0;
   }
 
-  static getFontAndPaddingFromCell = (cell: Element) : {fontDescriptor: string, padding: number} => {
+  static getFontAndPaddingFromCell = (cell: Element) : { fontDescriptor: string, padding: number } => {
     const style = getComputedStyle(cell);
     const padding = Utils.getTotalHorizontalPadding(style);
     return Utils.getFontAndPaddingFromChildren(cell.children, padding);
@@ -145,7 +149,7 @@ class Utils {
 
   // recursive routine to determine the padding and font from its children
   // specifically for the table view
-  static getFontAndPaddingFromChildren = (children: HTMLCollection, pad: number) : {fontDescriptor: string, padding: number} => {
+  static getFontAndPaddingFromChildren = (children: HTMLCollection, pad: number) : { fontDescriptor: string, padding: number } => {
     const myResults = {
       fontDescriptor: '',
       padding: pad
@@ -239,7 +243,7 @@ class Utils {
     return html.trim();
   }
 
-  static countCheckboxesInMarkdown (text: string): {total: number, checked: number} {
+  static countCheckboxesInMarkdown (text: string): { total: number, checked: number } {
     let total = 0;
     let checked = 0;
     const renderer = new marked.Renderer();
@@ -291,7 +295,9 @@ class Utils {
   }
 
   static sleep (miliseconds: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, miliseconds));
+    return new Promise((resolve) => {
+      setTimeout(resolve, miliseconds);
+    });
   }
 
   // Errors

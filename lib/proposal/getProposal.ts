@@ -1,14 +1,15 @@
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { truncate } from 'fs/promises';
+
+import { prisma } from 'db';
+import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
 /**
  *
  * @param param0
  * @returns
  */
-export async function getProposal ({ proposalId }: {proposalId: string}): Promise<IPageWithPermissions & PageWithProposal> {
+export async function getProposal ({ proposalId }: { proposalId: string }): Promise<IPageWithPermissions & PageWithProposal> {
   const proposalPage = await prisma.page.findUnique({
     where: {
       proposalId

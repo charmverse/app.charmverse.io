@@ -5,6 +5,10 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PeopleIcon from '@mui/icons-material/People';
 import { Alert, Box, Card, Chip, Collapse, Divider, Grid, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import { DateTime } from 'luxon';
+import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
@@ -13,13 +17,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
-import type { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import type { GnosisSafeTasks, GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import { shortenHex } from 'lib/utilities/strings';
-import { DateTime } from 'luxon';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
-import { useState } from 'react';
-import type { KeyedMutator } from 'swr';
+
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
+
 import useTasksState from './hooks/useTasksState';
 
 const rowHeight = 48;
@@ -278,9 +280,9 @@ function SafeTasks (
 }
 
 interface GnosisTasksSectionProps {
-  tasks: GetTasksResponse | undefined
-  error: any
-  mutateTasks: KeyedMutator<GetTasksResponse>
+  tasks: GnosisSafeTasks[] | undefined;
+  error: any;
+  mutateTasks: KeyedMutator<GnosisSafeTasks[]>;
 }
 
 export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
@@ -300,7 +302,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.addresses
+          addresses: user.wallets.map(wallet => wallet.address)
         });
         const safes = await mutate();
         await mutateTasks();
@@ -320,9 +322,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
     }
   }
 
-  const safesWithTasks = tasks?.gnosis;
-
-  if (!safesWithTasks) {
+  if (!tasks) {
     if (error) {
       return (
         <Box>
@@ -339,7 +339,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
 
   return (
     <>
-      {safesWithTasks.map(safe => (
+      {tasks.map(safe => (
         <SafeTasks
           isSnoozed={isSnoozed}
           key={safe.safeAddress}

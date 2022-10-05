@@ -1,22 +1,24 @@
-import charmClient from 'charmClient';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { PageContent } from 'models';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
+
+import charmClient from 'charmClient';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { PageContent } from 'models';
+
 import { usePages } from './usePages';
 
 type IContext = {
-  isValidating: boolean,
-  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
-  setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>,
-  addComment: (threadId: string, commentContent: PageContent) => Promise<void>,
-  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>,
-  deleteComment: (threadId: string, commentId: string) => Promise<void>,
-  resolveThread: (threadId: string) => Promise<void>,
-  deleteThread: (threadId: string) => Promise<void>,
-  refetchThreads: KeyedMutator<ThreadWithCommentsAndAuthors[]>
+  isValidating: boolean;
+  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>;
+  setThreads: Dispatch<SetStateAction<Record<string, ThreadWithCommentsAndAuthors | undefined>>>;
+  addComment: (threadId: string, commentContent: PageContent) => Promise<void>;
+  editComment: (threadId: string, commentId: string, commentContent: PageContent) => Promise<void>;
+  deleteComment: (threadId: string, commentId: string) => Promise<void>;
+  resolveThread: (threadId: string) => Promise<void>;
+  deleteThread: (threadId: string) => Promise<void>;
+  refetchThreads: KeyedMutator<ThreadWithCommentsAndAuthors[]>;
 };
 
 export const ThreadsContext = createContext<Readonly<IContext>>({

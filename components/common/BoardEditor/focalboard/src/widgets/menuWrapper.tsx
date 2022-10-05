@@ -1,16 +1,17 @@
 
-import React, { memo, useRef, useMemo, useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import React, { memo, useRef, useMemo, useState, useEffect } from 'react';
 
-import { MenuContext, useMenuContext, Context } from './menu/menuContext';
+import type { Context } from './menu/menuContext';
+import { MenuContext, useMenuContext } from './menu/menuContext';
 
 type Props = {
     children?: React.ReactNode;
     stopPropagationOnToggle?: boolean;
-    className?: string
-    disabled?: boolean
-    isOpen?: boolean
-    label?: string
+    className?: string;
+    disabled?: boolean;
+    isOpen?: boolean;
+    label?: string;
 }
 
 function MenuWrapper (props: Props) {
@@ -89,6 +90,7 @@ function MenuWrapper (props: Props) {
 
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
+      {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
       <div
         role='button'
         aria-label={props.label || 'menuwrapper'}

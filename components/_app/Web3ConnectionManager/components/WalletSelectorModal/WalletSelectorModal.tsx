@@ -1,28 +1,30 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
+import ArrowSquareOut from '@mui/icons-material/Launch';
 import {
   Grid,
   IconButton,
   Typography
 } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import ArrowSquareOut from '@mui/icons-material/Launch';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
+import { injected, walletConnect, walletLink } from 'connectors';
+import { useEffect, useRef } from 'react';
+
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
-import { injected, walletConnect, walletLink } from 'connectors';
-import { useEffect, useRef } from 'react';
+
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
 type Props = {
-  activatingConnector?: AbstractConnector
-  setActivatingConnector: (connector?: AbstractConnector) => void
-  isModalOpen: boolean
-  closeModal: () => void
-  openNetworkModal: () => void
+  activatingConnector?: AbstractConnector;
+  setActivatingConnector: (connector?: AbstractConnector) => void;
+  isModalOpen: boolean;
+  closeModal: () => void;
+  openNetworkModal: () => void;
 }
 
 function WalletSelectorModal ({

@@ -1,8 +1,9 @@
 import { AvailableBountyPermissions, bountyPermissionMapping } from 'lib/permissions/bounties/client';
 import { typedKeys } from 'lib/utilities/objects';
+
+import type { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
 import { AllowedPagePermissions } from './pages/available-page-permissions.class';
 import { permissionTemplates } from './pages/page-permission-mapping';
-import type { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
 
 export function compareBountyPagePermissions ({
   bountyOperations, bountyPermissions, pageOperations, pagePermissions, roleups
@@ -10,7 +11,7 @@ export function compareBountyPagePermissions ({
 
   const permissionsMap: Record<
     string,
-    {bountyPermissions: AvailableBountyPermissions, pagePermissions: AllowedPagePermissions, group: AssignablePermissionGroupsWithPublic}> = {
+    { bountyPermissions: AvailableBountyPermissions, pagePermissions: AllowedPagePermissions, group: AssignablePermissionGroupsWithPublic }> = {
     };
 
   // Populate each bounty assignee

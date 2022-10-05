@@ -1,24 +1,27 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import styled from '@emotion/styled';
 import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
-import { useThreads } from 'hooks/useThreads';
-import { createPortal } from 'react-dom';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import charmClient from 'charmClient';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { checkForEmpty } from 'components/common/CharmEditor/utils';
-import { useInlineComment } from 'hooks/useInlineComment';
-import { usePages } from 'hooks/usePages';
-import type { PageContent } from 'models';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+
+import charmClient from 'charmClient';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePages } from 'hooks/usePages';
+import { useThreads } from 'hooks/useThreads';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
-import PageThread from '../PageThread';
+import type { PageContent } from 'models';
+
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { updateInlineComment } from './inlineComment.utils';
+import PageThread from '../PageThread';
+
 import type { InlineCommentPluginState } from './inlineComment.plugins';
+import { updateInlineComment } from './inlineComment.utils';
 
 export const ThreadContainer = styled(Paper)`
   max-height: 400px;
@@ -29,7 +32,7 @@ export const ThreadContainer = styled(Paper)`
   overflow: auto;
 `;
 
-export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKey<InlineCommentPluginState>}) {
+export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -80,7 +83,7 @@ export default function InlineCommentThread ({ pluginKey }: {pluginKey: PluginKe
   return null;
 }
 
-export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
+export function InlineCommentSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -93,7 +96,7 @@ export function InlineCommentSubMenu ({ pluginKey }: {pluginKey: PluginKey}) {
   const { extractTextFromSelection } = useInlineComment();
   const { setThreads } = useThreads();
   const { currentPageId } = usePages();
-  const isEmpty = checkForEmpty(commentContent);
+  const isEmpty = checkIsContentEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
 
     if (!isEmpty) {

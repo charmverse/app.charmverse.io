@@ -1,9 +1,12 @@
 import type { ApplicationStatus, BountyStatus } from '@prisma/client';
+
 import { prisma } from 'db';
 import { submissionsCapReached } from 'lib/applications/shared';
+import type { BountyWithDetails } from 'lib/bounties';
 import { includePagePermissions } from 'lib/pages/server';
-import type { BountyWithDetails } from 'models';
+
 import { countValueOccurrences } from '../utilities/numbers';
+
 import { getBountyOrThrow } from './getBounty';
 
 export async function rollupBountyStatus (bountyId: string): Promise<BountyWithDetails> {

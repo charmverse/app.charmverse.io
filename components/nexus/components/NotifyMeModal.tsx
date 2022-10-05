@@ -1,11 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormHelperText } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import Button from 'components/common/Button';
-import { Modal } from 'components/common/Modal';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+
+import Button from 'components/common/Button';
+import { Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
   email: yup.string().ensure().trim()
@@ -16,10 +17,10 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type Props = {
-  currentValue: string | null | undefined,
-  save: (path: string) => void,
-  close: () => void,
-  isOpen: boolean,
+  currentValue: string | null | undefined;
+  save: (path: string) => void;
+  close: () => void;
+  isOpen: boolean;
 };
 
 export default function NotifyMeModal (props: Props) {

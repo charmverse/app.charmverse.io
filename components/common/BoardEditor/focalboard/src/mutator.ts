@@ -1,12 +1,20 @@
+/* eslint-disable default-param-last */
 import charmClient from 'charmClient';
-import { Page, PageContent } from 'models';
+import type { PageMeta } from 'lib/pages';
+import type { Page, PageContent } from 'models';
+
 import { publishIncrementalUpdate } from '../../publisher';
+
 import { BlockIcons } from './blockIcons';
-import { Block, BlockPatch, createPatchesFromBlocks } from './blocks/block';
-import { Board, createBoard, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
-import { BoardView, createBoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView';
-import { Card, createCard } from './blocks/card';
-import { FilterGroup } from './blocks/filterGroup';
+import type { Block, BlockPatch } from './blocks/block';
+import { createPatchesFromBlocks } from './blocks/block';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
+import { createBoard } from './blocks/board';
+import type { BoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView';
+import { createBoardView } from './blocks/boardView';
+import type { Card } from './blocks/card';
+import { createCard } from './blocks/card';
+import type { FilterGroup } from './blocks/filterGroup';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
 import store from './store';
@@ -15,8 +23,8 @@ import { UserSettings } from './userSettings';
 import { IDType, Utils } from './utils';
 
 export interface BlockChange {
-    block: Block
-    newBlock: Block
+    block: Block;
+    newBlock: Block;
 }
 
 //
@@ -486,9 +494,13 @@ class Mutator {
         const isNewTypeSelectOrMulti = newType === 'select' || newType === 'multiSelect';
 
         for (const card of cards) {
-          const oldValue = Array.isArray(card.fields.properties[propertyTemplate.id]) ? (card.fields.properties[propertyTemplate.id].length > 0 && card.fields.properties[propertyTemplate.id][0]) : card.fields.properties[propertyTemplate.id];
+          const oldValue = Array.isArray(card.fields.properties[propertyTemplate.id])
+            ? (card.fields.properties[propertyTemplate.id].length > 0 && card.fields.properties[propertyTemplate.id][0])
+            : card.fields.properties[propertyTemplate.id];
           if (oldValue) {
-            const newValue = isNewTypeSelectOrMulti ? propertyTemplate.options.find((o) => o.id === oldValue)?.id : propertyTemplate.options.find((o) => o.id === oldValue)?.value;
+            const newValue = isNewTypeSelectOrMulti
+              ? propertyTemplate.options.find((o) => o.id === oldValue)?.id
+              : propertyTemplate.options.find((o) => o.id === oldValue)?.value;
             const newCard = createCard(card);
 
             if (newValue) {
@@ -737,16 +749,17 @@ class Mutator {
       beforeUndo,
       cardPage
     }: {
-          cardId: string,
-          board: Board,
-          cardPage: Page,
-          description?: string,
-          asTemplate?: boolean,
-          afterRedo?: (newCardId: string) => Promise<void>,
-          beforeUndo?: () => Promise<void>,
+          cardId: string;
+          board: Board;
+          cardPage: PageMeta;
+          description?: string;
+          asTemplate?: boolean;
+          afterRedo?: (newCardId: string) => Promise<void>;
+          beforeUndo?: () => Promise<void>;
         }
   ): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
+    const pageDetails = await charmClient.pages.getPageDetails(cardId);
     const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>];
 
     const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
@@ -768,8 +781,8 @@ class Mutator {
     newCard.parentId = board.id;
     newCard.fields.icon = cardPage.icon || undefined;
     newCard.fields.headerImage = cardPage.headerImage || undefined;
-    newCard.fields.content = cardPage.content;
-    newCard.fields.contentText = cardPage.contentText;
+    newCard.fields.content = pageDetails.content;
+    newCard.fields.contentText = pageDetails.contentText;
 
     await this.insertBlocks(
       newBlocks,

@@ -1,8 +1,9 @@
 
 import { createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+
 import charmClient from 'charmClient';
 
-import { Subscription } from '../wsclient';
+import type { Subscription } from '../wsclient';
 
 import type { RootState } from './index';
 

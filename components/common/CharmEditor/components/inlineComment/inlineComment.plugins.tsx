@@ -3,12 +3,15 @@ import { Plugin } from '@bangle.dev/core';
 import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
-import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
-import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
 import reactDOM from 'react-dom';
+
+import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
+import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { markName } from './inlineComment.constants';
+
 import RowDecoration from './components/InlineCommentRowDecoration';
+import { markName } from './inlineComment.constants';
 
 export interface InlineCommentPluginState {
   tooltipContentDOM: HTMLElement;
@@ -17,7 +20,7 @@ export interface InlineCommentPluginState {
 }
 
 export function plugin ({ key } :{
-  key: PluginKey
+  key: PluginKey;
 }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [

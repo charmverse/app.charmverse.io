@@ -1,20 +1,20 @@
 import type { Space, SpaceRole } from '@prisma/client';
+import { Wallet } from 'ethers';
+import fetchMock from 'fetch-mock-jest';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
-import nock from 'nock';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-
-nock.disableNetConnect();
 
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
 
-const walletAddresses = [v4(), v4()];
+const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address];
 
 beforeAll(async () => {
 
@@ -22,32 +22,19 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  await prisma.user.update({
-    where: {
-      id: user.id
-    },
-    // Update wallet address so we can get cumulative results
+  await prisma.userWallet.create({
     data: {
-      addresses: walletAddresses
+      userId: user.id,
+      address: walletAddresses[1]
     }
   });
 });
 
 afterAll(() => {
-  nock.restore();
+  fetchMock.restore();
 });
 
 describe('GET /api/public/profile/[userPath]', () => {
-
-  it('should throw a not found error if userPath doesn\'t return any user', async () => {
-    try {
-      await getAggregatedData(v4(), 'dummy_key');
-      throw new ExpectedAnError();
-    }
-    catch (err) {
-      expect(err).toBeInstanceOf(DataNotFoundError);
-    }
-  });
 
   it('Should combine several responses', async () => {
 
@@ -80,9 +67,8 @@ describe('GET /api/public/profile/[userPath]', () => {
         createdAt: new Date().toString()
       };
 
-    const profileScope = nock(DEEP_DAO_BASE_URL as string)
-      .get(`/v0.1/people/profile/${walletAddresses[0]}`)
-      .reply(200, {
+    fetchMock
+      .get(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/${walletAddresses[0]}`, {
         data: {
           totalProposals: 1,
           proposals: [proposal1, proposal2],
@@ -91,8 +77,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           organizations: [{ organizationId: '1', name: 'organization 1' }]
         }
       })
-      .get(`/v0.1/people/profile/${walletAddresses[1]}`)
-      .reply(200, {
+      .get(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/${walletAddresses[1]}`, {
         data: {
           totalProposals: 2,
           proposals: [],
@@ -101,8 +86,7 @@ describe('GET /api/public/profile/[userPath]', () => {
           organizations: [{ organizationId: '2', name: 'organization 2' }]
         }
       })
-      .get('/v0.1/organizations')
-      .reply(200, {
+      .get(`${DEEP_DAO_BASE_URL}/v0.1/organizations`, {
         data: {
           resources: [],
           totalResources: 0
@@ -111,7 +95,7 @@ describe('GET /api/public/profile/[userPath]', () => {
 
     const aggregatedData = await getAggregatedData(user.id, 'dummy_key');
 
-    expect(profileScope.isDone());
+    expect(fetchMock).toBeDone();
 
     expect(aggregatedData).toStrictEqual({
       bounties: 1,

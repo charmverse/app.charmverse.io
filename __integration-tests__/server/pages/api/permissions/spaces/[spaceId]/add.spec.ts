@@ -1,6 +1,7 @@
+import request from 'supertest';
+
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -15,7 +16,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const updatedPermissions = (await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -47,7 +48,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       roleId: role.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.id);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -71,7 +72,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       userId: adminUser.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.id);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -90,7 +91,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser);
+    const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
@@ -114,7 +115,7 @@ describe('POST /api/permissions/space/{spaceId}/add - Add space permissions', ()
       spaceId: space.id
     };
 
-    const nonAdminCookie = await loginUser(adminUser);
+    const nonAdminCookie = await loginUser(adminUser.id);
 
     await request(baseUrl)
       .post(`/api/permissions/space/${space.id}/add`)
