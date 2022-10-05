@@ -209,3 +209,56 @@ To debug notifications, you can run a command to read back current tasks:
 ```
 dotenv -e .env.local -- npm run notifications:debug
 ```
+
+# Stuff related to running in Elastic Beanstalk
+## Adding a new secret to Beanstalk app & environment:
+
+1. Create the secret:
+
+  Secret names have the following format:
+  `/io.cv.app/<env>/<secret name>`
+
+  Secret names are namespaced by the running environment. If, for example, you are only using this secret when
+  running the app in production, then namespace is `prd`. In staging environment, then secret namespace is `stg`. 
+  Many secrets are the same regardless of whether you're running the app in production or staging, then the namespace is `shared`. 
+
+  If you have more than 1 secrets that are from the same vendor, then name the secret after the vendor, and
+  add each secret as a key:value pair under the vendor secret
+
+  ```
+  secret_json="{ \"discord_oauth_client_id\": \"xxxxx\", \"discord_oauth_client_secret\": \"yyyyy\" }"
+
+  aws secretsmanager create-secret --name /io.cv.app/shared/discord --secret-string $secret_json
+
+  # or create a json file with those secrets
+  aws secretsmanager create-secret --name /io.cv.app/shared/discord --secret-string file://secret.json
+
+  ```
+
+1. Add template mustache to pull secrets when deploying:
+  
+  In `.ebextensions/00_env_vars.config` add the mustache placeholder lines so beanstalk can pull the secret and
+  set it to the right environment variable. 
+
+  Format of the mustache placeholder is:
+  `{{pull:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}`
+
+  Following up with the previous example, we want to grab discord_oauth_client_id and set it to 
+  env variable `Discord_oauth_client_id`
+
+  ```
+  option_settings:
+    aws:elasticbeanstalk:application:environment:
+        DISCORD_OAUTH_CLIENT_ID: "{{pull:secretsmanager:/io.cv.app/shared/discord:SecretString:discord_oauth_client_id}}"
+        DISCORD_OAUTH_CLIENT_SECRET: "{{pull:secretsmanager:/io.cv.app/shared/discord:SecretString:discord_oauth_client_secret}}"
+  ```
+
+  _NOTE:_
+
+  This template placeholder format mimics that of Cloudformation mustache placeholder to pull secrets from secrets manager:
+  ```{{resolve:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}.  # does not work!```
+
+  Currently resolving the Secrets Manager template placeholder is not supported in ElasticBeanstalk. If we
+  specify template variable using the `{{resolve:secretsmanager}}` format, it will be stripped out entirely
+  from `.env` file. So we came up with a modified version `{{pull:secretsmanager}}`. 
+  Should/when Secrets Manager template variable placeholder becomes supported in Elastic beanstalk, we can simply do a global replace of `pull` to `resolve` to leverage that support. 
