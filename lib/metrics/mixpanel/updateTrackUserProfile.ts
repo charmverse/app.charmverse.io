@@ -13,7 +13,9 @@ export async function updateTrackUserProfile (user: LoggedInUser) {
     $name: user.username,
     'Is Connected to Discord': !!user.discordUser,
     'Is Connected via Wallet': !!user.wallets.length,
-    'Workspaces Joined': userSpaces.map(s => s.name)
+    'Workspaces Joined': userSpaces.map(s => s.name),
+    // Needed for grouping events in user profile
+    'Space Id': spaceIds
   };
 
   try {
