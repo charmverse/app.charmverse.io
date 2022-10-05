@@ -1,4 +1,5 @@
-import { Data } from 'emoji-mart';
+
+import type { PageEvents } from 'lib/metrics/mixpanel/interfaces/PageEvents';
 
 import type { ProposalEvents } from './ProposalEvents';
 import type { UserEvents } from './UserEvents';
@@ -29,7 +30,7 @@ export interface MixpanelUserProfile {
   spaces?: string[];
 }
 
-export type MixpanelEvent = UserEvents & ProposalEvents
+export type MixpanelEvent = UserEvents & ProposalEvents & PageEvents
 
 export type MixpanelEventName = keyof MixpanelEvent
 
