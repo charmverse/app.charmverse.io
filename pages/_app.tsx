@@ -28,7 +28,7 @@ import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { isDev } from 'config/constants';
+import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { ContributorsProvider } from 'hooks/useContributors';
@@ -286,7 +286,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
 function PageMetaTags () {
   const [title] = usePageTitle();
-  const prefix = isDev ? 'DEV | ' : '';
+  const prefix = isDevEnv ? 'DEV | ' : '';
 
   return (
     <Head>

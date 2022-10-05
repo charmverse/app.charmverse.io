@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-const isTestEnv = process.env.APP_ENV === 'test';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
