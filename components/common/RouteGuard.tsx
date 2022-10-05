@@ -96,17 +96,27 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     })[0] ?? '/';
 
     const spaceDomain = path.split('/')[1];
-
     // condition: public page
     if (publicPages.some(basePath => firstPathSegment === basePath)) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
     else if ((!user && !account)) {
-      // Logged out user arrives at cv via token invite link
-      if (router.asPath.startsWith('/join')) {
+      // Logged out user arrives at cv via
+      // 1. token gate invite link
+      // 2. private invite link
+      if (firstPathSegment.match(/^(join|invite)/)) {
         return {
           authorized: true
+        };
+      }
+      else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+        return {
+          authorized: false,
+          redirect: {
+            pathname: '/join',
+            query: { domain: spaceDomain, returnUrl: router.asPath }
+          }
         };
       }
       log.info('[RouteGuard]: redirect to login');
@@ -120,7 +130,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: account but no valid wallet signature
     else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-
       return {
         authorized: true,
         redirect: {

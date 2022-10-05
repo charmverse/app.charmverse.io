@@ -87,7 +87,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-
     if (account) {
       refreshUserWithWeb3Account();
     }
@@ -104,7 +103,8 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setIsLoaded,
     updateUser,
     loginFromWeb3Account,
-    refreshUserWithWeb3Account }) as IContext, [user, isLoaded]);
+    refreshUserWithWeb3Account
+  }) as IContext, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>
