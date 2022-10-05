@@ -120,8 +120,6 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     return res.status(200).json(updatedPage);
   }
 
-  trackPageAction('edit_page', userId, pageId);
-
   return res.status(200).json(pageWithPermission);
 }
 
