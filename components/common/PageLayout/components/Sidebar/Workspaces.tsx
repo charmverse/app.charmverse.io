@@ -74,7 +74,7 @@ export default function Workspaces () {
         ))}
         <Grid item>
           <Tooltip title='Create or join a workspace' placement='top' arrow>
-            <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
+            <IconButton data-test='sidebar-add-new-space' sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
           </Tooltip>
         </Grid>
       </Grid>
