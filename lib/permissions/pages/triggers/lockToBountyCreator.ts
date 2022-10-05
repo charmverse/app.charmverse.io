@@ -43,7 +43,7 @@ export async function lockToBountyCreator ({ pageId }: { pageId: string }): Prom
     for (const permission of toModify) {
       await upsertPermission(pageId, permission, pageTree, tx);
     }
-    await setupPermissionsAfterPageRepositioned(pageId);
+    await setupPermissionsAfterPageRepositioned(pageId, tx);
   });
 
   return getPage(pageId) as Promise<IPageWithPermissions>;

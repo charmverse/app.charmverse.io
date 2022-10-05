@@ -11,7 +11,7 @@ import { findExistingPermissionForGroup, hasSameOrMorePermissions, replaceIllega
  *
  * @abstract This function used to implement alot more. It has been left as a wrapper around the newly provided replaceIllegalPermissions to keep the codebase clean, and allow for additional changes to behaviour in future
  */
-export async function setupPermissionsAfterPageRepositioned (pageId: string | IPageWithPermissions, tx: TransactionClient)
+export async function setupPermissionsAfterPageRepositioned (pageId: string | IPageWithPermissions, tx?: TransactionClient)
 : Promise<IPageWithPermissions> {
 
   if (!tx) {
