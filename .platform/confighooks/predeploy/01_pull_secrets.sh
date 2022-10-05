@@ -1,0 +1,1 @@
+../../hooks/predeploy/01_pull_secrets.sh

@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
-
-const isTestEnv = process.env.ENABLE_TEST_LOGIN === 'true';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

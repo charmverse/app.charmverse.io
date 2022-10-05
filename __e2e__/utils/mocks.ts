@@ -1,12 +1,11 @@
-import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
@@ -15,34 +14,13 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import { baseUrl } from 'testing/mockApiCall';
 import { createPage } from 'testing/setupDatabase';
 
-export { baseUrl } from 'testing/mockApiCall';
-
-export async function mockAuthSig ({ address, page }: { address: string, page: BrowserPage }): Promise<AuthSig> {
-
-  await page.waitForURL(baseUrl);
-
-  const authSig = {
-    address,
-    derivedVia: 'charmverse-mock',
-    sig: 'signature',
-    signedMessage: 'signed message'
-  };
-
-  // Approach to setting localstorage found here https://github.com/microsoft/playwright/issues/6258#issuecomment-824314544
-  await page.evaluate(`window.localStorage.setItem('charm.v1.wallet-auth-sig-${address}', '${JSON.stringify(authSig)}')`);
-
-  return authSig;
-}
-
-export async function createUser ({ browserPage, walletAddress }: { browserPage: BrowserPage;
-  walletAddress: string; }): Promise<LoggedInUser> {
+export async function createUser ({ browserPage, address }: { browserPage: BrowserPage, address: string }): Promise<LoggedInUser> {
 
   return browserPage.request.post(`${baseUrl}/api/profile/dev`, {
     data: {
-      address: walletAddress
+      address
     }
   }).then(res => res.json());
 }
@@ -86,19 +64,22 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  */
 export async function createUserAndSpace ({
   browserPage,
-  walletAddress = Wallet.createRandom().address,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
-  walletAddress?: string;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, walletAddress?: string, space: Space, pages: IPageWithPermissions[] }> {
-  const user = await createUser({ browserPage, walletAddress });
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, address: string, privateKey: string, space: Space, pages: IPageWithPermissions[] }> {
+
+  const wallet = Wallet.createRandom();
+  const address = wallet.address;
+
+  const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages = await getPages({ browserPage, spaceId: space.id });
 
   return {
     space,
-    walletAddress,
+    address,
+    privateKey: wallet.privateKey,
     user,
     pages
   };
@@ -178,12 +159,12 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-interface CreateUserAndSpaceOptions {
-  walletAddress?: string;
-  isAdmin?: boolean;
-}
-export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.createRandom().address }: CreateUserAndSpaceOptions = {}) {
-  const user = await createUserFromWallet(walletAddress);
+export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } = {}) {
+
+  const wallet = Wallet.createRandom();
+  const address = wallet.address;
+
+  const user = await createUserFromWallet(address);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
@@ -229,36 +210,7 @@ export async function generateUserAndSpace ({ isAdmin, walletAddress = Wallet.cr
     page,
     user,
     space,
-    walletAddress
+    address,
+    privateKey: wallet.privateKey
   };
-}
-
-// load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-// optionally pass in a context object to be available to the callback
-export async function mockWeb3<T> (page: BrowserPage, context: T | ((context: T) => void), callback?: (context: T) => void) {
-  callback ||= context as (context: T) => void;
-  context = typeof context === 'function' ? {} as T : context;
-
-  await page.addInitScript({
-    content:
-      `${readFileSync(
-        require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'),
-        'utf-8'
-      )}\n`
-      + `
-
-        Web3Mock.mock('ethereum');
-
-        // mock deprecatd apis not handled by web3-mock
-        window.ethereum.enable = () => Promise.resolve();
-
-        window.ethereum.send = (method, opts) => {
-          return window.ethereum.request({ method }, opts);
-        };
-
-
-
-      `
-      + `(${callback.toString()})(${JSON.stringify(context)});`
-  });
 }

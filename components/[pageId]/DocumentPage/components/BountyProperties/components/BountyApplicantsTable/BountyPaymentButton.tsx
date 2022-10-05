@@ -6,9 +6,10 @@ import type { UserGnosisSafe } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
+import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -171,7 +172,7 @@ export default function BountyPaymentButton ({
         await switchActiveNetwork(chainToUse.chainId);
       }
 
-      const web3signer = library.getSigner(account);
+      const web3signer = library.getSigner(account) as Signer;
 
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         const tx = await web3signer.sendTransaction({

@@ -1,8 +1,9 @@
-
+// the fullcalendar lib most be loaded before any plugins
+// eslint-disable-next-line import/order
+import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/react';
-import FullCalendar from '@fullcalendar/react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -58,7 +59,8 @@ function createDatePropertyFromCalendarDate (start: Date) : DateProperty {
   return dateProperty;
 }
 
-function CalendarFullView (props: Props): JSX.Element|null {
+function CalendarFullView (props: Props): JSX.Element | null {
+
   const intl = useIntl();
   const { board, cards, activeView, dateDisplayProperty, readOnly } = props;
   const isSelectable = !readOnly;
