@@ -114,7 +114,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: account but no valid wallet signature
     else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-
+      log.info('[RouteGuard]: redirect to verify wallet');
       return {
         authorized: true,
         redirect: {
