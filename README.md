@@ -241,7 +241,9 @@ In `.ebextensions/00_env_vars.config` add the mustache placeholder lines so bean
 set it to the right environment variable. 
 
 Format of the mustache placeholder is:
-`{{pull:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}`
+```
+{{pull:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}
+```
 
 Following up with the previous example, we want to grab discord_oauth_client_id and set it to 
 env variable `Discord_oauth_client_id`
@@ -256,7 +258,10 @@ option_settings:
 ***NOTE:***
 
 This template placeholder format mimics that of Cloudformation mustache placeholder to pull secrets from secrets manager:
-```{{resolve:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}.  # does not work!```
+
+```
+{{resolve:secretsmanager:<SECRET_NAME>:SecretString:<SECRET_JSON_KEY>}}.  # does not work!
+```
 
 Currently resolving the Secrets Manager template placeholder is not supported in ElasticBeanstalk. If we
 specify template variable using the `{{resolve:secretsmanager}}` format, it will be stripped out entirely
