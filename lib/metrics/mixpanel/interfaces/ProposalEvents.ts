@@ -1,9 +1,8 @@
 import type { ProposalStatus } from '@prisma/client';
 
 import type { ResourceEvent } from './ResourceEvent';
-import type { SpaceEvent } from './SpaceEvent';
 
-interface ProposalEvent extends SpaceEvent, ResourceEvent {}
+interface ProposalEvent extends ResourceEvent {}
 
 interface ProposalStatusUpdatedEvent extends ProposalEvent {
   status: ProposalStatus;

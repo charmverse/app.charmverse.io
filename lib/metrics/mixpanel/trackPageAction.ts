@@ -3,8 +3,8 @@ import type { PageEventNames } from 'lib/metrics/mixpanel/interfaces/PageEvents'
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 export async function trackPageAction (eventName: PageEventNames, { userId, pageId }: { userId: string, pageId: string }) {
-  const page = await prisma.page.findUnique({ where: { id: pageId }, include: { space: true } });
-  if (page && page.space) {
-    trackUserAction(eventName, { userId, resourceId: pageId, spaceId: page.space.id, spaceName: page.space.name });
+  const page = await prisma.page.findUnique({ where: { id: pageId } });
+  if (page) {
+    trackUserAction(eventName, { userId, resourceId: pageId, spaceId: page.spaceId });
   }
 }

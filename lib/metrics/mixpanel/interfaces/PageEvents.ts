@@ -1,7 +1,6 @@
 import type { ResourceEvent } from './ResourceEvent';
-import type { SpaceEvent } from './SpaceEvent';
 
-type PageEvent = SpaceEvent & ResourceEvent;
+type PageEvent = ResourceEvent;
 
 export interface PageEventMap {
   page_load: PageEvent;

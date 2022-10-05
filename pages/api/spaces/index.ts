@@ -81,7 +81,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   logSpaceCreation(space);
-  trackUserAction('create_new_workspace', { userId, spaceId: space.id, spaceName: space.name });
+  trackUserAction('create_new_workspace', { userId, spaceId: space.id });
 
   return res.status(200).json(updatedSpace);
 }

@@ -44,7 +44,7 @@ export async function applyTokenGates ({
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {
-    trackUserAction('token_gate_verification', { result: 'fail', spaceId, spaceName: space.name, userId });
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
@@ -70,7 +70,7 @@ export async function applyTokenGates ({
   }))).filter(tk => tk !== null) as TokenGateWithRoles[];
 
   if (verifiedTokenGates.length === 0) {
-    trackUserAction('token_gate_verification', { result: 'fail', spaceId, spaceName: space.name, userId });
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
@@ -100,8 +100,8 @@ export async function applyTokenGates ({
     roles: assignedRoles
   };
 
-  trackUserAction('token_gate_verification', { result: 'pass', spaceId, spaceName: space.name, userId, roles: assignedRoles.map(r => r.name) });
-  trackUserAction('join_a_workspace', { spaceId, spaceName: space.name, userId, source: joinType });
+  trackUserAction('token_gate_verification', { result: 'pass', spaceId, userId, roles: assignedRoles.map(r => r.name) });
+  trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
 
   if (!commit) {
     return returnValue;
