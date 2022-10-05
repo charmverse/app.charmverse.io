@@ -64,14 +64,14 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  */
 export async function createUserAndSpace ({
   browserPage,
-  address,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
-  address?: string;
 } & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, address: string, privateKey: string, space: Space, pages: IPageWithPermissions[] }> {
+
   const wallet = Wallet.createRandom();
-  address ||= wallet.address;
+  const address = wallet.address;
+
   const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode });
   const pages = await getPages({ browserPage, spaceId: space.id });
@@ -159,14 +159,10 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-interface CreateUserAndSpaceOptions {
-  address?: string;
-  isAdmin?: boolean;
-}
-export async function generateUserAndSpace ({ isAdmin, address }: CreateUserAndSpaceOptions = {}) {
+export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } = {}) {
 
   const wallet = Wallet.createRandom();
-  address ||= wallet.address;
+  const address = wallet.address;
 
   const user = await createUserFromWallet(address);
 
