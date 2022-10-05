@@ -58,15 +58,6 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
 
     const nameInput = page.locator('data-test=workspace-name-input >> input');
     const domainInput = page.locator('data-test=workspace-domain-input');
-    const defaultSpaceName = await nameInput.inputValue();
-    const defaultSpaceDomain = await domainInput.inputValue();
-
-    expect(defaultSpaceName).toBeDefined();
-    expect(defaultSpaceName).toEqual(defaultSpaceDomain);
-
-    await nameInput.fill('test-space-name');
-    // udpate domain input when name changes
-    expect(await domainInput.inputValue()).toEqual('testspacename');
 
     // change domain to unique one
     const uniqueDomainName = Math.random().toString().replace('.', '');
