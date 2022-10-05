@@ -5,17 +5,21 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import type { Space } from '@prisma/client';
+import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import type { ChangeEvent, ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import type { PublicSpaceInfo } from 'lib/spaces/interfaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
@@ -40,12 +44,14 @@ function stripUrlParts (maybeUrl: string) {
 }
 
 export default function CreateSpace () {
-
+  const { user } = useUser();
+  const { account } = useWeb3React();
   const router = useRouter();
   const [spaces] = useSpaces();
   const [spaceDomain, setSpaceDomain] = useState<string>('');
   const [spaceInfo, setSpaceInfo] = useState<PublicSpaceInfo | null>(null);
   const [userInputStatus, setStatus] = useState('');
+  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
 
   async function onJoinSpace (joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
@@ -110,6 +116,19 @@ export default function CreateSpace () {
         {
           spaceInfo && (
             <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
+          )
+        }
+
+        {
+          (!user || !account) && (
+            <Box display='flex' gap={2} justifyContent='center' my={2}>
+              <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
+                Connect Wallet
+              </PrimaryButton>
+              <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(`${window.location.origin}/${spaceDomain}`)}&type=login`}>
+                Connect Discord
+              </PrimaryButton>
+            </Box>
           )
         }
 
