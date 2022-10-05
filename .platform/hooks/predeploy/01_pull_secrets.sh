@@ -13,8 +13,9 @@ if grep "{{pull:secretsmanager:" $APP_STAGING_DIR/.env; then
     grep -v "pull:secretsmanager" $APP_STAGING_DIR/.env > $APP_STAGING_DIR/.env.new
 
     pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+)}}'
+
+    # looping through secrets requested in .env file
     grep "pull:secretsmanager" $APP_STAGING_DIR/.env | while read -r line; do
-    #grep "pull:secretsmanager" 00_env_vars.config | while read -r line; do
         [[ $line =~ $pattern ]] && { 
             export env_var_name=${BASH_REMATCH[1]}
             secret_name=${BASH_REMATCH[2]}
