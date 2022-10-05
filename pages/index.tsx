@@ -55,7 +55,6 @@ export default function LoginPage () {
   }
 
   useEffect(() => {
-
     // redirect user once wallet is connected
     if (isDataLoaded) {
       // redirect once account exists (user has connected wallet)

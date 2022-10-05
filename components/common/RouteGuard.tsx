@@ -103,6 +103,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: no user session and no wallet address
     else if ((!user && !account)) {
+      // Logged out user arrives at cv via token invite link
+      if (router.asPath.startsWith('/join')) {
+        return {
+          authorized: true
+        };
+      }
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
