@@ -1,7 +1,7 @@
-import mixpanel from 'mixpanel';
 
 import { prisma } from 'db';
 import log from 'lib/log';
+import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import type { LoggedInUser } from 'models';
 
 export async function updateTrackUserProfile (user: LoggedInUser) {

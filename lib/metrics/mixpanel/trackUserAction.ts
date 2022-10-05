@@ -1,7 +1,7 @@
 import log from 'loglevel';
-import mixpanel from 'mixpanel';
 
 import type { MixpanelEventMap, MixpanelEventName, MixpanelTrackBase } from 'lib/metrics/mixpanel/interfaces';
+import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import { eventNameToHumanFormat, paramsToHumanFormat } from 'lib/metrics/mixpanel/utils';
 
 export function trackUserAction<T extends MixpanelEventName> (eventName: T, params: MixpanelEventMap[T]) {
