@@ -114,7 +114,7 @@ export default function CreateSpace () {
         />
 
         {
-          spaceInfo && (
+          spaceInfo && account && (
             <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
           )
         }
@@ -125,9 +125,11 @@ export default function CreateSpace () {
               <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
                 Connect Wallet
               </PrimaryButton>
-              <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(`${window.location.origin}/${spaceDomain}`)}&type=login`}>
-                Connect Discord
-              </PrimaryButton>
+              {!user?.discordUser && (
+                <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(`${window.location.origin}/${spaceDomain}`)}&type=login`}>
+                  Connect Discord
+                </PrimaryButton>
+              )}
             </Box>
           )
         }
