@@ -139,6 +139,7 @@
     "marked": "^4.0.12",
     "material-ui-popup-state": "^2.0.0",
     "millify": "^4.0.0",
+    "mixpanel": "^0.17.0",
     "mjml": "^4.13.0",
     "mjml-react": "^2.0.8",
     "nanoevents": "^6.0.2",

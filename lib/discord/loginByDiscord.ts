@@ -6,6 +6,8 @@ import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
 import { logSignupViaDiscord } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { sessionUserRelations } from 'lib/session/config';
 import { IDENTITY_TYPES } from 'models';
 
@@ -25,7 +27,7 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
   });
 
   if (discordUser) {
-
+    trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
   }
   else {
@@ -59,6 +61,8 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
       include: sessionUserRelations
     });
 
+    updateTrackUserProfile(newUser);
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord' });
     logSignupViaDiscord();
 
     return newUser;

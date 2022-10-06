@@ -97,6 +97,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
                   window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
                 }}
                 spaceDomain={space?.domain ?? ''}
+                joinType='public_bounty_token_gate'
               />
             )
         }

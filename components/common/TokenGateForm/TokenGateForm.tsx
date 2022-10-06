@@ -12,7 +12,7 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
 
 import type { AuthSig } from '../../../lib/blockchain/interfaces';
 
@@ -22,9 +22,10 @@ interface Props {
   onSuccess: (values: Space) => void;
   spaceDomain: string;
   joinButtonLabel?: string;
+  joinType?: TokenGateJoinType;
 }
 
-export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel }: Props) {
+export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
 
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
@@ -97,7 +98,8 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
             signedToken: tk.signedToken,
             tokenGateId: tk.tokenGate.id
           };
-        }) ?? []
+        }) ?? [],
+        joinType
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');

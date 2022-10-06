@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { logSignupViaWallet } from 'lib/log/userEvents';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
@@ -83,6 +84,8 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
       }
     });
   }
+
+  updateTrackUserProfile(user);
 
   return res.status(200).json(user);
 }
