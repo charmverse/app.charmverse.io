@@ -62,7 +62,7 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true) {
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true, spaceName = 'Example space') {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
@@ -76,7 +76,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   if (!space) {
     space = await prisma.space.create({
       data: {
-        name: 'Example space',
+        name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
         author: {
