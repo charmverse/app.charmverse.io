@@ -1,4 +1,5 @@
 import * as http from 'adapters/http';
+import { isProdEnv } from 'config/constants';
 import log from 'lib/log';
 
 /**
@@ -24,7 +25,7 @@ export interface IEventToLog {
   message: string;
 }
 
-const isProdEnvironment = process.env.NODE_ENV === 'production';
+const isProdEnvironment = isProdEnv;
 const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
 
 export async function postToDiscord (eventLog: IEventToLog) {

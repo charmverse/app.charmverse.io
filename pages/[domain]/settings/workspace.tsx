@@ -33,7 +33,7 @@ export default function WorkspaceSettings () {
 
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, setSpaces } = useSpaces();
   const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
   const isAdmin = isSpaceAdmin(user, space?.id);

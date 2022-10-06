@@ -28,7 +28,7 @@ interface Props {
 export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
 
   const { showMessage } = useSnackbar();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, setSpaces } = useSpaces();
   const { user, loginFromWeb3Account, refreshUserWithWeb3Account } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
