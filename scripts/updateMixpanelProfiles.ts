@@ -19,8 +19,9 @@ async function updateMixpanelGroupProfiles() {
     $set: getTrackGroupProfile(space)
   }))
 
-  // Mixpanel batch group update limit - 20
-  const chunks = chunk(profiles, 20);
+  // Mixpanel batch group update limit - 200
+  // https://developer.mixpanel.com/reference/limits-1
+  const chunks = chunk(profiles, 200);
   console.log('🔥', 'Number of group chunks:', chunks.length);
 
   const promises = chunks.map(async profilesChunk => {
@@ -89,15 +90,14 @@ async function updateMixpanelUserProfiles() {
     $set: getTrackUserProfile(user, user.spaces)
   }))
 
-  // Mixpanel batch profile update limit - 200
-  const chunks = chunk(profiles, 200);
+  // Mixpanel batch profile update limit - 2000
+  // https://developer.mixpanel.com/reference/user-profile-limits
+  const chunks = chunk(profiles, 2000);
   console.log('🔥', 'Number of profile chunks:', chunks.length);
 
-  // Batch update
-  // https://developer.mixpanel.com/reference/profile-batch-update
   const promises = chunks.map(async profilesChunk => {
     // Batch update
-    // https://developer.mixpanel.com/reference/group-batch-update
+    // https://developer.mixpanel.com/reference/profile-batch-update
     const res = await fetch('https://api.mixpanel.com/engage#profile-batch-update', {
       method: 'POST',
       headers: {
@@ -120,5 +120,5 @@ async function updateMixpanelUserProfiles() {
   }
 }
 
-// updateMixpanelGroupProfiles()
+updateMixpanelGroupProfiles()
 updateMixpanelUserProfiles()
