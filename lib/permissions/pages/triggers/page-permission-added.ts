@@ -68,10 +68,10 @@ export async function setupPermissionsAfterPagePermissionAdded (permissionId: st
     findChildPagesToCreatePermissionsFor(updatedPage);
 
     if (permissionsToDelete.length > 0) {
-      tx.pagePermission.deleteMany({ where: { OR: permissionsToDelete } });
+      await tx.pagePermission.deleteMany({ where: { OR: permissionsToDelete } });
     }
 
-    tx.pagePermission.createMany({ data: permissionsToCreate });
+    await tx.pagePermission.createMany({ data: permissionsToCreate });
 
     return true;
   }
