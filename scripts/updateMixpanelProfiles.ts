@@ -33,7 +33,7 @@ async function updateMixpanelGroupProfiles() {
         'Content-Type': 'application/json',
         'Accept': 'text/plain'
       },
-      body: JSON.stringify(profiles)
+      body: JSON.stringify(profilesChunk)
     })
 
     return await res.json() as number
@@ -104,7 +104,7 @@ async function updateMixpanelUserProfiles() {
         'Content-Type': 'application/json',
         'Accept': 'text/plain'
       },
-      body: JSON.stringify(profiles)
+      body: JSON.stringify(profilesChunk)
     })
 
     return await res.json() as number
@@ -114,7 +114,7 @@ async function updateMixpanelUserProfiles() {
   const results = await Promise.all(promises)
 
   if (results.every(r => r === 1)) {
-    console.log('🔥', `Updated ${users.length} group profiles successfully.`);
+    console.log('🔥', `Updated ${users.length} user profiles successfully.`);
   } else {
     console.log('❌', 'Failed to update user profiles.');
   }
