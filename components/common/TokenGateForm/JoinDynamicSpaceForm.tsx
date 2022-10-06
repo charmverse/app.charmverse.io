@@ -1,11 +1,11 @@
-import type { PopperProps } from '@mui/material';
-import { Popper, Autocomplete, Stack, Typography, TextField } from '@mui/material';
+import styled from '@emotion/styled';
+import { Autocomplete, Popper, Stack, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { Space } from '@prisma/client';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useSpaces } from 'hooks/useSpaces';
@@ -18,6 +18,10 @@ import TokenGateForm from './TokenGateForm';
 function stripUrlParts (maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
+
+const StyledPopper = styled(Popper)`
+  height: 0;
+`;
 
 export function JoinDynamicSpaceForm () {
   const router = useRouter();
@@ -68,17 +72,6 @@ export function JoinDynamicSpaceForm () {
     setSpaceDomain(stripUrlParts(event.target.value));
   }
 
-  const popperFactoryMemoized = useMemo(() => {
-    return function factory ({ style, ...props }: PopperProps) {
-      return (
-        <Popper
-          {...props}
-          style={{ ...style, height: 0 }}
-        />
-      );
-    };
-  }, []);
-
   return (
     <>
       <br />
@@ -93,7 +86,7 @@ export function JoinDynamicSpaceForm () {
         }}
         getOptionLabel={(space) => space.name}
         fullWidth
-        PopperComponent={popperFactoryMemoized}
+        PopperComponent={StyledPopper}
         renderOption={(props, space) => (
           <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
             <AvatarWithIcons
