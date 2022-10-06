@@ -35,7 +35,7 @@ async function getPageDetailsHandler (req: NextApiRequest, res: NextApiResponse<
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
 
-  trackPageAction('page_load', { userId, pageId });
+  trackPageAction('page_view', { userId, pageId });
 
   return res.status(200).json(pageDetails);
 }

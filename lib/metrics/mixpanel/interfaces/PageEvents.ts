@@ -3,7 +3,7 @@ import type { ResourceEvent } from './ResourceEvent';
 type PageEvent = ResourceEvent;
 
 export interface PageEventMap {
-  page_load: PageEvent;
+  page_view: PageEvent;
   archive_page: PageEvent;
   delete_page: PageEvent;
   restore_page: PageEvent;
