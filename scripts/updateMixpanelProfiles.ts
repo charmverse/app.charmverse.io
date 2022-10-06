@@ -38,7 +38,13 @@ async function updateMixpanelGroupProfiles() {
 }
 
 async function updateMixpanelUserProfiles() {
-  const users = await prisma.user.findMany({ include: {
+  const users = await prisma.user.findMany({
+    where: {
+      spaces: {
+          some: {} // user has at least one space
+      }
+    },
+    include: {
     favorites: {
       where: {
         page: {
@@ -85,11 +91,11 @@ async function updateMixpanelUserProfiles() {
   const data = await res.json()
 
   if (data === 1) {
-    console.log('🔥', `Updated ${users.length} user profiles successfully.`);
+    console.log('🔥', `Updated ${users.length} group profiles successfully.`);
   } else {
-    console.log('❌', 'Failed to update group profiles.');
+    console.log('❌', 'Failed to update user profiles.');
   }
 }
 
-updateMixpanelGroupProfiles()
+// updateMixpanelGroupProfiles()
 updateMixpanelUserProfiles()
