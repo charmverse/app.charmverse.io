@@ -1,5 +1,6 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import CheckIcon from '@mui/icons-material/Check';
+import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
@@ -15,8 +16,8 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import TokenGateForm from 'components/common/TokenGateForm';
+import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import { useSpaces } from 'hooks/useSpaces';
-import type { PublicSpaceInfo } from 'lib/spaces/interfaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const { spaces } = useSpaces();
@@ -44,8 +45,10 @@ export default function CreateSpace () {
   const router = useRouter();
   const { spaces } = useSpaces();
   const [spaceDomain, setSpaceDomain] = useState<string>('');
-  const [spaceInfo, setSpaceInfo] = useState<PublicSpaceInfo | null>(null);
+  const [spaceInfo, setSpaceInfo] = useState<Space | null>(null);
   const [userInputStatus, setStatus] = useState('');
+
+  const domain = router.query.domain;
 
   async function onJoinSpace (joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
@@ -83,30 +86,42 @@ export default function CreateSpace () {
   }, [spaceDomain]);
 
   function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
-    const domain = stripUrlParts(event.target.value);
-    setSpaceDomain(domain);
+    setSpaceDomain(stripUrlParts(event.target.value));
   }
 
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-
         <DialogTitle>Join a workspace</DialogTitle>
         <Divider />
-        <br />
-        <FieldLabel>Enter a CharmVerse Domain or URL</FieldLabel>
-        <TextField
-          onChange={onChangeDomainName}
-          autoFocus
-          placeholder='https://app.charmverse.io/my-space'
-          fullWidth
-          value={spaceDomain}
-          helperText={userInputStatus}
-          InputProps={{
-            endAdornment: spaceInfo && <CheckIcon color='success' />
-          }}
-        />
 
+        {spaceInfo && (
+          <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+            <Box mb={3}>
+              <WorkspaceAvatar image={spaceInfo.spaceImage} name={spaceInfo.name} variant='rounded' />
+            </Box>
+            <Box display='flex' flexDirection='column' alignItems='center'>
+              <Typography variant='h5'>{spaceInfo.name}</Typography>
+            </Box>
+          </Card>
+        )}
+        {/* If there is no domain param in the url, show the text input to search for workspaces */}
+        {!domain && (
+          <>
+            <FieldLabel>Enter a CharmVerse workspace name</FieldLabel>
+            <TextField
+              onChange={onChangeDomainName}
+              autoFocus
+              placeholder='https://app.charmverse.io/my-space'
+              fullWidth
+              value={spaceDomain}
+              helperText={userInputStatus}
+              InputProps={{
+                endAdornment: spaceInfo && <CheckIcon color='success' />
+              }}
+            />
+          </>
+        )}
         {
           spaceInfo && (
             <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
