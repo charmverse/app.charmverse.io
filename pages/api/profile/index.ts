@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { postToDiscord } from 'lib/log/userEvents';
+import { logSignupViaWallet } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
@@ -89,10 +89,3 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
 export default withSessionRoute(handler);
 
-export async function logSignupViaWallet () {
-  postToDiscord({
-    funnelStage: 'acquisition',
-    eventType: 'create_user',
-    message: 'A new user has joined Charmverse using their Web3 wallet'
-  });
-}

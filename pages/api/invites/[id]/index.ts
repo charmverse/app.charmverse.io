@@ -1,12 +1,10 @@
 
-import type { SpaceRole } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import type { IEventToLog } from 'lib/log/userEvents';
-import { postToDiscord } from 'lib/log/userEvents';
+import { logInviteAccepted } from 'lib/log/userEvents';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -54,7 +52,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    logInviteAccepted(newRole);
+    logInviteAccepted({ spaceId: newRole.spaceId });
 
     await prisma.inviteLink.update({
       where: { id: invite.id },
@@ -101,24 +99,3 @@ async function deleteInvite (req: NextApiRequest, res: NextApiResponse) {
 
 export default withSessionRoute(handler);
 
-/**
- * Assumes that a first page will be created by the system
- * Should be called after a page is created
- * @param page
- */
-async function logInviteAccepted (role: SpaceRole) {
-
-  const space = await prisma.space.findUnique({
-    where: {
-      id: role.spaceId
-    }
-  });
-
-  const eventLog: IEventToLog = {
-    eventType: 'join_workspace_from_link',
-    funnelStage: 'acquisition',
-    message: `Someone joined ${space?.domain} workspace via an invite link`
-  };
-
-  postToDiscord(eventLog);
-}

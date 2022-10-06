@@ -5,7 +5,7 @@ import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
-import { postToDiscord } from 'lib/log/userEvents';
+import { logSignupViaDiscord } from 'lib/log/userEvents';
 import { sessionUserRelations } from 'lib/session/config';
 import { IDENTITY_TYPES } from 'models';
 
@@ -65,10 +65,3 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
   }
 }
 
-async function logSignupViaDiscord () {
-  postToDiscord({
-    funnelStage: 'acquisition',
-    eventType: 'create_user',
-    message: 'A new user has joined Charmverse using their Discord account'
-  });
-}
