@@ -1,4 +1,4 @@
-import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Proposal, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
@@ -11,7 +11,7 @@ import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
@@ -567,10 +567,10 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
  */
 export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers, deletedAt = null }:
   { deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus }):
-  Promise<PageWithProposal> {
+  Promise<Page & { proposal: ProposalWithUsers, workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
-  return createPageDb({
+  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
     data: {
       id: proposalId,
       contentText: '',
@@ -627,6 +627,23 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
       }
     }
   });
+
+  const workspaceEvent = await prisma.workspaceEvent.create({
+    data: {
+      type: 'proposal_status_change',
+      meta: {
+        newStatus: proposalStatus
+      },
+      actorId: userId,
+      pageId: proposalId,
+      spaceId
+    }
+  });
+
+  return {
+    ...result,
+    workspaceEvent
+  };
 }
 
 export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }:

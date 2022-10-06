@@ -60,7 +60,7 @@ export async function getProposalTasks (userId: string): Promise<{
     return record;
   }, {});
 
-  const spaceRoles = (await prisma.spaceRole.findMany({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
     },
@@ -81,13 +81,11 @@ export async function getProposalTasks (userId: string): Promise<{
         }
       }
     }
-  }));
+  });
 
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
-  // Get all the roleId assigned to this user
-  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole.length !== 0
-    ? spaceRole.spaceRoleToRole[0].role.id
-    : null).filter(isTruthy);
+  // Get all the roleId assigned to this user for each space
+  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole).flat().map(({ role }) => role.id);
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
