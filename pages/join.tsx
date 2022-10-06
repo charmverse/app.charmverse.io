@@ -6,9 +6,10 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import type { Space } from '@prisma/client';
+import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import type { ChangeEvent, ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
@@ -66,9 +67,9 @@ export default function CreateSpace () {
     }
   }, [router.query]);
 
-  useEffect(() => {
-    if (spaceDomain && spaceDomain.length > 3) {
-      charmClient.getPublicSpacesInfo(spaceDomain)
+  const debouncedGetPublicSpaces = useMemo(() => {
+    return debounce((_spaceDomain: string) => {
+      charmClient.getPublicSpacesInfo(_spaceDomain)
         .then((_spaces) => {
           setSpacesInfo(_spaces);
           setStatus('');
@@ -77,6 +78,12 @@ export default function CreateSpace () {
           setSpacesInfo([]);
           setStatus('Workspace not found');
         });
+    }, 500);
+  }, []);
+
+  useEffect(() => {
+    if (spaceDomain && spaceDomain.length > 3) {
+      debouncedGetPublicSpaces(spaceDomain);
     }
     else {
       setSpacesInfo([]);
@@ -114,7 +121,7 @@ export default function CreateSpace () {
             <TextField
               onChange={onChangeDomainName}
               autoFocus
-              placeholder='https://app.charmverse.io/my-space'
+              placeholder='my-space'
               fullWidth
               value={spaceDomain}
               helperText={userInputStatus}
