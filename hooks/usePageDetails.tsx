@@ -27,7 +27,8 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     const updatedDetails: PageDetails = {
       id: pageId,
       content: updatedPage.content,
-      contentText: updatedPage.contentText
+      contentText: updatedPage.contentText,
+      spaceId: updatedPage.spaceId
     };
 
     const hasContent = !checkIsContentEmpty(updatedPage.content as PageContent);

@@ -1,5 +1,7 @@
 import { prisma } from 'db';
 import getENSName from 'lib/blockchain/getENSName';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
 import { shortenHex } from 'lib/utilities/strings';
@@ -40,6 +42,9 @@ export async function createUserFromWallet (address: string): Promise<LoggedInUs
       },
       include: sessionUserRelations
     });
+
+    updateTrackUserProfile(newUser);
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet' });
 
     return newUser;
 

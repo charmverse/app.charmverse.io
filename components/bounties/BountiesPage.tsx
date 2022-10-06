@@ -1,9 +1,11 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 
@@ -20,6 +22,11 @@ interface Props {
 }
 
 export default function BountiesPage ({ publicMode = false, bounties }: Props) {
+  const [space] = useCurrentSpace();
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
+  }, []);
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
