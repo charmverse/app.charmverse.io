@@ -1,4 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -25,6 +26,10 @@ export default function ProposalsPage () {
     categoryIdFilter,
     setCategoryIdFilter
   } = useProposalSortAndFilters(data ?? []);
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id || '', type: 'proposals_list' });
+  }, []);
 
   const loadingData = !data;
 

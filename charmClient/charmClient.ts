@@ -7,6 +7,7 @@ import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
 import { PagesApi } from 'charmClient/apis/pagesApi';
+import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
@@ -66,6 +67,8 @@ class CharmClient {
   pages = new PagesApi();
 
   tasks = new TasksApi();
+
+  track = new TrackApi();
 
   async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {

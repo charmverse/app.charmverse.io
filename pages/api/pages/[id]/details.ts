@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PageDetails } from 'lib/pages';
 import { getPageDetails } from 'lib/pages/server/getPageDetails';
@@ -34,8 +33,6 @@ async function getPageDetailsHandler (req: NextApiRequest, res: NextApiResponse<
   if (permissions.read !== true) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
-
-  trackPageAction('page_view', { userId, pageId });
 
   return res.status(200).json(pageDetails);
 }
