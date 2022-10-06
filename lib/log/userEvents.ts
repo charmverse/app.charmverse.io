@@ -38,7 +38,7 @@ const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
 
 export async function postToDiscord (eventLog: IEventToLog) {
 
-  let message = `Event: ${eventLog.funnelStage.toUpperCase()}  / ${eventLog.eventType}\r\n`;
+  let message = `Event: **${eventLog.funnelStage.toUpperCase()}**  / ${eventLog.eventType}\r\n`;
 
   message += eventLog.message;
 
