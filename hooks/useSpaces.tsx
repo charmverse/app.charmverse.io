@@ -49,7 +49,7 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
     // give some time for spaces state to update or user will be redirected to /join in RouteGuard
     setTimeout(() => {
       router.push(`/${space.domain}`);
-    }, 50);
+    }, 500);
   }, []);
 
   const value = useMemo(() => ({ spaces, setSpaces, isLoaded, createNewSpace }) as IContext, [spaces, isLoaded]);
