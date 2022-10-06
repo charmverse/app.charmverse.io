@@ -79,7 +79,7 @@ export default function PublicPage () {
     let foundSpace: Space | null = null;
 
     try {
-      foundSpace = await charmClient.getPublicSpaceInfo(spaceDomain);
+      foundSpace = (await charmClient.getPublicSpacesInfo(spaceDomain))[0];
       setSpaces([foundSpace]);
     }
     catch (err) {

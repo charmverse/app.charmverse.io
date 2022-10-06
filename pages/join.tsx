@@ -45,7 +45,7 @@ export default function CreateSpace () {
   const router = useRouter();
   const { spaces } = useSpaces();
   const [spaceDomain, setSpaceDomain] = useState<string>('');
-  const [spaceInfo, setSpaceInfo] = useState<Space | null>(null);
+  const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
   const [userInputStatus, setStatus] = useState('');
 
   const domain = router.query.domain;
@@ -68,22 +68,24 @@ export default function CreateSpace () {
 
   useEffect(() => {
     if (spaceDomain && spaceDomain.length > 3) {
-      charmClient.getPublicSpaceInfo(spaceDomain)
-        .then((_space) => {
-          setSpaceInfo(_space);
+      charmClient.getPublicSpacesInfo(spaceDomain)
+        .then((_spaces) => {
+          setSpacesInfo(_spaces);
           setStatus('');
         })
         .catch(() => {
-          setSpaceInfo(null);
+          setSpacesInfo([]);
           setStatus('Workspace not found');
         });
     }
     else {
-      setSpaceInfo(null);
+      setSpacesInfo([]);
       setStatus('');
     }
 
   }, [spaceDomain]);
+
+  const [spaceInfo] = spacesInfo;
 
   function onChangeDomainName (event: ChangeEvent<HTMLInputElement>) {
     setSpaceDomain(stripUrlParts(event.target.value));
@@ -94,7 +96,6 @@ export default function CreateSpace () {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join a workspace</DialogTitle>
         <Divider />
-
         {spaceInfo && (
           <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
             <Box mb={3}>
@@ -108,6 +109,7 @@ export default function CreateSpace () {
         {/* If there is no domain param in the url, show the text input to search for workspaces */}
         {!domain && (
           <>
+            <br />
             <FieldLabel>Enter a CharmVerse workspace name</FieldLabel>
             <TextField
               onChange={onChangeDomainName}
