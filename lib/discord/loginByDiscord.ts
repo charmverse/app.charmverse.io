@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
+import { isProdEnv } from 'config/constants';
 import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
@@ -10,7 +11,7 @@ import { IDENTITY_TYPES } from 'models';
 
 export default async function loginByDiscord ({ code, hostName, discordApiUrl }: { code: string, hostName?: string, discordApiUrl?: string }) {
 
-  const domain = process.env.NODE_ENV === 'development' ? `http://${hostName}` : `https://${hostName}`;
+  const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
   const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
   const discordUser = await prisma.discordUser.findUnique({
     where: {
