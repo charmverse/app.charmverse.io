@@ -108,7 +108,7 @@ export async function updateProposalStatus ({
       }
     });
 
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, tx });
 
     await tx.pagePermission.deleteMany(deleteArgs);
 
