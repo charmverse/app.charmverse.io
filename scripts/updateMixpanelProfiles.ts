@@ -52,7 +52,7 @@ async function updateMixpanelGroupProfiles() {
 async function updateMixpanelUserProfiles() {
   const users = await prisma.user.findMany({
     where: {
-      spaces: {
+      spaceRoles: {
           some: {} // user has at least one space
       }
     },
