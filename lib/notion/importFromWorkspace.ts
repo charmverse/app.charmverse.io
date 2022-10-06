@@ -650,6 +650,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
     failedImportsRecord[block.id] = {
       pageId: block.id,
+      /* eslint react/forbid-prop-types: 0 */
       type: block.object,
       title,
       blocks: failedImportBlocks
