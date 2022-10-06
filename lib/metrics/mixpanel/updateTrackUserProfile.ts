@@ -1,4 +1,6 @@
 
+import type { Space } from '@prisma/client';
+
 import { prisma } from 'db';
 import log from 'lib/log';
 import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
@@ -8,20 +10,22 @@ export async function updateTrackUserProfile (user: LoggedInUser) {
   const spaceIds = user.spaceRoles.map(sr => sr.spaceId);
   const userSpaces = await prisma.space.findMany({ where: { id: { in: spaceIds } } });
 
-  const profile = {
+  try {
+    mixpanel?.people.set(user.id, getTrackUserProfile(user, userSpaces));
+  }
+  catch (e) {
+    log.warn(`Failed to update mixpanel profile for user id ${user.id}`);
+  }
+}
+
+export function getTrackUserProfile (user: LoggedInUser, userSpaces: Space[]) {
+  return {
     $created: user.createdAt,
     $name: user.username,
     'Is Connected to Discord': !!user.discordUser,
     'Is Connected via Wallet': !!user.wallets.length,
     'Workspaces Joined': userSpaces.map(s => s.name),
     // Needed for grouping events in user profile
-    'Space Id': spaceIds
+    'Space Id': userSpaces.map(s => s.id)
   };
-
-  try {
-    mixpanel?.people.set(user.id, profile);
-  }
-  catch (e) {
-    log.warn(`Failed to update mixpanel profile for user id ${user.id}`);
-  }
 }
