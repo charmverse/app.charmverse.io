@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 
-import { getDiscordToken } from './getDiscordToken';
+import { getDiscordToken, DISCORD_API_URL } from './getDiscordToken';
 
 export interface DiscordAccount {
   id: string;
@@ -11,9 +11,9 @@ export interface DiscordAccount {
   bot?: boolean;
 }
 
-export async function getDiscordAccount (code: string, redirectUrl: string) {
-  const token = await getDiscordToken(code, redirectUrl);
-  return http.GET<DiscordAccount>('https://discord.com/api/v8/users/@me', undefined, {
+export async function getDiscordAccount (props: { code: string, discordApiUrl?: string, redirectUrl: string }) {
+  const token = await getDiscordToken(props);
+  return http.GET<DiscordAccount>(`${props.discordApiUrl ?? DISCORD_API_URL}/users/@me`, undefined, {
     headers: {
       Authorization: `Bearer ${token.access_token}`
     }

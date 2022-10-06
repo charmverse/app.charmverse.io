@@ -8,10 +8,10 @@ import { postToDiscord } from 'lib/log/userEvents';
 import { sessionUserRelations } from 'lib/session/config';
 import { IDENTITY_TYPES } from 'models';
 
-export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
+export default async function loginByDiscord ({ code, hostName, discordApiUrl }: { code: string, hostName?: string, discordApiUrl?: string }) {
 
   const domain = process.env.NODE_ENV === 'development' ? `http://${hostName}` : `https://${hostName}`;
-  const discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
+  const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id
