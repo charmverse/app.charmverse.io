@@ -162,7 +162,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
           <Grid item xs>
             {
             !tokenGateResult.canJoinSpace ? (
-              <Alert sx={{ mt: 2 }} severity='warning'>
+              <Alert severity='warning'>
                 Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
               </Alert>
             ) : (
