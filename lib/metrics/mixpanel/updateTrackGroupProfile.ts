@@ -16,6 +16,8 @@ export async function updateTrackGroupProfile (space: Space) {
 export function getTrackGroupProfile (space: Space) {
   return {
     $created: space.createdAt,
-    $name: space.name
+    $name: space.name,
+    'Space Created By': space.createdBy,
+    'Space Updated At': space.updatedAt
   };
 }

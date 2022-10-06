@@ -22,6 +22,7 @@ export function getTrackUserProfile (user: LoggedInUser, userSpaces: Space[]) {
   return {
     $created: user.createdAt,
     $name: user.username,
+    'User Updated At': user.updatedAt,
     'Is Connected to Discord': !!user.discordUser,
     'Is Connected via Wallet': !!user.wallets.length,
     'Workspaces Joined': userSpaces.map(s => s.name),
