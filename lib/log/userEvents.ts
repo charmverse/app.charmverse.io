@@ -1,7 +1,7 @@
 import type { Bounty, Page, Space } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import { isProdEnv } from 'config/constants';
+import { isProdEnv, isTestEnv } from 'config/constants';
 import { prisma } from 'db';
 import log from 'lib/log';
 
@@ -21,7 +21,7 @@ export interface UserSpaceAction {
 /// ------ Event types
 export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue' | 'referral';
 
-export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_workspace_from_link' | 'first_user_proposal_create' | 'first_user_proposal_template_create';
+export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_workspace_from_link' | 'first_user_proposal_create' | 'first_user_proposal_template_create' | 'first_workspace_proposal_create' | 'first_workspace_proposal_template_create';
 
 /// ------
 /**
@@ -38,13 +38,13 @@ const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
 
 export async function postToDiscord (eventLog: IEventToLog) {
 
-  let message = `Event: ${eventLog.funnelStage.toUpperCase()} / ${eventLog.eventType}\r\n`;
+  let message = `Event: ${eventLog.funnelStage.toUpperCase()}  / ${eventLog.eventType}\r\n`;
 
   message += eventLog.message;
 
   log.debug('New event logged', message);
 
-  if (isProdEnvironment === true && webhook) {
+  if (isProdEnvironment && webhook) {
 
     try {
       const discordReponse = await http.POST<IDiscordMessage>(webhook, { content: message });
@@ -67,20 +67,36 @@ export async function logFirstProposal ({ spaceId, userId }: UserSpaceAction) {
     }
   });
 
-  const createdProposals = await prisma.proposal.count({
+  const [userProposals, spaceProposals] = await Promise.all([prisma.proposal.count({
     where: {
       createdBy: userId,
       page: {
         type: 'proposal'
       }
     }
-  });
+  }), prisma.proposal.count({
+    where: {
+      spaceId,
+      page: {
+        type: 'proposal'
+      }
+    }
+  })]);
 
-  if (createdProposals === 1) {
+  if (userProposals === 1) {
     const eventLog: IEventToLog = {
       eventType: 'first_user_proposal_create',
       funnelStage: 'activation',
       message: `Someone created their first proposal ${space?.domain} workspace via an invite link`
+    };
+    postToDiscord(eventLog);
+  }
+
+  if (spaceProposals === 1) {
+    const eventLog: IEventToLog = {
+      eventType: 'first_workspace_proposal_create',
+      funnelStage: 'activation',
+      message: `The ${space?.domain} workspace just created its first proposal`
     };
     postToDiscord(eventLog);
   }
@@ -94,20 +110,36 @@ export async function logFirstProposalTemplate ({ spaceId, userId }: UserSpaceAc
     }
   });
 
-  const createdProposalTemplates = await prisma.proposal.count({
+  const [userProposals, spaceProposals] = await Promise.all([prisma.proposal.count({
     where: {
       createdBy: userId,
       page: {
         type: 'proposal_template'
       }
     }
-  });
+  }), prisma.proposal.count({
+    where: {
+      spaceId,
+      page: {
+        type: 'proposal_template'
+      }
+    }
+  })]);
 
-  if (createdProposalTemplates === 1) {
+  if (userProposals === 1) {
     const eventLog: IEventToLog = {
       eventType: 'first_user_proposal_create',
       funnelStage: 'activation',
       message: `Someone inside ${space?.domain} workspace created their first proposal template`
+    };
+    postToDiscord(eventLog);
+  }
+
+  if (spaceProposals === 1) {
+    const eventLog: IEventToLog = {
+      eventType: 'first_workspace_proposal_create',
+      funnelStage: 'activation',
+      message: `The ${space?.domain} workspace just created its first proposal template`
     };
     postToDiscord(eventLog);
   }
