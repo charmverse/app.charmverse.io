@@ -81,8 +81,8 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
-  return prisma.$transaction(async () => {
-    const createdWorkspaceEvent = await prisma.workspaceEvent.create({
+  return prisma.$transaction(async (tx) => {
+    const createdWorkspaceEvent = await tx.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
         actorId: userId,
@@ -94,7 +94,7 @@ export async function updateProposalStatus ({
         }
       }
     });
-    const updatedProposal = await prisma.proposal.update({
+    const updatedProposal = await tx.proposal.update({
       where: {
         id: proposalId
       },
@@ -108,12 +108,12 @@ export async function updateProposalStatus ({
       }
     });
 
-    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId });
+    const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, tx });
 
-    await prisma.pagePermission.deleteMany(deleteArgs);
+    await tx.pagePermission.deleteMany(deleteArgs);
 
     for (const arg of createArgs) {
-      await prisma.pagePermission.create(arg);
+      await tx.pagePermission.create(arg);
     }
     return {
       workspaceEvent: createdWorkspaceEvent,

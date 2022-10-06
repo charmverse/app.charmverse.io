@@ -1,11 +1,11 @@
-import { prisma } from 'db'
+import { prisma } from 'db';
 import { getTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { getTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { sessionUserRelations } from 'lib/session/config';
+import { chunk } from 'lodash';
 
 const MIXPANEL_API_KEY = process.env.MIXPANEL_API_KEY as string;
 
-export {};
+export { };
 
 async function updateMixpanelGroupProfiles() {
   // Group by workspace
@@ -18,22 +18,33 @@ async function updateMixpanelGroupProfiles() {
     $set: getTrackGroupProfile(space)
   }))
 
-  // Batch update
-  // https://developer.mixpanel.com/reference/group-batch-update
-  const res = await fetch('https://api.mixpanel.com/groups#group-batch-update', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'text/plain'
-    },
-    body: JSON.stringify(profiles)
-  })
-  const data = await res.json()
+  // Mixpanel batch group update limit - 200
+  // https://developer.mixpanel.com/reference/limits-1
+  const chunks = chunk(profiles, 200);
+  console.log('🔥', 'Number of group chunks:', chunks.length);
 
-  if (data === 1) {
+  const promises = chunks.map(async profilesChunk => {
+    // Batch update
+    // https://developer.mixpanel.com/reference/group-batch-update
+    const res = await fetch('https://api.mixpanel.com/groups#group-batch-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/plain'
+      },
+      body: JSON.stringify(profiles)
+    })
+
+    return await res.json() as number
+  });
+
+
+  const results = await Promise.all(promises)
+
+  if (results.every(r => r === 1)) {
     console.log('🔥', `Updated ${spaces.length} group profiles successfully.`);
   } else {
-    console.log('❌', 'Failed to update group profiles.');
+    console.log('❌', 'Failed to update some of group profiles.');
   }
 }
 
@@ -78,24 +89,35 @@ async function updateMixpanelUserProfiles() {
     $set: getTrackUserProfile(user, user.spaces)
   }))
 
-  // Batch update
-  // https://developer.mixpanel.com/reference/profile-batch-update
-  const res = await fetch('https://api.mixpanel.com/engage#profile-batch-update', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'text/plain'
-    },
-    body: JSON.stringify(profiles)
-  })
-  const data = await res.json()
+  // Mixpanel batch profile update limit - 2000
+  // https://developer.mixpanel.com/reference/user-profile-limits
+  const chunks = chunk(profiles, 2000);
+  console.log('🔥', 'Number of profile chunks:', chunks.length);
 
-  if (data === 1) {
+  const promises = chunks.map(async profilesChunk => {
+    // Batch update
+    // https://developer.mixpanel.com/reference/profile-batch-update
+    const res = await fetch('https://api.mixpanel.com/engage#profile-batch-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/plain'
+      },
+      body: JSON.stringify(profiles)
+    })
+
+    return await res.json() as number
+  });
+
+
+  const results = await Promise.all(promises)
+
+  if (results.every(r => r === 1)) {
     console.log('🔥', `Updated ${users.length} group profiles successfully.`);
   } else {
     console.log('❌', 'Failed to update user profiles.');
   }
 }
 
-// updateMixpanelGroupProfiles()
+updateMixpanelGroupProfiles()
 updateMixpanelUserProfiles()

@@ -1,6 +1,7 @@
 import type { PagePermissionLevel, Prisma, ProposalStatus } from '@prisma/client';
 import { v4 } from 'uuid';
 
+import type { OptionalTransaction, TransactionClient } from 'db';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { resolvePageTree } from 'lib/pages/server';
@@ -60,9 +61,9 @@ export interface ProposalPermissionsSync {
 /**
  * Generates proposal page permission prisma arguments to be consumed inside updateProposalStatus
  */
-export async function generateSyncProposalPermissions ({ proposalId, isNewProposal }: ProposalPermissionsSync):
+export async function generateSyncProposalPermissions ({ proposalId, isNewProposal, tx = prisma }: ProposalPermissionsSync & OptionalTransaction):
   Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]> {
-  const queryResult = await prisma.page.findUnique({
+  const queryResult = await tx.page.findUnique({
     where: {
       proposalId
     },
@@ -86,7 +87,7 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
 
   // Delete permissions
   // Check if there are children so we don't perform resolve page tree operation for nothing
-  let children = isNewProposal ? [] : await prisma.page.findMany({
+  let children = isNewProposal ? [] : await tx.page.findMany({
     where: {
       parentId: page.id
     },
@@ -104,7 +105,8 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
     children = (await resolvePageTree({
       pageId: page.id,
       flattenChildren: true,
-      includeDeletedPages: true
+      includeDeletedPages: true,
+      tx
     })).flatChildren;
   }
 
@@ -287,28 +289,37 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
 
 }
 
-export async function syncProposalPermissions ({ proposalId }: ProposalPermissionsSync): Promise<IPageWithPermissions> {
+export async function syncProposalPermissions ({ proposalId, tx }: ProposalPermissionsSync & OptionalTransaction): Promise<IPageWithPermissions> {
 
-  const [deletePermissionArgs, upsertPermissionArgs] = await generateSyncProposalPermissions({ proposalId });
+  if (!tx) {
+    return prisma.$transaction(txHandler);
+  }
 
-  // TEST
+  return txHandler(tx);
 
-  await prisma.$transaction([
-    prisma.pagePermission.deleteMany(deletePermissionArgs),
-    ...upsertPermissionArgs.map(arg => prisma.pagePermission.create(arg))
-  ]);
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  async function txHandler (tx: TransactionClient) {
+    const [deletePermissionArgs, upsertPermissionArgs] = await generateSyncProposalPermissions({ proposalId, tx });
 
-  return prisma.page.findUnique({
-    where: {
-      proposalId
-    },
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
+    await tx.pagePermission.deleteMany(deletePermissionArgs);
+
+    for (const permissionArgs of upsertPermissionArgs) {
+      await tx.pagePermission.create(permissionArgs);
+    }
+    // TEST
+
+    return tx.page.findUnique({
+      where: {
+        proposalId
+      },
+      include: {
+        permissions: {
+          include: {
+            sourcePermission: true
+          }
         }
       }
-    }
-  }) as Promise<IPageWithPermissions>;
+    }) as Promise<IPageWithPermissions>;
+  }
 
 }
