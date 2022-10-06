@@ -42,7 +42,7 @@ export class SignUpPage {
   }
 
   async submitWorkspaceForm ({ domain }: { domain: string }) {
-    this.workspaceFormDomainInput.fill(domain);
+    await this.workspaceFormDomainInput.fill(domain);
     await this.workspaceFormSubmit.click();
   }
 
