@@ -85,6 +85,16 @@ export async function createUserAndSpace ({
   };
 }
 
+export async function createDiscordUser ({ userId, discordUserId }: { userId: string, discordUserId: string }) {
+  return prisma.discordUser.create({
+    data: {
+      account: {},
+      discordId: discordUserId,
+      userId
+    }
+  });
+}
+
 export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & { bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>> }): Promise<BountyWithDetails> {
 
   const pageId = id ?? v4();
