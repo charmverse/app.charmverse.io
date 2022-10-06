@@ -101,7 +101,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
     const chainId = await signer.getChainId();
 
-    const preparedMessage = {
+    const preparedMessage: Partial<SiweMessage> = {
       domain: window.location.host,
       address: getAddress(account), // convert to EIP-55 format or else SIWE complains
       uri: globalThis.location.origin,
@@ -111,7 +111,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
     const message = new SiweMessage(preparedMessage);
 
-    const body = message.prepareMessage();
+    const body = `Welcome to CharmVerse. Please sign this message to login with your Ethereum account.\r\n\r\n${message.prepareMessage()}`;
 
     const messageBytes = toUtf8Bytes(body);
 
