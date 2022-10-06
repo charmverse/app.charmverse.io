@@ -1,5 +1,6 @@
 import { verifyMessage } from '@ethersproject/wallet';
 import { useWeb3React } from '@web3-react/core';
+import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
@@ -92,17 +93,17 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       throw new ExternalServiceError('No account detected');
     }
 
-    const signer = library.getSigner(account);
+    const signer = library.getSigner(account) as Signer;
 
     if (!signer) {
       throw new ExternalServiceError('Missing signer');
     }
 
-    const chainId = await signer?.getChainId();
+    const chainId = await signer.getChainId();
 
     const preparedMessage = {
       domain: window.location.host,
-      address: getAddress(account as string), // convert to EIP-55 format or else SIWE complains
+      address: getAddress(account), // convert to EIP-55 format or else SIWE complains
       uri: globalThis.location.origin,
       version: '1',
       chainId
@@ -115,8 +116,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     const messageBytes = toUtf8Bytes(body);
 
     const newSignature = await signer.signMessage(messageBytes);
-
-    const signatureAddress = verifyMessage(body, newSignature as string).toLowerCase();
+    const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
 
     if (!lowerCaseEqual(signatureAddress, account)) {
       throw new Error('Signature address does not match account');

@@ -207,7 +207,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <SidebarHeader className='sidebar-header'>
-            <Typography><strong>{space.name}</strong></Typography>
+            <Typography><strong data-test='sidebar-space-name'>{space.name}</strong></Typography>
             <IconButton onClick={closeSidebar} size='small'>
               <ChevronLeftIcon />
             </IconButton>

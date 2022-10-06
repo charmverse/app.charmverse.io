@@ -112,7 +112,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
       <br />
@@ -129,6 +129,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
+            data-test='workspace-name-input'
             {...register('name', {
               onChange: onChangeName
             })}
