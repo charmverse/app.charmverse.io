@@ -73,21 +73,20 @@ async function updateMixpanelUserProfiles() {
           include: {
             role: true
           }
-        }
+        },
+        space: true
       }
     },
     discordUser: true,
     telegramUser: true,
     notificationState: true,
-    wallets: true,
-    // include spaces
-    spaces: true
+    wallets: true
   } });
 
   const profiles = users.map(user => ({
     $token: MIXPANEL_API_KEY,
     $distinct_id: user.id,
-    $set: getTrackUserProfile(user, user.spaces)
+    $set: getTrackUserProfile(user, user.spaceRoles.map(role => role.space))
   }))
 
   // Mixpanel batch profile update limit - 2000
