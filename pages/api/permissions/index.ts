@@ -92,7 +92,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
 
     // Override behaviour, we always cascade board permissions downwards
     if (page.type.match(/board/)) {
-      await boardPagePermissionUpdated({ boardId: pageId, permissionId: newPermission.id });
+      await boardPagePermissionUpdated({ boardId: pageId, permissionId: newPermission.id, tx });
 
     }
     // Existing behaviour where we setup permissions after a page permission is added, and account for inheritance conditions
