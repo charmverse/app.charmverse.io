@@ -1,6 +1,6 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import type { PopperProps } from '@mui/material';
-import { Autocomplete, Popper, Stack, Typography } from '@mui/material';
+import { Alert, Autocomplete, Popper, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
@@ -131,6 +131,14 @@ export default function CreateSpace () {
                 <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
               )
             }
+          </>
+        )}
+        {!spaceInfo && domain && (
+          <>
+            <br />
+            <Alert severity='error'>
+              No workspace found
+            </Alert>
           </>
         )}
         {/* If there is no domain param in the url, show the text input to search for workspaces */}
