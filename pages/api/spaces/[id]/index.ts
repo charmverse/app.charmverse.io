@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { onError, onNoMatch, requireSpaceMembership, ActionNotPermittedError } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -34,6 +35,9 @@ async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     },
     data: req.body
   });
+
+  updateTrackGroupProfile(space);
+
   return res.status(200).json(space);
 }
 

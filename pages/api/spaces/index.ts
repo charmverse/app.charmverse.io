@@ -9,6 +9,7 @@ import { prisma } from 'db';
 import type { IEventToLog } from 'lib/log/userEvents';
 import { postToDiscord } from 'lib/log/userEvents';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
@@ -81,6 +82,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   logSpaceCreation(space);
+  updateTrackGroupProfile(space);
   trackUserAction('create_new_workspace', { userId, spaceId: space.id });
 
   return res.status(200).json(updatedSpace);

@@ -53,7 +53,7 @@ export default function WorkspaceSettings () {
   });
 
   useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: space?.id || '', type: 'settings' });
+    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'settings' });
   }, []);
 
   const watchName = watch('name');

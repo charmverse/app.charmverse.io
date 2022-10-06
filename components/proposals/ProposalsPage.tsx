@@ -28,7 +28,7 @@ export default function ProposalsPage () {
   } = useProposalSortAndFilters(data ?? []);
 
   useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id || '', type: 'proposals_list' });
+    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id, type: 'proposals_list' });
   }, []);
 
   const loadingData = !data;
