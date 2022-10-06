@@ -7,6 +7,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
 
 import AggregatedData from './components/AggregatedData';
+import CollablandCredentials from './components/CollablandCredentials';
 import type { Collectable } from './components/CollectibleRow';
 import CollectableRow from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
@@ -14,7 +15,6 @@ import CommunityRow from './components/CommunityRow';
 import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
-import CollablandCredentials from './components/CollablandCredentials';
 
 function transformPoap (poap: ExtendedPoap): Collectable {
   return {
