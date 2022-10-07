@@ -1,0 +1,24 @@
+diff --git a/node_modules/lit-siwe/dist/client.js b/node_modules/lit-siwe/dist/client.js
+index 38d7780..a4e3210 100644
+--- a/node_modules/lit-siwe/dist/client.js
++++ b/node_modules/lit-siwe/dist/client.js
+@@ -88,9 +88,9 @@ class SiweMessage {
+      * @returns {string} EIP-4361 formated message, ready for EIP-191 signing.
+      */
+     toMessage() {
+-        const header = `${this.domain} wants you to sign in with your Ethereum account:`;
++        const header = 'Welcome to CharmVerse. Please sign this message to login with your Ethereum account.';
+         const uriField = `URI: ${this.uri}`;
+-        let prefix = [header, this.address].join("\n");
++        let prefix = [header, this.address].join("\n\n");
+         const versionField = `Version: ${this.version}`;
+         if (!this.nonce) {
+             this.nonce = (0, exports.generateNonce)();
+@@ -121,6 +121,7 @@ class SiweMessage {
+         if (this.statement) {
+             prefix += "\n";
+         }
++        console.log('Generating message', prefix)
+         return [prefix, suffix].join("\n");
+     }
+     /** @deprecated
