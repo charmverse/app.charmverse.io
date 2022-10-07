@@ -180,6 +180,7 @@
     "reselect": "^4.0.0",
     "scroll-into-view-if-needed": "^2.2.29",
     "sharp": "^0.30.5",
+    "socket-io": "^1.0.0",
     "swagger-ui-react": "^4.14.1",
     "swr": "^1.2.1",
     "ts-node": "^10.9.1",
