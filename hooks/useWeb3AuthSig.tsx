@@ -93,7 +93,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
         setSignature(storedWalletSignature);
       }
       else {
-        setSignature(null);
+        setSignature(null, true);
       }
     }
     else {
