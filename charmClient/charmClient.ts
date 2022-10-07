@@ -280,8 +280,12 @@ class CharmClient {
     }));
   }
 
-  async getPublicSpaceInfo (spaceId: string): Promise<Space> {
-    return http.GET<Space>(`/api/spaces/${spaceId}/public`);
+  async getSpaceByDomain (search: string): Promise<Space | null> {
+    return http.GET<Space | null>('/api/spaces/search-domain', { search });
+  }
+
+  async getSpacesByName (search: string): Promise<Space[]> {
+    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   async getAllBlocks (spaceId: string): Promise<FBBlock[]> {
