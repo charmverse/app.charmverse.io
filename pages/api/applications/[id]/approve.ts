@@ -65,7 +65,7 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     });
 
   const { id: bountyId, rewardAmount, rewardToken, spaceId } = application.bounty;
-  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount: String(rewardAmount), rewardToken, resourceId: bountyId });
+  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
 
   return res.status(200).json(approvedApplication);
 }

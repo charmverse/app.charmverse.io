@@ -81,7 +81,7 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
 
     trackUserAction(
       'bounty_created',
-      { userId, spaceId, resourceId: id, rewardToken, rewardAmount: String(rewardAmount), pageId: page.id }
+      { userId, spaceId, resourceId: id, rewardToken, rewardAmount, pageId: page.id }
     );
 
   }, 60 * 1000);

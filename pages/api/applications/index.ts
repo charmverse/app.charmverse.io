@@ -99,7 +99,7 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
   });
 
   const { spaceId, rewardAmount, rewardToken } = bountySpaceId;
-  trackUserAction('bounty_application', { userId, spaceId, rewardAmount: String(rewardAmount), rewardToken, resourceId: bountyId });
+  trackUserAction('bounty_application', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
 
   return res.status(201).json(createdApplication);
 }
