@@ -31,9 +31,10 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
+    // sd d
+    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        status: privateDraftProposal1.proposal?.status,
+        status: privateDraftProposal1.proposal.status,
         action: 'start_review'
       })
     ]));
@@ -71,7 +72,7 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked.length).toEqual(0);
+    expect(proposalTasks.unmarked.length).toEqual(0);
   });
 
   it('Should get all reviewed proposals where the user is one of the authors', async () => {
@@ -96,9 +97,9 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
+    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        status: reviewedProposal1.proposal?.status,
+        status: reviewedProposal1.proposal.status,
         action: 'start_vote'
       })
     ]));
@@ -140,13 +141,13 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
+    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        status: proposalToReviewViaRole.proposal?.status,
+        status: proposalToReviewViaRole.proposal.status,
         action: 'review'
       }),
       expect.objectContaining({
-        status: proposalToReviewViaUser.proposal?.status,
+        status: proposalToReviewViaUser.proposal.status,
         action: 'review'
       })
     ]));
@@ -236,23 +237,23 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.marked).toEqual(expect.arrayContaining([
+    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        status: discussionProposal1.proposal?.status,
+        status: discussionProposal1.proposal.status,
         action: 'start_review'
       }),
       expect.objectContaining({
-        status: activeVoteProposal.proposal?.status,
+        status: activeVoteProposal.proposal.status,
         action: 'vote'
       }),
       expect.objectContaining({
-        status: discussionProposal2.proposal?.status,
+        status: discussionProposal2.proposal.status,
         action: 'discuss'
       })
     ]));
 
     // Making double sure private draft wasn't fetched
-    expect(proposalTasks.marked).toEqual(expect.not.arrayContaining([
+    expect(proposalTasks.unmarked).toEqual(expect.not.arrayContaining([
       expect.objectContaining({
         status: 'private_draft'
       })

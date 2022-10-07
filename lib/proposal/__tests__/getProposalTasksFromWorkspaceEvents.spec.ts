@@ -34,7 +34,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedProposal } = await updateProposalStatus({
-      proposal: authoredDraftProposal.proposal!,
+      proposal: authoredDraftProposal.proposal,
       newStatus: 'discussion',
       userId: user1.id
     });
@@ -60,7 +60,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
-      proposal: reviewProposal.proposal!,
+      proposal: reviewProposal.proposal,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -83,7 +83,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: authoredStartReviewProposal.proposal!,
+      proposal: authoredStartReviewProposal.proposal,
       newStatus: 'discussion',
       userId: user1.id
     });
@@ -100,7 +100,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: discussedProposal.proposal!,
+      proposal: discussedProposal.proposal,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -120,7 +120,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: reviewedProposal.proposal!,
+      proposal: reviewedProposal.proposal,
       newStatus: 'reviewed',
       userId: user1.id
     });
@@ -137,7 +137,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: voteActiveProposal.proposal!,
+      proposal: voteActiveProposal.proposal,
       newStatus: 'vote_active',
       userId: user2.id
     });
