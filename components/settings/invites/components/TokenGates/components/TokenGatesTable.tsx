@@ -1,16 +1,20 @@
+import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/Close';
+import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
+import { useRouter } from 'next/router';
+import type { MouseEvent } from 'react';
 import { useEffect, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
@@ -18,6 +22,7 @@ import charmClient from 'charmClient';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import log from 'lib/log';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
@@ -33,12 +38,28 @@ interface Props {
   onDelete: (tokenGate: TokenGate) => void;
 }
 
+const StyledTableRow = styled(TableRow)`
+  margin-bottom: 20px;
+  background-color: ${({ theme }) => theme.palette.sidebar.background};
+
+  & > th, & > td {
+    border-bottom-style: dashed;
+  }
+`;
+
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, chainId } = useWeb3React();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const [space] = useCurrentSpace();
+  const router = useRouter();
+  const { showMessage } = useSnackbar();
+  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
+
+  function onCopy () {
+    showMessage('Link copied to clipboard');
+  }
 
   async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
     if (space) {
@@ -108,61 +129,81 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
 
   return (
     <>
-      <Table size='small' aria-label='simple table'>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ px: 0 }}>Description</TableCell>
-            <TableCell>
-              <Tooltip arrow placement='top' title='Automatically assign these roles to new users'>
-                <Typography fontSize='small' noWrap>Assigned Roles</Typography>
-              </Tooltip>
-            </TableCell>
-            <TableCell />
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedTokenGates.map((tokenGate, tokenGateIndex) => (
-            <TableRow key={tokenGate.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }, marginBottom: 20 }}>
-              <TableCell sx={{ px: 0 }}>
-                <Typography variant='body2' sx={{ my: 1 }}>
-                  {descriptions[tokenGateIndex]}
+      <Box overflow='auto'>
+        <Table size='small' aria-label='Token gates table'>
+          <TableHead>
+            <StyledTableRow>
+              <TableCell sx={{ padding: '20px 16px' }}>
+                <Typography variant='body1' fontWeight='600'>
+                  Token Gated Link
                 </Typography>
               </TableCell>
-              <TableCell>
-                <TokenGateRolesSelect
-                  selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
-                  onChange={(roleIds) => {
-                    updateTokenGateRoles(tokenGate.id, roleIds);
-                  }}
-                  onDelete={(roleId) => {
-                    deleteRoleFromTokenGate(tokenGate.id, roleId);
-                  }}
-                />
+              <TableCell width={150}>Asssigned Role</TableCell>
+              <TableCell width={90} align='center'>
+                <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                  <Chip onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()} sx={{ width: 90 }} clickable color='secondary' size='small' variant='outlined' label='Copy Link' />
+                </CopyToClipboard>
               </TableCell>
-              <TableCell width={140} sx={{ px: 0, whiteSpace: 'nowrap' }} align='right'>
-                <Tooltip arrow placement='top' title={litClient ? 'Test this gate using your own wallet' : 'Lit Protocol client has not initialized'}>
-                  <Box component='span' pr={1}>
-                    <Chip onClick={() => litClient && testConnect(tokenGate)} sx={{ width: 70 }} clickable={Boolean(litClient)} color='secondary' size='small' variant='outlined' label='Test' />
-                  </Box>
-                </Tooltip>
-                {isAdmin && (
-                  <Tooltip arrow placement='top' title='Delete'>
-                    <ButtonChip
-                      className='row-actions'
-                      icon={<DeleteIcon />}
-                      clickable
-                      color='secondary'
-                      size='small'
-                      variant='outlined'
-                      onClick={() => onDelete(tokenGate)}
-                    />
+              <TableCell width={30}>{/** Delete */}</TableCell>
+            </StyledTableRow>
+          </TableHead>
+          <TableBody>
+            {sortedTokenGates.length === 0 && (
+              <TableRow>
+                <TableCell align='center' colSpan={4} sx={{ padding: '20px 16px' }}>This Workspace has no Token Gates</TableCell>
+              </TableRow>
+            )}
+            {sortedTokenGates.map((tokenGate, tokenGateIndex, tokenGateArray) => (
+              <TableRow key={tokenGate.id} sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
+                <TableCell>
+                  <Typography variant='body2' sx={{ my: 1 }}>
+                    {descriptions[tokenGateIndex]}
+                  </Typography>
+                  {tokenGateArray.length === tokenGateIndex + 1 ? null : (
+                    <Typography variant='body2' sx={{ mt: 1 }}>
+                      -- OR --
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <TokenGateRolesSelect
+                    isAdmin={isAdmin}
+                    selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
+                    onChange={(roleIds) => {
+                      updateTokenGateRoles(tokenGate.id, roleIds);
+                    }}
+                    onDelete={(roleId) => {
+                      deleteRoleFromTokenGate(tokenGate.id, roleId);
+                    }}
+                  />
+                </TableCell>
+                <TableCell align='center'>
+                  <Tooltip arrow placement='top' title={litClient ? 'Test this gate using your own wallet' : 'Lit Protocol client has not initialized'}>
+                    <Box component='span'>
+                      <Chip onClick={() => litClient && testConnect(tokenGate)} sx={{ width: 90 }} clickable={Boolean(litClient)} color='secondary' size='small' variant='outlined' label='Test' />
+                    </Box>
                   </Tooltip>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                </TableCell>
+                <TableCell width={30}>
+                  {isAdmin && (
+                    <Tooltip arrow placement='top' title='Delete'>
+                      <ButtonChip
+                        className='row-actions'
+                        icon={<DeleteIcon />}
+                        clickable
+                        color='secondary'
+                        size='small'
+                        variant='outlined'
+                        onClick={() => onDelete(tokenGate)}
+                      />
+                    </Tooltip>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
       <TestConnectionModal
         status={testResult.status}
         message={testResult.message}
