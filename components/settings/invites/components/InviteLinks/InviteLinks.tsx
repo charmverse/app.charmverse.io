@@ -1,11 +1,11 @@
 import type { InviteLink } from '@prisma/client';
 import type { PopupState } from 'material-ui-popup-state/hooks';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { Modal } from 'components/common/Modal';
+import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 
@@ -23,6 +23,7 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
   const { data = [], mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
 
+  const { isOpen: isOpenInviteModal, close: closeInviteModal } = popupState;
   const {
     isOpen: isInviteLinkDeleteOpen,
     open: openInviteLinkDelete,
@@ -41,7 +42,7 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
     });
     // update the list of links
     await mutate();
-    popupState.close();
+    closeInviteModal();
   }
 
   async function deleteLink (link: InviteLinkPopulated) {
@@ -52,8 +53,8 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
   return (
     <>
       <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />
-      <Modal {...bindPopover(popupState)}>
-        <InviteForm onSubmit={createLink} onClose={popupState.close} />
+      <Modal open={isOpenInviteModal} onClose={closeInviteModal}>
+        <InviteForm onSubmit={createLink} onClose={closeInviteModal} />
       </Modal>
       {removedInviteLink && (
         <ConfirmDeleteModal
