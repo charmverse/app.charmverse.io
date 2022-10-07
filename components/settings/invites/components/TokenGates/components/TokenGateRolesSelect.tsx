@@ -46,7 +46,9 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
 
   async function selectOption (ev: SelectChangeEvent<string[]>) {
     ev.preventDefault();
-    onChange(ev.target.value as string[]);
+    if (Array.isArray(ev.target.value)) {
+      onChange(ev.target.value);
+    }
   }
 
   const isAdmin = useIsAdmin();

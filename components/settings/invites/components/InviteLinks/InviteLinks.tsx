@@ -1,29 +1,27 @@
-import Typography from '@mui/material/Typography';
 import type { InviteLink } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { PopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import { Modal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import type { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
-import InviteForm from 'components/settings/contributors/InviteLinks/InviteLinkForm';
-import Legend from 'components/settings/Legend';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 
-import InvitesTable from './InviteLinksTable';
+import type { FormValues as InviteLinkFormValues } from './components/InviteLinkForm';
+import InviteForm from './components/InviteLinkForm';
+import InvitesTable from './components/InviteLinksTable';
 
-export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
+interface InviteLinksProps {
+  isAdmin: boolean;
+  spaceId: string;
+  popupState: PopupState;
+}
+
+export default function InviteLinkList ({ isAdmin, spaceId, popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
-
-  const { data, mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
-  const {
-    isOpen,
-    open,
-    close
-  } = usePopupState({ variant: 'popover', popupId: 'invite-link-form' });
+  const { data = [], mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
 
   const {
     isOpen: isInviteLinkDeleteOpen,
@@ -43,7 +41,7 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
     });
     // update the list of links
     await mutate();
-    close();
+    popupState.close();
   }
 
   async function deleteLink (link: InviteLinkPopulated) {
@@ -53,14 +51,9 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
 
   return (
     <>
-      <Legend>
-        Invite Links
-        {isAdmin && <Button sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
-      </Legend>
-      {data && data.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />}
-      <Modal open={isOpen} onClose={close}>
-        <InviteForm onSubmit={createLink} onClose={close} />
+      <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />
+      <Modal {...bindPopover(popupState)}>
+        <InviteForm onSubmit={createLink} onClose={popupState.close} />
       </Modal>
       {removedInviteLink && (
         <ConfirmDeleteModal
