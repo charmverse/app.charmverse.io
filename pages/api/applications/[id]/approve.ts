@@ -8,6 +8,7 @@ import { approveApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import * as collabland from 'lib/collabland';
 import log from 'lib/log';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -28,7 +29,8 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
       id: applicationId as string
     },
     select: {
-      bountyId: true
+      bountyId: true,
+      bounty: true
     }
   });
 
@@ -61,6 +63,9 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     .catch(error => {
       log.error('Error creating collabland VC', error);
     });
+
+  const { id: bountyId, rewardAmount, rewardToken, spaceId } = application.bounty;
+  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount: String(rewardAmount), rewardToken, resourceId: bountyId });
 
   return res.status(200).json(approvedApplication);
 }

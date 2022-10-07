@@ -8,6 +8,7 @@ import { createBounty, listAvailableBounties } from 'lib/bounties';
 import * as collabland from 'lib/collabland';
 import log from 'lib/log';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
@@ -72,11 +73,16 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
 
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {
-
-    collabland.createBountyCreatedCredential({ bountyId: createdBounty.id })
+    const { id, rewardAmount, rewardToken, page } = createdBounty;
+    collabland.createBountyCreatedCredential({ bountyId: id })
       .catch(err => {
         log.error('Error creating bounty created credential', err);
       });
+
+    trackUserAction(
+      'bounty_created',
+      { userId, spaceId, resourceId: id, rewardToken, rewardAmount: String(rewardAmount), pageId: page.id }
+    );
 
   }, 60 * 1000);
 
