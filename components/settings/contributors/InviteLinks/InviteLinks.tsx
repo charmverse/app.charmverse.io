@@ -58,7 +58,7 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
         {isAdmin && <Button sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} onDelete={deleteLink} />}
+      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />}
       <Modal open={isOpen} onClose={close}>
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>

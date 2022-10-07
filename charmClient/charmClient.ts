@@ -218,6 +218,10 @@ class CharmClient {
     return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
+  updateInviteLinkRoles (inviteLinkId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+  }
+
   createInviteLink (link: Partial<InviteLink>) {
     return http.POST<InviteLinkPopulated[]>('/api/invites', link);
   }
