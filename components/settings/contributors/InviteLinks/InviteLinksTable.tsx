@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Countdown from 'react-countdown';
-import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import ButtonChip from 'components/common/ButtonChip';
@@ -25,7 +24,7 @@ interface Props {
   isAdmin: boolean;
   invites: InviteLinkPopulated[];
   onDelete: (invite: InviteLinkPopulated) => void;
-  refetchInvites: KeyedMutator<InviteLinkPopulated[]>;
+  refetchInvites: VoidFunction;
 }
 
 export default function InvitesTable ({
@@ -51,13 +50,12 @@ export default function InvitesTable ({
   }
 
   async function deleteRoleFromInviteLink (inviteLinkId: string, roleId: string) {
-    const inviteLink = invites.find(_tokenGate => _tokenGate.id === inviteLinkId);
+    const inviteLink = invites.find(invite => invite.id === inviteLinkId);
     if (inviteLink && space) {
       const roleIds = inviteLink.inviteLinkToRoles
         .map(inviteLinkToRole => inviteLinkToRole.roleId)
         .filter(inviteLinkRoleId => inviteLinkRoleId !== roleId);
-      await charmClient.updateInviteLinkRoles(inviteLinkId, space.id, roleIds);
-      refetchInvites();
+      await updateInviteLinkRoles(inviteLinkId, roleIds);
     }
   }
 
