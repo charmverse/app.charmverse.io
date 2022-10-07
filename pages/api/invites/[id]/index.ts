@@ -29,17 +29,17 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     return res.status(421).send({ message: 'Invite not found' });
   }
   const userId = req.session.user.id;
-  const roles = await prisma.spaceRole.findMany({
+  const spaceRole = await prisma.spaceRole.findMany({
     where: {
-      userId
+      userId,
+      spaceId: invite.spaceId
     }
   });
 
-  const userHasRoleInSpace = roles.some(role => role.spaceId === invite.spaceId);
-
-  if (userHasRoleInSpace === false) {
+  // Only proceed if they are not a member of the workspace
+  if (spaceRole.length === 0) {
     log.info('User joined workspace via invite', { spaceId: invite.spaceId, userId });
-    const newRole = await prisma.spaceRole.create({
+    const createdSpaceRole = await prisma.spaceRole.create({
       data: {
         space: {
           connect: {
@@ -54,17 +54,41 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    logInviteAccepted({ spaceId: newRole.spaceId });
+    logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
 
     updateTrackUserProfileById(userId);
     trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
 
-    await prisma.inviteLink.update({
-      where: { id: invite.id },
-      data: {
-        useCount: invite.useCount + 1
+    const roleIdsToAssign: string[] = (await prisma.inviteLinkToRole.findMany({
+      where: {
+        inviteLinkId: invite.id
+      },
+      select: {
+        roleId: true
       }
-    });
+    })).map(({ roleId }) => roleId);
+
+    await prisma.$transaction([
+      ...roleIdsToAssign.map(roleId => prisma.spaceRoleToRole.upsert({
+        where: {
+          spaceRoleId_roleId: {
+            spaceRoleId: createdSpaceRole.id,
+            roleId
+          }
+        },
+        create: {
+          roleId,
+          spaceRoleId: createdSpaceRole.id
+        },
+        update: {}
+      })),
+      prisma.inviteLink.update({
+        where: { id: invite.id },
+        data: {
+          useCount: invite.useCount + 1
+        }
+      })
+    ]);
   }
 
   return res.status(200).json({ ok: true });
