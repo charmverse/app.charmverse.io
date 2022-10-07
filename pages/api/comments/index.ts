@@ -1,4 +1,7 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
@@ -6,8 +9,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

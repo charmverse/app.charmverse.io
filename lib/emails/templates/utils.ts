@@ -1,5 +1,5 @@
-import type React from 'react';
 import { render } from 'mjml-react';
+import type React from 'react';
 
 export function renderMJML (mjml: React.ReactElement) {
   const { html: rendered } = render(mjml, {

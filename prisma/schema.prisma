@@ -334,7 +334,7 @@ model User {
   pages             Page[]
   permissions       PagePermission[]
   poaps             Poap[]
-  spaces            Space[]
+  spacesCreated     Space[]
   spacePermissions  SpacePermission[]
   spaceRoles        SpaceRole[]
   telegramUser      TelegramUser?
@@ -437,16 +437,17 @@ model SpaceRole {
 }
 
 model InviteLink {
-  id            String   @id @default(uuid()) @db.Uuid
-  code          String   @unique
-  createdAt     DateTime @default(now())
-  createdBy     String   @db.Uuid
-  spaceId       String   @db.Uuid
-  maxAgeMinutes Int      @default(60)
-  maxUses       Int      @default(-1)
-  useCount      Int      @default(0)
-  author        User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  space         Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  id                String             @id @default(uuid()) @db.Uuid
+  code              String             @unique
+  createdAt         DateTime           @default(now())
+  createdBy         String             @db.Uuid
+  spaceId           String             @db.Uuid
+  maxAgeMinutes     Int                @default(60)
+  maxUses           Int                @default(-1)
+  useCount          Int                @default(0)
+  author            User               @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  inviteLinkToRoles InviteLinkToRole[]
 }
 
 model Bounty {
@@ -579,6 +580,7 @@ model Role {
   spaceRolesToRole  SpaceRoleToRole[]
   TokenGateToRole   TokenGateToRole[]
   proposalReviewer  ProposalReviewer[]
+  InviteLinkToRole  InviteLinkToRole[]
 
   @@unique([spaceId, name])
 }
@@ -592,6 +594,17 @@ model TokenGateToRole {
   tokenGate   TokenGate @relation(fields: [tokenGateId], references: [id], onDelete: Cascade)
 
   @@unique([tokenGateId, roleId])
+}
+
+model InviteLinkToRole {
+  id           String     @id @default(uuid()) @db.Uuid
+  createdAt    DateTime   @default(now())
+  inviteLinkId String     @db.Uuid
+  roleId       String     @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  inviteLink   InviteLink @relation(fields: [inviteLinkId], references: [id], onDelete: Cascade)
+
+  @@unique([inviteLinkId, roleId])
 }
 
 model SpaceRoleToRole {

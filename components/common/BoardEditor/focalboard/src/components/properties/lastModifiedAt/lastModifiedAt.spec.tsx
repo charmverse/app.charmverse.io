@@ -1,11 +1,10 @@
 
-import React from 'react';
 import { render } from '@testing-library/react';
-
-import { wrapIntl } from '../../../testUtils';
+import React from 'react';
 
 import { createCard } from '../../../blocks/card';
 import { createCommentBlock } from '../../../blocks/commentBlock';
+import { wrapIntl } from '../../../testUtils';
 
 import LastModifiedAt from './lastModifiedAt';
 

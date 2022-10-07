@@ -1,18 +1,20 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Chip, Grid, Tooltip, Typography } from '@mui/material';
+
 import Button from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
 import GridHeader from 'components/common/Grid/GridHeader';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import type { BrandColor } from 'theme/colors';
-import { ProposalStatusChip } from './ProposalStatusBadge';
+
 import NoProposalsMessage from './NoProposalsMessage';
 import ProposalActionsMenu from './ProposalActionsMenu';
+import { ProposalStatusChip } from './ProposalStatusBadge';
 
 export default function ProposalsTable ({ proposals, mutateProposals }: { proposals?: (ProposalWithUsers)[], mutateProposals: () => void }) {
   const { pages, deletePage } = usePages();

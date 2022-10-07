@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 
 import type { PropertyType } from '../blocks/board';
 import { Utils } from '../utils';
+
 import Menu from './menu';
 
 type Props = {

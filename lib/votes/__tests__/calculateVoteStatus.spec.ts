@@ -1,4 +1,5 @@
 import { VoteStatus } from '@prisma/client';
+
 import { calculateVoteStatus } from '../calculateVoteStatus';
 
 // 30 days ago

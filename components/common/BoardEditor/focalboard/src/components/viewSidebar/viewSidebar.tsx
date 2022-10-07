@@ -1,18 +1,20 @@
-import { Box, ClickAwayListener, Portal, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
-import PreviewIcon from '@mui/icons-material/Preview';
-import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
+import styled from '@emotion/styled';
 import BackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
-import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
+import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import PreviewIcon from '@mui/icons-material/Preview';
+import { Box, ClickAwayListener, Portal, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
-import ViewLayoutOptions from './viewLayoutOptions';
-import ViewPropertyOptions from './viewPropertyOptions';
-import GroupOptions from './viewGroupOptions';
+import { useEffect, useState } from 'react';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
+
+import GroupOptions from './viewGroupOptions';
+import ViewLayoutOptions from './viewLayoutOptions';
+import ViewPropertyOptions from './viewPropertyOptions';
 
 interface Props {
   board: Board;

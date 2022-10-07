@@ -1,12 +1,13 @@
+import { useRouter } from 'next/router';
+import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
+
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo } from 'react';
-import { FormattedMessage } from 'react-intl';
 
 type Props = {
   readOnly: boolean;

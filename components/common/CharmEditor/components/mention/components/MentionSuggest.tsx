@@ -1,13 +1,15 @@
 import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
+import type { PluginKey } from 'prosemirror-state';
+import { useCallback, useEffect, memo } from 'react';
+
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import { usePages } from 'hooks/usePages';
 import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
-import type { PluginKey } from 'prosemirror-state';
-import { useCallback, useEffect, memo } from 'react';
+
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PagesList from '../../PageList';

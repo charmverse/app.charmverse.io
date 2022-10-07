@@ -1,6 +1,8 @@
 import type { Space, User } from '@prisma/client';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { createPage, generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { lockToBountyCreator } from '../lockToBountyCreator';
 
 let user: User;

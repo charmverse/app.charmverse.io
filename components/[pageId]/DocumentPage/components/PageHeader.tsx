@@ -1,7 +1,12 @@
 import styled from '@emotion/styled';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { ChangeEvent } from 'react';
+import { memo } from 'react';
+
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
@@ -10,10 +15,7 @@ import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/me
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
 import type { Page } from 'models';
-import type { ChangeEvent } from 'react';
-import { memo } from 'react';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+
 import { randomBannerImage } from './PageBanner';
 import PageTitleInput from './PageTitleInput';
 

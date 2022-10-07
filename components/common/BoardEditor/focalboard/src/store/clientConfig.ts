@@ -3,7 +3,6 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import type { ClientConfig } from '../config/clientConfig';
-
 import client from '../octoClient';
 
 import type { RootState } from './index';

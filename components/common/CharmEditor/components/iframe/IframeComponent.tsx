@@ -8,14 +8,17 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
-import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
+
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
+import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
+
 import BlockAligner from '../BlockAligner';
-import IFrameSelector from './IFrameSelector';
 import Resizable from '../Resizable';
 import VerticalResizer from '../Resizable/VerticalResizer';
+
+import IFrameSelector from './IFrameSelector';
 
 const name = 'iframe';
 

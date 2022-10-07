@@ -1,8 +1,9 @@
+import { useCallback, useState } from 'react';
+
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { UserAvatar } from 'lib/users/interfaces';
-import { useCallback, useState } from 'react';
 
 const isAvatarObject = (
   avatar: string | UserAvatar

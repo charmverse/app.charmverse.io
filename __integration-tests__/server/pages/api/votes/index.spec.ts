@@ -1,13 +1,14 @@
 import type { Page, Space, Vote } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
-import { removeSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { removeSpaceOperations } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
 let space: Space;

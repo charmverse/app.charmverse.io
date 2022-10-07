@@ -1,4 +1,5 @@
 import type { Block, Page, PagePermission, Space } from '@prisma/client';
+
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -94,6 +95,7 @@ export type PageDetails = {
   id: string;
   content: string | number | boolean | Record<string, any> | any[] | null;
   contentText: string;
+  spaceId: string;
 }
 
 export type PageWithProposal = (Page & { proposal: ProposalWithUsers | null });

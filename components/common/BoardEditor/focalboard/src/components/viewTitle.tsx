@@ -1,21 +1,24 @@
 /* eslint-disable max-len */
+import styled from '@emotion/styled';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
-import type { Page, PageContent } from 'models';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import dynamic from 'next/dynamic';
-import styled from '@emotion/styled';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+
+import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { Page, PageContent } from 'models';
+
 import { BlockIcons } from '../blockIcons';
 import type { Board } from '../blocks/board';
 import mutator from '../mutator';
 import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
+
 import BlockIconSelector from './blockIconSelector';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {

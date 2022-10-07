@@ -1,10 +1,12 @@
 
 import type { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateBounty } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
+
 import { countValidSubmissions } from 'lib/applications/shared';
 import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
+import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateBounty } from 'testing/setupDatabase';
+
 import { createApplication, createSubmission } from '../../applications/actions';
 import { closeOutBounty } from '../closeOutBounty';
 import { createBounty } from '../createBounty';

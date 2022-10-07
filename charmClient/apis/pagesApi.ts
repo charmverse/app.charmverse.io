@@ -1,4 +1,5 @@
 import type { Page, ProfileItem } from '@prisma/client';
+
 import * as http from 'adapters/http';
 import type { IPageWithPermissions, PageDetails, PageMeta } from 'lib/pages';
 

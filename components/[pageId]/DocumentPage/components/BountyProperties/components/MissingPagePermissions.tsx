@@ -1,11 +1,12 @@
-import type { BountyPermissionLevel } from '@prisma/client';
-import type { BountyPermissions } from 'lib/bounties';
-import { isTruthy } from 'lib/utilities/types';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import useRoles from 'hooks/useRoles';
-import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { BountyPermissionLevel } from '@prisma/client';
+
 import { useContributors } from 'hooks/useContributors';
+import useRoles from 'hooks/useRoles';
+import type { BountyPermissions } from 'lib/bounties';
+import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   bountyPermissions: Partial<BountyPermissions>;

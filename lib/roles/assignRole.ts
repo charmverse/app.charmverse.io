@@ -1,7 +1,10 @@
 import type { SpaceRole } from '@prisma/client';
+
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
+
 import { hasAccessToSpace } from '../middleware';
+
 import type { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 

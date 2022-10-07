@@ -2,21 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import type { Card } from '../../blocks/card';
 import type { BoardView } from '../../blocks/boardView';
-
+import type { Card } from '../../blocks/card';
 import mutator from '../../mutator';
+import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
+import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
-
 import Calculations from '../calculations/calculations';
-import PropertyValueElement from '../propertyValueElement';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
 import { sendFlashMessage } from '../flashMessages';
-import Menu from '../../widgets/menu';
-import { IDType, Utils } from '../../utils';
+import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
     board: Board;

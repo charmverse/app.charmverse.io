@@ -1,10 +1,11 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

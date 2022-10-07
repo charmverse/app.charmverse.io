@@ -1,11 +1,12 @@
-import charmClient from 'charmClient';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { LoggedInUser } from 'models';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
+import charmClient from 'charmClient';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { LoggedInUser } from 'models';
 
 type IContext = {
   user: LoggedInUser | null;
@@ -59,6 +60,18 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }
 
+  function getCharmUser () {
+    setIsLoaded(false);
+    // try retrieving the user from session
+    charmClient.getUser()
+      .then(_user => {
+        setUser(_user);
+      })
+      .finally(() => {
+        setIsLoaded(true);
+      });
+  }
+
   /**
    * Used to sync current user with current web 3 account
    *
@@ -73,22 +86,16 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setUser(null);
     }
     else {
-      setIsLoaded(false);
-      // try retrieving the user from session
-      charmClient.getUser()
-        .then(_user => {
-          setUser(_user);
-        })
-        .finally(() => {
-          setIsLoaded(true);
-        });
+      getCharmUser();
     }
   }
 
   useEffect(() => {
-
     if (account) {
       refreshUserWithWeb3Account();
+    }
+    else {
+      getCharmUser();
     }
   }, [account]);
 

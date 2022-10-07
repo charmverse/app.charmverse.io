@@ -1,8 +1,11 @@
 import type { Space } from '@prisma/client';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
 import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -10,8 +13,6 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
 
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
@@ -21,17 +22,17 @@ export default function LoginPage () {
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
   const { user, isLoaded, loginFromWeb3Account } = useUser();
-  const [spaces,, isSpacesLoaded] = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
-  useEffect(() => {
-    setTitleState('Welcome');
-  }, []);
+  const isLoggedIn = !!user;
+  const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);
+  const isVerificationStep = !!account && !walletIsVerified;
 
-  function redirectUserAfterLogin () {
+  function redirectToDefaultPage () {
     if (typeof router.query.returnUrl === 'string') {
       router.push(router.query.returnUrl);
     }
@@ -48,28 +49,29 @@ export default function LoginPage () {
     }
   }
 
-  async function loginUser () {
+  async function loginFromWeb3 () {
     await loginFromWeb3Account();
-    redirectUserAfterLogin();
+    redirectToDefaultPage();
   }
 
   useEffect(() => {
+    setTitleState('Welcome');
+  }, []);
 
-    // redirect user once wallet is connected
+  useEffect(() => {
     if (isDataLoaded) {
-      // redirect once account exists (user has connected wallet)
-      if (user && (isLogInWithDiscord
-        || (account && user.wallets.some(w => w.address === account) && lowerCaseEqual(walletAuthSignature?.address as string, account)))) {
-        redirectUserAfterLogin();
+      // redirect once user is logged in unless we are verifying their wallet
+      if (isLoggedIn && !isVerificationStep) {
+        redirectToDefaultPage();
       }
-      else if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-        loginUser();
+      else if (!isLoggedIn && walletIsVerified) {
+        loginFromWeb3();
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [account, walletAuthSignature, isDataLoaded]);
+  }, [isDataLoaded, isLoggedIn, isVerificationStep]);
 
   if (!showLogin) {
     return null;
@@ -78,11 +80,7 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent walletSigned={() => {
-          showMessage('Wallet verified. Logging you in', 'success');
-          loginUser();
-        }}
-        />
+        <LoginPageContent walletSigned={loginFromWeb3} />
         <Footer />
       </>
     )

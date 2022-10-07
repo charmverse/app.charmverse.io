@@ -1,7 +1,9 @@
 
 import { forwardRef, memo } from 'react';
-import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+
 import type { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
+import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+
 import { StyledTreeItem, PageLink } from './PageTreeItem';
 
 interface BoardViewTreeItemProps {

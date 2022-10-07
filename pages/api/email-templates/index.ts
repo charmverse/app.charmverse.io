@@ -1,12 +1,13 @@
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import * as emails from 'lib/emails/emails';
 import { v4 } from 'uuid';
+
+import * as emails from 'lib/emails/emails';
 import type { MentionedTask } from 'lib/mentions/interfaces';
-import randomName from 'lib/utilities/randomName';
-import type { VoteTask } from 'lib/votes/interfaces';
+import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
+import randomName from 'lib/utilities/randomName';
+import type { VoteTask } from 'lib/votes/interfaces';
 
 const handler = nc({
   onError,

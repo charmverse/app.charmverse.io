@@ -3,6 +3,9 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Divider, Grid, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { ProposalStatus } from '@prisma/client';
+import { Fragment, useState } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import useTasks from 'components/nexus/hooks/useTasks';
@@ -10,8 +13,6 @@ import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import { proposalStatusTransitionPermission, proposalStatusTransitionRecord, PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import { Fragment, useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
 const proposalStatuses = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
 

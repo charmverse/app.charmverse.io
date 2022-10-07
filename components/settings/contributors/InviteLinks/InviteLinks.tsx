@@ -1,5 +1,9 @@
 import Typography from '@mui/material/Typography';
 import type { InviteLink } from '@prisma/client';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { Modal } from 'components/common/Modal';
@@ -7,10 +11,8 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { FormValues as InviteLinkFormValues } from 'components/settings/contributors/InviteLinks/InviteLinkForm';
 import InviteForm from 'components/settings/contributors/InviteLinks/InviteLinkForm';
 import Legend from 'components/settings/Legend';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import { useState } from 'react';
-import useSWR from 'swr';
+
 import InvitesTable from './InviteLinksTable';
 
 export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
@@ -56,7 +58,7 @@ export default function InviteLinkList ({ isAdmin, spaceId }: { isAdmin: boolean
         {isAdmin && <Button sx={{ float: 'right' }} onClick={open}>Add a link</Button>}
       </Legend>
       {data && data.length === 0 && <Typography color='secondary'>No invite links yet</Typography>}
-      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} onDelete={deleteLink} />}
+      {data && data?.length > 0 && <InvitesTable isAdmin={isAdmin} invites={data} refetchInvites={mutate} onDelete={deleteLink} />}
       <Modal open={isOpen} onClose={close}>
         <InviteForm onSubmit={createLink} onClose={close} />
       </Modal>

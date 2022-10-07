@@ -1,5 +1,6 @@
-import * as http from 'adapters/http';
 import { RateLimit } from 'async-sema';
+
+import * as http from 'adapters/http';
 import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;

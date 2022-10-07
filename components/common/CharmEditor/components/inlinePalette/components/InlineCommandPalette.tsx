@@ -2,21 +2,23 @@ import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { MenuItem } from '@mui/material';
+import MenuList from '@mui/material/MenuList';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import MenuList from '@mui/material/MenuList';
+
+import type { NestedPagePluginState } from '../../nestedPage';
+import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
+import { palettePluginKey } from '../config';
 import {
   useInlinePaletteItems,
   useInlinePaletteQuery
 } from '../hooks';
-import InlinePaletteRow from './InlinePaletteRow';
-import { palettePluginKey } from '../config';
 import {
   PaletteItem, PALETTE_ITEM_REGULAR_TYPE
 } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
-import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
-import type { NestedPagePluginState } from '../../nestedPage';
+
+import InlinePaletteRow from './InlinePaletteRow';
 
 function getItemsAndHints (
   view: EditorView,

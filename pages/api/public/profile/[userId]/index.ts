@@ -1,14 +1,15 @@
+import type { User, UserDetails } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import type { User, UserDetails } from '@prisma/client';
+
 import { prisma } from 'db';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
-import { getPOAPs } from 'lib/blockchain/poaps';
 import type { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
 import { getNFTs } from 'lib/blockchain/nfts';
+import { getPOAPs } from 'lib/blockchain/poaps';
+import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { isUUID } from 'lib/utilities/strings';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;

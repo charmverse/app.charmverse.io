@@ -13,6 +13,9 @@ import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+
 import Button from 'components/common/Button';
 import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
 import Modal from 'components/common/Modal';
@@ -21,10 +24,9 @@ import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { spaceOperationLabels } from 'lib/permissions/spaces/client';
-import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
-import { useState } from 'react';
+
 import RoleForm from './RoleForm';
 import RoleMemberRow from './RoleMemberRow';
 import SpacePermissions from './SpacePermissions';

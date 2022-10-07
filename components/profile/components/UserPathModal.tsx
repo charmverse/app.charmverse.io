@@ -2,13 +2,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Check, Close } from '@mui/icons-material';
 import { Box, InputAdornment, Stack } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 async function validatePath (path: string) {
   const result = await charmClient.checkNexusPath(path);

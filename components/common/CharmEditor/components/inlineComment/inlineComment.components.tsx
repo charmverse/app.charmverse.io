@@ -1,24 +1,27 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
 import styled from '@emotion/styled';
 import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
-import { useThreads } from 'hooks/useThreads';
-import { createPortal } from 'react-dom';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
-import charmClient from 'charmClient';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import { useInlineComment } from 'hooks/useInlineComment';
-import { usePages } from 'hooks/usePages';
-import type { PageContent } from 'models';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+
+import charmClient from 'charmClient';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePages } from 'hooks/usePages';
+import { useThreads } from 'hooks/useThreads';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
-import PageThread from '../PageThread';
+import type { PageContent } from 'models';
+
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { updateInlineComment } from './inlineComment.utils';
+import PageThread from '../PageThread';
+
 import type { InlineCommentPluginState } from './inlineComment.plugins';
+import { updateInlineComment } from './inlineComment.utils';
 
 export const ThreadContainer = styled(Paper)`
   max-height: 400px;

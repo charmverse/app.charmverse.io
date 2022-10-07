@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import request from 'supertest';
+import { v4 } from 'uuid';
+
 import type { IPageWithPermissions } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import request from 'supertest';
 import { generatePageToCreateStub } from 'testing/generate-stubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
 
 describe('POST /api/pages - create page', () => {
 

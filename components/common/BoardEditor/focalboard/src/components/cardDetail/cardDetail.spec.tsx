@@ -1,14 +1,11 @@
-import React from 'react';
-
 import 'isomorphic-fetch';
 import { act, render } from '@testing-library/react';
-
-import configureStore from 'redux-mock-store';
+import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 
 import { FetchMock } from '../../test/fetchMock';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import { mockDOM, wrapIntl } from '../../testUtils';
 
 import CardDetail from './cardDetail';

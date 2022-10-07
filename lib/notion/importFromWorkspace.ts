@@ -1,6 +1,9 @@
 import { Client } from '@notionhq/client';
 import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import type { PageType, Prisma } from '@prisma/client';
+import promiseRetry from 'promise-retry';
+import { v4 as uuid } from 'uuid';
+
 import { prisma } from 'db';
 import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
@@ -17,8 +20,7 @@ import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
 import type { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
-import promiseRetry from 'promise-retry';
-import { v4 as uuid } from 'uuid';
+
 import type { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, NotionImage, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
@@ -648,6 +650,7 @@ export async function importFromWorkspace ({ workspaceName, workspaceIcon, acces
     }
     failedImportsRecord[block.id] = {
       pageId: block.id,
+      /* eslint react/forbid-prop-types: 0 */
       type: block.object,
       title,
       blocks: failedImportBlocks

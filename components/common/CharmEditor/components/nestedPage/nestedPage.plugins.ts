@@ -1,11 +1,14 @@
+import { NodeView } from '@bangle.dev/core';
+import { NodeSelection, Plugin, PluginKey, TextSelection } from '@bangle.dev/pm';
 import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
 import { createTooltipDOM } from '@bangle.dev/tooltip';
-import { NodeSelection, Plugin, PluginKey, TextSelection } from '@bangle.dev/pm';
+
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
-import { NodeView } from '@bangle.dev/core';
+
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+
 import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
 import type { NestedPagePluginState } from './nestedPage.interfaces';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 export function nestedPagePlugins ({
   key,

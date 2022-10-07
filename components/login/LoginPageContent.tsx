@@ -2,10 +2,13 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
 import splashImage from 'public/images/artwork/world.png';
+
 import type { AuthSig } from '../../lib/blockchain/interfaces';
+
 import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`
@@ -70,7 +73,7 @@ export function LoginPageContent ({ walletSigned }: Props) {
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or
               </Typography>
-              <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+              <Button data-test='connect-discord' sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
                 Connect Discord
               </Button>
 

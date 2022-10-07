@@ -1,5 +1,7 @@
-import charmClient from 'charmClient';
 import useSWR from 'swr';
+
+import charmClient from 'charmClient';
+
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 

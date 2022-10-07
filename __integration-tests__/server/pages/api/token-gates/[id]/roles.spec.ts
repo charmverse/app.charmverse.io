@@ -1,12 +1,13 @@
 import type { Role, Space, TokenGate, TokenGateToRole, User } from '@prisma/client';
 import { SpaceRole } from '@prisma/client';
-import { createUserFromWallet } from 'lib/users/createUser';
 import request from 'supertest';
+import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import { createUserFromWallet } from 'lib/users/createUser';
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import { prisma } from 'db';
-import type { LoggedInUser } from 'models';
 
 // User 1 is admin
 let user1: LoggedInUser;

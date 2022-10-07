@@ -6,6 +6,9 @@ import Input from '@mui/material/OutlinedInput';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { PageType } from '@prisma/client';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect } from 'react';
+
 import charmClient from 'charmClient';
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import Link from 'components/common/Link';
@@ -15,8 +18,7 @@ import { usePages } from 'hooks/usePages';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 import type { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect } from 'react';
+
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 
 const permissionDisplayOrder = ['space', 'role', 'user'];

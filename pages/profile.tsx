@@ -1,13 +1,20 @@
 import type { ReactElement } from 'react';
-import NexusPageTitle from 'components/nexus/components/NexusPageTitle';
+import { useEffect } from 'react';
+
+import charmClient from 'charmClient';
 import PageLayout from 'components/nexus/components/NexusLayout';
-import { setTitle } from 'hooks/usePageTitle';
+import NexusPageTitle from 'components/nexus/components/NexusPageTitle';
 import PublicProfile from 'components/profile';
+import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 
 export default function PublicProfilePage () {
 
   setTitle('My Profile');
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { type: 'profile' });
+  }, []);
 
   const { user, setUser } = useUser();
 

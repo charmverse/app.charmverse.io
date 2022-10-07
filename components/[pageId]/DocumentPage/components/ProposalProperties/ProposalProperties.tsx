@@ -1,6 +1,9 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
@@ -16,9 +19,7 @@ import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import useSWR from 'swr';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;

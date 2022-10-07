@@ -1,20 +1,22 @@
-import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
-import { usePages } from 'hooks/usePages';
-import { ScrollableModal as Modal } from 'components/common/Modal';
-import type { Page } from 'models';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { MouseEvent } from 'react';
-import { memo, useMemo, useState, useCallback, useEffect } from 'react';
+import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
-import { fancyTrim } from 'lib/utilities/strings';
+import { useRouter } from 'next/router';
+import { memo, useMemo, useState, useCallback, useEffect } from 'react';
+import type { MouseEvent } from 'react';
+import { mutate } from 'swr';
+
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import { mutate } from 'swr';
-import { useRouter } from 'next/router';
+import { ScrollableModal as Modal } from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { fancyTrim } from 'lib/utilities/strings';
+import type { Page } from 'models';
+
 import PageIcon from './PageIcon';
 
 const PageArchivedDate = memo<{ date: Date, title: string }>(({ date, title }) => {

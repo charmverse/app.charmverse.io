@@ -2,10 +2,10 @@
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
+import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
-import throttle from 'lodash/throttle';
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 

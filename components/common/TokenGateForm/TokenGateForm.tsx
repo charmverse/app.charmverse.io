@@ -2,6 +2,8 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
+import { useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -10,21 +12,23 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { useEffect, useState } from 'react';
+import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
+
 import type { AuthSig } from '../../../lib/blockchain/interfaces';
+
 import TokenGateOption from './TokenGateOption';
 
 interface Props {
   onSuccess: (values: Space) => void;
   spaceDomain: string;
   joinButtonLabel?: string;
+  joinType?: TokenGateJoinType;
 }
 
-export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel }: Props) {
+export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
 
   const { showMessage } = useSnackbar();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, setSpaces } = useSpaces();
   const { user, loginFromWeb3Account, refreshUserWithWeb3Account } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
@@ -94,7 +98,8 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
             signedToken: tk.signedToken,
             tokenGateId: tk.tokenGate.id
           };
-        }) ?? []
+        }) ?? [],
+        joinType
       });
 
       showMessage(`You have joined the ${tokenGateResult?.space.name} workspace.`, 'success');
@@ -159,7 +164,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
           <Grid item xs>
             {
             !tokenGateResult.canJoinSpace ? (
-              <Alert sx={{ mt: 2 }} severity='warning'>
+              <Alert severity='warning'>
                 Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
               </Alert>
             ) : (

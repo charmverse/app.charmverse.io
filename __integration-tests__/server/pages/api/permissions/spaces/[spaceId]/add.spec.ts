@@ -1,6 +1,7 @@
+import request from 'supertest';
+
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
-import request from 'supertest';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

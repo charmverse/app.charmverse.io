@@ -4,6 +4,9 @@ import WarningIcon from '@mui/icons-material/HourglassBottom';
 import { Alert, Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import SvgIcon from '@mui/material/SvgIcon';
+import { useEffect, useState } from 'react';
+import { useSWRConfig } from 'swr';
+
 import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
@@ -15,8 +18,6 @@ import { deleteCookie, getCookie } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
 import NotionIcon from 'public/images/notion_logo.svg';
-import { useEffect, useState } from 'react';
-import { useSWRConfig } from 'swr';
 
 interface NotionResponseState {
   error?: string;

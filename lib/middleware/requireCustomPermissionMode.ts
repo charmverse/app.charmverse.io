@@ -1,8 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextHandler } from 'next-connect';
+
 import { prisma } from 'db';
 import type { ISystemError } from 'lib/utilities/errors';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import type { NextHandler } from 'next-connect';
+
 import type { PermissionAssigneeId } from '../permissions/interfaces';
 
 /**

@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
+import { MessageOutlined, FormatListBulleted, RateReviewOutlined } from '@mui/icons-material';
 import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
-import { MessageOutlined, FormatListBulleted, RateReviewOutlined } from '@mui/icons-material';
+
 import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageActionToggle';
 import type { PageAction } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';

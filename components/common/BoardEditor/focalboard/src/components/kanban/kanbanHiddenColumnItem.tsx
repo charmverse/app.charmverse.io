@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useDrop } from 'react-dnd';
 import type { IntlShape } from 'react-intl';
 
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import type { BoardGroup } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';

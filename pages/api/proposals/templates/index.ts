@@ -1,11 +1,13 @@
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
+import { logFirstProposalTemplate } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateProposalTemplateInput } from 'lib/templates/proposals/createProposalTemplate';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -25,6 +27,8 @@ async function createProposalTemplateController (req: NextApiRequest, res: NextA
   const { spaceId } = req.body as CreateProposalTemplateInput;
 
   const proposal = await createProposalTemplate({ spaceId, userId });
+
+  logFirstProposalTemplate({ userId, spaceId });
 
   res.status(201).send(proposal);
 

@@ -1,10 +1,13 @@
 
 import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
 import { domSerializationHelpers } from '@bangle.dev/core';
+
 import { getTwitterEmoji } from 'components/common/Emoji';
 import log from 'lib/log';
-import { markName } from './emojiSuggest.constants';
+
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+
+import { markName } from './emojiSuggest.constants';
 
 const defaultTrigger = ':';
 const name = 'emoji';

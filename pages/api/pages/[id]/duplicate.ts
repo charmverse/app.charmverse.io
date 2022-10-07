@@ -1,10 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { duplicatePage } from 'lib/pages/server/duplicatePage';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

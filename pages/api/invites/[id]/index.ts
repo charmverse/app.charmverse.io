@@ -1,14 +1,15 @@
 
-import type { SpaceRole } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import log from 'lib/log';
-import type { IEventToLog } from 'lib/log/userEvents';
-import { postToDiscord } from 'lib/log/userEvents';
+import { logInviteAccepted } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,17 +29,17 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     return res.status(421).send({ message: 'Invite not found' });
   }
   const userId = req.session.user.id;
-  const roles = await prisma.spaceRole.findMany({
+  const spaceRole = await prisma.spaceRole.findMany({
     where: {
-      userId
+      userId,
+      spaceId: invite.spaceId
     }
   });
 
-  const userHasRoleInSpace = roles.some(role => role.spaceId === invite.spaceId);
-
-  if (userHasRoleInSpace === false) {
+  // Only proceed if they are not a member of the workspace
+  if (spaceRole.length === 0) {
     log.info('User joined workspace via invite', { spaceId: invite.spaceId, userId });
-    const newRole = await prisma.spaceRole.create({
+    const createdSpaceRole = await prisma.spaceRole.create({
       data: {
         space: {
           connect: {
@@ -53,14 +54,41 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    logInviteAccepted(newRole);
+    logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
 
-    await prisma.inviteLink.update({
-      where: { id: invite.id },
-      data: {
-        useCount: invite.useCount + 1
+    updateTrackUserProfileById(userId);
+    trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
+
+    const roleIdsToAssign: string[] = (await prisma.inviteLinkToRole.findMany({
+      where: {
+        inviteLinkId: invite.id
+      },
+      select: {
+        roleId: true
       }
-    });
+    })).map(({ roleId }) => roleId);
+
+    await prisma.$transaction([
+      ...roleIdsToAssign.map(roleId => prisma.spaceRoleToRole.upsert({
+        where: {
+          spaceRoleId_roleId: {
+            spaceRoleId: createdSpaceRole.id,
+            roleId
+          }
+        },
+        create: {
+          roleId,
+          spaceRoleId: createdSpaceRole.id
+        },
+        update: {}
+      })),
+      prisma.inviteLink.update({
+        where: { id: invite.id },
+        data: {
+          useCount: invite.useCount + 1
+        }
+      })
+    ]);
   }
 
   return res.status(200).json({ ok: true });
@@ -100,24 +128,3 @@ async function deleteInvite (req: NextApiRequest, res: NextApiResponse) {
 
 export default withSessionRoute(handler);
 
-/**
- * Assumes that a first page will be created by the system
- * Should be called after a page is created
- * @param page
- */
-async function logInviteAccepted (role: SpaceRole) {
-
-  const space = await prisma.space.findUnique({
-    where: {
-      id: role.spaceId
-    }
-  });
-
-  const eventLog: IEventToLog = {
-    eventType: 'join_workspace_from_link',
-    funnelStage: 'acquisition',
-    message: `Someone joined ${space?.domain} workspace via an invite link`
-  };
-
-  postToDiscord(eventLog);
-}

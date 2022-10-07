@@ -1,4 +1,10 @@
+import type { UrlObject } from 'url';
+
 import type { User } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -6,10 +12,6 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import type { UrlObject } from 'url';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'share', 'api-docs', 'u'];
@@ -20,7 +22,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { account, walletAuthSignature, triedEager } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
-  const [spaces,, isSpacesLoaded] = useSpaces();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
   const isLoading = !isLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
@@ -100,7 +102,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
-    else if ((!user && !account)) {
+    else if (!user) {
       log.info('[RouteGuard]: redirect to login');
       return {
         authorized: true,
@@ -112,7 +114,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
     // condition: account but no valid wallet signature
     else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-
+      log.info('[RouteGuard]: redirect to verify wallet');
       return {
         authorized: true,
         redirect: {

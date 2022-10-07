@@ -2,17 +2,19 @@ import type { BaseRawNodeSpec, NodeViewProps } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
-import type { HTMLAttributes } from 'react';
-import { memo, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import dynamic from 'next/dynamic';
+import type { HTMLAttributes } from 'react';
+import { memo, useMemo, useState } from 'react';
+
 import PdfSelector from 'components/common/PdfSelector';
 import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
-import dynamic from 'next/dynamic';
+
 import Resizable from './Resizable/Resizable';
 
 const PDFViewer = dynamic(() => import('./PDFViewer'), {

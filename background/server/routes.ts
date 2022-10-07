@@ -1,4 +1,5 @@
 import type Koa from 'koa';
+
 import log from 'lib/log';
 
 export async function healthCheck (ctx: Koa.Context) {

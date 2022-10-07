@@ -1,16 +1,20 @@
-import { prisma } from 'db';
-import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { sessionUserRelations } from 'lib/session/config';
 import { v4 as uuid } from 'uuid';
-import { IDENTITY_TYPES } from 'models';
-import { postToDiscord } from 'lib/log/userEvents';
+
+import { isProdEnv } from 'config/constants';
+import { prisma } from 'db';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
+import { logSignupViaDiscord } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
+import { sessionUserRelations } from 'lib/session/config';
+import { IDENTITY_TYPES } from 'models';
 
-export default async function loginByDiscord ({ code, hostName }: { code: string, hostName?: string }) {
+export default async function loginByDiscord ({ code, hostName, discordApiUrl }: { code: string, hostName?: string, discordApiUrl?: string }) {
 
-  const domain = process.env.NODE_ENV === 'development' ? `http://${hostName}` : `https://${hostName}`;
-  const discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
+  const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
+  const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id
@@ -23,7 +27,7 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
   });
 
   if (discordUser) {
-
+    trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
   }
   else {
@@ -57,16 +61,11 @@ export default async function loginByDiscord ({ code, hostName }: { code: string
       include: sessionUserRelations
     });
 
+    updateTrackUserProfile(newUser);
+    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord' });
     logSignupViaDiscord();
 
     return newUser;
   }
 }
 
-async function logSignupViaDiscord () {
-  postToDiscord({
-    funnelStage: 'acquisition',
-    eventType: 'create_user',
-    message: 'A new user has joined Charmverse using their Discord account'
-  });
-}

@@ -1,9 +1,10 @@
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
-import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import Button from 'components/common/Button';
+
 import type { IPropertyTemplate } from '../../blocks/board';
 import type { BoardView, ISortOption } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';

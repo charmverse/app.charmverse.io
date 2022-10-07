@@ -1,7 +1,9 @@
 import type { User, UserNotification } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { markTasks } from '../markTasks';
 
 let user: User;

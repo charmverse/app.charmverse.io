@@ -1,23 +1,22 @@
-
+// the fullcalendar lib most be loaded before any plugins
+// eslint-disable-next-line import/order
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/react';
-import FullCalendar from '@fullcalendar/react';
-
-import interactionPlugin from '@fullcalendar/interaction';
-import dayGridPlugin from '@fullcalendar/daygrid';
-
-import { usePages } from 'hooks/usePages';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
-import mutator from '../../mutator';
+import { usePages } from 'hooks/usePages';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
+import mutator from '../../mutator';
+import Tooltip from '../../widgets/tooltip';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
-import Tooltip from '../../widgets/tooltip';
 import PropertyValueElement from '../propertyValueElement';
 
 const oneDay = 60 * 60 * 24 * 1000;
@@ -60,7 +59,8 @@ function createDatePropertyFromCalendarDate (start: Date) : DateProperty {
   return dateProperty;
 }
 
-function CalendarFullView (props: Props): JSX.Element|null {
+function CalendarFullView (props: Props): JSX.Element | null {
+
   const intl = useIntl();
   const { board, cards, activeView, dateDisplayProperty, readOnly } = props;
   const isSelectable = !readOnly;

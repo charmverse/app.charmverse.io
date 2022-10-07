@@ -1,6 +1,8 @@
 import { Node } from '@bangle.dev/pm';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { v4 } from 'uuid';
+
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+
 import { extractDeletedThreadIds } from '../extractDeletedThreadIds';
 
 describe('extractDeletedThreadIds', () => {

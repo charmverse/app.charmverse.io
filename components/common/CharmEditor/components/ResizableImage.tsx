@@ -1,4 +1,3 @@
-import Alert from '@mui/material/Alert';
 import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
@@ -6,13 +5,16 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
 import { memo, useCallback, useState } from 'react';
+import { v4 } from 'uuid';
+
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
-import { v4 } from 'uuid';
+
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyImageContainer = styled(Box)`

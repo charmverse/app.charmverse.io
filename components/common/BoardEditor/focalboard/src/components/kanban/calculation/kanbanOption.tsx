@@ -1,8 +1,7 @@
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useState } from 'react';
 
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import type { IPropertyTemplate } from '../../../blocks/board';
-
 import { Constants } from '../../../constants';
 import type { Option as SelectOption } from '../../calculations/options';
 import { typesByOptions } from '../../calculations/options';

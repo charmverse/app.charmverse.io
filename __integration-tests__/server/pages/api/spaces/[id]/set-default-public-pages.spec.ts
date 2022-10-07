@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@prisma/client';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import request from 'supertest';
+
+import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

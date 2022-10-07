@@ -1,4 +1,5 @@
 import request from 'supertest';
+
 import type { TestLoginRequest } from 'pages/api/session/login-testenv';
 
 export const baseUrl = process.env.DOMAIN as string;

@@ -1,49 +1,29 @@
-import type { Page, Proposal, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
+import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
+
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
-import { v4 } from 'uuid';
+
 import { getProposalAction } from './getProposalAction';
 
 export type ProposalTaskAction = 'start_discussion' | 'start_vote' | 'review' | 'discuss' | 'vote' | 'start_review';
 
 export interface ProposalTask {
-  id: string;
+  id: string; // the id of the workspace event
   action: ProposalTaskAction | null;
+  eventDate: Date;
   spaceDomain: string;
   spaceName: string;
+  pageId: string;
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
 }
 
-export function extractProposalData (proposal: Proposal & {
-  space: Space;
-  page: Page | null;
-}, action: ProposalTask['action']): ProposalTask | null {
-  return proposal.page ? {
-    id: proposal.id,
-    pagePath: proposal.page.path,
-    pageTitle: proposal.page.title,
-    spaceDomain: proposal.space.domain,
-    spaceName: proposal.space.name,
-    status: proposal.status,
-    action
-  } : null;
-}
-
 type WorkspaceEventRecord = Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'> | null>
 
-function sortProposals (proposals: ProposalTask[], workspaceEventsRecord: WorkspaceEventRecord) {
+function sortProposals (proposals: ProposalTask[]) {
   proposals.sort((proposalA, proposalB) => {
-    const proposalALastUpdatedDate = workspaceEventsRecord[proposalA.id]?.createdAt;
-    const proposalBLastUpdatedDate = workspaceEventsRecord[proposalB.id]?.createdAt;
-    if (proposalALastUpdatedDate && proposalBLastUpdatedDate) {
-      return proposalALastUpdatedDate > proposalBLastUpdatedDate ? -1 : 1;
-    }
-    else if (proposalALastUpdatedDate && !proposalBLastUpdatedDate) {
-      return 1;
-    }
-    return -1;
+    return proposalA.eventDate > proposalB.eventDate ? -1 : 1;
   });
 }
 
@@ -80,7 +60,7 @@ export async function getProposalTasks (userId: string): Promise<{
     return record;
   }, {});
 
-  const spaceRoles = (await prisma.spaceRole.findMany({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
     },
@@ -101,13 +81,11 @@ export async function getProposalTasks (userId: string): Promise<{
         }
       }
     }
-  }));
+  });
 
   const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
-  // Get all the roleId assigned to this user
-  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole.length !== 0
-    ? spaceRole.spaceRoleToRole[0].role.id
-    : null).filter(isTruthy);
+  // Get all the roleId assigned to this user for each space
+  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole).flat().map(({ role }) => role.id);
 
   const pagesWithProposals = await prisma.page.findMany({
     where: {
@@ -142,7 +120,7 @@ export async function getProposalTasks (userId: string): Promise<{
 
   pagesWithProposals.forEach(({ proposal, ...page }) => {
     if (proposal) {
-      const workspaceEvent = workspaceEventsRecord[proposal.id];
+      const workspaceEvent = workspaceEventsRecord[page.id];
       const isReviewer = proposal.reviewers.some(reviewer => reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId);
       const isAuthor = proposal.authors.some(author => author.userId === userId);
       const action = getProposalAction(
@@ -153,34 +131,31 @@ export async function getProposalTasks (userId: string): Promise<{
         }
       );
 
-      const proposalTask = {
-        // Making the id empty to fill them later
-        id: '',
-        pagePath: page.path,
-        pageTitle: page.title,
-        spaceDomain: page.space.domain,
-        spaceName: page.space.name,
-        status: proposal.status,
-        action
-      };
+      if (workspaceEvent) {
 
-      if (workspaceEvent && !userNotificationIds.has(workspaceEvent.id)) {
-        proposalsRecord.unmarked.push({
-          ...proposalTask,
-          id: workspaceEvent.id
-        });
-      }
-      else {
-        proposalsRecord.marked.push({
-          ...proposalTask,
-          id: v4()
-        });
+        const proposalTask = {
+          id: workspaceEvent.id,
+          eventDate: workspaceEvent.createdAt,
+          pageId: page.id,
+          pagePath: page.path,
+          pageTitle: page.title,
+          spaceDomain: page.space.domain,
+          spaceName: page.space.name,
+          status: proposal.status,
+          action
+        };
+        if (!userNotificationIds.has(workspaceEvent.id)) {
+          proposalsRecord.unmarked.push(proposalTask);
+        }
+        else {
+          proposalsRecord.marked.push(proposalTask);
+        }
       }
     }
   });
 
-  sortProposals(proposalsRecord.marked, workspaceEventsRecord);
-  sortProposals(proposalsRecord.unmarked, workspaceEventsRecord);
+  sortProposals(proposalsRecord.marked);
+  sortProposals(proposalsRecord.unmarked);
 
   return proposalsRecord;
 }

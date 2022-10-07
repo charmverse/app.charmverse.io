@@ -1,18 +1,18 @@
 
 import type { PagePermission } from '@prisma/client';
 import { Page, PrismaPromise, Prisma } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { findParentOfType } from 'lib/pages/findParentOfType';
+import { PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import type { IPagePermissionRequest, IPagePermissionToDelete, IPagePermissionWithAssignee, IPagePermissionWithSource, IPagePermissionToCreate } from 'lib/permissions/pages';
 import { deletePagePermission, listPagePermissions, setupPermissionsAfterPagePermissionAdded, upsertPermission, computeUserPagePermissions, getPagePermission } from 'lib/permissions/pages';
-import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-import nc from 'next-connect';
 import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
 import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
-import { PageNotFoundError, resolvePageTree } from 'lib/pages/server';
-import { findParentOfType } from 'lib/pages/findParentOfType';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -54,57 +54,62 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
 
-  const page = await prisma.page.findUnique({
-    where: {
-      id: pageId
+  const createdPermission = await prisma.$transaction(async (tx) => {
+    const page = await tx.page.findUnique({
+      where: {
+        id: pageId
+      }
+    });
+
+    if (!page) {
+      throw new PageNotFoundError(pageId);
     }
-  });
 
-  if (!page) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  if (page.type === 'proposal' && req.body.public !== true) {
-    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
-  }
-
-  // Count before and after permissions so we don't trigger the event unless necessary
-  const permissionsBefore = await prisma.pagePermission.count({
-    where: {
-      pageId
+    if (page.type === 'proposal' && req.body.public !== true) {
+      throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
     }
-  });
 
-  const pageTree = await resolvePageTree({
-    pageId: page.id,
-    flattenChildren: true
-  });
-
-  const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
-
-  if (proposalParentId) {
-    throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
-  }
-
-  const createdPermission = await upsertPermission(pageId, req.body, pageTree);
-
-  // Override behaviour, we always cascade board permissions downwards
-  if (page.type.match(/board/)) {
-    await boardPagePermissionUpdated({ boardId: pageId, permissionId: createdPermission.id });
-
-  }
-  // Existing behaviour where we setup permissions after a page permission is added, and account for inheritance conditions
-  else {
-    const permissionsAfter = await prisma.pagePermission.count({
+    // Count before and after permissions so we don't trigger the event unless necessary
+    const permissionsBefore = await tx.pagePermission.count({
       where: {
         pageId
       }
     });
 
-    if (permissionsAfter > permissionsBefore) {
-      await setupPermissionsAfterPagePermissionAdded(createdPermission.id);
+    const pageTree = await resolvePageTree({
+      pageId: page.id,
+      flattenChildren: true,
+      tx
+    });
+
+    const proposalParentId = findParentOfType({ targetPageTree: pageTree, pageType: 'proposal' });
+
+    if (proposalParentId) {
+      throw new ActionNotPermittedError('You cannot manually update permissions for child pages of proposals.');
     }
-  }
+
+    const newPermission = await upsertPermission(pageId, req.body, pageTree, tx);
+
+    // Override behaviour, we always cascade board permissions downwards
+    if (page.type.match(/board/)) {
+      await boardPagePermissionUpdated({ boardId: pageId, permissionId: newPermission.id, tx });
+
+    }
+    // Existing behaviour where we setup permissions after a page permission is added, and account for inheritance conditions
+    else {
+      const permissionsAfter = await tx.pagePermission.count({
+        where: {
+          pageId
+        }
+      });
+
+      if (permissionsAfter > permissionsBefore) {
+        await setupPermissionsAfterPagePermissionAdded(newPermission.id, tx);
+      }
+    }
+
+    return newPermission;
+  });
 
   return res.status(201).json(createdPermission);
 }

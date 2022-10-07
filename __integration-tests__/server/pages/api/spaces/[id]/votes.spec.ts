@@ -1,9 +1,10 @@
 import type { Space } from '@prisma/client';
 import request from 'supertest';
+import { v4 } from 'uuid';
+
+import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
-import type { LoggedInUser } from 'models';
 
 let space: Space;
 let user: LoggedInUser;

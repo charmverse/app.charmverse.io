@@ -3,6 +3,7 @@ import { createElement } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { Plugin, PluginKey, keymap, TextSelection } from '@bangle.dev/pm';
 import { hasParentNodeOfType } from '@bangle.dev/utils';
+
 import { backspaceCmd } from './commands';
 
 export function spec () {

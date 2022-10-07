@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable camelcase */
+import fs from 'node:fs/promises';
+
 import type { Page, Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages';
 import { createPage, generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { exportWorkspacePages } from '../exportWorkspacePages';
 import { importWorkspacePages } from '../importWorkspacePages';
+
+jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
@@ -101,10 +107,13 @@ describe('importWorkspacePages', () => {
 
     const exportName = `test-${v4()}`;
 
-    await exportWorkspacePages({
+    const { data, path } = await exportWorkspacePages({
       sourceSpaceIdOrDomain: space.domain,
       exportName
     });
+
+    const stringifiedData = JSON.stringify(data, null, 2);
+    jest.spyOn(fs, 'readFile').mockImplementation(() => Promise.resolve(stringifiedData));
 
     await importWorkspacePages({
       targetSpaceIdOrDomain: targetSpace.domain,
@@ -123,6 +132,7 @@ describe('importWorkspacePages', () => {
       }
     });
 
+    expect(fs.readFile).toHaveBeenCalledWith(path, 'utf-8');
     expect(pages.length).toBe(totalSourcePages);
     expect(blocks.length).toBe(totalSourceBlocks);
   });

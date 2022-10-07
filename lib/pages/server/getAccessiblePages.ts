@@ -1,6 +1,8 @@
 import type { Page, Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
+
 import type { IPageWithPermissions } from '../interfaces';
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>

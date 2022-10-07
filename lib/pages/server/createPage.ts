@@ -1,9 +1,9 @@
-import { prisma } from 'db';
 import type { Page, Prisma, PrismaPromise } from '@prisma/client';
 
-import type { PageContent } from 'models';
+import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import type { PageContent } from 'models';
 
 export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
   const createArgs: Prisma.PageCreateArgs = {
