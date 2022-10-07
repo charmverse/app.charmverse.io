@@ -150,7 +150,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           <TableBody>
             {sortedTokenGates.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} sx={{ padding: '20px 16px' }}>This Workspace has no Token Gate</TableCell>
+                <TableCell align='center' colSpan={4} sx={{ padding: '20px 16px' }}>This Workspace has no Token Gates</TableCell>
               </TableRow>
             )}
             {sortedTokenGates.map((tokenGate, tokenGateIndex, tokenGateArray) => (

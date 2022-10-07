@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Typography } from '@mui/material';
+import { Box, ListItemText, Typography } from '@mui/material';
 import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -106,22 +106,26 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleInvites} disableRipple {...restInviteProps}>
-          <AddIcon />
+        <MenuItem onClick={handleInvites} disableRipple dense {...restInviteProps}>
+          <AddIcon fontSize='small' />
           <Box>
-            <Typography variant='body1' fontSize='1.1rem'>Add a Private Link</Typography>
-            <Typography variant='body2' color='secondary'>
-              Anyone with this link can join your workspace.
-            </Typography>
+            <ListItemText
+              primary='Add a Private Link'
+              secondary='Anyone with this link can join your workspace'
+              primaryTypographyProps={{ fontWeight: 600 }}
+              secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
+            />
           </Box>
         </MenuItem>
-        <MenuItem onClick={handleTokenGate} disableRipple {...restTokenGateProps}>
-          <AddIcon />
+        <MenuItem onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
+          <AddIcon fontSize='small' />
           <Box>
-            <Typography variant='body1' fontSize='1.1rem'>Add a Token Gate</Typography>
-            <Typography variant='body2' color='secondary'>
-              Control access to your workspace with tokens & NFTS
-            </Typography>
+            <ListItemText
+              primary='Add a Token Gate'
+              secondary='Control access to your workspace with tokens & NFTS'
+              primaryTypographyProps={{ fontWeight: 600 }}
+              secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
+            />
           </Box>
         </MenuItem>
       </StyledMenu>

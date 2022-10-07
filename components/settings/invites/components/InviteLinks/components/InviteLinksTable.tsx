@@ -70,7 +70,7 @@ export default function InvitesTable (props: Props) {
         <TableBody>
           {invites.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} sx={{ padding: '20px 16px' }}>This Workspace has no Invite Links</TableCell>
+              <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>This Workspace has no Invite Links</TableCell>
             </TableRow>
           )}
           {invites.map((invite) => (
