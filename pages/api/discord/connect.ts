@@ -45,7 +45,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
 
   try {
     const domain = req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`;
-    discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
+    discordAccount = await getDiscordAccount({ code, redirectUrl: `${domain}/api/discord/callback` });
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);

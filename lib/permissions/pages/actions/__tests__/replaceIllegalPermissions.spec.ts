@@ -6,14 +6,9 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
-import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
-import { InsecureOperationError } from 'lib/utilities/errors';
-import { ExpectedAnError } from 'testing/errors';
-import { createPage, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { CannotInheritOutsideTreeError, SelfInheritancePermissionError } from '../../errors';
 import { replaceIllegalPermissions } from '../replaceIllegalPermissions';
-import { upsertPermission } from '../upsert-permission';
 
 let user: User;
 let space: Space;

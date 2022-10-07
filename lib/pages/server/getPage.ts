@@ -1,11 +1,12 @@
 import type { Prisma } from '@prisma/client';
 import { validate } from 'uuid';
 
+import type { TransactionClient } from 'db';
 import { prisma } from 'db';
 
 import type { IPageWithPermissions } from '../interfaces';
 
-export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<IPageWithPermissions | null> {
+export async function getPage (pageIdOrPath: string, spaceId?: string, tx: TransactionClient = prisma): Promise<IPageWithPermissions | null> {
 
   const isValidUUid = validate(pageIdOrPath);
 
@@ -21,7 +22,7 @@ export async function getPage (pageIdOrPath: string, spaceId?: string): Promise<
     spaceId
   };
 
-  return prisma.page.findFirst({
+  return tx.page.findFirst({
     where: searchQuery,
     include: {
       permissions: {

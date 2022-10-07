@@ -1,8 +1,6 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { postToDiscord } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { evalueTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
@@ -26,10 +24,3 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
 
 export default withSessionRoute(handler);
 
-export async function logWorkspaceJoinedViaTokenGate (workspaceName: string) {
-  postToDiscord({
-    funnelStage: 'acquisition',
-    eventType: 'create_user',
-    message: `A user has joined the ${workspaceName} workspace via token gate.`
-  });
-}

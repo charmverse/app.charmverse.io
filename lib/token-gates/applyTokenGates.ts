@@ -3,11 +3,15 @@ import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { LitJwtPayload, TokenGateVerification, TokenGateVerificationResult, TokenGateWithRoles } from './interfaces';
 
-export async function applyTokenGates ({ spaceId, userId, tokens, commit }: TokenGateVerification): Promise<TokenGateVerificationResult> {
+export async function applyTokenGates ({
+  spaceId, userId, tokens, commit, joinType = 'token_gate'
+}: TokenGateVerification): Promise<TokenGateVerificationResult> {
 
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
@@ -32,6 +36,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   });
 
   if (!space) {
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
@@ -39,6 +44,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
@@ -64,6 +70,7 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
   }))).filter(tk => tk !== null) as TokenGateWithRoles[];
 
   if (verifiedTokenGates.length === 0) {
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
@@ -92,6 +99,9 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
     space,
     roles: assignedRoles
   };
+
+  trackUserAction('token_gate_verification', { result: 'pass', spaceId, userId, roles: assignedRoles.map(r => r.name) });
+  trackUserAction('join_a_workspace', { spaceId, userId, source: joinType });
 
   if (!commit) {
     return returnValue;
@@ -125,6 +135,8 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
       });
     }));
 
+    updateTrackUserProfileById(userId);
+
     return returnValue;
   }
   else {
@@ -155,6 +167,9 @@ export async function applyTokenGates ({ spaceId, userId, tokens, commit }: Toke
         }
       })
     ]);
+
+    updateTrackUserProfileById(userId);
+
     return returnValue;
   }
 

@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import charmClient from 'charmClient';
@@ -33,7 +33,7 @@ export default function WorkspaceSettings () {
 
   const router = useRouter();
   const [space, setSpace] = useCurrentSpace();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, setSpaces } = useSpaces();
   const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
   const isAdmin = isSpaceAdmin(user, space?.id);
@@ -51,6 +51,10 @@ export default function WorkspaceSettings () {
     defaultValues: space,
     resolver: yupResolver(schema)
   });
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'settings' });
+  }, []);
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');

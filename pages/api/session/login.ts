@@ -1,8 +1,11 @@
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
@@ -37,6 +40,8 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   req.session.user = { id: user.id };
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
+
+  trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });
 
   return res.status(200).json(user);
 }

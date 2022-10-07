@@ -95,6 +95,7 @@ export type PageDetails = {
   id: string;
   content: string | number | boolean | Record<string, any> | any[] | null;
   contentText: string;
+  spaceId: string;
 }
 
 export type PageWithProposal = (Page & { proposal: ProposalWithUsers | null });

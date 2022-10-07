@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isProdEnv } from 'config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -32,7 +33,7 @@ async function oauth (req: NextApiRequest, res: NextApiResponse) {
     discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
   }
 
-  const domain = process.env.NODE_ENV === 'development' ? `http://${req.headers.host}` : `https://${req.headers.host}`;
+  const domain = isProdEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
   const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(`${domain}/api/discord/callback`)}`;
   res.redirect(oauthUrl);
 }

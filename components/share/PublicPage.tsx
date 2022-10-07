@@ -60,7 +60,7 @@ export default function PublicPage () {
   const { pages, setCurrentPageId, getPagePermissions } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
   const [currentSpace] = useCurrentSpace();
-  const [, setSpaces] = useSpaces();
+  const { setSpaces } = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
   const [basePageId, setBasePageId] = useState('');
@@ -79,8 +79,10 @@ export default function PublicPage () {
     let foundSpace: Space | null = null;
 
     try {
-      foundSpace = await charmClient.getPublicSpaceInfo(spaceDomain);
-      setSpaces([foundSpace]);
+      foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
+      if (foundSpace) {
+        setSpaces([foundSpace]);
+      }
     }
     catch (err) {
       setPageNotFound(true);

@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DeleteIcon from '@mui/icons-material/Delete';
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -207,7 +208,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <SidebarHeader className='sidebar-header'>
-            <Typography><strong>{space.name}</strong></Typography>
+            <Typography><strong data-test='sidebar-space-name'>{space.name}</strong></Typography>
             <IconButton onClick={closeSidebar} size='small'>
               <ChevronLeftIcon />
             </IconButton>
@@ -235,13 +236,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </div>
             </Tooltip>
-
+            <SidebarLink
+              active={router.pathname.startsWith('/[domain]/settings/invites')}
+              href={`/${space.domain}/settings/invites`}
+              icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+              label='Invite Members'
+            />
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
               close={searchInWorkspaceModalState.close}
             />
             <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings')}
+              active={router.pathname.startsWith('/[domain]/settings/workspace')}
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings & Members'
