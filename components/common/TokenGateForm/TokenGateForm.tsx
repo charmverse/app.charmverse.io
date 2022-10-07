@@ -128,7 +128,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   if (!isLoading && (!tokenGates || tokenGates?.length === 0)) {
     return (
-      <Alert severity='info' sx={{ my: 1 }}>
+      <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
         No token gates found for this workspace.
       </Alert>
     );
