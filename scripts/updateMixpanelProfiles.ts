@@ -33,7 +33,7 @@ async function updateMixpanelGroupProfiles() {
         'Content-Type': 'application/json',
         'Accept': 'text/plain'
       },
-      body: JSON.stringify(profiles)
+      body: JSON.stringify(profilesChunk)
     })
 
     return await res.json() as number
@@ -52,7 +52,7 @@ async function updateMixpanelGroupProfiles() {
 async function updateMixpanelUserProfiles() {
   const users = await prisma.user.findMany({
     where: {
-      spaces: {
+      spaceRoles: {
           some: {} // user has at least one space
       }
     },
@@ -73,21 +73,20 @@ async function updateMixpanelUserProfiles() {
           include: {
             role: true
           }
-        }
+        },
+        space: true
       }
     },
     discordUser: true,
     telegramUser: true,
     notificationState: true,
-    wallets: true,
-    // include spaces
-    spaces: true
+    wallets: true
   } });
 
   const profiles = users.map(user => ({
     $token: MIXPANEL_API_KEY,
     $distinct_id: user.id,
-    $set: getTrackUserProfile(user, user.spaces)
+    $set: getTrackUserProfile(user, user.spaceRoles.map(role => role.space))
   }))
 
   // Mixpanel batch profile update limit - 2000
@@ -104,7 +103,7 @@ async function updateMixpanelUserProfiles() {
         'Content-Type': 'application/json',
         'Accept': 'text/plain'
       },
-      body: JSON.stringify(profiles)
+      body: JSON.stringify(profilesChunk)
     })
 
     return await res.json() as number
@@ -114,7 +113,7 @@ async function updateMixpanelUserProfiles() {
   const results = await Promise.all(promises)
 
   if (results.every(r => r === 1)) {
-    console.log('🔥', `Updated ${users.length} group profiles successfully.`);
+    console.log('🔥', `Updated ${users.length} user profiles successfully.`);
   } else {
     console.log('❌', 'Failed to update user profiles.');
   }

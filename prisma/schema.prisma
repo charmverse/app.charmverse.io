@@ -335,7 +335,7 @@ model User {
   pages             Page[]
   permissions       PagePermission[]
   poaps             Poap[]
-  spaces            Space[]
+  spacesCreated     Space[]
   spacePermissions  SpacePermission[]
   spaceRoles        SpaceRole[]
   telegramUser      TelegramUser?
