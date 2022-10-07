@@ -12,10 +12,11 @@ type IContext = {
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
   createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<void>;
+  isCreatingSpace: boolean;
 };
 
 export const SpacesContext = createContext<Readonly<IContext>>({
-  spaces: [], setSpaces: () => undefined, isLoaded: false, createNewSpace: () => Promise.resolve()
+  spaces: [], setSpaces: () => undefined, isLoaded: false, createNewSpace: () => Promise.resolve(), isCreatingSpace: false
 });
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
@@ -23,6 +24,7 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
   const { user, isLoaded: isUserLoaded, setUser } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCreatingSpace, setIsCreatingSpace] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,18 +43,27 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
   }, [user?.id, isUserLoaded]);
 
   const createNewSpace = useCallback(async (newSpace: Prisma.SpaceCreateInput) => {
-    const space = await charmClient.createSpace(newSpace);
-    setSpaces((s) => [...s, space]);
-    // refresh user permissions
-    const _user = await charmClient.getUser();
-    setUser(_user);
-    // give some time for spaces state to update or user will be redirected to /join in RouteGuard
-    setTimeout(() => {
-      router.push(`/${space.domain}`);
-    }, 50);
+    setIsCreatingSpace(true);
+
+    try {
+      const space = await charmClient.createSpace(newSpace);
+      setSpaces((s) => [...s, space]);
+      // refresh user permissions
+      const _user = await charmClient.getUser();
+      setUser(_user);
+      // give some time for spaces state to update or user will be redirected to /join in RouteGuard
+      setTimeout(() => {
+        router.push(`/${space.domain}`);
+        setIsCreatingSpace(false);
+      }, 200);
+    }
+    catch (e) {
+      setIsCreatingSpace(false);
+    }
+
   }, []);
 
-  const value = useMemo(() => ({ spaces, setSpaces, isLoaded, createNewSpace }) as IContext, [spaces, isLoaded]);
+  const value = useMemo(() => ({ spaces, setSpaces, isLoaded, createNewSpace, isCreatingSpace }) as IContext, [spaces, isLoaded, isCreatingSpace]);
 
   return (
     <SpacesContext.Provider value={value}>

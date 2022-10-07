@@ -45,9 +45,10 @@ interface Props {
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => void;
   submitText?: string;
+  isSubmitting: boolean;
 }
 
-export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
+export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
 
   const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
@@ -163,7 +164,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
           />
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace'>
+          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace' loading={isSubmitting}>
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>
