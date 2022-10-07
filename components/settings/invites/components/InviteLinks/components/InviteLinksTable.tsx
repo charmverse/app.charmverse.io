@@ -87,6 +87,7 @@ export default function InvitesTable (props: Props) {
               <TableCell width={150}>{getExpires(invite)}</TableCell>
               <TableCell width={150}>
                 <TokenGateRolesSelect
+                  isAdmin={isAdmin}
                   selectedRoleIds={invite.inviteLinkToRoles.map(inviteLinkToRole => inviteLinkToRole.roleId)}
                   onChange={(roleIds) => {
                     updateInviteLinkRoles(invite.id, roleIds);

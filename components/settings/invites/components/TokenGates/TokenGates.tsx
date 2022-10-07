@@ -22,9 +22,10 @@ import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`
   width: 100%;
+  min-height: 600px;
 
-  .lsm-share-modal-container {
-    min-height: 500px;
+  .lsm-single-select-condition-display {
+    overflow-y: scroll;
   }
 
   .lsm-single-condition-select-container,

@@ -167,6 +167,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 </TableCell>
                 <TableCell>
                   <TokenGateRolesSelect
+                    isAdmin={isAdmin}
                     selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
                     onChange={(roleIds) => {
                       updateTokenGateRoles(tokenGate.id, roleIds);

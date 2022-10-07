@@ -8,7 +8,7 @@ import Legend from '../Legend';
 
 import InviteLinkList from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';
-import Inviteintro from './components/InviteLinks/components/InviteIntro';
+import InviteIntro from './components/InviteLinks/components/InviteIntro';
 import TokenGates from './components/TokenGates';
 
 interface InvitesProps {
@@ -23,7 +23,7 @@ function Invites ({ space }: InvitesProps) {
 
   return (
     <>
-      <Inviteintro />
+      <InviteIntro />
       <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} display='flex' justifyContent='space-between'>
         <Typography variant='h2' fontSize='inherit' fontWeight={700}>Invite Links</Typography>
         <InviteActions openInvites={bindTrigger(popupInvitesState)} openTokenGate={bindTrigger(popupTokenGateState)} isAdmin={isAdmin} />

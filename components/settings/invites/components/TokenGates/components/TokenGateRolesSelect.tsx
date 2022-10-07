@@ -4,7 +4,6 @@ import { Box, Chip, FormControl, MenuItem, Select, Tooltip, Typography } from '@
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useMemo } from 'react';
 
-import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { isTruthy } from 'lib/utilities/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -16,6 +15,7 @@ interface Props {
   onChange: (roleIds: string[]) => void;
   selectedRoleIds: string[];
   onDelete: (roleId: string) => void;
+  isAdmin: boolean;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -34,7 +34,7 @@ const StyledFormControl = styled(FormControl)`
   }
 `;
 
-export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onChange }: Props) {
+export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
   const { roles } = useRoles();
 
   const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles.reduce((obj, role) => (
@@ -50,8 +50,6 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
       onChange(ev.target.value);
     }
   }
-
-  const isAdmin = useIsAdmin();
 
   if (roles?.length === 0) {
     return (
