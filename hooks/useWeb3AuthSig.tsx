@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
@@ -48,12 +49,20 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as AuthSig;
-        return parsed;
+
+        if (isValidWalletSignature({ address: walletAddress, host: window.location.origin, signature: parsed })) {
+          return parsed;
+        }
+        else {
+          return (null);
+        }
+
       }
       catch (e) {
         log.error('Error parsing stored signature', e);
         return null;
       }
+
     }
     else {
       return null;
@@ -80,7 +89,12 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     //  Automagic lit signature update only
     if (account) {
       const storedWalletSignature = getStoredSignature(account);
-      setSignature(storedWalletSignature);
+      if (storedWalletSignature) {
+        setSignature(storedWalletSignature);
+      }
+      else {
+        setSignature(null);
+      }
     }
     else {
       setSignature(null);
@@ -104,14 +118,14 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     const preparedMessage: Partial<SiweMessage> = {
       domain: window.location.host,
       address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-      uri: globalThis.location.origin,
+      uri: window.location.origin,
       version: '1',
       chainId
     };
 
     const message = new SiweMessage(preparedMessage);
 
-    const body = `Welcome to CharmVerse. Please sign this message to login with your Ethereum account.\r\n\r\n${message.prepareMessage()}`;
+    const body = message.prepareMessage();
 
     const messageBytes = toUtf8Bytes(body);
 
