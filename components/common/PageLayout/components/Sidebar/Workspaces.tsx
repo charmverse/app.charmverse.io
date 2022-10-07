@@ -34,7 +34,7 @@ const WorkspacesContainer = styled.div`
 
 export default function Workspaces () {
   const [space] = useCurrentSpace();
-  const { spaces, createNewSpace } = useSpaces();
+  const { spaces, createNewSpace, isCreatingSpace } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();
 
@@ -79,7 +79,7 @@ export default function Workspaces () {
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} />
+        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
         <Typography variant='body2' align='center' sx={{ pt: 2 }}>
           <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
             Join an existing workspace

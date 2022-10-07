@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { logFirstProposalTemplate } from 'lib/log/userEvents';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -26,6 +27,8 @@ async function createProposalTemplateController (req: NextApiRequest, res: NextA
   const { spaceId } = req.body as CreateProposalTemplateInput;
 
   const proposal = await createProposalTemplate({ spaceId, userId });
+
+  logFirstProposalTemplate({ userId, spaceId });
 
   res.status(201).send(proposal);
 

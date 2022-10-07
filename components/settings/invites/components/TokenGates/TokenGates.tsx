@@ -1,38 +1,31 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
-import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3-react-17';
-import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
+import type { PopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
-import Legend from '../../../Legend';
-
 import TokenGatesTable from './components/TokenGatesTable';
 
 const ShareModalContainer = styled.div`
-
   width: 100%;
+  min-height: 600px;
 
-  .lsm-share-modal-container {
-    min-height: 500px;
+  .lsm-single-select-condition-display {
+    overflow-y: scroll;
   }
 
   .lsm-single-condition-select-container,
@@ -58,7 +51,13 @@ const ShareModalContainer = styled.div`
 
 type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[], chains: string[] };
 
-export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, spaceId: string }) {
+interface TokenGatesProps {
+  isAdmin: boolean;
+  spaceId: string;
+  popupState: PopupState;
+}
+
+export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
@@ -66,14 +65,9 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
   const litClient = useLitProtocol();
   const { chainId } = useWeb3React();
   const { walletAuthSignature } = useWeb3AuthSig();
-  const router = useRouter();
-  const popupState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
-  const { showMessage } = useSnackbar();
   const [apiError, setApiError] = useState<string>('');
-  const { data, mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
-
-  const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
+  const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
@@ -126,38 +120,9 @@ export default function TokenGates ({ isAdmin, spaceId }: { isAdmin: boolean, sp
     deletePopupState.open();
   }
 
-  function onCopy () {
-    showMessage('Link copied to clipboard');
-  }
-
   return (
     <>
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span>
-          <div>Token Gates</div>
-          <Typography variant='caption' component='p'>
-            Control access to your workspace automatically with tokens/NFTs.
-            <br />Optionally, associate specific token condition with a role to fine-tune membership access.
-          </Typography>
-        </span>
-        <Box display='flex' gap={1}>
-          <CopyToClipboard text={shareLink} onCopy={onCopy}>
-            <Button href={shareLink} external target='_blank' onClick={(e: any) => e.preventDefault()} variant='outlined'>
-              Copy Invite Link
-            </Button>
-          </CopyToClipboard>
-          {isAdmin && (
-            <Button
-              {...bindTrigger(popupState)}
-            >
-              Add a gate
-            </Button>
-          )}
-        </Box>
-      </Legend>
-      {data && data.length === 0 && <Typography color='secondary'>No token gates yet</Typography>}
-      {data && data?.length > 0
-        && <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />}
+      <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
       <Modal {...bindPopover(popupState)} noPadding size='large'>
         <ShareModalContainer>
           <LitShareModal
