@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { getSpacesPublicInfo } from '../getSpacesByName';
+import { getSpacesByName } from '../getSpacesByName';
 
 let space!: Space;
 const spaceName = v4();
@@ -15,17 +15,10 @@ beforeAll(async () => {
   space = generated.space;
 });
 
-describe('getSpacesPublicInfo', () => {
+describe('getSpacesByName', () => {
 
-  it('should return a space using its domain', async () => {
-    const [result] = await getSpacesPublicInfo(space.domain);
-    expect(result?.id).toBe(space.id);
-    expect(result?.name).toBe(space.name);
-    expect(result?.domain).toBe(space.domain);
-  });
-
-  it('should return a space using its name', async () => {
-    const [result] = await getSpacesPublicInfo(spaceName);
+  it('should return matched spaces using its name', async () => {
+    const [result] = await getSpacesByName(space.name);
     expect(result?.id).toBe(space.id);
     expect(result?.name).toBe(space.name);
     expect(result?.domain).toBe(space.domain);
