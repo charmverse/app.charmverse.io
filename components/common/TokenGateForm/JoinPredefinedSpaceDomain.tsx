@@ -11,15 +11,17 @@ import LoadingComponent from '../LoadingComponent';
 
 import TokenGateForm from './TokenGateForm';
 
+function stripUrlParts (maybeUrl: string) {
+  return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
+}
+
 export function JoinPredefinedSpaceDomain ({ spaceDomain }: { spaceDomain: string }) {
-  const { isValidating, data } = useSWR('workspace', () => charmClient.getPublicSpacesInfo(spaceDomain));
+  const { isValidating, data: spaceInfo } = useSWR('workspace', () => charmClient.getSpaceByDomain(stripUrlParts(spaceDomain)));
   const router = useRouter();
 
   async function onJoinSpace (joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
   }
-
-  const spaceInfo = data?.[0] ?? null;
 
   if (isValidating) {
     return <LoadingComponent height='80px' isLoading={true} />;

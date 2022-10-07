@@ -8,7 +8,6 @@ import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useSpaces } from 'hooks/useSpaces';
 
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
@@ -25,8 +24,7 @@ const StyledPopper = styled(Popper)`
 
 export function JoinDynamicSpaceForm () {
   const router = useRouter();
-  const { spaces } = useSpaces();
-  const [spaceDomain, setSpaceDomain] = useState<string>('');
+  const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
   const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
   const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
 
@@ -34,21 +32,9 @@ export function JoinDynamicSpaceForm () {
     router.push(`/${joinedSpace.domain}`);
   }
 
-  useEffect(() => {
-    if (spaces.some(space => space.domain === router.query.domain)) {
-      router.push(`/${router.query.domain}`);
-    }
-  }, [spaces]);
-
-  useEffect(() => {
-    if (router.query.domain) {
-      setSpaceDomain(stripUrlParts(router.query.domain as string));
-    }
-  }, [router.query]);
-
   const debouncedGetPublicSpaces = useMemo(() => {
-    return debounce((_spaceDomain: string) => {
-      charmClient.getPublicSpacesInfo(_spaceDomain)
+    return debounce((spaceName: string) => {
+      charmClient.getSpacesByName(spaceName)
         .then((_spaces) => {
           setSpacesInfo(_spaces);
         })

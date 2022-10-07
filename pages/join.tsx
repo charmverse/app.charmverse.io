@@ -4,6 +4,7 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
@@ -32,6 +33,13 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
 export default function CreateSpace () {
   const router = useRouter();
   const domain = router.query.domain;
+  const { spaces } = useSpaces();
+
+  useEffect(() => {
+    if (spaces.some(space => space.domain === router.query.domain)) {
+      router.push(`/${router.query.domain}`);
+    }
+  }, [spaces]);
 
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>

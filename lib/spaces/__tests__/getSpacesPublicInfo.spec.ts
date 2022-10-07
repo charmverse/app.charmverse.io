@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { getSpacesPublicInfo } from '../getSpacesPublicInfo';
+import { getSpacesPublicInfo } from '../getSpacesByName';
 
 let space!: Space;
 const spaceName = v4();
