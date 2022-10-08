@@ -107,11 +107,13 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
         chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...tokenGate.conditions as any
       });
+
       await charmClient.verifyTokenGate({ commit: false, spaceId: space?.id as string, tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }] });
 
       setTestResult({ status: 'success' });
     }
     catch (error) {
+      log.warn('Error when verifying wallet', error);
       let message = '';
       switch ((error as any).errorCode) {
         case 'not_authorized':
@@ -178,9 +180,9 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                   />
                 </TableCell>
                 <TableCell align='center'>
-                  <Tooltip arrow placement='top' title={litClient ? 'Test this gate using your own wallet' : 'Lit Protocol client has not initialized'}>
+                  <Tooltip arrow placement='top' title={litClient ? (account ? 'Connect your wallet to test' : 'Test this gate using your own wallet') : 'Lit Protocol client has not initialized'}>
                     <Box component='span'>
-                      <Chip onClick={() => litClient && testConnect(tokenGate)} sx={{ width: 90 }} clickable={Boolean(litClient)} color='secondary' size='small' variant='outlined' label='Test' />
+                      <Chip onClick={() => litClient && account && testConnect(tokenGate)} sx={{ width: 90 }} clickable={Boolean(account && litClient)} color='secondary' size='small' variant='outlined' label='Test' />
                     </Box>
                   </Tooltip>
                 </TableCell>
