@@ -13,11 +13,7 @@ export class TokenGatePage {
     this.tokenGateEmptyState = page.locator('data-test=token-gate-empty-state');
   }
 
-  async waitForURL () {
-    await this.page.waitForURL('**/join');
-  }
-
-  async isEmptyStateVisible () {
-    return this.tokenGateEmptyState.isVisible();
+  async waitForWorkspaceURL ({ domain, returnUrl }: { domain: string, returnUrl: string }) {
+    await this.page.waitForURL(`**/join?domain=${domain}&returnUrl=${encodeURIComponent(returnUrl)}`);
   }
 }
