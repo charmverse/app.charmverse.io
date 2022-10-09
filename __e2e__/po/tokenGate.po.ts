@@ -8,9 +8,12 @@ export class TokenGatePage {
 
   readonly tokenGateEmptyState: Locator;
 
+  readonly connectWalletButton: Locator;
+
   constructor (page: Page) {
     this.page = page;
     this.tokenGateEmptyState = page.locator('data-test=token-gate-empty-state');
+    this.connectWalletButton = page.locator('data-test=connect-wallet-button');
   }
 
   async waitForWorkspaceURL ({ domain, returnUrl }: { domain: string, returnUrl: string }) {

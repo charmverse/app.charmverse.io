@@ -187,6 +187,39 @@ export async function generateUser ({ walletAddress = v4() }: { walletAddress?: 
   return user;
 }
 
+export async function generateDiscordUser () {
+  const user = await prisma.user.create({
+    data: {
+      identityType: IDENTITY_TYPES[0],
+      username: v4(),
+      path: v4(),
+      discordUser: {
+        create: {
+          account: {},
+          discordId: v4()
+        }
+      }
+    }
+  });
+
+  return user;
+}
+
+export async function generateTokenGate ({ userId, spaceId }: { spaceId: string, userId: string }) {
+  return prisma.tokenGate.create({
+    data: {
+      conditions: {},
+      createdBy: userId,
+      resourceId: {},
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+}
+
 export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } = {}) {
 
   const wallet = Wallet.createRandom();
