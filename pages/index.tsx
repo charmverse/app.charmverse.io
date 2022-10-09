@@ -8,16 +8,15 @@ import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { isSpaceDomain } from 'lib/spaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage () {
   const { account, walletAuthSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
-  const { showMessage } = useSnackbar();
   const router = useRouter();
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   const [, setTitleState] = usePageTitle();
@@ -31,9 +30,11 @@ export default function LoginPage () {
   const isLoggedIn = !!user;
   const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);
   const isVerificationStep = !!account && !walletIsVerified;
+  const hasCompletedSignUp = spaces.length && isSpacesLoaded;
 
   function redirectToDefaultPage () {
-    if (typeof router.query.returnUrl === 'string') {
+    // allow redirect url if user is going to a workspace (token gate)
+    if (typeof router.query.returnUrl === 'string' && (!hasCompletedSignUp || isSpaceDomain(router.query.returnUrl))) {
       router.push(router.query.returnUrl);
     }
     else if (defaultWorkspace === '/nexus') {
