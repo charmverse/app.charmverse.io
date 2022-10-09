@@ -14,6 +14,6 @@ export class TokenGatePage {
   }
 
   async waitForWorkspaceURL ({ domain, returnUrl }: { domain: string, returnUrl: string }) {
-    await this.page.waitForURL(`**/join?domain=${domain}&returnUrl=${encodeURIComponent(returnUrl)}`);
+    await this.page.waitForURL(`**/join?domain=${domain}&returnUrl=${encodeURIComponent(returnUrl)}`, { timeout: 0 });
   }
 }

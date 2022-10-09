@@ -6,6 +6,7 @@ export function login ({ page, userId }: { userId: string, page: Page }) {
   return page.request.post(`${baseUrl}/api/session/login-testenv`, {
     data: {
       userId
-    }
+    },
+    timeout: 0
   });
 }
