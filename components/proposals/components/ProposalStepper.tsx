@@ -146,8 +146,12 @@ export default function ProposalStepper (
           proposal={proposal}
           open={isModalOpen}
           onCreateVote={async () => {
-            await updateProposalStatus('vote_active');
             setIsModalOpen(false);
+            await updateProposalStatus('vote_active');
+          }}
+          onPublishToSnapshot={async () => {
+            setIsModalOpen(false);
+            await updateProposalStatus('vote_active');
           }}
           onClose={() => {
             setIsModalOpen(false);
