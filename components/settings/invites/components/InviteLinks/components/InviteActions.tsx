@@ -10,6 +10,7 @@ import { memo, useState } from 'react';
 import type { MouseEvent, SyntheticEvent } from 'react';
 
 import Button from 'components/common/Button';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -69,6 +70,7 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const { account } = useWeb3AuthSig();
 
   const { onClick: onOpenInvitesClick, ...restInviteProps } = openInvites;
   const { onClick: onOpenTokenGateClick, ...restTokenGateProps } = openTokenGate;
@@ -117,12 +119,12 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
             />
           </Box>
         </MenuItem>
-        <MenuItem onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
+        <MenuItem disabled={!account} onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
               primary='Add a Token Gate'
-              secondary='Control access to your workspace with tokens & NFTS'
+              secondary='Control access to your workspace with tokens & NFTS (Wallet Required)'
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />
