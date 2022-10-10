@@ -88,7 +88,7 @@ function InlineVoteOptions (
 
 interface CreateVoteModalProps {
   onClose?: () => void;
-  onCreateVote?: (vote: ExtendedVote) => void;
+  onCreateVote?: (vote?: ExtendedVote) => void;
   open?: boolean;
   proposal?: ProposalWithUsers;
 }
@@ -280,6 +280,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
                       <Typography>{label}</Typography>
                     </Button>
                   )}
+                  onPublish={onCreateVote}
                   pageId={proposal.id}
                 />
               </div>
