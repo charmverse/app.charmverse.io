@@ -67,6 +67,12 @@ export default function PageDialog (props: Props) {
     }
   }, [!!page]);
 
+  useEffect(() => {
+    if (page?.id) {
+      charmClient.track.trackAction('page_view', { spaceId: page.spaceId, resourceId: page.id, type: page.type });
+    }
+  }, [page?.id]);
+
   async function onClickDelete () {
     if (page) {
       await deletePage({ pageId: page.id });

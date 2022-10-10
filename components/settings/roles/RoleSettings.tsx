@@ -9,7 +9,6 @@ import { useRef, useState } from 'react';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ShareBountyBoard from 'components/common/PageLayout/components/Header/components/BountyShareButton/ShareBountyBoard';
-import InviteLinkList from 'components/settings/contributors/InviteLinks/InviteLinks';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -22,7 +21,6 @@ import RoleRow from './components/RoleRow';
 import SpacePermissions from './components/SpacePermissions';
 import DefaultPagePermissions from './components/SpacePermissions/components/DefaultPagePermissions';
 import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
-import TokenGates from './components/TokenGates';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 export default function RoleSettings () {
@@ -112,11 +110,6 @@ export default function RoleSettings () {
         />
       ))}
       {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
-
-      {/* Token gates section */}
-      <TokenGates isAdmin={isAdmin} spaceId={space?.id as string} />
-
-      <InviteLinkList isAdmin={isAdmin} spaceId={space?.id as string} />
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />

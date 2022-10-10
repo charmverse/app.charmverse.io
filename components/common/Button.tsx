@@ -39,7 +39,7 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
 
 // make sure teh id prop is on the same element as onClick
 const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
-  const { href, external, children, id, onClick, target, ...props } = _props;
+  const { href, external, children, id, onClick, target, 'data-test': dataTest, ...props } = _props;
   if (href) {
     if (external) {
       return <PimpedButton ref={ref} href={href} id={id} onClick={onClick} {...props}>{children}</PimpedButton>;
@@ -57,6 +57,7 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
           target={target}
           id={id}
           onClick={mouseOnClick}
+          data-test={dataTest}
         >
           <PimpedButton {...props}>{children}</PimpedButton>
         </MuiLink>
@@ -64,7 +65,7 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
     );
   }
 
-  return <PimpedButton ref={ref} id={id} onClick={onClick} {...props}>{children}</PimpedButton>;
+  return <PimpedButton ref={ref} id={id} onClick={onClick} data-test={dataTest} {...props}>{children}</PimpedButton>;
 });
 
 export default PimpedButtonWithNextLink;

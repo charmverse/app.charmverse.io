@@ -4,9 +4,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
@@ -34,7 +34,6 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
   const pageId = newVote.pageId;
-  const createdBy = newVote.createdBy;
 
   const existingPage = await prisma.page.findUnique({
     where: {
@@ -80,6 +79,10 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
     spaceId: existingPage.spaceId,
     createdBy: userId
   } as VoteDTO);
+
+  if (vote.context === 'proposal') {
+    trackUserAction('new_vote_created', { userId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+  }
 
   return res.status(201).json(vote);
 }

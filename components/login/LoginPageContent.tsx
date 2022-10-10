@@ -73,7 +73,7 @@ export function LoginPageContent ({ walletSigned }: Props) {
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or
               </Typography>
-              <Button sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+              <Button data-test='connect-discord' sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
                 Connect Discord
               </Button>
 

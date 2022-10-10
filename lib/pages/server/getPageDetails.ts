@@ -26,7 +26,8 @@ export async function getPageDetails (pageIdOrPath: string, spaceId?: string): P
     select: {
       id: true,
       content: true,
-      contentText: true
+      contentText: true,
+      spaceId: true
     }
   });
 }

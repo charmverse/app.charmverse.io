@@ -1,5 +1,6 @@
 import type { PagePermission, Prisma } from '@prisma/client';
 
+import type { OptionalTransaction, Transaction, TransactionClient } from 'db';
 import { prisma } from 'db';
 import type { IPageWithPermissions, PageNodeWithChildren, PageNodeWithPermissions, TargetPageTree } from 'lib/pages/interfaces';
 import { TargetPageTreeWithFlatChildren } from 'lib/pages/interfaces';
@@ -207,32 +208,41 @@ export function generateReplaceIllegalPermissions ({ parents, targetPage }: Targ
   };
 }
 
-export async function replaceIllegalPermissions ({ pageId }: { pageId: string }):
+export async function replaceIllegalPermissions ({ pageId, tx }: { pageId: string } & OptionalTransaction):
  Promise<IPageWithPermissions & PageNodeWithChildren<PageNodeWithPermissions> & { tree: TargetPageTree<PageNodeWithPermissions> }> {
 
-  const { parents, targetPage } = await resolvePageTree({ pageId });
+  if (!tx) {
+    return prisma.$transaction(txHandler);
+  }
 
-  const args = generateReplaceIllegalPermissions({ parents, targetPage });
+  return txHandler(tx);
 
-  return prisma.$transaction(args.updateManyOperations.map(op => prisma.pagePermission.updateMany(op)))
-    .then(async () => {
-      const pageAfterPermissionsUpdate = await getPage(pageId) as IPageWithPermissions;
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  async function txHandler (tx: TransactionClient) {
+    const { parents, targetPage } = await resolvePageTree({ pageId, tx });
 
-      const { parents: newParents, targetPage: newTargetPage } = await resolvePageTree({ pageId });
+    const args = generateReplaceIllegalPermissions({ parents, targetPage });
 
-      const pageWithChildren: IPageWithPermissions
-      & PageNodeWithChildren<PageNodeWithPermissions>
-      & { tree: TargetPageTree<PageNodeWithPermissions> } = {
-        ...pageAfterPermissionsUpdate,
-        children: targetPage.children,
-        tree: {
-          parents: newParents,
-          targetPage: newTargetPage
-        }
-      };
+    for (const op of args.updateManyOperations) {
+      await tx.pagePermission.updateMany(op);
+    }
 
-      return pageWithChildren;
+    const pageAfterPermissionsUpdate = await getPage(pageId, undefined, tx) as IPageWithPermissions;
 
-    });
+    const { parents: newParents, targetPage: newTargetPage } = await resolvePageTree({ pageId, tx });
+
+    const pageWithChildren: IPageWithPermissions
+    & PageNodeWithChildren<PageNodeWithPermissions>
+    & { tree: TargetPageTree<PageNodeWithPermissions> } = {
+      ...pageAfterPermissionsUpdate,
+      children: targetPage.children,
+      tree: {
+        parents: newParents,
+        targetPage: newTargetPage
+      }
+    };
+
+    return pageWithChildren;
+  }
 
 }

@@ -1,5 +1,5 @@
 
-import type { InviteLink, User } from '@prisma/client';
+import type { InviteLink, InviteLinkToRole, Role, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,7 +8,7 @@ import { createInviteLink } from 'lib/invites';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-export type InviteLinkPopulated = InviteLink & { author: User };
+export type InviteLinkPopulated = InviteLink & { author: User, inviteLinkToRoles: (InviteLinkToRole & { role: Role })[] };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -40,7 +40,12 @@ async function getInviteLinks (req: NextApiRequest, res: NextApiResponse<InviteL
       spaceId
     },
     include: {
-      author: true
+      author: true,
+      inviteLinkToRoles: {
+        include: {
+          role: true
+        }
+      }
     }
   });
   return res.status(200).json(invites);

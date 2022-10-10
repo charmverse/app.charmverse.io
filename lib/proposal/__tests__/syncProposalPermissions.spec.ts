@@ -7,7 +7,7 @@ import { getPage } from 'lib/pages/server';
 import { typedKeys } from 'lib/utilities/objects';
 import { createPage, generateProposal, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ProposalReviewerInput, ProposalWithUsers } from '../interface';
+import type { ProposalReviewerInput } from '../interface';
 import { proposalPermissionMapping, syncProposalPermissions } from '../syncProposalPermissions';
 
 let space: Space;
@@ -50,13 +50,13 @@ describe('syncProposalPagePermissions', () => {
 
     const reviewers: ProposalReviewerInput[] = [{ group: 'user', id: reviewerUser.id }, { group: 'role', id: reviewerRole.id }];
 
-    let proposal = (await generateProposal({
+    let { proposal } = await generateProposal({
       proposalStatus: 'private_draft',
       spaceId: space.id,
       userId: user.id,
       authors,
       reviewers
-    })).proposal as ProposalWithUsers;
+    });
 
     const proposalChild = await createPage({
       createdBy: user.id,
@@ -139,13 +139,13 @@ describe('syncProposalPagePermissions', () => {
 
     const reviewers: ProposalReviewerInput[] = [{ group: 'user', id: reviewerUser.id }, { group: 'role', id: reviewerRole.id }];
 
-    const proposal = (await generateProposal({
+    const { proposal } = await generateProposal({
       proposalStatus: 'private_draft',
       spaceId: space.id,
       userId: user.id,
       authors,
       reviewers
-    })).proposal as ProposalWithUsers;
+    });
 
     const proposalChild = await createPage({
       createdBy: user.id,
