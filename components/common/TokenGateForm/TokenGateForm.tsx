@@ -135,7 +135,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   }
 
   return (
-    <Grid container direction='column' spacing={2} sx={{ mt: 2 }}>
+    <Grid container direction='column' spacing={2} sx={{ mt: 2 }} data-test='token-gate-form'>
       <Grid item>
         <Typography variant='body2'>
           Verify your wallet to check if you can join this workspace and which roles you can receive.
@@ -143,36 +143,36 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       </Grid>
 
       {
-          tokenGates?.map((gate, index, list) => (
-            <Grid item xs key={gate.id}>
-              <TokenGateOption
-                tokenGate={gate}
-                isVerifying={verifyingGates}
-                validGate={tokenGateResult ? (tokenGateResult.gateTokens.some(g => g.tokenGate.id === gate.id)) : null}
-              />
-              {
-                index < list.length - 1 && (
-                  <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>OR</Typography>
-                )
-              }
-            </Grid>
-          ))
-        }
+        tokenGates?.map((gate, index, list) => (
+          <Grid item xs key={gate.id}>
+            <TokenGateOption
+              tokenGate={gate}
+              isVerifying={verifyingGates}
+              validGate={tokenGateResult ? (tokenGateResult.gateTokens.some(g => g.tokenGate.id === gate.id)) : null}
+            />
+            {
+              index < list.length - 1 && (
+                <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>OR</Typography>
+              )
+            }
+          </Grid>
+        ))
+      }
 
       {
         tokenGateResult && (
           <Grid item xs>
             {
-            !tokenGateResult.canJoinSpace ? (
-              <Alert severity='warning'>
-                Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
-              </Alert>
-            ) : (
-              <Alert severity='success'>
-                You can join this workspace. {tokenGateResult.roles.length > 0 ? 'You will also receive the roles attached to each condition you passed' : ''}
-              </Alert>
-            )
-          }
+              !tokenGateResult.canJoinSpace ? (
+                <Alert severity='warning'>
+                  Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
+                </Alert>
+              ) : (
+                <Alert severity='success'>
+                  You can join this workspace. {tokenGateResult.roles.length > 0 ? 'You will also receive the roles attached to each condition you passed' : ''}
+                </Alert>
+              )
+            }
           </Grid>
         )
       }

@@ -75,6 +75,6 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
   }
 
   return (
-    <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
+    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
   );
 }
