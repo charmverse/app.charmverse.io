@@ -88,7 +88,7 @@ function InlineVoteOptions (
 
 interface CreateVoteModalProps {
   onClose?: () => void;
-  onCreateVote?: (vote?: ExtendedVote) => void;
+  onCreateVote?: (vote: ExtendedVote) => void;
   onPublishToSnapshot?: () => void;
   open?: boolean;
   proposal?: ProposalWithUsers;
