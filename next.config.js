@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const webpack = require('webpack');
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const transpileModules = require('next-transpile-modules');
 const next = require('next/dist/lib/is-serializable-props');
+const webpack = require('webpack');
+
 const esmModules = require('./next.base').esmModules;
 
 const config = {
@@ -54,7 +55,8 @@ const config = {
         return entry().then(_entry => {
           return {
             ..._entry,
-            cron: './background/cron.ts'
+            cron: './background/cron.ts',
+            sockets: './background/sockets.ts'
           };
         });
       };

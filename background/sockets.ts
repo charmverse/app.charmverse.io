@@ -1,16 +1,16 @@
-// import { WebSocketServer } from 'ws';
+import { Server } from 'socket.io';
 
-// const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
+import log from 'lib/log';
 
-// const wss = new WebSocketServer({ port });
+const port = process.env.SOCKETS_PORT as string;
 
-// wss.on('connection', (ws) => {
+const io = new Server({ /* options */ });
 
-//   ws.id = Math.random().toString(36).substr(2, 5);
+io.on('connection', (socket) => {
+  // ...
+  log.info('new connection!', socket);
+});
 
-//   ws.on('message', function onMessage (data) {
-//     console.log('Received from the frontend: %s', data, this.id);
-//   });
+io.listen(parseInt(port));
 
-//   ws.send('Hi from the backend!');
-// });
+log.info('Socket server listening to port: ', port);
