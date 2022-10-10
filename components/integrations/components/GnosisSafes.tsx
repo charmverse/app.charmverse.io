@@ -33,7 +33,7 @@ const StyledTableCell = styled(TableCell)`
   border-bottom: 1px solid #000;
 `;
 
-const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/rin:${address}/home`;
+const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/eth:${address}/home`;
 
 export default function GnosisSafesList () {
 
