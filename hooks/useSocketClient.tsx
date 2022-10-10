@@ -40,10 +40,15 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       setLastPong(new Date().toISOString());
     });
 
+    socket.on('connect_error', (err) => {
+      log.error('Socket error', err.message); // prints the message associated with the error
+    });
+
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
+      socket.off('connect_error');
     };
   }, []);
 
