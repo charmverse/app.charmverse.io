@@ -170,7 +170,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-export async function generateUser ({ walletAddress = v4() }: { walletAddress?: string } = {}) {
+export async function generateUser ({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
   const user = await prisma.user.create({
     data: {
       identityType: IDENTITY_TYPES[0],

@@ -60,26 +60,25 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
 test('signup - ignores the logic to redirect user after connect', async ({ sandboxPage, signupPage }) => {
 
-  const user = await generateUser();
-
   // mimic signup: create a user and a session
+  const user = await generateUser();
+  await sandboxPage.goto('/');
   await login({ page: sandboxPage, userId: user.id });
-
-  await sandboxPage.goto(`${baseUrl}?redirectUrl=${encodeURIComponent('/profile')}`);
+  await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent('/profile')}`);
 
   await signupPage.waitForURL();
 
 });
 
-test('signup - follows the logic to redirect to a token gate', async ({ sandboxPage, signupPage }) => {
+test('signup - follows the logic to redirect to a token gate', async ({ sandboxPage }) => {
 
   const user = await generateUser();
+
+  // go to a workspace
   const { space } = await generateUserAndSpace();
 
-  await sandboxPage.goto(`${baseUrl}?redirectUrl=${encodeURIComponent(`/${space.domain}`)}`);
-
-  // mimic signup: create a user and a session
   await login({ page: sandboxPage, userId: user.id });
+  await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/${space.domain}`)}`);
 
   await sandboxPage.waitForURL('**/join**');
 
