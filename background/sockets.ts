@@ -1,16 +1,11 @@
-import { Server } from 'socket.io';
 
+import { socketsHost, socketsPort } from 'config/constants';
 import log from 'lib/log';
 
-const port = process.env.SOCKETS_PORT as string;
+import { io } from './sockets/socketServer';
 
-const io = new Server({ /* options */ });
+if (socketsPort) {
+  io.listen(parseInt(socketsPort));
 
-io.on('connection', (socket) => {
-  // ...
-  log.info('new connection!', socket);
-});
-
-io.listen(parseInt(port));
-
-log.info('Socket server listening to port: ', port);
+  log.info('Socket server listening at', socketsHost);
+}

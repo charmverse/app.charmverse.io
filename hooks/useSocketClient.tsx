@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useEffect, createContext, useContext, useMemo, useState } from 'react';
 import io from 'socket.io-client';
 
-import { socketsHost, socketsPort } from 'config/constants';
+import { socketsHost } from 'config/constants';
 import log from 'lib/log';
 
 type IContext = {
@@ -17,9 +17,11 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   sendPing: () => null
 });
 
-export function WebSocketClientProvider ({ children }: { children: ReactNode }) {
+const socket = io(socketsHost, {
+  withCredentials: true
+});
 
-  const socket = io(`${socketsHost}${socketsPort ? `:${socketsPort}` : ''}`);
+export function WebSocketClientProvider ({ children }: { children: ReactNode }) {
 
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [lastPong, setLastPong] = useState<string | null>(null);
