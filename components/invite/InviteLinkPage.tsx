@@ -38,7 +38,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
           <Typography variant='h5'>{invite.space.name}</Typography>
         </Box>
         {(account || user) ? (
-          <PrimaryButton fullWidth size='large' onClick={joinSpace}>
+          <PrimaryButton data-test='accept-invite-button' fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
         ) : (
