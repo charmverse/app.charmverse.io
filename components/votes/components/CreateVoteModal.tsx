@@ -269,21 +269,24 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
           >
             Create
           </Button>
-          or
           {proposal?.status === 'reviewed' && (
-            <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
-              <div>
-                <PublishToSnapshot
-                  renderContent={({ label, onClick, icon }) => (
-                    <Button disabled={!isProposalAuthor} onClick={onClick}>
-                      {icon}
-                      <Typography>{label}</Typography>
-                    </Button>
-                  )}
-                  pageId={proposal.id}
-                />
-              </div>
-            </Tooltip>
+            <>
+              or
+              <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+                <div>
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick, icon }) => (
+                      <Button disabled={!isProposalAuthor} onClick={onClick}>
+                        {icon}
+                        <Typography>{label}</Typography>
+                      </Button>
+                    )}
+                    pageId={proposal.id}
+                  />
+                </div>
+              </Tooltip>
+            </>
+
           )}
         </Stack>
       </Box>
