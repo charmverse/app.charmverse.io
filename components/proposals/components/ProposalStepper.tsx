@@ -81,7 +81,7 @@ export default function ProposalStepper (
                   height='100%'
                   gap={1}
                 >
-                  <Tooltip title={canChangeStatus ? proposalStatusTooltips[status] : ''}>
+                  <Tooltip title={proposalStatusTooltips[status]}>
                     <Box
                       sx={{
                         width: stepperDimension,
