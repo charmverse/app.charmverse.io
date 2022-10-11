@@ -205,7 +205,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       sidebar: {
         avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
-        background: mode === 'dark' ? backgroundLightColorDarkMode : '#EDF2F4'
+        background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor
       },
       code: {
         color: '#EB5757',
