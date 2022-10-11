@@ -42,9 +42,8 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
   top: ${({ top }) => top}px;
-  padding-bottom: ${({ theme }) => theme.spacing(5)};
+  padding: ${({ theme }) => `0 ${theme.spacing(10)} 0 ${theme.spacing(5)};`}
 
-  padding: 0 24px;
   ${({ theme }) => theme.breakpoints.up('md')} {
     padding: 0 80px;
   }
