@@ -72,6 +72,9 @@ export function JoinDynamicSpaceForm () {
         }}
         getOptionLabel={(space) => space.name}
         fullWidth
+        filterOptions={(x) => x}
+        clearOnEscape={false}
+        clearOnBlur={false}
         PopperComponent={StyledPopper}
         renderOption={(props, space) => (
           <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
