@@ -89,11 +89,13 @@ function InlineVoteOptions (
 interface CreateVoteModalProps {
   onClose?: () => void;
   onCreateVote?: (vote: ExtendedVote) => void;
+  onPublishToSnapshot?: () => void;
   open?: boolean;
   proposal?: ProposalWithUsers;
 }
 
-export default function CreateVoteModal ({ open = true, onClose, onCreateVote, proposal }: CreateVoteModalProps) {
+export default function CreateVoteModal ({
+  open = true, onClose = () => null, onCreateVote = () => null, onPublishToSnapshot = () => null, proposal }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -281,6 +283,7 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
                         <Typography>{label}</Typography>
                       </Button>
                     )}
+                    onPublish={onPublishToSnapshot}
                     pageId={proposal.id}
                   />
                 </div>
