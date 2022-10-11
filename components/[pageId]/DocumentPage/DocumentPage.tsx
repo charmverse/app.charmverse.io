@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
-import { useRouter, useRouter } from 'next/router';
-import { memo, useCallback, useEffect, useState, memo, useCallback, useEffect, useState } from 'react';
-import { useElementSize, useElementSize } from 'usehooks-ts';
+import { useRouter } from 'next/router';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
