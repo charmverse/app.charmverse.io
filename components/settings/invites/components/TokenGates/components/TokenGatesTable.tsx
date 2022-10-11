@@ -139,7 +139,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                   Token Gated Link
                 </Typography>
               </TableCell>
-              <TableCell width={150}>Asssigned Role</TableCell>
+              <TableCell width={150}>Assigned Role</TableCell>
               <TableCell width={90} align='center'>
                 <CopyToClipboard text={shareLink} onCopy={onCopy}>
                   <Chip onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()} sx={{ width: 90 }} clickable color='secondary' size='small' variant='outlined' label='Copy Link' />
