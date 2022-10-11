@@ -40,6 +40,7 @@ import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
+import { MemberApi } from './apis/memberApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -51,6 +52,8 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+
+  member = new MemberApi();
 
   blockchain = new BlockchainApi();
 

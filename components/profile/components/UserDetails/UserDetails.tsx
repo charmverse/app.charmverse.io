@@ -1,10 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import { Box, Divider, Grid, Link as ExternalLink, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -26,7 +23,6 @@ import type { IdentityType, LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import DiscordIcon from 'public/images/discord_logo.svg';
 
 import type { Social } from '../../interfaces';
 import DescriptionModal from '../DescriptionModal';
@@ -34,6 +30,8 @@ import type { IntegrationModel } from '../IdentityModal';
 import IdentityModal, { getIdentityIcon } from '../IdentityModal';
 import SocialModal from '../SocialModal';
 import UserPathModal from '../UserPathModal';
+
+import { SocialIcons } from './SocialIcons';
 
 const StyledDivider = styled(Divider)`
   height: 36px;
@@ -55,18 +53,12 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   });
 
   const ENSName = useENSName(account);
-  const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
   const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
-
-  const onDiscordUsernameCopy = () => {
-    setIsDiscordUsernameCopied(true);
-    setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
-  };
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
   const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
@@ -82,8 +74,6 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     discordUsername: '',
     linkedinURL: ''
   };
-
-  const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (isPublicUser(user)) {
@@ -151,7 +141,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
             <Stack direction='row' spacing={1} alignItems='end'>
-              { user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType) }
+              {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{user?.username}</Typography>
               {!readOnly && (
                 <IconButton onClick={identityModalState.open} data-testid='edit-identity'>
@@ -186,47 +176,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
             </Grid>
           )}
           <Grid item mt={1} height={40}>
-            <Stack direction='row' alignItems='center' spacing={2}>
-              { socialDetails && socialDetails.twitterURL && (
-                <ExternalLink href={socialDetails.twitterURL} target='_blank' display='flex'>
-                  <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
-                </ExternalLink>
-              )}
-              {
-                socialDetails && socialDetails.githubURL && (
-                  <ExternalLink href={socialDetails.githubURL} target='_blank' display='flex'>
-                    <GitHubIcon style={{ color: '#888', height: '22px' }} />
-                  </ExternalLink>
-                )
-              }
-              {
-                  socialDetails && socialDetails.discordUsername && (
-                    <Tooltip
-                      placement='top'
-                      title={isDiscordUsernameCopied ? 'Copied' : `Click to copy: ${socialDetails.discordUsername}`}
-                      disableInteractive
-                      arrow
-                    >
-                      <Box sx={{ display: 'initial' }}>
-                        <CopyToClipboard text={socialDetails.discordUsername} onCopy={onDiscordUsernameCopy}>
-                          <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
-                            <DiscordIcon />
-                          </SvgIcon>
-                        </CopyToClipboard>
-                      </Box>
-                    </Tooltip>
-                  )
-              }
-              {
-                socialDetails && socialDetails.linkedinURL && (
-                  <ExternalLink href={socialDetails.linkedinURL} target='_blank' display='flex'>
-                    <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
-                  </ExternalLink>
-                )
-              }
-              {
-                !hasAnySocialInformation(socialDetails) && <Typography>No social media links</Typography>
-              }
+            <SocialIcons social={socialDetails}>
               {!readOnly && (
                 <>
                   <StyledDivider orientation='vertical' flexItem />
@@ -235,7 +185,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
                   </IconButton>
                 </>
               )}
-            </Stack>
+            </SocialIcons>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
@@ -255,7 +205,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           </Grid>
         </Grid>
       </Stack>
-      { !isPublicUser(user) && (
+      {!isPublicUser(user) && (
         <>
           <IdentityModal
             isOpen={identityModalState.isOpen}

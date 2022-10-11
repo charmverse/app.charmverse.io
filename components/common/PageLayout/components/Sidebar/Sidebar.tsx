@@ -1,6 +1,7 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
@@ -214,6 +215,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </IconButton>
           </SidebarHeader>
           <Box mb={2}>
+            <SidebarLink
+              href={`/${space.domain}/members`}
+              active={router.pathname.startsWith('/[domain]/members')}
+              icon={<AccountCircleIcon fontSize='small' />}
+              label='Member Directory'
+            />
             <SidebarLink
               href={`/${space.domain}/bounties`}
               active={router.pathname.startsWith('/[domain]/bounties')}
