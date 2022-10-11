@@ -1,10 +1,12 @@
-import charmClient from 'charmClient';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { PageContent } from 'models';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
+
+import charmClient from 'charmClient';
+import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { PageContent } from 'models';
+
 import { usePages } from './usePages';
 
 type IContext = {

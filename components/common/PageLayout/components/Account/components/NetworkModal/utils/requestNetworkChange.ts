@@ -2,6 +2,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import type { ExternalProvider } from '@ethersproject/providers';
 import type { Blockchain } from 'connectors';
 import { RPC } from 'connectors';
+
 import log from 'lib/log';
 
 type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider }

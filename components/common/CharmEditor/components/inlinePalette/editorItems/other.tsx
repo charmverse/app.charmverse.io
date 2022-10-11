@@ -1,17 +1,19 @@
 
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import type { PluginKey } from 'prosemirror-state';
-import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { rafCommandExec } from '@bangle.dev/utils';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import type { PageType } from '@prisma/client';
-import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
-import { replaceSuggestionMarkWith } from '../inlinePalette';
-import { palettePluginKey } from '../config';
+import type { PluginKey } from 'prosemirror-state';
+
+import type { SpacePermissionFlags } from 'lib/permissions/spaces';
+
+import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import type { NestedPagePluginState } from '../../nestedPage';
 import { nestedPageSuggestMarkName } from '../../nestedPage';
-import { insertNode, isAtBeginningOfLine } from '../../../utils';
+import { palettePluginKey } from '../config';
+import { replaceSuggestionMarkWith } from '../inlinePalette';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
 interface ItemsProps {
   addNestedPage: () => Promise<void>;

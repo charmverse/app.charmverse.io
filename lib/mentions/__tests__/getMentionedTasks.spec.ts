@@ -1,7 +1,9 @@
 import type { Comment, Block, Bounty, Page, Space, User } from '@prisma/client';
-import { createPage, createBlock, generateBounty, generateComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
 import { prisma } from 'db';
+import { createPage, createBlock, generateBounty, generateComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { getMentionedTasks } from '../getMentionedTasks';
 
 let user1: User;

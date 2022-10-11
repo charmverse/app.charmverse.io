@@ -3,11 +3,13 @@ import type {
   Block, InviteLink, Page, PagePermissionLevel, PaymentMethod, Prisma,
   Role, Space, TelegramUser, TokenGate, TokenGateToRole, User, UserDetails, UserGnosisSafe
 } from '@prisma/client';
+import type { FiatCurrency, IPairQuote } from 'connectors';
+
 import * as http from 'adapters/http';
 import { PagesApi } from 'charmClient/apis/pagesApi';
+import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
-import type { FiatCurrency, IPairQuote } from 'connectors';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
@@ -34,6 +36,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
+
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
@@ -64,6 +67,8 @@ class CharmClient {
   pages = new PagesApi();
 
   tasks = new TasksApi();
+
+  track = new TrackApi();
 
   async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -213,6 +218,10 @@ class CharmClient {
     return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
+  updateInviteLinkRoles (inviteLinkId: string, spaceId: string, roleIds: string[]) {
+    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+  }
+
   createInviteLink (link: Partial<InviteLink>) {
     return http.POST<InviteLinkPopulated[]>('/api/invites', link);
   }
@@ -271,8 +280,12 @@ class CharmClient {
     }));
   }
 
-  async getPublicSpaceInfo (spaceId: string): Promise<Space> {
-    return http.GET<Space>(`/api/spaces/${spaceId}/public`);
+  async getSpaceByDomain (search: string): Promise<Space | null> {
+    return http.GET<Space | null>('/api/spaces/search-domain', { search });
+  }
+
+  async getSpacesByName (search: string): Promise<Space[]> {
+    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   async getAllBlocks (spaceId: string): Promise<FBBlock[]> {

@@ -3,24 +3,25 @@ import { useState, useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import { randomIntFromInterval } from 'lib/utilities/random';
+
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from '../blocks/board';
 import type { Card } from '../blocks/card';
+import { Constants } from '../constants';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import { Utils, IDType } from '../utils';
 import Editable from '../widgets/editable';
 import Switch from '../widgets/switch';
 
-import UserProperty from './properties/user/user';
-import MultiSelectProperty from './properties/multiSelect/multiSelect';
-import URLProperty from './properties/link/link';
-import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
-import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
 import DateRange from './properties/dateRange/dateRange';
+import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
+import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
+import URLProperty from './properties/link/link';
+import MultiSelectProperty from './properties/multiSelect/multiSelect';
 import SelectProperty from './properties/select/select';
-import { Constants } from '../constants';
+import UserProperty from './properties/user/user';
 
 const menuColors = Object.keys(Constants.menuColors);
 

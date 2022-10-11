@@ -1,8 +1,10 @@
 import type { Space, User } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { createProposalTemplate } from '../../templates/proposals/createProposalTemplate';
 import { createProposal } from '../createProposal';
 import { getProposalsBySpace } from '../getProposalsBySpace';

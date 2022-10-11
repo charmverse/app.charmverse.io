@@ -1,16 +1,18 @@
-import type { Page, Space, User, Vote } from '@prisma/client';
+import type { Page, Space, Vote } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
-import { removeSpaceOperations } from 'lib/permissions/spaces';
 import request from 'supertest';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { removeSpaceOperations } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { typedKeys } from 'lib/utilities/objects';
+import type { LoggedInUser } from 'models';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
 let space: Space;
-let user: User;
+let user: LoggedInUser;
 let vote: Vote;
 
 let userCookie: string;
@@ -31,7 +33,7 @@ beforeAll(async () => {
     spaceId: space.id
   });
 
-  userCookie = await loginUser(user);
+  userCookie = await loginUser(user.id);
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {
@@ -72,7 +74,7 @@ describe('POST /api/votes - Create a new poll', () => {
   it('Should create the poll if the user is an admin for the page and respond 201', async () => {
 
     const nonAdminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
-    const nonAdminUserCookie = await loginUser(nonAdminUser);
+    const nonAdminUserCookie = await loginUser(nonAdminUser.id);
 
     const pageForVote = await createPage({
       createdBy: nonAdminUser.id,
@@ -135,7 +137,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 
-    const authorCookie = await loginUser(author);
+    const authorCookie = await loginUser(author.id);
 
     const { page: resultPage } = await createProposal({
       createdBy: author.id,
@@ -166,7 +168,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 
-    const adminCookie = await loginUser(adminUser);
+    const adminCookie = await loginUser(adminUser.id);
 
     const { page: resultPage } = await createProposal({
       createdBy: author.id,
@@ -192,7 +194,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
     const otherUser = await generateSpaceUser({ isAdmin: false, spaceId: authorSpace.id });
-    const otherUserCookie = await loginUser(otherUser);
+    const otherUserCookie = await loginUser(otherUser.id);
 
     await removeSpaceOperations({ forSpaceId: authorSpace.id, operations: typedKeys(SpaceOperation), spaceId: authorSpace.id });
 

@@ -1,17 +1,13 @@
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import '@testing-library/jest-dom';
-
-import userEvent from '@testing-library/user-event';
-
 import type { FilterClause } from '../../blocks/filterClause';
-
 import mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-
 import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import FilterComponenet from './filterComponent';

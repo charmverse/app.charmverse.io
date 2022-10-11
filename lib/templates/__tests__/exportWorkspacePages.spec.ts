@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable camelcase */
+import fs from 'node:fs/promises';
+
 import type { Page, Space, User } from '@prisma/client';
+
 import { createBounty } from 'lib/bounties';
 import type { IPageWithPermissions } from 'lib/pages';
-import fs from 'node:fs/promises';
 import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
 import { exportWorkspacePages } from '../exportWorkspacePages';
+
+jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
@@ -51,6 +56,7 @@ beforeAll(async () => {
 });
 
 describe('exportWorkspacePages', () => {
+
   it('should export the pages within a workspace to a list of root pages, and their children as a recursive tree structure', async () => {
 
     const { data } = await exportWorkspacePages({
@@ -205,11 +211,8 @@ describe('exportWorkspacePages', () => {
       exportName
     });
 
-    const file = await fs.readFile(exportedPath, 'utf8');
-
     const stringifiedData = JSON.stringify(data, null, 2);
-
-    expect(file).toEqual(stringifiedData);
+    expect(fs.writeFile).toHaveBeenCalledWith(exportedPath, stringifiedData);
   });
 
 });

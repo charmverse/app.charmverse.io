@@ -1,9 +1,11 @@
 import { Box, CardHeader, Typography } from '@mui/material';
-import { fancyTrim } from 'lib/utilities/strings';
-import type { BountyWithDetails } from 'lib/bounties';
 import { memo } from 'react';
-import type { PageMeta } from 'lib/pages';
+
 import { usePageDetails } from 'hooks/usePageDetails';
+import type { BountyWithDetails } from 'lib/bounties';
+import type { PageMeta } from 'lib/pages';
+import { fancyTrim } from 'lib/utilities/strings';
+
 import BountyStatusBadge from './BountyStatusBadge';
 
 interface Props {

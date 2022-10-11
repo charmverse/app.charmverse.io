@@ -1,4 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material';
+import { useEffect } from 'react';
+import useSWR from 'swr';
+
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
@@ -6,7 +9,7 @@ import { useProposalCategories } from 'components/proposals/hooks/useProposalCat
 import { useProposalSortAndFilters } from 'components/proposals/hooks/useProposalSortAndFilters';
 import NewProposalButton from 'components/votes/components/NewProposalButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useSWR from 'swr';
+
 import ProposalsTable from './components/ProposalsTable';
 import ProposalsViewOptions from './components/ProposalsViewOptions';
 
@@ -23,6 +26,10 @@ export default function ProposalsPage () {
     categoryIdFilter,
     setCategoryIdFilter
   } = useProposalSortAndFilters(data ?? []);
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id, type: 'proposals_list' });
+  }, []);
 
   const loadingData = !data;
 

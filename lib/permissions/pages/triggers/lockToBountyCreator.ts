@@ -1,10 +1,13 @@
-import type { IPageWithPermissions } from 'lib/pages';
-import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { getPage, resolvePageTree } from 'lib/pages/server';
 import type { PagePermission, PagePermissionLevel } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import type { IPageWithPermissions } from 'lib/pages';
+import { getPage, resolvePageTree } from 'lib/pages/server';
+import { DataNotFoundError } from 'lib/utilities/errors';
+
 import { upsertPermission } from '../actions';
+
 import { setupPermissionsAfterPageRepositioned } from './page-repositioned';
 
 export async function lockToBountyCreator ({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
@@ -29,14 +32,18 @@ export async function lockToBountyCreator ({ pageId }: { pageId: string }): Prom
     };
   }), { id: v4(), inheritedFromPermission: null, pageId, permissionLevel: 'full_access', public: null, roleId: null, permissions: [], spaceId: null, userId: page.bounty?.createdBy }];
 
-  const pageTree = await resolvePageTree({
-    pageId,
-    flattenChildren: true
-  });
+  await prisma.$transaction(async (tx) => {
 
-  await prisma.$transaction(async () => {
-    await Promise.all(toModify.map(p => upsertPermission(pageId, p, pageTree)));
-    await setupPermissionsAfterPageRepositioned(pageId);
+    const pageTree = await resolvePageTree({
+      pageId,
+      flattenChildren: true,
+      tx
+    });
+
+    for (const permission of toModify) {
+      await upsertPermission(pageId, permission, pageTree, tx);
+    }
+    await setupPermissionsAfterPageRepositioned(pageId, tx);
   });
 
   return getPage(pageId) as Promise<IPageWithPermissions>;

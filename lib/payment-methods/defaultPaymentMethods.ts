@@ -1,4 +1,5 @@
 import type { PaymentMethod, Space } from '@prisma/client';
+
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 

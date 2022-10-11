@@ -1,12 +1,14 @@
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import SignupForm from 'components/signup/SignupForm';
 import { useSpaces } from 'hooks/useSpaces';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+
 import { getDefaultWorkspaceUrl } from './index';
 
 export default function LoginPage () {
-  const [spaces] = useSpaces();
+  const { spaces } = useSpaces();
   const router = useRouter();
 
   useEffect(() => {

@@ -1,5 +1,9 @@
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
+import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect, useRef, useState } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { DownIcon } from 'components/common/Icons/DownIcon';
@@ -14,9 +18,6 @@ import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useRef, useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
 export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const { user } = useUser();

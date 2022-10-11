@@ -1,7 +1,10 @@
 import type { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import { hasAccessToSpace } from '../../middleware';
 import type { PermissionComputeRequest } from '../interfaces';
+
 import { AvailableBountyPermissions } from './availableBountyPermissions';
 import type { BountyPermissionFlags } from './interfaces';
 import { bountyPermissionMapping } from './mapping';

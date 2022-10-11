@@ -3,22 +3,23 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
+import { useRouter } from 'next/router';
+import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
+import { useDrop } from 'react-dnd';
+
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getKey, useLocalStorage } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { IPageWithPermissions, NewPageInput, PageMeta, PageUpdates } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
 import type { Page } from 'models';
-import { useRouter } from 'next/router';
-import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
-import { memo, useCallback, useEffect, useMemo } from 'react';
-import { useDrop } from 'react-dnd';
 
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 

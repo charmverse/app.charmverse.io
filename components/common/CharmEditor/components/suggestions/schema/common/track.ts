@@ -1,5 +1,5 @@
-import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
+import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
 
 // for implementations of parseDOM by other components
 export function parseTracks (str: string) {
@@ -66,6 +66,14 @@ export const deletion: BaseRawMarkSpec = {
         'data-username': node.attrs.username,
         'data-date': node.attrs.date
       }];
+    }
+  },
+  markdown: {
+    toMarkdown: {
+      open: '',
+      close: '',
+      mixable: true,
+      expelEnclosingWhitespace: true
     }
   }
 } as const;
@@ -135,6 +143,14 @@ export const formatChange: BaseRawMarkSpec = {
         'data-after': JSON.stringify(node.attrs.after)
       }];
     }
+  },
+  markdown: {
+    toMarkdown: {
+      open: '',
+      close: '',
+      mixable: true,
+      expelEnclosingWhitespace: true
+    }
   }
 } as const;
 
@@ -193,6 +209,14 @@ export const insertion: BaseRawMarkSpec = {
         'data-username': node.attrs.username,
         'data-date': node.attrs.date
       }];
+    }
+  },
+  markdown: {
+    toMarkdown: {
+      open: '',
+      close: '',
+      mixable: true,
+      expelEnclosingWhitespace: true
     }
   }
 } as const;

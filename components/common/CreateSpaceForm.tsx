@@ -1,23 +1,24 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { IconButton, Tooltip, InputAdornment } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { IconButton, Tooltip, InputAdornment } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import TextField from '@mui/material/TextField';
-import PrimaryButton from 'components/common/PrimaryButton';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Avatar from 'components/settings/workspace/LargeAvatar';
 import Divider from '@mui/material/Divider';
-import { useUser } from 'hooks/useUser';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import type { Prisma } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import { DialogTitle } from 'components/common/Modal';
 import { useForm } from 'react-hook-form';
-import { DOMAIN_BLACKLIST } from 'lib/spaces';
+import * as yup from 'yup';
+
 import charmClient from 'charmClient';
+import FieldLabel from 'components/common/form/FieldLabel';
+import { DialogTitle } from 'components/common/Modal';
+import PrimaryButton from 'components/common/PrimaryButton';
+import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
+import { DOMAIN_BLACKLIST } from 'lib/spaces';
 import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({
@@ -44,9 +45,10 @@ interface Props {
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => void;
   submitText?: string;
+  isSubmitting: boolean;
 }
 
-export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText }: Props) {
+export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
 
   const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
@@ -111,7 +113,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
       <br />
@@ -128,6 +130,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
+            data-test='workspace-name-input'
             {...register('name', {
               onChange: onChangeName
             })}
@@ -161,7 +164,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
           />
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace'>
+          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace' loading={isSubmitting}>
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>

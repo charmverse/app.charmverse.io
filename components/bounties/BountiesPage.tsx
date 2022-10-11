@@ -1,14 +1,18 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { BountyStatus } from '@prisma/client';
-import Button from 'components/common/Button';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
-import type { BountyWithDetails } from 'lib/bounties';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
-import MultiPaymentModal from './components/MultiPaymentModal';
-import NewBountyButton from './components/NewBountyButton';
+
+import charmClient from 'charmClient';
+import Button from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { BountyWithDetails } from 'lib/bounties';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
+
 import BountiesEmptyState from './components/BountiesEmptyState';
 import BountiesKanbanView from './components/BountiesKanbanView';
+import MultiPaymentModal from './components/MultiPaymentModal';
+import NewBountyButton from './components/NewBountyButton';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
@@ -18,6 +22,11 @@ interface Props {
 }
 
 export default function BountiesPage ({ publicMode = false, bounties }: Props) {
+  const [space] = useCurrentSpace();
+
+  useEffect(() => {
+    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
+  }, []);
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 

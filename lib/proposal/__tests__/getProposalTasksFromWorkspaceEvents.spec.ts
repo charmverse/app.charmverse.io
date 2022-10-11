@@ -1,7 +1,9 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import type { ProposalTask } from '../getProposalTasks';
 import { getProposalTasksFromWorkspaceEvents } from '../getProposalTasksFromWorkspaceEvents';
 import { updateProposalStatus } from '../updateProposalStatus';
@@ -32,7 +34,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedProposal } = await updateProposalStatus({
-      proposal: authoredDraftProposal.proposal!,
+      proposal: authoredDraftProposal.proposal,
       newStatus: 'discussion',
       userId: user1.id
     });
@@ -58,7 +60,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
-      proposal: reviewProposal.proposal!,
+      proposal: reviewProposal.proposal,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -81,7 +83,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: authoredStartReviewProposal.proposal!,
+      proposal: authoredStartReviewProposal.proposal,
       newStatus: 'discussion',
       userId: user1.id
     });
@@ -98,7 +100,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: discussedProposal.proposal!,
+      proposal: discussedProposal.proposal,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -118,7 +120,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: reviewedProposal.proposal!,
+      proposal: reviewedProposal.proposal,
       newStatus: 'reviewed',
       userId: user1.id
     });
@@ -135,7 +137,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: voteActiveProposal.proposal!,
+      proposal: voteActiveProposal.proposal,
       newStatus: 'vote_active',
       userId: user2.id
     });

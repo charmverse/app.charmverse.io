@@ -1,6 +1,10 @@
 
 import type { Page } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
+import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
 import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
@@ -10,8 +14,6 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -141,6 +143,8 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
   });
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
+
+  trackPageAction('delete_page', { userId, pageId });
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

@@ -1,14 +1,15 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Alert, Card, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useEffect } from 'react';
+import type { KeyedMutator } from 'swr';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
-import { useEffect } from 'react';
-import type { KeyedMutator } from 'swr';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {

@@ -1,9 +1,11 @@
 import { ThemeProvider } from '@mui/material/styles';
 import type { UserDetails } from '@prisma/client';
 import { fireEvent, render, screen } from '@testing-library/react';
+
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import { createThemeLightSensitive } from 'theme';
+
 import IdentityModal from '../IdentityModal';
 import UserDetailsComponent from '../UserDetails';
 
@@ -28,7 +30,7 @@ function WrappedUserDetails () {
       updatedAt: new Date(),
       identityType: IDENTITY_TYPES[1],
       username: 'test.ens',
-      addresses: ['0x0000000000000000000000000000000000000000']
+      wallets: [{ address: '0x0000000000000000000000000000000000000000' }]
     } as LoggedInUser,
     updateUser: () => {}
   };

@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+
 import Avatar from 'components/common/Avatar';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';

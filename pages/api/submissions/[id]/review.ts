@@ -1,15 +1,17 @@
 
 import type { Application } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
-import type { SubmissionReview } from 'lib/applications/actions';
+import type { ReviewDecision, SubmissionReview } from 'lib/applications/actions';
 import { reviewSubmission } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,6 +22,7 @@ handler
 
 async function reviewSubmissionController (req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: submissionId } = req.query;
+  const { decision } = req.body as { decision: ReviewDecision };
 
   const userId = req.session.user.id;
 
@@ -28,7 +31,12 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
       id: submissionId as string
     },
     select: {
-      bounty: true
+      bounty: {
+        include: {
+          page: true
+        }
+      },
+      status: true
     }
   });
 
@@ -47,12 +55,26 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
   }
 
   const updatedSubmission = await reviewSubmission({
-    decision: req.body.decision,
+    decision,
     submissionId: submissionId as string,
     userId
   });
 
   await rollupBountyStatus(updatedSubmission.bountyId);
+
+  const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
+  if (decision === 'approve') {
+    trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id, resourceId: id });
+  }
+  else {
+    if (submission.status === 'applied') {
+      trackUserAction('bounty_application_rejected', { userId, spaceId, rewardToken, rewardAmount, resourceId: id });
+    }
+
+    if (submission.status === 'review') {
+      trackUserAction('bounty_submission_rejected', { userId, spaceId, pageId: page?.id, resourceId: id });
+    }
+  }
 
   return res.status(200).json(updatedSubmission);
 }

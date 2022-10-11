@@ -1,7 +1,9 @@
 import type { PagePermission, PagePermissionLevel } from '@prisma/client';
+
 import { AllowedPagePermissions } from '../available-page-permissions.class';
 import type { PageOperationType } from '../page-permission-interfaces';
 import { permissionTemplates } from '../page-permission-mapping';
+
 import { findExistingPermissionForGroup } from './find-existing-permission-for-group';
 
 /**

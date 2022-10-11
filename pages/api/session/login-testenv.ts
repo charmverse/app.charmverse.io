@@ -1,9 +1,9 @@
-import { onError, onNoMatch } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-const isTestEnv = process.env.ENABLE_TEST_LOGIN === 'true';
+import { isTestEnv } from 'config/constants';
+import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

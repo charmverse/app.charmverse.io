@@ -11,6 +11,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import type { SvgIconProps } from '@mui/material';
+
 import type { PropertyType } from '../../blocks/board';
 
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {

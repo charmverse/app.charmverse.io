@@ -1,5 +1,6 @@
 
 import { usePages } from 'hooks/usePages';
+
 import Favicon from './Favicon';
 
 export default function CurrentPageFavicon () {

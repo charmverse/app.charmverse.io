@@ -1,7 +1,9 @@
-import * as http from 'adapters/http';
 import type { Logger, LogLevelDesc } from 'loglevel';
 import _log from 'loglevel';
 import { DateTime } from 'luxon';
+
+import * as http from 'adapters/http';
+import { isProdEnv } from 'config/constants';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
@@ -9,12 +11,11 @@ const originalFactory = _log.methodFactory;
 
 export function apply (log: Logger) {
 
-  const isProduction = process.env.NODE_ENV === 'production';
-  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProduction ? 'debug' : 'debug');
+  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProdEnv ? 'debug' : 'debug');
   log.setDefaultLevel(defaultLevel);
 
   // add timestamps and send errors to Slack channel in production
-  if (isProduction && ERRORS_WEBHOOK) {
+  if (isProdEnv && ERRORS_WEBHOOK) {
 
     log.methodFactory = (methodName, logLevel, loggerName) => {
       const rawMethod = originalFactory(methodName, logLevel, loggerName);

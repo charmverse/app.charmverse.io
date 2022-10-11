@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
+
 import { useLocalStorage } from './useLocalStorage';
 
 type FocalboardViewsRecord = Record<string, null | string>;

@@ -1,4 +1,5 @@
 import type { UserVote, VoteOptions } from '@prisma/client';
+
 import type { ExtendedVote } from './interfaces';
 
 export function aggregateVoteResult ({ userId, userVotes, voteOptions }: { voteOptions: Pick<VoteOptions, 'name'>[], userVotes: Pick<UserVote, 'choice' | 'userId'>[], userId: string }) {

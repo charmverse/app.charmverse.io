@@ -18,6 +18,8 @@ export interface LitJwtPayload {
   extraData: '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}';
 }
 
+export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate'
+
 export interface TokenGateWithRoles extends TokenGate {
   tokenGateToRoles: (TokenGateToRole & { role: Role })[];
 }
@@ -54,6 +56,7 @@ export interface TokenGateVerification {
   spaceId: string;
   tokens: (Pick<TokenGateJwt, 'signedToken'> & { tokenGateId: string })[];
   commit: boolean;
+  joinType?: TokenGateJoinType;
 }
 
 export interface TokenGateVerificationResult {
@@ -61,3 +64,4 @@ export interface TokenGateVerificationResult {
   space: Space;
   roles: Role[];
 }
+

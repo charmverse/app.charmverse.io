@@ -1,8 +1,8 @@
 
-import type { ComponentProps } from 'react';
-import Box from '@mui/material/Box';
 import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
 import NextImage from 'next/image';
+import type { ComponentProps } from 'react';
 
 type Props = ComponentProps<typeof Box> & Pick<ComponentProps<typeof NextImage>, 'src'>;
 

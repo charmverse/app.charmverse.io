@@ -1,11 +1,15 @@
 import type { ProposalStatus, Prisma } from '@prisma/client';
-import { prisma } from 'db';
 import { v4 as uuid } from 'uuid';
+
+import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
-import type { PageContent } from 'models';
 import { createPage } from 'lib/pages/server/createPage';
-import { generateSyncProposalPermissions } from './syncProposalPermissions';
+import type { PageContent } from 'models';
+
 import { getPagePath } from '../pages';
+
+import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 type PageProps = 'createdBy' | 'spaceId';
 type OptionalPageProps = 'content' | 'contentText' | 'title';
@@ -80,6 +84,8 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
       prisma.pagePermission.create(args)
     ))
   ]);
+
+  trackUserAction('new_proposal_created', { userId: createdBy, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }

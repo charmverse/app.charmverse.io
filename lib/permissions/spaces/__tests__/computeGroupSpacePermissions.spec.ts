@@ -1,11 +1,13 @@
 
 import type { Space, User } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { addSpaceOperations } from '../addSpaceOperations';
 import { computeGroupSpacePermissions } from '../computeGroupSpacePermissions';
 

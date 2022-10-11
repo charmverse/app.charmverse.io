@@ -1,3 +1,7 @@
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
@@ -15,9 +19,6 @@ import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { getUriWithParam } from 'lib/utilities/strings';
 import type { Page } from 'models';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 /**
  *

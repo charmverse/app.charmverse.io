@@ -1,9 +1,12 @@
 import type { PagePermission, Prisma, PrismaPromise } from '@prisma/client';
+
+import type { OptionalTransaction } from 'db';
 import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+
 import type { BoardPagePermissionUpdated } from '../interfaces';
 
 /**
@@ -11,7 +14,7 @@ import type { BoardPagePermissionUpdated } from '../interfaces';
  * @param param0
  * @returns
  */
-export async function generateboardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
+export async function generateboardPagePermissionUpdated ({ boardId, permissionId, tx = prisma }: BoardPagePermissionUpdated & OptionalTransaction):
  Promise<{ updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs }> {
 
   const permissionUpdates: Prisma.PagePermissionUpdateArgs [] = [];
@@ -21,7 +24,7 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
 
   const permissionCreateMany: Prisma.PagePermissionCreateManyInput[] = [];
 
-  const { parents: boardParents, targetPage: board } = await resolvePageTree({ pageId: boardId });
+  const { parents: boardParents, targetPage: board } = await resolvePageTree({ pageId: boardId, tx });
   const boardChildren = flattenTree(board);
 
   const targetPermission = board.permissions.find(permission => permission.id === permissionId);
@@ -104,14 +107,25 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
   };
 }
 
-export async function boardPagePermissionUpdated ({ boardId, permissionId }: BoardPagePermissionUpdated):
+export async function boardPagePermissionUpdated ({ boardId, permissionId, tx }: BoardPagePermissionUpdated & OptionalTransaction):
  Promise<true> {
-  const args = await generateboardPagePermissionUpdated({ boardId, permissionId });
+  const args = await generateboardPagePermissionUpdated({ boardId, permissionId, tx });
 
-  await prisma.$transaction([
-    args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
-    args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
-  ].filter(a => isTruthy(a)) as PrismaPromise<any>[]);
+  if (tx) {
+    if (args.updateManyArgs) {
+      await tx.pagePermission.updateMany(args.updateManyArgs);
+    }
+
+    if (args.createManyArgs) {
+      await tx.pagePermission.createMany(args.createManyArgs);
+    }
+  }
+  else {
+    await prisma.$transaction([
+      args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
+      args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
+    ].filter(a => isTruthy(a)) as PrismaPromise<any>[]);
+  }
 
   return true;
 }

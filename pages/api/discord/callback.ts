@@ -1,11 +1,13 @@
-import nc from 'next-connect';
-import { onError, onNoMatch } from 'lib/middleware';
-import loginByDiscord from 'lib/discord/loginByDiscord';
-import log from 'lib/log';
-import { withSessionRoute } from 'lib/session/withSession';
-import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import Cookies from 'cookies';
+import nc from 'next-connect';
+
+import { isTestEnv } from 'config/constants';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
+import loginByDiscord from 'lib/discord/loginByDiscord';
+import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import log from 'lib/log';
+import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc({
   onError,
@@ -31,9 +33,10 @@ handler.get(async (req, res) => {
 
   if (type === 'login') {
     try {
-      const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host });
+      const discordApiUrl = isTestEnv ? req.query.discordApiUrl as string : undefined;
+      const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host, discordApiUrl });
       req.session.user = { id: user.id };
-      await updateGuildRolesForUser(user.addresses, user.spaceRoles);
+      await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
     }
     catch (error) {
       log.warn('Error while connecting to Discord', error);

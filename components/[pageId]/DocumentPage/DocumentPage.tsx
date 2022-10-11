@@ -1,5 +1,10 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import dynamic from 'next/dynamic';
+import { useRouter, useRouter } from 'next/router';
+import { memo, useCallback, useEffect, useState, memo, useCallback, useEffect, useState } from 'react';
+import { useElementSize, useElementSize } from 'usehooks-ts';
+
 import charmClient from 'charmClient';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
@@ -19,10 +24,7 @@ import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 import type { Page, PageContent } from 'models';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import { memo, useCallback, useEffect, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';

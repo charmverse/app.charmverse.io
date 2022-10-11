@@ -1,8 +1,10 @@
 import type { Space, User } from '@prisma/client';
-import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
-import { ExpectedAnError } from 'testing/errors';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { ExpectedAnError } from 'testing/errors';
+import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication } from 'testing/setupDatabase';
+
 import { lockApplicationAndSubmissions } from '../lockApplicationAndSubmissions';
 
 let nonAdminUser: User;

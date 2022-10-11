@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import Popper from '@mui/material/Popper';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import Popper from '@mui/material/Popper';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Menu from '.';
 

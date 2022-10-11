@@ -4,6 +4,7 @@ import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
 import { floatingMenu } from '@bangle.dev/react-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import type { NodeSelection } from 'prosemirror-state';
+
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
 

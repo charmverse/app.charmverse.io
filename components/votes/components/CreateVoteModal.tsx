@@ -1,21 +1,22 @@
+import AddCircle from '@mui/icons-material/AddCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { VoteType } from '@prisma/client';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import Button from 'components/common/Button';
-import FieldLabel from 'components/common/form/FieldLabel';
-import Modal from 'components/common/Modal';
-import type { ExtendedVote } from 'lib/votes/interfaces';
+import { VoteType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-import { usePages } from 'hooks/usePages';
-import { useVotes } from 'hooks/useVotes';
-import AddCircle from '@mui/icons-material/AddCircle';
-import DeleteIcon from '@mui/icons-material/Delete';
+
+import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
+import Modal from 'components/common/Modal';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import { useVotes } from 'hooks/useVotes';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 
 interface InlineVoteOptionsProps {
   options: { name: string }[];
@@ -268,21 +269,24 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
           >
             Create
           </Button>
-          or
           {proposal?.status === 'reviewed' && (
-            <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
-              <div>
-                <PublishToSnapshot
-                  renderContent={({ label, onClick, icon }) => (
-                    <Button disabled={!isProposalAuthor} onClick={onClick}>
-                      {icon}
-                      <Typography>{label}</Typography>
-                    </Button>
-                  )}
-                  pageId={proposal.id}
-                />
-              </div>
-            </Tooltip>
+            <>
+              or
+              <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+                <div>
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick, icon }) => (
+                      <Button disabled={!isProposalAuthor} onClick={onClick}>
+                        {icon}
+                        <Typography>{label}</Typography>
+                      </Button>
+                    )}
+                    pageId={proposal.id}
+                  />
+                </div>
+              </Tooltip>
+            </>
+
           )}
         </Stack>
       </Box>

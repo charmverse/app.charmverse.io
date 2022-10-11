@@ -1,5 +1,6 @@
 import type { ISystemErrorInput } from 'lib/utilities/errors';
 import { SystemError } from 'lib/utilities/errors';
+
 import type { PageProperty } from './interfaces';
 
 export class PageNotFoundError extends SystemError {

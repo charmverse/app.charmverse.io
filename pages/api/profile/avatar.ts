@@ -1,12 +1,12 @@
-import { prisma } from 'db';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import * as alchemyApi from 'lib/blockchain/provider/alchemy';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT } from 'lib/blockchain/nfts';
+import * as alchemyApi from 'lib/blockchain/provider/alchemy';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
 import type { UserAvatar } from 'lib/users/interfaces';
@@ -39,8 +39,8 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const user = await getUserProfile('id', req.session.user.id);
     const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
 
-    const isOwner = user?.addresses.some(a => {
-      return owners.find(o => o.toLowerCase() === a.toLowerCase());
+    const isOwner = user?.wallets.some(a => {
+      return owners.find(o => o.toLowerCase() === a.address.toLowerCase());
     });
 
     if (!isOwner) {

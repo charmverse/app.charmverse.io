@@ -1,6 +1,6 @@
 
-import React, { memo, useRef, useMemo, useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import React, { memo, useRef, useMemo, useState, useEffect } from 'react';
 
 import type { Context } from './menu/menuContext';
 import { MenuContext, useMenuContext } from './menu/menuContext';

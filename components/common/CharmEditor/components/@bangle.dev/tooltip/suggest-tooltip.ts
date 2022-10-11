@@ -13,6 +13,7 @@ import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+
 import log from 'lib/log';
 
 export const spec = specFactory;

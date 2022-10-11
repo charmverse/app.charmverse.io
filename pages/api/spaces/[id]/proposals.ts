@@ -1,9 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { getProposalsBySpace } from 'lib/proposal/getProposalsBySpace';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

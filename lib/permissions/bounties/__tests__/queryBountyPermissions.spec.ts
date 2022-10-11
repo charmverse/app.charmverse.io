@@ -1,7 +1,9 @@
 
+import { v4 } from 'uuid';
+
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { v4 } from 'uuid';
+
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 

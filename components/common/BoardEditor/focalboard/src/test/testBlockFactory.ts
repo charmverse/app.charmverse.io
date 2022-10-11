@@ -1,10 +1,13 @@
 
+import type { Block } from '../blocks/block';
 import type { Board, IPropertyOption, IPropertyTemplate } from '../blocks/board';
 import { createBoard } from '../blocks/board';
 import type { BoardView } from '../blocks/boardView';
 import { createBoardView } from '../blocks/boardView';
 import type { Card } from '../blocks/card';
 import { createCard } from '../blocks/card';
+import type { CheckboxBlock } from '../blocks/checkboxBlock';
+import { createCheckboxBlock } from '../blocks/checkboxBlock';
 import type { CommentBlock } from '../blocks/commentBlock';
 import { createCommentBlock } from '../blocks/commentBlock';
 import type { DividerBlock } from '../blocks/dividerBlock';
@@ -15,9 +18,6 @@ import type { ImageBlock } from '../blocks/imageBlock';
 import { createImageBlock } from '../blocks/imageBlock';
 import type { TextBlock } from '../blocks/textBlock';
 import { createTextBlock } from '../blocks/textBlock';
-import type { CheckboxBlock } from '../blocks/checkboxBlock';
-import { createCheckboxBlock } from '../blocks/checkboxBlock';
-import type { Block } from '../blocks/block';
 
 class TestBlockFactory {
   static createBoard (): Board {

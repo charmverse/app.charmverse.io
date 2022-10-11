@@ -1,15 +1,18 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { Check, Close } from '@mui/icons-material';
+import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { memo, useMemo } from 'react';
+
+import UserDisplay from 'components/common/UserDisplay';
 import type { Contributor } from 'hooks/useContributors';
 import { useContributors } from 'hooks/useContributors';
-import UserDisplay from 'components/common/UserDisplay';
-import { memo, useMemo } from 'react';
+
 import { RelativeDate } from '../PageThread';
-import { accept } from './track/accept';
-import { reject } from './track/reject';
+
 import type { TrackedEvent } from './getEvents';
+import { accept } from './track/accept';
 import type { TrackType } from './track/interfaces';
+import { reject } from './track/reject';
 
 const FORMAT_MARK_NAMES: Record<string, string> = {
   italic: 'italic',

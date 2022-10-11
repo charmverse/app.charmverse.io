@@ -1,27 +1,33 @@
 
+import path from 'node:path';
+
+import type { Prisma, Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import type { Prisma, Space } from '@prisma/client';
+
 import { prisma } from 'db';
+import { logSpaceCreation } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
-import type { IEventToLog } from 'lib/log/userEvents';
-import { postToDiscord } from 'lib/log/userEvents';
+import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
+import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
-import path from 'node:path';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
-import { createPage } from 'lib/pages/server/createPage';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getSpaces).post(createSpace);
 
 async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
+  const userId = req.session.user.id;
+
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      userId: req.session.user.id
+      userId
     },
     include: {
       space: true
@@ -32,6 +38,7 @@ async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
 }
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
+  const userId = req.session.user.id;
   const data = req.body as Prisma.SpaceCreateInput;
   // add a first page to the space
   // data.pages = {
@@ -75,18 +82,12 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   logSpaceCreation(space);
+  updateTrackGroupProfile(space);
+  updateTrackUserProfileById(userId);
+  trackUserAction('create_new_workspace', { userId, spaceId: space.id });
 
   return res.status(200).json(updatedSpace);
 }
 
 export default withSessionRoute(handler);
 
-function logSpaceCreation (space: Space) {
-  const eventLog: IEventToLog = {
-    funnelStage: 'acquisition',
-    eventType: 'create_workspace',
-    message: `New workspace ${space.domain} has just been created`
-  };
-
-  postToDiscord(eventLog);
-}

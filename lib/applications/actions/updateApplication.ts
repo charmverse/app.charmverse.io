@@ -1,6 +1,8 @@
 import type { Application } from '@prisma/client';
+
 import { prisma } from 'db';
 import { DataNotFoundError, StringTooShortError } from 'lib/utilities/errors';
+
 import type { ApplicationUpdateData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from '../shared';
 

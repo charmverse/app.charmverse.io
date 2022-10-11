@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 import type { ResizableProps } from 'react-resizable';
+
 import ResizableBox from './ResizableBox';
 import ResizableContainer from './ResizableContainer';
 

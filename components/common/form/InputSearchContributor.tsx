@@ -1,9 +1,10 @@
 import type { AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
+
 import UserDisplay from 'components/common/UserDisplay';
 import { useContributors } from 'hooks/useContributors';
 import type { Contributor } from 'models';
-import { useEffect, useState } from 'react';
 
 interface IContributorsFilter {
   mode: 'include' | 'exclude';

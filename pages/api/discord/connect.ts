@@ -1,18 +1,19 @@
-import nc from 'next-connect';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { DiscordUser } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { withSessionRoute } from 'lib/session/withSession';
-import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
-import { findOrCreateRoles } from 'lib/roles/createRoles';
+import nc from 'next-connect';
+
+import { prisma } from 'db';
+import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import type { DiscordUser } from '@prisma/client';
-import log from 'lib/log';
-import { prisma } from 'db';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import log from 'lib/log';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { findOrCreateRoles } from 'lib/roles/createRoles';
+import { withSessionRoute } from 'lib/session/withSession';
 import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
@@ -44,7 +45,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
 
   try {
     const domain = req.headers.host?.startsWith('localhost') ? `http://${req.headers.host}` : `https://${req.headers.host}`;
-    discordAccount = await getDiscordAccount(code, `${domain}/api/discord/callback`);
+    discordAccount = await getDiscordAccount({ code, redirectUrl: `${domain}/api/discord/callback` });
   }
   catch (error) {
     log.warn('Error while connecting to Discord', error);

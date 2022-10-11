@@ -1,28 +1,35 @@
-import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Proposal, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import { Wallet } from 'ethers';
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
+import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import type { BountyWithDetails } from 'lib/bounties';
 import { IDENTITY_TYPES } from 'models';
-import { v4 } from 'uuid';
-import { createPage as createPageDb } from 'lib/pages/server/createPage';
+
 import { boardWithCardsArgs } from './generate-board-stub';
 
 export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string, isAdmin: boolean }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
-      addresses: [v4()],
       identityType: IDENTITY_TYPES[1],
       username: 'Username',
+      wallets: {
+        create: {
+          address: Wallet.createRandom().address
+        }
+      },
       spaceRoles: {
         create: {
           space: {
@@ -44,7 +51,8 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
             }
           }
         }
-      }
+      },
+      wallets: true
     }
   });
 }
@@ -54,7 +62,7 @@ export async function generateSpaceUser ({ spaceId, isAdmin }: { spaceId: string
  * @param walletAddress
  * @returns
  */
-export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true) {
+export async function generateUserAndSpaceWithApiToken (walletAddress: string = v4(), isAdmin = true, spaceName = 'Example space') {
   const user = await createUserFromWallet(walletAddress);
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
@@ -68,7 +76,7 @@ export async function generateUserAndSpaceWithApiToken (walletAddress: string = 
   if (!space) {
     space = await prisma.space.create({
       data: {
-        name: 'Example space',
+        name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
         author: {
@@ -213,6 +221,14 @@ export function generateTransaction ({ applicationId, chainId = '4', transaction
   });
 }
 
+type BountyAndApplicationProps = {
+  applicationStatus: ApplicationStatus;
+  bountyCap: number | null;
+  userId: string;
+  spaceId: string;
+  bountyStatus?: BountyStatus;
+}
+
 export async function generateBountyWithSingleApplication ({ applicationStatus, bountyCap, userId, spaceId, bountyStatus }:
   { applicationStatus: ApplicationStatus; bountyCap: number | null; userId: string; spaceId: string; bountyStatus?: BountyStatus;
     // This should be deleted on future PR. Left for backwards compatibility for now
@@ -235,7 +251,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
     }
   }) as BountyWithDetails;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
   const createdApp = await prisma.application.create({
     data: {
@@ -250,7 +266,7 @@ export async function generateBountyWithSingleApplication ({ applicationStatus, 
           id: createdBounty.id
         }
       },
-      walletAddress: user?.addresses?.[0],
+      walletAddress: user?.wallets[0]?.address,
       message: 'I can do this!',
       // Other important variable
       status: applicationStatus
@@ -551,10 +567,10 @@ export function createBlock (options: Partial<Block> & Pick<Block, 'createdBy' |
  */
 export async function generateProposal ({ userId, spaceId, proposalStatus, authors, reviewers, deletedAt = null }:
   { deletedAt?: Page['deletedAt'], userId: string, spaceId: string, authors: string[], reviewers: ProposalReviewerInput[], proposalStatus: ProposalStatus }):
-  Promise<PageWithProposal> {
+  Promise<Page & { proposal: ProposalWithUsers, workspaceEvent: WorkspaceEvent }> {
   const proposalId = v4();
 
-  return createPageDb({
+  const result = await createPageDb<{ proposal: ProposalWithUsers }>({
     data: {
       id: proposalId,
       contentText: '',
@@ -611,6 +627,23 @@ export async function generateProposal ({ userId, spaceId, proposalStatus, autho
       }
     }
   });
+
+  const workspaceEvent = await prisma.workspaceEvent.create({
+    data: {
+      type: 'proposal_status_change',
+      meta: {
+        newStatus: proposalStatus
+      },
+      actorId: userId,
+      pageId: proposalId,
+      spaceId
+    }
+  });
+
+  return {
+    ...result,
+    workspaceEvent
+  };
 }
 
 export async function generateBoard ({ createdBy, spaceId, parentId, cardCount }:

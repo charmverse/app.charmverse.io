@@ -1,19 +1,20 @@
 import { Box } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+
 import charmClient from 'charmClient';
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PageMeta } from 'lib/pages';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
 
 interface Props {
   bountyPage: PageMeta;
@@ -96,6 +97,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
                   window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
                 }}
                 spaceDomain={space?.domain ?? ''}
+                joinType='public_bounty_token_gate'
               />
             )
         }

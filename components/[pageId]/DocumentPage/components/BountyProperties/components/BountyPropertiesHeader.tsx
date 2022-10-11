@@ -1,19 +1,19 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from 'components/common/Button';
-import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
-import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import type { PagePermission } from '@prisma/client';
-import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
-import type { BountyPagePermissionIntersection } from 'lib/permissions/interfaces';
-import useRoles from 'hooks/useRoles';
-import charmClient from 'charmClient';
-import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+
+import charmClient from 'charmClient';
+import BountyStatusBadge from 'components/bounties/components/BountyStatusBadge';
+import Button from 'components/common/Button';
+import { usePages } from 'hooks/usePages';
+import useRoles from 'hooks/useRoles';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { BountyWithDetails, BountyPermissions } from 'lib/bounties';
+import { compareBountyPagePermissions } from 'lib/permissions/compareBountyPagePermissions';
+import type { BountyPagePermissionIntersection, PagePermissionMeta } from 'lib/permissions/interfaces';
 
 /**
  * Permissions left optional so this component can initialise without them
@@ -21,7 +21,7 @@ import { useState } from 'react';
 interface Props {
   bounty: BountyWithDetails;
   bountyPermissions?: Partial<BountyPermissions>;
-  pagePermissions?: PagePermission[];
+  pagePermissions?: PagePermissionMeta[];
   pageId: string;
 }
 

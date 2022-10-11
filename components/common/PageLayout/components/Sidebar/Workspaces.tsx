@@ -1,26 +1,25 @@
 
 import styled from '@emotion/styled';
-import { Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useRouter } from 'next/router';
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
-import Button from 'components/common/Button';
+import { Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { Prisma } from '@prisma/client';
-import charmClient from 'charmClient';
 import NextLink from 'next/link';
 import { useState } from 'react';
+
+import Button from 'components/common/Button';
 import CreateWorkspaceForm from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
-import { useSpaces } from 'hooks/useSpaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import WorkspaceAvatar from './WorkspaceAvatar';
+
 import NexusAvatar from './NexusAvatar';
+import WorkspaceAvatar from './WorkspaceAvatar';
 
 const AvatarLink = styled(NextLink)`
   cursor: pointer;
@@ -34,12 +33,10 @@ const WorkspacesContainer = styled.div`
 `;
 
 export default function Workspaces () {
-
-  const router = useRouter();
   const [space] = useCurrentSpace();
-  const [spaces, setSpaces] = useSpaces();
+  const { spaces, createNewSpace, isCreatingSpace } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
-  const { user, setUser } = useUser();
+  const { user } = useUser();
 
   function showSpaceForm () {
     setSpaceFormOpen(true);
@@ -47,15 +44,6 @@ export default function Workspaces () {
 
   function closeSpaceForm () {
     setSpaceFormOpen(false);
-  }
-
-  async function addSpace (spaceOpts: Prisma.SpaceCreateInput) {
-    const newSpace = await charmClient.createSpace(spaceOpts);
-    setSpaces([...spaces, newSpace]);
-    // refresh user permissions
-    const _user = await charmClient.getUser();
-    setUser(_user);
-    router.push(`/${newSpace.domain}`);
   }
 
   return (
@@ -86,12 +74,12 @@ export default function Workspaces () {
         ))}
         <Grid item>
           <Tooltip title='Create or join a workspace' placement='top' arrow>
-            <IconButton sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
+            <IconButton data-test='sidebar-add-new-space' sx={{ borderRadius: '8px' }} onClick={showSpaceForm}><AddIcon /></IconButton>
           </Tooltip>
         </Grid>
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
-        <CreateWorkspaceForm onSubmit={addSpace} onCancel={closeSpaceForm} />
+        <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
         <Typography variant='body2' align='center' sx={{ pt: 2 }}>
           <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
             Join an existing workspace

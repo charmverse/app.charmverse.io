@@ -2,6 +2,7 @@ import { prisma } from 'db';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { isTruthy } from 'lib/utilities/types';
+
 import { PermissionNotFoundError } from '../errors';
 
 export async function deletePagePermission (permissionId: string) {

@@ -1,4 +1,5 @@
 import type { PageLink } from 'lib/pages';
+
 import { nestedPageMarkdownEnclosure } from './nestedPage.constants';
 
 /**

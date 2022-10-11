@@ -1,5 +1,7 @@
 import type { Page, ProposalStatus, Space, WorkspaceEvent } from '@prisma/client';
+
 import { prisma } from 'db';
+
 import type { ProposalWithUsers } from './interface';
 
 export interface ProposalTask {

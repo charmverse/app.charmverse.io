@@ -1,5 +1,6 @@
 import { prisma } from 'db';
 import { generateAccessibleBountiesQuery } from 'lib/bounties';
+
 import type { ApplicationWithTransactions } from '../interfaces';
 
 /**

@@ -1,15 +1,17 @@
 
 import type { Application } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { createApplication } from 'lib/applications/actions';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -68,7 +70,9 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
     },
     select: {
       approveSubmitters: true,
-      spaceId: true
+      spaceId: true,
+      rewardAmount: true,
+      rewardToken: true
     }
   });
 
@@ -93,6 +97,9 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
     message,
     userId: req.session.user.id
   });
+
+  const { spaceId, rewardAmount, rewardToken } = bountySpaceId;
+  trackUserAction('bounty_application', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
 
   return res.status(201).json(createdApplication);
 }

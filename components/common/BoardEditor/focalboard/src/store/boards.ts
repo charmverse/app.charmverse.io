@@ -1,9 +1,12 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+
 import type { Board } from '../blocks/board';
-import type { RootState } from './index';
+
 import { initialLoad, initialReadOnlyLoad } from './initialLoad';
+
+import type { RootState } from './index';
 
 type BoardsState = {
     current: string;

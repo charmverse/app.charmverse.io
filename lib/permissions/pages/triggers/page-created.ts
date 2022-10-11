@@ -1,37 +1,63 @@
 import type { Space } from '@prisma/client';
+
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage, PageNotFoundError } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
+
 import { copyAllPagePermissions } from '../actions/copyPermission';
 import { generateReplaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
 import { upsertPermission } from '../actions/upsert-permission';
 
 export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {
-  const page = await getPage(pageId);
 
-  if (!page) {
-    throw new PageNotFoundError(pageId);
-  }
+  // connect to page node from use pages (Removing iPageWithPermissions)
+  return prisma.$transaction(async (tx) => {
+    const page = await getPage(pageId, undefined, tx);
 
-  // This is a root page, so we can go ahead
-  if (!page.parentId) {
-    // Space id could be null
-    if (page.spaceId) {
-      const space = await prisma.space.findUnique({
-        where: {
-          id: page.spaceId
-        },
-        select: {
-          defaultPagePermissionGroup: true,
-          defaultPublicPages: true
+    if (!page) {
+      throw new PageNotFoundError(pageId);
+    }
+
+    // This is a root page, so we can go ahead
+    if (!page.parentId) {
+      // Space id could be null
+      if (page.spaceId) {
+        const space = await tx.space.findUnique({
+          where: {
+            id: page.spaceId
+          },
+          select: {
+            defaultPagePermissionGroup: true,
+            defaultPublicPages: true
+          }
+        }) as Space;
+        if (space?.defaultPagePermissionGroup) {
+          // Pass tx here for writes
+          await upsertPermission(pageId, {
+            permissionLevel: space.defaultPagePermissionGroup,
+            spaceId: page.spaceId
+          }, undefined, tx);
         }
-      }) as Space;
-      if (space?.defaultPagePermissionGroup) {
-        await upsertPermission(pageId, {
-          permissionLevel: space.defaultPagePermissionGroup,
-          spaceId: page.spaceId
-        });
+        else {
+          await upsertPermission(
+            pageId,
+            {
+              permissionLevel: 'full_access',
+              spaceId: page.spaceId
+            },
+            undefined,
+            tx
+          );
+        }
+
+        if (space.defaultPublicPages) {
+          await upsertPermission(pageId, {
+            permissionLevel: 'view',
+            public: true
+
+          }, undefined, tx);
+        }
       }
       else {
         await upsertPermission(
@@ -39,72 +65,68 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
           {
             permissionLevel: 'full_access',
             spaceId: page.spaceId
-          }
-        );
-      }
+          },
+          undefined,
 
-      if (space.defaultPublicPages) {
-        await upsertPermission(pageId, {
-          permissionLevel: 'view',
-          public: true
-        });
+          tx
+        );
       }
     }
     else {
-      await upsertPermission(
-        pageId,
-        {
-          permissionLevel: 'full_access',
-          spaceId: page.spaceId
-        }
-      );
-    }
-  }
-  else {
-    const parent = (await getPage(page.parentId) as IPageWithPermissions);
+      const parent = (await getPage(page.parentId, undefined, tx) as IPageWithPermissions);
 
-    if (!parent) {
-      await prisma.page.update({
+      if (!parent) {
+        await tx.page.update({
+          where: {
+            id: pageId
+          },
+          data: {
+            parentId: null
+          }
+        });
+        // Parent was deleted, so we should drop the reference, and reinvoke this function with the page as a root page
+        return setupPermissionsAfterPageCreated(pageId);
+      }
+
+      // Generate a prisma transaction for the inheritance
+
+      const tree = await resolvePageTree({ pageId: parent.id, tx });
+
+      const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
+
+      for (const op of illegalPermissionReplaceOperations) {
+        await tx.pagePermission.updateMany(op);
+      }
+      const refreshedParent = await tx.page.findUniqueOrThrow({
         where: {
-          id: pageId
+          id: parent.id
         },
-        data: {
-          parentId: null
+        include: {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
         }
       });
-      // Parent was deleted, so we should drop the reference, and reinvoke this function with the page as a root page
-      return setupPermissionsAfterPageCreated(pageId);
+      const pagePermissionArgs = copyAllPagePermissions({
+        inheritFrom: true,
+        newPageId: pageId,
+        permissions: refreshedParent.permissions
+      });
+
+      await tx.pagePermission.createMany(pagePermissionArgs);
     }
 
-    // Generate a prisma transaction for the inheritance
+    // Add a full access permission for the creating user
+    await upsertPermission(page.id, {
+      permissionLevel: 'full_access',
+      userId: page.createdBy
+    }, undefined, tx);
 
-    const tree = await resolvePageTree({ pageId: parent.id });
+    const pageWithPermissions = await getPage(page.id, undefined, tx) as IPageWithPermissions;
 
-    const { updateManyOperations: illegalPermissionReplaceOperations } = generateReplaceIllegalPermissions(tree);
-
-    await prisma.$transaction(async () => {
-      for (const op of illegalPermissionReplaceOperations) {
-        await prisma.pagePermission.updateMany(op);
-      }
-      const refreshedParent = await getPage(parent.id) as IPageWithPermissions;
-      await prisma.pagePermission.createMany(
-        copyAllPagePermissions({
-          inheritFrom: true,
-          newPageId: pageId,
-          permissions: refreshedParent.permissions
-        })
-      );
-
-    });
-  }
-
-  // Add a full access permission for the creating user
-  await upsertPermission(page.id, {
-    permissionLevel: 'full_access',
-    userId: page.createdBy
+    return pageWithPermissions;
   });
 
-  const pageWithPermissions = await getPage(page.id) as IPageWithPermissions;
-
-  return pageWithPermissions;
 }

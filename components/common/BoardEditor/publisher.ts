@@ -1,15 +1,16 @@
 
 import { batch } from 'react-redux';
+
+import type { Block } from './focalboard/src/blocks/block';
+import type { Board } from './focalboard/src/blocks/board';
+import type { BoardView } from './focalboard/src/blocks/boardView';
+import type { Card } from './focalboard/src/blocks/card';
+import type { CommentBlock } from './focalboard/src/blocks/commentBlock';
+import store from './focalboard/src/store';
 import { updateBoards } from './focalboard/src/store/boards';
 import { updateCards } from './focalboard/src/store/cards';
 import { updateComments } from './focalboard/src/store/comments';
 import { updateViews } from './focalboard/src/store/views';
-import type { Block } from './focalboard/src/blocks/block';
-import type { CommentBlock } from './focalboard/src/blocks/commentBlock';
-import type { Board } from './focalboard/src/blocks/board';
-import type { Card } from './focalboard/src/blocks/card';
-import type { BoardView } from './focalboard/src/blocks/boardView';
-import store from './focalboard/src/store';
 
 // this code is normally called by a websocket connection in focalboard
 export const publishIncrementalUpdate = async (blocks: Block[]) => {

@@ -1,16 +1,18 @@
 
 import type { Application } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { prisma } from 'db';
 import { approveApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import * as collabland from 'lib/collabland';
 import log from 'lib/log';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,7 +29,8 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
       id: applicationId as string
     },
     select: {
-      bountyId: true
+      bountyId: true,
+      bounty: true
     }
   });
 
@@ -60,6 +63,9 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     .catch(error => {
       log.error('Error creating collabland VC', error);
     });
+
+  const { id: bountyId, rewardAmount, rewardToken, spaceId } = application.bounty;
+  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
 
   return res.status(200).json(approvedApplication);
 }

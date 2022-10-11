@@ -1,7 +1,9 @@
-import { prisma } from 'db';
 import { DateTime } from 'luxon';
-import { createBlock, createPage } from 'testing/setupDatabase';
 import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import { createBlock, createPage } from 'testing/setupDatabase';
+
 import { deleteArchivedPages } from '../deleteArchivedPages';
 
 describe('deleteArchivedPages', () => {

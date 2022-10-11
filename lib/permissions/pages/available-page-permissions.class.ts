@@ -1,5 +1,7 @@
 import { PageOperations } from '@prisma/client';
+
 import { Permissions } from '../permissions.class';
+
 import type { IPagePermissionFlags, PageOperationType } from './page-permission-interfaces';
 
 /**

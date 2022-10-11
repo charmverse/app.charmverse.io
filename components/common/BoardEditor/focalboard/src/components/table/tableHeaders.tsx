@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
-
-import { FormattedMessage, useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
+import React, { useCallback, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, Board } from '../../blocks/board';
 import type { BoardView, ISortOption } from '../../blocks/boardView';
@@ -10,13 +9,12 @@ import { createBoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
-import Button from '../../widgets/buttons/button';
-import MenuWrapper from '../../widgets/menuWrapper';
-import Menu from '../../widgets/menu';
-import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
-import { IDType, Utils } from '../../utils';
-
 import { OctoUtils } from '../../octoUtils';
+import { IDType, Utils } from '../../utils';
+import Button from '../../widgets/buttons/button';
+import Menu from '../../widgets/menu';
+import MenuWrapper from '../../widgets/menuWrapper';
+import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
 
 import TableHeader from './tableHeader';
 

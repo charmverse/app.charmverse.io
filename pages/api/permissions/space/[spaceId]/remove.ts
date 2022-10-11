@@ -1,12 +1,13 @@
 
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+
+import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { SpacePermissionWithAssignee, removeSpaceOperations } from 'lib/permissions/spaces';
 import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
-import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

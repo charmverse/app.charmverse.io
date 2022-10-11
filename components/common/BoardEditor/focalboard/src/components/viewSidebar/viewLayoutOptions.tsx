@@ -1,14 +1,15 @@
+import { Box, Card, Grid, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
-import { Box, Card, Grid, Typography } from '@mui/material';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
-import { updateView } from '../../store/views';
-import { useAppDispatch } from '../../store/hooks';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
+import { useAppDispatch } from '../../store/hooks';
+import { updateView } from '../../store/views';
 import BoardIcon from '../../widgets/icons/board';
 import CalendarIcon from '../../widgets/icons/calendar';
 import GalleryIcon from '../../widgets/icons/gallery';

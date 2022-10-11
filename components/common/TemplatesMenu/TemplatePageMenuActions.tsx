@@ -3,9 +3,10 @@ import { IconButton } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 type Props = {
   deleteTemplate: (pageId: string) => void;

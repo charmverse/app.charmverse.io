@@ -1,7 +1,7 @@
+import CloseIcon from '@mui/icons-material/Close';
 import { ClickAwayListener } from '@mui/material';
 import React, { useRef, useEffect } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {

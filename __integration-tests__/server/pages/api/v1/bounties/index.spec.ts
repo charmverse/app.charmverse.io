@@ -1,7 +1,8 @@
-import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import request from 'supertest';
-import { baseUrl } from 'testing/mockApiCall';
+
 import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
+import { baseUrl } from 'testing/mockApiCall';
+import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/v1/bounties', () => {
   // This test needs to be fixed.
@@ -48,10 +49,10 @@ describe('GET /api/v1/bounties', () => {
         description: (bountyWithPaidApplication as unknown as PublicApiBounty).description,
         id: bountyWithPaidApplication.id,
         issuer: {
-          address: user.addresses[0]
+          address: user.wallets[0].address
         },
         recipients: [{
-          address: user.addresses[0]
+          address: user.wallets[0].address
         }],
         reward: {
           amount: bountyWithPaidApplication.rewardAmount,
@@ -72,7 +73,7 @@ describe('GET /api/v1/bounties', () => {
         description: (bountyWithInProgressWork as unknown as PublicApiBounty).description,
         id: bountyWithInProgressWork.id,
         issuer: {
-          address: secondUser.addresses[0]
+          address: secondUser.wallets[0].address
         },
         // Empty recipients list
         recipients: [],

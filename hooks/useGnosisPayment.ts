@@ -2,10 +2,12 @@ import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { useWeb3React } from '@web3-react/core';
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
+
+import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+
 import useGnosisSafes from './useGnosisSafes';
 
 export type GnosisPaymentProps = {
