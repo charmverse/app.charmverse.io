@@ -6,8 +6,6 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/log/userEvents';
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPageWithPermissions } from 'lib/pages/server';
@@ -106,9 +104,6 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
         userId,
         spaceId
       });
-    }
-    else if (page.type === 'page' || page.type === 'board') {
-      trackPageAction(page.type === 'page' ? 'create_page' : 'create_a_database', { userId, pageId: page.id, withName: true, delay: 60000 });
     }
 
     res.status(201).json(pageWithPermissions);
