@@ -39,6 +39,7 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   const conditions = conditionsArr.filter(c => Boolean(c.chain));
   const chains: string[] = req.body.conditions?.chains || [];
   const numberOfConditions = conditions.length;
+  const accessTypes = getAccessTypes(conditions);
 
   // Make sure token gate has at least 1 condition.
   if (numberOfConditions < 1) {
@@ -48,11 +49,11 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
   const result = await prisma.tokenGate.create({
     data: {
       createdBy: req.session.user.id,
-      ...req.body
+      ...req.body,
+      accessTypes
     }
   });
 
-  const accessTypes = getAccessTypes(conditions);
   const chainTypeParam = chains.length === 1 ? chains[0] : chains;
   const accessTypesParam = accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map(at => accessTypeDict[at]);
   trackUserAction('add_a_gate', { userId, spaceId, accesType: accessTypesParam, chainType: chainTypeParam, numberOfConditions });
