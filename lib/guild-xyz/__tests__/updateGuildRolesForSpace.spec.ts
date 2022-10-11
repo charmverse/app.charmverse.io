@@ -29,7 +29,7 @@ beforeAll(async () => {
     }
   }) as SpaceRole;
 
-  // Make user2 a contributor of the space
+  // Make user2 a member of the space
   user2SpaceRole = await prisma.spaceRole.create({
     data: {
       space: {

@@ -11,7 +11,7 @@ beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
 
-  // External space the user didn't create but is a contributor of
+  // External space the user didn't create but is a member of
   const { space } = await generateUserAndSpaceWithApiToken();
   // Inaccessible space by the user
   await generateUserAndSpaceWithApiToken();

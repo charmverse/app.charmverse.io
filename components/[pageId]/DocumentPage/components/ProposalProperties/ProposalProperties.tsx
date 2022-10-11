@@ -6,15 +6,15 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import { InputSearchContributorBase } from 'components/common/form/InputSearchContributor';
+import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
 import InputSearchReviewers from 'components/common/form/InputSearchReviewers';
 import UserDisplay from 'components/common/UserDisplay';
 import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import type { Contributor } from 'hooks/useContributors';
-import { useContributors } from 'hooks/useContributors';
 import useIsAdmin from 'hooks/useIsAdmin';
+import type { Member } from 'hooks/useMembers';
+import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
 import type { ProposalCategory } from 'lib/proposal/interface';
@@ -32,7 +32,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
 
-  const [contributors] = useContributors();
+  const [members] = useMembers();
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
@@ -45,7 +45,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
 
-  const proposalReviewer = contributors?.find(contributor => contributor.id === proposalReviewerId);
+  const proposalReviewer = members?.find(member => member.id === proposalReviewerId);
 
   const isProposalAuthor = (user && proposalAuthors.some(author => author.userId === user.id));
 
@@ -58,7 +58,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
 
   const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
 
-  const reviewerOptionsRecord: Record<string, ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Contributor)> = {};
+  const reviewerOptionsRecord: Record<string, ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)> = {};
 
   const currentUserGroups: ProposalUserGroup[] = [];
   if (isProposalAuthor) {
@@ -69,9 +69,9 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     currentUserGroups.push('reviewer');
   }
 
-  contributors.forEach(contributor => {
-    reviewerOptionsRecord[contributor.id] = {
-      ...contributor,
+  members.forEach(member => {
+    reviewerOptionsRecord[member.id] = {
+      ...member,
       group: 'user'
     };
   });
@@ -162,18 +162,18 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
             <Button>Author</Button>
           </div>
           <div style={{ width: '100%' }}>
-            <InputSearchContributorBase
+            <InputSearchMemberBase
               filterSelectedOptions
               multiple
               placeholder='Select authors'
-              value={contributors.filter(contributor => proposalAuthors.find(author => contributor.id === author.userId))}
+              value={members.filter(member => proposalAuthors.find(author => member.id === author.userId))}
               disableCloseOnSelect
-              onChange={async (_, _contributors) => {
+              onChange={async (_, _members) => {
                 // Must have atleast one author of proposal
-                if ((_contributors as Contributor[]).length !== 0) {
+                if ((_members as Member[]).length !== 0) {
                   await charmClient.proposals.updateProposal({
                     proposalId,
-                    authors: (_contributors as Contributor[]).map(contributor => contributor.id),
+                    authors: (_members as Member[]).map(member => member.id),
                     reviewers: proposalReviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
                   });
                   refreshProposal();
@@ -181,7 +181,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
               }}
               disabled={readOnly || !canUpdateProposalProperties || !proposal}
               readOnly={readOnly}
-              options={contributors}
+              options={members}
               sx={{
                 width: '100%'
               }}

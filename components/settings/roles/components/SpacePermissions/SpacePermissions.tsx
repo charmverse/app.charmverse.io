@@ -204,11 +204,11 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
                     }
 
                     {
-                      targetGroup === 'role' && newValues[operation] === true && (`Contributors with this role can ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'role' && newValues[operation] === true && (`Members with this role can ${actionLabel.toLowerCase()}`)
                     }
 
                     {
-                      targetGroup === 'role' && newValues[operation] === false && (`Contributors with this role cannot ${actionLabel.toLowerCase()}`)
+                      targetGroup === 'role' && newValues[operation] === false && (`Members with this role cannot ${actionLabel.toLowerCase()}`)
                     }
 
                     {

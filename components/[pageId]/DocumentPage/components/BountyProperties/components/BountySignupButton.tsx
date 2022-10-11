@@ -9,8 +9,8 @@ import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import TokenGateForm from 'components/common/TokenGateForm';
-import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PageMeta } from 'lib/pages';
@@ -25,13 +25,13 @@ export function BountySignupButton ({ bountyPage }: Props) {
   const { account, walletAuthSignature } = useWeb3AuthSig();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const router = useRouter();
-  const [contributors] = useContributors();
+  const [members] = useMembers();
   const [space] = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const isSpaceMember = Boolean(user && contributors.some(c => c.id === user.id));
+  const isSpaceMember = Boolean(user && members.some(c => c.id === user.id));
   const showSignup = isUserLoaded && (!user || !isSpaceMember);
   const showSpaceRedirect = isUserLoaded && isSpaceMember;
 
