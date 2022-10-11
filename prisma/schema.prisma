@@ -147,7 +147,7 @@ model Space {
   deletedAt                   DateTime?
   createdAt                   DateTime                          @default(now())
   createdBy                   String                            @db.Uuid
-  updatedAt                   DateTime
+  updatedAt                   DateTime                          @default(now())
   updatedBy                   String                            @db.Uuid
   name                        String
   domain                      String                            @unique
