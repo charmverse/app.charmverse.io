@@ -87,3 +87,13 @@ export function showDateWithMonthAndYear (dateInput: Date | string, showDate?: b
     month: 'long'
   })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
 }
+
+/**
+ * Returns a string representation of a this time relative to now, such as "in two days".
+ */
+export function relativeTime (dateInput: DateInput) {
+
+  const inputDate = dateInput instanceof DateTime ? dateInput.toJSDate() : new Date(dateInput);
+
+  return DateTime.fromJSDate(new Date(inputDate)).toRelative({ base: (DateTime.now()) });
+}
