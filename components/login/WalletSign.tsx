@@ -68,13 +68,13 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   if (!account) {
     return (
-      <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <PrimaryButton data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
         Connect Wallet
       </PrimaryButton>
     );
   }
 
   return (
-    <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
+    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
   );
 }
