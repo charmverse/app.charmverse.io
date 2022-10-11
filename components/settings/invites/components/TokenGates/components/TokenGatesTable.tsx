@@ -9,8 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
-import { checkAndSignAuthMessage, humanizeAccessControlConditions } from 'lit-js-sdk';
+import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import { useContext, useEffect, useState } from 'react';
@@ -24,8 +23,8 @@ import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
 
@@ -49,7 +48,7 @@ const StyledTableRow = styled(TableRow)`
 `;
 
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, chainId } = useWeb3React();
+  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
@@ -100,8 +99,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
       if (!litClient) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const chain = getLitChainFromChainId(chainId);
-      const authSig = await checkAndSignAuthMessage({ chain });
+      const authSig = walletAuthSignature ?? await sign();
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
