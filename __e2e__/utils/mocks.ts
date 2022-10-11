@@ -216,9 +216,6 @@ export async function generateTokenGate ({ userId, spaceId }: { spaceId: string,
           id: spaceId
         }
       }
-    },
-    include: {
-      space: true
     }
   });
 }

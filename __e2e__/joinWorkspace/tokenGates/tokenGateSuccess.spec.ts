@@ -17,7 +17,7 @@ const test = base.extend<Fixtures>({
 });
 
 test('tokenGates - token gate verify wallet shows error if no condition is met', async ({ page, tokenGatePage }) => {
-  const { space, user: spaceUser } = await generateUserAndSpace();
+  const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
 
   const tokenGate = await generateTokenGate({
@@ -95,5 +95,5 @@ test('tokenGates - token gate verify wallet shows error if no condition is met',
     })
   ]);
   await page.goto(`${baseUrl}${workspacePath}`);
-  await page.locator('text=[Your DAO] Home').first().waitFor({ state: 'visible' });
+  await page.locator(`text=${pageDoc.title}`).first().waitFor({ state: 'visible' });
 });
