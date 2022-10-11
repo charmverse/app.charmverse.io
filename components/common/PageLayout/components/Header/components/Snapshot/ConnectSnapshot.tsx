@@ -11,7 +11,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { getSnapshotSpace } from 'lib/snapshot/get-space';
+import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 

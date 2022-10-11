@@ -39,6 +39,7 @@ export interface SnapshotProposal {
   state: SnapshotProposalState;
   author: string;
   space: Pick<SnapshotSpace, 'id' | 'name'>;
+  votes: number;
 }
 
 export interface SnapshotReceipt {
