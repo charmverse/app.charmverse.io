@@ -15,7 +15,7 @@ export const DOMAIN_BLACKLIST = [
   'u'
 ];
 
-export function isSpaceDomain (path: string) {
+export function isSpaceDomain (path?: string) {
   if (!path) {
     return false;
   }
