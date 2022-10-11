@@ -7,10 +7,9 @@ export type AddInviteLink = BaseEvent & {
 }
 
 export type AddAGate = BaseEvent & {
-  chainType: string;
-  roleName: string | null;
   numberOfConditions: number;
-  accesType: string;
+  chainType: string | string[];
+  accesType: string | string [];
 }
 
 export type SettingEventMap = {

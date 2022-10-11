@@ -1,13 +1,17 @@
 
 import type { Space } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
+import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { getAccessTypes } from 'lib/token-gates/utils';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -18,20 +22,26 @@ handler
   .post(saveTokenGate);
 
 async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
+  const userId = req.session.user.id;
+  const spaceId = req.body.spaceId;
 
   const { error } = await hasAccessToSpace({
-    userId: req.session.user.id,
-    spaceId: req.body.spaceId,
+    userId,
+    spaceId,
     adminOnly: true
   });
   if (error) {
     throw error;
   }
 
-  // Make sure token gate has at least 1 condition.
-  const hasValidCondition = (req.body.conditions?.unifiedAccessControlConditions as AccessControlCondition[])?.some(c => Boolean(c.chain));
+  // Flatten to get all nested conditions in the same flat array
+  const conditionsArr: AccessControlCondition[] = flatten(req.body.conditions?.unifiedAccessControlConditions);
+  const conditions = conditionsArr.filter(c => Boolean(c.chain));
+  const chains: string[] = req.body.conditions?.chains || [];
+  const numberOfConditions = conditions.length;
 
-  if (!hasValidCondition) {
+  // Make sure token gate has at least 1 condition.
+  if (numberOfConditions < 1) {
     throw new InvalidInputError('Your token gate must contain at least one condition.');
   }
 
@@ -41,6 +51,11 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
       ...req.body
     }
   });
+
+  const accessTypes = getAccessTypes(conditions);
+  const chainTypeParam = chains.length === 1 ? chains[0] : chains;
+  const accessTypesParam = accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map(at => accessTypeDict[at]);
+  trackUserAction('add_a_gate', { userId, spaceId, accesType: accessTypesParam, chainType: chainTypeParam, numberOfConditions });
 
   res.status(200).json(result);
 }
