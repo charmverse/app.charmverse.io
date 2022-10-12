@@ -1,4 +1,4 @@
-import type { MemberPropertyType, User } from '@prisma/client';
+import type { MemberPropertyType, User, UserDetails } from '@prisma/client';
 
 export type MemberPropertyValue = {
   id: string;
@@ -12,5 +12,6 @@ export type Member = Omit<User, 'addresses'> & {
   isAdmin: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
+  profile: UserDetails | null;
   properties: MemberPropertyValue[];
 }

@@ -25,23 +25,23 @@ export default function MemberDirectoryPage () {
                   <CardMedia
                     component='img'
                     height={150}
-                    image={profilePic?.value.value as string ?? ''}
+                    image={profilePic?.value as string ?? ''}
                     alt='Profile pic'
                   />
                   <CardContent>
                     <Typography gutterBottom variant='h6' component='div'>
-                      {workspaceMember.user.username}
+                      {workspaceMember.username}
                     </Typography>
                     <SocialIcons
                       sx={{
                         gap: 1,
                         my: 1
                       }}
-                      social={workspaceMember.user.profile.social as Social}
+                      social={workspaceMember.profile?.social as Social}
                     />
                     <Typography variant='body2' fontWeight={500}>About Me</Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      {workspaceMember.user.profile.description}
+                      {workspaceMember.profile?.description}
                     </Typography>
                   </CardContent>
                 </Card>

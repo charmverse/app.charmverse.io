@@ -18,9 +18,14 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       spaceId: req.query.id as string
     },
     include: {
-      user: true
+      user: {
+        include: {
+          profile: true
+        }
+      }
     }
   });
+
   const members = spaceRoles.map((spaceRole): Member => {
     return {
       ...spaceRole.user,
