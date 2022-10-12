@@ -85,7 +85,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
     ))
   ]);
 
-  trackUserAction('new_proposal_created', { userId: createdBy, resourceId: proposal.id, spaceId });
+  trackUserAction('new_proposal_created', { userId: createdBy, pageId: page.id, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }
