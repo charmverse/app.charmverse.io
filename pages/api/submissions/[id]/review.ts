@@ -64,15 +64,15 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
 
   const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
   if (decision === 'approve') {
-    trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id, resourceId: id });
+    trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
   }
   else {
     if (submission.status === 'applied') {
-      trackUserAction('bounty_application_rejected', { userId, spaceId, rewardToken, rewardAmount, resourceId: id });
+      trackUserAction('bounty_application_rejected', { userId, spaceId, pageId: page?.id || '', rewardToken, rewardAmount, resourceId: id });
     }
 
     if (submission.status === 'review') {
-      trackUserAction('bounty_submission_rejected', { userId, spaceId, pageId: page?.id, resourceId: id });
+      trackUserAction('bounty_submission_rejected', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     }
   }
 
