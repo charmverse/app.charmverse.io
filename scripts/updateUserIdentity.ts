@@ -58,7 +58,7 @@ import { prisma } from '../db';
           data: {
             identityType: IDENTITY_TYPES[0],
             // @ts-ignore
-            username: user.ensName || shortenHex(user.wallets[0]?.address)
+            username: user.ensName || shortenHex(user.wallets[0].address)
           }
         });
       }

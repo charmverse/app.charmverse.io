@@ -50,7 +50,7 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
 
   let ens: string | null = null;
   if (user.wallets[0]?.address) {
-    ens = await getENSName(user.wallets[0]?.address);
+    ens = await getENSName(user.wallets[0].address);
   }
 
   if (ens) {
