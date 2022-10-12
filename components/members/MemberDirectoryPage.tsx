@@ -9,7 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export default function MemberDirectoryPage () {
   const [currentSpace] = useCurrentSpace();
-  const { data: workspaceMembers } = useSWR(currentSpace ? `${currentSpace.id}/members` : null, () => currentSpace ? charmClient.member.getWorkspaceMembers(currentSpace.id) : null);
+  const { data: workspaceMembers } = useSWR(currentSpace ? `${currentSpace.id}/members` : null, () => currentSpace ? charmClient.members.getWorkspaceMembers(currentSpace.id) : null);
 
   return (
     <CenteredPageContent>
