@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { createInviteLink } from 'lib/invites';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -19,13 +20,23 @@ handler
   .post(createInviteLinkEndpoint);
 
 async function createInviteLinkEndpoint (req: NextApiRequest, res: NextApiResponse) {
+  const userId = req.session.user.id;
+  const { maxAgeMinutes, maxUses, spaceId } = req.body;
 
   const invite = await createInviteLink({
-    createdBy: req.session.user.id,
-    maxAgeMinutes: req.body.maxAgeMinutes,
-    maxUses: req.body.maxUses,
-    spaceId: req.body.spaceId as string
+    createdBy: userId,
+    maxAgeMinutes,
+    maxUses,
+    spaceId: spaceId as string
   });
+
+  trackUserAction(
+    'add_invite_link',
+    {
+      userId, spaceId, maxNumberOfUses: maxUses === -1 ? 'no limit' : maxUses, expires: maxAgeMinutes === -1 ? 'never' : Math.floor(maxAgeMinutes / 60)
+    }
+  );
+
   return res.status(200).json(invite);
 }
 async function getInviteLinks (req: NextApiRequest, res: NextApiResponse<InviteLinkPopulated[] | { error: string }>) {

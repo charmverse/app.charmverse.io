@@ -220,7 +220,23 @@ export async function generateTokenGate ({ userId, spaceId }: { spaceId: string,
   });
 }
 
-export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } = {}) {
+export async function generateSpaceRole ({
+  spaceId,
+  userId
+}: {
+  userId: string;
+  spaceId: string;
+}) {
+  return prisma.spaceRole.create({
+    data: {
+      isAdmin: false,
+      spaceId,
+      userId
+    }
+  });
+}
+
+export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Space' }: { isAdmin?: boolean, spaceName?: string } = {}) {
 
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -237,7 +253,7 @@ export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } =
   else {
     space = await prisma.space.create({
       data: {
-        name: 'Example space',
+        name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
         domain: `domain-${v4()}`,
         author: {

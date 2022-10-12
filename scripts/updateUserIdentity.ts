@@ -27,7 +27,7 @@ import { prisma } from '../db';
     if (!user.wallets.length) {
       return;
     }
-    const address = user.wallets[0].address;
+    const address = user.wallets[0]?.address;
     const ens = await getENSName(address);
 
     if (ens) {

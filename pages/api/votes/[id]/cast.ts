@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -45,6 +46,10 @@ async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { 
   }
 
   const newUserVote: UserVote = await castVoteService(choice, vote, userId);
+
+  if (vote.context === 'proposal') {
+    trackUserAction('user_cast_a_vote', { userId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+  }
 
   return res.status(200).json(newUserVote);
 }
