@@ -27,7 +27,7 @@ import { prisma } from '../db';
     if (!user.wallets.length) {
       return;
     }
-    const address = user.wallets[0].address;
+    const address = user.wallets[0]?.address;
     const ens = await getENSName(address);
 
     if (ens) {
@@ -47,7 +47,7 @@ import { prisma } from '../db';
 
   await prisma.$transaction(
     users.map((user) => {
-      if (!user.username && user.wallets[0]?.address) {
+      if (!user.username && user.wallets[0]??.address) {
 
         identityTypes.wallet += 1;
 
@@ -58,7 +58,7 @@ import { prisma } from '../db';
           data: {
             identityType: IDENTITY_TYPES[0],
             // @ts-ignore
-            username: user.ensName || shortenHex(user.wallets[0].address)
+            username: user.ensName || shortenHex(user.wallets[0]?.address)
           }
         });
       }

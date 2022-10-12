@@ -55,8 +55,8 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
   let newIdentityProvider: IdentityType;
 
   let ens: string | null = null;
-  if (user.wallets[0].address) {
-    ens = await getENSName(user.wallets[0].address);
+  if (user.wallets[0]?.address) {
+    ens = await getENSName(user.wallets[0]?.address);
   }
 
   if (ens) {
@@ -69,7 +69,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     newIdentityProvider = IDENTITY_TYPES[2];
   }
   else {
-    newUserName = shortenHex(user.wallets[0].address);
+    newUserName = shortenHex(user.wallets[0]?.address);
     newIdentityProvider = IDENTITY_TYPES[0];
   }
 
