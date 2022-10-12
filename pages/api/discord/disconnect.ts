@@ -3,7 +3,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import getENSName from 'lib/blockchain/getENSName';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType } from 'models';
@@ -55,7 +55,7 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
   let newIdentityProvider: IdentityType;
 
   let ens: string | null = null;
-  if (user.wallets[0].address) {
+  if (user.wallets[0]?.address) {
     ens = await getENSName(user.wallets[0].address);
   }
 
@@ -68,9 +68,12 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
     newUserName = telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`;
     newIdentityProvider = IDENTITY_TYPES[2];
   }
-  else {
+  else if (user.wallets.length) {
     newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
+  }
+  else {
+    throw new InvalidStateError();
   }
 
   const updatedUser = await prisma.user.update({
