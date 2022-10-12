@@ -9,6 +9,7 @@ CREATE TABLE "MemberProperty" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "updatedBy" UUID NOT NULL,
     "spaceId" UUID NOT NULL,
+    "name" TEXT NOT NULL,
     "type" "MemberPropertyType" NOT NULL,
     "options" JSONB,
     "index" INTEGER NOT NULL DEFAULT -1,
@@ -21,7 +22,7 @@ CREATE TABLE "MemberPropertyValue" (
     "id" UUID NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "updatedBy" UUID NOT NULL,
-    "workspaceUserPropertyId" UUID NOT NULL,
+    "memberPropertyId" UUID NOT NULL,
     "spaceId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "value" JSONB,
@@ -33,7 +34,7 @@ CREATE TABLE "MemberPropertyValue" (
 ALTER TABLE "MemberProperty" ADD CONSTRAINT "MemberProperty_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MemberPropertyValue" ADD CONSTRAINT "MemberPropertyValue_workspaceUserPropertyId_fkey" FOREIGN KEY ("workspaceUserPropertyId") REFERENCES "MemberProperty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "MemberPropertyValue" ADD CONSTRAINT "MemberPropertyValue_memberPropertyId_fkey" FOREIGN KEY ("memberPropertyId") REFERENCES "MemberProperty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MemberPropertyValue" ADD CONSTRAINT "MemberPropertyValue_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
