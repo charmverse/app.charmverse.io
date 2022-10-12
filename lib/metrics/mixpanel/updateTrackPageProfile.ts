@@ -9,7 +9,7 @@ export async function updateTrackPageProfile (pageId: string) {
     const page = await getPage(pageId);
 
     if (page) {
-      mixpanel?.groups.set('Page Id', page.id, getTrackGroupProfile(page));
+      mixpanel?.groups.set('Page Id', page.id, getTrackPageProfile(page));
     }
   }
   catch (e) {
@@ -17,7 +17,7 @@ export async function updateTrackPageProfile (pageId: string) {
   }
 }
 
-export function getTrackGroupProfile (page: PageWithPermissionsMeta) {
+export function getTrackPageProfile (page: PageWithPermissionsMeta) {
   const isPublic = page.permissions.some(p => p.public);
 
   return {

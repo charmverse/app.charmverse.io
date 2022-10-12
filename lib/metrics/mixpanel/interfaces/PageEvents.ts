@@ -12,16 +12,17 @@ type CustomPageViewEvent = BaseEventWithoutGroup & {
   type: CustomPageType;
 }
 
-type PageViewEvent = PageEvent & {
+type PageTypeEvent = PageEvent & {
   type: PageType;
 };
 
 export interface PageEventMap {
-  page_view: PageViewEvent | CustomPageViewEvent;
+  page_view: PageTypeEvent | CustomPageViewEvent;
   archive_page: PageEvent;
   delete_page: PageEvent;
   restore_page: PageEvent;
   edit_page: PageEvent;
+  create_page: PageTypeEvent;
 }
 
 export type PageEventNames = keyof PageEventMap;
