@@ -220,6 +220,22 @@ export async function generateTokenGate ({ userId, spaceId }: { spaceId: string,
   });
 }
 
+export async function generateSpaceRole ({
+  spaceId,
+  userId
+}: {
+  userId: string;
+  spaceId: string;
+}) {
+  return prisma.spaceRole.create({
+    data: {
+      isAdmin: false,
+      spaceId,
+      userId
+    }
+  });
+}
+
 export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Space' }: { isAdmin?: boolean, spaceName?: string } = {}) {
 
   const wallet = Wallet.createRandom();

@@ -1,12 +1,13 @@
 import { expect, test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';
+import { generateAndMockTokenGateRequests } from '__e2e__/utils/tokenGates';
 import { mockWeb3 } from '__e2e__/utils/web3';
 
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
-import { generateTokenGate, generateUserAndSpace } from '../../utils/mocks';
+import { generateUserAndSpace } from '../../utils/mocks';
 
 type Fixtures = {
   tokenGatePage: TokenGatePage;
@@ -19,11 +20,6 @@ const test = base.extend<Fixtures>({
 test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({ page, tokenGatePage }) => {
   const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
-
-  const tokenGate = await generateTokenGate({
-    spaceId: space.id,
-    userId: spaceUser.id
-  });
 
   await mockWeb3({
     page: tokenGatePage.page,
@@ -40,40 +36,15 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
 
   await login({ userId: user.id, page });
 
+  await generateAndMockTokenGateRequests({
+    address,
+    space,
+    page,
+    userId: user.id,
+    spaceUserId: spaceUser.id
+  });
+
   const workspacePath = `/${space.domain}`;
-
-  await page.route('**/api/token-gates', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([tokenGate])
-    });
-  });
-
-  await page.route('**/api/token-gates/evaluate', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        userId: user.id,
-        space,
-        walletAddress: address,
-        canJoinSpace: true,
-        gateTokens: [{ tokenGate, signedToken: '' }],
-        roles: []
-      })
-    });
-  });
-
-  await page.route('**/api/token-gates/verify', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true
-      })
-    });
-  });
 
   // go to a page to which we don't have access
   await page.goto(`${baseUrl}${workspacePath}`);
