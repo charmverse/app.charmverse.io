@@ -34,13 +34,13 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedProposal } = await updateProposalStatus({
-      proposal: authoredDraftProposal.proposal,
+      proposalId: authoredDraftProposal.proposal.id,
       newStatus: 'discussion',
       userId: user1.id
     });
 
     await updateProposalStatus({
-      proposal: updatedProposal,
+      proposalId: updatedProposal.id,
       newStatus: 'private_draft',
       userId: user1.id
     });
@@ -60,13 +60,13 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
-      proposal: reviewProposal.proposal,
+      proposalId: reviewProposal.proposal.id,
       newStatus: 'discussion',
       userId: user2.id
     });
 
     await updateProposalStatus({
-      proposal: updatedReviewProposal,
+      proposalId: updatedReviewProposal.id,
       newStatus: 'review',
       userId: user2.id
     });
@@ -83,7 +83,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: authoredStartReviewProposal.proposal,
+      proposalId: authoredStartReviewProposal.proposal.id,
       newStatus: 'discussion',
       userId: user1.id
     });
@@ -100,7 +100,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: discussedProposal.proposal,
+      proposalId: discussedProposal.proposal.id,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -120,7 +120,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: reviewedProposal.proposal,
+      proposalId: reviewedProposal.proposal.id,
       newStatus: 'reviewed',
       userId: user1.id
     });
@@ -137,7 +137,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: voteActiveProposal.proposal,
+      proposalId: voteActiveProposal.proposal.id,
       newStatus: 'vote_active',
       userId: user2.id
     });
