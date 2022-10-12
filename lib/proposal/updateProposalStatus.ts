@@ -2,6 +2,8 @@ import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
 
 import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
+import { getSnapshotProposal } from 'lib/snapshot/getProposal';
+import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { MissingDataError } from 'lib/utilities/errors';
 
 import type { ProposalWithUsers } from './interface';
@@ -9,36 +11,39 @@ import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 export async function updateProposalStatus ({
-  proposal,
+  proposalId,
   newStatus,
   userId
 }: {
   userId: string;
   newStatus: ProposalStatus;
-  proposal: ProposalWithUsers | string;
+  proposalId: string;
 }): Promise<{
   proposal: ProposalWithUsers;
   workspaceEvent: WorkspaceEvent;
 }> {
 
-  if (typeof proposal === 'string') {
-    proposal = await prisma.proposal.findUnique({
-      where: {
-        id: proposal
-      },
-      include: {
-        authors: true,
-        reviewers: true
+  const proposal = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    include: {
+      category: true,
+      authors: true,
+      reviewers: true,
+      page: {
+        select: {
+          snapshotProposalId: true
+        }
       }
-    }) as ProposalWithUsers;
-  }
+    }
+  }) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
 
   if (!proposal) {
     throw new MissingDataError(`Proposal with id ${proposal} not found`);
   }
 
   const currentStatus = proposal.status;
-  const proposalId = proposal.id;
   const proposalSpaceId = proposal.spaceId;
 
   // Going from review to review, mark the reviewer in the proposal
@@ -81,6 +86,8 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
+  const snapshotProposal = proposal.page.snapshotProposalId ? await getSnapshotProposal(proposal.page.snapshotProposalId) : null;
+
   return prisma.$transaction(async (tx) => {
     const createdWorkspaceEvent = await tx.workspaceEvent.create({
       data: {
@@ -99,7 +106,8 @@ export async function updateProposalStatus ({
         id: proposalId
       },
       data: {
-        status: newStatus
+        status: newStatus,
+        snapshotProposalExpiry: snapshotProposal?.end ? new Date(coerceToMilliseconds(snapshotProposal.end)) : undefined
       },
       include: {
         authors: true,
