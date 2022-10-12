@@ -139,6 +139,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   function disconnectWallet () {
     if (account) {
       window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
+      setWalletAuthSignature(null);
     }
   }
 

@@ -35,14 +35,12 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   useEffect(() => {
     if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
-
       userClickedConnect.current = false;
       generateWalletAuth();
     }
   }, [account]);
 
   async function generateWalletAuth () {
-
     if (isSigning) {
       return;
     }
