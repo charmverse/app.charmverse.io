@@ -93,7 +93,15 @@ export function showDateWithMonthAndYear (dateInput: Date | string, showDate?: b
  */
 export function relativeTime (dateInput: DateInput) {
 
-  const inputDate = dateInput instanceof DateTime ? dateInput.toJSDate() : new Date(dateInput);
+  dateInput = coerceToMilliseconds(dateInput);
 
-  return DateTime.fromJSDate(new Date(inputDate)).toRelative({ base: (DateTime.now()) });
+  return DateTime.fromJSDate(new Date(dateInput)).toRelative({ base: DateTime.now() });
+}
+
+export function coerceToMilliseconds (timestamp: DateInput): number {
+  if (typeof timestamp === 'number' && timestamp.toString().length <= 10) {
+    return timestamp * 1000;
+  }
+
+  return timestamp instanceof DateTime ? timestamp.toMillis() : new Date(timestamp).valueOf();
 }

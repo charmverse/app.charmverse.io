@@ -89,7 +89,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        <VoteStatusChip size='small' status={vote.status} />
+        <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
       {description && (
         <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (

@@ -127,12 +127,12 @@ async function cleanSpacePages({spaceDomain}: {spaceDomain: string}) {
 //   process.exit(1)
 // })
 
-// seedTestBoards({spaceDomain: 'slim-ivory-tyrannosaurus', boardCount: 1, cardCount: 10})
-//   .then(() => console.log('Done'))
-// .catch(e => {
-//   console.error(e)
-//   process.exit(1)
-// })
+seedTestBoards({spaceDomain: 'maximum-fuchsia-cicada', boardCount: 1, cardCount: 500})
+  .then(() => console.log('Done'))
+.catch(e => {
+  console.error(e)
+  process.exit(1)
+})
 
 
 // seedTestPages({spaceDomain: 'slim-ivory-tyrannosaurus', pagesToCreate: 100, nestedPercent: 92})
