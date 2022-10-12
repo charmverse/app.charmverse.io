@@ -786,6 +786,7 @@ model MemberProperty {
   updatedBy                   String                @db.Uuid
   spaceId                     String                @db.Uuid
   space                       Space                 @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  name                        String
   type                        MemberPropertyType
   options                     Json?
   index                       Int                   @default(-1)
