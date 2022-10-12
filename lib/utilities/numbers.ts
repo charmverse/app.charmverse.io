@@ -137,7 +137,7 @@ export function percent({total, value, significantDigits}: PercentCalculation): 
 
   significantDigits = Math.abs(significantDigits ?? 0)
 
-  const percentage = (value / total) * 100;
+  const percentage = value === 0 ? 0 : ((value / total) * 100);
 
   return `${percentage.toFixed(significantDigits)}%`
 }
