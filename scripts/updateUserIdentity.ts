@@ -47,7 +47,7 @@ import { prisma } from '../db';
 
   await prisma.$transaction(
     users.map((user) => {
-      if (!user.username && user.wallets[0]??.address) {
+      if (!user.username && user.wallets[0]?.address) {
 
         identityTypes.wallet += 1;
 
