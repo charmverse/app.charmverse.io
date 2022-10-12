@@ -40,7 +40,7 @@ import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
-import { MemberApi } from './apis/memberApi';
+import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -53,7 +53,7 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 //
 class CharmClient {
 
-  member = new MemberApi();
+  members = new MembersApi();
 
   blockchain = new BlockchainApi();
 
@@ -143,10 +143,6 @@ class CharmClient {
 
   checkDomain (params: { spaceId?: string, domain: string }) {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
-  }
-
-  getMembers (spaceId: string) {
-    return http.GET<Member[]>(`/api/spaces/${spaceId}/members`);
   }
 
   updateMember ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
@@ -270,7 +266,7 @@ class CharmClient {
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
-    const members = await this.getMembers(spaceId);
+    const members = await this.members.getMembers(spaceId);
 
     return members.map((member: Member) => ({
       id: member.id,

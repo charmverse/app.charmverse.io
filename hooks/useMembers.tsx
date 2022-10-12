@@ -18,7 +18,7 @@ export function MembersProvider ({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
 
   const { data } = useSWR(() => space ? `users/${space?.id}` : null, (e) => {
-    return charmClient.getMembers(space!.id);
+    return charmClient.members.getMembers(space!.id);
   });
 
   useEffect(() => {

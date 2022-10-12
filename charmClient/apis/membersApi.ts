@@ -1,6 +1,7 @@
 import type { User, MemberProperty, MemberPropertyValue, UserDetails } from '@prisma/client';
 
 import * as http from 'adapters/http';
+import type { Member } from 'models';
 
 type WorkspaceMembers = {
   user: User & { profile: UserDetails };
@@ -32,7 +33,11 @@ function getWorkspaceMembers (): WorkspaceMembers {
   ];
 }
 
-export class MemberApi {
+export class MembersApi {
+  getMembers (spaceId: string) {
+    return http.GET<Member[]>(`/api/spaces/${spaceId}/members`);
+  }
+
   getWorkspaceMembers (workspaceId: string) {
     // return http.POST<WorkspaceMembers>(`/api/space/${workspaceId}/members`);
     return getWorkspaceMembers();
