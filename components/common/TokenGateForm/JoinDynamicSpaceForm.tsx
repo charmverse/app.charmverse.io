@@ -77,7 +77,7 @@ export function JoinDynamicSpaceForm () {
         clearOnBlur={false}
         PopperComponent={StyledPopper}
         renderOption={(props, space) => (
-          <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+          <Box data-test={`join-workspace-autocomplete-${space.domain}`} component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
             <AvatarWithIcons
               avatar={space.spaceImage}
               icons={[]}
@@ -96,7 +96,7 @@ export function JoinDynamicSpaceForm () {
           </Box>
         )}
         noOptionsText='No spaces found'
-        renderInput={(params) => <TextField placeholder='my-space' {...params} value={spaceDomain} onChange={onChangeDomainName} />}
+        renderInput={(params) => <TextField data-test='join-workspace-textfield' placeholder='my-space' {...params} value={spaceDomain} onChange={onChangeDomainName} />}
       />
       {selectedSpace && <TokenGateForm onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
     </>
