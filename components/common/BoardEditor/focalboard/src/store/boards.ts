@@ -88,9 +88,9 @@ export const getSortedTemplates = createSelector(
   }
 );
 
-export function getBoard (boardId: string): (state: RootState) => Board|null {
-  return (state: RootState): Board|null => {
-    return state.boards.boards[boardId] || state.boards.templates[boardId] || null;
+export function getBoard (boardId: string): (state: RootState) => Board | undefined {
+  return (state: RootState): Board | undefined => {
+    return state.boards.boards[boardId] || state.boards.templates[boardId] || undefined;
   };
 }
 

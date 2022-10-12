@@ -39,11 +39,7 @@ export function JoinPredefinedSpaceDomain ({ spaceDomain }: { spaceDomain: strin
               <Typography variant='h5'>{spaceInfo.name}</Typography>
             </Box>
           </Card>
-          {
-            spaceInfo && (
-              <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
-            )
-          }
+          <TokenGateForm onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
         </>
       )}
       {!spaceInfo && !isValidating && (

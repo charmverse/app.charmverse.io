@@ -29,7 +29,7 @@ beforeAll(async () => {
   user2 = generated2.user;
   space2 = generated2.space;
 
-  // Making user 1 a contributor of space 2
+  // Making user 1 a member of space 2
   await prisma.spaceRole.create({
     data: {
       spaceId: space2.id,

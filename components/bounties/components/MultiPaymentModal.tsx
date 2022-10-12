@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import type { TransactionWithMetadata } from 'hooks/useMultiBountyPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -45,7 +45,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     return record;
   }, {}) ?? {};
 
-  const [contributors] = useContributors();
+  const [members] = useMembers();
 
   useEffect(() => {
     const applicationIds = transactions.map(transaction => transaction.applicationId);
@@ -125,7 +125,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
           <Box pb={2}>
             <List>
               {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
-                const user = contributors.find(contributor => contributor.id === userId);
+                const user = members.find(member => member.id === userId);
                 const isChecked = selectedApplicationIds.includes(applicationId);
                 if (user) {
                   return (
