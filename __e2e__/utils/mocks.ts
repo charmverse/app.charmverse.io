@@ -14,6 +14,7 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
+import { IDENTITY_TYPES } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
 export async function createUser ({ browserPage, address }: { browserPage: BrowserPage, address: string }): Promise<LoggedInUser> {
@@ -167,6 +168,56 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   ]);
 
   return getBountyOrThrow(pageId);
+}
+
+export async function generateUser ({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
+  const user = await prisma.user.create({
+    data: {
+      identityType: IDENTITY_TYPES[0],
+      username: v4(),
+      path: v4(),
+      wallets: {
+        create: {
+          address: walletAddress
+        }
+      }
+    }
+  });
+
+  return user;
+}
+
+export async function generateDiscordUser () {
+  const user = await prisma.user.create({
+    data: {
+      identityType: IDENTITY_TYPES[0],
+      username: v4(),
+      path: v4(),
+      discordUser: {
+        create: {
+          account: {},
+          discordId: v4()
+        }
+      }
+    }
+  });
+
+  return user;
+}
+
+export async function generateTokenGate ({ userId, spaceId }: { spaceId: string, userId: string }) {
+  return prisma.tokenGate.create({
+    data: {
+      conditions: {},
+      createdBy: userId,
+      resourceId: {},
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
 }
 
 export async function generateUserAndSpace ({ isAdmin }: { isAdmin?: boolean } = {}) {

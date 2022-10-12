@@ -12,7 +12,7 @@ import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import type { Contributor } from 'models';
+import type { Member } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -21,21 +21,21 @@ export const StyledRow = styled(Box)`
   justify-content: space-between;
 `;
 
-const roleActions = ['makeAdmin', 'makeContributor', 'removeFromSpace'] as const;
+const roleActions = ['makeAdmin', 'makeMember', 'removeFromSpace'] as const;
 export type RoleAction = typeof roleActions[number];
 
 interface Props {
-  contributor: Contributor;
+  member: Member;
   isAdmin?: boolean;
   isSpaceOwner?: boolean;
-  onChange: (action: RoleAction, contributor: Contributor) => void;
+  onChange: (action: RoleAction, member: Member) => void;
 }
 
-export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, onChange }: Props) {
+export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
 
   function handleMenuItemClick (action: RoleAction) {
-    onChange(action, contributor);
+    onChange(action, member);
     popupState.close();
   }
 
@@ -43,7 +43,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     switch (action) {
       case 'makeAdmin':
         return isAdmin;
-      case 'makeContributor':
+      case 'makeMember':
         return isAdmin;
       case 'removeFromSpace': {
         return isAdmin && !isSpaceOwner;
@@ -53,22 +53,22 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
     }
   });
 
-  const activeRoleAction = contributor.isAdmin ? 'makeAdmin' : 'makeContributor';
+  const activeRoleAction = member.isAdmin ? 'makeAdmin' : 'makeMember';
 
   return (
     <TableRow>
       <TableCell>
         <Box display='flex' alignItems='center'>
-          <Avatar name={contributor.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
+          <Avatar name={member.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
           <Box pl={2}>
-            <Typography variant='body1'><strong>{contributor.username}</strong></Typography>
+            <Typography variant='body1'><strong>{member.username}</strong></Typography>
           </Box>
           <Box pl={2}>
           </Box>
         </Box>
       </TableCell>
       <TableCell>
-        <Typography variant='body2'>{humanFriendlyDate(contributor.createdAt)}</Typography>
+        <Typography variant='body2'>{humanFriendlyDate(member.createdAt)}</Typography>
       </TableCell>
       <TableCell>
         {actions.length > 0 ? (
@@ -80,7 +80,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
               {...bindTrigger(popupState)}
               endIcon={<KeyboardArrowDownIcon fontSize='small' />}
             >
-              {contributor.isAdmin ? 'admin' : 'contributor'}
+              {member.isAdmin ? 'admin' : 'member'}
             </Button>
             <Menu
               {...bindMenu(popupState)}
@@ -99,9 +99,9 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
                       secondary='Can access all settings and invite new members to the workspace'
                     />
                   )}
-                  {action === 'makeContributor' && (
+                  {action === 'makeMember' && (
                     <StyledListItemText
-                      primary='Contributor'
+                      primary='Member'
                       secondary='Cannot change workspace settings or invite new members to the workspace'
                     />
                   )}
@@ -123,7 +123,7 @@ export default function ContributorRow ({ isAdmin, isSpaceOwner, contributor, on
         )
           : (
             <Typography color='secondary'>
-              {contributor.isAdmin ? 'admin' : 'contributor'}
+              {member.isAdmin ? 'admin' : 'member'}
             </Typography>
           )}
       </TableCell>

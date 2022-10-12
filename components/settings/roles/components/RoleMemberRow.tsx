@@ -27,22 +27,22 @@ export const StyledRow = styled(Box)`
 `;
 
 interface Props {
-  contributor: User;
+  member: User;
   isEditable: boolean;
   onRemove: (id: string) => void;
 }
 
-export default function ContributorRow ({ contributor, isEditable, onRemove }: Props) {
+export default function MemberRow ({ member, isEditable, onRemove }: Props) {
   function removeMember () {
-    onRemove(contributor.id);
+    onRemove(member.id);
   }
 
   return (
     <StyledRow py={2}>
       <Box display='flex' alignItems='center'>
-        <Avatar name={contributor.username} avatar={contributor?.avatar} size='small' isNft={hasNftAvatar(contributor)} />
+        <Avatar name={member.username} avatar={member?.avatar} size='small' isNft={hasNftAvatar(member)} />
         <Box pl={2}>
-          <Typography variant='body1'>{contributor.username}</Typography>
+          <Typography variant='body1'>{member.username}</Typography>
         </Box>
       </Box>
       {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}

@@ -65,7 +65,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
   // Get all the spaceRole and role this user has been assigned to
   // Roles would be used to detect if the user is a reviewer of the proposal
-  // SpaceRoles would be used to detect if the user is a contributor of the proposal space
+  // SpaceRoles would be used to detect if the user is a member of the proposal space
   const spaceRoles = (await prisma.spaceRole.findMany({
     where: {
       userId
@@ -116,7 +116,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
       // If an event for this proposal was already handled no need to process further
       if (!visitedProposals.has(page.id)) {
         const isAuthor = Boolean(page.proposal.authors.find(author => author.userId === userId));
-        const isContributor = spaceIds.includes(workspaceEvent.spaceId);
+        const isMember = spaceIds.includes(workspaceEvent.spaceId);
         const isReviewer = Boolean(page.proposal.reviewers.find(reviewer => {
           if (reviewer.userId) {
             return reviewer.userId === userId;
@@ -141,7 +141,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
               action: 'start_review'
             });
           }
-          else if (isContributor) {
+          else if (isMember) {
             proposalTasks.push({
               ...proposalTask,
               action: 'discuss'
@@ -157,7 +157,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
           }
         }
         else if (newStatus === 'vote_active') {
-          if (isContributor) {
+          if (isMember) {
             proposalTasks.push({
               ...proposalTask,
               action: 'vote'

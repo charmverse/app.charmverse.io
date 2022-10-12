@@ -25,7 +25,7 @@ import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors }
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { Contributor, LoggedInUser, PageContent } from 'models';
+import type { Member, LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -142,16 +142,16 @@ class CharmClient {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  getContributors (spaceId: string) {
-    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
+  getMembers (spaceId: string) {
+    return http.GET<Member[]>(`/api/spaces/${spaceId}/members`);
   }
 
-  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
+  updateMember ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin });
   }
 
-  removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
-    return http.DELETE<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`);
+  removeMember ({ spaceId, userId }: { spaceId: string, userId: string }) {
+    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
   }
 
   getPublicPageByViewId (viewId: string) {
@@ -267,15 +267,15 @@ class CharmClient {
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
-    const contributors = await this.getContributors(spaceId);
+    const members = await this.getMembers(spaceId);
 
-    return contributors.map((contributor: Contributor) => ({
-      id: contributor.id,
-      username: contributor.username,
+    return members.map((member: Member) => ({
+      id: member.id,
+      username: member.username,
       email: '',
       props: {},
-      create_at: new Date(contributor.createdAt).getTime(),
-      update_at: new Date(contributor.updatedAt).getTime(),
+      create_at: new Date(member.createdAt).getTime(),
+      update_at: new Date(member.updatedAt).getTime(),
       is_bot: false
     }));
   }

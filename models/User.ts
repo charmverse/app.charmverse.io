@@ -2,7 +2,7 @@ import type { DiscordUser, FavoritePage, Role as RoleMembership, SpaceRole, Spac
 
 export { FavoritePage, SpaceRole, User };
 
-export interface Contributor extends Omit<User, 'addresses'> {
+export interface Member extends Omit<User, 'addresses'> {
   isAdmin: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
