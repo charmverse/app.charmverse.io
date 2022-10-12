@@ -8,6 +8,8 @@ export class TokenGatePage {
 
   readonly tokenGateEmptyState: Locator;
 
+  readonly tokenGateFailureState: Locator;
+
   readonly connectWalletButton: Locator;
 
   readonly tokenGateForm: Locator;
@@ -23,6 +25,7 @@ export class TokenGatePage {
     this.tokenGateForm = page.locator('data-test=token-gate-form');
     this.verifyWalletButton = page.locator('data-test=verify-wallet-button');
     this.joinWorkspaceButton = page.locator('text=Join workspace');
+    this.tokenGateFailureState = page.locator('data-test=token-gate-failure-alert');
   }
 
   async waitForWorkspaceURL ({ domain, returnUrl }: { domain: string, returnUrl: string }) {
