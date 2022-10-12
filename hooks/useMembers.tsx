@@ -3,11 +3,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
-
-export type { Member };
 
 type Context = [users: Member[], setSpaces: (users: Member[]) => void];
 

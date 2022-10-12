@@ -3,8 +3,8 @@ import type { CSSObject } from '@emotion/serialize';
 import Select from 'react-select';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Member } from 'hooks/useMembers';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import { getSelectBaseStyle } from '../../../theme';
 

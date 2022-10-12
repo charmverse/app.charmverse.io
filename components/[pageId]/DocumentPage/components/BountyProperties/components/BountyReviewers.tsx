@@ -7,9 +7,9 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import type { BountyPermissions } from 'lib/bounties';
+import type { Member } from 'lib/members/interfaces';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { Member } from 'models';
 
 type ReviewersData = {
   roles: ({ id: string, name: string, users: Member[] })[];

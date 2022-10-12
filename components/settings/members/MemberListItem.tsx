@@ -11,8 +11,8 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
-import type { Member } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

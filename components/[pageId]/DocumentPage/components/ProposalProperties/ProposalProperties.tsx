@@ -13,10 +13,10 @@ import ProposalCategoryInput from 'components/proposals/components/ProposalCateg
 import ProposalStepper from 'components/proposals/components/ProposalStepper';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import useIsAdmin from 'hooks/useIsAdmin';
-import type { Member } from 'hooks/useMembers';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
+import type { Member } from 'lib/members/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';

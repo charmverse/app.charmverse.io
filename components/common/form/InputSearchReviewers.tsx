@@ -5,7 +5,7 @@ import type { ComponentProps, SyntheticEvent } from 'react';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
-import type { Member } from 'models/User';
+import type { Member } from 'lib/members/interfaces';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 type ReducedRole = Role | ListSpaceRolesResponse

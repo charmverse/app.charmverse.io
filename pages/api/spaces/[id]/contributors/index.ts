@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { Member } from 'lib/members/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { Member } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,7 +27,8 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       addresses: [],
       isAdmin: spaceRole.isAdmin,
       joinDate: spaceRole.createdAt.toISOString(),
-      hasNftAvatar: hasNftAvatar(spaceRole.user)
+      hasNftAvatar: hasNftAvatar(spaceRole.user),
+      properties: []
     } as Member;
   })
     .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first

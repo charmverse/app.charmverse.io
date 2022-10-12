@@ -4,8 +4,8 @@ import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/materia
 import { memo, useMemo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Member } from 'hooks/useMembers';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import { RelativeDate } from '../PageThread';
 

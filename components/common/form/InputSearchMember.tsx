@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 interface IMembersFilter {
   mode: 'include' | 'exclude';

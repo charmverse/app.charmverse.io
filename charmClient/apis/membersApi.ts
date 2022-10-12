@@ -1,7 +1,7 @@
 import type { User, MemberProperty, MemberPropertyValue, UserDetails } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 type WorkspaceMembers = {
   user: User & { profile: UserDetails };

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 import Legend from '../Legend';
 
