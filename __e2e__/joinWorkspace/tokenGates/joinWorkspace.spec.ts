@@ -17,7 +17,7 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGates - token gate verify wallet shows error if no condition is met', async ({ page, tokenGatePage }) => {
+test('joinWorkspace - search for a workspace and join a token gated workspace after meeting conditions', async ({ page, tokenGatePage }) => {
   const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace({ spaceName: v4() });
   const { user, address, privateKey } = await generateUserAndSpace();
 
@@ -86,18 +86,15 @@ test('tokenGates - token gate verify wallet shows error if no condition is met',
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
   await tokenGatePage.verifyWalletButton.click();
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
-  await page.screenshot({ path: 'ss-1.png' });
   await tokenGatePage.joinWorkspaceButton.click();
   // Joining a workspace creates a spaceRole
-  await prisma.$transaction([
-    prisma.spaceRole.create({
-      data: {
-        isAdmin: false,
-        spaceId: space.id,
-        userId: user.id
-      }
-    })
-  ]);
+  await prisma.spaceRole.create({
+    data: {
+      isAdmin: false,
+      spaceId: space.id,
+      userId: user.id
+    }
+  });
   await page.goto(`${baseUrl}/${space.domain}`);
   await page.locator(`text=${pageDoc.title}`).first().waitFor({ state: 'visible' });
 });
