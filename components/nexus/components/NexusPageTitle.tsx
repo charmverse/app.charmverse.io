@@ -46,6 +46,7 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
             <strong>{MyNexus}</strong>
             <Box display='flex' justifyContent='flex-end' mt={2}>
               <Button
+                data-test='logout-button'
                 variant='outlined'
                 color='secondary'
                 loading={isLoggingOut}
