@@ -17,12 +17,12 @@ import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-p
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
-import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useContributors } from 'hooks/useContributors';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { spaceOperationLabels } from 'lib/permissions/spaces/client';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import GuildXYZIcon from 'public/images/guild_logo.svg';
@@ -52,7 +52,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
   const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
-  const [contributors] = useContributors();
+  const [members] = useMembers();
 
   const [currentSpace] = useCurrentSpace();
 
@@ -74,7 +74,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
     userPopupState.close();
   }
 
-  const assignedContributors = role.spaceRolesToRole.map(r => r.spaceRole.user);
+  const assignedMembers = role.spaceRolesToRole.map(r => r.spaceRole.user);
 
   function removeMember (userId: string) {
     unassignRole(role.id, userId);
@@ -134,11 +134,11 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         )
       }
 
-      <ScrollableBox rows={assignedContributors.length}>
-        {assignedContributors.map(contributor => (
+      <ScrollableBox rows={assignedMembers.length}>
+        {assignedMembers.map(member => (
           <RoleMemberRow
-            key={contributor.id}
-            contributor={contributor}
+            key={member.id}
+            member={member}
             isEditable={isEditable && role.source !== 'guild_xyz'}
             onRemove={(userId) => {
               removeMember(userId);
@@ -148,7 +148,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         ))}
       </ScrollableBox>
       { role.source !== 'guild_xyz'
-        ? assignedContributors.length < contributors.length ? (
+        ? assignedMembers.length < members.length ? (
           isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
         ) : (
           <Typography variant='caption'>All space members have been added to this role</Typography>
@@ -203,7 +203,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
       <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
         <Grid container direction='column' spacing={3}>
           <Grid item>
-            <InputSearchContributorMultiple filter={{ mode: 'exclude', userIds: userIdsToHide }} onChange={onChangeNewMembers} />
+            <InputSearchMemberMultiple filter={{ mode: 'exclude', userIds: userIdsToHide }} onChange={onChangeNewMembers} />
           </Grid>
           <Grid item>
             <Button onClick={addMembers}>Add</Button>

@@ -16,7 +16,7 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useBounties } from 'hooks/useBounties';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
@@ -46,10 +46,10 @@ export default function BountyApplicantTableRow ({
   submissionsCapReached,
   refreshSubmissions
 }: Props) {
-  const [contributors] = useContributors();
+  const [members] = useMembers();
   const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
-  const contributor = contributors.find(c => c.id === submission.createdBy);
+  const member = members.find(c => c.id === submission.createdBy);
   const { refreshBounty } = useBounties();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
@@ -74,8 +74,8 @@ export default function BountyApplicantTableRow ({
   }
 
   function resetInput () {
-    if (user && contributor) {
-      const content = getContentWithMention({ myUserId: user?.id, targetUserId: contributor?.id });
+    if (user && member) {
+      const content = getContentWithMention({ myUserId: user?.id, targetUserId: member?.id });
       setDefaultComment({ content });
     }
     else {
@@ -111,7 +111,7 @@ export default function BountyApplicantTableRow ({
 
   useEffect(() => {
     resetInput();
-  }, [user, contributor]);
+  }, [user, member]);
 
   return (
     <>
@@ -121,10 +121,10 @@ export default function BountyApplicantTableRow ({
         sx={{ '.MuiTableCell-root': { borderBottom: 0 } }}
       >
         <TableCell size='small'>
-          {contributor ? (
+          {member ? (
             <UserDisplay
               avatarSize='small'
-              user={contributor}
+              user={member}
               fontSize='small'
               linkToProfile
             />
