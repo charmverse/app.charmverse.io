@@ -31,9 +31,9 @@ import Snackbar from 'components/common/Snackbar';
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
-import { ContributorsProvider } from 'hooks/useContributors';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
@@ -265,7 +265,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <ContributorsProvider>
+        <MembersProvider>
           <BountiesProvider>
             <PaymentMethodsProvider>
               <PagesProvider>
@@ -277,7 +277,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
               </PagesProvider>
             </PaymentMethodsProvider>
           </BountiesProvider>
-        </ContributorsProvider>
+        </MembersProvider>
       </SpacesProvider>
     </UserProvider>
 

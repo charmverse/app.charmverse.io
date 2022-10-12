@@ -90,7 +90,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
 
     // User is not an author or reviewer of proposal, but have access to the space
     // Move a private_draft proposal to discussion
-    // Should create a single proposal task with action discuss (as a workspace contributor)
+    // Should create a single proposal task with action discuss (as a workspace member)
     const discussedProposal = await generateProposal({
       authors: [user2.id],
       proposalStatus: 'private_draft',
@@ -125,7 +125,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user1.id
     });
 
-    // User is a space contributor
+    // User is a space member
     // Move a reviewed proposal to vote_active
     // Single proposal task with action vote
     const voteActiveProposal = await generateProposal({

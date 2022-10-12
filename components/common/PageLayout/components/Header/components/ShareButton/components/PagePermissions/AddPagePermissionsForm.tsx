@@ -9,7 +9,7 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
-import { InputSearchContributorMultiple } from 'components/common/form/InputSearchContributor';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
 import useRoles from 'hooks/useRoles';
@@ -158,7 +158,7 @@ export default function AddPagePermissionsForm ({ pageId, existingPermissions = 
 
           <Grid item>
             <InputLabel>Users</InputLabel>
-            <InputSearchContributorMultiple
+            <InputSearchMemberMultiple
               onChange={setSelectedUserIds}
               filter={{
                 mode: 'exclude',

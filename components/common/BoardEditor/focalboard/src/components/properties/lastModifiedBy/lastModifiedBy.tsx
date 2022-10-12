@@ -1,16 +1,16 @@
 
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 
 type Props = {
   updatedBy: string;
 }
 
 function LastModifiedBy (props: Props): JSX.Element {
-  const [contributors] = useContributors();
-  const contributor = contributors.find(user => user.id === props.updatedBy);
+  const [members] = useMembers();
+  const member = members.find(user => user.id === props.updatedBy);
   return (
     <div className='LastModifiedBy octo-propertyvalue readonly'>
-      {contributor?.username ?? props.updatedBy}
+      {member?.username ?? props.updatedBy}
     </div>
   );
 }
