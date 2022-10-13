@@ -17,10 +17,10 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box, Chip, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
-import type { MemberPropertyType, Role } from '@prisma/client';
+import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
@@ -129,7 +129,7 @@ export default function MemberDirectoryPage () {
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
   const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
-  const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
+  const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
   const [editedPropertyId, setEditedPropertyId] = useState<string | null>(null);
@@ -185,7 +185,7 @@ export default function MemberDirectoryPage () {
                             case 'role': {
                               return (
                                 <TableCell key={property.id}>
-                                  {(memberProperty.value as Role[]).map(role => <Chip size='small' label={role.name} variant='outlined' />)}
+                                  {member.roles.map(role => <Chip size='small' label={role.name} variant='outlined' />)}
                                 </TableCell>
                               );
                             }
@@ -226,7 +226,7 @@ export default function MemberDirectoryPage () {
                     }}
                     alignItems='center'
                   >
-                    <Box display='flex' gap={0.5} alignItems='center'>
+                    <Box display='flex' gap={1} alignItems='center'>
                       {memberPropertiesRecord[property.type].icon}
                       <Typography variant='body2'>{property.name}</Typography>
                     </Box>

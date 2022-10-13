@@ -7,6 +7,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { logSpaceCreation } from 'lib/log/userEvents';
+import { defaultMemberPropertiesLabel, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/utils';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -80,6 +81,16 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
+
+  await prisma.memberProperty.createMany({
+    data: DEFAULT_MEMBER_PROPERTIES.map(memberProperty => ({
+      createdBy: userId,
+      name: defaultMemberPropertiesLabel[memberProperty],
+      type: memberProperty,
+      spaceId: space.id,
+      updatedBy: userId
+    }))
+  });
 
   logSpaceCreation(space);
   updateTrackGroupProfile(space);

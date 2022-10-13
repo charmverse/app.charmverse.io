@@ -19,3 +19,12 @@ export const DEFAULT_MEMBER_PROPERTIES = [
   'twitter',
   'timezone'
 ] as const;
+
+export const defaultMemberPropertiesLabel: Record<typeof DEFAULT_MEMBER_PROPERTIES[number], string> = {
+  discord: 'Discord',
+  name: 'Name',
+  profile_pic: 'Profile pic',
+  role: 'Role',
+  timezone: 'Timezone',
+  twitter: 'Twitter'
+};
