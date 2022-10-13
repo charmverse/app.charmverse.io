@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "MemberPropertyType" AS ENUM ('text', 'number', 'phone', 'url', 'email', 'wallet', 'select', 'multiselect', 'role', 'profile_pic', 'timezone', 'wallet_address');
+CREATE TYPE "MemberPropertyType" AS ENUM ('text', 'number', 'email', 'phone', 'url', 'select', 'multiselect', 'role', 'profile_pic', 'timezone', 'wallet_address', 'name', 'discord', 'twitter');
 
 -- CreateTable
 CREATE TABLE "MemberProperty" (

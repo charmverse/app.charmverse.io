@@ -766,16 +766,18 @@ model ProposalCategory {
 enum MemberPropertyType {
   text
   number
+  email
   phone
   url
-  email
-  wallet
   select
   multiselect
   role
   profile_pic
   timezone
   wallet_address
+  name
+  discord
+  twitter
 }
 
 model MemberProperty {

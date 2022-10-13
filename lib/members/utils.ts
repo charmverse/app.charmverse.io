@@ -10,3 +10,12 @@ export function getPropertiesWithValues (properties: MemberProperty[], propertyV
     value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null
   }));
 }
+
+export const DEFAULT_MEMBER_PROPERTIES = [
+  'profile_pic',
+  'name',
+  'role',
+  'discord',
+  'twitter',
+  'timezone'
+] as const;

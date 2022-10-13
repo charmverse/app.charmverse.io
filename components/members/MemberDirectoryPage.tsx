@@ -4,6 +4,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import LinkIcon from '@mui/icons-material/Link';
@@ -12,11 +13,12 @@ import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
+import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
@@ -24,6 +26,7 @@ import Modal from 'components/common/Modal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+import DiscordIcon from 'public/images/discord_logo.svg';
 
 const memberPropertiesRecord: Record<MemberPropertyType, {
   label: string;
@@ -72,6 +75,18 @@ const memberPropertiesRecord: Record<MemberPropertyType, {
   timezone: {
     label: 'Timezone',
     icon: <AccessTimeIcon fontSize='small' />
+  },
+  discord: {
+    label: 'Discord',
+    icon: <DiscordIcon width={18.5} height={18.5} />
+  },
+  twitter: {
+    label: 'Twitter',
+    icon: <TwitterIcon fontSize='small' />
+  },
+  name: {
+    label: 'Name',
+    icon: <DriveFileRenameOutlineIcon fontSize='small' />
   }
 };
 
@@ -189,8 +204,9 @@ export default function MemberDirectoryPage () {
                 Add Property
               </Button>
               {properties.map(property => (
-                <Box>
-                  {property.name}
+                <Box display='flex' gap={1}>
+                  {memberPropertiesRecord[property.type].icon}
+                  <Typography>{memberPropertiesRecord[property.type].label}</Typography>
                 </Box>
               ))}
             </StyledSidebar>
@@ -217,7 +233,7 @@ export default function MemberDirectoryPage () {
             }}
           >
             {icon}
-            <Typography textTransform='capitalize'>{label}</Typography>
+            <Typography>{label}</Typography>
           </MenuItem>
         ))}
       </Menu>
