@@ -30,6 +30,12 @@ const WorkspacesContainer = styled.div`
   height: 100%;
   border-right: 1px solid ${({ theme }) => theme.palette.divider};
   padding: ${({ theme }) => theme.spacing(1)};
+  overflow: auto;
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  ::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 `;
 
 export default function Workspaces () {
