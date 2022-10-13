@@ -1,9 +1,21 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import LinkIcon from '@mui/icons-material/Link';
+import ListIcon from '@mui/icons-material/List';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import PhoneIcon from '@mui/icons-material/Phone';
+import SubjectIcon from '@mui/icons-material/Subject';
 import { Box, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
@@ -12,6 +24,56 @@ import Modal from 'components/common/Modal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+
+const memberPropertiesRecord: Record<MemberPropertyType, {
+  label: string;
+  icon: ReactNode;
+}> = {
+  text: {
+    label: 'Text',
+    icon: <SubjectIcon fontSize='small' />
+  },
+  number: {
+    label: 'Number',
+    icon: <NumbersIcon fontSize='small' />
+  },
+  phone: {
+    label: 'Phone',
+    icon: <PhoneIcon fontSize='small' />
+  },
+  url: {
+    label: 'URL',
+    icon: <LinkIcon fontSize='small' />
+  },
+  email: {
+    label: 'Email',
+    icon: <AlternateEmailIcon fontSize='small' />
+  },
+  wallet_address: {
+    label: 'Wallet',
+    icon: <AccountBalanceWalletIcon fontSize='small' />
+  },
+  select: {
+    label: 'Select',
+    icon: <FormatListBulletedIcon fontSize='small' />
+  },
+  multiselect: {
+    label: 'Multi-select',
+    icon: <ListIcon fontSize='small' />
+  },
+  role: {
+    label: 'Role',
+    icon: <MilitaryTechIcon fontSize='small' />
+  },
+  profile_pic: {
+    label: 'Profile pic',
+    icon: <InsertPhotoIcon fontSize='small' />
+  },
+  timezone: {
+    label: 'Timezone',
+    icon: <AccessTimeIcon fontSize='small' />
+  }
+};
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -41,21 +103,6 @@ const StyledSidebar = styled.div`
 `;
 
 const views = ['table', 'gallery'] as const;
-
-const memberPropertiesLabel: Record<MemberPropertyType, string> = {
-  text: 'Text',
-  number: 'Number',
-  phone: 'Phone',
-  url: 'URL',
-  email: 'Email',
-  wallet: 'Wallet',
-  select: 'Select',
-  multiselect: 'Multi-select',
-  role: 'Role',
-  profile_pic: 'Profile pic',
-  timezone: 'Timezone',
-  wallet_address: 'Wallet address'
-};
 
 export default function MemberDirectoryPage () {
   const { members } = useMembers();
@@ -156,17 +203,21 @@ export default function MemberDirectoryPage () {
           width: '100%'
         }}
       >
-        {Object.entries(memberPropertiesLabel).map(([memberPropertyValue, memberPropertyLabel]) => (
+        {Object.entries(memberPropertiesRecord).map(([memberPropertyValue, { icon, label }]) => (
           <MenuItem
-            key={memberPropertyLabel}
+            key={label}
             onClick={() => {
               setSelectedPropertyType(memberPropertyValue as MemberPropertyType);
-              setPropertyName(memberPropertyLabel);
+              setPropertyName(label);
               addMemberPropertyPopupState.close();
               propertyNamePopupState.open();
             }}
+            sx={{
+              gap: 1
+            }}
           >
-            <Typography textTransform='capitalize'>{memberPropertyLabel}</Typography>
+            {icon}
+            <Typography textTransform='capitalize'>{label}</Typography>
           </MenuItem>
         ))}
       </Menu>
