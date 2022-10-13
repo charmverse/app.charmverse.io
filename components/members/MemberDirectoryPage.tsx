@@ -4,7 +4,9 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import EditIcon from '@mui/icons-material/Edit';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import LinkIcon from '@mui/icons-material/Link';
@@ -14,8 +16,8 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import TwitterIcon from '@mui/icons-material/Twitter';
-import { Box, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
-import type { MemberPropertyType } from '@prisma/client';
+import { Box, Chip, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
+import type { MemberPropertyType, Role } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
@@ -121,13 +123,15 @@ const views = ['table', 'gallery'] as const;
 
 export default function MemberDirectoryPage () {
   const { members } = useMembers();
-  const { properties, addProperty } = useMemberProperties();
+  const { properties, addProperty, deleteProperty, updateProperty } = useMemberProperties();
   const [currentView, setCurrentView] = useState<typeof views[number]>('table');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
   const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
+  const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
+  const [editedPropertyId, setEditedPropertyId] = useState<string | null>(null);
   return properties && members ? (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>Member Directory</Typography>
@@ -176,11 +180,22 @@ export default function MemberDirectoryPage () {
                       {properties.map(property => {
                         const memberProperty = member.properties.find(_property => _property.id === property.id);
                         if (memberProperty) {
-                          return (
-                            <TableCell key={property.id}>
-                              {memberProperty.value}
-                            </TableCell>
-                          );
+                          switch (memberProperty.type) {
+                            case 'role': {
+                              return (
+                                <TableCell key={property.id}>
+                                  {(memberProperty.value as Role[]).map(role => <Chip size='small' label={role.name} variant='outlined' />)}
+                                </TableCell>
+                              );
+                            }
+                            default: {
+                              return (
+                                <TableCell key={property.id}>
+                                  {memberProperty.value}
+                                </TableCell>
+                              );
+                            }
+                          }
                         }
                         return null;
                       })}
@@ -194,6 +209,56 @@ export default function MemberDirectoryPage () {
         <ClickAwayListener mouseEvent={false} onClickAway={() => setIsPropertiesDrawerVisible(false)}>
           <Collapse in={isPropertiesDrawerVisible} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
             <StyledSidebar>
+              <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
+                <Typography fontWeight='bold' variant='body2'>Properties</Typography>
+              </Box>
+
+              <Stack gap={1.5} p={1}>
+                {properties.map(property => (
+                  <Box
+                    display='flex'
+                    justifyContent='space-between'
+                    sx={{
+                      '&:hover .icons': {
+                        opacity: 1
+                      }
+                    }}
+                    alignItems='center'
+                  >
+                    <Box display='flex' gap={0.5} alignItems='center'>
+                      {memberPropertiesRecord[property.type].icon}
+                      <Typography variant='body2'>{property.name}</Typography>
+                    </Box>
+                    <Box
+                      display='flex'
+                      gap={0.5}
+                      className='icons'
+                      sx={{
+                        opacity: 0
+                      }}
+                    >
+                      <EditIcon
+                        cursor='pointer'
+                        fontSize='small'
+                        color='secondary'
+                        onClick={() => {
+                          propertyRenamePopupState.open();
+                          setPropertyName(property.name);
+                          setEditedPropertyId(property.id);
+                        }}
+                      />
+                      <DeleteIcon
+                        cursor='pointer'
+                        fontSize='small'
+                        color='secondary'
+                        onClick={() => {
+                          deleteProperty(property.id);
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                ))}
+              </Stack>
               <Button
                 variant='text'
                 size='small'
@@ -203,12 +268,6 @@ export default function MemberDirectoryPage () {
               >
                 Add Property
               </Button>
-              {properties.map(property => (
-                <Box display='flex' gap={1}>
-                  {memberPropertiesRecord[property.type].icon}
-                  <Typography>{memberPropertiesRecord[property.type].label}</Typography>
-                </Box>
-              ))}
             </StyledSidebar>
           </Collapse>
         </ClickAwayListener>
@@ -260,6 +319,33 @@ export default function MemberDirectoryPage () {
               }
             }}
           >Add
+          </Button>
+        </Box>
+      </Modal>
+
+      <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title='Rename property'>
+        <Box>
+          <TextField
+            error={!propertyName || !editedPropertyId}
+            value={propertyName}
+            onChange={(e) => setPropertyName(e.target.value)}
+            autoFocus
+          />
+          <Button
+            disabled={!propertyName || !editedPropertyId}
+            onClick={async () => {
+              if (propertyName && editedPropertyId) {
+                await updateProperty({
+                  index: properties.length,
+                  name: propertyName,
+                  id: editedPropertyId
+                });
+                setPropertyName('');
+                propertyRenamePopupState.close();
+                setEditedPropertyId(null);
+              }
+            }}
+          >Rename
           </Button>
         </Box>
       </Modal>
