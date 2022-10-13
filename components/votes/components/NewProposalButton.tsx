@@ -6,7 +6,6 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { DownIcon } from 'components/common/Icons/DownIcon';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
