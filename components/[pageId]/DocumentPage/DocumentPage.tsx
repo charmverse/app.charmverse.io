@@ -43,10 +43,9 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
   top: ${({ top }) => top}px;
-  padding-bottom: ${({ theme }) => theme.spacing(5)};
+  padding: ${({ theme }) => theme.spacing(0, 3)};
 
-  padding: 0 24px;
-  ${({ theme }) => theme.breakpoints.up('md')} {
+  ${({ theme }) => theme.breakpoints.up('sm')} {
     padding: 0 80px;
   }
 `;
@@ -149,9 +148,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
-          minWidth: {
-            md: 700
-          },
           width: {
             md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
           },
