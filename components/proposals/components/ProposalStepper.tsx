@@ -34,13 +34,14 @@ const proposalStatusTooltips: Record<ProposalStatus, string> = {
 
 const stepperSize = 25;
 
-const StepperIcon = styled.div<{ isCurrent: boolean, isEnabled: boolean }>(({ theme, isCurrent, isEnabled }) => `
+const StepperIcon = styled.div<{ isCurrent: boolean, isComplete: boolean, isEnabled: boolean }>(({ theme, isComplete, isCurrent, isEnabled }) => `
   width: ${stepperSize}px;
   height: ${stepperSize}px;
-  background-color: ${isCurrent
+  background-color: ${isComplete
     ? theme.palette.purple.main
-    : isEnabled
-      ? theme.palette.teal.main : theme.palette.gray.main};
+    : (isCurrent || isEnabled)
+      ? theme.palette.teal.main
+      : theme.palette.gray.main};
   transition: background-color 150ms ease-in-out;
   justify-content: center;
   align-items: center;
@@ -49,30 +50,38 @@ const StepperIcon = styled.div<{ isCurrent: boolean, isEnabled: boolean }>(({ th
   cursor: ${isEnabled ? 'pointer' : 'default'};
   position: relative;
 
-  ${!isCurrent && isEnabled && `
+  &::before {
+    border-radius: 100%;
+    content: '';
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.main};
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+  }
+
+  ${isCurrent ? `
+    &::before {
+      box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.main};
+      opacity: 1;
+    }
+  ` : ''}
+
+  ${(!isCurrent && isEnabled) ? `
     // disable hover UX on ios which converts first click to a hover event
     @media (pointer: fine) {
-
-      &::before {
-        border-radius: 100%;
-        content: '';
-        display: block;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.dark};
-        opacity: 0;
-        transition: opacity 150ms ease-in-out;
-      }
 
       &:hover {
         background-color: ${theme.palette.teal.dark};
         &::before  {
+          box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.dark};
           opacity: 1;
         }
       }
     }
-  `}
+  ` : ''}
 `);
 
 export default function ProposalStepper ({ refreshProposal, proposal, proposalUserGroups }: StepperContainerProps) {
@@ -149,9 +158,10 @@ function DesktopStepper ({ openVoteModal, currentStatus, proposalUserGroups, upd
       }}
     >
       {PROPOSAL_STATUSES.map((status, statusIndex) => {
-        const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (proposalUserGroups.some(
-          proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
-        )) : false;
+        const canChangeStatus = currentStatus ? (currentStatus === 'discussion' && status === 'review' ? reviewers.length !== 0 : true) && (
+          proposalUserGroups.some(
+            proposalUserGroup => proposalStatusTransitionPermission[currentStatus]?.[proposalUserGroup]?.includes(status)
+          )) : false;
 
         return (
           <Fragment key={status}>
@@ -163,6 +173,7 @@ function DesktopStepper ({ openVoteModal, currentStatus, proposalUserGroups, upd
               >
                 <Tooltip title={proposalStatusTooltips[status]}>
                   <StepperIcon
+                    isComplete={currentStatusIndex > statusIndex}
                     isCurrent={currentStatusIndex === statusIndex}
                     isEnabled={canChangeStatus}
                     onClick={() => {
@@ -176,7 +187,7 @@ function DesktopStepper ({ openVoteModal, currentStatus, proposalUserGroups, upd
                       }
                     }}
                   >
-                    {currentStatusIndex >= statusIndex
+                    {currentStatusIndex > statusIndex
                       ? <CheckIcon fontSize='small' />
                       : (
                         <Typography fontWeight={500}>
