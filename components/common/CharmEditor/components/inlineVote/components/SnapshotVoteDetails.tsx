@@ -21,9 +21,10 @@ type Props = {
 
 export function SnapshotVoteDetails ({ snapshotProposalId }: Props) {
   const { account } = useWeb3AuthSig();
-  const [snapshotProposal, setSnapshotProposal] = useState<SnapshotProposal | null>(null);
+  const { data: snapshotProposal } = useSWR<SnapshotProposal | null>(`/snapshotProposal/${snapshotProposalId}`, () => getSnapshotProposal(snapshotProposalId));
   const { data: userVotes } = useSWR(account ? `snapshotUserVotes-${account}` : null, () => getUserProposalVotes({ walletAddress: account as string, snapshotProposalId }));
-  const [loading, setLoading] = useState(true);
+
+  const loading = snapshotProposal === undefined;
 
   const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
 
@@ -31,19 +32,6 @@ export function SnapshotVoteDetails ({ snapshotProposalId }: Props) {
 
   const voteChoices = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
-
-  useEffect(() => {
-
-    getSnapshotProposal(snapshotProposalId)
-      .then((_snapshotProposal) => {
-        setSnapshotProposal(_snapshotProposal);
-        setLoading(false);
-      });
-  }, []);
-
-  useEffect(() => {
-
-  }, [account]);
 
   const hasPassedDeadline = proposalEndDate < Date.now();
 
