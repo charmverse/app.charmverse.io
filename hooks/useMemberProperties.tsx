@@ -4,7 +4,7 @@ import { useCallback, createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import type { CreateMemberPropertyPayload } from 'pages/api/spaces/[id]/members/properties';
+import type { CreateMemberPropertyPayload } from 'lib/members/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 

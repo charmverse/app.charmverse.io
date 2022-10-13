@@ -5,10 +5,9 @@ import nc from 'next-connect';
 
 import { createMemberProperty } from 'lib/members/createMemberProperty';
 import { getMemberPropertiesBySpace } from 'lib/members/getMemberPropertiesBySpace';
+import type { CreateMemberPropertyPayload } from 'lib/members/interfaces';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
