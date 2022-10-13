@@ -251,6 +251,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiButtonGroup: {
         defaultProps: {
           disableRipple: true
+        },
+        styleOverrides: {
+          groupedContained: {
+            '&:not(:last-child)': {
+              borderRightColor: 'rgba(0, 0, 0, .2)'
+            }
+          }
         }
       },
       MuiButton: {
