@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { deleteMemberProperty } from 'lib/members/deleteMemberProperty';
 import { updateMemberProperty } from 'lib/members/updateMemberProperty';
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -25,8 +25,10 @@ async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiRes
 }
 
 async function deleteMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse) {
-  await deleteMemberProperty(req.query.propertyId as string);
-
+  const memberProperty = await deleteMemberProperty(req.query.propertyId as string);
+  if (!memberProperty.count) {
+    throw new InvalidStateError("Can't delete default member properties");
+  }
   return res.status(200).json({ ok: true });
 }
 

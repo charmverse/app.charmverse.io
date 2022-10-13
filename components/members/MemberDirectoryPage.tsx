@@ -28,6 +28,7 @@ import Modal from 'components/common/Modal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/utils';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 const memberPropertiesRecord: Record<MemberPropertyType, {
@@ -247,14 +248,16 @@ export default function MemberDirectoryPage () {
                           setEditedPropertyId(property.id);
                         }}
                       />
-                      <DeleteIcon
-                        cursor='pointer'
-                        fontSize='small'
-                        color='secondary'
-                        onClick={() => {
-                          deleteProperty(property.id);
-                        }}
-                      />
+                      {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+                        <DeleteIcon
+                          cursor='pointer'
+                          fontSize='small'
+                          color='secondary'
+                          onClick={() => {
+                            deleteProperty(property.id);
+                          }}
+                        />
+                      )}
                     </Box>
                   </Box>
                 ))}
