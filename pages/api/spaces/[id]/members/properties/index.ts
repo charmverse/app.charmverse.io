@@ -26,11 +26,17 @@ async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResp
 
 async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
   const spaceId = req.query.id as string;
+  const userId = req.session.user.id;
   const propertyData = req.body as Prisma.MemberPropertyCreateInput;
 
-  const property = await createMemberProperty({ ...propertyData, space: { connect: { id: spaceId } } });
+  const property = await createMemberProperty({
+    ...propertyData,
+    updatedBy: userId,
+    createdBy: userId,
+    space: { connect: { id: spaceId } }
+  });
 
-  return res.status(200).json(property);
+  return res.status(201).json(property);
 }
 
 export default withSessionRoute(handler);
