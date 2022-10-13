@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useEffect, createContext, useContext, useMemo, useState } from 'react';
+import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { socketsHost } from 'config/constants';
@@ -24,21 +25,42 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   messageLog: []
 });
 
-const socket = io(socketsHost, {
-  withCredentials: true
-});
+let socket: Socket;
 
 export function WebSocketClientProvider ({ children }: { children: ReactNode }) {
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
   const [lastPong, setLastPong] = useState<string | null>(null);
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
   useEffect(() => {
+
+    connect();
+
+    return () => {
+      socket?.off('connect');
+      socket?.off('disconnect');
+      socket?.off('pong');
+      socket?.off('connect_error');
+    };
+  }, []);
+
+  async function connect () {
+    await fetch('/api/socket');
+
+    socket = io(socketsHost, {
+      withCredentials: true
+      // path: '/api/socket'
+    }).connect();
+
     socket.on('connect', () => {
       setIsConnected(true);
       log.info('Socket client connected');
       setMessageLog((prev) => [{ type: 'connect', message: 'Socket client connected' }, ...prev]);
+    });
+
+    socket.on('message', (message) => {
+      setMessageLog((prev) => [{ type: 'pong', message }, ...prev]);
     });
 
     socket.on('disconnect', () => {
@@ -56,21 +78,15 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       setMessageLog((prev) => [{ type: 'error', message: err.message }, ...prev]);
     });
 
-    return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('pong');
-      socket.off('connect_error');
-    };
-  }, []);
+  }
 
   function sendPing () {
     socket.emit('ping');
   }
 
   function sendMessage (message: any) {
-    setMessageLog((prev) => [...prev, { type: 'ping', message }]);
-    socket.send(message);
+    setMessageLog((prev) => [{ type: 'ping', message }, ...prev]);
+    socket.emit('message', message);
   }
 
   const value: IContext = useMemo(() => ({
