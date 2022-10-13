@@ -1,8 +1,10 @@
 import type { MemberPropertyType, User, UserDetails } from '@prisma/client';
 
-export type MemberPropertyValue = {
+export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
+
+export type PropertyValue = {
   id: string;
-  value: string | number | string[] | null;
+  value: MemberPropertyValueType;
   // TODO - we might not need props below
   type: MemberPropertyType;
   name: string;
@@ -13,5 +15,5 @@ export type Member = Omit<User, 'addresses'> & {
   joinDate: string;
   hasNftAvatar?: boolean;
   profile: UserDetails | null;
-  properties: MemberPropertyValue[];
+  properties: PropertyValue[];
 }
