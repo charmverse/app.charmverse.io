@@ -41,7 +41,7 @@ export function SnapshotVoteDetails ({ snapshotProposalId }: Props) {
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center' sx={{ mb: 2 }}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
         <Typography variant='h6' fontWeight='bold'>
           Snapshot votes on this proposal
         </Typography>
