@@ -28,7 +28,7 @@ const MentionContainer = styled(Link)`
 
 export default function Mention ({ node }: NodeViewProps) {
   const attrs = node.attrs as MentionSpecSchemaAttrs;
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { pages } = usePages();
   const member = members.find(_member => _member.id === attrs.value);
   const [space] = useCurrentSpace();

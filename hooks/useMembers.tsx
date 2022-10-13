@@ -7,9 +7,9 @@ import type { Member } from 'lib/members/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
-type Context = [users: Member[], setSpaces: (users: Member[]) => void];
+type Context = { members: Member[], setMembers: (users: Member[]) => void };
 
-const MembersContext = createContext<Readonly<Context>>([[], () => undefined]);
+const MembersContext = createContext<Readonly<Context>>({ members: [], setMembers: () => {} });
 
 export function MembersProvider ({ children }: { children: ReactNode }) {
   const [space] = useCurrentSpace();
@@ -23,7 +23,7 @@ export function MembersProvider ({ children }: { children: ReactNode }) {
     setMembers(data || []);
   }, [data]);
 
-  const value = useMemo(() => [members, setMembers] as Context, [members]);
+  const value = useMemo(() => ({ members, setMembers }) as Context, [members]);
 
   return (
     <MembersContext.Provider value={value}>

@@ -20,7 +20,7 @@ interface Props {
 
 export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
-  const [members, setMembers] = useMembers();
+  const { members, setMembers } = useMembers();
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
   const removedMember = removedMemberId ? members.find(member => member.id === removedMemberId) : null;

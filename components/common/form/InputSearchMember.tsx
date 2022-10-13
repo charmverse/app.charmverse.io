@@ -78,7 +78,7 @@ interface IInputSearchMemberProps {
 
 export function InputSearchMember ({ defaultValue, onChange, ...props }: IInputSearchMemberProps) {
 
-  const [members] = useMembers();
+  const { members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
   useEffect(() => {
@@ -117,7 +117,7 @@ interface IInputSearchMemberMultipleProps extends Partial<Omit<AutocompleteProps
 
 export function InputSearchMemberMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchMemberMultipleProps) {
 
-  const [members] = useMembers();
+  const { members } = useMembers();
   const [value, setValue] = useState<Member[]>([]);
 
   function emitValue (users: Member[]) {

@@ -18,7 +18,7 @@ export default function InputSearchReviewers ({
   disableCloseOnSelect = false, excludedIds, ...props
 }: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[], onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void }) {
   const { roles } = useRoles();
-  const [members] = useMembers();
+  const { members } = useMembers();
 
   const excludedIdsSet = new Set(excludedIds);
 

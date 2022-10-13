@@ -23,7 +23,7 @@ const selectStyles = {
 };
 
 function UserProperty (props: Props): JSX.Element | null {
-  const [members] = useMembers();
+  const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
     return acc;

@@ -26,7 +26,7 @@ const defaultAvatarGroupIncrement = 2;
 
 export default function BountyReviewers ({ bounty, permissions }: BountyReviewersProps) {
   const [maxVisibleUsers, setMaxVisibleUsers] = useState<number>(defaultAvatarGroupIncrement);
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { roleups } = useRoles();
 
   const reviewerNames: ReviewersData = useMemo(() => {

@@ -45,7 +45,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     return record;
   }, {}) ?? {};
 
-  const [members] = useMembers();
+  const { members } = useMembers();
 
   useEffect(() => {
     const applicationIds = transactions.map(transaction => transaction.applicationId);

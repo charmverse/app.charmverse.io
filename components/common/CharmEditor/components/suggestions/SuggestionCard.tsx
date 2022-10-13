@@ -69,7 +69,7 @@ type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
 
 function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
-  const [members] = useMembers();
+  const { members } = useMembers();
   // get parentNode for lists
   const parentNode = useMemo(() => (
     pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null

@@ -32,7 +32,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
   const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
 
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { roles = [], roleups } = useRoles();
   const { user } = useUser();
   const isAdmin = useIsAdmin();
