@@ -30,10 +30,11 @@ async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiRes
   const propertyData = req.body as Prisma.MemberPropertyCreateInput;
 
   const property = await createMemberProperty({
-    ...propertyData,
-    updatedBy: userId,
-    createdBy: userId,
-    space: { connect: { id: spaceId } }
+    userId,
+    data: {
+      ...propertyData,
+      space: { connect: { id: spaceId } }
+    }
   });
 
   return res.status(201).json(property);

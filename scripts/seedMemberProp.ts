@@ -3,11 +3,15 @@ import { prisma} from 'db'
 import { Prisma } from "@prisma/client";
 
 export async function seedMemberProp() {
-  const zz = await createMemberProperty({ name: 'test2', type: 'text',
+  const zz = await createMemberProperty({
+    data: { name: 'test2', type: 'text',
    space: { connect: { id: '8cee49eb-68bb-444c-8dbf-bdfa776b172a'}},
-   createdBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b', updatedBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b',
+   createdBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b',
+   updatedBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b',
    updatedAt: new Date()
-  })
+  },
+  userId: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b'
+})
 
   console.log('🔥', zz);
 }
