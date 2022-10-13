@@ -104,7 +104,8 @@ export function SnapshotVoteDetails ({ snapshotProposalId }: Props) {
                   label={(
                     <Box display='flex' justifyContent='space-between' flexGrow={1}>
                       <span>{voteOption}</span>
-                      <Typography variant='subtitle1' color='secondary'>{percent({ value: voteScores[index], total: snapshotProposal.scores_total, significantDigits: 2 })}</Typography>
+                      {voteScores[index]}
+                      <Typography variant='subtitle1' color='secondary'>{!voteScores[index] ? 'No votes yet' : percent({ value: voteScores[index], total: snapshotProposal.scores_total, significantDigits: 2 })}</Typography>
                     </Box>
                   )}
                   disableTypography
