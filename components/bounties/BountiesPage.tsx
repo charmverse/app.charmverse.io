@@ -21,6 +21,15 @@ interface Props {
   bounties: BountyWithDetails[];
 }
 
+// Gnosis Safe Airdrop compatible format
+// receiver: Ethereum address of transfer receiver.
+// token_address: Ethereum address of ERC20 token to be transferred.
+// amount: the amount of token to be transferred.
+// More information: https://github.com/bh2smith/safe-airdrop
+
+const csvHeaders = ['receiver', 'token_address', 'amount', 'chainId'] as const;
+type CSVRow = Record<typeof csvHeaders[number], string | number>;
+
 export default function BountiesPage ({ publicMode = false, bounties }: Props) {
   const [space] = useCurrentSpace();
 
@@ -29,28 +38,16 @@ export default function BountiesPage ({ publicMode = false, bounties }: Props) {
   }, []);
 
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
+  const completedBounties = bountiesSorted.filter(bounty => bounty.status === BountyStatus.complete);
 
-  const csvData = useMemo(() => {
-    const completedBounties = bountiesSorted.filter(bounty => bounty.status === BountyStatus.complete);
-    if (!completedBounties.length) {
-      return [];
-    }
-
-    // Gnosis Safe Airdrop compatible format
-    // receiver: Ethereum address of transfer receiver.
-    // token_address: Ethereum address of ERC20 token to be transferred.
-    // amount: the amount of token to be transferred.
-    // More information: https://github.com/bh2smith/safe-airdrop
-    return [
-      ['token_address', 'receiver', 'amount', 'chainId'],
-      ...completedBounties.map((bounty) => [
-        bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
-        bounty.applications.find(application => application.status === 'complete')?.walletAddress,
-        bounty.rewardAmount,
-        bounty.chainId
-      ])
-    ];
-  }, [bountiesSorted]);
+  function getCSVData (): CSVRow[] {
+    return completedBounties.map((bounty): CSVRow => ({
+      receiver: bounty.rewardToken.startsWith('0x') ? bounty.rewardToken : '', // for native token it should be empty
+      token_address: bounty.applications.find(application => application.status === 'complete')?.walletAddress || '',
+      amount: bounty.rewardAmount,
+      chainId: bounty.chainId
+    }));
+  }
 
   return (
     <div
@@ -67,9 +64,9 @@ export default function BountiesPage ({ publicMode = false, bounties }: Props) {
 
               {!publicMode && (
                 <Box width='fit-content' display='flex' gap={1}>
-                  {!!csvData.length
+                  {Boolean(completedBounties.length)
                     && (
-                      <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                      <CSVLink headers={csvHeaders.slice()} data={getCSVData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
                         <Button color='secondary' variant='outlined'>
                           Export to CSV
                         </Button>
