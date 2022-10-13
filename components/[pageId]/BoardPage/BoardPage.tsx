@@ -14,6 +14,7 @@ import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/sr
 import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { WebSocketTester } from 'components/WebSocketTester';
 import { silentlyUpdateURL } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
@@ -128,6 +129,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
       <>
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
+          <WebSocketTester />
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
             board={board}

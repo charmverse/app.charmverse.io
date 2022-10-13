@@ -5,16 +5,23 @@ import io from 'socket.io-client';
 import { socketsHost } from 'config/constants';
 import log from 'lib/log';
 
+type LoggedMessage = { type: 'ping' | 'pong' | 'connect' | 'disconnect' | 'error', message: string }
+
 type IContext = {
   lastPong: string | null;
   isConnected: boolean;
   sendPing: () => void;
+  sendMessage: (message: any) => void;
+  // Testing purposes
+  messageLog: LoggedMessage[];
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
   lastPong: null,
   isConnected: false,
-  sendPing: () => null
+  sendPing: () => null,
+  sendMessage: () => null,
+  messageLog: []
 });
 
 const socket = io(socketsHost, {
@@ -25,23 +32,28 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [lastPong, setLastPong] = useState<string | null>(null);
+  const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
   useEffect(() => {
     socket.on('connect', () => {
       setIsConnected(true);
       log.info('Socket client connected');
+      setMessageLog((prev) => [{ type: 'connect', message: 'Socket client connected' }, ...prev]);
     });
 
     socket.on('disconnect', () => {
       setIsConnected(false);
+      setMessageLog((prev) => [{ type: 'disconnect', message: 'Socket client disconnected' }, ...prev]);
     });
 
-    socket.on('pong', () => {
+    socket.on('pong', (msg) => {
+      setMessageLog((prev) => [{ type: 'pong', message: msg }, ...prev]);
       setLastPong(new Date().toISOString());
     });
 
     socket.on('connect_error', (err) => {
       log.error('Socket error', err.message); // prints the message associated with the error
+      setMessageLog((prev) => [{ type: 'error', message: err.message }, ...prev]);
     });
 
     return () => {
@@ -56,11 +68,18 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     socket.emit('ping');
   }
 
+  function sendMessage (message: any) {
+    setMessageLog((prev) => [...prev, { type: 'ping', message }]);
+    socket.send(message);
+  }
+
   const value: IContext = useMemo(() => ({
     isConnected,
     lastPong,
-    sendPing
-  }), [isConnected]);
+    sendPing,
+    sendMessage,
+    messageLog
+  }), [isConnected, messageLog]);
 
   return (
     <WebSocketClientContext.Provider value={value}>
