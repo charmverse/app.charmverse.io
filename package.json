@@ -44,7 +44,9 @@
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./jest.config-server.ts' --maxWorkers=2",
     "test:browser:ci": "dotenv -e .env.test.local --override -- npx jest --config='./jest.config-browser.ts'",
-    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test"
+    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
+    "storybook": "start-storybook -p 6006 -s ./public",
+    "build-storybook": "build-storybook -s public"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -194,9 +196,18 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@babel/core": "^7.19.3",
     "@depay/web3-mock": "^13.18.1",
     "@next/eslint-plugin-next": "^12.0.10",
     "@playwright/test": "^1.26.1",
+    "@storybook/addon-actions": "^6.5.12",
+    "@storybook/addon-essentials": "^6.5.12",
+    "@storybook/addon-interactions": "^6.5.12",
+    "@storybook/addon-links": "^6.5.12",
+    "@storybook/builder-webpack5": "^6.5.12",
+    "@storybook/manager-webpack5": "^6.5.12",
+    "@storybook/react": "^6.5.12",
+    "@storybook/testing-library": "^0.0.13",
     "@svgr/webpack": "^6.1.2",
     "@testing-library/cypress": "^8.0.2",
     "@testing-library/dom": "^8.11.3",
@@ -231,6 +242,7 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "aws-cdk-lib": "^2.20.0",
+    "babel-loader": "^8.2.5",
     "cross-env": "^7.0.3",
     "eslint": "^8.8.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -242,6 +254,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-storybook": "^0.6.6",
     "fetch-mock-jest": "^1.5.1",
     "husky": "^7.0.0",
     "jest": "^28.1.1",
