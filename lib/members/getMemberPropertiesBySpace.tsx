@@ -5,6 +5,9 @@ export function getMemberPropertiesBySpace (userId: string, spaceId: string) {
   return prisma.memberProperty.findMany({
     where: {
       spaceId
+    },
+    orderBy: {
+      index: 'asc'
     }
   });
 }

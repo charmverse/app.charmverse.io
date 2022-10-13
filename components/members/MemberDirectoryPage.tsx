@@ -1,55 +1,49 @@
-import { Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
-import useSWR from 'swr';
+import styled from '@emotion/styled';
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
-import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
-import type { Social } from 'components/profile/interfaces';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useMembers } from 'hooks/useMembers';
+
+const StyledTableCell = styled(TableCell)`
+  font-weight: 700;
+  border-bottom: 1px solid #000;
+`;
 
 export default function MemberDirectoryPage () {
-  const [currentSpace] = useCurrentSpace();
-  const { data: workspaceMembers } = useSWR(currentSpace ? `${currentSpace.id}/members` : null, () => currentSpace ? charmClient.members.getWorkspaceMembers(currentSpace.id) : null);
+  const { members } = useMembers();
+  const { properties } = useMemberProperties();
 
-  return (
+  return properties && members ? (
     <CenteredPageContent>
-      <Typography variant='h1'>Member Directory</Typography>
+      <Typography variant='h1' my={2}>Member Directory</Typography>
 
-      <Grid container>
-        {
-          workspaceMembers?.map(workspaceMember => {
-            const profilePic = workspaceMember.properties.find(property => property.type === 'profile_pic');
+      <Table size='small'>
+        <TableHead>
+          <TableRow>
+            {properties.map(property => <StyledTableCell>{property.name}</StyledTableCell>)}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {members.map(member => {
             return (
-              <Grid item xs={4}>
-                <Card sx={{ maxWidth: 345 }}>
-                  <CardMedia
-                    component='img'
-                    height={150}
-                    image={profilePic?.value as string ?? ''}
-                    alt='Profile pic'
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant='h6' component='div'>
-                      {workspaceMember.username}
-                    </Typography>
-                    <SocialIcons
-                      sx={{
-                        gap: 1,
-                        my: 1
-                      }}
-                      social={workspaceMember.profile?.social as Social}
-                    />
-                    <Typography variant='body2' fontWeight={500}>About Me</Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      {workspaceMember.profile?.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <TableRow key={member.id}>
+                {properties.map(property => {
+                  const memberProperty = member.properties.find(_property => _property.id === property.id);
+                  if (memberProperty) {
+                    return (
+                      <TableCell key={property.id}>
+                        {memberProperty.value}
+                      </TableCell>
+                    );
+                  }
+                  return null;
+                })}
+              </TableRow>
             );
-          })
-        }
-      </Grid>
+          })}
+        </TableBody>
+      </Table>
     </CenteredPageContent>
-  );
+  ) : null;
 }
