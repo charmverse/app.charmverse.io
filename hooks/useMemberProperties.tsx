@@ -1,6 +1,6 @@
 import type { MemberProperty } from '@prisma/client';
 import type { ReactNode } from 'react';
-import { useEffect, useCallback, createContext, useContext, useMemo } from 'react';
+import { useCallback, createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -56,12 +56,6 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
       mutateProperties(state => {
         return state ? state.filter(p => p.id !== id) : undefined;
       });
-    }
-  }, [space]);
-
-  useEffect(() => {
-    if (space && space.id) {
-      deleteProperty('cfd1e4bc-403e-49bb-91b4-9d923cc09464');
     }
   }, [space]);
 
