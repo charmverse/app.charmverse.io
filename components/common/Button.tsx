@@ -42,7 +42,7 @@ const PimpedButtonWithNextLink = forwardRef<HTMLButtonElement, InputProps<Elemen
   const { href, external, children, id, onClick, target, 'data-test': dataTest, ...props } = _props;
   if (href) {
     if (external) {
-      return <PimpedButton ref={ref} href={href} id={id} onClick={onClick} {...props}>{children}</PimpedButton>;
+      return <PimpedButton ref={ref} href={href} id={id} onClick={onClick} target={target} {...props}>{children}</PimpedButton>;
     }
     // @ts-ignore
     const mouseOnClick = onClick as MouseEventHandler<HTMLAnchorElement>;

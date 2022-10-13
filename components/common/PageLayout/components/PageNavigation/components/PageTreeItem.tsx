@@ -27,6 +27,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { getKey } from 'hooks/useLocalStorage';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/browser';
@@ -187,6 +188,10 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
   const isempty = !label;
 
   const stopPropagation = useCallback((event: SyntheticEvent) => {
+    const pageNavigationElement = document.querySelector('.page-navigation');
+    if (pageNavigationElement) {
+      localStorage.setItem(getKey('sidebar-scroll-top'), pageNavigationElement.scrollTop.toString());
+    }
     event.stopPropagation();
   }, []);
 

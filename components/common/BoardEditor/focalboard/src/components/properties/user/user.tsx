@@ -3,8 +3,8 @@ import type { CSSObject } from '@emotion/serialize';
 import Select from 'react-select';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Contributor } from 'hooks/useContributors';
-import { useContributors } from 'hooks/useContributors';
+import type { Member } from 'hooks/useMembers';
+import { useMembers } from 'hooks/useMembers';
 
 import { getSelectBaseStyle } from '../../../theme';
 
@@ -23,17 +23,17 @@ const selectStyles = {
 };
 
 function UserProperty (props: Props): JSX.Element | null {
-  const [contributors] = useContributors();
-  const contributorMap = contributors.reduce<Record<string, Contributor>>((acc, contributor) => {
-    acc[contributor.id] = contributor;
+  const [members] = useMembers();
+  const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
+    acc[member.id] = member;
     return acc;
   }, {});
 
   if (props.readOnly) {
-    if (contributorMap[props.value]) {
+    if (memberMap[props.value]) {
       return (
         <div className='UserProperty octo-propertyvalue'>
-          <UserDisplay user={contributorMap[props.value]} avatarSize='xSmall' fontSize='small' />
+          <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
         </div>
       );
     }
@@ -42,7 +42,7 @@ function UserProperty (props: Props): JSX.Element | null {
 
   return (
     <Select
-      options={contributors}
+      options={members}
       isSearchable={true}
       isClearable={true}
       backspaceRemovesValue={true}
@@ -52,9 +52,9 @@ function UserProperty (props: Props): JSX.Element | null {
       formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
       styles={selectStyles}
       placeholder='Empty'
-      getOptionLabel={(o: Contributor) => o.username}
-      getOptionValue={(a: Contributor) => a.id}
-      value={contributorMap[props.value] || null}
+      getOptionLabel={(o: Member) => o.username}
+      getOptionValue={(a: Member) => a.id}
+      value={memberMap[props.value] || null}
       onChange={(item, action) => {
         if (action.action === 'select-option') {
           props.onChange(item?.id || '');

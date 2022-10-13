@@ -69,11 +69,13 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
+  const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
+
   function onSubmit (conditions: ConditionsModalResult) {
     setApiError('');
     return saveTokenGate(conditions)
       .then(() => {
-        popupState.close();
+        closeTokenGateModal();
       })
       .catch(error => {
         setApiError(error.message || error);
@@ -123,7 +125,7 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
   return (
     <>
       <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
-      <Modal {...bindPopover(popupState)} noPadding size='large'>
+      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
         <ShareModalContainer>
           <LitShareModal
             darkMode={theme.palette.mode === 'dark'}

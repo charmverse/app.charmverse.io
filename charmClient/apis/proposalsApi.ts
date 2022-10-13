@@ -16,7 +16,7 @@ export class ProposalsApi {
   }
 
   updateStatus (proposalId: string, newStatus: ProposalStatus) {
-    return http.PUT(`/api/proposals/${proposalId}/status`, { newStatus });
+    return http.PUT<ProposalWithUsers>(`/api/proposals/${proposalId}/status`, { newStatus });
   }
 
   getProposalsBySpace (spaceId: string) {

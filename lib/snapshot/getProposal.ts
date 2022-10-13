@@ -29,6 +29,9 @@ export async function getSnapshotProposal (proposalId: string): Promise<Snapshot
           id
           name
         }
+        votes
+        scores
+        scores_total
       }
     }    
   `

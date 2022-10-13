@@ -147,7 +147,7 @@ model Space {
   deletedAt                   DateTime?
   createdAt                   DateTime                          @default(now())
   createdBy                   String                            @db.Uuid
-  updatedAt                   DateTime
+  updatedAt                   DateTime                          @updatedAt
   updatedBy                   String                            @db.Uuid
   name                        String
   domain                      String                            @unique
@@ -531,6 +531,7 @@ model TokenGate {
   conditions       Json
   resourceId       Json
   userRole         String?
+  accessTypes      String[]          @default([])
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceRoles       SpaceRole[]
   tokenGateToRoles TokenGateToRole[]
@@ -704,6 +705,7 @@ model Proposal {
   reviewedAt DateTime?
   categoryId String?            @db.Uuid
   category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  snapshotProposalExpiry DateTime?
 }
 
 model ProposalAuthor {

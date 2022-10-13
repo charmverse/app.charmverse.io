@@ -89,11 +89,13 @@ function InlineVoteOptions (
 interface CreateVoteModalProps {
   onClose?: () => void;
   onCreateVote?: (vote: ExtendedVote) => void;
+  onPublishToSnapshot?: () => void;
   open?: boolean;
   proposal?: ProposalWithUsers;
 }
 
-export default function CreateVoteModal ({ open = true, onClose, onCreateVote, proposal }: CreateVoteModalProps) {
+export default function CreateVoteModal ({
+  open = true, onClose = () => null, onCreateVote = () => null, onPublishToSnapshot = () => null, proposal }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -269,21 +271,25 @@ export default function CreateVoteModal ({ open = true, onClose, onCreateVote, p
           >
             Create
           </Button>
-          or
           {proposal?.status === 'reviewed' && (
-            <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
-              <div>
-                <PublishToSnapshot
-                  renderContent={({ label, onClick, icon }) => (
-                    <Button disabled={!isProposalAuthor} onClick={onClick}>
-                      {icon}
-                      <Typography>{label}</Typography>
-                    </Button>
-                  )}
-                  pageId={proposal.id}
-                />
-              </div>
-            </Tooltip>
+            <>
+              or
+              <Tooltip title={!isProposalAuthor ? 'Only proposal authors can publish to snapshot' : ''}>
+                <div>
+                  <PublishToSnapshot
+                    renderContent={({ label, onClick, icon }) => (
+                      <Button disabled={!isProposalAuthor} onClick={onClick}>
+                        {icon}
+                        <Typography>{label}</Typography>
+                      </Button>
+                    )}
+                    onPublish={onPublishToSnapshot}
+                    pageId={proposal.id}
+                  />
+                </div>
+              </Tooltip>
+            </>
+
           )}
         </Stack>
       </Box>

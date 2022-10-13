@@ -49,7 +49,14 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
       <ScrollableWindow>
         <NavigationContainer>
           <Container>
-            <Tabs value={tab} indicatorColor='primary' sx={{ minHeight: 44 }}>
+            <Tabs
+              value={tab}
+              indicatorColor='primary'
+              sx={{ minHeight: 44 }}
+              variant='scrollable'
+              scrollButtons={false}
+              aria-label='Setting tabs'
+            >
               {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
               {SETTINGS_TABS.map(({ icon, path, label }) => (
                 <Link href={`/${domain}/settings/${path}`} passHref key={label}>

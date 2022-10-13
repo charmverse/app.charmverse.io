@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import type { Contributor } from 'models';
+import type { Member } from 'models';
 
 import type { Block } from '../../blocks/block';
 import mutator from '../../mutator';
@@ -19,12 +19,12 @@ import Tooltip from '../../widgets/tooltip';
 
 type Props = {
   comment: Block;
-  contributor?: Pick<Contributor, 'username' | 'avatar' | 'hasNftAvatar'>;
+  member?: Pick<Member, 'username' | 'avatar' | 'hasNftAvatar'>;
   readOnly: boolean;
 }
 
 function Comment (props: Props) {
-  const { comment, contributor } = props;
+  const { comment, member } = props;
   const intl = useIntl();
   const html = comment.title && Utils.htmlFromMarkdown(comment.title);
   const date = new Date(comment.createdAt);
@@ -35,8 +35,8 @@ function Comment (props: Props) {
       className='Comment comment'
     >
       <div className='comment-header'>
-        <Avatar size='xSmall' name={contributor?.username} avatar={contributor?.avatar} isNft={contributor?.hasNftAvatar} />
-        <div className='comment-username'>{contributor?.username}</div>
+        <Avatar size='xSmall' name={member?.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
+        <div className='comment-username'>{member?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
           <div className='comment-date'>
             {Utils.relativeDisplayDateTime(date, intl)}

@@ -153,13 +153,13 @@ describe('getProposalTasks', () => {
     ]));
   });
 
-  it('Should get all proposals in discussion and active vote stage where the user is a contributor of the proposal space', async () => {
+  it('Should get all proposals in discussion and active vote stage where the user is a member of the proposal space', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet(v4());
 
     const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await generateUserAndSpaceWithApiToken();
 
-    // Making user2 a contributor of the proposal space
+    // Making user2 a member of the proposal space
     await prisma.spaceRole.create({
       data: {
         userId: user2.id,
@@ -226,7 +226,7 @@ describe('getProposalTasks', () => {
       userId: user2.id
     });
 
-    // This proposal is inaccessible as the user is not a contributor of the space
+    // This proposal is inaccessible as the user is not a member of the space
     await generateProposal({
       proposalStatus: 'discussion',
       spaceId: inaccessibleSpace.id,

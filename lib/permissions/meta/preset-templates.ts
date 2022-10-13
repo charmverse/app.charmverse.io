@@ -58,9 +58,9 @@ export const configurationModeName: Record<SpacePermissionConfigurationMode, str
 
 export const configurationModeDescription: Record<SpacePermissionConfigurationMode, string> = {
   custom: 'Manage settings individually.',
-  readOnly: 'Contributors can only read existing content.',
-  collaborative: 'Contributors can create and edit content.',
-  open: 'Content created by contributors is available to the public by default.'
+  readOnly: 'Members can only read existing content.',
+  collaborative: 'Members can create and edit content.',
+  open: 'Content created by members is available to the public by default.'
 };
 
 /**
