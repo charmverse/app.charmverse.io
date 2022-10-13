@@ -1,5 +1,3 @@
-
-import type { Role } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -29,42 +27,17 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
           profile: true,
           memberPropertyValues: true
         }
-      }
-    }
-  });
-
-  const spaceRoleIds = spaceRoles.map(spaceRole => spaceRole.id);
-  // Fetch all the roles
-  const spaceRoleToRoles = await prisma.spaceRoleToRole.findMany({
-    where: {
-      spaceRoleId: {
-        in: spaceRoleIds
-      }
-    },
-    include: {
-      role: true,
-      spaceRole: {
-        select: {
-          user: {
+      },
+      spaceRoleToRole: {
+        include: {
+          role: {
             select: {
-              id: true
+              id: true,
+              name: true
             }
           }
         }
       }
-    }
-  });
-
-  const userRolesMap: Record<string, Role[]> = {};
-
-  spaceRoleToRoles.forEach(spaceRoleToRole => {
-    const spaceRoleUserId = spaceRoleToRole.spaceRole.user.id;
-    const role = spaceRoleToRole.role;
-    if (!userRolesMap[spaceRoleUserId]) {
-      userRolesMap[spaceRoleUserId] = [role];
-    }
-    else {
-      userRolesMap[spaceRoleUserId].push(role);
     }
   });
 
@@ -73,14 +46,8 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
 
   const members = spaceRoles.map((spaceRole): Member => {
     const { memberPropertyValues = [], id, ...userData } = spaceRole.user;
-    if (roleMemberProperty) {
-      memberPropertyValues.push({
-        memberPropertyId: roleMemberProperty.id,
-        value: userRolesMap[id] as any,
-        userId: id,
-        ...roleMemberProperty
-      });
-    }
+    const roles = spaceRole.spaceRoleToRole?.map(sr => sr.role);
+
     return {
       id,
       ...userData,
@@ -88,7 +55,8 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       isAdmin: spaceRole.isAdmin,
       joinDate: spaceRole.createdAt.toISOString(),
       hasNftAvatar: hasNftAvatar(spaceRole.user),
-      properties: getPropertiesWithValues(visibleProperties, memberPropertyValues)
+      properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
+      roles
     } as Member;
   })
     .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first
