@@ -1,4 +1,5 @@
 
+import type { Role } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -32,12 +33,56 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
     }
   });
 
+  const spaceRoleIds = spaceRoles.map(spaceRole => spaceRole.id);
+  // Fetch all the roles
+  const spaceRoleToRoles = await prisma.spaceRoleToRole.findMany({
+    where: {
+      spaceRoleId: {
+        in: spaceRoleIds
+      }
+    },
+    include: {
+      role: true,
+      spaceRole: {
+        select: {
+          user: {
+            select: {
+              id: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const userRolesMap: Record<string, Role[]> = {};
+
+  spaceRoleToRoles.forEach(spaceRoleToRole => {
+    const spaceRoleUserId = spaceRoleToRole.spaceRole.user.id;
+    const role = spaceRoleToRole.role;
+    if (!userRolesMap[spaceRoleUserId]) {
+      userRolesMap[spaceRoleUserId] = [role];
+    }
+    else {
+      userRolesMap[spaceRoleUserId].push(role);
+    }
+  });
+
   const visibleProperties = await getMemberPropertiesBySpace(userId, spaceId);
+  const roleMemberProperty = visibleProperties.find(visibleProperty => visibleProperty.type === 'role');
 
   const members = spaceRoles.map((spaceRole): Member => {
-    const { memberPropertyValues = [], ...userData } = spaceRole.user;
-
+    const { memberPropertyValues = [], id, ...userData } = spaceRole.user;
+    if (roleMemberProperty) {
+      memberPropertyValues.push({
+        memberPropertyId: roleMemberProperty.id,
+        value: userRolesMap[id] as any,
+        userId: id,
+        ...roleMemberProperty
+      });
+    }
     return {
+      id,
       ...userData,
       addresses: [],
       isAdmin: spaceRole.isAdmin,

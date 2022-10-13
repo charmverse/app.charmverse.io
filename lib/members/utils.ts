@@ -2,7 +2,7 @@ import type { MemberProperty, MemberPropertyValue } from '@prisma/client';
 
 import type { PropertyValue } from 'lib/members/interfaces';
 
-export function getPropertiesWithValues (properties: MemberProperty[], propertyValues: MemberPropertyValue[]): PropertyValue[] {
+export function getPropertiesWithValues (properties: MemberProperty[], propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[]): PropertyValue[] {
   return properties.map(({ id, type, name }) => ({
     id,
     type,
