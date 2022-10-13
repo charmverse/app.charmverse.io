@@ -98,60 +98,58 @@ export default function MemberDirectoryPage () {
           <MoreHoriz color='secondary' />
         </IconButton>
       </Stack>
-      <div className={`container-container ${isPropertiesDrawerVisible ? 'sidebar-visible' : ''}`}>
-        <Box position='relative' display='flex'>
-          <Box width='100%'>
-            {currentView === 'table' && (
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    {properties.map(property => <StyledTableCell key={property.name}>{property.name}</StyledTableCell>)}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {members.map(member => {
-                    return (
-                      <TableRow key={member.id}>
-                        {properties.map(property => {
-                          const memberProperty = member.properties.find(_property => _property.id === property.id);
-                          if (memberProperty) {
-                            return (
-                              <TableCell key={property.id}>
-                                {memberProperty.value}
-                              </TableCell>
-                            );
-                          }
-                          return null;
-                        })}
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            )}
-          </Box>
-          <ClickAwayListener mouseEvent={false} onClickAway={() => setIsPropertiesDrawerVisible(false)}>
-            <Collapse in={isPropertiesDrawerVisible} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
-              <StyledSidebar>
-                <Button
-                  variant='text'
-                  size='small'
-                  color='secondary'
-                  startIcon={<AddIcon />}
-                  onClick={addMemberPropertyPopupState.open}
-                >
-                  Add Property
-                </Button>
-                {properties.map(property => (
-                  <Box>
-                    {property.name}
-                  </Box>
-                ))}
-              </StyledSidebar>
-            </Collapse>
-          </ClickAwayListener>
+      <Box position='relative' display='flex' minHeight={500} height='100%'>
+        <Box width='100%'>
+          {currentView === 'table' && (
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  {properties.map(property => <StyledTableCell key={property.name}>{property.name}</StyledTableCell>)}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {members.map(member => {
+                  return (
+                    <TableRow key={member.id}>
+                      {properties.map(property => {
+                        const memberProperty = member.properties.find(_property => _property.id === property.id);
+                        if (memberProperty) {
+                          return (
+                            <TableCell key={property.id}>
+                              {memberProperty.value}
+                            </TableCell>
+                          );
+                        }
+                        return null;
+                      })}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
         </Box>
-      </div>
+        <ClickAwayListener mouseEvent={false} onClickAway={() => setIsPropertiesDrawerVisible(false)}>
+          <Collapse in={isPropertiesDrawerVisible} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
+            <StyledSidebar>
+              <Button
+                variant='text'
+                size='small'
+                color='secondary'
+                startIcon={<AddIcon />}
+                onClick={addMemberPropertyPopupState.open}
+              >
+                Add Property
+              </Button>
+              {properties.map(property => (
+                <Box>
+                  {property.name}
+                </Box>
+              ))}
+            </StyledSidebar>
+          </Collapse>
+        </ClickAwayListener>
+      </Box>
       <Menu
         {...bindMenu(addMemberPropertyPopupState)}
         sx={{
@@ -163,6 +161,7 @@ export default function MemberDirectoryPage () {
             key={memberPropertyLabel}
             onClick={() => {
               setSelectedPropertyType(memberPropertyValue as MemberPropertyType);
+              setPropertyName(memberPropertyLabel);
               addMemberPropertyPopupState.close();
               propertyNamePopupState.open();
             }}
@@ -173,19 +172,26 @@ export default function MemberDirectoryPage () {
       </Menu>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
         <Box>
-          <TextField value={propertyName} onChange={(e) => setPropertyName(e.target.value)} autoFocus />
-          <Button onClick={async () => {
-            if (propertyName && selectedPropertyType) {
-              await addProperty({
-                index: properties.length,
-                name: propertyName,
-                options: null,
-                type: selectedPropertyType
-              });
-              setPropertyName('');
-              propertyNamePopupState.close();
-            }
-          }}
+          <TextField
+            error={!propertyName || !selectedPropertyType}
+            value={propertyName}
+            onChange={(e) => setPropertyName(e.target.value)}
+            autoFocus
+          />
+          <Button
+            disabled={!propertyName || !selectedPropertyType}
+            onClick={async () => {
+              if (propertyName && selectedPropertyType) {
+                await addProperty({
+                  index: properties.length,
+                  name: propertyName,
+                  options: null,
+                  type: selectedPropertyType
+                });
+                setPropertyName('');
+                propertyNamePopupState.close();
+              }
+            }}
           >Add
           </Button>
         </Box>
