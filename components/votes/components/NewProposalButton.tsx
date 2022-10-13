@@ -1,5 +1,5 @@
-import Box from '@mui/material/Box';
-import Tooltip from '@mui/material/Tooltip';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -29,7 +29,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   const { mutate } = useTasks();
 
   // MUI Menu specific content
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
   const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
@@ -103,20 +103,14 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
     <>
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
-          <Button disabled={!canCreateProposal} ref={buttonRef} onClick={onClickCreate}>
-            Create Proposal
-            <Box
-            // Negative right margin fixes issue with too much whitespace on right of button
-              pl={1}
-              mr={-2}
-              onClick={e => {
-                e.stopPropagation();
-                popupState.open();
-              }}
-            >
-              <DownIcon />
-            </Box>
-          </Button>
+          <ButtonGroup variant='contained' ref={buttonRef}>
+            <Button disabled={!canCreateProposal} onClick={onClickCreate}>
+              Create Proposal
+            </Button>
+            <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
+              <KeyboardArrowDown />
+            </Button>
+          </ButtonGroup>
         </Box>
       </Tooltip>
       <TemplatesMenu
