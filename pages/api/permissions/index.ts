@@ -1,10 +1,10 @@
 
 import type { PagePermission } from '@prisma/client';
-import { Page, PrismaPromise, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import { PageNotFoundError, resolvePageTree } from 'lib/pages/server';
@@ -108,6 +108,8 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
       }
     }
 
+    updateTrackPageProfile(pageId);
+
     return newPermission;
   });
 
@@ -148,6 +150,8 @@ async function removePagePermission (req: NextApiRequest, res: NextApiResponse) 
   }
 
   await deletePagePermission(permissionId);
+
+  updateTrackPageProfile(permission.pageId);
 
   return res.status(200).json({
     success: true

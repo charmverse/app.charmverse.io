@@ -72,7 +72,8 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
       approveSubmitters: true,
       spaceId: true,
       rewardAmount: true,
-      rewardToken: true
+      rewardToken: true,
+      page: true
     }
   });
 
@@ -98,8 +99,8 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
     userId: req.session.user.id
   });
 
-  const { spaceId, rewardAmount, rewardToken } = bountySpaceId;
-  trackUserAction('bounty_application', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
+  const { spaceId, rewardAmount, rewardToken, page } = bountySpaceId;
+  trackUserAction('bounty_application', { userId, spaceId, pageId: page?.id || '', rewardAmount, rewardToken, resourceId: bountyId });
 
   return res.status(201).json(createdApplication);
 }

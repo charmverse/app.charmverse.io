@@ -1,5 +1,6 @@
 import { prisma } from 'db'
 import { getTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { getTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { getTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { sessionUserRelations } from 'lib/session/config';
 import { chunk } from 'lodash';
@@ -119,5 +120,47 @@ async function updateMixpanelUserProfiles() {
   }
 }
 
-updateMixpanelGroupProfiles()
-updateMixpanelUserProfiles()
+async function updateMixpanelPageProfiles() {
+  // Group by page
+  const pages = await prisma.page.findMany({ where: { deletedAt: null }, include: { permissions: true }});
+
+  const profiles = pages.map(page => ({
+    $token: MIXPANEL_API_KEY,
+    $group_key: "Page Id",
+    $group_id: page.id,
+    $set: getTrackPageProfile(page)
+  }))
+
+  // Mixpanel batch group update limit - 200
+  // https://developer.mixpanel.com/reference/limits-1
+  const chunks = chunk(profiles, 200);
+  console.log('🔥', 'Number of page profile chunks:', chunks.length);
+
+  const promises = chunks.map(async profilesChunk => {
+    // Batch update
+    // https://developer.mixpanel.com/reference/group-batch-update
+    const res = await fetch('https://api.mixpanel.com/groups#group-batch-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/plain'
+      },
+      body: JSON.stringify(profilesChunk)
+    })
+
+    return await res.json() as number
+  });
+
+
+  const results = await Promise.all(promises)
+
+  if (results.every(r => r === 1)) {
+    console.log('🔥', `Updated ${pages.length} group profiles successfully.`);
+  } else {
+    console.log('❌', 'Failed to update some of group profiles.');
+  }
+}
+
+updateMixpanelPageProfiles()
+// updateMixpanelGroupProfiles()
+// updateMixpanelUserProfiles()

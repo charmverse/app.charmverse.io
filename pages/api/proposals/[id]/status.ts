@@ -30,7 +30,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      page: true
     }
   });
 
@@ -54,7 +55,7 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     userId
   });
 
-  trackUserAction('new_proposal_stage', { userId, resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
+  trackUserAction('new_proposal_stage', { userId, pageId: proposal.page?.id || '', resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
 
   return res.status(200).send(updatedProposal.proposal);
 }
