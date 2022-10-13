@@ -7,6 +7,6 @@ export function getPropertiesWithValues (properties: MemberProperty[], propertyV
     id,
     type,
     name,
-    value: propertyValues.find(pv => pv.id === id)?.value || null
+    value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null
   }));
 }
