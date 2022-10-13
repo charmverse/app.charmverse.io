@@ -1,14 +1,14 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
 import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import type { Proposal } from '@prisma/client';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
-import type { SnapshotProposal, SnapshotVote } from 'lib/snapshot';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { SnapshotProposal } from 'lib/snapshot';
 import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
 import { coerceToMilliseconds, humanFriendlyDate, relativeTime } from 'lib/utilities/dates';
 import { percent } from 'lib/utilities/numbers';
@@ -17,23 +17,15 @@ import { StyledFormControl, VotesWrapper } from './VotesWrapper';
 
 type Props = {
   snapshotProposalId: string;
-  proposalId: string;
 }
 
-export function SnapshotVoteDetails ({ snapshotProposalId, proposalId }: Props) {
-
-  const [proposal, setProposal] = useState<Proposal | null>(null);
+export function SnapshotVoteDetails ({ snapshotProposalId }: Props) {
+  const { account } = useWeb3AuthSig();
   const [snapshotProposal, setSnapshotProposal] = useState<SnapshotProposal | null>(null);
-  const [userVotes, setUserVotes] = useState<SnapshotVote[]>([]);
+  const { data: userVotes } = useSWR(account ? `snapshotUserVotes-${account}` : null, () => getUserProposalVotes({ walletAddress: account as string, snapshotProposalId }));
   const [loading, setLoading] = useState(true);
 
   const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
-
-  // Address to use for getting votes (95K aave)
-  const account = '0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b';
-
-  // For the active proposal
-  //  const account = '0x344d5A4da2329A885b24aeC4C8937e20Cd67b112';
 
   // Either the number of votes or tokens
 
@@ -46,29 +38,18 @@ export function SnapshotVoteDetails ({ snapshotProposalId, proposalId }: Props) 
       .then((_snapshotProposal) => {
         setSnapshotProposal(_snapshotProposal);
         setLoading(false);
-
-        getUserProposalVotes({ proposalId: snapshotProposalId, walletAddress: account })
-          .then(foundVotes => setUserVotes(foundVotes));
       });
-
-    charmClient.proposals.getProposal(proposalId)
-      .then(_proposal => setProposal(_proposal));
-
   }, []);
+
+  useEffect(() => {
+
+  }, [account]);
 
   const hasPassedDeadline = proposalEndDate < Date.now();
 
-  useEffect(() => {
-    if (snapshotProposal && hasPassedDeadline && proposal) {
-      charmClient.proposals.updateStatus(proposalId, 'vote_closed')
-        .then(updatedProposal => {
-          setProposal(updatedProposal);
-        });
-    }
-  }, [snapshotProposal, proposal]);
   const remainingTime = relativeTime(proposalEndDate);
 
-  const currentUserChoices = userVotes.map(v => voteChoices[v.choice - 1]).join(',');
+  const currentUserChoices = (userVotes ?? []).map(v => voteChoices[v.choice - 1]).join(',');
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>

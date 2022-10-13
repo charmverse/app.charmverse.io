@@ -197,7 +197,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               />
               {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                 <Box my={2}>
-                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} proposalId={page.proposalId as string} />
+                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
                 </Box>
               )}
               {page.type === 'proposal' && !isLoading && pageVote && (

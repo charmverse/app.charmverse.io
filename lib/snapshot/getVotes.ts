@@ -11,17 +11,17 @@ export type SnapshotVote = {
 }
 
 interface UserVoteRequest {
-  proposalId: string;
+  snapshotProposalId: string;
   walletAddress: string;
 }
 
-export async function getUserProposalVotes ({ proposalId, walletAddress }: UserVoteRequest): Promise<SnapshotVote[]> {
+export async function getUserProposalVotes ({ snapshotProposalId, walletAddress }: UserVoteRequest): Promise<SnapshotVote[]> {
   const { data } = await client.query({
     query: gql`
     query Votes {
       votes(
         where: {
-          proposal: "${proposalId}"
+          proposal: "${snapshotProposalId}"
           voter: "${walletAddress}"
         },
         orderBy: "created",
