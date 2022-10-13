@@ -41,6 +41,7 @@ const StepperIcon = styled.div<{ isCurrent: boolean, isEnabled: boolean }>(({ th
     ? theme.palette.purple.main
     : isEnabled
       ? theme.palette.teal.main : theme.palette.gray.main};
+  transition: background-color 150ms ease-in-out;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -48,22 +49,30 @@ const StepperIcon = styled.div<{ isCurrent: boolean, isEnabled: boolean }>(({ th
   cursor: ${isEnabled ? 'pointer' : 'default'};
   position: relative;
 
-  // disable hover UX on ios which converts first click to a hover event
-  @media (pointer: fine) {
+  ${!isCurrent && isEnabled && `
+    // disable hover UX on ios which converts first click to a hover event
+    @media (pointer: fine) {
 
-    &:hover::before  {
-      border-radius: 100%;
-      content: '';
-      display: block;
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      ${!isCurrent && isEnabled && `
-        box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.main};
-      `}
+      &::before {
+        border-radius: 100%;
+        content: '';
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${theme.palette.teal.dark};
+        opacity: 0;
+        transition: opacity 150ms ease-in-out;
+      }
+
+      &:hover {
+        background-color: ${theme.palette.teal.dark};
+        &::before  {
+          opacity: 1;
+        }
+      }
     }
-  }
-
+  `}
 `);
 
 export default function ProposalStepper ({ refreshProposal, proposal, proposalUserGroups }: StepperContainerProps) {
