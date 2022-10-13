@@ -33,6 +33,7 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
@@ -265,19 +266,21 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <MembersProvider>
-          <BountiesProvider>
-            <PaymentMethodsProvider>
-              <PagesProvider>
-                <PrimaryCharmEditorProvider>
-                  <PageTitleProvider>
-                    {children}
-                  </PageTitleProvider>
-                </PrimaryCharmEditorProvider>
-              </PagesProvider>
-            </PaymentMethodsProvider>
-          </BountiesProvider>
-        </MembersProvider>
+        <MemberPropertiesProvider>
+          <MembersProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PrimaryCharmEditorProvider>
+                    <PageTitleProvider>
+                      {children}
+                    </PageTitleProvider>
+                  </PrimaryCharmEditorProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </MembersProvider>
+        </MemberPropertiesProvider>
       </SpacesProvider>
     </UserProvider>
 

@@ -39,6 +39,10 @@ export class MembersApi {
     return http.GET<MemberProperty[]>(`/api/spaces/${spaceId}/members/properties`);
   }
 
+  createMemberProperty (spaceId: string, property: Partial<MemberProperty>) {
+    return http.POST<MemberProperty>(`/api/spaces/${spaceId}/members/properties`, property);
+  }
+
   getWorkspaceMembers (workspaceId: string) {
     // return http.POST<WorkspaceMembers>(`/api/space/${workspaceId}/members`);
     return getWorkspaceMembers();
