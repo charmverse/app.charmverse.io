@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyValue } from '@prisma/client';
+import type { MemberProperty, MemberPropertyType, MemberPropertyValue } from '@prisma/client';
 
 import type { PropertyValue } from 'lib/members/interfaces';
 
@@ -20,11 +20,19 @@ export const DEFAULT_MEMBER_PROPERTIES = [
   'timezone'
 ] as const;
 
-export const defaultMemberPropertiesLabel: Record<typeof DEFAULT_MEMBER_PROPERTIES[number], string> = {
+export const MemberPropertyTypesLabel: Record<MemberPropertyType, string> = {
   discord: 'Discord',
   name: 'Name',
   profile_pic: 'Profile pic',
   role: 'Role',
   timezone: 'Timezone',
-  twitter: 'Twitter'
+  twitter: 'Twitter',
+  email: 'Email',
+  multiselect: 'Multi-select',
+  number: 'Number',
+  phone: 'Phone',
+  select: 'Select',
+  text: 'Text',
+  url: 'URL',
+  wallet_address: 'Wallet address'
 };

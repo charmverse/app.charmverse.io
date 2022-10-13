@@ -1,25 +1,10 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AddIcon from '@mui/icons-material/Add';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import EditIcon from '@mui/icons-material/Edit';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import LinkIcon from '@mui/icons-material/Link';
-import ListIcon from '@mui/icons-material/List';
-import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-import NumbersIcon from '@mui/icons-material/Numbers';
-import PhoneIcon from '@mui/icons-material/Phone';
-import SubjectIcon from '@mui/icons-material/Subject';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import { Box, Chip, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
+import { Box, Chip, ClickAwayListener, Collapse, IconButton, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
-import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
@@ -28,70 +13,10 @@ import Modal from 'components/common/Modal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/utils';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import { DEFAULT_MEMBER_PROPERTIES, MemberPropertyTypesLabel } from 'lib/members/utils';
 
-const memberPropertiesRecord: Record<MemberPropertyType, {
-  label: string;
-  icon: ReactNode;
-}> = {
-  text: {
-    label: 'Text',
-    icon: <SubjectIcon fontSize='small' />
-  },
-  number: {
-    label: 'Number',
-    icon: <NumbersIcon fontSize='small' />
-  },
-  phone: {
-    label: 'Phone',
-    icon: <PhoneIcon fontSize='small' />
-  },
-  url: {
-    label: 'URL',
-    icon: <LinkIcon fontSize='small' />
-  },
-  email: {
-    label: 'Email',
-    icon: <AlternateEmailIcon fontSize='small' />
-  },
-  wallet_address: {
-    label: 'Wallet',
-    icon: <AccountBalanceWalletIcon fontSize='small' />
-  },
-  select: {
-    label: 'Select',
-    icon: <FormatListBulletedIcon fontSize='small' />
-  },
-  multiselect: {
-    label: 'Multi-select',
-    icon: <ListIcon fontSize='small' />
-  },
-  role: {
-    label: 'Role',
-    icon: <MilitaryTechIcon fontSize='small' />
-  },
-  profile_pic: {
-    label: 'Profile pic',
-    icon: <InsertPhotoIcon fontSize='small' />
-  },
-  timezone: {
-    label: 'Timezone',
-    icon: <AccessTimeIcon fontSize='small' />
-  },
-  discord: {
-    label: 'Discord',
-    icon: <DiscordIcon width={18.5} height={18.5} />
-  },
-  twitter: {
-    label: 'Twitter',
-    icon: <TwitterIcon fontSize='small' />
-  },
-  name: {
-    label: 'Name',
-    icon: <DriveFileRenameOutlineIcon fontSize='small' />
-  }
-};
+import { AddMemberPropertyButton } from './AddMemberPropertyButton';
+import { MemberPropertyItem } from './MemberPropertyItem';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -127,7 +52,6 @@ export default function MemberDirectoryPage () {
   const { properties, addProperty, deleteProperty, updateProperty } = useMemberProperties();
   const [currentView, setCurrentView] = useState<typeof views[number]>('table');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
   const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
@@ -226,10 +150,10 @@ export default function MemberDirectoryPage () {
                     }}
                     alignItems='center'
                   >
-                    <Box display='flex' gap={1} alignItems='center'>
-                      {memberPropertiesRecord[property.type].icon}
-                      <Typography variant='body2'>{property.name}</Typography>
-                    </Box>
+                    <MemberPropertyItem
+                      type={property.type}
+                      name={property.name}
+                    />
                     <Box
                       display='flex'
                       gap={0.5}
@@ -262,43 +186,17 @@ export default function MemberDirectoryPage () {
                   </Box>
                 ))}
               </Stack>
-              <Button
-                variant='text'
-                size='small'
-                color='secondary'
-                startIcon={<AddIcon />}
-                onClick={addMemberPropertyPopupState.open}
-              >
-                Add Property
-              </Button>
+              <AddMemberPropertyButton
+                onClick={(memberPropertyType) => {
+                  setSelectedPropertyType(memberPropertyType as MemberPropertyType);
+                  setPropertyName(MemberPropertyTypesLabel[memberPropertyType]);
+                  propertyNamePopupState.open();
+                }}
+              />
             </StyledSidebar>
           </Collapse>
         </ClickAwayListener>
       </Box>
-      <Menu
-        {...bindMenu(addMemberPropertyPopupState)}
-        sx={{
-          width: '100%'
-        }}
-      >
-        {Object.entries(memberPropertiesRecord).map(([memberPropertyValue, { icon, label }]) => (
-          <MenuItem
-            key={label}
-            onClick={() => {
-              setSelectedPropertyType(memberPropertyValue as MemberPropertyType);
-              setPropertyName(label);
-              addMemberPropertyPopupState.close();
-              propertyNamePopupState.open();
-            }}
-            sx={{
-              gap: 1
-            }}
-          >
-            {icon}
-            <Typography>{label}</Typography>
-          </MenuItem>
-        ))}
-      </Menu>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
         <Box>
           <TextField
