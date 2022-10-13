@@ -3,6 +3,7 @@ import cron from 'node-cron';
 import log from 'lib/log';
 
 import app from './server/app';
+import { closeOutSnapshotProposalsTask } from './tasks/closeOutSnapshotProposals';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as notificationTask } from './tasks/sendNotifications';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -17,6 +18,9 @@ cron.schedule('0 * * * *', notificationTask);
 
 // Update votes status
 cron.schedule('0 */30 * * * *', voteTask);
+
+// Close out snapshot proposals
+cron.schedule('0 */15 * * * *', closeOutSnapshotProposalsTask);
 
 const port = process.env.PORT || 4000;
 

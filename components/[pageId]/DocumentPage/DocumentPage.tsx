@@ -12,6 +12,7 @@ import CommentsList from 'components/common/BoardEditor/focalboard/src/component
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -190,6 +191,11 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                 readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
+              {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+                <Box my={2}>
+                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
+                </Box>
+              )}
               {page.type === 'proposal' && !isLoading && pageVote && (
                 <Box my={2}>
                   <VoteDetail

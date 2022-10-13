@@ -5,7 +5,6 @@ import { generateAndMockTokenGateRequests } from '__e2e__/utils/tokenGates';
 import { mockWeb3 } from '__e2e__/utils/web3';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
 
 import { generateUserAndSpace } from '../../utils/mocks';
 
@@ -17,8 +16,8 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({ page, tokenGatePage }) => {
-  const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace();
+test('tokenGates - token gate verify wallet shows error if no condition is met', async ({ page, tokenGatePage }) => {
+  const { space, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
 
   await mockWeb3({
@@ -41,30 +40,16 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
     space,
     page,
     userId: user.id,
-    spaceUserId: spaceUser.id
+    spaceUserId: spaceUser.id,
+    canJoinSpace: false
   });
 
   const workspacePath = `/${space.domain}`;
 
   // go to a page to which we don't have access
   await page.goto(`${baseUrl}${workspacePath}`);
-
-  // wait for token gate page to open for the workspace
   await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
   await tokenGatePage.verifyWalletButton.click();
-  await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
-  await tokenGatePage.joinWorkspaceButton.click();
-  // Joining a workspace creates a spaceRole
-  await prisma.$transaction([
-    prisma.spaceRole.create({
-      data: {
-        isAdmin: false,
-        spaceId: space.id,
-        userId: user.id
-      }
-    })
-  ]);
-  await page.goto(`${baseUrl}${workspacePath}`);
-  await page.locator(`text=${pageDoc.title}`).first().waitFor({ state: 'visible' });
+  await expect(tokenGatePage.tokenGateFailureState).toBeVisible();
 });
