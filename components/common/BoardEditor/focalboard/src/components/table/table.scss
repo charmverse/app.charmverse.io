@@ -89,11 +89,9 @@
         border-bottom: 1px solid transparent;
         box-sizing: border-box;
         padding: 8px;
-        height: 44px;
         font-size: 14px;
         position: relative;
         text-overflow: ellipsis;
-
         &:hover {
             background-color: rgba(var(--center-channel-color-rgb), 0.05);
         }
