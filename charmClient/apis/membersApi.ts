@@ -1,4 +1,4 @@
-import type { User, MemberProperty, MemberPropertyValue, UserDetails } from '@prisma/client';
+import type { MemberProperty } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { Member } from 'lib/members/interfaces';
@@ -33,6 +33,10 @@ function getWorkspaceMembers (): WorkspaceMembers {
 export class MembersApi {
   getMembers (spaceId: string) {
     return http.GET<Member[]>(`/api/spaces/${spaceId}/members`);
+  }
+
+  getMemberProperties (spaceId: string) {
+    return http.GET<MemberProperty[]>(`/api/spaces/${spaceId}/members/properties`);
   }
 
   getWorkspaceMembers (workspaceId: string) {
