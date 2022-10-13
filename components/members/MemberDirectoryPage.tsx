@@ -1,11 +1,14 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, ClickAwayListener, Collapse, IconButton, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, IconButton, Menu, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, TextField, Typography } from '@mui/material';
+import type { MemberPropertyType } from '@prisma/client';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
@@ -39,11 +42,30 @@ const StyledSidebar = styled.div`
 
 const views = ['table', 'gallery'] as const;
 
+const memberPropertiesLabel: Record<MemberPropertyType, string> = {
+  text: 'Text',
+  number: 'Number',
+  phone: 'Phone',
+  url: 'URL',
+  email: 'Email',
+  wallet: 'Wallet',
+  select: 'Select',
+  multiselect: 'Multi-select',
+  role: 'Role',
+  profile_pic: 'Profile pic',
+  timezone: 'Timezone',
+  wallet_address: 'Wallet address'
+};
+
 export default function MemberDirectoryPage () {
   const { members } = useMembers();
-  const { properties } = useMemberProperties();
+  const { properties, addProperty } = useMemberProperties();
   const [currentView, setCurrentView] = useState<typeof views[number]>('table');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
+  const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
+  const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
+  const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
+  const [propertyName, setPropertyName] = useState('');
   return properties && members ? (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>Member Directory</Typography>
@@ -83,7 +105,7 @@ export default function MemberDirectoryPage () {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    {properties.map(property => <StyledTableCell>{property.name}</StyledTableCell>)}
+                    {properties.map(property => <StyledTableCell key={property.name}>{property.name}</StyledTableCell>)}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -116,6 +138,7 @@ export default function MemberDirectoryPage () {
                   size='small'
                   color='secondary'
                   startIcon={<AddIcon />}
+                  onClick={addMemberPropertyPopupState.open}
                 >
                   Add Property
                 </Button>
@@ -129,6 +152,44 @@ export default function MemberDirectoryPage () {
           </ClickAwayListener>
         </Box>
       </div>
+      <Menu
+        {...bindMenu(addMemberPropertyPopupState)}
+        sx={{
+          width: '100%'
+        }}
+      >
+        {Object.entries(memberPropertiesLabel).map(([memberPropertyValue, memberPropertyLabel]) => (
+          <MenuItem
+            key={memberPropertyLabel}
+            onClick={() => {
+              setSelectedPropertyType(memberPropertyValue as MemberPropertyType);
+              addMemberPropertyPopupState.close();
+              propertyNamePopupState.open();
+            }}
+          >
+            <Typography textTransform='capitalize'>{memberPropertyLabel}</Typography>
+          </MenuItem>
+        ))}
+      </Menu>
+      <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
+        <Box>
+          <TextField value={propertyName} onChange={(e) => setPropertyName(e.target.value)} autoFocus />
+          <Button onClick={async () => {
+            if (propertyName && selectedPropertyType) {
+              await addProperty({
+                index: properties.length,
+                name: propertyName,
+                options: null,
+                type: selectedPropertyType
+              });
+              setPropertyName('');
+              propertyNamePopupState.close();
+            }
+          }}
+          >Add
+          </Button>
+        </Box>
+      </Modal>
     </CenteredPageContent>
   ) : null;
 }

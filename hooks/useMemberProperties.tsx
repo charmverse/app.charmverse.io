@@ -4,12 +4,13 @@ import { useCallback, createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import type { CreateMemberPropertyPayload } from 'pages/api/spaces/[id]/members/properties';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   properties: MemberProperty[] | undefined;
-  addProperty: (property: Partial<MemberProperty>) => Promise<MemberProperty>;
+  addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
   updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<MemberProperty>;
   deleteProperty: (id: string) => Promise<void>;
 };
@@ -28,7 +29,7 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
     return charmClient.members.getMemberProperties(space!.id);
   });
 
-  const addProperty = useCallback(async (propertyData: Partial<MemberProperty>) => {
+  const addProperty = useCallback(async (propertyData: CreateMemberPropertyPayload) => {
     if (space) {
       const createdProperty = await charmClient.members.createMemberProperty(space.id, propertyData);
       mutateProperties(state => {

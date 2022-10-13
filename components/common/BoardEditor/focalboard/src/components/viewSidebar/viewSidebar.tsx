@@ -5,9 +5,9 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
-import { Box, ClickAwayListener, Portal, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
-import { useEffect, useState, memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
