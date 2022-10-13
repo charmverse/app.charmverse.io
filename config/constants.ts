@@ -3,3 +3,5 @@ export const isTestEnv = process.env.APP_ENV === 'test';
 export const isDevEnv = process.env.NODE_ENV === 'development' && !isTestEnv;
 export const isProdEnv = process.env.NODE_ENV === 'production' && !isTestEnv;
 export const baseUrl = process.env.DOMAIN as string;
+export const socketsPort = process.env.NEXT_PUBLIC_SOCKETS_PORT;
+export const socketsHost = `${process.env.NEXT_PUBLIC_SOCKETS_HOST}${socketsPort ? `:${socketsPort}` : ''}`;

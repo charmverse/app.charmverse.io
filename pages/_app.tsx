@@ -39,6 +39,7 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
@@ -262,25 +263,25 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-
-    <UserProvider>
-      <SpacesProvider>
-        <MembersProvider>
-          <BountiesProvider>
-            <PaymentMethodsProvider>
-              <PagesProvider>
-                <PrimaryCharmEditorProvider>
-                  <PageTitleProvider>
-                    {children}
-                  </PageTitleProvider>
-                </PrimaryCharmEditorProvider>
-              </PagesProvider>
-            </PaymentMethodsProvider>
-          </BountiesProvider>
-        </MembersProvider>
-      </SpacesProvider>
-    </UserProvider>
-
+    <WebSocketClientProvider>
+      <UserProvider>
+        <SpacesProvider>
+          <MembersProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PrimaryCharmEditorProvider>
+                    <PageTitleProvider>
+                      {children}
+                    </PageTitleProvider>
+                  </PrimaryCharmEditorProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </MembersProvider>
+        </SpacesProvider>
+      </UserProvider>
+    </WebSocketClientProvider>
   );
 }
 
