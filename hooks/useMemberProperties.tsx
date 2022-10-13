@@ -1,6 +1,6 @@
 import type { MemberProperty } from '@prisma/client';
 import type { ReactNode } from 'react';
-import { useCallback, createContext, useContext, useMemo } from 'react';
+import { useEffect, useCallback, createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -9,10 +9,16 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
   properties: MemberProperty[] | undefined;
+  addProperty: (property: Partial<MemberProperty>) => Promise<MemberProperty>;
+  updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<MemberProperty>;
+  deleteProperty: (id: string) => Promise<void>;
 };
 
 const MemberPropertiesContext = createContext<Readonly<Context>>({
-  properties: undefined
+  properties: undefined,
+  addProperty: () => Promise.resolve({} as any),
+  updateProperty: () => Promise.resolve({} as any),
+  deleteProperty: () => Promise.resolve()
 });
 
 export function MemberPropertiesProvider ({ children }: { children: ReactNode }) {
@@ -28,10 +34,38 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
       mutateProperties(state => {
         return state ? [...state, createdProperty] : [createdProperty];
       });
+
+      return createdProperty;
     }
   }, [space]);
 
-  const value = useMemo(() => ({ properties, addProperty }) as Context, [properties, addProperty]);
+  const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }) => {
+    if (space) {
+      const updatedProperty = await charmClient.members.updateMemberProperty(space.id, propertyData);
+      mutateProperties(state => {
+        return state ? state.map(p => p.id === updatedProperty.id ? { ...updatedProperty } : p) : [updatedProperty];
+      });
+
+      return updatedProperty;
+    }
+  }, [space]);
+
+  const deleteProperty = useCallback(async (id: string) => {
+    if (space) {
+      await charmClient.members.deleteMemberProperty(space.id, id);
+      mutateProperties(state => {
+        return state ? state.filter(p => p.id !== id) : undefined;
+      });
+    }
+  }, [space]);
+
+  useEffect(() => {
+    if (space && space.id) {
+      deleteProperty('cfd1e4bc-403e-49bb-91b4-9d923cc09464');
+    }
+  }, [space]);
+
+  const value = useMemo(() => ({ properties, addProperty, updateProperty, deleteProperty }) as Context, [properties, addProperty]);
 
   return (
     <MemberPropertiesContext.Provider value={value}>

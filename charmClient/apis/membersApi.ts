@@ -43,6 +43,14 @@ export class MembersApi {
     return http.POST<MemberProperty>(`/api/spaces/${spaceId}/members/properties`, property);
   }
 
+  updateMemberProperty (spaceId: string, { id, ...property }: Partial<MemberProperty> & { id: string }) {
+    return http.PUT<MemberProperty>(`/api/spaces/${spaceId}/members/properties/${id}`, property);
+  }
+
+  deleteMemberProperty (spaceId: string, id: string) {
+    return http.DELETE<MemberProperty>(`/api/spaces/${spaceId}/members/properties/${id}`);
+  }
+
   getWorkspaceMembers (workspaceId: string) {
     // return http.POST<WorkspaceMembers>(`/api/space/${workspaceId}/members`);
     return getWorkspaceMembers();
