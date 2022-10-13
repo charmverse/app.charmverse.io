@@ -161,7 +161,7 @@
             text-overflow: ellipsis;
 
             .Label {
-                margin: 0 5px;
+                margin: 2px 5px;
                 padding: 0 8px;
             }
         }
@@ -169,7 +169,6 @@
         .Editable,
         .octo-propertyvalue {
             text-align: left;
-            white-space: nowrap;
             width: inherit;
         }
     }
