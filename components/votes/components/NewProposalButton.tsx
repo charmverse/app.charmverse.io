@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
@@ -101,7 +101,6 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   return (
 
     <>
-
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
           <Button disabled={!canCreateProposal} ref={buttonRef} onClick={onClickCreate}>
