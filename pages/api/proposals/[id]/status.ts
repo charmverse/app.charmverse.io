@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -17,7 +18,7 @@ handler.use(requireUser)
   .use(requireKeys(['newStatus'], 'body'))
   .put(updateProposalStatusController);
 
-async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<{ newStatus: ProposalStatus }>) {
+async function updateProposalStatusController (req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
   const newStatus = req.body.newStatus as ProposalStatus;
@@ -29,7 +30,8 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      page: true
     }
   });
 
@@ -47,15 +49,15 @@ async function updateProposalStatusController (req: NextApiRequest, res: NextApi
     throw new UnauthorisedActionError();
   }
 
-  await updateProposalStatus({
-    proposal,
+  const updatedProposal = await updateProposalStatus({
+    proposalId: proposal.id,
     newStatus,
     userId
   });
 
-  trackUserAction('new_proposal_stage', { userId, resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
+  trackUserAction('new_proposal_stage', { userId, pageId: proposal.page?.id || '', resourceId: proposalId, status: newStatus, spaceId: proposal.spaceId });
 
-  return res.status(200).end();
+  return res.status(200).send(updatedProposal.proposal);
 }
 
 export default withSessionRoute(handler);

@@ -81,7 +81,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     }
 
     const types: IntegrationModel[] = [];
-    if (user?.wallets) {
+    if (user?.wallets.length !== 0) {
       types.push({
         type: IDENTITY_TYPES[0],
         username: ENSName || user.wallets[0].address,

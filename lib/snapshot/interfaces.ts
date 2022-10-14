@@ -39,6 +39,10 @@ export interface SnapshotProposal {
   state: SnapshotProposalState;
   author: string;
   space: Pick<SnapshotSpace, 'id' | 'name'>;
+  votes: number;
+  // List of numbers in same order as the scores
+  scores: number[];
+  scores_total: number;
 }
 
 export interface SnapshotReceipt {

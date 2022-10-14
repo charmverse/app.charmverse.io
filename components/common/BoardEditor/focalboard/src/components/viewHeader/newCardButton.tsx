@@ -1,5 +1,7 @@
 
+import { KeyboardArrowDown } from '@mui/icons-material';
 import Box from '@mui/material/Box';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
@@ -26,7 +28,7 @@ type Props = {
 const NewCardButton = React.memo(({ addCard, addCardFromTemplate, addCardTemplate, deleteCardTemplate, editCardTemplate, showCard, boardId }: Props):
   JSX.Element => {
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const buttonRef = React.useRef<HTMLDivElement>(null);
   const { pages, getPagePermissions } = usePages();
 
   const cardTemplatesPages = cardTemplates.map(c => pages[c.id]).filter(p => p !== undefined) as PageMeta[];
@@ -39,26 +41,15 @@ const NewCardButton = React.memo(({ addCard, addCardFromTemplate, addCardTemplat
 
   return (
     <>
-      <Button
-        sx={{ p: 0 }}
-        ref={buttonRef}
-      >
-        <Box
-          sx={{ pl: '15px' }}
-          onClick={() => {
-            addCard();
-          }}
-        >
+      <ButtonGroup variant='contained' ref={buttonRef}>
+        <Button onClick={addCard}>
           New
-        </Box>
+        </Button>
+        <Button size='small' onClick={popupState.open}>
+          <KeyboardArrowDown />
+        </Button>
+      </ButtonGroup>
 
-        <Box
-          sx={{ pl: 1 }}
-          {...bindTrigger(popupState)}
-        >
-          <DownIcon />
-        </Box>
-      </Button>
       <TemplatesMenu
         addPageFromTemplate={addCardFromTemplate}
         createTemplate={addCardTemplate}

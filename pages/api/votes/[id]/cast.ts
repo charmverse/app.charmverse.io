@@ -48,7 +48,7 @@ async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { 
   const newUserVote: UserVote = await castVoteService(choice, vote, userId);
 
   if (vote.context === 'proposal') {
-    trackUserAction('user_cast_a_vote', { userId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+    trackUserAction('user_cast_a_vote', { userId, spaceId: vote.spaceId, pageId: vote.pageId, resourceId: vote.id, platform: 'charmverse' });
   }
 
   return res.status(200).json(newUserVote);

@@ -5,11 +5,11 @@ import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 
-import BountiesEmptyState from './components/BountiesEmptyState';
 import BountiesKanbanView from './components/BountiesKanbanView';
 import MultiPaymentModal from './components/MultiPaymentModal';
 import NewBountyButton from './components/NewBountyButton';
@@ -86,7 +86,11 @@ export default function BountiesPage ({ publicMode = false, bounties }: Props) {
         <div className='container-container'>
           {bounties.length === 0
             ? (
-              <BountiesEmptyState />
+              <EmptyStateVideo
+                description='Getting started with bounties'
+                videoTitle='Bounties | Getting started with Charmverse'
+                videoUrl='https://tiny.charmverse.io/bounties'
+              />
             ) : (
               <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
             )}

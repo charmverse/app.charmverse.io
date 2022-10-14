@@ -19,6 +19,8 @@ import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 
+import { VotesWrapper } from './VotesWrapper';
+
 export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
@@ -27,11 +29,6 @@ export interface VoteDetailProps {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
 }
-
-const StyledDiv = styled.div<{ detailed: boolean }>`
-  background-color: ${({ theme, detailed }) => detailed && theme.palette.mode !== 'light' ? theme.palette.background.default : theme.palette.background.light};
-  padding: ${({ theme }) => theme.spacing(2)};
-`;
 
 const StyledFormControl = styled(FormControl)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -78,7 +75,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
   }
 
   return (
-    <StyledDiv detailed={detailed} id={`vote.${vote.id}`}>
+    <VotesWrapper detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold'>
           {!isProposal ? title : 'Poll on this proposal'}
@@ -92,7 +89,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
         >
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        <VoteStatusChip size='small' status={vote.status} />
+        <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
       {description && (
         <Box my={1} mb={2}>{isDescriptionAbove && !detailed ? (
@@ -209,6 +206,6 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
           deleteVote={deleteVote}
         />
       </Modal>
-    </StyledDiv>
+    </VotesWrapper>
   );
 }
