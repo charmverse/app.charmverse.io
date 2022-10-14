@@ -1,11 +1,9 @@
 import type { MemberProperty, Space } from '@prisma/client';
 import request from 'supertest';
 
-import { upsertPermission } from 'lib/permissions/pages';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 
 let space: Space;

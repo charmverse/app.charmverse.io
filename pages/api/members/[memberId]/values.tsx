@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
-  .put(updateMemberPropertyValuesHandler);
+  .post(updateMemberPropertyValuesHandler);
 
 async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
   const userId = req.session.user.id;
@@ -31,7 +31,7 @@ async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: Next
 
   const data = req.body as UpdateMemberPropertyValuePayload[];
 
-  const updatedPropertyValues = await updateMemberPropertyValues({ userId, spaceId, data });
+  const updatedPropertyValues = await updateMemberPropertyValues({ userId: memberId, spaceId, updatedBy: userId, data });
 
   return res.status(200).json(updatedPropertyValues);
 }
