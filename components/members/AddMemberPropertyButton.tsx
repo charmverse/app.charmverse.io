@@ -3,7 +3,7 @@ import { Button, Menu, MenuItem } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
-import { DEFAULT_MEMBER_PROPERTIES, MemberPropertyTypesLabel } from 'lib/members/utils';
+import { DEFAULT_MEMBER_PROPERTIES, DefaultMemberPropertyDict } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
 
@@ -31,7 +31,7 @@ export function AddMemberPropertyButton ({
           width: '100%'
         }}
       >
-        {Object.keys(MemberPropertyTypesLabel).map((memberPropertyType) => (
+        {Object.keys(DefaultMemberPropertyDict).map((memberPropertyType) => (
           !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
             <MenuItem
               key={memberPropertyType}

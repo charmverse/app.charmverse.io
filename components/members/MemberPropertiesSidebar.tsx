@@ -9,7 +9,7 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { DEFAULT_MEMBER_PROPERTIES, MemberPropertyTypesLabel } from 'lib/members/utils';
+import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 
 import { AddMemberPropertyButton } from './AddMemberPropertyButton';
 import { MemberPropertyItem } from './MemberPropertyItem';
@@ -136,7 +136,7 @@ export function MemberPropertiesSidebar ({
             <AddMemberPropertyButton
               onClick={(memberPropertyType) => {
                 setSelectedPropertyType(memberPropertyType as MemberPropertyType);
-                setPropertyName(MemberPropertyTypesLabel[memberPropertyType]);
+                setPropertyName(DefaultMemberPropertyDict[memberPropertyType]);
                 propertyNamePopupState.open();
               }}
             />

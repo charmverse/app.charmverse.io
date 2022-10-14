@@ -15,7 +15,7 @@ import { Box, Typography } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
-import { MemberPropertyTypesLabel } from 'lib/members/utils';
+import { DefaultMemberPropertyDict } from 'lib/members/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
@@ -45,7 +45,7 @@ export function MemberPropertyItem ({
   return (
     <Box display='flex' gap={1} alignItems='center'>
       {MemberPropertyIcons[type]}
-      <Typography variant='body2'>{name ?? MemberPropertyTypesLabel[type]}</Typography>
+      <Typography variant='body2'>{name ?? DefaultMemberPropertyDict[type]}</Typography>
     </Box>
   );
 }
