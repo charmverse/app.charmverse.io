@@ -9,7 +9,7 @@ const StyledTableCell = styled(TableCell)`
   border-bottom: 1px solid #000;
 `;
 
-export function MemberPropertiesTableView () {
+export function MemberDirectoryTableView () {
   const { properties = [] } = useMemberProperties();
   const { members } = useMembers();
 

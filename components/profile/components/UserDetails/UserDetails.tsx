@@ -68,7 +68,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const socialDetails: Social = userDetails?.social ? userDetails?.social as Social : {
+  const socialDetails: Social = userDetails?.social as Social ?? {
     twitterURL: '',
     githubURL: '',
     discordUsername: '',
