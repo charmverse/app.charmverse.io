@@ -24,7 +24,7 @@ export function DiscordSocialIcon (
     >
       <Box sx={{ display: 'initial', cursor: 'pointer' }}>
         <CopyToClipboard text={username} onCopy={onDiscordUsernameCopy}>
-          <Box width='fit-content'>
+          <Box>
             {showLogo && (
               <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
                 <DiscordIcon />

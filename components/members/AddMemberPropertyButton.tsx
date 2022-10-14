@@ -21,6 +21,9 @@ export function AddMemberPropertyButton ({
         size='small'
         color='secondary'
         startIcon={<AddIcon />}
+        sx={{
+          p: 1
+        }}
         onClick={addMemberPropertyPopupState.open}
       >
         Add Property

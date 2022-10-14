@@ -30,7 +30,10 @@ export default function MemberDirectoryPage () {
   const [currentView, setCurrentView] = useState<typeof views[number]>('gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   return properties && members ? (
-    <CenteredPageContent>
+    <CenteredPageContent style={{
+      height: '100%'
+    }}
+    >
       <Typography variant='h1' my={2}>Member Directory</Typography>
       <Stack flexDirection='row' justifyContent='space-between'>
         <Tabs textColor='primary' indicatorColor='secondary' value={currentView} sx={{ minHeight: 0, height: 'fit-content' }}>

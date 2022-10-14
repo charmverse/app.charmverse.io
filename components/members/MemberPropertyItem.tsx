@@ -11,7 +11,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import TwitterIcon from '@mui/icons-material/Twitter';
-import { Box, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemIcon, ListItemText } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
