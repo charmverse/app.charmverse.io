@@ -304,9 +304,6 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
         setIsLoadingSafes(false);
       }
     }
-    else {
-      alert('Please connect your Metamask wallet');
-    }
   }
 
   if (!tasks) {
@@ -336,9 +333,15 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
           safeUrl={safe.safeUrl}
         />
       ))}
-      {safeData?.length === 0 && (
+      {gnosisSigner && user && safeData?.length === 0 ? (
         <GnosisConnectCard loading={isLoadingSafes} onClick={importSafes} />
-      )}
+      ) : (!gnosisSigner || !user) ? (
+        <Box>
+          <Alert severity='warning'>
+            Please connect your Metamask wallet.
+          </Alert>
+        </Box>
+      ) : null}
     </>
   );
 }
