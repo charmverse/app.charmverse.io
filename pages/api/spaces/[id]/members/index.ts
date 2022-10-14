@@ -41,7 +41,7 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
     }
   });
 
-  const visibleProperties = await getVisibleMemberPropertiesBySpace(userId, spaceId);
+  const visibleProperties = await getVisibleMemberPropertiesBySpace({ userId, spaceId });
   const roleMemberProperty = visibleProperties.find(visibleProperty => visibleProperty.type === 'role');
 
   const members = spaceRoles.map((spaceRole): Member => {

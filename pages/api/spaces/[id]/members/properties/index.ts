@@ -21,7 +21,7 @@ async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResp
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const properties = await getVisibleMemberPropertiesBySpace(userId, spaceId);
+  const properties = await getVisibleMemberPropertiesBySpace({ userId, spaceId });
 
   return res.status(200).json(properties);
 }
