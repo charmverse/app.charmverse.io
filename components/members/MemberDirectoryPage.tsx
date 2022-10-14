@@ -57,11 +57,16 @@ export default function MemberDirectoryPage () {
             />
           ))}
         </Tabs>
-        <IconButton onClick={() => setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible)}>
+        <IconButton onClick={() => {
+          setTimeout(() => {
+            setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+          });
+        }}
+        >
           <MoreHoriz color='secondary' />
         </IconButton>
       </Stack>
-      <Box position='relative' display='flex' minHeight={500} height='100%'>
+      <Box position='relative' display='flex' height='100%'>
         <Box width='100%'>
           {currentView === 'table' && <MemberDirectoryTableView />}
           {currentView === 'gallery' && <MemberDirectoryGalleryView />}

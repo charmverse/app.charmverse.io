@@ -123,7 +123,7 @@ export function MemberPropertiesSidebar ({
 
   return properties ? (
     <>
-      <ClickAwayListener mouseEvent={false} onClickAway={onClose}>
+      <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
         <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
           <StyledSidebar>
             <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
