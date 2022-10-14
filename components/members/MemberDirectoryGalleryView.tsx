@@ -30,7 +30,7 @@ function MemberDirectoryGalleryCard ({
         <Typography gutterBottom variant='h6' mb={0} component='div'>
           {member.username}
         </Typography>
-        {member.profile?.social && <SocialIcons social={member.profile.social as Social} />}
+        {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
         <Stack gap={0.5}>
           <Typography variant='subtitle2'>Roles</Typography>
           <Stack gap={1} flexDirection='row'>

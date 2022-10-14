@@ -2,6 +2,8 @@ import styled from '@emotion/styled';
 import { Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import Link from 'components/common/Link';
+import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
@@ -30,6 +32,9 @@ export function MemberDirectoryTableView () {
       </TableHead>
       <TableBody>
         {members.map(member => {
+          const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
+          const twitterHandle = twitterUrl.split('/').at(-1);
+          const discordUsername = (member.profile?.social as Social)?.discordUsername;
           return (
             <TableRow
               key={member.id}
@@ -51,14 +56,10 @@ export function MemberDirectoryTableView () {
                 </Stack>
               </TableCell>
               <TableCell>
-                <Typography variant='body2'>
-                  {(member.profile?.social as Social)?.discordUsername}
-                </Typography>
+                {discordUsername && <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} />}
               </TableCell>
               <TableCell>
-                <Typography variant='body2'>
-                  {(member.profile?.social as Social)?.twitterURL}
-                </Typography>
+                <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link>
               </TableCell>
               <TableCell>
                 <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value}</Typography>

@@ -2,13 +2,12 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import type { StackProps } from '@mui/material';
-import { Box, Link, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 
 import type { Social } from 'components/profile/interfaces';
-import DiscordIcon from 'public/images/discord_logo.svg';
+
+import { DiscordSocialIcon } from './DiscordSocialIcon';
 
 export function SocialIcons ({
   children,
@@ -28,12 +27,6 @@ export function SocialIcons ({
     linkedinURL?: string;
   };
 } & StackProps) {
-  const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
-
-  const onDiscordUsernameCopy = () => {
-    setIsDiscordUsernameCopied(true);
-    setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
-  };
 
   const hasAnySocialInformation = (model: Social) => model.twitterURL || model.githubURL || model.discordUsername || model.linkedinURL;
 
@@ -53,20 +46,7 @@ export function SocialIcons ({
     }
       {
       social && social.discordUsername && (
-        <Tooltip
-          placement='top'
-          title={isDiscordUsernameCopied ? 'Copied' : `Click to copy: ${social.discordUsername}`}
-          disableInteractive
-          arrow
-        >
-          <Box sx={{ display: 'initial' }}>
-            <CopyToClipboard text={social.discordUsername} onCopy={onDiscordUsernameCopy}>
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
-                <DiscordIcon />
-              </SvgIcon>
-            </CopyToClipboard>
-          </Box>
-        </Tooltip>
+        <DiscordSocialIcon username={social.discordUsername} />
       )
     }
       {
