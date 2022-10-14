@@ -1,5 +1,5 @@
 import HowToVote from '@mui/icons-material/HowToVote';
-import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import { Alert, Box, Card, Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
