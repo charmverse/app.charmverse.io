@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ClickAwayListener, Collapse, Stack, TextField, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -37,15 +38,17 @@ export function MemberPropertySidebarItem ({
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
 
   return (
-    <Box
-      display='flex'
-      justifyContent='space-between'
+    <MenuItem
+      dense
       sx={{
+        alignItems: 'center',
+        display: 'flex',
+        justifyContent: 'space-between',
         '&:hover .icons': {
           opacity: 1
-        }
+        },
+        width: '100%'
       }}
-      alignItems='center'
     >
       <MemberPropertyItem
         type={property.type}
@@ -104,7 +107,7 @@ export function MemberPropertySidebarItem ({
           </Button>
         </Box>
       </Modal>
-    </Box>
+    </MenuItem>
   );
 }
 
@@ -126,11 +129,29 @@ export function MemberPropertiesSidebar ({
       <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
         <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
           <StyledSidebar>
-            <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
-              <Typography fontWeight='bold' variant='body2'>Properties</Typography>
-            </Box>
+            <SidebarHeader
+              closeSidebar={onClose}
+              title='Properties'
+            />
 
-            <Stack gap={1.5} p={1}>
+            <Stack mb={1}>
+              {[...DEFAULT_MEMBER_PROPERTIES].sort().map(property => {
+                return (
+                  <MenuItem
+                    dense
+                    sx={{
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      width: '100%'
+                    }}
+                  >
+                    <MemberPropertyItem
+                      type={property}
+                    />
+                  </MenuItem>
+                );
+              })}
               {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
             </Stack>
             <AddMemberPropertyButton
@@ -153,6 +174,9 @@ export function MemberPropertiesSidebar ({
           />
           <Button
             disabled={!propertyName || !selectedPropertyType}
+            sx={{
+              height: 40
+            }}
             onClick={async () => {
               if (propertyName && selectedPropertyType) {
                 await addProperty({

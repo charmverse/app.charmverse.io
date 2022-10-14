@@ -33,7 +33,7 @@ export default function MemberDirectoryPage () {
     <CenteredPageContent>
       <Typography variant='h1' my={2}>Member Directory</Typography>
       <Stack flexDirection='row' justifyContent='space-between'>
-        <Tabs textColor='primary' indicatorColor='secondary' value={currentView} sx={{ minHeight: 0, mb: '-4px' }}>
+        <Tabs textColor='primary' indicatorColor='secondary' value={currentView} sx={{ minHeight: 0, height: 'fit-content' }}>
           {views.map(view => (
             <Tab
               component='div'

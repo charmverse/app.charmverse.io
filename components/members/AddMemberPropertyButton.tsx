@@ -39,9 +39,6 @@ export function AddMemberPropertyButton ({
                 onClick(memberPropertyType as MemberPropertyType);
                 addMemberPropertyPopupState.close();
               }}
-              sx={{
-                gap: 1
-              }}
             >
               <MemberPropertyItem
                 type={memberPropertyType as MemberPropertyType}

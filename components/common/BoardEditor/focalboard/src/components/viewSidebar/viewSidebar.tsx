@@ -138,7 +138,7 @@ function MenuRow ({ icon, title, value, onClick }: { icon: JSX.Element, title: s
   );
 }
 
-function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => void, goBack?: () => void, title: string }) {
+export function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => void, goBack?: () => void, title: string }) {
 
   return (
     <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>

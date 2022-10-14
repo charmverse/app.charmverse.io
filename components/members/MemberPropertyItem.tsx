@@ -11,7 +11,7 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import TwitterIcon from '@mui/icons-material/Twitter';
-import { Box, Typography } from '@mui/material';
+import { Box, ListItemIcon, ListItemText } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
@@ -43,9 +43,13 @@ export function MemberPropertyItem ({
   name?: string;
 }) {
   return (
-    <Box display='flex' gap={1} alignItems='center'>
-      {MemberPropertyIcons[type]}
-      <Typography variant='body2'>{name ?? DefaultMemberPropertyDict[type]}</Typography>
-    </Box>
+    <>
+      <ListItemIcon>
+        {MemberPropertyIcons[type]}
+      </ListItemIcon>
+      <ListItemText>
+        {name ?? DefaultMemberPropertyDict[type]}
+      </ListItemText>
+    </>
   );
 }
