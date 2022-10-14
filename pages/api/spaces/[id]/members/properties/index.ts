@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createMemberProperty } from 'lib/members/createMemberProperty';
-import { getMemberPropertiesBySpace } from 'lib/members/getMemberPropertiesBySpace';
+import { getVisibleMemberPropertiesBySpace } from 'lib/members/getVisibleMemberPropertiesBySpace';
 import type { CreateMemberPropertyPayload } from 'lib/members/interfaces';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -21,7 +21,7 @@ async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResp
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const properties = await getMemberPropertiesBySpace(userId, spaceId);
+  const properties = await getVisibleMemberPropertiesBySpace(userId, spaceId);
 
   return res.status(200).json(properties);
 }

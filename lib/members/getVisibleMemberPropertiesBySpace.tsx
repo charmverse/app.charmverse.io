@@ -1,10 +1,12 @@
 import { prisma } from 'db';
 
-export function getMemberPropertiesBySpace (userId: string, spaceId: string) {
+export function getVisibleMemberPropertiesBySpace (userId: string, spaceId: string | string[]) {
+  const spaceIdQuery = typeof spaceId === 'string' ? [spaceId] : spaceId;
+
   // TODO - handle permissions and select only properties accessible by userId
   return prisma.memberProperty.findMany({
     where: {
-      spaceId
+      spaceId: { in: spaceIdQuery }
     },
     orderBy: {
       index: 'asc'

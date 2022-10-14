@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getMemberPropertiesBySpace } from 'lib/members/getMemberPropertiesBySpace';
+import { getVisibleMemberPropertiesBySpace } from 'lib/members/getVisibleMemberPropertiesBySpace';
 import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -41,7 +41,7 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
     }
   });
 
-  const visibleProperties = await getMemberPropertiesBySpace(userId, spaceId);
+  const visibleProperties = await getVisibleMemberPropertiesBySpace(userId, spaceId);
   const roleMemberProperty = visibleProperties.find(visibleProperty => visibleProperty.type === 'role');
 
   const members = spaceRoles.map((spaceRole): Member => {
