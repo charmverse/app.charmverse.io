@@ -9,8 +9,9 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 
+import { MemberDirectoryGalleryView } from './MemberDirectoryGalleryView';
+import { MemberDirectoryTableView } from './MemberDirectoryTableView';
 import { MemberPropertiesSidebar } from './MemberPropertiesSidebar';
-import { MemberPropertiesTableView } from './MemberPropertiesTableView';
 
 const StyledButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing(0.5, 1)};
@@ -21,12 +22,12 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const views = ['table', 'gallery'] as const;
+const views = ['gallery', 'table'] as const;
 
 export default function MemberDirectoryPage () {
   const { members } = useMembers();
   const { properties } = useMemberProperties();
-  const [currentView, setCurrentView] = useState<typeof views[number]>('table');
+  const [currentView, setCurrentView] = useState<typeof views[number]>('gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   return properties && members ? (
     <CenteredPageContent>
@@ -62,7 +63,8 @@ export default function MemberDirectoryPage () {
       </Stack>
       <Box position='relative' display='flex' minHeight={500} height='100%'>
         <Box width='100%'>
-          {currentView === 'table' && <MemberPropertiesTableView />}
+          {currentView === 'table' && <MemberDirectoryTableView />}
+          {currentView === 'gallery' && <MemberDirectoryGalleryView />}
         </Box>
         <MemberPropertiesSidebar
           isOpen={isPropertiesDrawerVisible}
