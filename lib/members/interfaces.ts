@@ -1,13 +1,11 @@
-import type { MemberProperty, MemberPropertyType, Role, User, UserDetails } from '@prisma/client';
+import type { MemberProperty, MemberPropertyValue, Role, User, UserDetails } from '@prisma/client';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 
 export type PropertyValue = {
-  id: string;
+  memberPropertyId: string;
   value: MemberPropertyValueType;
-  // TODO - we might not need props below
-  type: MemberPropertyType;
-  name: string;
+  spaceId: string;
 }
 
 export type Member = Omit<User, 'addresses'> & {
@@ -20,3 +18,4 @@ export type Member = Omit<User, 'addresses'> & {
 }
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>
+export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>

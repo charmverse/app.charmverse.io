@@ -25,9 +25,9 @@ export function MemberPropertiesTableView () {
           return (
             <TableRow key={member.id}>
               {properties.map(property => {
-                const memberProperty = member.properties.find(_property => _property.id === property.id);
+                const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
-                  switch (memberProperty.type) {
+                  switch (property.type) {
                     case 'role': {
                       return (
                         <TableCell key={property.id}>

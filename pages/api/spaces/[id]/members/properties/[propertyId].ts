@@ -10,7 +10,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .put(updateMemberPropertyHandler)
   .delete(deleteMemberPropertyHandler);
 
