@@ -160,9 +160,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   }, []);
 
   // dark mode: https://mui.com/customization/dark-mode/
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
-  const [mode, setMode] = useState<PaletteMode>('light');
+  const [mode, setMode] = useState<PaletteMode>('dark');
   const [isOldBuild, setIsOldBuild] = useState(false);
   const colorModeContext = useMemo(() => ({
     toggleColorMode: () => {
@@ -189,10 +188,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     if (savedDarkMode) {
       setMode(savedDarkMode);
     }
-    else if (prefersDarkMode) {
-      setMode('dark');
-    }
-  }, [prefersDarkMode, savedDarkMode]);
+  }, [savedDarkMode]);
 
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
