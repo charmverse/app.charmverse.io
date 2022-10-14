@@ -32,18 +32,18 @@ function MemberDirectoryGalleryCard ({
         </Typography>
         {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
         <Stack gap={0.5}>
-          <Typography variant='subtitle2'>Roles</Typography>
+          <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
           <Stack gap={1} flexDirection='row'>
             {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
           </Stack>
         </Stack>
         <Stack>
-          <Typography variant='subtitle2'>About Me</Typography>
+          <Typography fontWeight='bold' variant='subtitle2'>About Me</Typography>
           <Typography variant='body2'>{member.profile?.description}</Typography>
         </Stack>
         <Stack flexDirection='row' gap={1}>
           <AccessTimeIcon fontSize='small' />
-          <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value}</Typography>
+          <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
         </Stack>
         {properties.map(property => {
           const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
@@ -54,17 +54,18 @@ function MemberDirectoryGalleryCard ({
             case 'number': {
               return (
                 <Stack>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>{memberPropertyValue}</Typography>
+                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                  <Typography variant='body2'>{memberPropertyValue ?? 'N/A'}</Typography>
                 </Stack>
               );
             }
             case 'multiselect': {
+              const values = memberPropertyValue?.value as string[];
               return (
                 <Stack gap={0.5}>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
+                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Stack gap={1} flexDirection='row'>
-                    {(memberPropertyValue?.value as string[]).map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
+                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N?A'}
                   </Stack>
                 </Stack>
               );
@@ -72,12 +73,12 @@ function MemberDirectoryGalleryCard ({
             case 'select': {
               return (
                 <Stack gap={0.5}>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
-                  {memberPropertyValue?.value && (
+                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                  {memberPropertyValue?.value ? (
                     <Stack gap={1} flexDirection='row'>
                       <Chip label={memberPropertyValue?.value} key={memberPropertyValue?.value?.toString() ?? ''} size='small' variant='outlined' />
                     </Stack>
-                  )}
+                  ) : <Typography variant='body2'>N/A</Typography>}
                 </Stack>
               );
             }

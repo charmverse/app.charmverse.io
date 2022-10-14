@@ -46,7 +46,7 @@ export function MemberDirectoryTableView () {
                 <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
               </TableCell>
               <TableCell>
-                <Typography>
+                <Typography fontWeight='bold'>
                   {member.username}
                 </Typography>
               </TableCell>
@@ -56,13 +56,13 @@ export function MemberDirectoryTableView () {
                 </Stack>
               </TableCell>
               <TableCell>
-                {discordUsername && <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} />}
+                {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
               </TableCell>
               <TableCell>
-                <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link>
+                {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : 'N/A'}
               </TableCell>
               <TableCell>
-                <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value}</Typography>
+                <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
               </TableCell>
               {properties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
@@ -74,7 +74,7 @@ export function MemberDirectoryTableView () {
                     case 'number': {
                       return (
                         <TableCell key={property.id}>
-                          <Typography variant='body2'>{memberProperty.value}</Typography>
+                          <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
                         </TableCell>
                       );
                     }
@@ -90,18 +90,18 @@ export function MemberDirectoryTableView () {
                     case 'select': {
                       return (
                         <TableCell>
-                          {memberProperty?.value && (
+                          {memberProperty?.value ? (
                             <Stack gap={1} flexDirection='row'>
                               <Chip label={memberProperty?.value} key={memberProperty?.value?.toString() ?? ''} size='small' variant='outlined' />
                             </Stack>
-                          )}
+                          ) : 'N/A'}
                         </TableCell>
                       );
                     }
                     default: {
                       return (
                         <TableCell key={property.id}>
-                          <Typography variant='body2'>{memberProperty.value}</Typography>
+                          <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
                         </TableCell>
                       );
                     }
