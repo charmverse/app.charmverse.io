@@ -48,7 +48,10 @@ function MemberDirectoryGalleryCard ({
         {properties.map(property => {
           const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
           switch (property.type) {
-            case 'text': {
+            case 'text':
+            case 'phone':
+            case 'url':
+            case 'number': {
               return (
                 <Stack>
                   <Typography variant='subtitle2'>{property.name}</Typography>
@@ -75,36 +78,6 @@ function MemberDirectoryGalleryCard ({
                       <Chip label={memberPropertyValue?.value} key={memberPropertyValue?.value?.toString() ?? ''} size='small' variant='outlined' />
                     </Stack>
                   )}
-                </Stack>
-              );
-            }
-            case 'phone': {
-              return (
-                <Stack gap={0.5}>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>
-                    {memberPropertyValue?.value}
-                  </Typography>
-                </Stack>
-              );
-            }
-            case 'url': {
-              return (
-                <Stack gap={0.5}>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>
-                    {memberPropertyValue?.value}
-                  </Typography>
-                </Stack>
-              );
-            }
-            case 'number': {
-              return (
-                <Stack>
-                  <Typography variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>
-                    {memberPropertyValue?.value}
-                  </Typography>
                 </Stack>
               );
             }

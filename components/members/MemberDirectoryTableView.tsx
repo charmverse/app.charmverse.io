@@ -1,44 +1,106 @@
 import styled from '@emotion/styled';
-import { Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
+import Avatar from 'components/common/Avatar';
+import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
-  border-bottom: 1px solid #000;
 `;
 
 export function MemberDirectoryTableView () {
   const { properties = [] } = useMemberProperties();
   const { members } = useMembers();
+  const timezoneProperty = properties.find(property => property.type === 'timezone');
 
   return (
-    <Table size='small'>
+    <Table
+      size='small'
+      sx={{
+        my: 2
+      }}
+    >
       <TableHead>
         <TableRow>
-          {properties.map(property => <StyledTableCell key={property.name}>{property.name}</StyledTableCell>)}
+          <StyledTableCell />
+          {['Name', 'Role', 'Discord', 'Twitter', 'Timezone', ...properties.map(property => property.name)].map(property => <StyledTableCell key={property}>{property}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
         {members.map(member => {
           return (
-            <TableRow key={member.id}>
+            <TableRow
+              key={member.id}
+            >
+              <TableCell sx={{
+                p: 1
+              }}
+              >
+                <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
+              </TableCell>
+              <TableCell>
+                <Typography>
+                  {member.username}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Stack gap={1} flexDirection='row'>
+                  {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                </Stack>
+              </TableCell>
+              <TableCell>
+                <Typography variant='body2'>
+                  {(member.profile?.social as Social)?.discordUsername}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant='body2'>
+                  {(member.profile?.social as Social)?.twitterURL}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value}</Typography>
+              </TableCell>
               {properties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
                   switch (property.type) {
-                    case 'role': {
+                    case 'text':
+                    case 'phone':
+                    case 'url':
+                    case 'number': {
                       return (
                         <TableCell key={property.id}>
-                          {member.roles.map(role => <Chip size='small' label={role.name} variant='outlined' />)}
+                          <Typography variant='body2'>{memberProperty.value}</Typography>
+                        </TableCell>
+                      );
+                    }
+                    case 'multiselect': {
+                      return (
+                        <TableCell>
+                          <Stack gap={1} flexDirection='row'>
+                            {(memberProperty?.value as string[]).map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
+                          </Stack>
+                        </TableCell>
+                      );
+                    }
+                    case 'select': {
+                      return (
+                        <TableCell>
+                          {memberProperty?.value && (
+                            <Stack gap={1} flexDirection='row'>
+                              <Chip label={memberProperty?.value} key={memberProperty?.value?.toString() ?? ''} size='small' variant='outlined' />
+                            </Stack>
+                          )}
                         </TableCell>
                       );
                     }
                     default: {
                       return (
                         <TableCell key={property.id}>
-                          {memberProperty.value}
+                          <Typography variant='body2'>{memberProperty.value}</Typography>
                         </TableCell>
                       );
                     }
