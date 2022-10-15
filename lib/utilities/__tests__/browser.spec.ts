@@ -17,7 +17,7 @@ describe('getNewUrl()', () => {
   });
 
   it('should remove a property from the query string', () => {
-    const result = getNewUrl({ cardId: undefined }, `${baseUrl}&cardId=foo`);
+    const result = getNewUrl({ cardId: null }, `${baseUrl}&cardId=foo`);
 
     expect(result.toString()).toEqual(baseUrl);
   });

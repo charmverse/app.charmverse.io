@@ -1,6 +1,7 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
@@ -17,8 +18,10 @@ import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+  const router = useRouter();
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -94,6 +97,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
           mutateProposals();
         }
       });
+      setUrlWithoutRerender(router.pathname, { id: newPage.id });
     }
   }
 

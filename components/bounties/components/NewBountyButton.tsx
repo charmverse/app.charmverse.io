@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router';
+
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -7,9 +9,11 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewBountyButton () {
   const { user } = useUser();
+  const router = useRouter();
   const [currentSpace] = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
@@ -59,6 +63,7 @@ export default function NewBountyButton () {
         pageId: createdBounty.page.id,
         hideToolsMenu: suggestBounties
       });
+      setUrlWithoutRerender(router.pathname, { bountyId: createdBounty.page.id });
     }
   }
 
