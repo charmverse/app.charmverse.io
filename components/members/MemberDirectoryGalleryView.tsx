@@ -2,6 +2,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -27,9 +28,11 @@ function MemberDirectoryGalleryCard ({
         variant='square'
       />
       <Stack p={2} gap={1}>
-        <Typography gutterBottom variant='h6' mb={0} component='div'>
-          {member.username}
-        </Typography>
+        <Link href={`/u/${member.path}`}>
+          <Typography gutterBottom variant='h6' mb={0} component='div'>
+            {member.username}
+          </Typography>
+        </Link>
         {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
         <Stack gap={0.5}>
           <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>

@@ -46,13 +46,15 @@ export function MemberDirectoryTableView () {
                 <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
               </TableCell>
               <TableCell>
-                <Typography fontWeight='bold'>
-                  {member.username}
-                </Typography>
+                <Link href={`/u/${member.path}`}>
+                  <Typography fontWeight='bold'>
+                    {member.username}
+                  </Typography>
+                </Link>
               </TableCell>
               <TableCell>
                 <Stack gap={1} flexDirection='row'>
-                  {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                 </Stack>
               </TableCell>
               <TableCell>
