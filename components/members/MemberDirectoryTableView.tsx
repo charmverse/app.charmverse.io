@@ -82,7 +82,7 @@ export function MemberDirectoryTableView () {
                     }
                     case 'multiselect': {
                       return (
-                        <TableCell>
+                        <TableCell key={property.id}>
                           <Stack gap={1} flexDirection='row'>
                             {(memberProperty?.value as string[]).map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
                           </Stack>
@@ -91,7 +91,7 @@ export function MemberDirectoryTableView () {
                     }
                     case 'select': {
                       return (
-                        <TableCell>
+                        <TableCell key={property.id}>
                           {memberProperty?.value ? (
                             <Stack gap={1} flexDirection='row'>
                               <Chip label={memberProperty?.value} key={memberProperty?.value?.toString() ?? ''} size='small' variant='outlined' />

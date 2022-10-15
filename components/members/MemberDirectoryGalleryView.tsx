@@ -56,7 +56,7 @@ function MemberDirectoryGalleryCard ({
             case 'url':
             case 'number': {
               return (
-                <Stack>
+                <Stack key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Typography variant='body2'>{memberPropertyValue ?? 'N/A'}</Typography>
                 </Stack>
@@ -65,7 +65,7 @@ function MemberDirectoryGalleryCard ({
             case 'multiselect': {
               const values = memberPropertyValue?.value as string[];
               return (
-                <Stack gap={0.5}>
+                <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Stack gap={1} flexDirection='row'>
                     {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N?A'}
@@ -75,7 +75,7 @@ function MemberDirectoryGalleryCard ({
             }
             case 'select': {
               return (
-                <Stack gap={0.5}>
+                <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   {memberPropertyValue?.value ? (
                     <Stack gap={1} flexDirection='row'>
@@ -101,7 +101,7 @@ export function MemberDirectoryGalleryView () {
   return (
     <Grid container>
       {members.map(member => (
-        <Grid xs={3} key={member.id}>
+        <Grid item xs={3} key={member.id}>
           <MemberDirectoryGalleryCard member={member} />
         </Grid>
       ))}

@@ -145,6 +145,7 @@ export function MemberPropertiesSidebar ({
                       justifyContent: 'space-between',
                       width: '100%'
                     }}
+                    key={property}
                   >
                     <MemberPropertyItem
                       type={property}
