@@ -72,7 +72,7 @@ type Props = {
   readOnly: boolean;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
 }
 
 function Kanban (props: Props) {

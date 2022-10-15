@@ -8,16 +8,14 @@ import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/f
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { getUriWithParam } from 'lib/utilities/strings';
 import type { Page } from 'models';
 
 /**
@@ -37,9 +35,8 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
   const board = useAppSelector(getCurrentBoard);
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
-  const clientConfig = useAppSelector(getClientConfig);
   const dispatch = useAppDispatch();
-  const [shownCardId, setShownCardId] = useState(router.query.cardId);
+  const [shownCardId, setShownCardId] = useState<string | null>(router.query.cardId as string ?? null);
 
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
@@ -113,12 +110,8 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
     }
   });
 
-  const showCard = useCallback((cardId?: string) => {
-    const newUrl = `${router.pathname}?viewId=${router.query.viewId}&cardId=${cardId ?? ''}`;
-
-    const asUrl = getUriWithParam(`${router.asPath}`, { viewId: router.query.viewId, cardId }).split(window.location.origin)[1];
-
-    silentlyUpdateURL(newUrl, asUrl);
+  const showCard = useCallback((cardId: string | null) => {
+    setUrlWithoutRerender(router.pathname, { viewId: router.query.viewId as string, cardId });
     setShownCardId(cardId);
   }, [router.query]);
 
@@ -141,7 +134,7 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
               <CardDialog
                 key={shownCardId}
                 cardId={shownCardId}
-                onClose={() => showCard(undefined)}
+                onClose={() => showCard(null)}
                 readOnly={readOnly}
               />
             </RootPortal>

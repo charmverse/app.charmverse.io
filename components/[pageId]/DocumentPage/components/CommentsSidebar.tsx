@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { BoxProps, SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -10,7 +11,7 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
+import { highlightDomElement, setUrlWithoutRerender } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -63,6 +64,7 @@ function getCommentFromThreads (threads: (ThreadWithCommentsAndAuthors | undefin
 
 export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boolean }) {
 
+  const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
 
@@ -118,7 +120,7 @@ export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boole
 
   useEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
-    const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
+    const highlightedCommentId = router.query.commentId;
     if (highlightedCommentId) {
       const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
       if (highlightedComment) {
@@ -128,7 +130,7 @@ export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boole
             setCurrentPageActionDisplay('comments');
             setThreadFilter('all');
             // Remove query parameters from url
-            silentlyUpdateURL(window.location.href.split('?')[0]);
+            setUrlWithoutRerender(router.pathname, { commentId: null });
             requestAnimationFrame(() => {
               highlightedCommentDomNode.scrollIntoView({
                 behavior: 'smooth'
@@ -143,7 +145,7 @@ export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boole
         }
       }
     }
-  }, [allThreads, window.location.search]);
+  }, [allThreads, router.query.commentId]);
 
   return (
     <>

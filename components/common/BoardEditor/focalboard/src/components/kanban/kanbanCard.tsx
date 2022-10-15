@@ -42,7 +42,7 @@ type Props = {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string) => void;
   isManualSort: boolean;
 }
 
@@ -156,18 +156,19 @@ const KanbanCard = React.memo((props: Props) => {
                     id='duplicate'
                     name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
                     onClick={() => {
-                      if (pages[card.id] && space) {
+                      const _cardPage = pages[card.id];
+                      if (_cardPage && space) {
                         mutator.duplicateCard(
                           {
                             cardId: card.id,
                             board,
-                            cardPage: pages[card.id]!,
+                            cardPage: _cardPage,
                             afterRedo: async (newCardId) => {
                               props.showCard(newCardId);
                               mutate(`pages/${space.id}`);
                             },
                             beforeUndo: async () => {
-                              props.showCard(undefined);
+                              props.showCard(null);
                             }
                           }
                         );

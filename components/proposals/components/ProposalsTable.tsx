@@ -10,10 +10,9 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/browser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
-import { getUriWithParam } from 'lib/utilities/strings';
 import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
@@ -27,15 +26,13 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   const router = useRouter();
 
   function onClose () {
-    const newUrl = getUriWithParam(window.location.href, { id: null });
-    silentlyUpdateURL(newUrl);
+    setUrlWithoutRerender(router.pathname, { id: null });
     mutateProposals();
     mutateTasks();
   }
 
   function openPage (pageId: string) {
-    const newUrl = getUriWithParam(window.location.href, { id: pageId });
-    silentlyUpdateURL(newUrl);
+    setUrlWithoutRerender(router.pathname, { id: pageId });
     showPage({
       pageId,
       onClose

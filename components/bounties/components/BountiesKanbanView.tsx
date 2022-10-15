@@ -6,9 +6,8 @@ import { useEffect, useState } from 'react';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
-import { getUriWithParam } from 'lib/utilities/strings';
 
 import BountyCard from './BountyCard';
 import { BountyStatusChip } from './BountyStatusBadge';
@@ -38,19 +37,17 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
     suggestion: []
   });
 
-  function closePopup () {
-    const newUrl = getUriWithParam(window.location.href, { bountyId: null });
-    silentlyUpdateURL(newUrl);
+  function onClose () {
+    setUrlWithoutRerender(router.pathname, { bountyId: null });
   }
 
   function showBounty (bounty: BountyWithDetails) {
-    const newUrl = getUriWithParam(window.location.href, { bountyId: bounty.id });
-    silentlyUpdateURL(newUrl);
+    setUrlWithoutRerender(router.pathname, { bountyId: bounty.id });
     if (bounty?.id) {
       showPage({
         bountyId: bounty.id,
         readOnly: publicMode,
-        onClose: closePopup
+        onClose
       });
     }
   }

@@ -114,10 +114,50 @@ function scrollIntoViewIfNeededPolyfill (
   }
 }
 
+// @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
+export function getNewUrl (params: Record<string, string | null>, baseUrl = window.location.href) {
+  const url = new URL(baseUrl, baseUrl.match('http') ? undefined : window.location.origin);
+  const urlParams: URLSearchParams = new URLSearchParams(url.search);
+  for (const key in params) {
+    if (params.hasOwnProperty(key)) {
+      const value = params[key];
+      if (typeof value === 'string') {
+        urlParams.set(key, value);
+      }
+      else {
+        urlParams.delete(key);
+      }
+    }
+  }
+  url.search = urlParams.toString();
+  return url;
+}
+
+export function getUriWithParam (baseUrl: string, params: Record<string, any>): string {
+  return getNewUrl(params, baseUrl).toString();
+}
+
 // source: https://github.com/vercel/next.js/discussions/18072
 // update URL without Next.js re-rendering the page
 export function silentlyUpdateURL (newUrl: string, as?: string) {
   window.history.replaceState({ ...window.history.state, as: as ?? newUrl, url: newUrl }, '', as ?? newUrl);
+}
+
+export function setUrlWithoutRerender (pathname: string, params: Record<string, string | null>) {
+
+  const newUrl = getNewUrl(params);
+  // get the path that Next.js uses internally
+  const nextjsPath = `${pathname}${newUrl.search}`;
+  // get the path that appears in the browsr
+  const displayPath = newUrl.toString().replace(window.location.origin, '');
+
+  const newState = {
+    ...window.history.state,
+    as: displayPath,
+    url: nextjsPath
+  };
+
+  window.history.replaceState(newState, '', displayPath);
 }
 
 export function getCookie (name: string): string {
