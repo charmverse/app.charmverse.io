@@ -1,25 +1,25 @@
-import { getUriWithParam } from '../browser';
+import { getNewUrl } from '../browser';
 
-describe('getUriWithParam()', () => {
+describe('getNewUrl()', () => {
 
   const baseUrl = 'https://google.com/search?q=3531422';
 
   it('should add a property to the query string', () => {
-    const result = getUriWithParam(baseUrl, { cardId: 'baz' });
+    const result = getNewUrl({ cardId: 'baz' }, baseUrl);
 
-    expect(result).toBe(`${baseUrl}&cardId=baz`);
+    expect(result.toString()).toBe(`${baseUrl}&cardId=baz`);
   });
 
   it('should replace a property from the query string', () => {
-    const result = getUriWithParam(`${baseUrl}&cardId=foo`, { cardId: 'baz' });
+    const result = getNewUrl({ cardId: 'baz' }, `${baseUrl}&cardId=foo`);
 
-    expect(result).toEqual(`${baseUrl}&cardId=baz`);
+    expect(result.toString()).toEqual(`${baseUrl}&cardId=baz`);
   });
 
   it('should remove a property from the query string', () => {
-    const result = getUriWithParam(`${baseUrl}&cardId=foo`, { cardId: undefined });
+    const result = getNewUrl({ cardId: undefined }, `${baseUrl}&cardId=foo`);
 
-    expect(result).toEqual(baseUrl);
+    expect(result.toString()).toEqual(baseUrl);
   });
 
 });

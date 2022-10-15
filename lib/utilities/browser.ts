@@ -115,8 +115,8 @@ function scrollIntoViewIfNeededPolyfill (
 }
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
-export function getNewUrl (params: Record<string, string | null>, baseUrl = window.location.href) {
-  const url = new URL(baseUrl, baseUrl.match('http') ? undefined : window.location.origin);
+export function getNewUrl (params: Record<string, string | null>, currentUrl = window.location.href) {
+  const url = new URL(currentUrl, currentUrl.match('http') ? undefined : window.location.origin);
   const urlParams: URLSearchParams = new URLSearchParams(url.search);
   for (const key in params) {
     if (params.hasOwnProperty(key)) {
@@ -133,16 +133,8 @@ export function getNewUrl (params: Record<string, string | null>, baseUrl = wind
   return url;
 }
 
-export function getUriWithParam (baseUrl: string, params: Record<string, any>): string {
-  return getNewUrl(params, baseUrl).toString();
-}
-
-// source: https://github.com/vercel/next.js/discussions/18072
 // update URL without Next.js re-rendering the page
-export function silentlyUpdateURL (newUrl: string, as?: string) {
-  window.history.replaceState({ ...window.history.state, as: as ?? newUrl, url: newUrl }, '', as ?? newUrl);
-}
-
+// source: https://github.com/vercel/next.js/discussions/18072
 export function setUrlWithoutRerender (pathname: string, params: Record<string, string | null>) {
 
   const newUrl = getNewUrl(params);

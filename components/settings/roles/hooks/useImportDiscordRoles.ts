@@ -8,15 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { silentlyUpdateURL } from 'lib/utilities/browser';
-
-function routerQueryIsDiscordCallback () {
-  const urlSearchParams = new URLSearchParams(window.location.href);
-  return {
-    shouldImportDiscordRoles: typeof urlSearchParams.get('guild_id') === 'string' && urlSearchParams.get('discord') === '1' && urlSearchParams.get('type') === 'server',
-    serverConnectFailed: urlSearchParams.get('discord') === '2' && urlSearchParams.get('type') === 'server'
-  };
-}
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export function useImportDiscordRoles () {
   const { showMessage } = useSnackbar();
@@ -27,7 +19,9 @@ export function useImportDiscordRoles () {
     refreshRoles
   } = useRoles();
 
-  const { serverConnectFailed, shouldImportDiscordRoles } = routerQueryIsDiscordCallback();
+  const shouldImportDiscordRoles = typeof router.query.guild_id === 'string' && router.query.discord === '1' && router.query.type === 'server';
+  const serverConnectFailed = router.query.discord === '2' && router.query.type === 'server';
+
   const guildId = router.query.guild_id as string;
   // Using immutable version as otherwise its called twice
   const { data, isValidating, error } = useSWRImmutable(isAdmin && shouldImportDiscordRoles && space ? 'discord-roles-import' : null, async () => {
@@ -37,22 +31,19 @@ export function useImportDiscordRoles () {
     });
   });
 
-  // Remove the query string from the url as they are no longer needed after discord import
-  const urlWithoutQueryString = window.location.href.split('?')[0];
-
   useEffect(() => {
     if (data && !isValidating) {
       showMessage(`Successfully imported ${data.importedRoleCount} discord roles`, 'success');
       refreshRoles();
       setTimeout(() => {
-        silentlyUpdateURL(urlWithoutQueryString);
+        setUrlWithoutRerender(router.pathname, { guild_id: null, discord: null, type: null });
       }, 0);
     }
     else if (error) {
       // Major failure while trying to import discord server role
       showMessage(error.message || error.error || 'Something went wrong. Please try again', 'error');
       setTimeout(() => {
-        silentlyUpdateURL(urlWithoutQueryString);
+        setUrlWithoutRerender(router.pathname, { guild_id: null, discord: null, type: null });
       }, 0);
     }
     else if (serverConnectFailed) {
