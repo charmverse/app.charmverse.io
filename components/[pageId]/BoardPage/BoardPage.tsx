@@ -13,9 +13,9 @@ import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/sr
 import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { setUrlWithoutRerender } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { Page } from 'models';
 
 /**

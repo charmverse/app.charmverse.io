@@ -10,8 +10,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
-import { setUrlWithoutRerender } from 'lib/browser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
 import type { BrandColor } from 'theme/colors';
 

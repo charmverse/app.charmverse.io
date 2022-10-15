@@ -1,4 +1,4 @@
-import { getUriWithParam } from '../strings';
+import { getUriWithParam } from '../browser';
 
 describe('getUriWithParam()', () => {
 

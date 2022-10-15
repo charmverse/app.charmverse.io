@@ -35,11 +35,11 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { setUrlWithoutRerender } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
 import * as bulletList from './components/bulletList';

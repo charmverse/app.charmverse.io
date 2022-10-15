@@ -11,9 +11,9 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { highlightDomElement, setUrlWithoutRerender } from 'lib/browser';
 import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 const Center = styled.div`
@@ -121,7 +121,7 @@ export default function CommentsSidebar ({ inline }: BoxProps & { inline?: boole
   useEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
     const highlightedCommentId = router.query.commentId;
-    if (highlightedCommentId) {
+    if (typeof highlightedCommentId === 'string') {
       const highlightedComment = getCommentFromThreads(allThreads, highlightedCommentId);
       if (highlightedComment) {
         const highlightedCommentDomNode = document.getElementById(`comment.${highlightedComment.id}`);

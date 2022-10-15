@@ -10,7 +10,7 @@ import withScrolling, { createHorizontalStrength, createVerticalStrength } from 
 import { FormattedMessage, injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
 
-import { isTouchScreen } from 'lib/browser';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';

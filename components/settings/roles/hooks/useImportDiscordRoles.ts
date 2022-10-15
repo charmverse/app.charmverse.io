@@ -8,7 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import useRoles from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { silentlyUpdateURL } from 'lib/browser';
+import { silentlyUpdateURL } from 'lib/utilities/browser';
 
 function routerQueryIsDiscordCallback () {
   const urlSearchParams = new URLSearchParams(window.location.href);

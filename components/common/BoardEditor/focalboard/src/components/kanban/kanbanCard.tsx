@@ -18,7 +18,7 @@ import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { isTouchScreen } from 'lib/browser';
+import { isTouchScreen } from 'lib/utilities/browser';
 import { PageContent } from 'models';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
@@ -42,7 +42,7 @@ type Props = {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string | null) => void;
   isManualSort: boolean;
 }
 

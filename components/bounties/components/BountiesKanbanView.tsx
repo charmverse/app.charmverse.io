@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
-import { setUrlWithoutRerender } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import BountyCard from './BountyCard';
 import { BountyStatusChip } from './BountyStatusBadge';

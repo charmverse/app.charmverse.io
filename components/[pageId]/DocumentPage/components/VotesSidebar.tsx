@@ -8,8 +8,8 @@ import VoteDetail from 'components/common/CharmEditor/components/inlineVote/comp
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
-import { highlightDomElement, setUrlWithoutRerender } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
+import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
@@ -40,7 +40,7 @@ export default function VotesSidebar () {
   useEffect(() => {
     // Highlight the vote id when navigation from nexus votes tasks list tab
     const highlightedVoteId = router.query.voteId;
-    if (highlightedVoteId) {
+    if (typeof highlightedVoteId === 'string') {
       const highlightedVote = votes[highlightedVoteId];
       if (highlightedVote && votes[highlightedVoteId].context !== 'proposal') {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);

@@ -4,9 +4,9 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect } from 'react';
 
 import { usePages } from 'hooks/usePages';
-import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
+import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';

@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useUser } from 'hooks/useUser';
-import { setUrlWithoutRerender } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';

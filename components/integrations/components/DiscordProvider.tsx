@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getCookie, deleteCookie, silentlyUpdateURL } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
+import { getCookie, deleteCookie, silentlyUpdateURL } from 'lib/utilities/browser';
 
 interface State {
   isConnected: boolean;

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { setUrlWithoutRerender } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export function useCollablandCredentials () {
 

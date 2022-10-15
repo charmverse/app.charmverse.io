@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   isTouchDevice,
   safeScrollIntoViewIfNeeded
-} from 'lib/browser';
+} from 'lib/utilities/browser';
 
 interface InlinePaletteRowProps {
   dataId: string;
