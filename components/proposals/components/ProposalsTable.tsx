@@ -1,5 +1,7 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 import Button from 'components/common/Button';
 import GridContainer from 'components/common/Grid/GridContainer';
@@ -8,8 +10,10 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import useTasks from 'components/nexus/hooks/useTasks';
 import { usePages } from 'hooks/usePages';
+import { silentlyUpdateURL } from 'lib/browser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { humanFriendlyDate, toMonthDate } from 'lib/utilities/dates';
+import { getUriWithParam } from 'lib/utilities/strings';
 import type { BrandColor } from 'theme/colors';
 
 import NoProposalsMessage from './NoProposalsMessage';
@@ -20,21 +24,35 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
   const { pages, deletePage } = usePages();
   const { mutate: mutateTasks } = useTasks();
   const { showPage } = usePageDialog();
+  const router = useRouter();
+
+  function onClose () {
+    const newUrl = getUriWithParam(window.location.href, { id: null });
+    silentlyUpdateURL(newUrl);
+    mutateProposals();
+    mutateTasks();
+  }
+
   function openPage (pageId: string) {
+    const newUrl = getUriWithParam(window.location.href, { id: pageId });
+    silentlyUpdateURL(newUrl);
     showPage({
       pageId,
-      onClose () {
-        mutateTasks();
-        mutateProposals();
-      }
+      onClose
     });
   }
 
   async function deleteProposal (proposalId: string) {
     await deletePage({ pageId: proposalId });
-    mutateTasks();
     mutateProposals();
+    mutateTasks();
   }
+
+  useEffect(() => {
+    if (typeof router.query.id === 'string') {
+      openPage(router.query.id);
+    }
+  }, [router.query.id]);
 
   return (
     <>
