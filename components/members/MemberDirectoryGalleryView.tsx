@@ -36,7 +36,7 @@ function MemberDirectoryGalleryCard ({
         <Stack gap={0.5}>
           <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
           <Stack gap={1} flexDirection='row'>
-            {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+            {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
           </Stack>
         </Stack>
         <Stack>
@@ -67,7 +67,7 @@ function MemberDirectoryGalleryCard ({
                 <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Stack gap={1} flexDirection='row'>
-                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N?A'}
+                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N/A'}
                   </Stack>
                 </Stack>
               );
@@ -100,9 +100,9 @@ export function MemberDirectoryGalleryView ({
   members: Member[];
 }) {
   return (
-    <Grid container>
+    <Grid container gap={2.5}>
       {members.map(member => (
-        <Grid item xs={3} key={member.id}>
+        <Grid item xs={3.75} key={member.id}>
           <MemberDirectoryGalleryCard member={member} />
         </Grid>
       ))}
