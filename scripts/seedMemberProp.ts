@@ -49,6 +49,36 @@ export async function getMember() {
   console.log('🔥', spaceRoles[0].user.memberPropertyValues);
 }
 
-getMember()
+async function getMemberProps() {
+  const spaces = await prisma.space.findMany({
+    where: {
+      id: undefined,
+      AND: [
+        {
+          spaceRoles: {
+            some: {
+              userId: '1d410c32-a108-4d08-91bc-c2479ea24e51'
+            }
+          }
+        },
+        {
+          spaceRoles: {
+            some: {
+              userId: 'd29ecff7-96ab-4aa0-a2d5-52b811d971fc'
+            }
+          }
+        }
+      ]
+    },
+    select: {
+      id: true
+    }
+  })
+
+  console.log('🔥', spaces);
+}
+
+// getMember()
 // seedMemberProp()
 // seedMemberPropValue()
+getMemberProps()

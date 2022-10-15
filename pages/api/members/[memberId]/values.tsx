@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { PropertyValue, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import { getSpacesPropertyValues } from 'lib/members/getSpacesPropertyValues';
+import type { MemberPropertyValuesBySpace, PropertyValue, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { updateMemberPropertyValues } from 'lib/members/updateMemberPropertyValues';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -10,8 +11,23 @@ import { InvalidInputError } from 'lib/utilities/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getMemberValuesHandler)
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
   .post(updateMemberPropertyValuesHandler);
+
+async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse<MemberPropertyValuesBySpace[]>) {
+  const userId = req.session.user.id;
+  const memberId = req.query.memberId as string;
+  const spaceId = req.query.spaceId as string | undefined;
+
+  if (!memberId) {
+    throw new InvalidInputError('Please provide proper member and worspace information');
+  }
+
+  const updatedPropertyValues = await getSpacesPropertyValues({ memberId, requestingUserId: userId, spaceId });
+
+  return res.status(200).json(updatedPropertyValues);
+}
 
 async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
   const userId = req.session.user.id;

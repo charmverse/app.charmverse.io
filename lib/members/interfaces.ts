@@ -19,3 +19,6 @@ export type Member = Omit<User, 'addresses'> & {
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>
+
+export type MemberPropertyValuesBySpace = { spaceId: string, properties: PropertyValue[] }
+
