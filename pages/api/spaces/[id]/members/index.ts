@@ -25,7 +25,11 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       user: {
         include: {
           profile: true,
-          memberPropertyValues: true
+          memberPropertyValues: {
+            where: {
+              spaceId
+            }
+          }
         }
       },
       spaceRoleToRole: {
