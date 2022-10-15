@@ -65,14 +65,18 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       user: {
         memberPropertyValues: {
           some: {
-            memberProperty: {
-              type: {
-                in: ['multiselect', 'select']
+            OR: [
+              {
+                value: {
+                  array_contains: search
+                }
+              },
+              {
+                value: {
+                  string_contains: search
+                }
               }
-            },
-            value: {
-              array_contains: search
-            }
+            ]
           }
         }
       }

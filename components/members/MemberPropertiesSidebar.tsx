@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField } from '@mui/material';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, ClickAwayListener, Collapse, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -34,58 +36,87 @@ export function MemberPropertySidebarItem ({
 }: {
   property: MemberProperty;
 }) {
+  const [toggled, setToggled] = useState(false);
   const { properties = [], deleteProperty, updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
 
   return (
-    <MenuItem
-      dense
-      sx={{
-        alignItems: 'center',
-        display: 'flex',
-        justifyContent: 'space-between',
-        '&:hover .icons': {
-          opacity: 1
-        },
-        width: '100%'
-      }}
-    >
-      <MemberPropertyItem
-        type={property.type}
-        name={property.name}
-      />
-      {admin && (
-        <Box
-          display='flex'
-          gap={0.5}
-          className='icons'
+    <Stack>
+      <MenuItem
+        dense
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'space-between',
+          '&:hover .icons': {
+            opacity: 1
+          },
+          width: '100%',
+          '& .MuiListItemIcon-root': {
+            minWidth: 30
+          },
+          pl: 1
+        }}
+        onClick={() => setToggled(!toggled)}
+      >
+        <ArrowRightIcon
+          onClick={() => setToggled(!toggled)}
           sx={{
-            opacity: 0
+            transform: toggled ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 150ms ease-in-out'
           }}
-        >
-          <EditIcon
-            cursor='pointer'
-            fontSize='small'
-            color='secondary'
-            onClick={() => {
-              propertyRenamePopupState.open();
-              setPropertyName(property.name);
+        />
+        <MemberPropertyItem
+          type={property.type}
+          name={property.name}
+        />
+        {admin && (
+          <Box
+            display='flex'
+            gap={0.5}
+            className='icons'
+            sx={{
+              opacity: 0
             }}
-          />
-          {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
-            <DeleteIcon
+          >
+            <EditIcon
               cursor='pointer'
               fontSize='small'
               color='secondary'
-              onClick={() => {
-                deleteProperty(property.id);
+              onClick={(e) => {
+                e.stopPropagation();
+                propertyRenamePopupState.open();
+                setPropertyName(property.name);
               }}
             />
-          )}
-        </Box>
-      )}
+            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+              <DeleteIcon
+                cursor='pointer'
+                fontSize='small'
+                color='secondary'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteProperty(property.id);
+                }}
+              />
+            )}
+          </Box>
+        )}
+      </MenuItem>
+      <Collapse in={toggled}>
+        <Stack pl={5} pr={2.5} mb={1}>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+            <Typography variant='subtitle2'>Workspace</Typography>
+            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
+          </Stack>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+            <Typography variant='subtitle2'>Admins</Typography>
+            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
+          </Stack>
+        </Stack>
+      </Collapse>
       <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title='Rename property'>
         <Box>
           <TextField
@@ -111,7 +142,7 @@ export function MemberPropertySidebarItem ({
           </Button>
         </Box>
       </Modal>
-    </MenuItem>
+    </Stack>
   );
 }
 
@@ -126,6 +157,7 @@ export function MemberPropertiesSidebar ({
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
 
   const { properties, addProperty } = useMemberProperties();
+
   const [propertyName, setPropertyName] = useState('');
 
   return properties ? (
@@ -137,26 +169,7 @@ export function MemberPropertiesSidebar ({
               closeSidebar={onClose}
               title='Properties'
             />
-
             <Stack mb={1}>
-              {[...DEFAULT_MEMBER_PROPERTIES].sort().map(property => {
-                return (
-                  <MenuItem
-                    dense
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      width: '100%'
-                    }}
-                    key={property}
-                  >
-                    <MemberPropertyItem
-                      type={property}
-                    />
-                  </MenuItem>
-                );
-              })}
               {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
             </Stack>
             <AddMemberPropertyButton

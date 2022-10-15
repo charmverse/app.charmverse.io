@@ -34,7 +34,10 @@ export function AddMemberPropertyButton ({
       <Menu
         {...bindMenu(addMemberPropertyPopupState)}
         sx={{
-          width: '100%'
+          width: '100%',
+          '& .MuiListItemIcon-root': {
+            minWidth: 30
+          }
         }}
       >
         {Object.keys(DefaultMemberPropertyDict).map((memberPropertyType) => (
