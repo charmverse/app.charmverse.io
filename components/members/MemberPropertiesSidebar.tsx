@@ -1,15 +1,17 @@
 import styled from '@emotion/styled';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, ClickAwayListener, Collapse, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, IconButton, InputLabel, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
+import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -41,6 +43,9 @@ export function MemberPropertySidebarItem ({
   const [propertyName, setPropertyName] = useState('');
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
+
+  const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
 
   return (
     <Stack>
@@ -115,6 +120,19 @@ export function MemberPropertySidebarItem ({
             <Typography variant='subtitle2'>Admins</Typography>
             <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
           </Stack>
+          <Button
+            variant='text'
+            size='small'
+            color='secondary'
+            sx={{
+              width: 'fit-content'
+            }}
+            startIcon={<AddOutlinedIcon />}
+            onClick={memberPropertySidebarItemPopupState.open}
+            disabled={!admin}
+          >
+            Add Role
+          </Button>
         </Stack>
       </Collapse>
       <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title='Rename property'>
@@ -141,6 +159,26 @@ export function MemberPropertySidebarItem ({
           >Rename
           </Button>
         </Box>
+      </Modal>
+
+      <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
+        <Stack gap={0.5}>
+          <InputLabel>Roles</InputLabel>
+          <InputSearchRoleMultiple
+            onChange={setSelectedRoleIds}
+            filter={{
+              mode: 'exclude',
+              // TODO: It should be fetched from backend
+              userIds: []
+            }}
+          />
+          <Button sx={{
+            mt: 1,
+            width: 'fit-content'
+          }}
+          >Add
+          </Button>
+        </Stack>
       </Modal>
     </Stack>
   );
