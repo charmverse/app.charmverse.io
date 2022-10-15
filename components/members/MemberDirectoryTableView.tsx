@@ -29,8 +29,7 @@ export function MemberDirectoryTableView ({
     >
       <TableHead>
         <TableRow>
-          <StyledTableCell />
-          {['Name', 'Role', 'Discord', 'Twitter', 'Timezone', ...properties.map(property => property.name)].map(property => <StyledTableCell key={property}>{property}</StyledTableCell>)}
+          {properties.map(property => property.name).map(property => <StyledTableCell key={property}>{property}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -42,37 +41,61 @@ export function MemberDirectoryTableView ({
             <TableRow
               key={member.id}
             >
-              <TableCell sx={{
-                p: 1
-              }}
-              >
-                <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
-              </TableCell>
-              <TableCell>
-                <Link href={`/u/${member.path}`}>
-                  <Typography fontWeight='bold'>
-                    {member.username}
-                  </Typography>
-                </Link>
-              </TableCell>
-              <TableCell>
-                <Stack gap={1} flexDirection='row'>
-                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
-                </Stack>
-              </TableCell>
-              <TableCell>
-                {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
-              </TableCell>
-              <TableCell>
-                {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : 'N/A'}
-              </TableCell>
-              <TableCell>
-                <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
-              </TableCell>
               {properties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
                   switch (property.type) {
+                    case 'profile_pic': {
+                      return (
+                        <TableCell sx={{
+                          p: 1
+                        }}
+                        >
+                          <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
+                        </TableCell>
+                      );
+                    }
+                    case 'role': {
+                      return (
+                        <TableCell>
+                          <Stack gap={1} flexDirection='row'>
+                            {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                          </Stack>
+                        </TableCell>
+                      );
+                    }
+                    case 'discord': {
+                      return (
+                        <TableCell>
+                          {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
+                        </TableCell>
+                      );
+                    }
+                    case 'twitter': {
+                      return (
+                        <TableCell>
+                          {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : 'N/A'}
+                        </TableCell>
+                      );
+                    }
+                    case 'timezone': {
+                      return (
+                        <TableCell>
+                          <Typography variant='body2'>{member.properties.find(_property => _property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
+                        </TableCell>
+                      );
+                    }
+                    case 'name': {
+                      return (
+                        <TableCell>
+                          <Link href={`/u/${member.path}`}>
+                            <Typography fontWeight='bold'>
+                              {member.username}
+                            </Typography>
+                          </Link>
+                        </TableCell>
+                      );
+                    }
                     case 'text':
                     case 'phone':
                     case 'url':
@@ -84,7 +107,7 @@ export function MemberDirectoryTableView ({
                       );
                     }
                     case 'multiselect': {
-                      const values = (memberProperty?.value as string[]);
+                      const values = (memberProperty?.value ?? [])as string[];
                       return (
                         <TableCell key={property.id}>
                           <Stack gap={1} flexDirection='row'>

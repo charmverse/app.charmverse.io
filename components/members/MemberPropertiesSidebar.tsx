@@ -168,8 +168,7 @@ export function MemberPropertySidebarItem ({
             onChange={setSelectedRoleIds}
             filter={{
               mode: 'exclude',
-              // TODO: It should be fetched from backend
-              userIds: []
+              userIds: selectedRoleIds
             }}
           />
           <Button sx={{

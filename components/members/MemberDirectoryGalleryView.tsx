@@ -62,7 +62,7 @@ function MemberDirectoryGalleryCard ({
               );
             }
             case 'multiselect': {
-              const values = memberPropertyValue?.value as string[];
+              const values = (memberPropertyValue?.value ?? [])as string[];
               return (
                 <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
