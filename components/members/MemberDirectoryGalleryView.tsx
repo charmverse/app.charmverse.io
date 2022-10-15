@@ -6,7 +6,6 @@ import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 function MemberDirectoryGalleryCard ({
@@ -95,9 +94,11 @@ function MemberDirectoryGalleryCard ({
   );
 }
 
-export function MemberDirectoryGalleryView () {
-  const { members } = useMembers();
-
+export function MemberDirectoryGalleryView ({
+  members
+}: {
+  members: Member[];
+}) {
   return (
     <Grid container>
       {members.map(member => (

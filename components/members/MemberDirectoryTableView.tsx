@@ -6,15 +6,18 @@ import Link from 'components/common/Link';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
 `;
 
-export function MemberDirectoryTableView () {
+export function MemberDirectoryTableView ({
+  members
+}: {
+  members: Member[];
+}) {
   const { properties = [] } = useMemberProperties();
-  const { members } = useMembers();
   const timezoneProperty = properties.find(property => property.type === 'timezone');
 
   return (
