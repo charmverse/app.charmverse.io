@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 
@@ -36,6 +37,7 @@ export function MemberPropertySidebarItem ({
   const { properties = [], deleteProperty, updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
+  const admin = isAdmin();
 
   return (
     <MenuItem
@@ -54,34 +56,36 @@ export function MemberPropertySidebarItem ({
         type={property.type}
         name={property.name}
       />
-      <Box
-        display='flex'
-        gap={0.5}
-        className='icons'
-        sx={{
-          opacity: 0
-        }}
-      >
-        <EditIcon
-          cursor='pointer'
-          fontSize='small'
-          color='secondary'
-          onClick={() => {
-            propertyRenamePopupState.open();
-            setPropertyName(property.name);
+      {admin && (
+        <Box
+          display='flex'
+          gap={0.5}
+          className='icons'
+          sx={{
+            opacity: 0
           }}
-        />
-        {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
-          <DeleteIcon
+        >
+          <EditIcon
             cursor='pointer'
             fontSize='small'
             color='secondary'
             onClick={() => {
-              deleteProperty(property.id);
+              propertyRenamePopupState.open();
+              setPropertyName(property.name);
             }}
           />
-        )}
-      </Box>
+          {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+            <DeleteIcon
+              cursor='pointer'
+              fontSize='small'
+              color='secondary'
+              onClick={() => {
+                deleteProperty(property.id);
+              }}
+            />
+          )}
+        </Box>
+      )}
       <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title='Rename property'>
         <Box>
           <TextField

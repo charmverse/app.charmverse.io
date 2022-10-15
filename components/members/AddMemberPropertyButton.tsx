@@ -3,6 +3,7 @@ import { Button, Menu, MenuItem } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
+import isAdmin from 'hooks/useIsAdmin';
 import { DEFAULT_MEMBER_PROPERTIES, DefaultMemberPropertyDict } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
@@ -13,6 +14,7 @@ export function AddMemberPropertyButton ({
   onClick: (memberPropertyType: MemberPropertyType) => void;
 }) {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
+  const admin = isAdmin();
 
   return (
     <>
@@ -24,6 +26,7 @@ export function AddMemberPropertyButton ({
         sx={{
           p: 1
         }}
+        disabled={!admin}
         onClick={addMemberPropertyPopupState.open}
       >
         Add Property
