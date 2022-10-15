@@ -4,8 +4,8 @@ import * as http from 'adapters/http';
 import type { Member } from 'lib/members/interfaces';
 
 export class MembersApi {
-  getMembers (spaceId: string) {
-    return http.GET<Member[]>(`/api/spaces/${spaceId}/members`);
+  getMembers (spaceId: string, search?: string) {
+    return http.GET<Member[]>(`/api/spaces/${spaceId}/members`, { search });
   }
 
   getMemberProperties (spaceId: string) {

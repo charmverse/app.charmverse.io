@@ -6,15 +6,18 @@ import Link from 'components/common/Link';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
 `;
 
-export function MemberDirectoryTableView () {
+export function MemberDirectoryTableView ({
+  members
+}: {
+  members: Member[];
+}) {
   const { properties = [] } = useMemberProperties();
-  const { members } = useMembers();
   const timezoneProperty = properties.find(property => property.type === 'timezone');
 
   return (
@@ -46,13 +49,15 @@ export function MemberDirectoryTableView () {
                 <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
               </TableCell>
               <TableCell>
-                <Typography fontWeight='bold'>
-                  {member.username}
-                </Typography>
+                <Link href={`/u/${member.path}`}>
+                  <Typography fontWeight='bold'>
+                    {member.username}
+                  </Typography>
+                </Link>
               </TableCell>
               <TableCell>
                 <Stack gap={1} flexDirection='row'>
-                  {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                 </Stack>
               </TableCell>
               <TableCell>
@@ -80,7 +85,7 @@ export function MemberDirectoryTableView () {
                     }
                     case 'multiselect': {
                       return (
-                        <TableCell>
+                        <TableCell key={property.id}>
                           <Stack gap={1} flexDirection='row'>
                             {(memberProperty?.value as string[]).map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
                           </Stack>
@@ -89,7 +94,7 @@ export function MemberDirectoryTableView () {
                     }
                     case 'select': {
                       return (
-                        <TableCell>
+                        <TableCell key={property.id}>
                           {memberProperty?.value ? (
                             <Stack gap={1} flexDirection='row'>
                               <Chip label={memberProperty?.value} key={memberProperty?.value?.toString() ?? ''} size='small' variant='outlined' />

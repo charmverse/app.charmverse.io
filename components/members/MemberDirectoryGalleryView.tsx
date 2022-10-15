@@ -2,10 +2,10 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 function MemberDirectoryGalleryCard ({
@@ -27,9 +27,11 @@ function MemberDirectoryGalleryCard ({
         variant='square'
       />
       <Stack p={2} gap={1}>
-        <Typography gutterBottom variant='h6' mb={0} component='div'>
-          {member.username}
-        </Typography>
+        <Link href={`/u/${member.path}`}>
+          <Typography gutterBottom variant='h6' mb={0} component='div'>
+            {member.username}
+          </Typography>
+        </Link>
         {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
         <Stack gap={0.5}>
           <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
@@ -53,7 +55,7 @@ function MemberDirectoryGalleryCard ({
             case 'url':
             case 'number': {
               return (
-                <Stack>
+                <Stack key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Typography variant='body2'>{memberPropertyValue ?? 'N/A'}</Typography>
                 </Stack>
@@ -62,7 +64,7 @@ function MemberDirectoryGalleryCard ({
             case 'multiselect': {
               const values = memberPropertyValue?.value as string[];
               return (
-                <Stack gap={0.5}>
+                <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Stack gap={1} flexDirection='row'>
                     {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N?A'}
@@ -72,7 +74,7 @@ function MemberDirectoryGalleryCard ({
             }
             case 'select': {
               return (
-                <Stack gap={0.5}>
+                <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   {memberPropertyValue?.value ? (
                     <Stack gap={1} flexDirection='row'>
@@ -92,13 +94,15 @@ function MemberDirectoryGalleryCard ({
   );
 }
 
-export function MemberDirectoryGalleryView () {
-  const { members } = useMembers();
-
+export function MemberDirectoryGalleryView ({
+  members
+}: {
+  members: Member[];
+}) {
   return (
     <Grid container>
       {members.map(member => (
-        <Grid xs={3} key={member.id}>
+        <Grid item xs={3} key={member.id}>
           <MemberDirectoryGalleryCard member={member} />
         </Grid>
       ))}

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -16,9 +17,73 @@ handler.use(requireUser).get(getMembers);
 async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
+  const search = req.query.search as string ?? '';
+
+  const whereOr:Prisma.Enumerable<Prisma.SpaceRoleWhereInput> = [];
+
+  if (search.length !== 0) {
+    whereOr.push({
+      user: {
+        username: {
+          search: `${search
+            .split(/\s/)
+            .filter((s) => s)
+            .join(' & ')}:*`
+        }
+      }
+    });
+
+    whereOr.push({
+      spaceRoleToRole: {
+        some: {
+          role: {
+            name: {
+              search: `${search
+                .split(/\s/)
+                .filter((s) => s)
+                .join(' & ')}:*`
+            }
+          }
+        }
+      }
+    });
+
+    whereOr.push({
+      user: {
+        profile: {
+          description: {
+            search: `${search
+              .split(/\s/)
+              .filter((s) => s)
+              .join(' & ')}:*`
+          }
+        }
+      }
+    });
+
+    whereOr.push({
+      user: {
+        memberPropertyValues: {
+          some: {
+            memberProperty: {
+              type: {
+                in: ['multiselect', 'select']
+              }
+            },
+            value: {
+              array_contains: search
+            }
+          }
+        }
+      }
+    });
+  }
 
   const spaceRoles = await prisma.spaceRole.findMany({
-    where: {
+    where: whereOr.length !== 0 ? {
+      spaceId,
+      OR: whereOr
+    } : {
       spaceId
     },
     include: {
@@ -46,7 +111,6 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
   });
 
   const visibleProperties = await getVisibleMemberPropertiesBySpace({ userId, spaceId });
-  const roleMemberProperty = visibleProperties.find(visibleProperty => visibleProperty.type === 'role');
 
   const members = spaceRoles.map((spaceRole): Member => {
     const { memberPropertyValues = [], id, ...userData } = spaceRole.user;

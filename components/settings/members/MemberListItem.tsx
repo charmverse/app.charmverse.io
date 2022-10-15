@@ -11,6 +11,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
@@ -33,7 +34,8 @@ interface Props {
 
 export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
-
+  const { members } = useMembers();
+  const totalAdmins = members.filter(_member => _member.isAdmin).length;
   function handleMenuItemClick (action: RoleAction) {
     onChange(action, member);
     popupState.close();
@@ -92,6 +94,7 @@ export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: 
                 <MenuItem
                   key={action}
                   onClick={() => handleMenuItemClick(action)}
+                  disabled={action === 'makeMember' && totalAdmins === 1}
                 >
                   {action === 'makeAdmin' && (
                     <StyledListItemText
