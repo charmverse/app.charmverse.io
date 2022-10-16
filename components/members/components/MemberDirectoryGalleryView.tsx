@@ -15,6 +15,7 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const timezoneProperty = properties.find(property => property.type === 'timezone');
+
   return (
     <Card sx={{ width: '100%' }}>
       <Avatar
@@ -57,7 +58,7 @@ function MemberDirectoryGalleryCard ({
               return (
                 <Stack key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>{memberPropertyValue ?? 'N/A'}</Typography>
+                  <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
                 </Stack>
               );
             }
