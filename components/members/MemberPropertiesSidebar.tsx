@@ -1,16 +1,24 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField } from '@mui/material';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, ClickAwayListener, Collapse, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
+import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { darkModeColors, lightModeColors } from 'theme/colors';
 
 import { AddMemberPropertyButton } from './AddMemberPropertyButton';
 import { MemberPropertyItem } from './MemberPropertyItem';
@@ -28,86 +36,264 @@ const StyledSidebar = styled.div`
   }
 `;
 
+type PropertyOption = { name: string, color: string }
+
+function MemberPropertyItemForm ({
+  property,
+  close
+}: {
+  property: MemberProperty;
+  close: VoidFunction;
+}) {
+  const { properties = [], updateProperty } = useMemberProperties();
+  const [propertyName, setPropertyName] = useState('');
+  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>(property.options as PropertyOption[] ?? []);
+
+  const theme = useTheme();
+  const colorRecord = theme.palette.mode === 'dark' ? darkModeColors : lightModeColors;
+
+  useEffect(() => {
+    setPropertyName(property.name);
+  }, []);
+
+  const isDisabled = Boolean(propertyName && propertyOptions.find(po => po.name.length === 0));
+
+  return (
+    <Stack gap={2}>
+      <Stack>
+        <FieldLabel>Name</FieldLabel>
+        <TextField
+          error={!propertyName}
+          value={propertyName}
+          onChange={(e) => setPropertyName(e.target.value)}
+          autoFocus
+        />
+      </Stack>
+
+      {
+        property.type.match(/select/) && (
+          <Stack>
+            <FieldLabel>Options</FieldLabel>
+            {
+                propertyOptions.map((propertyOption, propertyOptionIndex) => {
+                  return (
+                    <Stack flexDirection='row' justifyContent='space-between' mb={1}>
+                      <TextField
+                        key={propertyOption.name}
+                        value={propertyOption.name}
+                        onChange={(e) => {
+                          setPropertyOptions(
+                            propertyOptions.map((po, index) => ({ ...po, name: index === propertyOptionIndex ? e.target.value : po.name }))
+                          );
+                        }}
+                      />
+                      <Stack gap={1} flexDirection='row'>
+                        <Select
+                          value={propertyOption.color}
+                          displayEmpty={false}
+                          onChange={(e) => {
+                            setPropertyOptions(
+                              propertyOptions.map((po, index) => ({ ...po, color: index === propertyOptionIndex ? e.target.value : po.color }))
+                            );
+                          }}
+                        >
+                          {Object.entries(colorRecord).map(([label, color]) => (
+                            <MenuItem key={label} value={label}>
+                              <div style={{
+                                width: 25,
+                                height: 25,
+                                borderRadius: '50%',
+                                backgroundColor: color
+                              }}
+                              />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        <IconButton color='error'>
+                          <DeleteIcon
+                            fontSize='small'
+                            onClick={() => {
+                              setPropertyOptions(propertyOptions.filter((_, index) => index !== propertyOptionIndex));
+                            }}
+                          />
+                        </IconButton>
+                      </Stack>
+                    </Stack>
+                  );
+                })
+              }
+
+            <Button
+              variant='text'
+              size='small'
+              color='secondary'
+              sx={{
+                width: 'fit-content',
+                my: 1
+              }}
+              startIcon={<AddOutlinedIcon />}
+              onClick={() => {
+                setPropertyOptions([...propertyOptions, {
+                  name: '',
+                  color: 'teal'
+                }]);
+              }}
+            >
+              Add option
+            </Button>
+          </Stack>
+        )
+      }
+
+      <Button
+        disabled={isDisabled}
+        onClick={async () => {
+          if (!isDisabled) {
+            await updateProperty({
+              index: properties.length,
+              name: propertyName,
+              id: property.id,
+              options: propertyOptions
+            });
+            setPropertyName('');
+            close();
+          }
+        }}
+        sx={{
+          width: 'fit-content'
+        }}
+      >Update
+      </Button>
+    </Stack>
+  );
+}
+
 export function MemberPropertySidebarItem ({
   property
 }: {
   property: MemberProperty;
 }) {
-  const { properties = [], deleteProperty, updateProperty } = useMemberProperties();
-  const [propertyName, setPropertyName] = useState('');
+  const [toggled, setToggled] = useState(false);
+  const { deleteProperty } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
+  const admin = isAdmin();
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
+
+  const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
 
   return (
-    <MenuItem
-      dense
-      sx={{
-        alignItems: 'center',
-        display: 'flex',
-        justifyContent: 'space-between',
-        '&:hover .icons': {
-          opacity: 1
-        },
-        width: '100%'
-      }}
-    >
-      <MemberPropertyItem
-        type={property.type}
-        name={property.name}
-      />
-      <Box
-        display='flex'
-        gap={0.5}
-        className='icons'
+    <Stack>
+      <MenuItem
+        dense
         sx={{
-          opacity: 0
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'space-between',
+          '&:hover .icons': {
+            opacity: 1
+          },
+          width: '100%',
+          '& .MuiListItemIcon-root': {
+            minWidth: 30
+          },
+          pl: 1
         }}
+        onClick={() => setToggled(!toggled)}
       >
-        <EditIcon
-          cursor='pointer'
-          fontSize='small'
-          color='secondary'
-          onClick={() => {
-            propertyRenamePopupState.open();
-            setPropertyName(property.name);
+        <ArrowRightIcon
+          onClick={() => setToggled(!toggled)}
+          sx={{
+            transform: toggled ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 150ms ease-in-out'
           }}
         />
-        {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
-          <DeleteIcon
-            cursor='pointer'
-            fontSize='small'
-            color='secondary'
-            onClick={() => {
-              deleteProperty(property.id);
+        <MemberPropertyItem
+          type={property.type}
+          name={property.name}
+        />
+        {admin && (
+          <Box
+            display='flex'
+            gap={0.5}
+            className='icons'
+            sx={{
+              opacity: 0
             }}
-          />
+          >
+            <EditIcon
+              cursor='pointer'
+              fontSize='small'
+              color='secondary'
+              onClick={(e) => {
+                e.stopPropagation();
+                propertyRenamePopupState.open();
+              }}
+            />
+            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+              <DeleteIcon
+                cursor='pointer'
+                fontSize='small'
+                color='secondary'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteProperty(property.id);
+                }}
+              />
+            )}
+          </Box>
         )}
-      </Box>
-      <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title='Rename property'>
-        <Box>
-          <TextField
-            error={!propertyName}
-            value={propertyName}
-            onChange={(e) => setPropertyName(e.target.value)}
-            autoFocus
-          />
+      </MenuItem>
+      <Collapse in={toggled}>
+        <Stack pl={5} pr={2.5} mb={1}>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+            <Typography variant='subtitle2'>Workspace</Typography>
+            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
+          </Stack>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+            <Typography variant='subtitle2'>Admins</Typography>
+            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
+          </Stack>
           <Button
-            disabled={!propertyName}
-            onClick={async () => {
-              if (propertyName) {
-                await updateProperty({
-                  index: properties.length,
-                  name: propertyName,
-                  id: property.id
-                });
-                setPropertyName('');
-                propertyRenamePopupState.close();
-              }
+            variant='text'
+            size='small'
+            color='secondary'
+            sx={{
+              width: 'fit-content'
             }}
-          >Rename
+            startIcon={<AddOutlinedIcon />}
+            onClick={memberPropertySidebarItemPopupState.open}
+            disabled={!admin}
+          >
+            Add Role
           </Button>
-        </Box>
+        </Stack>
+      </Collapse>
+      <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title={`Update ${property.name}`}>
+        <MemberPropertyItemForm
+          close={propertyRenamePopupState.close}
+          property={property}
+        />
       </Modal>
-    </MenuItem>
+
+      <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
+        <Stack gap={0.5}>
+          <InputLabel>Roles</InputLabel>
+          <InputSearchRoleMultiple
+            onChange={setSelectedRoleIds}
+            filter={{
+              mode: 'exclude',
+              userIds: selectedRoleIds
+            }}
+          />
+          <Button sx={{
+            mt: 1,
+            width: 'fit-content'
+          }}
+          >Add
+          </Button>
+        </Stack>
+      </Modal>
+    </Stack>
   );
 }
 
@@ -122,6 +308,7 @@ export function MemberPropertiesSidebar ({
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
 
   const { properties, addProperty } = useMemberProperties();
+
   const [propertyName, setPropertyName] = useState('');
 
   return properties ? (
@@ -133,26 +320,7 @@ export function MemberPropertiesSidebar ({
               closeSidebar={onClose}
               title='Properties'
             />
-
             <Stack mb={1}>
-              {[...DEFAULT_MEMBER_PROPERTIES].sort().map(property => {
-                return (
-                  <MenuItem
-                    dense
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      width: '100%'
-                    }}
-                    key={property}
-                  >
-                    <MemberPropertyItem
-                      type={property}
-                    />
-                  </MenuItem>
-                );
-              })}
               {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
             </Stack>
             <AddMemberPropertyButton
