@@ -94,6 +94,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       showPage({
         pageId: newPage.id,
         onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
       });

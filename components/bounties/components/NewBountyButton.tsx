@@ -61,7 +61,10 @@ export default function NewBountyButton () {
       setBounties((bounties) => [...bounties, createdBounty]);
       showPage({
         pageId: createdBounty.page.id,
-        hideToolsMenu: suggestBounties
+        hideToolsMenu: suggestBounties,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { bountyId: null });
+        }
       });
       setUrlWithoutRerender(router.pathname, { bountyId: createdBounty.page.id });
     }
