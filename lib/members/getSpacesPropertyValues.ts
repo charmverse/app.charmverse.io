@@ -1,39 +1,11 @@
 import { prisma } from 'db';
+import { getCommonSpaceIds } from 'lib/members/getCommonSpaceIds';
 import { getVisibleMemberPropertiesBySpace } from 'lib/members/getVisibleMemberPropertiesBySpace';
-import type { MemberPropertyValuesBySpace } from 'lib/members/interfaces';
+import type { CommonSpacesInput, MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 import { getPropertiesWithValues, groupPropertyValuesBySpace } from 'lib/members/utils';
 
-type UpdatePropertyInput = {
-  memberId: string;
-  requestingUserId: string;
-  spaceId?: string | undefined;
-}
-
-export async function getSpacesPropertyValues ({ memberId, requestingUserId, spaceId }: UpdatePropertyInput): Promise<MemberPropertyValuesBySpace[]> {
-  const commonSpaces = await prisma.space.findMany({
-    where: {
-      id: spaceId || undefined,
-      AND: [
-        {
-          spaceRoles: {
-            some: {
-              userId: memberId
-            }
-          }
-        },
-        {
-          spaceRoles: {
-            some: {
-              userId: requestingUserId
-            }
-          }
-        }
-      ]
-    },
-    select: { id: true }
-  });
-
-  const spaceIds = commonSpaces.map(s => s.id);
+export async function getSpacesPropertyValues ({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<MemberPropertyValuesBySpace[]> {
+  const spaceIds = await getCommonSpaceIds({ spaceId, memberId, requestingUserId });
   const visibleMemberProperties = await getVisibleMemberPropertiesBySpace({ userId: requestingUserId, spaceId: spaceIds });
   const memberPropertyIds = visibleMemberProperties.map(mp => mp.id);
 

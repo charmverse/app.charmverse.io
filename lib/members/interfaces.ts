@@ -22,3 +22,8 @@ export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'member
 
 export type MemberPropertyValuesBySpace = { spaceId: string, properties: PropertyValue[] }
 
+export type CommonSpacesInput = {
+  memberId: string;
+  requestingUserId: string;
+  spaceId?: string | undefined;
+}
