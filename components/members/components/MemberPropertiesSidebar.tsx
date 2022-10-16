@@ -17,6 +17,7 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useMembers } from 'hooks/useMembers';
 import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { BrandColor } from 'theme/colors';
 import { darkModeColors, lightModeColors } from 'theme/colors';
@@ -344,6 +345,7 @@ export function MemberPropertiesSidebar ({
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
 
   const { properties, addProperty } = useMemberProperties();
+  const { mutateMembers } = useMembers();
 
   const [propertyName, setPropertyName] = useState('');
 
@@ -391,6 +393,7 @@ export function MemberPropertiesSidebar ({
                   type: selectedPropertyType
                 });
                 setPropertyName('');
+                mutateMembers();
                 propertyNamePopupState.close();
               }
             }}
