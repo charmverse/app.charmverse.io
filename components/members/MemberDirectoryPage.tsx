@@ -10,10 +10,10 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
-import { MemberDirectoryGalleryView } from './MemberDirectoryGalleryView';
-import { MemberDirectorySearchBar } from './MemberDirectorySearchBar';
-import { MemberDirectoryTableView } from './MemberDirectoryTableView';
-import { MemberPropertiesSidebar } from './MemberPropertiesSidebar';
+import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
+import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
+import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
+import { MemberPropertiesSidebar } from './components/MemberPropertiesSidebar';
 
 const StyledButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing(0.5, 1)};

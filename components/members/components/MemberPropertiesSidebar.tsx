@@ -18,6 +18,7 @@ import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import type { BrandColor } from 'theme/colors';
 import { darkModeColors, lightModeColors } from 'theme/colors';
 
 import { AddMemberPropertyButton } from './AddMemberPropertyButton';
@@ -36,7 +37,7 @@ const StyledSidebar = styled.div`
   }
 `;
 
-type PropertyOption = { name: string, color: string }
+type PropertyOption = { name: string, color: BrandColor }
 
 function MemberPropertyItemForm ({
   property,
@@ -79,7 +80,8 @@ function MemberPropertyItemForm ({
                   return (
                     <Stack flexDirection='row' justifyContent='space-between' mb={1}>
                       <TextField
-                        key={propertyOption.name}
+                        // Using name would cause textfield to lose focus on each stroke
+                        key={`${propertyOptionIndex.toString()}`}
                         value={propertyOption.name}
                         onChange={(e) => {
                           setPropertyOptions(
@@ -93,12 +95,45 @@ function MemberPropertyItemForm ({
                           displayEmpty={false}
                           onChange={(e) => {
                             setPropertyOptions(
-                              propertyOptions.map((po, index) => ({ ...po, color: index === propertyOptionIndex ? e.target.value : po.color }))
+                              propertyOptions
+                                .map((po, index) => (
+                                  { ...po, color: index === propertyOptionIndex ? e.target.value as BrandColor : po.color }
+                                ))
+                            );
+                          }}
+                          renderValue={(name: BrandColor) => {
+                            return (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  gap: 1,
+                                  flexDirection: 'row',
+                                  textTransform: 'capitalize'
+                                }}
+                              >
+                                <div style={{
+                                  width: 25,
+                                  height: 25,
+                                  borderRadius: '50%',
+                                  backgroundColor: colorRecord[name]
+                                }}
+                                />
+                                <Typography>{name}</Typography>
+                              </Box>
                             );
                           }}
                         >
                           {Object.entries(colorRecord).map(([label, color]) => (
-                            <MenuItem key={label} value={label}>
+                            <MenuItem
+                              sx={{
+                                display: 'flex',
+                                gap: 1,
+                                flexDirection: 'row',
+                                textTransform: 'capitalize'
+                              }}
+                              key={label}
+                              value={label}
+                            >
                               <div style={{
                                 width: 25,
                                 height: 25,
@@ -106,6 +141,7 @@ function MemberPropertyItemForm ({
                                 backgroundColor: color
                               }}
                               />
+                              <Typography>{label}</Typography>
                             </MenuItem>
                           ))}
                         </Select>
