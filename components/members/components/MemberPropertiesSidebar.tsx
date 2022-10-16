@@ -18,7 +18,7 @@ import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { BrandColor } from 'theme/colors';
 import { darkModeColors, lightModeColors } from 'theme/colors';
 
@@ -364,7 +364,6 @@ export function MemberPropertiesSidebar ({
             <AddMemberPropertyButton
               onClick={(memberPropertyType) => {
                 setSelectedPropertyType(memberPropertyType as MemberPropertyType);
-                setPropertyName(DefaultMemberPropertyDict[memberPropertyType]);
                 propertyNamePopupState.open();
               }}
             />
@@ -372,17 +371,19 @@ export function MemberPropertiesSidebar ({
         </Collapse>
       </ClickAwayListener>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
-        <Box>
+        <Stack gap={1}>
           <TextField
+            fullWidth
             error={!propertyName || !selectedPropertyType}
             value={propertyName}
+            placeholder='Name'
             onChange={(e) => setPropertyName(e.target.value)}
             autoFocus
           />
           <Button
             disabled={!propertyName || !selectedPropertyType}
             sx={{
-              height: 40
+              width: 'fit-content'
             }}
             onClick={async () => {
               if (propertyName && selectedPropertyType) {
@@ -399,7 +400,7 @@ export function MemberPropertiesSidebar ({
             }}
           >Add
           </Button>
-        </Box>
+        </Stack>
       </Modal>
     </>
   ) : null;
