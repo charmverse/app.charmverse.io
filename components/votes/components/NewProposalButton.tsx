@@ -61,9 +61,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
 
       mutateProposals();
       mutatePage(newProposal);
-
+      setUrlWithoutRerender(router.pathname, { id: newProposal.id });
       showPage({
-        pageId: newProposal.id
+        pageId: newProposal.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -73,8 +76,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
       mutatePage(newTemplate);
+      setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
       showPage({
-        pageId: newTemplate.id
+        pageId: newTemplate.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -120,7 +127,13 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       <TemplatesMenu
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
-        editTemplate={(pageId) => showPage({ pageId })}
+        editTemplate={(pageId) => {
+          setUrlWithoutRerender(router.pathname, { id: pageId });
+          showPage({ pageId,
+            onClose () {
+              setUrlWithoutRerender(router.pathname, { id: null });
+            } });
+        }}
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}
