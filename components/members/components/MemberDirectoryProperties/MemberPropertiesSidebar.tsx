@@ -18,7 +18,8 @@ import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 
-import { AddMemberPropertyButton } from './AddMemberPropertyButton';
+import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
+
 import { MemberPropertyItem } from './MemberPropertyItem';
 import type { PropertyOption } from './MemberPropertySelectInput';
 import { MemberPropertySelectInput } from './MemberPropertySelectInput';

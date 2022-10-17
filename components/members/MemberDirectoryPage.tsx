@@ -11,9 +11,9 @@ import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
+import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
-import { MemberPropertiesSidebar } from './components/MemberPropertiesSidebar';
 
 const StyledButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing(0.5, 1)};
