@@ -11,6 +11,8 @@ import { useMembers } from 'hooks/useMembers';
 import { DEFAULT_MEMBER_PROPERTIES, DefaultMemberPropertyDict } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
+import type { PropertyOption } from './MemberPropertySelectInput';
+import { MemberPropertySelectInput } from './MemberPropertySelectInput';
 
 export function AddMemberPropertyButton () {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
@@ -20,6 +22,7 @@ export function AddMemberPropertyButton () {
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
   const { properties, addProperty } = useMemberProperties();
+  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>([]);
 
   return (
     <>
@@ -63,7 +66,7 @@ export function AddMemberPropertyButton () {
         ))}
       </Menu>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
-        <Stack gap={1} flexDirection='row'>
+        <Stack gap={1}>
           <TextField
             fullWidth
             error={!propertyName || !selectedPropertyType}
@@ -75,6 +78,12 @@ export function AddMemberPropertyButton () {
               flexGrow: 1
             }}
           />
+          {selectedPropertyType?.match(/select/) && (
+            <MemberPropertySelectInput
+              onChange={setPropertyOptions}
+              options={propertyOptions}
+            />
+          )}
           <Button
             disabled={!propertyName || !selectedPropertyType}
             sx={{
@@ -85,7 +94,7 @@ export function AddMemberPropertyButton () {
                 await addProperty({
                   index: properties?.length ?? 0,
                   name: propertyName,
-                  options: null,
+                  options: propertyOptions,
                   type: selectedPropertyType
                 });
                 setPropertyName('');
