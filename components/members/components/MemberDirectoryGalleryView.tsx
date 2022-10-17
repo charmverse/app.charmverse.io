@@ -8,6 +8,8 @@ import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
+import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
+
 function MemberDirectoryGalleryCard ({
   member
 }: {
@@ -63,23 +65,24 @@ function MemberDirectoryGalleryCard ({
               );
             }
             case 'multiselect': {
-              const values = (memberPropertyValue?.value ?? [])as string[];
+              const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
               return (
                 <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                   <Stack gap={1} flexDirection='row'>
-                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />) : 'N/A'}
+                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
                   </Stack>
                 </Stack>
               );
             }
             case 'select': {
+              const propertyValue = memberPropertyValue?.value as PropertyOption;
               return (
                 <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  {memberPropertyValue?.value ? (
+                  {propertyValue ? (
                     <Stack gap={1} flexDirection='row'>
-                      <Chip label={memberPropertyValue?.value} key={memberPropertyValue?.value?.toString() ?? ''} size='small' variant='outlined' />
+                      <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
                     </Stack>
                   ) : <Typography variant='body2'>N/A</Typography>}
                 </Stack>
