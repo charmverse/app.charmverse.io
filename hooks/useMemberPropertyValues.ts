@@ -34,7 +34,7 @@ export function useMemberPropertyValues (memberId: string) {
             }
           });
 
-          return { spaceId, properties: updatedProperties };
+          return { ...sv, properties: updatedProperties };
         }
 
         return sv;
