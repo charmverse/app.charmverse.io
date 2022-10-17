@@ -4,9 +4,9 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { logInviteAccepted } from 'lib/log/userEvents';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
+import { logInviteAccepted } from 'lib/metrics/postToDiscord';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
