@@ -10,7 +10,7 @@ import withScrolling, { createHorizontalStrength, createVerticalStrength } from 
 import { FormattedMessage, injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
 
-import { isTouchScreen } from 'lib/browser';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
@@ -72,7 +72,7 @@ type Props = {
   readOnly: boolean;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
 }
 
 function Kanban (props: Props) {

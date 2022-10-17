@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
-import { isSmallScreen } from 'lib/browser';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import { isSmallScreen } from 'lib/utilities/browser';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { usePages } from './usePages';
