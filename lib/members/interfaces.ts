@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyValue, Role, User, UserDetails } from '@prisma/client';
+import type { MemberProperty, MemberPropertyType, MemberPropertyValue, Role, User, UserDetails } from '@prisma/client';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 
@@ -7,6 +7,13 @@ export type PropertyValue = {
   value: MemberPropertyValueType;
   spaceId: string;
 }
+
+export type PropertyValueDetails = {
+  type: MemberPropertyType;
+  name: string;
+}
+
+export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 
 export type Member = Omit<User, 'addresses'> & {
   isAdmin: boolean;
@@ -20,7 +27,7 @@ export type Member = Omit<User, 'addresses'> & {
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>
 
-export type MemberPropertyValuesBySpace = { spaceId: string, properties: PropertyValue[] }
+export type MemberPropertyValuesBySpace = { spaceId: string, properties: PropertyValueWithDetails[] }
 
 export type CommonSpacesInput = {
   memberId: string;

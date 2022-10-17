@@ -24,6 +24,9 @@ export function updateMemberPropertyValue ({ data, userId, spaceId, updatedBy }:
       memberPropertyId: data.memberPropertyId,
       userId,
       spaceId
+    },
+    include: {
+      memberProperty: true
     }
   });
 }
