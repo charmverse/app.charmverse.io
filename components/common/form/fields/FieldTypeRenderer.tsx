@@ -9,7 +9,9 @@ type Props = {
 export function FieldTypeRenderer ({ type, ...fieldProps }: Props) {
   switch (type) {
     case 'text':
-    case 'name': {
+    case 'phone':
+    case 'url':
+    case 'email': {
       return <TextInputField {...fieldProps} />;
     }
     case 'number': {

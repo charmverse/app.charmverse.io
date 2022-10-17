@@ -37,6 +37,7 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
               case 'text':
               case 'phone':
               case 'url':
+              case 'email':
               case 'number': {
                 return (
                   <Stack key={property.memberPropertyId}>

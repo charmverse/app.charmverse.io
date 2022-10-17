@@ -26,7 +26,41 @@ function getFieldTypeRules (type: FieldType): RegisterOptions {
   switch (type) {
     case 'number': {
       return {
+        required: false,
         pattern: /^(0|[1-9]\d*)(\.\d+)?$/
+      };
+    }
+
+    case 'phone': {
+      return {
+        required: false,
+        pattern: /^(0|[1-9]\d*)(\.\d+)?$/
+      };
+    }
+
+    case 'email': {
+      return {
+        required: false,
+        pattern: /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
+      };
+    }
+
+    case 'url': {
+      return {
+        required: false,
+        validate: (val: string) => {
+          if (!val) {
+            return true;
+          }
+
+          try {
+            const url = new URL(val);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+          }
+          catch (_) {
+            return false;
+          }
+        }
       };
     }
 
