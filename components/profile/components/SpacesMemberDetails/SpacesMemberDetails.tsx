@@ -1,6 +1,10 @@
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { Box } from '@mui/system';
+import { useState } from 'react';
 
+import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { MemberPropertiesForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesForm';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 
@@ -10,6 +14,7 @@ type Props = {
 
 export function SpacesMemberDetails ({ memberId }: Props) {
   const { isLoading, memberPropertyValues } = useMemberPropertyValues(memberId);
+  const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
@@ -31,6 +36,15 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           properties={pv.properties}
         />
       ))}
+
+      {/* <Button onClick={() => setEditSpaceId(memberPropertyValues?.[0].spaceId)}>edit</Button> */}
+
+      <Dialog open={!!editSpaceId} onClose={() => setEditSpaceId(null)} fullWidth>
+        <DialogTitle>Edit workspace profile</DialogTitle>
+        <DialogContent dividers>
+          <MemberPropertiesForm memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={() => Promise.resolve()} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

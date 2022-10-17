@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyValue } from '@prisma/client';
+import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client';
 
 import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, PropertyValue, MemberPropertyWithSpace } from 'lib/members/interfaces';
 
@@ -32,10 +32,10 @@ export function groupPropertyValuesBySpace (propertyValues: PropertyValueWithDet
 export function mapPropertyValueWithDetails ({
   memberPropertyId,
   spaceId,
-  spaceImage,
   value,
-  memberProperty: { type, name }
-}: PropertyValue & { memberProperty: MemberProperty }): PropertyValueWithDetails {
+  memberProperty: { type, name },
+  space: { spaceImage }
+}: MemberPropertyValue & { memberProperty: MemberProperty, space: Space }): PropertyValueWithDetails {
   return {
     memberPropertyId,
     spaceId,
