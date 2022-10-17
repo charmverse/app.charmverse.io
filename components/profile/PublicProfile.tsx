@@ -4,6 +4,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { SpacesMemberDetails } from 'components/profile/components/SpacesMemberDetails/SpacesMemberDetails';
 import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
 
 import AggregatedData from './components/AggregatedData';
@@ -185,6 +186,7 @@ export default function PublicProfile (props: UserDetailsProps) {
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
+      <SpacesMemberDetails memberId={user.id} />
       <Divider />
       <LoadingComponent isLoading={isLoading} minHeight={300}>
         <AggregatedData

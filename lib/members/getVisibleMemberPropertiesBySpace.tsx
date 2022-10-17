@@ -15,6 +15,9 @@ export function getVisibleMemberPropertiesBySpace ({ userId, spaceId }: GetVisib
     },
     orderBy: {
       index: 'asc'
+    },
+    include: {
+      space: true
     }
   });
 }
