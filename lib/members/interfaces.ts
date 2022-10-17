@@ -42,6 +42,6 @@ export type MemberPropertyValuesBySpace = {
 
 export type CommonSpacesInput = {
   memberId: string;
-  requestingUserId: string;
+  requestingUserId: string | undefined;
   spaceId?: string | undefined;
 }
