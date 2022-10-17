@@ -2,13 +2,13 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
 
-import type { PropertyValue } from 'lib/members/interfaces';
+import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
 type Props = {
   spaceId: string;
   spaceName: string;
   memberId: string;
-  properties: PropertyValue[];
+  properties: PropertyValueWithDetails[];
 };
 
 const StyledAccordion = styled(Accordion)`
