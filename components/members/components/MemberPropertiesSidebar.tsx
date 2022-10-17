@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, ClickAwayListener, Collapse, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import type { MemberProperty, MemberPropertyType } from '@prisma/client';
+import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
@@ -17,7 +17,6 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { BrandColor } from 'theme/colors';
 import { darkModeColors, lightModeColors } from 'theme/colors';
@@ -341,67 +340,22 @@ export function MemberPropertiesSidebar ({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const propertyNamePopupState = usePopupState({ variant: 'popover', popupId: 'property-name-modal' });
-  const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
-
-  const { properties, addProperty } = useMemberProperties();
-  const { mutateMembers } = useMembers();
-
-  const [propertyName, setPropertyName] = useState('');
+  const { properties } = useMemberProperties();
 
   return properties ? (
-    <>
-      <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
-        <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
-          <StyledSidebar>
-            <SidebarHeader
-              closeSidebar={onClose}
-              title='Properties'
-            />
-            <Stack mb={1}>
-              {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
-            </Stack>
-            <AddMemberPropertyButton
-              onClick={(memberPropertyType) => {
-                setSelectedPropertyType(memberPropertyType as MemberPropertyType);
-                propertyNamePopupState.open();
-              }}
-            />
-          </StyledSidebar>
-        </Collapse>
-      </ClickAwayListener>
-      <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
-        <Stack gap={1}>
-          <TextField
-            fullWidth
-            error={!propertyName || !selectedPropertyType}
-            value={propertyName}
-            placeholder='Name'
-            onChange={(e) => setPropertyName(e.target.value)}
-            autoFocus
+    <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
+      <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
+        <StyledSidebar>
+          <SidebarHeader
+            closeSidebar={onClose}
+            title='Properties'
           />
-          <Button
-            disabled={!propertyName || !selectedPropertyType}
-            sx={{
-              width: 'fit-content'
-            }}
-            onClick={async () => {
-              if (propertyName && selectedPropertyType) {
-                await addProperty({
-                  index: properties.length,
-                  name: propertyName,
-                  options: null,
-                  type: selectedPropertyType
-                });
-                setPropertyName('');
-                mutateMembers();
-                propertyNamePopupState.close();
-              }
-            }}
-          >Add
-          </Button>
-        </Stack>
-      </Modal>
-    </>
+          <Stack mb={1}>
+            {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
+          </Stack>
+          <AddMemberPropertyButton />
+        </StyledSidebar>
+      </Collapse>
+    </ClickAwayListener>
   ) : null;
 }
