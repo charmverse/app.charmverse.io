@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
+import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Chip, Stack, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
 
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyOption } from 'components/members/components/MemberDirectoryProperties/MemberPropertySelectInput';
@@ -12,6 +13,8 @@ type Props = {
   memberId: string;
   properties: PropertyValueWithDetails[];
   spaceImage: string | null;
+  readOnly?: boolean;
+  onEdit: VoidFunction;
 };
 
 const StyledAccordion = styled(Accordion)`
@@ -21,14 +24,30 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, properties, spaceImage }: Props) {
+export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, properties, spaceImage, readOnly, onEdit }: Props) {
 
   return (
     <StyledAccordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}><WorkspaceAvatar
         name={spaceName}
         image={spaceImage}
-      /> <Typography ml={2} variant='h5' fontWeight='bold'>{spaceName}</Typography>
+      />
+        <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
+          <Typography ml={2} variant='h5' fontWeight='bold'>{spaceName}</Typography>
+          {!readOnly && (
+            <IconButton
+              sx={{ mx: 1 }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit();
+              }}
+              data-testid='edit-identity'
+            >
+              <EditIcon fontSize='small' />
+            </IconButton>
+          )}
+        </Box>
       </AccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>

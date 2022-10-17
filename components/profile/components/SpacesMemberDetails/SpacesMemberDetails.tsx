@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 
-import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesForm';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
@@ -13,7 +12,7 @@ type Props = {
 };
 
 export function SpacesMemberDetails ({ memberId }: Props) {
-  const { isLoading, memberPropertyValues } = useMemberPropertyValues(memberId);
+  const { isLoading, memberPropertyValues, canEditSpaceProfile } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
 
   if (isLoading) {
@@ -34,10 +33,10 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           spaceName={pv.spaceName}
           spaceImage={pv.spaceImage}
           properties={pv.properties}
+          readOnly={!canEditSpaceProfile(pv.spaceId)}
+          onEdit={() => setEditSpaceId(pv.spaceId)}
         />
       ))}
-
-      {/* <Button onClick={() => setEditSpaceId(memberPropertyValues?.[0].spaceId)}>edit</Button> */}
 
       <Dialog open={!!editSpaceId} onClose={() => setEditSpaceId(null)} fullWidth>
         <DialogTitle>Edit workspace profile</DialogTitle>

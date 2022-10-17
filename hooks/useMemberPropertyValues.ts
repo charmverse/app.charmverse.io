@@ -2,14 +2,26 @@ import { useCallback } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useUser } from 'hooks/useUser';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 export function useMemberPropertyValues (memberId: string) {
+  const { user } = useUser();
   const { data: memberPropertyValues, mutate } = useSWR(`members/${memberId}/values`, () => charmClient.members.getPropertyValues(memberId));
 
   const getValuesForSpace = useCallback((spaceId: string) => {
     return memberPropertyValues?.find(sv => sv.spaceId === spaceId);
   }, [memberPropertyValues]);
+
+  const canEditSpaceProfile = useCallback((spaceId: string) => {
+    if (!user) {
+      return false;
+    }
+    // check if there are editable props
+    const isAdmin = user.spaceRoles.find(sr => sr.spaceId === spaceId)?.isAdmin || false;
+
+    return isAdmin || memberId === user.id;
+  }, [user]);
 
   const updateSpaceValues = useCallback(async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
     const updatedValues = await charmClient.members.updateSpacePropertyValues(memberId, spaceId, values);
@@ -46,6 +58,7 @@ export function useMemberPropertyValues (memberId: string) {
     getValuesForSpace,
     memberPropertyValues,
     updateSpaceValues,
-    isLoading: !memberPropertyValues
+    isLoading: !memberPropertyValues,
+    canEditSpaceProfile
   };
 }
