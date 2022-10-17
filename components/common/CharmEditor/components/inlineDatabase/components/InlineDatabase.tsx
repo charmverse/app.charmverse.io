@@ -107,10 +107,9 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
 
   const groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
-  const clientConfig = useAppSelector(getClientConfig);
   const { pages, updatePage, getPagePermissions } = usePages();
 
-  const [shownCardId, setShownCardId] = useState<string | undefined>('');
+  const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getSortedBoards);
   const board = boards.find(b => b.id === pageId);
@@ -118,7 +117,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   // TODO: Handle for other sources in future like workspace users
   const currentPagePermissions = getPagePermissions(pageId || '');
 
-  function showCard (cardId?: string) {
+  function showCard (cardId: string | null) {
     setShownCardId(cardId);
   }
 
@@ -173,7 +172,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
           <CardDialog
             key={shownCardId}
             cardId={shownCardId}
-            onClose={() => showCard(undefined)}
+            onClose={() => showCard(null)}
             readOnly={readOnly}
           />
         </RootPortal>

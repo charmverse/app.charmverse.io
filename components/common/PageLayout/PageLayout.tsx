@@ -12,7 +12,7 @@ import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { VotesProvider } from 'hooks/useVotes';
-import { isSmallScreen } from 'lib/browser';
+import { isSmallScreen } from 'lib/utilities/browser';
 
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import Header, { headerHeight } from './components/Header';

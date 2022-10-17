@@ -2,7 +2,7 @@ import type { Command, EditorState } from '@bangle.dev/pm';
 import { toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
 
-import { createHighlightDomElement } from 'lib/browser';
+import { createHighlightDomElement } from 'lib/utilities/browser';
 
 import { markName } from './inlineComment.constants';
 

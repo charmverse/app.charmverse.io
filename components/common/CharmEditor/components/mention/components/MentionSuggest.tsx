@@ -7,8 +7,8 @@ import { useCallback, useEffect, memo } from 'react';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
+import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';

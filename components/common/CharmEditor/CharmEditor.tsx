@@ -18,6 +18,7 @@ import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
+import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
@@ -34,11 +35,11 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
 import * as bulletList from './components/bulletList';
@@ -372,6 +373,7 @@ function CharmEditor (
   }:
   CharmEditorProps
 ) {
+  const router = useRouter();
   const { mutate } = useSWRConfig();
   const [currentSpace] = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -470,7 +472,7 @@ function CharmEditor (
 
   useEffect(() => {
     if (editorRef.current) {
-      const highlightedMentionId = (new URLSearchParams(window.location.search)).get('mentionId');
+      const highlightedMentionId = router.query.mentionId;
       if (highlightedMentionId && typeof window !== 'undefined') {
         setTimeout(() => {
           const highlightedMentionDomElement = window.document.getElementById(`user-${highlightedMentionId}`);
@@ -479,8 +481,7 @@ function CharmEditor (
               highlightedMentionDomElement.scrollIntoView({
                 behavior: 'smooth'
               });
-              // Remove the ?mentionId from url
-              silentlyUpdateURL(window.location.href.split('?')[0]);
+              setUrlWithoutRerender(router.pathname, { mentionId: null });
             });
           }
         }, 250);

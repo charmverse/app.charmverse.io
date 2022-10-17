@@ -1,6 +1,7 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
@@ -17,8 +18,10 @@ import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+  const router = useRouter();
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -58,9 +61,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
 
       mutateProposals();
       mutatePage(newProposal);
-
+      setUrlWithoutRerender(router.pathname, { id: newProposal.id });
       showPage({
-        pageId: newProposal.id
+        pageId: newProposal.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -70,8 +76,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
       mutatePage(newTemplate);
+      setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
       showPage({
-        pageId: newTemplate.id
+        pageId: newTemplate.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -91,9 +101,11 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       showPage({
         pageId: newPage.id,
         onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
       });
+      setUrlWithoutRerender(router.pathname, { id: newPage.id });
     }
   }
 
@@ -115,7 +127,13 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       <TemplatesMenu
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
-        editTemplate={(pageId) => showPage({ pageId })}
+        editTemplate={(pageId) => {
+          setUrlWithoutRerender(router.pathname, { id: pageId });
+          showPage({ pageId,
+            onClose () {
+              setUrlWithoutRerender(router.pathname, { id: null });
+            } });
+        }}
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}
