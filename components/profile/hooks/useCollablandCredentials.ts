@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export function useCollablandCredentials () {
 
@@ -15,7 +15,7 @@ export function useCollablandCredentials () {
   useEffect(() => {
     if (tokenFromUrl) {
       setAeToken(tokenFromUrl || '');
-      silentlyUpdateURL(window.location.href.split('?')[0]);
+      setUrlWithoutRerender(router.pathname, { aeToken: null });
     }
   }, [tokenFromUrl]);
 

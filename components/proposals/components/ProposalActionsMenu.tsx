@@ -5,6 +5,7 @@ import { IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
 import useTasks from 'components/nexus/hooks/useTasks';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
@@ -16,11 +17,13 @@ interface VoteActionsProps {
 
 export default function ProposalActionsMenu ({ deleteProposal, editProposal, proposal }: VoteActionsProps) {
   const { user } = useUser();
+  const isAdmin = useIsAdmin();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'proposal-action' });
   const { mutate: refetchTasks } = useTasks();
+  const showContextMenu = isAdmin || proposal.authors.some(author => author.userId === user?.id);
   return (
     <>
-      {proposal.authors.some(author => author.userId === user?.id) && (
+      {showContextMenu && (
         <IconButton size='small' onClick={actionsPopup.open}>
           <MoreHorizIcon fontSize='small' />
         </IconButton>

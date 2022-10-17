@@ -42,7 +42,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
             setPageNotFound(false);
             setCurrentPageId(page.id);
             setTitleState(page.title);
-            charmClient.track.trackAction('page_view', { spaceId: page.spaceId, resourceId: page.id, type: page.type });
+            charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
           }
           else {
             setPageNotFound(true);

@@ -62,7 +62,7 @@ type Props = WrappedComponentProps & PropsFromRedux & {
   addCard: (card: Card) => void;
   setPage: (p: Partial<Page>) => void;
   updateView: (view: BoardView) => void;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
   onViewTabClick?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
@@ -157,7 +157,7 @@ function CenterPanel (props: Props) {
     }
   }
 
-  const showCard = React.useCallback((cardId?: string) => {
+  const showCard = React.useCallback((cardId: string | null) => {
     if (state.selectedCardIds.length > 0) {
       setState({ ...state, selectedCardIds: [] });
     }
@@ -228,7 +228,7 @@ function CenterPanel (props: Props) {
           }
         },
         async () => {
-          showCard(undefined);
+          showCard(null);
         }
       );
     });

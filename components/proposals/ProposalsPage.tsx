@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
@@ -64,7 +65,16 @@ export default function ProposalsPage () {
                   </Box>
                 </Grid>
                 <Grid item xs={12} sx={{ mt: 5 }}>
-                  <ProposalsTable proposals={filteredProposals} mutateProposals={mutateProposals} />
+                  {data?.length === 0 && (
+                    <EmptyStateVideo
+                      description='Getting started with proposals'
+                      videoTitle='Proposals | Getting started with Charmverse'
+                      videoUrl='https://tiny.charmverse.io/proposal-builder'
+                    />
+                  )}
+                  {data?.length > 0 && (
+                    <ProposalsTable proposals={filteredProposals} mutateProposals={mutateProposals} />
+                  )}
                 </Grid>
               </>
             )

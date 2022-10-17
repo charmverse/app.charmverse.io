@@ -69,7 +69,7 @@ export default function PageDialog (props: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      charmClient.track.trackAction('page_view', { spaceId: page.spaceId, resourceId: page.id, type: page.type });
+      charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
     }
   }, [page?.id]);
 

@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
@@ -120,6 +121,11 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     return res.status(200).json(updatedPage);
   }
 
+  // Update page track profile, unless it was content update
+  if (!('content' in updateContent)) {
+    updateTrackPageProfile(pageWithPermission.id);
+  }
+
   return res.status(200).json(pageWithPermission);
 }
 
@@ -145,6 +151,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
   trackPageAction('delete_page', { userId, pageId });
+  updateTrackPageProfile(pageId);
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
