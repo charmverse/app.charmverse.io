@@ -1,5 +1,4 @@
 import { Box } from '@mui/system';
-import React from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
@@ -28,6 +27,7 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           memberId={memberId}
           spaceId={pv.spaceId}
           spaceName={pv.spaceName}
+          spaceImage={pv.spaceImage}
           properties={pv.properties}
         />
       ))}

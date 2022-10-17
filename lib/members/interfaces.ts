@@ -7,6 +7,7 @@ export type PropertyValue = {
   value: MemberPropertyValueType;
   spaceId: string;
   spaceName?: string;
+  spaceImage: string | null;
 }
 
 export type PropertyValueDetails = {
@@ -35,6 +36,7 @@ export type MemberPropertyWithSpace = MemberProperty & {
 export type MemberPropertyValuesBySpace = {
   spaceId: string;
   spaceName: string;
+  spaceImage: string | null;
   properties: PropertyValueWithDetails[];
 }
 

@@ -3,10 +3,11 @@ import type { MemberProperty, MemberPropertyValue } from '@prisma/client';
 import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, PropertyValue, MemberPropertyWithSpace } from 'lib/members/interfaces';
 
 export function getPropertiesWithValues (properties: MemberPropertyWithSpace[], propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[]): PropertyValueWithDetails[] {
-  return properties.map(({ id, spaceId, type, name, space: { name: spaceName } }) => ({
+  return properties.map(({ id, spaceId, type, name, space: { name: spaceName, spaceImage } }) => ({
     memberPropertyId: id,
     spaceId,
     spaceName,
+    spaceImage,
     type,
     name,
     value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null
@@ -21,7 +22,7 @@ export function groupPropertyValuesBySpace (propertyValues: PropertyValueWithDet
       groupedPropertyValuesMap[pv.spaceId].properties.push(pv);
     }
     else {
-      groupedPropertyValuesMap[pv.spaceId] = { spaceId: pv.spaceId, spaceName: pv.spaceName || '', properties: [pv] };
+      groupedPropertyValuesMap[pv.spaceId] = { spaceId: pv.spaceId, spaceName: pv.spaceName || '', properties: [pv], spaceImage: pv.spaceImage };
     }
   });
 
@@ -30,7 +31,9 @@ export function groupPropertyValuesBySpace (propertyValues: PropertyValueWithDet
 
 export function mapPropertyValueWithDetails ({
   memberPropertyId,
-  spaceId, value,
+  spaceId,
+  spaceImage,
+  value,
   memberProperty: { type, name }
 }: PropertyValue & { memberProperty: MemberProperty }): PropertyValueWithDetails {
   return {
@@ -38,7 +41,8 @@ export function mapPropertyValueWithDetails ({
     spaceId,
     value,
     type,
-    name
+    name,
+    spaceImage
   };
 
 }

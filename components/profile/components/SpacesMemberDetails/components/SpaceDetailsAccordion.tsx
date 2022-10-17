@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Chip, Stack, Typography } from '@mui/material';
 
+import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyOption } from 'components/members/components/MemberDirectoryProperties/MemberPropertySelectInput';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
@@ -10,6 +11,7 @@ type Props = {
   spaceName: string;
   memberId: string;
   properties: PropertyValueWithDetails[];
+  spaceImage: string | null;
 };
 
 const StyledAccordion = styled(Accordion)`
@@ -19,11 +21,15 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, properties }: Props) {
+export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, properties, spaceImage }: Props) {
 
   return (
     <StyledAccordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant='h5' fontWeight='bold'>{spaceName}</Typography></AccordionSummary>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}><WorkspaceAvatar
+        name={spaceName}
+        image={spaceImage}
+      /> <Typography ml={2} variant='h5' fontWeight='bold'>{spaceName}</Typography>
+      </AccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
