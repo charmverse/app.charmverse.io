@@ -37,7 +37,7 @@ export function SpacesMemberDetails ({ memberId }: Props) {
         />
       ))}
 
-      <Button onClick={() => setEditSpaceId(memberPropertyValues?.[0].spaceId)}>edit</Button>
+      {/* <Button onClick={() => setEditSpaceId(memberPropertyValues?.[0].spaceId)}>edit</Button> */}
 
       <Dialog open={!!editSpaceId} onClose={() => setEditSpaceId(null)} fullWidth>
         <DialogTitle>Edit workspace profile</DialogTitle>
