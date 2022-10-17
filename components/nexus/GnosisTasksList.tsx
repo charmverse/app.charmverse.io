@@ -195,26 +195,23 @@ function SafeTasks (
   { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
 ) {
   return (
-    <>
+    <Box margin='40px 0'>
       <Typography
-        color='inherit'
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}
         variant='body2'
+        color='inherit'
+        display='flex'
+        alignItems='center'
+        gap={1}
+        marginBottom='20px'
       >
         <strong>Gnosis Safe:</strong>
         <Link
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.5
-          }}
           href={safeUrl}
           external
           target='_blank'
+          display='inline-flex'
+          alignItems='center'
+          gap={0.5}
         >
           {safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
         </Link>
@@ -224,9 +221,9 @@ function SafeTasks (
           <TableHead>
             <TableRow>
               <TableCell width='20px'></TableCell>
-              <TableCell>Payment</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Required Signers</TableCell>
+              <TableCell sx={{ minWidth: { xs: 150, sm: 'inherit' } }}>Payment</TableCell>
+              <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Date</TableCell>
+              <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Required Signers</TableCell>
               <TableCell width='100'>
                 <Typography variant='body2' fontWeight='500' marginLeft='12px' variantMapping={{ body2: 'span' }}>Action</Typography>
               </TableCell>
@@ -262,7 +259,7 @@ function SafeTasks (
           </TableBody>
         </Table>
       </Box>
-    </>
+    </Box>
   );
 }
 
