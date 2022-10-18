@@ -55,6 +55,8 @@ function MemberDirectoryGalleryCard ({
           switch (property.type) {
             case 'text':
             case 'phone':
+            case 'email':
+            case 'wallet_address':
             case 'url':
             case 'number': {
               return (
