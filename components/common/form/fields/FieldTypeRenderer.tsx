@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
@@ -6,20 +8,20 @@ type Props = {
   type: FieldType;
 } & FieldProps & ControlFieldProps;
 
-export function FieldTypeRenderer ({ type, ...fieldProps }: Props) {
+export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...fieldProps }: Props, ref) => {
   switch (type) {
     case 'text':
     case 'phone':
     case 'url':
     case 'email': {
-      return <TextInputField {...fieldProps} />;
+      return <TextInputField {...fieldProps} ref={ref} />;
     }
     case 'number': {
-      return <NumberInputField {...fieldProps} />;
+      return <NumberInputField {...fieldProps} ref={ref} />;
     }
 
     default: {
       return null;
     }
   }
-}
+});

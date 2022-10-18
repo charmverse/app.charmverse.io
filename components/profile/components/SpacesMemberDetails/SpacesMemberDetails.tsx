@@ -1,9 +1,8 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberPropertiesForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesForm';
+import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 
@@ -38,12 +37,12 @@ export function SpacesMemberDetails ({ memberId }: Props) {
         />
       ))}
 
-      <Dialog open={!!editSpaceId} onClose={() => setEditSpaceId(null)} fullWidth>
-        <DialogTitle>Edit workspace profile</DialogTitle>
-        <DialogContent dividers>
-          <MemberPropertiesForm memberId={memberId} spaceId={editSpaceId} updateMemberPropertyValues={() => Promise.resolve()} />
-        </DialogContent>
-      </Dialog>
+      <MemberPropertiesPopupForm
+        onCancel={() => setEditSpaceId(null)}
+        memberId={memberId}
+        spaceId={editSpaceId}
+        updateMemberPropertyValues={() => Promise.resolve()}
+      />
     </Box>
   );
 }
