@@ -4,6 +4,7 @@
 }
 
 // fix the background color in dark mode for the NFT select dropdown
-.lsm__menu-portal > div {
+.lsm__menu-portal > div,
+.lsm-ts__menu-portal > div {
   background-color: var(--background-default);
 }
