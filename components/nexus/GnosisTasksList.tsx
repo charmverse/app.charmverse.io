@@ -9,7 +9,6 @@ import Chip from '@mui/material/Chip';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -33,6 +32,7 @@ import { shortenHex } from 'lib/utilities/strings';
 
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 
+import Table from './components/NexusTable';
 import useTasksState from './hooks/useTasksState';
 
 function TransactionRow (
