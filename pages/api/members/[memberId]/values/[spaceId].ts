@@ -13,7 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
   .get(getMemberValuesHandler)
-  .post(updateMemberPropertyValuesHandler);
+  .put(updateMemberPropertyValuesHandler);
 
 async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
   const userId = req.session.user.id;

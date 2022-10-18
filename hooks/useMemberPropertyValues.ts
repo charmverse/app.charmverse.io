@@ -39,7 +39,7 @@ export function useMemberPropertyValues (memberId: string) {
           updatedValues.forEach(uv => {
             const valueIndex = updatedProperties.findIndex(v => v.memberPropertyId === uv.memberPropertyId);
             if (valueIndex > -1) {
-              updatedProperties[valueIndex].value = uv;
+              updatedProperties[valueIndex].value = uv.value;
             }
             else {
               updatedProperties.push(uv);

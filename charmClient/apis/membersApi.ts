@@ -33,6 +33,6 @@ export class MembersApi {
   }
 
   updateSpacePropertyValues (memberId: string, spaceId: string, updateData: UpdateMemberPropertyValuePayload[]) {
-    return http.GET<PropertyValueWithDetails[]>(`/api/members/${memberId}/values/${spaceId}`, updateData);
+    return http.PUT<PropertyValueWithDetails[]>(`/api/members/${memberId}/values/${spaceId}`, updateData);
   }
 }

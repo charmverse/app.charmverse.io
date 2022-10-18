@@ -7,39 +7,53 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 type Props = {
   spaceId: string | null;
   memberId: string;
-  updateMemberPropertyValues: (values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
-  onCancel: VoidFunction;
+  updateMemberPropertyValues: (spsaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
+  onClose: VoidFunction;
 };
 
-export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onCancel }: Props) {
+export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onClose }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
   );
+  const { showMessage } = useSnackbar();
 
-  const defaultValues: any = useMemo(() => {
+  const defaultValues = useMemo(() => {
     if (data) {
-      return undefined;
+      return data.reduce((acc, prop) => {
+        acc[prop.memberPropertyId] = prop.value;
+        return acc;
+      }, {} as Record<string, MemberPropertyValueType>);
     }
 
     return undefined;
-  }, []);
+  }, [data]);
 
-  const { control, handleSubmit, formState: { touchedFields, errors }, reset } = useForm({ defaultValues });
-  const onSubmit = (submitData: any) => {
-    // console.log('🔥tf', touchedFields);
-    // console.log('🔥d', submitData);
+  const { control, handleSubmit, formState: { touchedFields, errors, isSubmitting }, reset } = useForm();
+
+  const onSubmit = async (submitData: any) => {
+    if (!spaceId) {
+      return;
+    }
+
+    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(touchedFields)
+      .map(key => ({ memberPropertyId: key, value: submitData[key] }));
+
+    await updateMemberPropertyValues(spaceId, updateData);
+    showMessage('Profile updated successfully', 'success');
+    onClose();
   };
 
   useEffect(() => {
-    reset();
-  }, [spaceId, data]);
+    reset(defaultValues);
+  }, [defaultValues]);
 
   if (!data && spaceId) {
     return <LoadingComponent isLoading />;
@@ -50,7 +64,7 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
   }
 
   return (
-    <Dialog open={!!spaceId} onClose={onCancel} fullWidth>
+    <Dialog open={!!spaceId} onClose={onClose} fullWidth>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle>Edit workspace profile</DialogTitle>
         <DialogContent dividers>
@@ -76,8 +90,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onCancel} variant='text' color='secondary'>Cancel</Button>
-          <Button type='submit'>Save</Button>
+          <Button onClick={onClose} variant='text' color='secondary'>Cancel</Button>
+          <Button type='submit' disabled={isSubmitting} loading={isSubmitting}>Save</Button>
         </DialogActions>
       </form>
     </Dialog>

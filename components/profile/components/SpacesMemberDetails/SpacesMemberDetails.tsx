@@ -11,7 +11,7 @@ type Props = {
 };
 
 export function SpacesMemberDetails ({ memberId }: Props) {
-  const { isLoading, memberPropertyValues, canEditSpaceProfile } = useMemberPropertyValues(memberId);
+  const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
 
   if (isLoading) {
@@ -38,10 +38,10 @@ export function SpacesMemberDetails ({ memberId }: Props) {
       ))}
 
       <MemberPropertiesPopupForm
-        onCancel={() => setEditSpaceId(null)}
+        onClose={() => setEditSpaceId(null)}
         memberId={memberId}
         spaceId={editSpaceId}
-        updateMemberPropertyValues={() => Promise.resolve()}
+        updateMemberPropertyValues={updateSpaceValues}
       />
     </Box>
   );
