@@ -9,7 +9,7 @@ export const DEFAULT_MEMBER_PROPERTIES = [
   'timezone'
 ] as const;
 
-export const DefaultMemberPropertyDict: Record<Exclude<MemberPropertyType, 'multiselect' | 'select'>, string> = {
+export const DefaultMemberPropertyDict: Record<MemberPropertyType, string> = {
   discord: 'Discord',
   name: 'Name',
   profile_pic: 'Profile pic',
@@ -17,10 +17,10 @@ export const DefaultMemberPropertyDict: Record<Exclude<MemberPropertyType, 'mult
   timezone: 'Timezone',
   twitter: 'Twitter',
   email: 'Email',
-  // multiselect: 'Multi-select',
+  multiselect: 'Multi-select',
   number: 'Number',
   phone: 'Phone',
-  // select: 'Select',
+  select: 'Select',
   text: 'Text',
   url: 'URL',
   wallet_address: 'Wallet address'

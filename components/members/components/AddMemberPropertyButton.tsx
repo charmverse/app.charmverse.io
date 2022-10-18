@@ -49,7 +49,7 @@ export function AddMemberPropertyButton () {
         }}
       >
         {Object.keys(DefaultMemberPropertyDict).map((memberPropertyType) => (
-          !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
+          !memberPropertyType.match(/select/) && !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
             <MenuItem
               key={memberPropertyType}
               onClick={() => {
