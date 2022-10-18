@@ -14,6 +14,7 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
@@ -111,6 +112,7 @@ export function MemberPropertySidebarItem ({
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
   const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
+  const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
   return (
     <Stack>
@@ -167,10 +169,19 @@ export function MemberPropertySidebarItem ({
                 color='secondary'
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteProperty(property.id);
+                  deleteConfirmation.open();
                 }}
               />
             )}
+            <ConfirmDeleteModal
+              title='Delete property'
+              question='Are you sure you want to delete this property?'
+              onConfirm={() => {
+                deleteProperty(property.id);
+              }}
+              onClose={deleteConfirmation.close}
+              open={deleteConfirmation.isOpen}
+            />
           </Box>
         )}
       </MenuItem>
