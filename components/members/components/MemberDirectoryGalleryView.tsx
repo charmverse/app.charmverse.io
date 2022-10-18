@@ -42,10 +42,6 @@ function MemberDirectoryGalleryCard ({
             {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
           </Stack>
         </Stack>
-        <Stack>
-          <Typography fontWeight='bold' variant='subtitle2'>About Me</Typography>
-          <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
-        </Stack>
         <Stack flexDirection='row' gap={1}>
           <AccessTimeIcon fontSize='small' />
           <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
@@ -58,6 +54,7 @@ function MemberDirectoryGalleryCard ({
             case 'email':
             case 'wallet_address':
             case 'url':
+            case 'bio':
             case 'number': {
               return (
                 <Stack key={property.id}>

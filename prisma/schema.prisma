@@ -695,19 +695,19 @@ model Comment {
 }
 
 model Proposal {
-  id         String             @id @default(uuid()) @db.Uuid
-  createdBy  String             @db.Uuid
-  spaceId    String             @db.Uuid
-  status     ProposalStatus
-  authors    ProposalAuthor[]
-  reviewers  ProposalReviewer[]
-  space      Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page       Page?
-  reviewedBy String?            @db.Uuid
-  reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
-  reviewedAt DateTime?
-  categoryId String?            @db.Uuid
-  category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  id                     String             @id @default(uuid()) @db.Uuid
+  createdBy              String             @db.Uuid
+  spaceId                String             @db.Uuid
+  status                 ProposalStatus
+  authors                ProposalAuthor[]
+  reviewers              ProposalReviewer[]
+  space                  Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page                   Page?
+  reviewedBy             String?            @db.Uuid
+  reviewer               User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
+  reviewedAt             DateTime?
+  categoryId             String?            @db.Uuid
+  category               ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   snapshotProposalExpiry DateTime?
 }
 
@@ -779,6 +779,7 @@ enum MemberPropertyType {
   name
   discord
   twitter
+  bio
 }
 
 model MemberProperty {

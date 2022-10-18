@@ -20,6 +20,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   text: <SubjectIcon fontSize='small' />,
+  bio: <SubjectIcon fontSize='small' />,
   number: <NumbersIcon fontSize='small' />,
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,

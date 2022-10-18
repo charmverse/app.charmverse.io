@@ -6,7 +6,8 @@ export const DEFAULT_MEMBER_PROPERTIES = [
   'role',
   'discord',
   'twitter',
-  'timezone'
+  'timezone',
+  'bio'
 ] as const;
 
 export const DefaultMemberPropertyDict: Record<MemberPropertyType, string> = {
@@ -23,5 +24,6 @@ export const DefaultMemberPropertyDict: Record<MemberPropertyType, string> = {
   select: 'Select',
   text: 'Text',
   url: 'URL',
-  wallet_address: 'Wallet address'
+  wallet_address: 'Wallet address',
+  bio: 'Bio'
 };
