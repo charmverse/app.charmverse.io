@@ -7,7 +7,6 @@ import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import { ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Web3ReactProvider } from '@web3-react/core';
@@ -33,7 +32,6 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
@@ -262,21 +260,19 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <MemberPropertiesProvider>
-          <MembersProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PagesProvider>
-                  <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>
-                      {children}
-                    </PageTitleProvider>
-                  </PrimaryCharmEditorProvider>
-                </PagesProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </MembersProvider>
-        </MemberPropertiesProvider>
+        <MembersProvider>
+          <BountiesProvider>
+            <PaymentMethodsProvider>
+              <PagesProvider>
+                <PrimaryCharmEditorProvider>
+                  <PageTitleProvider>
+                    {children}
+                  </PageTitleProvider>
+                </PrimaryCharmEditorProvider>
+              </PagesProvider>
+            </PaymentMethodsProvider>
+          </BountiesProvider>
+        </MembersProvider>
       </SpacesProvider>
     </UserProvider>
 
