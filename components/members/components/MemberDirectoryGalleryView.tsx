@@ -38,13 +38,13 @@ function MemberDirectoryGalleryCard ({
         {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
         <Stack gap={0.5}>
           <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-          <Stack gap={1} flexDirection='row'>
+          <Stack gap={1} flexDirection='row' flexWrap='wrap'>
             {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
           </Stack>
         </Stack>
         <Stack>
           <Typography fontWeight='bold' variant='subtitle2'>About Me</Typography>
-          <Typography variant='body2'>{member.profile?.description}</Typography>
+          <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
         </Stack>
         <Stack flexDirection='row' gap={1}>
           <AccessTimeIcon fontSize='small' />
@@ -71,7 +71,7 @@ function MemberDirectoryGalleryCard ({
               return (
                 <Stack gap={0.5} key={property.id}>
                   <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  <Stack gap={1} flexDirection='row'>
+                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                     {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
                   </Stack>
                 </Stack>

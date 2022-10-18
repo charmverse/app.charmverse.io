@@ -64,7 +64,7 @@ export function MemberDirectoryTableView ({
                     case 'role': {
                       return (
                         <TableCell>
-                          <Stack gap={1} flexDirection='row'>
+                          <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                             {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                           </Stack>
                         </TableCell>
@@ -118,7 +118,7 @@ export function MemberDirectoryTableView ({
                       const values = (memberProperty?.value ?? [])as string[];
                       return (
                         <TableCell key={property.id}>
-                          <Stack gap={1} flexDirection='row'>
+                          <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                             {values.length === 0 ? 'N/A' : values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
                           </Stack>
                         </TableCell>
