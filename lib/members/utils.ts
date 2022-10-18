@@ -1,6 +1,6 @@
 import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client';
 
-import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, PropertyValue, MemberPropertyWithSpace } from 'lib/members/interfaces';
+import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, MemberPropertyWithSpace } from 'lib/members/interfaces';
 
 export function getPropertiesWithValues (properties: MemberPropertyWithSpace[], propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[]): PropertyValueWithDetails[] {
   return properties.map(({ id, spaceId, type, name, space: { name: spaceName, spaceImage } }) => ({
@@ -22,7 +22,7 @@ export function groupPropertyValuesBySpace (propertyValues: PropertyValueWithDet
       groupedPropertyValuesMap[pv.spaceId].properties.push(pv);
     }
     else {
-      groupedPropertyValuesMap[pv.spaceId] = { spaceId: pv.spaceId, spaceName: pv.spaceName || '', properties: [pv], spaceImage: pv.spaceImage };
+      groupedPropertyValuesMap[pv.spaceId] = { spaceId: pv.spaceId, spaceName: pv.spaceName || '', properties: [pv], spaceImage: pv.spaceImage || '' };
     }
   });
 

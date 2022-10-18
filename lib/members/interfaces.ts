@@ -7,7 +7,7 @@ export type PropertyValue = {
   value: MemberPropertyValueType;
   spaceId: string;
   spaceName?: string;
-  spaceImage: string | null;
+  spaceImage?: string | null;
 }
 
 export type PropertyValueDetails = {
