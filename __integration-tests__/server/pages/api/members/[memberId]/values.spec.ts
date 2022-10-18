@@ -36,7 +36,7 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
 
     expect(memberPropertyValues.length).toBe(1);
     expect(memberPropertyValues[0]).toEqual(expect.objectContaining({
-      memberPropertyId: property1.id, value: 'updated text', updatedBy: adminUser.id, userId: nonAdminUser.id, spaceId: space.id
+      memberPropertyId: property1.id, type: property1.type, name: property1.name, value: 'updated text', spaceId: space.id
     }));
   });
 
@@ -49,7 +49,7 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
 
     expect(memberPropertyValues.length).toBe(1);
     expect(memberPropertyValues[0]).toEqual(expect.objectContaining({
-      memberPropertyId: property1.id, value: 'updated text2', updatedBy: nonAdminUser.id, userId: nonAdminUser.id, spaceId: space.id
+      memberPropertyId: property1.id, type: property1.type, name: property1.name, value: 'updated text2', spaceId: space.id
     }));
   });
 
@@ -69,10 +69,10 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
     expect(memberPropertyValues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          memberPropertyId: property2.id, value: 1337, updatedBy: adminUser.id, userId: nonAdminUser.id, spaceId: space.id
+          memberPropertyId: property2.id, type: property2.type, name: property2.name, value: 1337, spaceId: space.id
         }),
         expect.objectContaining({
-          memberPropertyId: property3.id, value: 'updated text2', updatedBy: adminUser.id, userId: nonAdminUser.id, spaceId: space.id
+          memberPropertyId: property3.id, type: property3.type, name: property3.name, value: 'updated text2', spaceId: space.id
         })
       ])
     );
