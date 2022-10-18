@@ -4,7 +4,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -20,6 +19,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import type { MentionedTask } from 'lib/mentions/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
+
+import Table from './components/NexusTable';
 
 function MentionedTaskRow (
   {
