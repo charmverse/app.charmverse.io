@@ -90,8 +90,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} variant='text' color='secondary'>Cancel</Button>
-          <Button type='submit' disabled={isSubmitting} loading={isSubmitting}>Save</Button>
+          <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
+          <Button type='submit' disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
         </DialogActions>
       </form>
     </Dialog>

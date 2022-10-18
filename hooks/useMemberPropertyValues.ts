@@ -3,6 +3,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
+import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 export function useMemberPropertyValues (memberId: string) {
@@ -17,10 +18,12 @@ export function useMemberPropertyValues (memberId: string) {
     if (!user) {
       return false;
     }
-    // check if there are editable props
-    const isAdmin = user.spaceRoles.find(sr => sr.spaceId === spaceId)?.isAdmin || false;
 
-    return isAdmin || memberId === user.id;
+    const isAdmin = user.spaceRoles.find(sr => sr.spaceId === spaceId)?.isAdmin || false;
+    const spaceProps = getValuesForSpace(spaceId)?.properties || [];
+    const hasEditableProps = spaceProps.some(prop => !DEFAULT_MEMBER_PROPERTIES.includes(prop.type as any));
+
+    return hasEditableProps && (isAdmin || memberId === user.id);
   }, [user]);
 
   const updateSpaceValues = useCallback(async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
