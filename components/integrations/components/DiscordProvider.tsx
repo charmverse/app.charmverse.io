@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getCookie, deleteCookie, silentlyUpdateURL } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
+import { getCookie, deleteCookie } from 'lib/utilities/browser';
 
 interface State {
   isConnected: boolean;
@@ -66,7 +66,6 @@ export default function DiscordProvider ({ children }: Props) {
     }
   }, [authError]);
 
-  // We might get redirected after connection with discord, so check the query param if it has a discord field
   // It can either be fail or success
   useEffect(() => {
     // Connection with discord
@@ -85,7 +84,6 @@ export default function DiscordProvider ({ children }: Props) {
           setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
         })
         .finally(() => {
-          silentlyUpdateURL(window.location.href.split('?')[0]);
           setIsConnectDiscordLoading(false);
         });
     }

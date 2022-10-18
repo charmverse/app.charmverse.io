@@ -14,7 +14,8 @@
     background-color: var(--editorCore-selectionChange-bgColor);
   }
 
-  to {}
+  to {
+  }
 }
 
 :root {
@@ -30,7 +31,8 @@
   text-decoration: underline;
 }
 
-.bangle-editor p > code {}
+.bangle-editor p > code {
+}
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
@@ -422,7 +424,7 @@ details {
   &[open] > summary::before {
     content: "▼";
     transform: rotate(0);
-    top: 1px;
+    top: 6px;
   }
 
   summary {
@@ -436,9 +438,13 @@ details {
       cursor: pointer;
       transform: rotate(-90deg);
       position: relative;
-      top: -3px;
-      min-width: 20px;
-      display: inline-block;
+      width: 17px;
+      top: 6px;
+      height: 13px;
+      margin-right: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     &::-webkit-details-marker,
@@ -452,7 +458,6 @@ details {
     }
   }
 }
-
 
 /** Component-Styling-END */
 
@@ -512,7 +517,7 @@ details {
 
   .charm-drag-handle {
     cursor: grab;
-    opacity: .5;
+    opacity: 0.5;
     transition: opacity 0.2s ease-in-out;
 
     &:hover {
@@ -531,7 +536,6 @@ details {
 
 // for inline comments
 .charm-row-decoration {
-
   background-color: var(--background-default);
   cursor: pointer;
   display: inline;
@@ -541,11 +545,11 @@ details {
   width: 40px;
 
   svg {
-    color: rgba(var(--center-channel-color-rgb), .5);
+    color: rgba(var(--center-channel-color-rgb), 0.5);
   }
 
   .MuiTypography-root {
-    color: rgba(var(--center-channel-color-rgb), .8);
-    font-size: .8rem;
+    color: rgba(var(--center-channel-color-rgb), 0.8);
+    font-size: 0.8rem;
   }
 }

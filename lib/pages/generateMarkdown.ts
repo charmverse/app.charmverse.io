@@ -8,9 +8,7 @@ import type { Page, PageContent } from 'models';
 
 export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
 
-  const isExportablePage = page && (page.type === 'page' || page.type === 'card');
-
-  if (page && isExportablePage) {
+  if (page) {
     const serializer = markdownSerializer(specRegistry);
 
     const state = new BangleEditorState({

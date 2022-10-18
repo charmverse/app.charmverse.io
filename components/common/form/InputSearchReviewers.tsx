@@ -3,43 +3,43 @@ import type { Role } from '@prisma/client';
 import type { ComponentProps, SyntheticEvent } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
-import type { Contributor } from 'models/User';
+import type { Member } from 'models/User';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 type ReducedRole = Role | ListSpaceRolesResponse
 
 type GroupedRole = ReducedRole & { group: 'role' }
-type GroupedContributor = Contributor & { group: 'user' }
-type GroupedOption = GroupedRole | GroupedContributor
+type GroupedMember = Member & { group: 'user' }
+type GroupedOption = GroupedRole | GroupedMember
 
 export default function InputSearchReviewers ({
   disableCloseOnSelect = false, excludedIds, ...props
 }: Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange'>> & { excludedIds?: string[], onChange: (event: SyntheticEvent<Element, Event>, value: GroupedOption[]) => void }) {
   const { roles } = useRoles();
-  const [contributors] = useContributors();
+  const [members] = useMembers();
 
   const excludedIdsSet = new Set(excludedIds);
 
-  const mappedContributors: GroupedContributor[] = contributors.map(contributor => ({ ...contributor, group: 'user' }));
+  const mappedMembers: GroupedMember[] = members.map(member => ({ ...member, group: 'user' }));
   const mappedRoles: GroupedRole[] = roles?.map(includedRole => ({ ...includedRole, group: 'role' } as const)) ?? [];
 
   const options: GroupedOption[] = [
-    ...mappedContributors.filter(contributor => !excludedIdsSet.has(contributor.id)),
+    ...mappedMembers.filter(member => !excludedIdsSet.has(member.id)),
     ...mappedRoles.filter(role => !excludedIdsSet.has(role.id))
   ];
 
   const optionsRecord: Record<string, GroupedOption> = {};
 
-  [...mappedContributors, ...mappedRoles].forEach(option => {
+  [...mappedMembers, ...mappedRoles].forEach(option => {
     optionsRecord[option.id] = option;
   });
 
   return (
     <Autocomplete<GroupedOption, boolean>
       disabled={!roles}
-      loading={!roles || contributors.length === 0}
+      loading={!roles || members.length === 0}
       disableCloseOnSelect={disableCloseOnSelect}
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
@@ -81,7 +81,7 @@ export default function InputSearchReviewers ({
         <TextField
           {...params}
           size='small'
-          placeholder='Contributors or Roles'
+          placeholder='Members or Roles'
           inputProps={{
             ...params.inputProps
           }}

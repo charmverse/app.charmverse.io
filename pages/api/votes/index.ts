@@ -81,7 +81,7 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
   } as VoteDTO);
 
   if (vote.context === 'proposal') {
-    trackUserAction('new_vote_created', { userId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+    trackUserAction('new_vote_created', { userId, pageId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
   }
 
   return res.status(201).json(vote);

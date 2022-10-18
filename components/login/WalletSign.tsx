@@ -35,14 +35,12 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   useEffect(() => {
     if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
-
       userClickedConnect.current = false;
       generateWalletAuth();
     }
   }, [account]);
 
   async function generateWalletAuth () {
-
     if (isSigning) {
       return;
     }
@@ -68,13 +66,13 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   if (!account) {
     return (
-      <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <PrimaryButton data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
         Connect Wallet
       </PrimaryButton>
     );
   }
 
   return (
-    <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
+    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
   );
 }

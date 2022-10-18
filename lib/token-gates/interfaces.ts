@@ -65,3 +65,4 @@ export interface TokenGateVerificationResult {
   roles: Role[];
 }
 
+export type TokenGateAccessType = 'individual_wallet' | 'individual_nft' | 'group_token_or_nft' | 'dao_members' | 'poap_collectors' | 'cask_subscribers'

@@ -72,7 +72,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
       </Grid>
 
       <Grid item container xs>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <Button
             color='secondary'
             variant='outlined'
@@ -117,8 +117,18 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
           </Menu>
         </Grid>
-        <Grid item xs={6}>
-          <Typography variant='body2' sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
+        <Grid item xs={12} sm={6}>
+          <Typography
+            variant='body2'
+            sx={{ height: '100%',
+              justifyContent: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              margin: {
+                xs: '10px 0',
+                sm: 0
+              } }}
+          >
             {configurationModeDescription[selectedConfigurationMode]}
           </Typography>
         </Grid>

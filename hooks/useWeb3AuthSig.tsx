@@ -21,6 +21,7 @@ type IContext = {
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
   getStoredSignature: (account: string) => AuthSig | null;
+  disconnectWallet: () => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -28,7 +29,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
-  getStoredSignature: () => null
+  getStoredSignature: () => null,
+  disconnectWallet: () => null
 });
 
 // a wrapper around account and library from web3react
@@ -134,8 +136,15 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     return generated;
   }
 
+  function disconnectWallet () {
+    if (account) {
+      window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
+      setWalletAuthSignature(null);
+    }
+  }
+
   const value = useMemo(() => ({
-    account, walletAuthSignature, triedEager, sign, getStoredSignature
+    account, walletAuthSignature, triedEager, sign, getStoredSignature, disconnectWallet
   }) as IContext, [account, walletAuthSignature, triedEager]);
 
   return (

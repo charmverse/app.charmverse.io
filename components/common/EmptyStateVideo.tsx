@@ -1,19 +1,19 @@
 import { Typography } from '@mui/material';
 
-export default function BountiesEmptyState () {
+export function EmptyStateVideo (props: { description: string, videoTitle: string, videoUrl: string }) {
   return (
     <div>
       <Typography variant='h6' gutterBottom>
-        Getting started with bounties
+        {props.description}
       </Typography>
 
       {/* Onboarding video when no bounties exist */}
       <iframe
-        src='https://tiny.charmverse.io/bounties'
+        src={props.videoUrl}
         style={{ maxWidth: '100%', border: '0 none' }}
         height='367px'
         width='650px'
-        title='Bounties | Getting started with Charmverse'
+        title={props.videoTitle}
       >
       </iframe>
     </div>

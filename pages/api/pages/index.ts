@@ -5,7 +5,9 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
+import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPageWithPermissions } from 'lib/pages/server';
@@ -105,6 +107,9 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
         spaceId
       });
     }
+
+    updateTrackPageProfile(page.id);
+    trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
 
     res.status(201).json(pageWithPermissions);
   }
