@@ -108,7 +108,7 @@ export function MemberDirectoryGalleryView ({
   return (
     <Grid container gap={2.5}>
       {members.map(member => (
-        <Grid item xs={3.75} key={member.id}>
+        <Grid item xs={12} sm={5} md={3.75} key={member.id}>
           <MemberDirectoryGalleryCard member={member} />
         </Grid>
       ))}

@@ -36,6 +36,7 @@ export default function MemberDirectoryPage () {
   return properties && searchedMembers ? (
     <CenteredPageContent style={{
       height: '100%'
+
     }}
     >
       <Typography variant='h1' my={2}>Member Directory</Typography>
@@ -77,7 +78,7 @@ export default function MemberDirectoryPage () {
         </IconButton>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
-        <Box width='100%'>
+        <Box width='100%' overflow='auto' height='fit-content'>
           {currentView === 'table' && <MemberDirectoryTableView members={searchedMembers} />}
           {currentView === 'gallery' && <MemberDirectoryGalleryView members={searchedMembers} />}
         </Box>
