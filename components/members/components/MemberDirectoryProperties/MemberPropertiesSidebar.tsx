@@ -126,18 +126,18 @@ export function MemberPropertySidebarItem ({
           width: '100%',
           '& .MuiListItemIcon-root': {
             minWidth: 30
-          },
-          pl: 1
+          }
+          // pl: 1
         }}
         onClick={() => setToggled(!toggled)}
       >
-        <ArrowRightIcon
+        {/* <ArrowRightIcon
           onClick={() => setToggled(!toggled)}
           sx={{
             transform: toggled ? 'rotate(90deg)' : 'rotate(0deg)',
             transition: 'transform 150ms ease-in-out'
           }}
-        />
+        /> */}
         <MemberPropertyItem
           type={property.type}
           name={property.name}
@@ -174,7 +174,7 @@ export function MemberPropertySidebarItem ({
           </Box>
         )}
       </MenuItem>
-      <Collapse in={toggled}>
+      {/* <Collapse in={toggled}>
         <Stack pl={5} pr={2.5} mb={1}>
           <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
             <Typography variant='subtitle2'>Workspace</Typography>
@@ -198,7 +198,7 @@ export function MemberPropertySidebarItem ({
             Add Role
           </Button>
         </Stack>
-      </Collapse>
+      </Collapse> */}
       <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title={`Update ${property.name}`}>
         <MemberPropertyItemForm
           close={propertyRenamePopupState.close}
