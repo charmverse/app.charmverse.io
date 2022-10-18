@@ -19,81 +19,89 @@ function MemberDirectoryGalleryCard ({
   const timezoneProperty = properties.find(property => property.type === 'timezone');
 
   return (
-    <Card sx={{ width: '100%' }}>
-      <Avatar
-        sx={{
-          width: '100%'
-        }}
-        avatar={member.avatar}
-        name={member.username}
-        size='2xLarge'
-        variant='square'
-      />
-      <Stack p={2} gap={1}>
-        <Link href={`/u/${member.path}`}>
+    <Link
+      href={`/u/${member.path}`}
+      color='primary'
+      sx={{
+        '&:hover': {
+          opacity: 0.8
+        }
+      }}
+    >
+      <Card sx={{ width: '100%' }}>
+        <Avatar
+          sx={{
+            width: '100%'
+          }}
+          avatar={member.avatar}
+          name={member.username}
+          size='2xLarge'
+          variant='square'
+        />
+        <Stack p={2} gap={1}>
           <Typography gutterBottom variant='h6' mb={0} component='div'>
             {member.username}
           </Typography>
-        </Link>
-        {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
-        <Stack gap={0.5}>
-          <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-          <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-            {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+          {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
+          <Stack gap={0.5}>
+            <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
+            <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+              {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+            </Stack>
           </Stack>
-        </Stack>
-        <Stack flexDirection='row' gap={1}>
-          <AccessTimeIcon fontSize='small' />
-          <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
-        </Stack>
-        {properties.map(property => {
-          const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
-          switch (property.type) {
-            case 'text':
-            case 'phone':
-            case 'email':
-            case 'wallet_address':
-            case 'url':
-            case 'bio':
-            case 'number': {
-              return (
-                <Stack key={property.id}>
-                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
-                </Stack>
-              );
-            }
-            case 'multiselect': {
-              const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
-              return (
-                <Stack gap={0.5} key={property.id}>
-                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
+          <Stack flexDirection='row' gap={1}>
+            <AccessTimeIcon fontSize='small' />
+            <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
+          </Stack>
+          {properties.map(property => {
+            const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
+            switch (property.type) {
+              case 'text':
+              case 'phone':
+              case 'email':
+              case 'wallet_address':
+              case 'url':
+              case 'bio':
+              case 'number': {
+                return (
+                  <Stack key={property.id}>
+                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                    <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
                   </Stack>
-                </Stack>
-              );
-            }
-            case 'select': {
-              const propertyValue = memberPropertyValue?.value as PropertyOption;
-              return (
-                <Stack gap={0.5} key={property.id}>
-                  <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                  {propertyValue ? (
-                    <Stack gap={1} flexDirection='row'>
-                      <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
+                );
+              }
+              case 'multiselect': {
+                const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
+                return (
+                  <Stack gap={0.5} key={property.id}>
+                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                      {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
                     </Stack>
-                  ) : <Typography variant='body2'>N/A</Typography>}
-                </Stack>
-              );
+                  </Stack>
+                );
+              }
+              case 'select': {
+                const propertyValue = memberPropertyValue?.value as PropertyOption;
+                return (
+                  <Stack gap={0.5} key={property.id}>
+                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                    {propertyValue ? (
+                      <Stack gap={1} flexDirection='row'>
+                        <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
+                      </Stack>
+                    ) : <Typography variant='body2'>N/A</Typography>}
+                  </Stack>
+                );
+              }
+              default: {
+                return null;
+              }
             }
-            default: {
-              return null;
-            }
-          }
-        })}
-      </Stack>
-    </Card>
+          })}
+        </Stack>
+      </Card>
+    </Link>
   );
 }
 
