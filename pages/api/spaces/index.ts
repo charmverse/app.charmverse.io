@@ -6,10 +6,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { logSpaceCreation } from 'lib/log/userEvents';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
+import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';

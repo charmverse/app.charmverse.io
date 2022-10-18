@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { logFirstProposalTemplate } from 'lib/log/userEvents';
+import { logFirstProposalTemplate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { withSessionRoute } from 'lib/session/withSession';
