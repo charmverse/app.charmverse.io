@@ -29,7 +29,7 @@ beforeAll(async () => {
 describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member properties', () => {
   it('should create property value by admin user', async () => {
     const memberPropertyValues = (await request(baseUrl)
-      .post(`/api/members/${nonAdminUser.id}/values/${space.id}`)
+      .put(`/api/members/${nonAdminUser.id}/values/${space.id}`)
       .set('Cookie', adminCookie)
       .send([{ memberPropertyId: property1.id, value: 'updated text' }])
       .expect(200)).body as PropertyValue[];
@@ -42,7 +42,7 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
 
   it('should create property value by non-admin user for himself', async () => {
     const memberPropertyValues = (await request(baseUrl)
-      .post(`/api/members/${nonAdminUser.id}/values/${space.id}`)
+      .put(`/api/members/${nonAdminUser.id}/values/${space.id}`)
       .set('Cookie', nonAdminCookie)
       .send([{ memberPropertyId: property1.id, value: 'updated text2' }])
       .expect(200)).body as PropertyValue[];
@@ -60,7 +60,7 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
     await generateMemberPropertyValue({ memberPropertyId: property3.id, userId: nonAdminUser.id, spaceId: space.id, value: 'val1' });
 
     const memberPropertyValues = (await request(baseUrl)
-      .post(`/api/members/${nonAdminUser.id}/values/${space.id}`)
+      .put(`/api/members/${nonAdminUser.id}/values/${space.id}`)
       .set('Cookie', adminCookie)
       .send([{ memberPropertyId: property2.id, value: 1337 }, { memberPropertyId: property3.id, value: 'updated text2' }])
       .expect(200)).body as PropertyValue[];
@@ -80,7 +80,7 @@ describe('POST /api/members/[memberId]/values/[spaceId] - Update / create member
 
   it('should not allow non-admin user to update someone else property value', async () => {
     (await request(baseUrl)
-      .post(`/api/members/${adminUser.id}/values/${space.id}`)
+      .put(`/api/members/${adminUser.id}/values/${space.id}`)
       .set('Cookie', nonAdminCookie)
       .send([{ memberPropertyId: property1.id, value: 'updated text2' }])
       .expect(401));

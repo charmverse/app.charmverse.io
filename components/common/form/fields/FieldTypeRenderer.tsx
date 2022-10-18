@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
+import { MemberPropertyIcons } from 'components/members/components/MemberDirectoryProperties/MemberPropertyItem';
 
 type Props = {
   type: FieldType;
@@ -14,10 +15,10 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...f
     case 'phone':
     case 'url':
     case 'email': {
-      return <TextInputField {...fieldProps} ref={ref} />;
+      return <TextInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
     }
     case 'number': {
-      return <NumberInputField {...fieldProps} ref={ref} />;
+      return <NumberInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
     }
 
     default: {
