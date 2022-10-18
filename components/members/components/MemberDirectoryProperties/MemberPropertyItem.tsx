@@ -47,7 +47,15 @@ export function MemberPropertyItem ({
       <ListItemIcon>
         {MemberPropertyIcons[type]}
       </ListItemIcon>
-      <ListItemText>
+      <ListItemText
+        sx={{
+          '& span': {
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+          }
+        }}
+      >
         {name ?? DefaultMemberPropertyDict[type]}
       </ListItemText>
     </>
