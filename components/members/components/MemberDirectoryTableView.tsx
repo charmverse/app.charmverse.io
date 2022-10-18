@@ -24,7 +24,13 @@ export function MemberDirectoryTableView ({
     <Table
       size='small'
       sx={{
-        my: 2
+        my: 2,
+        '& .MuiTableCell-root': {
+          whiteSpace: 'nowrap',
+          maxWidth: 150,
+          textOverflow: 'ellipsis',
+          overflow: 'hidden'
+        }
       }}
     >
       <TableHead>
