@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { logWorkspaceJoinedViaTokenGate } from 'lib/log/userEvents';
+import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';

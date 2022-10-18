@@ -5,7 +5,7 @@ import { TextSelection } from 'prosemirror-state';
 import type { ChangeEvent } from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import { isTouchScreen } from 'lib/browser';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {

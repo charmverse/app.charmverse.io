@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { logSignupViaWallet } from 'lib/log/userEvents';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
+import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';

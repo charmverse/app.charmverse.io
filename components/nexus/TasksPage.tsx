@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
@@ -155,7 +155,7 @@ export default function TasksPage () {
               </Badge>
             )}
             onClick={() => {
-              silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
+              setUrlWithoutRerender(router.pathname, { task: task.type });
               setCurrentTaskType(task.type);
             }}
           />

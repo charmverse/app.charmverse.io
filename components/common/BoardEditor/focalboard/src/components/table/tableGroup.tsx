@@ -20,7 +20,7 @@ type Props = {
     cardIdToFocusOnRender: string;
     hideGroup: (groupByOptionId: string) => void;
     addCard: (groupByOptionId?: string) => Promise<void>;
-    showCard: (cardId?: string) => void;
+    showCard: (cardId: string) => void;
     propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
     onCardClicked: (e: React.MouseEvent, card: Card) => void;
     onDropToGroupHeader: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
