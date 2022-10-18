@@ -36,7 +36,6 @@ export default function MemberDirectoryPage () {
   return properties && searchedMembers ? (
     <CenteredPageContent style={{
       height: '100%'
-
     }}
     >
       <Typography variant='h1' my={2}>Member Directory</Typography>

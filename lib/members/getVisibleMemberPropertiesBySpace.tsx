@@ -17,8 +17,10 @@ export function getVisibleMemberPropertiesBySpace ({ userId, spaceId }: GetVisib
     where: {
       spaceId: { in: spaceIdQuery }
     },
+    // Sort by createdAt ascending for now as ordering by index (most has -1)
+    // would return properties in different order
     orderBy: {
-      index: 'asc'
+      createdAt: 'asc'
     },
     include: {
       space: true
