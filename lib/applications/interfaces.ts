@@ -1,4 +1,4 @@
-import type { Application, Bounty, Transaction } from '@prisma/client';
+import type { Application, ApplicationStatus, Bounty, Transaction } from '@prisma/client';
 
 import type { RequiredNotNull } from 'lib/utilities/types';
 
@@ -6,6 +6,7 @@ export interface ApplicationCreationData {
   userId: string;
   bountyId: string;
   message: string;
+  status?: ApplicationStatus;
 }
 
 export interface ApplicationUpdateData {
