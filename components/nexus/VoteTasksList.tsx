@@ -96,7 +96,6 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
     const userVote = await charmClient.votes.castVote(voteId, choice);
-    removeVoteFromTask(voteId);
     return userVote;
   };
 
