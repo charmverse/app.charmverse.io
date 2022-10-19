@@ -89,12 +89,20 @@ export class CdkDeployStack extends Stack {
       },
     ];
 
+    const resourceTags: cdk.CfnTag[] = [
+      { 
+        key: 'env',
+        value: 'stg'
+      } 
+    ];
+    
     // Create an Elastic Beanstalk environment to run the application
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
       solutionStackName: '64bit Amazon Linux 2 v3.4.13 running Docker',
       optionSettings: optionSettingProperties,
+      tags: resourceTags,
       versionLabel: appVersionProps.ref,
     });
 
