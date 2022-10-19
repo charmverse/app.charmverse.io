@@ -55,12 +55,14 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
             switch (property.type) {
               case 'text':
               case 'phone':
+              case 'name':
               case 'url':
+              case 'bio':
               case 'email':
               case 'number': {
                 return (
                   <Stack key={property.memberPropertyId}>
-                    <Typography fontWeight='bold' variant='h6'>{property.name}</Typography>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
                     <Typography variant='body2'>{property.value ?? 'N/A'}</Typography>
                   </Stack>
                 );
@@ -69,7 +71,7 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
                 const values = (property.value ?? [])as PropertyOption[];
                 return (
                   <Stack gap={0.5} key={property.memberPropertyId}>
-                    <Typography fontWeight='bold' variant='h6'>{property.name}</Typography>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
                     <Stack gap={1} flexDirection='row'>
                       {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
                     </Stack>
@@ -80,7 +82,7 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
                 const propertyValue = property.value as PropertyOption;
                 return (
                   <Stack gap={0.5} key={property.memberPropertyId}>
-                    <Typography fontWeight='bold' variant='h6'>{property.name}</Typography>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
                     {propertyValue ? (
                       <Stack gap={1} flexDirection='row'>
                         <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
