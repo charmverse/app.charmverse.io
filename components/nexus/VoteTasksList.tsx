@@ -81,6 +81,8 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
 
   const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
 
+  const closeModal = () => setSelectedVoteId(undefined);
+
   const handleVoteId = (voteId: string) => setSelectedVoteId(voteId);
 
   const removeVoteFromTask = (voteId: string) => {
@@ -96,6 +98,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
     const userVote = await charmClient.votes.castVote(voteId, choice);
+    closeModal();
     return userVote;
   };
 
@@ -158,7 +161,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
         title='Poll details'
         size='large'
         open={!!selectedVoteId && !!voteTask}
-        onClose={() => setSelectedVoteId(undefined)}
+        onClose={closeModal}
       >
         {voteTask && (
           <VoteDetail
