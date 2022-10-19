@@ -9,12 +9,12 @@ type Props = {
   type: FieldType;
 } & FieldProps;
 
-type FiedRenderedConfig = {
+type FieldRenderedConfig = {
   rules: RegisterOptions;
   renderer: (fieldProps: { field: ControlFieldProps }) => ReactElement<any, string | JSXElementConstructor<any>>;
 }
 
-export function getFieldRendererConfig ({ type, ...fieldProps }: Props): FiedRenderedConfig {
+export function getFieldRendererConfig ({ type, ...fieldProps }: Props): FieldRenderedConfig {
   return {
     rules: getFieldTypeRules(type),
     renderer: ({ field }: { field: ControlFieldProps }) => <FieldTypeRenderer {...field} {...fieldProps} type={type} />

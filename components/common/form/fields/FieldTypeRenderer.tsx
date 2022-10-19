@@ -14,8 +14,12 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...f
     case 'text':
     case 'phone':
     case 'url':
+    case 'name':
     case 'email': {
       return <TextInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+    }
+    case 'bio': {
+      return <TextInputField {...fieldProps} ref={ref} multiline rows={3} iconLabel={MemberPropertyIcons[type]} />;
     }
     case 'number': {
       return <NumberInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;

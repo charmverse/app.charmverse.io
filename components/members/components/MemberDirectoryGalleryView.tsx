@@ -17,6 +17,7 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const timezoneProperty = properties.find(property => property.type === 'timezone');
+  const nameProperty = properties.find(property => property.type === 'name');
 
   return (
     <Link
@@ -40,7 +41,7 @@ function MemberDirectoryGalleryCard ({
         />
         <Stack p={2} gap={1}>
           <Typography gutterBottom variant='h6' mb={0} component='div'>
-            {member.username}
+            {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
           </Typography>
           {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
           <Stack gap={0.5}>

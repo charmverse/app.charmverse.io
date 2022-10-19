@@ -63,7 +63,7 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
                 return (
                   <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography variant='body2'>{property.value ?? 'N/A'}</Typography>
+                    <Typography>{property.value ?? 'N/A'}</Typography>
                   </Stack>
                 );
               }
