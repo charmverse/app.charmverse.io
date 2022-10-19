@@ -83,9 +83,10 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
 
   await prisma.memberProperty.createMany({
-    data: DEFAULT_MEMBER_PROPERTIES.map(memberProperty => ({
+    data: [...DEFAULT_MEMBER_PROPERTIES].sort().map((memberProperty, memberPropertyIndex) => ({
       createdBy: userId,
       name: DefaultMemberPropertyDict[memberProperty],
+      index: memberPropertyIndex,
       type: memberProperty,
       spaceId: space.id,
       updatedBy: userId

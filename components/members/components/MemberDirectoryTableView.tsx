@@ -35,7 +35,8 @@ export function MemberDirectoryTableView ({
     >
       <TableHead>
         <TableRow>
-          {properties.map(property => property.name).map(property => <StyledTableCell key={property}>{property}</StyledTableCell>)}
+          {/** No need to show bio in table view */}
+          {properties.filter(property => property.type !== 'bio').map(property => property.name).map(property => <StyledTableCell key={property}>{property}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -51,6 +52,9 @@ export function MemberDirectoryTableView ({
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
                   switch (property.type) {
+                    case 'bio': {
+                      return null;
+                    }
                     case 'profile_pic': {
                       return (
                         <TableCell sx={{

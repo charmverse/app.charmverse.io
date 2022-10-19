@@ -82,7 +82,6 @@ function MemberPropertyItemForm ({
         onClick={async () => {
           if (!isDisabled) {
             await updateProperty({
-              index: properties.length,
               name: propertyName,
               id: property.id,
               options: propertyOptions
