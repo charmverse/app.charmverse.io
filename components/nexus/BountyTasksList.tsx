@@ -41,7 +41,7 @@ function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
           <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
-      <TableCell>
+      <TableCell align='center'>
         {action ? <BountyStatusNexusChip action={action} /> : 'No action'}
       </TableCell>
       <TableCell>
