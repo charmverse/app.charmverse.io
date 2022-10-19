@@ -64,8 +64,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
   }
 
   return (
-    <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Dialog open={!!spaceId} onClose={onClose} fullWidth>
         <DialogTitle>Edit workspace profile</DialogTitle>
         <DialogContent dividers>
           <Box display='flex' flexDirection='column'>
@@ -93,8 +93,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
           <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
           <Button type='submit' disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
         </DialogActions>
-      </form>
-    </Dialog>
+      </Dialog>
+    </form>
   );
 
 }
