@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import { useEffect, createContext, useContext, useMemo, useState } from 'react';
+import { BehaviorSubject } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { socketsHost } from 'config/constants';
 import log from 'lib/log';
+import type { WebsocketEvent, WebsocketMessage } from 'lib/websockets/broadcaster';
 
 import { useUser } from './useUser';
 
@@ -18,6 +20,7 @@ type IContext = {
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
+  eventFeed: Record<WebsocketEvent, BehaviorSubject<WebsocketMessage | null>>;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -27,7 +30,8 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   sendMessage: () => null,
   // Development only
   messageLog: [],
-  clearLog: () => null
+  clearLog: () => null,
+  eventFeed: {} as any
 });
 
 let socket: Socket;
@@ -37,6 +41,9 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
   const [lastPong, setLastPong] = useState<string | null>(null);
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
+  const [eventFeed] = useState<Record<WebsocketEvent, BehaviorSubject<WebsocketMessage | null>>>({
+    block_updated: new BehaviorSubject<WebsocketMessage<'block_updated'> | null>(null)
+  });
 
   const { user } = useUser();
 
@@ -70,8 +77,12 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       setMessageLog((prev) => [{ type: 'connect', message: 'Socket client connected' }, ...prev]);
     });
 
-    socket.on('message', (message) => {
-      setMessageLog((prev) => [{ type: 'pong', message }, ...prev]);
+    socket.on('message', (message: WebsocketMessage) => {
+      const isValidMessage = eventFeed[message.type] !== undefined;
+
+      if (isValidMessage) {
+        eventFeed[message.type].next(message);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -110,7 +121,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     sendPing,
     sendMessage,
     messageLog,
-    clearLog
+    clearLog,
+    eventFeed
   }), [isConnected, messageLog]);
 
   return (

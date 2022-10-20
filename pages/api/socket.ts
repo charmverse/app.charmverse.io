@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -13,8 +14,16 @@ handler.use(requireUser).get(socketHandler);
 
 // Initialise socket and bind user session to the socket
 
+type NextApiReponseWithSocketServer = NextApiResponse & {
+  socket: {
+    server: Partial<ServerOptions> & {
+      io?: Server;
+    };
+  };
+}
+
 // Subscribe user to messages
-function socketHandler (req: NextApiRequest, res: NextApiResponse) {
+function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer) {
 
   // It means that socket server was already initialised
   if (res.socket?.server?.io) {

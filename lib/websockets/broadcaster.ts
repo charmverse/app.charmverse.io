@@ -68,13 +68,14 @@ export class WebsocketBroadcaster implements Broadcaster {
   bindServer (io: Server): void {
     this.io = io;
 
-    setInterval(() => {
-      this.io.sockets.allSockets().then(sockets => {
-        // eslint-disable-next-line no-console
-        console.log('Connected socket amount', sockets.size);
-      });
+    // Function for debugging amount of connections
+    // setInterval(() => {
+    //   this.io.sockets.allSockets().then(sockets => {
+    //     // eslint-disable-next-line no-console
+    //     console.log('Connected socket amount', sockets.size);
+    //   });
 
-    }, 1000);
+    // }, 1000);
 
   }
 

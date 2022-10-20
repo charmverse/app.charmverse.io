@@ -43,15 +43,17 @@ const cardsSlice = createSlice({
     },
     updateCards: (state, action: PayloadAction<Card[]>) => {
       for (const card of action.payload) {
-        if (card.deletedAt !== 0) {
+        if (card.deletedAt) {
           delete state.cards[card.id];
           delete state.templates[card.id];
         }
         else if (card.fields.isTemplate) {
-          state.templates[card.id] = card;
+          const existingCard = state.templates[card.id] ?? {};
+          state.templates[card.id] = { ...existingCard, ...card };
         }
         else {
-          state.cards[card.id] = card;
+          const existingCard = state.cards[card.id] ?? {};
+          state.cards[card.id] = { ...existingCard, ...card };
         }
       }
     },

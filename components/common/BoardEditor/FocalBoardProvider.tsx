@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
+import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useWebSocketClient } from 'hooks/useSocketClient';
 import log from 'lib/log';
 
 import store from './focalboard/src/store';
@@ -12,12 +14,25 @@ import { initialLoad } from './focalboard/src/store/initialLoad';
 function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
   const [space] = useCurrentSpace();
+
+  const { eventFeed } = useWebSocketClient();
+
   useEffect(() => {
     log.debug('Load focalboard data');
     if (space) {
       dispatch(initialLoad({ spaceId: space.id }));
     }
   }, [space?.id]);
+
+  useEffect(() => {
+    eventFeed.block_updated.subscribe({
+      next: (value => {
+        if (value?.payload.id) {
+          publishIncrementalUpdate([value.payload as any]);
+        }
+      })
+    });
+  });
 
   return children;
 }
