@@ -776,7 +776,6 @@ enum MemberPropertyType {
   role
   profile_pic
   timezone
-  wallet_address
   name
   discord
   twitter

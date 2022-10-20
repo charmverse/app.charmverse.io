@@ -61,7 +61,6 @@ function MemberDirectoryGalleryCard ({
               case 'text_multiline':
               case 'phone':
               case 'email':
-              case 'wallet_address':
               case 'url':
               case 'number': {
                 return (

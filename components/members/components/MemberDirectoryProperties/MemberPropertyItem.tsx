@@ -26,7 +26,6 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,
   email: <AlternateEmailIcon fontSize='small' />,
-  wallet_address: <AccountBalanceWalletIcon fontSize='small' />,
   select: <FormatListBulletedIcon fontSize='small' />,
   multiselect: <ListIcon fontSize='small' />,
   role: <MilitaryTechIcon fontSize='small' />,

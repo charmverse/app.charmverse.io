@@ -23,6 +23,5 @@ export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
   select: 'Select',
   text: 'Text',
   text_multiline: 'Multiline text',
-  url: 'URL',
-  wallet_address: 'Wallet address'
+  url: 'URL'
 };

@@ -105,7 +105,6 @@ export function MemberDirectoryTableView ({
                     case 'text':
                     case 'phone':
                     case 'email':
-                    case 'wallet_address':
                     case 'url':
                     case 'number': {
                       return (
