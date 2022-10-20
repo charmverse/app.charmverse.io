@@ -84,7 +84,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               case 'role': {
                 const roles = property.value as string[];
                 return (
-                  <Stack gap={0.5} mb={2} key={property.memberPropertyId}>
+                  <Stack gap={0.5} key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
                     <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                       {roles.length === 0 ? 'N/A' : roles.map(role => <Chip label={role} key={role} size='small' variant='outlined' />)}
