@@ -1,4 +1,6 @@
-import { noSpaceTmp } from '../../common';
+import { noSpaceTmp } from '../common/basic';
+
+import type { ModCollab } from './index';
 
 const CSS_COLORS = [
   '0,119,190',
@@ -14,11 +16,16 @@ const CSS_COLORS = [
 
 /* Create a CSS stylesheet for the colors of all users. */
 export class ModCollabColors {
-  constructor (mod) {
+
+  mod: ModCollab;
+
+  userColorStyle: null | HTMLElement = null;
+
+  colorIds: string[] = [];
+
+  constructor (mod: ModCollab) {
     mod.colors = this;
     this.mod = mod;
-    this.userColorStyle = false;
-    this.colorIds = [];
     this.setup();
   }
 
@@ -31,7 +38,7 @@ export class ModCollabColors {
     this.userColorStyle = document.getElementById('user-colors');
   }
 
-  ensureUserColor (userId) {
+  ensureUserColor (userId: string) {
     /* We assign a color to each user. This color stays even if the user
         * disconnects or the participant list is being updated.
         */
@@ -43,22 +50,23 @@ export class ModCollabColors {
 
   // Ensure that there are at least the given number of user color styles.
   provideUserColorStyles () {
-    this.userColorStyle.innerHTML = this.colorIds.map((id, index) => {
-      const color = index < CSS_COLORS.length ? CSS_COLORS[index]
-        : `${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)}`;
-      return noSpaceTmp`
-                span.user-${id} {
-                    border-color: rgba(${color},1);
-                    text-decoration-color: rgba(${color},1);
-                }
-                span.user-${id}.insertion {
-                    color: rgba(${color},1);
-                }
-                .user-bg-${id} {
-                    background-color: rgba(${color},0.2);
-                }`;
-    }).join('\n');
-
+    if (this.userColorStyle) {
+      this.userColorStyle.innerHTML = this.colorIds.map((id, index) => {
+        const color = index < CSS_COLORS.length ? CSS_COLORS[index]
+          : `${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)}`;
+        return noSpaceTmp`
+          span.user-${id} {
+              border-color: rgba(${color},1);
+              text-decoration-color: rgba(${color},1);
+          }
+          span.user-${id}.insertion {
+              color: rgba(${color},1);
+          }
+          .user-bg-${id} {
+              background-color: rgba(${color},0.2);
+          }`;
+      }).join('\n');
+    }
   }
 
 }

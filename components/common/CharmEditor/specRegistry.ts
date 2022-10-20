@@ -18,6 +18,11 @@ import * as columnLayout from './components/columnLayout';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as emoji from './components/emojiSuggest';
+import {
+  deletion,
+  insertion,
+  formatChange
+} from './components/fiduswriter/schema/common/track';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -33,11 +38,6 @@ import paragraph from './components/paragraph';
 import * as quote from './components/quote';
 import { imageSpec } from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
-import {
-  deletion,
-  insertion,
-  formatChange
-} from './components/suggestions/schema/common/track';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 

@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import { amendTransaction } from '../../suggestions/track/amendTransaction';
+import { amendTransaction } from '../../fiduswriter/track/amendTransaction';
 
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
