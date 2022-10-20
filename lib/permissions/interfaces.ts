@@ -68,6 +68,7 @@ export type AssignablePermissionGroupsWithPublic = AssignablePermissionGroups | 
 export type TargetPermissionGroup<G extends Exclude<AssignablePermissionGroupsWithPublic, 'any'> = Exclude<AssignablePermissionGroupsWithPublic, 'any'>> = {
   group: G;
   id: G extends 'public' ? undefined : string;
+  roleId?: G;
 }
 
 // A permission mapping is a mapping of a permission group to a list of operations

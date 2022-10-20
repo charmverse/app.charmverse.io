@@ -152,7 +152,6 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
         </TableHead>
         <TableBody>
           {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
-          {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
         </TableBody>
       </Table>
       <Modal
