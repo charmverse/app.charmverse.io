@@ -4,7 +4,6 @@ import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/c
 
 const DEFAULT_CUSTOM_PROPERTIES: { name: string, type: MemberPropertyType }[] = [
   { name: 'Bio', type: 'text_multiline' }
-  // { name: 'Bio2', type: 'text_multiline' }
 ];
 
 export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: string, spaceId: string }) {
