@@ -119,6 +119,34 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     }
   });
 
+  const userProposals = await prisma.proposal.findMany({
+    where: {
+      spaceId: {
+        in: userWorkspaces.map(userWorkspace => userWorkspace.id)
+      },
+      page: {
+        deletedAt: null,
+        type: 'proposal'
+      },
+      OR: [
+        {
+          authors: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          reviewers: {
+            some: {
+              userId
+            }
+          }
+        }
+      ]
+    }
+  });
+
   const deepDaoCommunities: UserCommunity[] = Object.values(profiles)
     .map(profile => profile.data.organizations
       .map(org => ({
@@ -181,8 +209,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
 
   return {
     communities: sortedCommunities,
-    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
-    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
+    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0) + userProposals.length,
+    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0) + userVotes.length,
     bounties: completedApplications.length
   };
 }
