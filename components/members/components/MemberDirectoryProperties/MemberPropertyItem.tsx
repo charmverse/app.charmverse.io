@@ -21,7 +21,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   text: <TextIcon fontSize='small' />,
-  textMultiline: <SubjectIcon fontSize='small' />,
+  text_multiline: <SubjectIcon fontSize='small' />,
   number: <NumbersIcon fontSize='small' />,
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,

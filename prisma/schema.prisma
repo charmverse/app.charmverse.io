@@ -766,7 +766,7 @@ model ProposalCategory {
 
 enum MemberPropertyType {
   text
-  textMultiline
+  text_multiline
   number
   email
   phone

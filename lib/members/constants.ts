@@ -22,7 +22,7 @@ export const DefaultMemberPropertyDict: Record<MemberPropertyType, string> = {
   phone: 'Phone',
   select: 'Select',
   text: 'Text',
-  textMultiline: 'Multiline text',
+  text_multiline: 'Multiline text',
   url: 'URL',
   wallet_address: 'Wallet address'
 };

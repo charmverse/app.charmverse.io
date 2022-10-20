@@ -58,7 +58,7 @@ function MemberDirectoryGalleryCard ({
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
             switch (property.type) {
               case 'text':
-              case 'textMultiline':
+              case 'text_multiline':
               case 'phone':
               case 'email':
               case 'wallet_address':

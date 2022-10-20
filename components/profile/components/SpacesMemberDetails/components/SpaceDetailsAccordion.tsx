@@ -44,7 +44,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           {properties.map(property => {
             switch (property.type) {
               case 'text':
-              case 'textMultiline':
+              case 'text_multiline':
               case 'phone':
               case 'name':
               case 'url':
@@ -53,12 +53,13 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
                 return (
                   <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography whiteSpace={property.type === 'textMultiline' ? 'pre-wrap' : 'initial'}>{property.value ?? 'N/A'}</Typography>
+                    <Typography whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}>{property.value ?? 'N/A'}</Typography>
                   </Stack>
                 );
               }
-              case 'multiselect': {
-                const values = (property.value ?? [])as PropertyOption[];
+              case 'multiselect':
+              case 'select': {
+                const values = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean)) as PropertyOption[];
                 return (
                   <Stack gap={0.5} key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
@@ -68,19 +69,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
                   </Stack>
                 );
               }
-              case 'select': {
-                const propertyValue = property.value as PropertyOption;
-                return (
-                  <Stack gap={0.5} key={property.memberPropertyId}>
-                    <Typography fontWeight='bold'>{property.name}</Typography>
-                    {propertyValue ? (
-                      <Stack gap={1} flexDirection='row'>
-                        <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
-                      </Stack>
-                    ) : <Typography variant='body2'>N/A</Typography>}
-                  </Stack>
-                );
-              }
+
               case 'role': {
                 const roles = property.value as string[];
                 return (
