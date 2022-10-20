@@ -18,7 +18,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
       status: 'InProgress'
     },
     orderBy: {
-      deadline: 'asc'
+      deadline: 'desc'
     },
     include: {
       page: true,
