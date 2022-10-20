@@ -111,6 +111,9 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         some: {
           userId
         }
+      },
+      page: {
+        type: 'proposal'
       }
     },
     select: {
@@ -161,6 +164,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
 
   const communities = [...deepDaoCommunities, ...charmVerseCommunities];
   const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+
   const votes = [
     // Deepdao votes
     ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => ([..._votes, ...profile.data.votes]), []),
