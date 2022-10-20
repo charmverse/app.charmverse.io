@@ -41,7 +41,7 @@ function MemberDirectoryGalleryCard ({
         />
         <Stack p={2} gap={1}>
           <Typography gutterBottom variant='h6' mb={0} component='div'>
-            {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
+            {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value}
           </Typography>
           {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
           <Stack gap={0.5}>

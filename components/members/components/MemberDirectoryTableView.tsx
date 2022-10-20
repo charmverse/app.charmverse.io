@@ -96,7 +96,7 @@ export function MemberDirectoryTableView ({
                         <TableCell>
                           <Link href={`/u/${member.path}`}>
                             <Typography fontWeight='bold'>
-                              {member.username}
+                              {memberProperty.value}
                             </Typography>
                           </Link>
                         </TableCell>

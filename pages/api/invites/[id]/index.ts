@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
+import { populateNamePropertyValue } from 'lib/members/populateNamePropertyValue';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
@@ -52,6 +53,11 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
           }
         }
       }
+    });
+
+    await populateNamePropertyValue({
+      spaceId: invite.spaceId,
+      userId
     });
 
     logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
