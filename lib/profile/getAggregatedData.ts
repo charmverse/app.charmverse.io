@@ -78,11 +78,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
             }
           },
           {
-            reviewers: {
-              some: {
-                userId
-              }
-            }
+            reviewedBy: userId
           }
         ]
       }
