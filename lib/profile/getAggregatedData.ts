@@ -33,7 +33,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
     allOrganizations,
     bountiesCreated,
     bountyApplications,
-    userWorkspaces
+    userWorkspaces,
+    userProposalsCount
   ] = await Promise.all([
     getAllOrganizations(apiToken),
     prisma.bounty.findMany({
@@ -61,7 +62,31 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         }
       }
     }),
-    getSpacesOfUser(userId)
+    getSpacesOfUser(userId),
+    prisma.proposal.count({
+      where: {
+        page: {
+          deletedAt: null,
+          type: 'proposal'
+        },
+        OR: [
+          {
+            authors: {
+              some: {
+                userId
+              }
+            }
+          },
+          {
+            reviewers: {
+              some: {
+                userId
+              }
+            }
+          }
+        ]
+      }
+    })
   ]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
@@ -116,34 +141,6 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       threshold: true,
       type: true,
       status: true
-    }
-  });
-
-  const userProposals = await prisma.proposal.findMany({
-    where: {
-      spaceId: {
-        in: userWorkspaces.map(userWorkspace => userWorkspace.id)
-      },
-      page: {
-        deletedAt: null,
-        type: 'proposal'
-      },
-      OR: [
-        {
-          authors: {
-            some: {
-              userId
-            }
-          }
-        },
-        {
-          reviewers: {
-            some: {
-              userId
-            }
-          }
-        }
-      ]
     }
   });
 
@@ -209,7 +206,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
 
   return {
     communities: sortedCommunities,
-    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0) + userProposals.length,
+    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0) + userProposalsCount,
     totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0) + userVotes.length,
     bounties: completedApplications.length
   };
