@@ -10,6 +10,7 @@ import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
+import TextIcon from '@mui/icons-material/TextFields';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
@@ -19,8 +20,8 @@ import { DefaultMemberPropertyDict } from 'lib/members/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
-  text: <SubjectIcon fontSize='small' />,
-  bio: <SubjectIcon fontSize='small' />,
+  text: <TextIcon fontSize='small' />,
+  textMultiline: <SubjectIcon fontSize='small' />,
   number: <NumbersIcon fontSize='small' />,
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,

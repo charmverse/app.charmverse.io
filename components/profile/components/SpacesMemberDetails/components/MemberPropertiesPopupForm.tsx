@@ -64,10 +64,10 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-        <DialogTitle>Edit workspace profile</DialogTitle>
-        <DialogContent dividers>
+    <Dialog open={!!spaceId} onClose={onClose} fullWidth>
+      <DialogTitle>Edit workspace profile</DialogTitle>
+      <DialogContent dividers>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>
             {data.map(property => {
               const fieldRendererConfig = getFieldRendererConfig({
@@ -89,13 +89,13 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
                 ) : null;
             })}
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
-          <Button type='submit' disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
-        </DialogActions>
-      </Dialog>
-    </form>
+        </form>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
+        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
+      </DialogActions>
+    </Dialog>
   );
 
 }

@@ -44,16 +44,16 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           {properties.map(property => {
             switch (property.type) {
               case 'text':
+              case 'textMultiline':
               case 'phone':
               case 'name':
               case 'url':
-              case 'bio':
               case 'email':
               case 'number': {
                 return (
                   <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography>{property.value ?? 'N/A'}</Typography>
+                    <Typography whiteSpace={property.type === 'textMultiline' ? 'pre-wrap' : 'initial'}>{property.value ?? 'N/A'}</Typography>
                   </Stack>
                 );
               }

@@ -58,11 +58,11 @@ function MemberDirectoryGalleryCard ({
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
             switch (property.type) {
               case 'text':
+              case 'textMultiline':
               case 'phone':
               case 'email':
               case 'wallet_address':
               case 'url':
-              case 'bio':
               case 'number': {
                 return (
                   <Stack key={property.id}>
