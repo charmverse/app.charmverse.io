@@ -1,10 +1,7 @@
-import type { UserVote, Vote, VoteOptions } from '@prisma/client';
 
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-
-type VoteWithUserVotes = (Vote & { userVotes: UserVote[], voteOptions: VoteOptions[] })
 
 const updateVoteStatus = async () => {
 
@@ -21,12 +18,12 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline as VoteWithUserVotes[]);
+  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
 
   await prisma.vote.updateMany({
     where: {
       id: {
-        in: passedVotes
+        in: passedVotes.map(v => v.id)
       }
     },
     data: {
@@ -37,7 +34,7 @@ const updateVoteStatus = async () => {
   await prisma.vote.updateMany({
     where: {
       id: {
-        in: rejectedVotes
+        in: rejectedVotes.map(v => v.id)
       }
     },
     data: {
@@ -45,24 +42,13 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const closedProposals = await prisma.vote.findMany({
-    where: {
-      pageId: {
-        in: [...rejectedVotes, ...passedVotes]
-      },
-      context: 'proposal'
-    },
-    select: {
-      pageId: true
-    }
-  });
-
-  const closedProposalIds = closedProposals.map(closedProposal => closedProposal.pageId);
+  const proposalVotes = [...rejectedVotes, ...passedVotes].filter(v => v.context === 'proposal');
+  const proposalPageIds = proposalVotes.map(v => v.pageId);
 
   await prisma.proposal.updateMany({
     where: {
       id: {
-        in: closedProposalIds
+        in: proposalPageIds
       }
     },
     data: {
