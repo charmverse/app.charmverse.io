@@ -170,7 +170,7 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
             <TableRow>
               <TableCell>Comment</TableCell>
               <TableCell width={160}>Commenter</TableCell>
-              <TableCell>Page title</TableCell>
+              <TableCell>Page Title</TableCell>
               <TableCell width={140} align='center'>Date</TableCell>
             </TableRow>
           </TableHead>
