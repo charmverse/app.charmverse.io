@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
@@ -15,17 +14,10 @@ type Props = {
   onEdit: VoidFunction;
 };
 
-const StyledAccordion = styled(Accordion)`
-  &.MuiPaper-root {
-    margin-top: 0;
-    background: none;
-  }
-`;
-
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit }: Props) {
 
   return (
-    <StyledAccordion>
+    <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}><WorkspaceAvatar
         name={spaceName}
         image={spaceImage}
@@ -107,6 +99,6 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           })}
         </Stack>
       </AccordionDetails>
-    </StyledAccordion>
+    </Accordion>
   );
 }
