@@ -24,7 +24,7 @@ export function useMemberPropertyValues (memberId: string) {
     const hasEditableProps = spaceProps.some(prop => prop.type === 'name' || prop.type === 'bio' || !DEFAULT_MEMBER_PROPERTIES.includes(prop.type as any));
 
     return hasEditableProps && (isAdmin || memberId === user.id);
-  }, [user]);
+  }, [user, memberPropertyValues]);
 
   const updateSpaceValues = useCallback(async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
     const updatedValues = await charmClient.members.updateSpacePropertyValues(memberId, spaceId, values);

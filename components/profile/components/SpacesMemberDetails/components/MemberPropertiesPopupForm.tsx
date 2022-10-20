@@ -73,7 +73,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
               const fieldRendererConfig = getFieldRendererConfig({
                 type: property.type,
                 label: property.name,
-                error: errors[property.memberPropertyId]
+                error: errors[property.memberPropertyId],
+                inline: true
               });
 
               return fieldRendererConfig.renderer
