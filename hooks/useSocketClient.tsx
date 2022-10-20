@@ -6,6 +6,8 @@ import io from 'socket.io-client';
 import { socketsHost } from 'config/constants';
 import log from 'lib/log';
 
+import { useUser } from './useUser';
+
 type LoggedMessage = { type: 'ping' | 'pong' | 'connect' | 'disconnect' | 'error', message: string }
 
 type IContext = {
@@ -15,6 +17,7 @@ type IContext = {
   sendMessage: (message: any) => void;
   // Testing purposes
   messageLog: LoggedMessage[];
+  clearLog: () => void;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -22,7 +25,9 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   isConnected: false,
   sendPing: () => null,
   sendMessage: () => null,
-  messageLog: []
+  // Development only
+  messageLog: [],
+  clearLog: () => null
 });
 
 let socket: Socket;
@@ -33,20 +38,26 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   const [lastPong, setLastPong] = useState<string | null>(null);
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
+  const { user } = useUser();
+
   useEffect(() => {
 
-    connect();
+    if (user) {
+      connect();
+    }
 
     return () => {
-      socket?.off('connect');
-      socket?.off('disconnect');
-      socket?.off('pong');
-      socket?.off('connect_error');
+      socket?.disconnect();
+      socket?.off();
     };
-  }, []);
+  }, [user]);
 
   async function connect () {
     await fetch('/api/socket');
+
+    if (socket?.connected) {
+      socket.disconnect();
+    }
 
     socket = io(socketsHost, {
       withCredentials: true
@@ -89,12 +100,17 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     socket.emit('message', message);
   }
 
+  function clearLog () {
+    setMessageLog([]);
+  }
+
   const value: IContext = useMemo(() => ({
     isConnected,
     lastPong,
     sendPing,
     sendMessage,
-    messageLog
+    messageLog,
+    clearLog
   }), [isConnected, messageLog]);
 
   return (

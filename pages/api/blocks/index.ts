@@ -5,11 +5,11 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/broadcaster';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -216,6 +216,18 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
   });
 
   const updatedBlocks = await prisma.$transaction(blockOps);
+
+  blocks.forEach((blockUpdate, index) => {
+
+    const spaceId = updatedBlocks[index].spaceId;
+
+    relay.broadcast({
+      type: 'block_updated',
+      spaceId,
+      payload: blockUpdate
+    });
+  });
+
   return res.status(200).json(updatedBlocks);
 }
 

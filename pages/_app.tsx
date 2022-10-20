@@ -263,8 +263,9 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-    <WebSocketClientProvider>
-      <UserProvider>
+
+    <UserProvider>
+      <WebSocketClientProvider>
         <SpacesProvider>
           <MembersProvider>
             <BountiesProvider>
@@ -280,8 +281,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
             </BountiesProvider>
           </MembersProvider>
         </SpacesProvider>
-      </UserProvider>
-    </WebSocketClientProvider>
+      </WebSocketClientProvider>
+    </UserProvider>
+
   );
 }
 

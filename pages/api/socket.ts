@@ -1,31 +1,47 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import type { Socket } from 'socket.io';
+import nc from 'next-connect';
 import { Server } from 'socket.io';
 
-function messageHandler (socket: Socket) {
-  socket.on('message', (message) => {
-    socket.emit('message', 'Hello from the server!');
-  });
-}
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
+import type { WebsocketMessage } from 'lib/websockets/broadcaster';
+import { relay } from 'lib/websockets/broadcaster';
 
-export default function socketHandler (req: NextApiRequest, res: NextApiResponse) {
+const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+
+handler.use(requireUser).get(socketHandler);
+
+// Initialise socket and bind user session to the socket
+
+// Subscribe user to messages
+function socketHandler (req: NextApiRequest, res: NextApiResponse) {
 
   // It means that socket server was already initialised
   if (res.socket?.server?.io) {
+
     res.end();
     return;
   }
 
   const io = new Server(res.socket.server);
 
+  // Define actions inside
+  io.on('connect', (socket) => {
+    relay.registerSubscriber({
+      userId: req.session.user.id,
+      socket
+    });
+
+    socket.on('message', (message: WebsocketMessage) => {
+      socket.emit('message', 'Hello from the server!');
+    });
+  });
+
   res.socket.server.io = io;
 
-  const onConnection = (socket: Socket) => {
-    messageHandler(socket);
-  };
-
-  // Define actions inside
-  io.on('connection', onConnection);
+  relay.bindServer(io);
 
   res.end();
 }
+
+export default withSessionRoute(handler);
