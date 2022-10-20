@@ -7,21 +7,21 @@ async function createDefaultMemberPropertiesForSpaces (): Promise<any> {
     select: {
       id: true,
       createdBy: true,
-      spaceRoles: {
-        include: {
-          user: {
-            select: {
-              username: true,
-              id: true
-            }
-          }
-        }
-      }
+      // spaceRoles: {
+      //   include: {
+      //     user: {
+      //       select: {
+      //         username: true,
+      //         id: true
+      //       }
+      //     }
+      //   }
+      // }
     },
   });
 
   for (const space of spaces) {
-    const spaceMembers = space.spaceRoles.map(spaceRole => ({username: spaceRole.user.username, id: spaceRole.user.id}))
+    // const spaceMembers = space.spaceRoles.map(spaceRole => ({username: spaceRole.user.username, id: spaceRole.user.id}))
 
     await prisma.memberProperty.createMany({
       data: generateDefaultPropertiesInput({
@@ -30,22 +30,22 @@ async function createDefaultMemberPropertiesForSpaces (): Promise<any> {
       })
     });
 
-    const nameMemberProperty = await prisma.memberProperty.findFirst({
-      where: {
-        spaceId: space.id,
-        type: "name"
-      }
-    }) as MemberProperty
+    // const nameMemberProperty = await prisma.memberProperty.findFirst({
+    //   where: {
+    //     spaceId: space.id,
+    //     type: "name"
+    //   }
+    // }) as MemberProperty
 
-    await prisma.memberPropertyValue.createMany({
-      data: spaceMembers.map(spaceMember => ({
-        memberPropertyId: nameMemberProperty.id,
-        spaceId: space.id,
-        updatedBy: spaceMember.id,
-        userId: spaceMember.id,
-        value: spaceMember.username
-      }))
-    })
+    // await prisma.memberPropertyValue.createMany({
+    //   data: spaceMembers.map(spaceMember => ({
+    //     memberPropertyId: nameMemberProperty.id,
+    //     spaceId: space.id,
+    //     updatedBy: spaceMember.id,
+    //     userId: spaceMember.id,
+    //     value: spaceMember.username
+    //   }))
+    // })
   }
 }
 

@@ -7,7 +7,6 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
-import { populateNamePropertyValue } from 'lib/members/populateNamePropertyValue';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -80,11 +79,6 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const updatedSpace = await updateSpacePermissionConfigurationMode({
     permissionConfigurationMode: data.permissionConfigurationMode ?? 'collaborative',
     spaceId: space.id
-  });
-
-  await populateNamePropertyValue({
-    spaceId: space.id,
-    userId: space.createdBy
   });
 
   // Add default stablecoin methods

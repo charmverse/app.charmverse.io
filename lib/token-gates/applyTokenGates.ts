@@ -3,7 +3,6 @@ import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { populateNamePropertyValue } from 'lib/members/populateNamePropertyValue';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
@@ -165,11 +164,6 @@ export async function applyTokenGates ({
           }
         }
       }
-    });
-
-    await populateNamePropertyValue({
-      spaceId,
-      userId
     });
 
     updateTrackUserProfileById(userId);
