@@ -73,7 +73,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
           }}
           onClick={() => handleVoteId(voteTask.id)}
         >
-          {isDeadlineOverdue ? 'View' : 'Vote now'}
+          {isDeadlineOverdue ? 'View' : 'Vote'}
         </Button>
       </TableCell>
     </TableRow>
@@ -149,8 +149,8 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Table size='medium' aria-label='Nexus polls table'>
         <TableHead>
           <TableRow>
-            <TableCell>Poll name</TableCell>
-            <TableCell>Page name</TableCell>
+            <TableCell>Poll</TableCell>
+            <TableCell>Page</TableCell>
             <TableCell align='center'>Due</TableCell>
             <TableCell width='135' align='center'>Action</TableCell>
           </TableRow>
