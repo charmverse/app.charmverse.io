@@ -1,4 +1,4 @@
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Stack, StackProps, CfnTag } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
@@ -89,12 +89,20 @@ export class CdkDeployStack extends Stack {
       },
     ];
 
+    const resourceTags: CfnTag[] = [
+      { 
+        key: 'env',
+        value: 'stg'
+      } 
+    ];
+
     // Create an Elastic Beanstalk environment to run the application
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
       solutionStackName: '64bit Amazon Linux 2 v3.4.13 running Docker',
       optionSettings: optionSettingProperties,
+      tags: resourceTags,
       versionLabel: appVersionProps.ref,
     });
 

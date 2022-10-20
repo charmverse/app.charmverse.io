@@ -1,10 +1,12 @@
 import HowToVote from '@mui/icons-material/HowToVote';
-import { Alert, Box, Card, Grid, Typography } from '@mui/material';
-import Table from '@mui/material/Table';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -19,6 +21,8 @@ import Modal from 'components/common/Modal';
 import VoteIcon from 'components/votes/components/VoteIcon';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
+
+import Table from './components/NexusTable';
 
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined;
@@ -147,7 +151,6 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
           {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
         </TableBody>
       </Table>
