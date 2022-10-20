@@ -21,7 +21,7 @@ async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse
   const spaceId = req.query.spaceId as string | undefined;
 
   if (!memberId || !spaceId) {
-    throw new InvalidInputError('Please provide proper member and worspace information');
+    throw new InvalidInputError('Please provide proper member and workspace information');
   }
 
   const propertyValues = await getSpacePropertyValues({ memberId, requestingUserId: userId, spaceId });
@@ -35,7 +35,7 @@ async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: Next
   const spaceId = req.query.spaceId as string;
 
   if (!memberId || !spaceId) {
-    throw new InvalidInputError('Please provide proper member and worspace information');
+    throw new InvalidInputError('Please provide proper member and workspace information');
   }
 
   if (memberId !== userId) {

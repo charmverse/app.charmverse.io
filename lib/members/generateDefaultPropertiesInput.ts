@@ -3,8 +3,8 @@ import type { MemberPropertyType } from '@prisma/client';
 import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
 
 const DEFAULT_CUSTOM_PROPERTIES: { name: string, type: MemberPropertyType }[] = [
-  { name: 'Bio', type: 'text_multiline' },
-  { name: 'Bio2', type: 'text_multiline' }
+  { name: 'Bio', type: 'text_multiline' }
+  // { name: 'Bio2', type: 'text_multiline' }
 ];
 
 export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: string, spaceId: string }) {
@@ -17,12 +17,12 @@ export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: s
     spaceId
   }));
 
-  DEFAULT_CUSTOM_PROPERTIES.forEach((customMemberProperty) => {
+  DEFAULT_CUSTOM_PROPERTIES.forEach((customMemberProperty, customMemberPropertyIndex) => {
     defaultPropertiesInput.push({
       createdBy: userId,
       name: customMemberProperty.name,
       type: customMemberProperty.type,
-      index: defaultPropertiesInput.length,
+      index: customMemberPropertyIndex,
       updatedBy: userId,
       spaceId
     });
