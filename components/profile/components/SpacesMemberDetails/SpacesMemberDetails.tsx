@@ -27,8 +27,6 @@ export function SpacesMemberDetails ({ memberId }: Props) {
       {memberPropertyValues.map(pv => (
         <SpaceDetailsAccordion
           key={pv.spaceId}
-          memberId={memberId}
-          spaceId={pv.spaceId}
           spaceName={pv.spaceName}
           spaceImage={pv.spaceImage}
           properties={pv.properties}

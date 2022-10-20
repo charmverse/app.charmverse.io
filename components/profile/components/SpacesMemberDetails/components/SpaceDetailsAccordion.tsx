@@ -8,9 +8,7 @@ import type { PropertyOption } from 'components/members/components/MemberDirecto
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
 type Props = {
-  spaceId: string;
   spaceName: string;
-  memberId: string;
   properties: PropertyValueWithDetails[];
   spaceImage: string | null;
   readOnly?: boolean;
@@ -24,7 +22,7 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, properties, spaceImage, readOnly, onEdit }: Props) {
+export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit }: Props) {
 
   return (
     <StyledAccordion>
@@ -33,7 +31,7 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
         image={spaceImage}
       />
         <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
-          <Typography ml={2} variant='h5' fontWeight='bold'>{spaceName}</Typography>
+          <Typography ml={2} variant='h6'>{spaceName}</Typography>
           {!readOnly && (
             <IconButton
               sx={{ mx: 1 }}
@@ -88,6 +86,17 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, memberId, propertie
                         <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
                       </Stack>
                     ) : <Typography variant='body2'>N/A</Typography>}
+                  </Stack>
+                );
+              }
+              case 'role': {
+                const roles = property.value as string[];
+                return (
+                  <Stack gap={0.5} mb={2}>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
+                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                      {roles.length === 0 ? 'N/A' : roles.map(role => <Chip label={role} key={role} size='small' variant='outlined' />)}
+                    </Stack>
                   </Stack>
                 );
               }
