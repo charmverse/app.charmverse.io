@@ -83,7 +83,10 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
                     key={property.memberPropertyId}
                     name={property.memberPropertyId}
                     control={control}
-                    rules={fieldRendererConfig.rules}
+                    rules={{
+                      ...fieldRendererConfig.rules,
+                      required: property.type === 'name' ? true : fieldRendererConfig.rules.required
+                    }}
                     render={fieldRendererConfig.renderer}
                   />
                 ) : null;
@@ -93,7 +96,16 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
-        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          disabled={
+            isSubmitting
+            || Object.keys(errors).length >= 1
+          }
+          loading={isSubmitting}
+          sx={{ px: 4 }}
+        >Save
+        </Button>
       </DialogActions>
     </Dialog>
   );
