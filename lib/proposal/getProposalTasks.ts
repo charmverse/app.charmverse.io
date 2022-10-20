@@ -1,7 +1,6 @@
 import type { ProposalStatus, WorkspaceEvent } from '@prisma/client';
 
 import { prisma } from 'db';
-import { isTruthy } from 'lib/utilities/types';
 
 import { getProposalAction } from './getProposalAction';
 
@@ -17,6 +16,11 @@ export interface ProposalTask {
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
+}
+
+export interface ProposalTasksGroup {
+  marked: ProposalTask[];
+  unmarked: ProposalTask[];
 }
 
 type WorkspaceEventRecord = Record<string, Pick<WorkspaceEvent, 'id' | 'pageId' | 'createdAt' | 'meta'> | null>

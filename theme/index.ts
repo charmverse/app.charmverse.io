@@ -189,6 +189,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       teal: {
         main: mode === 'dark' ? darkModeColors.teal : lightModeColors.teal,
+        dark: darken(mode === 'dark' ? darkModeColors.teal : lightModeColors.teal, 0.05),
         contrastText
       },
       purple: {

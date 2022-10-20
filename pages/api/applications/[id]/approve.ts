@@ -30,7 +30,9 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
     },
     select: {
       bountyId: true,
-      bounty: true
+      bounty: {
+        include: { page: true }
+      }
     }
   });
 
@@ -64,8 +66,8 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
       log.error('Error creating collabland VC', error);
     });
 
-  const { id: bountyId, rewardAmount, rewardToken, spaceId } = application.bounty;
-  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount, rewardToken, resourceId: bountyId });
+  const { id: bountyId, rewardAmount, rewardToken, spaceId, page } = application.bounty;
+  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount, pageId: page?.id || '', rewardToken, resourceId: bountyId });
 
   return res.status(200).json(approvedApplication);
 }

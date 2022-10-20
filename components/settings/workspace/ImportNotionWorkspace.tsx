@@ -14,9 +14,9 @@ import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { deleteCookie, getCookie } from 'lib/browser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
+import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import NotionIcon from 'public/images/notion_logo.svg';
 
 interface NotionResponseState {

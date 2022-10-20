@@ -48,27 +48,6 @@ export const shortenHex = (hex: string = '', length = 4): string => {
   return `${hex.substring(0, length + 2)}…${hex.substring(hex.length - length)}`;
 };
 
-// @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
-export function getUriWithParam (
-  baseUrl: string,
-  params: Record<string, any>
-): string {
-  const Url = new URL(baseUrl, baseUrl.match('http') ? undefined : window.location.origin);
-  const urlParams: URLSearchParams = new URLSearchParams(Url.search);
-  for (const key in params) {
-    if (params.hasOwnProperty(key)) {
-      if (typeof params[key] === 'string') {
-        urlParams.set(key, params[key]);
-      }
-      else {
-        urlParams.delete(key);
-      }
-    }
-  }
-  Url.search = urlParams.toString();
-  return Url.toString();
-}
-
 /**
  * Change the first character of a string to uppercase
  * Leaves other characters unchanged

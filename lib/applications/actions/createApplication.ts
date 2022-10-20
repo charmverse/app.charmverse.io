@@ -7,7 +7,7 @@ import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/
 import type { ApplicationCreationData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
 
-export async function createApplication ({ bountyId, message, userId }: ApplicationCreationData): Promise<Application> {
+export async function createApplication ({ bountyId, message, userId, status = 'applied' }: ApplicationCreationData): Promise<Application> {
   const bounty = await getBountyOrThrow(bountyId);
 
   const existingApplication = bounty.applications.find(app => app.createdBy === userId);
@@ -28,7 +28,7 @@ export async function createApplication ({ bountyId, message, userId }: Applicat
 
   return prisma.application.create({
     data: {
-      status: 'applied',
+      status,
       message,
       applicant: {
         connect: {
