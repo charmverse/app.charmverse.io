@@ -19,11 +19,12 @@ import type { ReactNode } from 'react';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import { nanofy } from 'lib/utilities/numbers';
 import type { BrandColor } from 'theme/colors';
 
-const BOUNTY_LABELS: Record<BountyStatus, string> = {
+const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   inProgress: 'In Progress',
@@ -39,7 +40,29 @@ const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   paid: <PaidIcon />
 };
 
-export const BountyStatusColors: Record<BountyStatus, BrandColor> = {
+const BOUNTY_ACTION_LABELS: Record<BountyTaskAction, string> = {
+  application_pending: 'Application pending',
+  application_approved: 'Application approved',
+  application_rejected: 'Application rejected',
+  work_submitted: 'Work submitted',
+  work_approved: 'Work approved',
+  payment_needed: 'Payment needed',
+  payment_complete: 'Payment complete',
+  suggested_bounty: 'Suggested bounty'
+};
+
+const BOUNTY_ACTION_ICONS: Record<BountyTaskAction, ReactNode> = {
+  application_pending: <ModeStandbyIcon />,
+  application_approved: <CheckCircleOutlineIcon />,
+  application_rejected: <ModeStandbyIcon />,
+  work_submitted: <CheckCircleOutlineIcon />,
+  work_approved: <CheckCircleOutlineIcon />,
+  payment_needed: <PaidIcon />,
+  payment_complete: <PaidIcon />,
+  suggested_bounty: <LightbulbIcon />
+};
+
+export const BOUNTY_STATUS_COLORS: Record<BountyStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
   inProgress: 'yellow',
@@ -47,10 +70,31 @@ export const BountyStatusColors: Record<BountyStatus, BrandColor> = {
   paid: 'gray'
 };
 
-const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus }>`
+export const BOUNTY_ACTION_COLORS: Record<BountyTaskAction, BrandColor> = {
+  application_pending: 'teal',
+  application_approved: 'teal',
+  application_rejected: 'red',
+  work_submitted: 'yellow',
+  work_approved: 'yellow',
+  payment_needed: 'pink',
+  payment_complete: 'gray',
+  suggested_bounty: 'purple'
+};
+
+const isBountyStatus = (status: BountyStatus | BountyTaskAction): status is BountyStatus => status in BOUNTY_STATUS_LABELS;
+const isBountyAction = (status: BountyStatus | BountyTaskAction): status is BountyTaskAction => status in BOUNTY_ACTION_LABELS;
+
+const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus | BountyTaskAction }>`
   background-color: ${({ status, theme }) => {
-    // @ts-ignore
-    return theme.palette[BountyStatusColors[status]].main;
+    if (isBountyStatus(status)) {
+      return theme.palette[BOUNTY_STATUS_COLORS[status]].main;
+    }
+    else if (isBountyAction(status)) {
+      return theme.palette[BOUNTY_ACTION_COLORS[status]].main;
+    }
+    else {
+      return 'initial';
+    }
   }};
   .MuiChip-icon {
     display: flex;
@@ -82,9 +126,24 @@ export function BountyStatusChip ({
     <StyledBountyStatusChip
       size={size}
       status={status}
-      label={BOUNTY_LABELS[status]}
+      label={BOUNTY_STATUS_LABELS[status]}
       variant='filled'
       icon={<span>{BOUNTY_STATUS_ICONS[status]}</span>}
+    />
+  );
+}
+
+export function BountyStatusNexusChip ({
+  action,
+  size = 'small'
+}: { size?: ChipProps['size'], action: BountyTaskAction }) {
+  return (
+    <StyledBountyStatusChip
+      size={size}
+      status={action}
+      label={BOUNTY_ACTION_LABELS[action]}
+      variant='filled'
+      icon={<span>{BOUNTY_ACTION_ICONS[action]}</span>}
     />
   );
 }

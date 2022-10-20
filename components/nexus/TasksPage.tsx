@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -12,6 +13,7 @@ import { useState } from 'react';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import BountyTasksList from './BountyTasksList';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
@@ -51,7 +53,7 @@ const StyledTypography = styled(Typography)`
 
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
-  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
   { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' }
@@ -75,7 +77,8 @@ export default function TasksPage () {
     multisig: (gnosisTasks && !hasSnoozedNotifications) ? gnosisTasks.length : 0,
     vote: tasks ? tasks.votes.length : 0,
     discussion: tasks ? tasks.mentioned.unmarked.length : 0,
-    proposal: tasks ? tasks.proposals.unmarked.length : 0
+    proposal: tasks ? tasks.proposals.unmarked.length : 0,
+    bounty: tasks ? tasks.bounties?.unmarked.length : 0
   };
 
   return (
@@ -172,6 +175,9 @@ export default function TasksPage () {
       }
       {
         currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
+      }
+      {
+        currentTaskType === 'bounty' && <BountyTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
       }
     </>
   );
