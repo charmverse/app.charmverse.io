@@ -69,18 +69,11 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
           deletedAt: null,
           type: 'proposal'
         },
-        OR: [
-          {
-            authors: {
-              some: {
-                userId
-              }
-            }
-          },
-          {
-            reviewedBy: userId
+        authors: {
+          some: {
+            userId
           }
-        ]
+        }
       }
     })
   ]);
