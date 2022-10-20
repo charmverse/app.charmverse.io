@@ -9,7 +9,7 @@ export const DEFAULT_MEMBER_PROPERTIES = [
   'timezone'
 ] as const;
 
-export const DefaultMemberPropertyDict: Record<MemberPropertyType, string> = {
+export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
   discord: 'Discord',
   name: 'Name',
   profile_pic: 'Profile pic',

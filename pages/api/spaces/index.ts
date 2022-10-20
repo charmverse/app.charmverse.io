@@ -6,7 +6,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { MEMBER_PROPERTY_LABELS, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -67,11 +68,13 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   });
 
   const defaultCategories = generateDefaultCategoriesInput(space.id);
+  const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
 
   await prisma.$transaction([
     ...seedPagesTransactionInput.blocksToCreate.map(input => prisma.block.create({ data: input })),
     ...seedPagesTransactionInput.pagesToCreate.map(input => createPage({ data: input })),
-    ...defaultCategories.map(input => prisma.proposalCategory.create({ data: input }))
+    prisma.proposalCategory.createMany({ data: defaultCategories }),
+    prisma.memberProperty.createMany({ data: defaultProperties })
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({
@@ -81,17 +84,6 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
-
-  await prisma.memberProperty.createMany({
-    data: [...DEFAULT_MEMBER_PROPERTIES].sort().map((memberProperty, memberPropertyIndex) => ({
-      createdBy: userId,
-      name: DefaultMemberPropertyDict[memberProperty],
-      index: memberPropertyIndex,
-      type: memberProperty,
-      spaceId: space.id,
-      updatedBy: userId
-    }))
-  });
 
   logSpaceCreation(space);
   updateTrackGroupProfile(space);

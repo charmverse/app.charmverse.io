@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { DefaultMemberPropertyDict, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { MEMBER_PROPERTY_LABELS, DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 
 async function createDefaultMemberPropertiesForSpaces (): Promise<any> {
   const spaces = await prisma.space.findMany({
@@ -13,7 +13,7 @@ async function createDefaultMemberPropertiesForSpaces (): Promise<any> {
     await prisma.memberProperty.createMany({
       data: DEFAULT_MEMBER_PROPERTIES.map(memberProperty => ({
         createdBy: space.createdBy,
-        name: DefaultMemberPropertyDict[memberProperty],
+        name: MEMBER_PROPERTY_LABELS[memberProperty],
         type: memberProperty,
         spaceId: space.id,
         updatedBy: space.createdBy

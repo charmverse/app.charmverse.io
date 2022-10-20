@@ -8,7 +8,7 @@ import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import { DEFAULT_MEMBER_PROPERTIES, DefaultMemberPropertyDict } from 'lib/members/constants';
+import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
 import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
@@ -48,7 +48,7 @@ export function AddMemberPropertyButton () {
           }
         }}
       >
-        {Object.keys(DefaultMemberPropertyDict).map((memberPropertyType) => (
+        {Object.keys(MEMBER_PROPERTY_LABELS).map((memberPropertyType) => (
           !memberPropertyType.match(/select/) && !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
             <MenuItem
               key={memberPropertyType}
