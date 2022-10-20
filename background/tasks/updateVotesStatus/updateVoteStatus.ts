@@ -20,43 +20,47 @@ const updateVoteStatus = async () => {
 
   const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
 
-  await prisma.vote.updateMany({
-    where: {
-      id: {
-        in: passedVotes.map(v => v.id)
+  const proposalPageIds = votesPassedDeadline
+    .filter(v => v.context === 'proposal')
+    .map(v => v.pageId);
+
+  await prisma.$transaction([
+    // update passed votes
+    prisma.vote.updateMany({
+      where: {
+        id: {
+          in: passedVotes.map(v => v.id)
+        }
+      },
+      data: {
+        status: 'Passed'
       }
-    },
-    data: {
-      status: 'Passed'
-    }
-  });
-
-  await prisma.vote.updateMany({
-    where: {
-      id: {
-        in: rejectedVotes.map(v => v.id)
+    }),
+    // update rejected votes
+    prisma.vote.updateMany({
+      where: {
+        id: {
+          in: rejectedVotes.map(v => v.id)
+        }
+      },
+      data: {
+        status: 'Rejected'
       }
-    },
-    data: {
-      status: 'Rejected'
-    }
-  });
-
-  const proposalVotes = [...rejectedVotes, ...passedVotes].filter(v => v.context === 'proposal');
-  const proposalPageIds = proposalVotes.map(v => v.pageId);
-
-  await prisma.proposal.updateMany({
-    where: {
-      id: {
-        in: proposalPageIds
+    }),
+    // update proposals
+    prisma.proposal.updateMany({
+      where: {
+        id: {
+          in: proposalPageIds
+        }
+      },
+      data: {
+        status: 'vote_closed'
       }
-    },
-    data: {
-      status: 'vote_closed'
-    }
-  });
+    })
+  ]);
 
-  return passedVotes.length + rejectedVotes.length;
+  return votesPassedDeadline.length;
 };
 
 export default updateVoteStatus;
