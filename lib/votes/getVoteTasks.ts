@@ -15,11 +15,7 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
         }
       },
       context: 'inline',
-      status: 'InProgress',
-      // No need to fetch votes that are passed deadline, those can't be voted on
-      deadline: {
-        gte: new Date()
-      }
+      status: 'InProgress'
     },
     orderBy: {
       deadline: 'asc'

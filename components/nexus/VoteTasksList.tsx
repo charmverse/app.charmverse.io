@@ -40,6 +40,9 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
     deadline, title: voteTitle, id
   } = voteTask;
 
+  const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
+  const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
+
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
   const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
 
@@ -57,7 +60,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Typography>due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}</Typography>
+        <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
       </TableCell>
       <TableCell align='center'>
         <Button
@@ -70,7 +73,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
           }}
           onClick={() => handleVoteId(voteTask.id)}
         >
-          Vote now
+          {isDeadlineOverdue ? 'View' : 'Vote now'}
         </Button>
       </TableCell>
     </TableRow>
