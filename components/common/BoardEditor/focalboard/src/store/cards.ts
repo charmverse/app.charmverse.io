@@ -48,12 +48,12 @@ const cardsSlice = createSlice({
           delete state.templates[card.id];
         }
         else if (card.fields.isTemplate) {
-          const existingCard = state.templates[card.id] ?? {};
-          state.templates[card.id] = { ...existingCard, ...card };
+          const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
+          state.templates[card.id] = cardAfterUpdate;
         }
         else {
-          const existingCard = state.cards[card.id] ?? {};
-          state.cards[card.id] = { ...existingCard, ...card };
+          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
+          state.cards[card.id] = cardAfterUpdate;
         }
       }
     },
