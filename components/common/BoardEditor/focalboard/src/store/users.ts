@@ -2,7 +2,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import type { Subscription } from '../octoClient';
 import type { IUser } from '../user';
 
 import { initialLoad } from './initialLoad';
@@ -11,13 +10,11 @@ import type { RootState } from './index';
 
 type UsersStatus = {
   workspaceUsers: { [key: string]: IUser };
-  blockSubscriptions: Subscription[];
 }
 
 const initialState = {
   workspaceUsers: {},
-  userWorkspaces: [],
-  blockSubscriptions: []
+  userWorkspaces: []
 } as UsersStatus;
 
 const usersSlice = createSlice({
@@ -29,13 +26,6 @@ const usersSlice = createSlice({
         acc[user.id] = user;
         return acc;
       }, {});
-    },
-    followBlock: (state, action: PayloadAction<Subscription>) => {
-      state.blockSubscriptions.push(action.payload);
-    },
-    unfollowBlock: (state, action: PayloadAction<Subscription>) => {
-      const oldSubscriptions = state.blockSubscriptions;
-      state.blockSubscriptions = oldSubscriptions.filter((subscription) => subscription.blockId !== action.payload.blockId);
     }
   },
   extraReducers: (builder) => {
@@ -59,5 +49,3 @@ export const getUser = (userId: string): (state: RootState) => IUser|undefined =
     return users[userId];
   };
 };
-
-export const { followBlock, unfollowBlock } = usersSlice.actions;
