@@ -1,12 +1,10 @@
 import type { Block } from './blocks/block';
-import { BlockPatch } from './blocks/block';
 import type { ISharing } from './blocks/sharing';
 import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
 import type { IUser } from './user';
 import { UserSettings } from './userSettings';
 import { Utils } from './utils';
-import type { Subscription } from './wsclient';
 
 //
 // OctoClient is the client interface to the server APIs
@@ -178,29 +176,6 @@ class OctoClient {
     const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
 
     return fixedBlocks;
-  }
-
-  async followBlock (blockId: string, blockType: string, userId: string): Promise<Response> {
-    const body: Subscription = {
-      blockType,
-      blockId,
-      workspaceId: this.workspaceId,
-      subscriberType: 'user',
-      subscriberId: userId
-    };
-
-    return fetch(`${this.getBaseURL()}/api/focalboard/workspaces/${this.workspaceId}/subscriptions`, {
-      method: 'POST',
-      headers: this.headers(),
-      body: JSON.stringify(body)
-    });
-  }
-
-  async unfollowBlock (blockId: string, blockType: string, userId: string): Promise<Response> {
-    return fetch(`${this.getBaseURL()}/api/focalboard/workspaces/${this.workspaceId}/subscriptions/${blockId}/${userId}`, {
-      method: 'DELETE',
-      headers: this.headers()
-    });
   }
 
   // Sharing
