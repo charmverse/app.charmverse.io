@@ -3,15 +3,19 @@ import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { prisma } from 'db';
+import type { PageMeta } from 'lib/pages';
+
+export type WebsocketEvent = 'block_updated' | 'page_meta_updated'
 
 export type Resource = { id: string }
-
+// List of event payloads
 export type BlockUpdate = Partial<Block> & Resource
 
-export type WebsocketEvent = 'block_updated'
+export type PageMetaUpdate = Partial<PageMeta> & Resource
 
 export type Updates = {
   block_updated: BlockUpdate;
+  page_meta_updated: PageMetaUpdate;
 }
 
 export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Updates[T]
@@ -19,7 +23,7 @@ export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Update
 export type WebsocketMessage<T extends WebsocketEvent = WebsocketEvent> = {
   type: T;
   spaceId: string;
-  payload: WebsocketPayload;
+  payload: WebsocketPayload<T>;
 }
 
 export type WebsocketSubscriber = {

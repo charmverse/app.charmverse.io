@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useCallback, createContext, useContext, useMemo, useState } from 'react';
+import { useEffect, useCallback, createContext, useContext, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -17,6 +17,7 @@ import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
+import { useWebSocketClient } from './useSocketClient';
 import { useUser } from './useUser';
 
 export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
@@ -59,6 +60,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
+  const { eventFeed } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
 
@@ -208,6 +210,18 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     return freshPageVersion;
   }
+
+  useEffect(() => {
+    eventFeed.page_meta_updated.subscribe({
+      next: (value => {
+        if (typeof value?.payload.id === 'string') {
+
+          mutatePage(value.payload, false);
+
+        }
+      })
+    });
+  }, []);
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,

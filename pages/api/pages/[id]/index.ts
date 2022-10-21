@@ -15,6 +15,7 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/broadcaster';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -125,6 +126,14 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   if (!('content' in updateContent)) {
     updateTrackPageProfile(pageWithPermission.id);
   }
+
+  const { content, contentText, ...updatedPageMeta } = req.body as Page;
+
+  relay.broadcast({
+    type: 'page_meta_updated',
+    spaceId: page.spaceId,
+    payload: { ...updatedPageMeta, id: pageId }
+  });
 
   return res.status(200).json(pageWithPermission);
 }

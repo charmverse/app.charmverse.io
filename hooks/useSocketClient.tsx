@@ -12,6 +12,10 @@ import { useUser } from './useUser';
 
 type LoggedMessage = { type: 'ping' | 'pong' | 'connect' | 'disconnect' | 'error', message: string }
 
+type EventFeed = {
+  [E in WebsocketEvent]: BehaviorSubject<WebsocketMessage<E> | null>;
+}
+
 type IContext = {
   lastPong: string | null;
   isConnected: boolean;
@@ -20,7 +24,7 @@ type IContext = {
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  eventFeed: Record<WebsocketEvent, BehaviorSubject<WebsocketMessage | null>>;
+  eventFeed: EventFeed;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -41,8 +45,9 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
   const [lastPong, setLastPong] = useState<string | null>(null);
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
-  const [eventFeed] = useState<Record<WebsocketEvent, BehaviorSubject<WebsocketMessage | null>>>({
-    block_updated: new BehaviorSubject<WebsocketMessage<'block_updated'> | null>(null)
+  const [eventFeed] = useState<EventFeed>({
+    block_updated: new BehaviorSubject<WebsocketMessage<'block_updated'> | null>(null),
+    page_meta_updated: new BehaviorSubject<WebsocketMessage<'page_meta_updated'> | null>(null)
   });
 
   const { user } = useUser();
@@ -78,10 +83,10 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     });
 
     socket.on('message', (message: WebsocketMessage) => {
-      const isValidMessage = eventFeed[message.type] !== undefined;
+      const isValidMessage = !!message && eventFeed[message.type] !== undefined;
 
       if (isValidMessage) {
-        eventFeed[message.type].next(message);
+        (eventFeed[message.type] as BehaviorSubject<WebsocketMessage>).next(message);
       }
     });
 
