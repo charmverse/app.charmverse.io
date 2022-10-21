@@ -18,8 +18,9 @@ export function MemberDirectoryTableView ({
   members: Member[];
 }) {
   const { properties = [] } = useMemberProperties();
-  const timezoneProperty = properties.find(property => property.type === 'timezone');
+  // const timezoneProperty = properties.find(property => property.type === 'timezone');
 
+  const filteredProperties = properties.filter(property => property.type !== 'timezone');
   return (
     <Table
       size='small'
@@ -35,7 +36,7 @@ export function MemberDirectoryTableView ({
     >
       <TableHead>
         <TableRow>
-          {properties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
+          {filteredProperties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -47,7 +48,7 @@ export function MemberDirectoryTableView ({
             <TableRow
               key={member.id}
             >
-              {properties.map(property => {
+              {filteredProperties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
                   switch (property.type) {
@@ -84,13 +85,13 @@ export function MemberDirectoryTableView ({
                         </TableCell>
                       );
                     }
-                    case 'timezone': {
-                      return (
-                        <TableCell>
-                          <Typography variant='body2'>{member.properties.find(_property => _property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
-                        </TableCell>
-                      );
-                    }
+                    // case 'timezone': {
+                    //   return (
+                    //     <TableCell>
+                    //       <Typography variant='body2'>{member.properties.find(_property => _property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
+                    //     </TableCell>
+                    //   );
+                    // }
                     case 'name': {
                       return (
                         <TableCell>
