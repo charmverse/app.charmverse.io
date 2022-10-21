@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
@@ -9,6 +10,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
@@ -25,12 +27,14 @@ const StyledButton = styled(Button)`
 `;
 
 const views = ['gallery', 'table'] as const;
+type View = typeof views[number];
 
 export default function MemberDirectoryPage () {
+  const router = useRouter();
   const { members } = useMembers();
   const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
   const { properties } = useMemberProperties();
-  const [currentView, setCurrentView] = useState<typeof views[number]>('gallery');
+  const [currentView, setCurrentView] = useState<View>(router.query.view as View ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
 
   return properties && searchedMembers ? (
@@ -54,6 +58,7 @@ export default function MemberDirectoryPage () {
                   startIcon={iconForViewType(view)}
                   onClick={() => {
                     setCurrentView(view);
+                    setUrlWithoutRerender(router.pathname, { view });
                   }}
                   variant='text'
                   size='small'

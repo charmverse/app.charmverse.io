@@ -94,7 +94,7 @@ export function MemberDirectoryTableView ({
                     case 'name': {
                       return (
                         <TableCell>
-                          <Link href={`/u/${member.path}`}>
+                          <Link color='inherit' href={`/u/${member.path ?? member.id}`}>
                             <Typography fontWeight='bold'>
                               {memberProperty.value ?? member.username}
                             </Typography>
