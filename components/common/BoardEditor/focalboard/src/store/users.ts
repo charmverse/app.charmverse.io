@@ -1,11 +1,9 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import client from '../octoClient';
+import type { Subscription } from '../octoClient';
 import type { IUser } from '../user';
-import { Utils } from '../utils';
-import type { Subscription } from '../wsclient';
 
 import { initialLoad } from './initialLoad';
 
@@ -15,11 +13,6 @@ type UsersStatus = {
   workspaceUsers: { [key: string]: IUser };
   blockSubscriptions: Subscription[];
 }
-
-export const fetchUserBlockSubscriptions = createAsyncThunk(
-  'user/blockSubscriptions',
-  async (userId: string) => (Utils.isFocalboardPlugin() ? client.getUserBlockSubscriptions(userId) : [])
-);
 
 const initialState = {
   workspaceUsers: {},
@@ -51,9 +44,6 @@ const usersSlice = createSlice({
         acc[user.id] = user;
         return acc;
       }, {});
-    });
-    builder.addCase(fetchUserBlockSubscriptions.fulfilled, (state, action) => {
-      state.blockSubscriptions = action.payload;
     });
   }
 });

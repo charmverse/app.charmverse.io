@@ -1,13 +1,21 @@
 import type { Block } from './blocks/block';
-import { BlockPatch } from './blocks/block';
 import type { ISharing } from './blocks/sharing';
 import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
 import type { IUser } from './user';
 import { UserSettings } from './userSettings';
 import { Utils } from './utils';
-import type { Subscription } from './wsclient';
 
+export interface Subscription {
+  blockId: string;
+  workspaceId: string;
+  subscriberId: string;
+  blockType: string;
+  subscriberType: string;
+  notifiedAt?: number;
+  createdAt?: number;
+  deletedAt?: number;
+}
 //
 // OctoClient is the client interface to the server APIs
 //

@@ -83,7 +83,6 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCar
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
-import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';

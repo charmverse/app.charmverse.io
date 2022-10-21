@@ -55,8 +55,7 @@ const config = {
         return entry().then(_entry => {
           return {
             ..._entry,
-            cron: './background/cron.ts',
-            sockets: './background/sockets.ts'
+            cron: './background/cron.ts'
           };
         });
       };
