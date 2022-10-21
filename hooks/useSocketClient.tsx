@@ -1,16 +1,18 @@
 import type { ReactNode } from 'react';
-import { useEffect, createContext, useContext, useMemo, useState } from 'react';
+import { useRef, useEffect, createContext, useContext, useMemo, useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { socketsHost } from 'config/constants';
 import log from 'lib/log';
+import { typedKeys } from 'lib/utilities/objects';
 import type { WebsocketEvent, WebsocketMessage } from 'lib/websockets/broadcaster';
+import { WebsocketEvents } from 'lib/websockets/broadcaster';
 
 import { useUser } from './useUser';
 
-type LoggedMessage = { type: 'ping' | 'pong' | 'connect' | 'disconnect' | 'error', message: string }
+type LoggedMessage = { type: string, payload: any }
 
 type EventFeed = {
   [E in WebsocketEvent]: BehaviorSubject<WebsocketMessage<E> | null>;
@@ -45,10 +47,10 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
   const [lastPong, setLastPong] = useState<string | null>(null);
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
-  const [eventFeed] = useState<EventFeed>({
-    block_updated: new BehaviorSubject<WebsocketMessage<'block_updated'> | null>(null),
-    page_meta_updated: new BehaviorSubject<WebsocketMessage<'page_meta_updated'> | null>(null)
-  });
+  const { current: eventFeed } = useRef<EventFeed>(typedKeys(WebsocketEvents).reduce((acc, key) => {
+    acc[key as WebsocketEvent] = new BehaviorSubject<WebsocketMessage | null>(null) as any;
+    return acc;
+  }, {} as EventFeed));
 
   const { user } = useUser();
 
@@ -64,6 +66,12 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     };
   }, [user]);
 
+  function pushToMessageLog (message: LoggedMessage) {
+    if (process.env.NODE_ENV === 'development') {
+      setMessageLog((prev) => [message, ...prev.slice(0, 50)]);
+    }
+  }
+
   async function connect () {
     await fetch('/api/socket');
 
@@ -77,9 +85,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     }).connect();
 
     socket.on('connect', () => {
-      setIsConnected(true);
       log.info('Socket client connected');
-      setMessageLog((prev) => [{ type: 'connect', message: 'Socket client connected' }, ...prev]);
+      pushToMessageLog({ type: 'connect', payload: 'Client connected' });
     });
 
     socket.on('message', (message: WebsocketMessage) => {
@@ -87,22 +94,17 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
       if (isValidMessage) {
         (eventFeed[message.type] as BehaviorSubject<WebsocketMessage>).next(message);
+        pushToMessageLog(message);
       }
     });
 
     socket.on('disconnect', () => {
-      setIsConnected(false);
-      setMessageLog((prev) => [{ type: 'disconnect', message: 'Socket client disconnected' }, ...prev]);
-    });
-
-    socket.on('pong', (msg) => {
-      setMessageLog((prev) => [{ type: 'pong', message: msg }, ...prev]);
-      setLastPong(new Date().toISOString());
+      pushToMessageLog({ type: 'connect', payload: 'disconnected from websocket' });
     });
 
     socket.on('connect_error', (err) => {
       log.error('Socket error', err.message); // prints the message associated with the error
-      setMessageLog((prev) => [{ type: 'error', message: err.message }, ...prev]);
+      pushToMessageLog({ type: 'error', payload: err.message });
     });
 
   }
@@ -111,8 +113,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     socket.emit('ping');
   }
 
-  function sendMessage (message: any) {
-    setMessageLog((prev) => [{ type: 'ping', message }, ...prev]);
+  function sendMessage (message: WebsocketMessage) {
+    pushToMessageLog(message);
     socket.emit('message', message);
   }
 

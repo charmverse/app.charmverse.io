@@ -4,8 +4,10 @@ import { Server } from 'socket.io';
 
 import { prisma } from 'db';
 import type { PageMeta } from 'lib/pages';
+import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
+import type { SystemError } from 'lib/utilities/errors';
 
-const WebsocketEvents = ['block_updated', 'page_meta_updated'] as const;
+export const WebsocketEvents = ['block_updated', 'page_meta_updated', 'subscribe', 'error'] as const;
 
 export type WebsocketEvent = typeof WebsocketEvents[number]
 
@@ -17,9 +19,15 @@ export type BlockUpdate = Partial<Block> & ResourceWithSpaceId
 
 export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
 
+export type SubscribeRequest = {
+  spaceId: string;
+}
+
 export type Updates = {
   block_updated: BlockUpdate;
   page_meta_updated: PageMetaUpdate;
+  subscribe: SubscribeRequest;
+  error: SystemError;
 }
 
 export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Updates[T]
@@ -75,27 +83,45 @@ export class WebsocketBroadcaster {
     this.io.to(roomId).emit('message', message);
   }
 
+  /**
+   * Subscribe a user to all events for themselves and a specific room
+   * Unsubscribes user from all other rooms
+   */
   async registerSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }): Promise<void> {
 
-    const spaceRoles = await prisma.spaceRole.findMany({
+    const spaceRole = await prisma.spaceRole.findFirst({
       where: {
-        userId
+        userId,
+        spaceId: roomId
       }
     });
 
-    await this.setUserSocket({ userId, socket });
+    if (!spaceRole) {
+      socket.send(new SpaceMembershipRequiredError());
+      return;
+    }
 
-    spaceRoles.forEach(role => {
-      socket.join(role.spaceId);
+    const existingSocket = this.userSockets[userId];
+
+    // Handle undefined and existing socket
+    if (!existingSocket) {
+      await this.setUserSocket({ userId, socket });
+
+    }
+    else if (existingSocket.id !== socket.id) {
+      existingSocket.disconnect();
+      await this.setUserSocket({ userId, socket });
+    }
+
+    Object.keys(socket.rooms).forEach(room => {
+      if (room !== userId && room !== roomId) {
+        socket.leave(room);
+      }
     });
 
-  }
+    socket.join(roomId);
+    socket.join(userId);
 
-  async removeSubscriber (userId: string): Promise<void> {
-    const userSocket = await this.getUserSocket(userId);
-    userSocket?.rooms.forEach(room => {
-      userSocket.leave(room);
-    });
   }
 
 }

@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { WebsocketMessage } from 'lib/websockets/broadcaster';
-import { relay } from 'lib/websockets/broadcaster';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
