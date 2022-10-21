@@ -52,7 +52,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
   const rolePermissionsPopupState = usePopupState({ variant: 'popover', popupId: `role-permissions-${role.id}` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const [newMembers, setNewMembers] = useState<string[]>([]);
-  const [members] = useMembers();
+  const { members } = useMembers();
 
   const [currentSpace] = useCurrentSpace();
 

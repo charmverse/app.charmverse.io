@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 interface IMembersFilter {
   mode: 'include' | 'exclude';
@@ -78,7 +78,7 @@ interface IInputSearchMemberProps {
 
 export function InputSearchMember ({ defaultValue, onChange, ...props }: IInputSearchMemberProps) {
 
-  const [members] = useMembers();
+  const { members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
   useEffect(() => {
@@ -117,7 +117,7 @@ interface IInputSearchMemberMultipleProps extends Partial<Omit<AutocompleteProps
 
 export function InputSearchMemberMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchMemberMultipleProps) {
 
-  const [members] = useMembers();
+  const { members } = useMembers();
   const [value, setValue] = useState<Member[]>([]);
 
   function emitValue (users: Member[]) {

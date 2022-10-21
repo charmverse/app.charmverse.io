@@ -3,8 +3,8 @@ import type { CSSObject } from '@emotion/serialize';
 import Select from 'react-select';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Member } from 'hooks/useMembers';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import { getSelectBaseStyle } from '../../../theme';
 
@@ -23,7 +23,7 @@ const selectStyles = {
 };
 
 function UserProperty (props: Props): JSX.Element | null {
-  const [members] = useMembers();
+  const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
     return acc;

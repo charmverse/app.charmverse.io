@@ -7,9 +7,9 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import type { BountyPermissions } from 'lib/bounties';
+import type { Member } from 'lib/members/interfaces';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { Member } from 'models';
 
 type ReviewersData = {
   roles: ({ id: string, name: string, users: Member[] })[];
@@ -26,7 +26,7 @@ const defaultAvatarGroupIncrement = 2;
 
 export default function BountyReviewers ({ bounty, permissions }: BountyReviewersProps) {
   const [maxVisibleUsers, setMaxVisibleUsers] = useState<number>(defaultAvatarGroupIncrement);
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { roleups } = useRoles();
 
   const reviewerNames: ReviewersData = useMemo(() => {
