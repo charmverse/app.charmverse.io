@@ -1,7 +1,9 @@
+import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { prisma } from 'db';
+import { redisClient } from 'lib/cache/redisClient';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import type { WebsocketMessage } from './interfaces';
@@ -24,8 +26,18 @@ export class WebsocketBroadcaster {
   private io: Server = new Server();
 
   // Only called once in the app lifecycle once the server is initialised
-  bindServer (io: Server): void {
+  async bindServer (io: Server): Promise<void> {
     this.io = io;
+
+    const pubClient = redisClient;
+    const subClient = pubClient.duplicate();
+
+    await Promise.all([
+      pubClient.connect(),
+      subClient.connect()
+    ]);
+
+    io.adapter(createAdapter(pubClient, subClient));
 
     // Function for debugging amount of connections
     // setInterval(() => {
