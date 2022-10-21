@@ -256,7 +256,7 @@ export function MemberPropertiesSidebar ({
             title='Properties'
           />
           <Stack height='fit-content'>
-            {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
+            {properties.filter(property => property.type !== 'timezone').map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
           </Stack>
           <AddMemberPropertyButton />
         </StyledSidebar>
