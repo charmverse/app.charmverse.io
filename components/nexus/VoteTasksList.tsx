@@ -71,6 +71,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
               md: '100px'
             }
           }}
+          variant={isDeadlineOverdue ? 'outlined' : 'contained'}
           onClick={() => handleVoteId(voteTask.id)}
         >
           {isDeadlineOverdue ? 'View' : 'Vote'}
