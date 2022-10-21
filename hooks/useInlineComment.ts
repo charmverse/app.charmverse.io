@@ -17,7 +17,7 @@ export function useInlineComment () {
 
   return {
     extractTextFromSelection () {
-      return extractTextFromSelection(view, contributors, pages);
+      return extractTextFromSelection(view, members, pages);
     },
     findTotalInlineComments (node: Node, keepResolved?: boolean) {
       return findTotalInlineComments(view.state.schema, node, threads, keepResolved);
