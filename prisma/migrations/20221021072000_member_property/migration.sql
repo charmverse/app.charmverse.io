@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "MemberPropertyType" AS ENUM ('text', 'number', 'email', 'phone', 'url', 'select', 'multiselect', 'role', 'profile_pic', 'timezone', 'wallet_address', 'name', 'discord', 'twitter');
+CREATE TYPE "MemberPropertyType" AS ENUM ('text', 'text_multiline', 'number', 'email', 'phone', 'url', 'select', 'multiselect', 'role', 'profile_pic', 'timezone', 'name', 'discord', 'twitter');
 
 -- CreateTable
 CREATE TABLE "MemberProperty" (
@@ -29,6 +29,9 @@ CREATE TABLE "MemberPropertyValue" (
 
     CONSTRAINT "MemberPropertyValue_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MemberPropertyValue_memberPropertyId_spaceId_userId_key" ON "MemberPropertyValue"("memberPropertyId", "spaceId", "userId");
 
 -- AddForeignKey
 ALTER TABLE "MemberProperty" ADD CONSTRAINT "MemberProperty_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
