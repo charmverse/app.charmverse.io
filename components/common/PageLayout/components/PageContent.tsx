@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import type { ReactNode } from 'react';
+import { SxProps } from '@mui/system';
+import type { CSSProperties, ReactNode } from 'react';
 
 import ScrollableWindow from './ScrollableWindow';
 
@@ -18,10 +19,10 @@ const FixedWidthStyledBox = styled(StyledBox)`
   max-width: 100%;
 `;
 
-export function CenteredPageContent (props: { children: ReactNode }) {
+export function CenteredPageContent (props: { children: ReactNode, style?: CSSProperties }) {
   return (
     <ScrollableWindow>
-      <FixedWidthStyledBox>
+      <FixedWidthStyledBox style={props.style}>
         {props.children}
       </FixedWidthStyledBox>
     </ScrollableWindow>

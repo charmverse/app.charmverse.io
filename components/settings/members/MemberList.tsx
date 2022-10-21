@@ -5,7 +5,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 import Legend from '../Legend';
 
@@ -20,7 +20,7 @@ interface Props {
 
 export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
-  const [members, setMembers] = useMembers();
+  const { members, mutateMembers } = useMembers();
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
   const removedMember = removedMemberId ? members.find(member => member.id === removedMemberId) : null;
@@ -37,12 +37,12 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
 
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
-        setMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: true } : c));
+        mutateMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: true } : c), { revalidate: false });
         break;
 
       case 'makeMember':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: false });
-        setMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: false } : c));
+        mutateMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: false } : c), { revalidate: false });
         break;
 
       case 'removeFromSpace':
@@ -58,7 +58,7 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
 
   async function removeMember () {
     await charmClient.removeMember({ spaceId, userId: removedMemberId as string });
-    setMembers(members.filter(c => c.id !== removedMemberId));
+    mutateMembers(members.filter(c => c.id !== removedMemberId), { revalidate: false });
     setRemovedMemberId(null);
   }
 

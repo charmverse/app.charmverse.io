@@ -17,7 +17,7 @@ interface Props {
 export default function MissingPagePermissions ({ bountyPermissions, pagePermissions, target }: Props) {
 
   const { roleups } = useRoles();
-  const [members] = useMembers();
+  const { members } = useMembers();
 
   const visibleToSpace = pagePermissions.some(p => (isTruthy(p.spaceId) || p.public === true));
 

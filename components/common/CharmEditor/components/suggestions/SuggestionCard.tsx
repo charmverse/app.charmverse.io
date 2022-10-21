@@ -4,8 +4,8 @@ import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/materia
 import { memo, useMemo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Member } from 'hooks/useMembers';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import { RelativeDate } from '../PageThread';
 
@@ -69,7 +69,7 @@ type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
 
 function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
-  const [members] = useMembers();
+  const { members } = useMembers();
   // get parentNode for lists
   const parentNode = useMemo(() => (
     pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null
