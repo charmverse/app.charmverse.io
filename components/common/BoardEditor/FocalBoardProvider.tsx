@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useSocketClient';
 import log from 'lib/log';
+import type { BlockUpdate, WebsocketPayload } from 'lib/websockets/interfaces';
 
 import store from './focalboard/src/store';
 import { useAppDispatch } from './focalboard/src/store/hooks';
@@ -24,14 +25,14 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
     }
   }, [space?.id]);
 
+  const handleBlockUpdate = useCallback((value: BlockUpdate) => {
+    publishIncrementalUpdate([value as any]);
+  }, []);
+
   useEffect(() => {
-    eventFeed.block_updated.subscribe({
-      next: (value => {
-        if (value?.payload.id) {
-          publishIncrementalUpdate([value.payload as any]);
-        }
-      })
-    });
+    eventFeed.subscribe<'block_updated', WebsocketPayload<'block_updated'>>('block_updated', handleBlockUpdate);
+
+    return eventFeed.unsubscribe('block_updated', handleBlockUpdate as any);
   }, []);
 
   return children;

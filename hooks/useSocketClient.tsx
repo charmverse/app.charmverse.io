@@ -1,29 +1,25 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { BehaviorSubject } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { socketsHost } from 'config/constants';
 import log from 'lib/log';
-import type { WebsocketEvent, WebsocketMessage } from 'lib/websockets/interfaces';
+import type { WebsocketEvent, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
 import { WebsocketEvents } from 'lib/websockets/interfaces';
+import { PubSub } from 'lib/websockets/pubSub';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
 type LoggedMessage = { type: string, payload: any }
 
-type EventFeed = {
-  [E in WebsocketEvent]: BehaviorSubject<WebsocketMessage<E> | null>;
-}
-
 type IContext = {
   sendMessage: (message: any) => void;
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  eventFeed: EventFeed;
+  eventFeed: PubSub<WebsocketEvent, WebsocketPayload>;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -42,10 +38,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   const [space] = useCurrentSpace();
 
-  const { current: eventFeed } = useRef<EventFeed>(WebsocketEvents.reduce((acc, key) => {
-    acc[key] = new BehaviorSubject<WebsocketMessage | null>(null) as any;
-    return acc;
-  }, {} as EventFeed));
+  const { current: eventFeed } = useRef(new PubSub<WebsocketEvent, WebsocketPayload>());
 
   const { user } = useUser();
 
@@ -92,11 +85,11 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     });
 
     socket.on('message', (message: WebsocketMessage) => {
-      const isValidMessage = !!message && eventFeed[message.type] !== undefined;
+      const isValidMessage = !!message && WebsocketEvents.includes(message.type);
 
       if (isValidMessage) {
         // Key part when we relay messages from the server to consumers
-        (eventFeed[message.type] as BehaviorSubject<WebsocketMessage>).next(message);
+        eventFeed.publish(message.type, message.payload);
         pushToMessageLog(message);
       }
     });

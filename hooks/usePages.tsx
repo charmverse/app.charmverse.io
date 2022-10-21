@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useEffect, useCallback, createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -13,6 +13,7 @@ import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
+import type { WebsocketPayload } from 'lib/websockets/interfaces';
 import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -211,16 +212,14 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
+  const handlePageUpdate = useCallback((value: WebsocketPayload<'page_meta_updated'>) => {
+    mutatePage(value, false);
+  }, []);
+
   useEffect(() => {
-    eventFeed.page_meta_updated.subscribe({
-      next: (value => {
-        if (typeof value?.payload.id === 'string') {
+    eventFeed.subscribe<'page_meta_updated', WebsocketPayload<'page_meta_updated'>>('page_meta_updated', handlePageUpdate);
 
-          mutatePage(value.payload, false);
-
-        }
-      })
-    });
+    return eventFeed.unsubscribe('page_meta_updated', handlePageUpdate as any);
   }, []);
 
   const value: PagesContext = useMemo(() => ({
