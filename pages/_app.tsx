@@ -260,8 +260,8 @@ function DataProviders ({ children }: { children: ReactNode }) {
   return (
 
     <UserProvider>
-      <WebSocketClientProvider>
-        <SpacesProvider>
+      <SpacesProvider>
+        <WebSocketClientProvider>
           <MembersProvider>
             <BountiesProvider>
               <PaymentMethodsProvider>
@@ -275,8 +275,9 @@ function DataProviders ({ children }: { children: ReactNode }) {
               </PaymentMethodsProvider>
             </BountiesProvider>
           </MembersProvider>
-        </SpacesProvider>
-      </WebSocketClientProvider>
+        </WebSocketClientProvider>
+      </SpacesProvider>
+
     </UserProvider>
 
   );

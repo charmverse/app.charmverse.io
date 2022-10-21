@@ -1,45 +1,10 @@
-import type { Block } from '@prisma/client';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { prisma } from 'db';
-import type { PageMeta } from 'lib/pages';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
-import type { SystemError } from 'lib/utilities/errors';
 
-export const WebsocketEvents = ['block_updated', 'page_meta_updated', 'subscribe', 'error'] as const;
-
-export type WebsocketEvent = typeof WebsocketEvents[number]
-
-export type Resource = { id: string }
-export type ResourceWithSpaceId = Resource & { spaceId: string }
-
-// List of event payloads
-export type BlockUpdate = Partial<Block> & ResourceWithSpaceId
-
-export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
-
-export type SubscribeRequest = {
-  spaceId: string;
-}
-
-export type Updates = {
-  block_updated: BlockUpdate;
-  page_meta_updated: PageMetaUpdate;
-  subscribe: SubscribeRequest;
-  error: SystemError;
-}
-
-export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Updates[T]
-
-export type WebsocketMessage<T extends WebsocketEvent = WebsocketEvent> = {
-  type: T;
-  payload: WebsocketPayload<T>;
-}
-
-export type WebsocketSubscriber = {
-  userId: string;
-}
+import type { WebsocketMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
@@ -54,8 +19,6 @@ export class WebsocketBroadcaster {
   private async getUserSocket (userId: string): Promise<Socket | undefined> {
     return this.userSockets[userId];
   }
-
-  private identifier = Math.random();
 
   // Server will be set after the first request
   private io: Server = new Server();
@@ -101,7 +64,7 @@ export class WebsocketBroadcaster {
       return;
     }
 
-    const existingSocket = this.userSockets[userId];
+    const existingSocket = await this.getUserSocket(userId);
 
     // Handle undefined and existing socket
     if (!existingSocket) {
@@ -109,7 +72,7 @@ export class WebsocketBroadcaster {
 
     }
     else if (existingSocket.id !== socket.id) {
-      existingSocket.disconnect();
+      // existingSocket.disconnect();
       await this.setUserSocket({ userId, socket });
     }
 
@@ -119,8 +82,7 @@ export class WebsocketBroadcaster {
       }
     });
 
-    socket.join(roomId);
-    socket.join(userId);
+    socket.join([roomId, userId]);
 
   }
 

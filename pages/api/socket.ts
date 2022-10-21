@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { WebsocketMessage } from 'lib/websockets/broadcaster';
+import type { WebsocketMessage } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -36,13 +36,17 @@ function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer
 
   // Define actions inside
   io.on('connect', (socket) => {
-    relay.registerSubscriber({
-      userId: req.session.user.id,
-      socket
-    });
 
     socket.on('message', (message: WebsocketMessage) => {
       socket.emit('message', 'Hello from the server!');
+
+      if (message.type === 'subscribe') {
+        relay.registerSubscriber({
+          userId: req.session.user.id,
+          socket,
+          roomId: (message as WebsocketMessage<'subscribe'>).payload.spaceId
+        });
+      }
     });
   });
 

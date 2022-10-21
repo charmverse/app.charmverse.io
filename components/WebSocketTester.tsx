@@ -16,13 +16,13 @@ export function WebSocketTester () {
       <Grid item xs={12} spacing={2}>
         Web socket connection test ({messageLog.length})
 
-        <Button onClick={() => sendMessage({ content: 'Here is the update' })}>Send ping</Button>
+        <Button onClick={() => sendMessage({ type: 'ping', content: 'Here is the update' })}>Send ping</Button>
         <Button css={{ backgroundColor: 'red' }} onClick={clearLog}>Clear</Button>
       </Grid>
       {
       messageLog.map((message, index) => (
         <Grid item xs={12}>
-          <p>{message.type}: {typeof message === 'object' ? JSON.stringify(message) : message}</p>
+          <p>{typeof message === 'object' ? JSON.stringify(message) : message}</p>
         </Grid>
       ))
     }
