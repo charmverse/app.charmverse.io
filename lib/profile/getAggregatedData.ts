@@ -29,6 +29,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       }))
   )).filter(isTruthy);
 
+  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+
   const [
     allOrganizations,
     bountiesCreated,
@@ -67,7 +69,10 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       where: {
         page: {
           deletedAt: null,
-          type: 'proposal'
+          type: 'proposal',
+          snapshotProposalId: {
+            notIn: proposals.map(prop => prop.proposalId)
+          }
         },
         authors: {
           some: {
@@ -156,7 +161,6 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
   }));
 
   const communities = [...deepDaoCommunities, ...charmVerseCommunities];
-  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
 
   const votes = [
     // Deepdao votes
