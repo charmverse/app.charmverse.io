@@ -1,7 +1,7 @@
 import type { EditorView } from '@bangle.dev/pm';
 
+import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
-import type { Member } from 'models/User';
 
 export function extractTextFromSelection (view: EditorView, members: Member[], pages: Record<string, PageMeta | undefined>) {
   // Get the context from current selection

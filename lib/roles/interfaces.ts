@@ -1,6 +1,7 @@
 import type { Role, User } from '@prisma/client';
 
-import type { Member, LoggedInUser } from 'models';
+import type { Member } from 'lib/members/interfaces';
+import type { LoggedInUser } from 'models';
 
 export interface RoleMembersQuery {
   roleId: string;

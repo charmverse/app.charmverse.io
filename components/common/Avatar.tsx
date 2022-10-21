@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Avatar from '@mui/material/Avatar';
+import type { SxProps } from '@mui/system';
 import React from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
@@ -77,9 +78,10 @@ export type InitialAvatarProps = {
   variant?: AvatarVariant;
   size?: AvatarSize;
   isNft?: boolean;
+  sx?: SxProps;
 };
 
-export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft }: InitialAvatarProps) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft, sx = {} }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   const muiVariant = isNft ? 'square' : variant;
   const AvatarComponent = isNft ? HexagonAvatar : StyledAvatar;
@@ -87,12 +89,11 @@ export default function InitialAvatar ({ avatar, className, name, variant, size 
   return (
     <AvatarComponent
       className={className}
-      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...getAvatarCustomStyles(variant, size) }}
+      sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...getAvatarCustomStyles(variant, size), ...sx }}
       variant={muiVariant}
       src={avatar ?? undefined}
     >
       {nameStr.charAt(0).toUpperCase()}
     </AvatarComponent>
-
   );
 }

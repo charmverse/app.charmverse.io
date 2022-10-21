@@ -141,32 +141,30 @@ export async function applyTokenGates ({
   }
   else {
     const spaceRoleId = v4();
-    await prisma.$transaction([
-      prisma.spaceRole.create({
-        data: {
-          id: spaceRoleId,
-          spaceRoleToRole: {
-            createMany: {
-              data: roleIdsToAssign.map(roleId => {
-                return {
-                  roleId
-                };
-              }) }
-          },
-          isAdmin: false,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          user: {
-            connect: {
-              id: userId
-            }
+    await prisma.spaceRole.create({
+      data: {
+        id: spaceRoleId,
+        spaceRoleToRole: {
+          createMany: {
+            data: roleIdsToAssign.map(roleId => {
+              return {
+                roleId
+              };
+            }) }
+        },
+        isAdmin: false,
+        space: {
+          connect: {
+            id: spaceId
+          }
+        },
+        user: {
+          connect: {
+            id: userId
           }
         }
-      })
-    ]);
+      }
+    });
 
     updateTrackUserProfileById(userId);
 

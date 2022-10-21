@@ -6,6 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -66,11 +67,13 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   });
 
   const defaultCategories = generateDefaultCategoriesInput(space.id);
+  const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
 
   await prisma.$transaction([
     ...seedPagesTransactionInput.blocksToCreate.map(input => prisma.block.create({ data: input })),
     ...seedPagesTransactionInput.pagesToCreate.map(input => createPage({ data: input })),
-    ...defaultCategories.map(input => prisma.proposalCategory.create({ data: input }))
+    prisma.proposalCategory.createMany({ data: defaultCategories }),
+    prisma.memberProperty.createMany({ data: defaultProperties })
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({
