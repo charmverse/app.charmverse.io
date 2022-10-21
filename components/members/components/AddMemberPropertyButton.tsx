@@ -32,7 +32,9 @@ export function AddMemberPropertyButton () {
         color='secondary'
         startIcon={<AddIcon />}
         sx={{
-          p: 1
+          py: 1,
+          px: 2,
+          justifyContent: 'flex-start'
         }}
         disabled={!admin}
         onClick={addMemberPropertyPopupState.open}

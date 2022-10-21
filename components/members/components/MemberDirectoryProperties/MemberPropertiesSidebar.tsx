@@ -255,7 +255,7 @@ export function MemberPropertiesSidebar ({
             closeSidebar={onClose}
             title='Properties'
           />
-          <Stack mb={1}>
+          <Stack>
             {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
           </Stack>
           <AddMemberPropertyButton />

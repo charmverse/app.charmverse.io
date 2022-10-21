@@ -21,7 +21,7 @@ function MemberDirectoryGalleryCard ({
 
   return (
     <Link
-      href={`/u/${member.path}`}
+      href={`/u/${member.path || member.id}`}
       color='primary'
       sx={{
         '&:hover': {
