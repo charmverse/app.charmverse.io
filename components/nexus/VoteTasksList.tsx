@@ -41,7 +41,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   } = voteTask;
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
-  const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  const voteLocation = pageTitle || 'Untitled';
 
   return (
     <TableRow>
@@ -55,6 +55,9 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
         <Link href={voteLink} variant='body1'>
           {voteLocation}
         </Link>
+      </TableCell>
+      <TableCell>
+        <Typography>{spaceName}</Typography>
       </TableCell>
       <TableCell align='center'>
         <Typography>due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}</Typography>
@@ -144,8 +147,9 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Table size='medium' aria-label='Nexus polls table'>
         <TableHead>
           <TableRow>
-            <TableCell>Poll name</TableCell>
-            <TableCell>Page name</TableCell>
+            <TableCell>Poll</TableCell>
+            <TableCell width={300}>Page</TableCell>
+            <TableCell width={200}>Workspace</TableCell>
             <TableCell align='center'>Due</TableCell>
             <TableCell width='135' align='center'>Action</TableCell>
           </TableRow>
