@@ -38,10 +38,7 @@ export default function MemberDirectoryPage () {
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
 
   return properties && searchedMembers ? (
-    <CenteredPageContent style={{
-      height: '100%'
-    }}
-    >
+    <CenteredPageContent>
       <Typography variant='h1' my={2}>Member Directory</Typography>
       <MemberDirectorySearchBar
         onChange={setSearchedMembers}

@@ -30,7 +30,7 @@ const StyledSidebar = styled.div`
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;
   flex-direction: column;
-  height: 300px;
+  height: fit-content;
   min-height: 100%;
   width: 100%;
   ${({ theme }) => theme.breakpoints.up('md')} {
@@ -114,7 +114,7 @@ export function MemberPropertySidebarItem ({
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
   return (
-    <Stack>
+    <Stack height='fit-content'>
       <MenuItem
         dense
         sx={{
@@ -249,13 +249,13 @@ export function MemberPropertiesSidebar ({
 
   return properties ? (
     <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
-      <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
+      <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000, height: 'fit-content', marginBottom: 1 }}>
         <StyledSidebar>
           <SidebarHeader
             closeSidebar={onClose}
             title='Properties'
           />
-          <Stack>
+          <Stack height='fit-content'>
             {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
           </Stack>
           <AddMemberPropertyButton />
