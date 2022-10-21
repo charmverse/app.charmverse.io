@@ -55,7 +55,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant='body1'>
+        <Link href={voteLink} variant='body1' color='inherit'>
           {voteLocation}
         </Link>
       </TableCell>
