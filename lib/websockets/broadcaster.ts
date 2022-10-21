@@ -5,13 +5,17 @@ import { Server } from 'socket.io';
 import { prisma } from 'db';
 import type { PageMeta } from 'lib/pages';
 
-export type WebsocketEvent = 'block_updated' | 'page_meta_updated'
+const WebsocketEvents = ['block_updated', 'page_meta_updated'] as const;
+
+export type WebsocketEvent = typeof WebsocketEvents[number]
 
 export type Resource = { id: string }
-// List of event payloads
-export type BlockUpdate = Partial<Block> & Resource
+export type ResourceWithSpaceId = Resource & { spaceId: string }
 
-export type PageMetaUpdate = Partial<PageMeta> & Resource
+// List of event payloads
+export type BlockUpdate = Partial<Block> & ResourceWithSpaceId
+
+export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
 
 export type Updates = {
   block_updated: BlockUpdate;
@@ -22,7 +26,6 @@ export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Update
 
 export type WebsocketMessage<T extends WebsocketEvent = WebsocketEvent> = {
   type: T;
-  spaceId: string;
   payload: WebsocketPayload<T>;
 }
 
@@ -30,26 +33,7 @@ export type WebsocketSubscriber = {
   userId: string;
 }
 
-export type Broadcaster = {
-
-  /**
-   * Utility to bind the http server to this instance.
-   */
-  bindServer(server: any): void;
-
-  broadcast(message: WebsocketMessage): void;
-
-  registerSubscriber(registration: { userId: string, socket: Socket }): Promise<void>;
-
-  removeSubscriber(userId: string): Promise<void>;
-
-}
-
-export class WebsocketBroadcaster implements Broadcaster {
-
-  private workspaceRooms: Record<string, Socket> = {
-
-  };
+export class WebsocketBroadcaster {
 
   private userSockets: Record<string, Socket> = {
 
@@ -83,11 +67,15 @@ export class WebsocketBroadcaster implements Broadcaster {
 
   }
 
-  broadcast (message: WebsocketMessage<'block_updated'>): void {
-    this.io.to(message.spaceId).emit('message', message);
+  broadcastToAll (message: WebsocketMessage): void {
+    this.io.emit('message', message);
   }
 
-  async registerSubscriber ({ userId, socket }: { userId: string, socket: Socket }): Promise<void> {
+  broadcast (message: WebsocketMessage, roomId: string): void {
+    this.io.to(roomId).emit('message', message);
+  }
+
+  async registerSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }): Promise<void> {
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: {
@@ -112,12 +100,3 @@ export class WebsocketBroadcaster implements Broadcaster {
 
 }
 
-// Export the singleton instance
-declare global {
-  // eslint-disable-next-line no-var, vars-on-top
-  var relay: Broadcaster | undefined;
-}
-
-export const relay = global.relay ?? new WebsocketBroadcaster();
-
-global.relay = relay;
