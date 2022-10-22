@@ -24,7 +24,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
       await charmClient.createUser({ address: account, walletSignature: walletAuthSignature });
     }
     await charmClient.acceptInvite({ id: invite.id });
-    window.location.href = `/${invite.space.domain}`;
+    window.location.href = `/${invite.space.domain}?onboarding=true`;
   }
 
   return (
