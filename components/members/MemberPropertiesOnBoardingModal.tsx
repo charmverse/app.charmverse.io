@@ -36,7 +36,7 @@ export function MemberPropertiesOnBoardingModal () {
   }, [router]);
 
   function onClose () {
-    setUrlWithoutRerender(window.location.href, {});
+    setUrlWithoutRerender(window.location.href, { onboarding: null });
     memberDirectoryFormModal.close();
   }
 
