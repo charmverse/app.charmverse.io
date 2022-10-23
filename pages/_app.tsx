@@ -27,6 +27,7 @@ import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
+import { MemberPropertiesOnBoardingModal } from 'components/members/MemberPropertiesOnBoardingModal';
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
@@ -235,7 +236,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                   handleClose={() => setIsOldBuild(false)}
                                 />
                                 {getLayout(<Component {...pageProps} />)}
-
+                                <MemberPropertiesOnBoardingModal />
                                 <GlobalComponents />
                               </ErrorBoundary>
                             </RouteGuard>

@@ -17,6 +17,7 @@ export default function RedirectToMainPage () {
   const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;
   const staticCommonPages = ['bounties', 'votes', 'settings/workspace', 'settings/members', 'settings/roles', 'settings/invites'];
   const isOnboarding = router.query.onboarding === 'true';
+
   useEffect(() => {
     const isCommonDefaultPage = defaultPage && staticCommonPages.some(page => defaultPage.includes(`/${page}`));
     const isDynamicDefaultPage = !isCommonDefaultPage && defaultPage && Object.values(pages).some(page => page && defaultPage.includes(`/${page.path}`));
