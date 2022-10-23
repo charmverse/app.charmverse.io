@@ -29,7 +29,7 @@ export function JoinDynamicSpaceForm () {
   const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
 
   async function onJoinSpace (joinedSpace: Space) {
-    router.push(`/${joinedSpace.domain}`);
+    router.push(`/${joinedSpace.domain}?onboarding=true`);
   }
 
   const debouncedGetPublicSpaces = useMemo(() => {
