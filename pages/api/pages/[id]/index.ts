@@ -130,8 +130,8 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   const { content, contentText, ...updatedPageMeta } = req.body as Page;
 
   relay.broadcast({
-    type: 'page_meta_updated',
-    payload: { ...updatedPageMeta, id: pageId }
+    type: 'pages_meta_updated',
+    payload: [{ ...updatedPageMeta, id: pageId }]
   }, page.spaceId);
 
   return res.status(200).json(pageWithPermission);

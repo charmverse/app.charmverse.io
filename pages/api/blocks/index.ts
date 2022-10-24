@@ -236,13 +236,25 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
   const updatedBlocks = await prisma.$transaction(blockOps);
 
-  blocks.forEach((blockUpdate, index) => {
+  // We expect blocks to only be updated in a single space, but some future-proofing doesn't hurt
+  const bySpaceId = blocks.reduce((acc, block, index) => {
 
     const spaceId = updatedBlocks[index].spaceId;
 
+    if (!acc[spaceId]) {
+      acc[spaceId] = [];
+    }
+
+    acc[spaceId].push(block);
+
+    return acc;
+
+  }, {} as Record<string, Block[]>);
+
+  Object.entries(bySpaceId).forEach(([spaceId, blockList]) => {
     relay.broadcast({
-      type: 'block_updated',
-      payload: blockUpdate
+      type: 'blocks_updated',
+      payload: blockList
     }, spaceId);
   });
 

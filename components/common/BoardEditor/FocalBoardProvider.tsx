@@ -1,4 +1,3 @@
-import type { Block } from '@prisma/client';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
@@ -6,7 +5,7 @@ import { publishIncrementalUpdate } from 'components/common/BoardEditor/publishe
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useSocketClient';
 import log from 'lib/log';
-import type { BlockUpdate, WebsocketPayload } from 'lib/websockets/interfaces';
+import type { WebsocketPayload } from 'lib/websockets/interfaces';
 
 import store from './focalboard/src/store';
 import { useAppDispatch } from './focalboard/src/store/hooks';
@@ -26,12 +25,12 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
     }
   }, [space?.id]);
 
-  const handleBlockUpdates = useCallback((value: WebsocketPayload<'block_updated' | 'blocks_created'>) => {
+  const handleBlockUpdates = useCallback((value: WebsocketPayload<'blocks_updated' | 'blocks_created'>) => {
     publishIncrementalUpdate(value instanceof Array ? value : [value] as any);
   }, []);
 
   useEffect(() => {
-    const unsubscribeFromBlockUpdates = subscribe('block_updated', handleBlockUpdates);
+    const unsubscribeFromBlockUpdates = subscribe('blocks_updated', handleBlockUpdates);
     const unsubscribeFromNewBlocks = subscribe('blocks_created', handleBlockUpdates);
 
     return () => {
