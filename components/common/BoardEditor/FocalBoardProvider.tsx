@@ -30,9 +30,9 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   }, []);
 
   useEffect(() => {
-    eventFeed.subscribe<'block_updated', WebsocketPayload<'block_updated'>>('block_updated', handleBlockUpdate);
+    const unsubscribe = eventFeed.subscribe<'block_updated', WebsocketPayload<'block_updated'>>('block_updated', handleBlockUpdate);
 
-    return eventFeed.unsubscribe('block_updated', handleBlockUpdate as any);
+    return () => unsubscribe();
   }, []);
 
   return children;

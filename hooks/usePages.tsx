@@ -217,9 +217,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    eventFeed.subscribe<'page_meta_updated', WebsocketPayload<'page_meta_updated'>>('page_meta_updated', handlePageUpdate);
+    const unsubscribe = eventFeed.subscribe<'page_meta_updated', WebsocketPayload<'page_meta_updated'>>('page_meta_updated', handlePageUpdate);
 
-    return eventFeed.unsubscribe('page_meta_updated', handlePageUpdate as any);
+    return () => unsubscribe();
   }, []);
 
   const value: PagesContext = useMemo(() => ({

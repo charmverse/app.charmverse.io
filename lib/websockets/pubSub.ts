@@ -10,6 +10,8 @@ export class PubSub<T, V> {
     }
 
     this.subscribers.get(type)?.push(callback as any);
+
+    return () => this.unsubscribe(type, callback as any);
   }
 
   unsubscribe (type: T, callback: CallbackType<V>) {
