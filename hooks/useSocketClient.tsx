@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
-import { socketsHost } from 'config/constants';
 import log from 'lib/log';
 import type { WebsocketEvent, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
 import { WebsocketEvents } from 'lib/websockets/interfaces';
@@ -67,7 +66,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket.disconnect();
     }
 
-    socket = io(socketsHost, {
+    socket = io(window.location.origin, {
       withCredentials: true
       // path: '/api/socket'
     }).connect();
