@@ -201,7 +201,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
   }
   const { sortOptions } = activeView.fields;
 
-  if (sortOptions.length < 1) {
+  if (sortOptions?.length < 1) {
     Utils.log('Manual sort');
     return cards.sort((a, b) => manualOrder(activeView, a, b));
   }
