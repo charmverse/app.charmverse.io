@@ -16,7 +16,7 @@ export function WebSocketTester () {
       <Grid item xs={12} spacing={2}>
         Web socket connection test ({messageLog.length})
 
-        <Button onClick={() => sendMessage({ type: 'ping', content: 'Here is the update' })}>Send ping</Button>
+        <Button onClick={() => sendMessage({ type: 'ping', content: 'Here is the update' } as any)}>Send ping</Button>
         <Button css={{ backgroundColor: 'red' }} onClick={clearLog}>Clear</Button>
       </Grid>
       {
