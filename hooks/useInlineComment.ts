@@ -12,7 +12,7 @@ import { useThreads } from './useThreads';
 export function useInlineComment () {
   const view = useEditorViewContext();
   const { pages } = usePages();
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { threads } = useThreads();
 
   return {

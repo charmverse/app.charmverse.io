@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import type { Member } from 'models';
+import type { Member } from 'lib/members/interfaces';
 
 import type { Block } from '../../blocks/block';
 import mutator from '../../mutator';

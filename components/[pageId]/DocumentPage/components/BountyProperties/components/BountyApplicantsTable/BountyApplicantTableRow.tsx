@@ -46,7 +46,7 @@ export default function BountyApplicantTableRow ({
   submissionsCapReached,
   refreshSubmissions
 }: Props) {
-  const [members] = useMembers();
+  const { members } = useMembers();
   const { user } = useUser();
   const [isExpandedRow, setIsExpandedRow] = useState(false);
   const member = members.find(c => c.id === submission.createdBy);

@@ -28,7 +28,8 @@ export class PagesApi {
   }
 
   getPageDetails (pageIdOrPath: string, spaceId?: string) {
-    return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details?spaceId=${spaceId}`);
+    const query = spaceId ? `?spaceId=${spaceId}` : '';
+    return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details${query}`);
   }
 }
 

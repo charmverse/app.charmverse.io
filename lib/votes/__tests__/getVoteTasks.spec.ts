@@ -21,7 +21,7 @@ describe('getVoteTasks', () => {
       deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
 
-    // Not included as the vote is past deadline
+    // Included even if the vote is past deadline
     await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -31,7 +31,7 @@ describe('getVoteTasks', () => {
       deadline: new Date(Date.now() - 24 * 60 * 60 * 1000)
     });
 
-    // Not included as the user casted vote
+    // Included since we show votes that have been casted
     await createVote({
       pageId: page.id,
       createdBy: user.id,
@@ -42,7 +42,7 @@ describe('getVoteTasks', () => {
       deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
 
-    const createdVote4 = await createVote({
+    const createdVote = await createVote({
       pageId: page.id,
       createdBy: user.id,
       spaceId: space.id,
@@ -51,7 +51,8 @@ describe('getVoteTasks', () => {
     });
 
     const votes = await getVoteTasks(user.id);
-    expect(votes[0].id).toBe(createdVote4.id);
-    expect(votes.length).toBe(1);
+
+    expect(votes[1].id).toBe(createdVote.id);
+    expect(votes.length).toBe(3);
   });
 });
