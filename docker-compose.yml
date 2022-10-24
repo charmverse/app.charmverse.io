@@ -43,7 +43,7 @@ services:
       - dev
 
   datadog-agent:
-    image: public.ecr.aws/datadog/agent:6
+    image: public.ecr.aws/datadog/agent
     hostname: datadog-agent
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
