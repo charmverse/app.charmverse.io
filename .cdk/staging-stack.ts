@@ -96,7 +96,7 @@ export class CdkDeployStack extends Stack {
       } 
     ];
 
-    # add ddenabled tag to instance to enable datadog aws integration.
+    // add ddenabled tag to instance to enable datadog aws integration.
     if (process.env.ddenabled === "true") {
         resourceTags.push(
           {
