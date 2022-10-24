@@ -1,0 +1,194 @@
+diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+index aefc8ee..ff5bde5 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
++++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+@@ -7,10 +7,11 @@ import { createHash } from 'crypto';
+ import { Transform } from 'prosemirror-transform';
+ import { splitBlockKeepMarks } from 'prosemirror-commands';
+ import { MenuItem as MenuItem$1, Dropdown, renderGrouped } from 'prosemirror-menu';
+-import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+-import { createGenerateClassName, StylesProvider, ThemeProvider } from '@material-ui/core/styles';
+-import { createTheme } from '@material-ui/core';
++import { DatePicker } from '@mui/x-date-pickers';
++import LocalizationProvider from '@mui/lab/LocalizationProvider';
++import AdapterDayjs from '@mui/lab/AdapterDayjs';
++import { StylesProvider, ThemeProvider } from '@mui/material/styles';
++import { createTheme } from '@mui/material/styles';
+ import ReactDOM from 'react-dom';
+ 
+ function ownKeys(object, enumerableOnly) {
+@@ -4982,7 +4983,7 @@ var deleteMenuItem = function deleteMenuItem() {
+   });
+ };
+ 
+-var colors = ['rgb(255, 191, 181)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
++var colors = ['var(--bg-gray)', 'var(--bg-brown)', 'var(--bg-orange)', 'var(--bg-yellow)', 'var(--bg-green)', 'var(--bg-blue)', 'var(--bg-purple)', 'var(--bg-pink)', 'var(--bg-red)', 'transparent'];
+ 
+ var cellBackgroundColorItem = function cellBackgroundColorItem(color) {
+   return new MenuItem$1({
+@@ -5054,7 +5055,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+     } // append popup to dom
+ 
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    }
+ 
+     this.popUpDOM.addEventListener('mouseover', addDeleteHoverClass);
+     this.popUpDOM.addEventListener('mouseout', removeDeleteHoverClass); // render prosemirror menu to popUpDom
+@@ -5955,9 +5958,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+ 
+ ee(DateEventEmitter.prototype);
+ var datePopupEmitter = new DateEventEmitter();
+-var generateClassName$1 = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+ 
+ var DateComponent = function DateComponent(_ref) {
+   var view = _ref.view,
+@@ -6031,19 +6031,19 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+   return /*#__PURE__*/React.createElement("div", {
+     className: "date-picker",
+     ref: ref
+-  }, /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName$1
+   }, /*#__PURE__*/React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+     autoOk: true,
++    inputFormat: DATE_FORMAT,
+     onChange: handleChange,
+-    openTo: "date",
++    openTo: "dat",
++    renderInput: (params) =>  new TextField(params),
+     value: date,
+     variant: "static"
+-  })))));
++  }))));
+ };
+ 
+ var ReactNodeView = /*#__PURE__*/function () {
+@@ -8405,7 +8405,7 @@ var deleteItem = function deleteItem() {
+   });
+ };
+ 
+-var menuItems = [[columnTypeDropdown()], [filterItem(), sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
++var menuItems = [/*[columnTypeDropdown()]*/ [/*filterItem(),*/ sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
+ 
+ // ::- The type of field that `FieldPrompt` expects to be passed to it.
+ var Field = /*#__PURE__*/function () {
+@@ -8519,7 +8519,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+       }
+     }); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    }
+ 
+     var _renderGrouped = renderGrouped(this.view, items),
+         itemsDOM = _renderGrouped.dom,
+@@ -8621,6 +8623,7 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+   }, {
+     key: "setTypesDropdownContent",
+     value: function setTypesDropdownContent() {
++      return; // disabled type dropdown
+       var _this$popUpDOM$getEle = this.popUpDOM.getElementsByClassName(dropdownClassName),
+           _this$popUpDOM$getEle2 = _slicedToArray(_this$popUpDOM$getEle, 1),
+           dropDown = _this$popUpDOM$getEle2[0];
+@@ -8694,6 +8697,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+         tr.deleteRange(pos + 2, pos + node.nodeSize - 2);
+       }
+ 
++      // prevent infinite recursion
++      this.headerData = null;
++
+       this.view.dispatch(tr);
+     }
+   }, {
+@@ -8833,7 +8839,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableDateMenuView, [{
+@@ -9016,7 +9024,9 @@ var TableLabelsMenu = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableLabelsMenu, [{
+@@ -9407,10 +9417,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+   })));
+ };
+ 
+-var generateClassName = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+-
+ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+   var onFilterChange = _ref.onFilterChange,
+       filterHandler = _ref.filterHandler;
+@@ -9420,28 +9426,27 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+       date = _useState2[0],
+       setDate = _useState2[1];
+ 
+-  return /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName
+-  }, /*#__PURE__*/React.createElement(ThemeProvider, {
++  return React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+-    format: DATE_FORMAT,
++    inputFormat: DATE_FORMAT,
+     onChange: function onChange(newValue) {
+       setDate(newValue.toDate().getTime());
+       onFilterChange(_objectSpread2(_objectSpread2({}, filterHandler.toAttrsValue()), {}, {
+         filterValue: newValue.toDate().getTime()
+       }));
+     },
+-    openTo: "date",
++    openTo: "day",
++    renderInput: (params) =>  new TextField(params),
+     style: {
+       width: '100px',
+       cursor: 'pointer'
+     },
+     value: date,
+     variant: "inline"
+-  }))));
++  })));
+ };
+ 
+ var FiltersInputDropdown = function FiltersInputDropdown(_ref2) {
+@@ -9775,7 +9780,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableFiltersMenuView, [{
