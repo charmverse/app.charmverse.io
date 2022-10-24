@@ -61,7 +61,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
-  const { eventFeed } = useWebSocketClient();
+  const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
 
@@ -217,7 +217,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = eventFeed.subscribe<'page_meta_updated', WebsocketPayload<'page_meta_updated'>>('page_meta_updated', handlePageUpdate);
+    const unsubscribe = subscribe('page_meta_updated', handlePageUpdate);
 
     return () => unsubscribe();
   }, []);

@@ -19,7 +19,7 @@ type IContext = {
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  eventFeed: PubSub<WebsocketEvent, WebsocketPayload>;
+  subscribe: <T extends WebsocketEvent>(event: T, callback: (payload: WebsocketPayload<T>) => void) => () => void;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -27,7 +27,7 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   // Development only
   messageLog: [],
   clearLog: () => null,
-  eventFeed: {} as any
+  subscribe: () => () => null
 });
 
 let socket: Socket<{ message: (message: WebsocketMessage) => void }>;
@@ -118,7 +118,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     sendMessage,
     messageLog,
     clearLog,
-    eventFeed
+    // Wrapper exists as there was an issue directly exporting the function itself
+    subscribe: <T extends WebsocketEvent>(event: T, callback: (payload: WebsocketPayload<T>) => void) => eventFeed.subscribe(event, callback)
   }), [messageLog]);
 
   return (

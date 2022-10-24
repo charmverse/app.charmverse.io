@@ -16,7 +16,7 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
   const [space] = useCurrentSpace();
 
-  const { eventFeed } = useWebSocketClient();
+  const { subscribe } = useWebSocketClient();
 
   useEffect(() => {
     log.debug('Load focalboard data');
@@ -30,7 +30,7 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = eventFeed.subscribe<'block_updated', WebsocketPayload<'block_updated'>>('block_updated', handleBlockUpdate);
+    const unsubscribe = subscribe('block_updated', handleBlockUpdate);
 
     return () => unsubscribe();
   }, []);
