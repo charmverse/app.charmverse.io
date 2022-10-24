@@ -43,17 +43,15 @@ const cardsSlice = createSlice({
     },
     updateCards: (state, action: PayloadAction<Card[]>) => {
       for (const card of action.payload) {
-        if (card.deletedAt) {
+        if (card.deletedAt !== 0) {
           delete state.cards[card.id];
           delete state.templates[card.id];
         }
         else if (card.fields.isTemplate) {
-          const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
-          state.templates[card.id] = cardAfterUpdate;
+          state.templates[card.id] = card;
         }
         else {
-          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
-          state.cards[card.id] = cardAfterUpdate;
+          state.cards[card.id] = card;
         }
       }
     },
@@ -64,12 +62,6 @@ const cardsSlice = createSlice({
           state.cards[payload.id] = { ...card, ...payload };
         }
       }
-    },
-    deleteCards: (state, action: PayloadAction<Pick<Card, 'id'>[]>) => {
-      action.payload.forEach(deletedCard => {
-        delete state.cards[deletedCard.id];
-        delete state.templates[deletedCard.id];
-      });
     }
   },
   extraReducers: (builder) => {
@@ -115,7 +107,7 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { updateCards, updateCard, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const { updateCards, updateCard, addCard, addTemplate, setCurrent } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
@@ -207,7 +199,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
   }
   const { sortOptions } = activeView.fields;
 
-  if (sortOptions?.length < 1) {
+  if (sortOptions.length < 1) {
     Utils.log('Manual sort');
     return cards.sort((a, b) => manualOrder(activeView, a, b));
   }
