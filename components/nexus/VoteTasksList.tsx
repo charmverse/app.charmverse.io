@@ -37,7 +37,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id
+    deadline, title: voteTitle, id, userChoice
   } = voteTask;
 
   const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
@@ -74,10 +74,10 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
               md: '100px'
             }
           }}
-          variant={isDeadlineOverdue ? 'outlined' : 'contained'}
+          variant={isDeadlineOverdue || userChoice ? 'outlined' : 'contained'}
           onClick={() => handleVoteId(voteTask.id)}
         >
-          {isDeadlineOverdue ? 'View' : 'Vote'}
+          {isDeadlineOverdue || userChoice ? 'View' : 'Vote'}
         </Button>
       </TableCell>
     </TableRow>
