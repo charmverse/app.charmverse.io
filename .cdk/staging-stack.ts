@@ -100,7 +100,7 @@ export class CdkDeployStack extends Stack {
     if (process.env.ddenabled === "true") {
         resourceTags.push(
           {
-            key: 'ddenabled'
+            key: 'ddenabled',
             value: 'true'
           }
         )
