@@ -64,6 +64,12 @@ const cardsSlice = createSlice({
           state.cards[payload.id] = { ...card, ...payload };
         }
       }
+    },
+    deleteCards: (state, action: PayloadAction<Pick<Card, 'id'>[]>) => {
+      action.payload.forEach(deletedCard => {
+        delete state.cards[deletedCard.id];
+        delete state.templates[deletedCard.id];
+      });
     }
   },
   extraReducers: (builder) => {
@@ -109,7 +115,7 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { updateCards, updateCard, addCard, addTemplate, setCurrent } = cardsSlice.actions;
+export const { updateCards, updateCard, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;

@@ -141,6 +141,15 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
+  const pageToDelete = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
   const permissions = await computeUserPagePermissions({
     pageId,
     userId
@@ -160,6 +169,13 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
 
   trackPageAction('delete_page', { userId, pageId });
   updateTrackPageProfile(pageId);
+
+  if (pageToDelete) {
+    relay.broadcast({
+      type: 'pages_deleted',
+      payload: modifiedChildPageIds.map(id => ({ id }))
+    }, pageToDelete?.spaceId as string);
+  }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

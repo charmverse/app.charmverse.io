@@ -37,6 +37,11 @@ const viewsSlice = createSlice({
     },
     updateView: (state, action: PayloadAction<BoardView>) => {
       state.views[action.payload.id] = action.payload;
+    },
+    deleteViews: (state, action: PayloadAction<Pick<BoardView, 'id'>[]>) => {
+      action.payload.forEach(deletedView => {
+        delete state.views[deletedView.id];
+      });
     }
   },
   extraReducers: (builder) => {
@@ -59,7 +64,7 @@ const viewsSlice = createSlice({
   }
 });
 
-export const { updateViews, setCurrent, updateView, addView } = viewsSlice.actions;
+export const { updateViews, setCurrent, updateView, addView, deleteViews } = viewsSlice.actions;
 export const { reducer } = viewsSlice;
 
 export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;

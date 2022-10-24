@@ -122,6 +122,9 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
       <>
         <FlashMessages milliseconds={2000} />
         <div className='focalboard-body full-page'>
+
+          <WebSocketTester />
+
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
             board={board}

@@ -255,13 +255,29 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const handlePageDeletes = useCallback((value: WebsocketPayload<'pages_deleted'>) => {
+
+    mutatePagesList(existingPages => {
+
+      const newValue = { ...existingPages };
+
+      value.forEach(deletedPage => {
+        delete newValue[deletedPage.id];
+      });
+
+      return newValue;
+    });
+  }, []);
+
   useEffect(() => {
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handlePagesUpdate);
     const unsubscribeFromNewPages = subscribe('pages_created', handleNewPages);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handlePageDeletes);
 
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromNewPages();
+      unsubscribeFromPageDeletes();
     };
   }, []);
 
