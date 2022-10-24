@@ -15,7 +15,7 @@ import { useUser } from './useUser';
 type LoggedMessage = { type: string, payload: any }
 
 type IContext = {
-  sendMessage: (message: any) => void;
+  sendMessage: (message: WebsocketMessage) => void;
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;

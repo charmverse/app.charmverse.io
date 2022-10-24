@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -189,6 +190,24 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
           });
         }
       }
+
+      const blocksToNotify = await prisma.block.findMany({ where: {
+        id: {
+          in: newBlocks.map(b => b.id)
+        }
+      } });
+
+      relay.broadcast({
+        type: 'blocks_created',
+        payload: blocksToNotify
+      }, space.id);
+
+      const createdPages = await getPageMetaList(newBlocks.map(b => b.id));
+
+      relay.broadcast({
+        type: 'pages_created',
+        payload: createdPages
+      }, space.id);
 
       return res.status(200).json(newBlocks);
     }

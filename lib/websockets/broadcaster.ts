@@ -6,7 +6,7 @@ import { prisma } from 'db';
 import { redisClient } from 'lib/cache/redisClient';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
-import type { WebsocketMessage } from './interfaces';
+import type { WebsocketEvent, WebsocketMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
@@ -54,7 +54,7 @@ export class WebsocketBroadcaster {
     this.io.emit('message', message);
   }
 
-  broadcast (message: WebsocketMessage, roomId: string): void {
+  broadcast<T extends WebsocketEvent> (message: WebsocketMessage<T>, roomId: string): void {
     this.io.to(roomId).emit('message', message);
   }
 

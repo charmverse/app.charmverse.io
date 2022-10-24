@@ -3,7 +3,7 @@ import type { Block } from '@prisma/client';
 import type { PageMeta } from 'lib/pages';
 import type { SystemError } from 'lib/utilities/errors';
 
-export const WebsocketEvents = ['block_updated', 'page_meta_updated', 'subscribe', 'error'] as const;
+export const WebsocketEvents = ['block_updated', 'blocks_created', 'page_meta_updated', 'pages_created', 'subscribe', 'error'] as const;
 
 export type WebsocketEvent = typeof WebsocketEvents[number]
 
@@ -19,9 +19,12 @@ export type SubscribeRequest = {
   spaceId: string;
 }
 
+// Map of event type to event payload
 export type Updates = {
   block_updated: BlockUpdate;
+  blocks_created: Block[];
   page_meta_updated: PageMetaUpdate;
+  pages_created: PageMeta[];
   subscribe: SubscribeRequest;
   error: SystemError;
 }

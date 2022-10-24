@@ -216,10 +216,31 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     mutatePage(value, false);
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = subscribe('page_meta_updated', handlePageUpdate);
+  const handleNewPages = useCallback((value: WebsocketPayload<'pages_created'>) => {
 
-    return () => unsubscribe();
+    const newPages = value.reduce((pageMap, page) => {
+      pageMap[page.id] = page;
+
+      return pageMap;
+
+    }, {} as PagesMap);
+
+    mutatePagesList(existingPages => {
+      return {
+        ...(existingPages ?? {}),
+        ...newPages
+      };
+    });
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeFromPageUpdates = subscribe('page_meta_updated', handlePageUpdate);
+    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPages);
+
+    return () => {
+      unsubscribeFromPageUpdates();
+      unsubscribeFromNewPages();
+    };
   }, []);
 
   const value: PagesContext = useMemo(() => ({
