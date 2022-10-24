@@ -3,7 +3,7 @@ import nc from 'next-connect';
 
 import * as http from 'adapters/http';
 import log from 'lib/log';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import type { FailedImportsError } from 'lib/notion/types';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -13,7 +13,9 @@ const handler = nc({
   onNoMatch
 });
 
-handler.use(requireUser).post(importNotion);
+handler
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId' }))
+  .post(importNotion);
 
 interface NotionApiResponse {
   workspace_name: string;

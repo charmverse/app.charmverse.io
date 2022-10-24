@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import MuiLink from '@mui/material/Link';
@@ -27,13 +28,15 @@ export type InputProps<C extends ElementType> = ButtonProps
 
 export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
 
-  const { children, loading, loadingMessage, ...props } = _props;
+  const { children, loading, loadingMessage, disabledTooltip, ...props } = _props;
 
   return (
-    <StyledButton ref={ref} disabled={loading} {...props}>
-      {(loading && loadingMessage) ? loadingMessage : children}
-      {loading && <StyledSpinner color='inherit' size={15} />}
-    </StyledButton>
+    <Tooltip title={props.disabled ? disabledTooltip : ''}>
+      <StyledButton ref={ref} disabled={loading} {...props}>
+        {(loading && loadingMessage) ? loadingMessage : children}
+        {loading && <StyledSpinner color='inherit' size={15} />}
+      </StyledButton>
+    </Tooltip>
   );
 });
 
