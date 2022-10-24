@@ -29,11 +29,14 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
       }))
   )).filter(isTruthy);
 
+  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+
   const [
     allOrganizations,
     bountiesCreated,
     bountyApplications,
-    userWorkspaces
+    userWorkspaces,
+    userProposalsCount
   ] = await Promise.all([
     getAllOrganizations(apiToken),
     prisma.bounty.findMany({
@@ -61,7 +64,23 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         }
       }
     }),
-    getSpacesOfUser(userId)
+    getSpacesOfUser(userId),
+    prisma.proposal.count({
+      where: {
+        page: {
+          deletedAt: null,
+          type: 'proposal',
+          snapshotProposalId: {
+            notIn: proposals.map(prop => prop.proposalId)
+          }
+        },
+        authors: {
+          some: {
+            userId
+          }
+        }
+      }
+    })
   ]);
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
@@ -90,6 +109,9 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
         some: {
           userId
         }
+      },
+      page: {
+        type: 'proposal'
       }
     },
     select: {
@@ -139,7 +161,7 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
   }));
 
   const communities = [...deepDaoCommunities, ...charmVerseCommunities];
-  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+
   const votes = [
     // Deepdao votes
     ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => ([..._votes, ...profile.data.votes]), []),
@@ -181,8 +203,8 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
 
   return {
     communities: sortedCommunities,
-    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0),
-    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0),
+    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0) + userProposalsCount,
+    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0) + userVotes.length,
     bounties: completedApplications.length
   };
 }

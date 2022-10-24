@@ -73,9 +73,11 @@ export default function TasksPage () {
     && userNotificationState.snoozedUntil
     && new Date(userNotificationState.snoozedUntil) > new Date();
 
+  const unvoted = tasks?.votes.filter(vote => !vote.userChoice && new Date() < new Date(vote.deadline));
+
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig: (gnosisTasks && !hasSnoozedNotifications) ? gnosisTasks.length : 0,
-    vote: tasks ? tasks.votes.length : 0,
+    vote: unvoted ? unvoted.length : 0,
     discussion: tasks ? tasks.mentioned.unmarked.length : 0,
     proposal: tasks ? tasks.proposals.unmarked.length : 0,
     bounty: tasks ? tasks.bounties?.unmarked.length : 0

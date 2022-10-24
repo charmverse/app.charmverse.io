@@ -92,9 +92,9 @@ export function ProposalTasksListRow (
             }
           }}
           href={proposalLink}
-          disabled={!action}
+          variant={action ? 'contained' : 'outlined'}
         >
-          {action ? ProposalActionRecord[action] : 'No action'}
+          {action ? ProposalActionRecord[action] : 'View'}
         </Button>
       </TableCell>
     </TableRow>

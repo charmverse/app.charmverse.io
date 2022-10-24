@@ -24,6 +24,20 @@ export function AddMemberPropertyButton () {
   const { properties, addProperty } = useMemberProperties();
   const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>([]);
 
+  async function onSubmit () {
+    if (propertyName && selectedPropertyType) {
+      await addProperty({
+        index: properties?.length ?? 0,
+        name: propertyName,
+        options: propertyOptions,
+        type: selectedPropertyType
+      });
+      setPropertyName('');
+      mutateMembers();
+      propertyNamePopupState.close();
+    }
+  }
+
   return (
     <>
       <Button
@@ -79,6 +93,11 @@ export function AddMemberPropertyButton () {
             sx={{
               flexGrow: 1
             }}
+            onKeyDown={(e) => {
+              if (e.code === 'Enter') {
+                onSubmit();
+              }
+            }}
           />
           {selectedPropertyType?.match(/select/) && (
             <MemberPropertySelectInput
@@ -91,19 +110,7 @@ export function AddMemberPropertyButton () {
             sx={{
               width: 'fit-content'
             }}
-            onClick={async () => {
-              if (propertyName && selectedPropertyType) {
-                await addProperty({
-                  index: properties?.length ?? 0,
-                  name: propertyName,
-                  options: propertyOptions,
-                  type: selectedPropertyType
-                });
-                setPropertyName('');
-                mutateMembers();
-                propertyNamePopupState.close();
-              }
-            }}
+            onClick={onSubmit}
           >Add
           </Button>
         </Stack>

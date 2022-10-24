@@ -15,20 +15,10 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
         }
       },
       context: 'inline',
-      status: 'InProgress',
-      // No need to fetch votes that have been casted by the user
-      userVotes: {
-        none: {
-          userId
-        }
-      },
-      // No need to fetch votes that are passed deadline, those can't be voted on
-      deadline: {
-        gte: new Date()
-      }
+      status: 'InProgress'
     },
     orderBy: {
-      deadline: 'asc'
+      deadline: 'desc'
     },
     include: {
       page: true,
@@ -38,7 +28,12 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
     }
   });
 
-  return votes.map(vote => {
+  const now = new Date();
+  const futureVotes = votes.filter(item => item.deadline > now).sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
+  const pastVotes = votes.filter(item => item.deadline <= now);
+  const sortedVotes = [...futureVotes, ...pastVotes];
+
+  return sortedVotes.map(vote => {
     const voteStatus = calculateVoteStatus(vote);
     const userVotes = vote.userVotes;
     const { aggregatedResult, userChoice } = aggregateVoteResult({

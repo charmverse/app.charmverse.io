@@ -45,7 +45,7 @@ function MemberPropertyItemForm ({
   property: MemberProperty;
   close: VoidFunction;
 }) {
-  const { properties = [], updateProperty } = useMemberProperties();
+  const { updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
   const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>((property?.options as PropertyOption[]) ?? []);
 
@@ -59,6 +59,17 @@ function MemberPropertyItemForm ({
     || (isSelectPropertyType
       && (property.options as PropertyOption[])?.find(po => po.name.length === 0));
 
+  async function onSubmit () {
+    if (!isDisabled) {
+      await updateProperty({
+        name: propertyName,
+        id: property.id,
+        options: propertyOptions
+      });
+      setPropertyName('');
+      close();
+    }
+  }
   return (
     <Stack gap={2}>
       <Stack>
@@ -66,7 +77,14 @@ function MemberPropertyItemForm ({
         <TextField
           error={!propertyName}
           value={propertyName}
-          onChange={(e) => setPropertyName(e.target.value)}
+          onChange={(e) => {
+            setPropertyName(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.code === 'Enter') {
+              onSubmit();
+            }
+          }}
           autoFocus
         />
       </Stack>
@@ -79,17 +97,7 @@ function MemberPropertyItemForm ({
       )}
       <Button
         disabled={isDisabled}
-        onClick={async () => {
-          if (!isDisabled) {
-            await updateProperty({
-              name: propertyName,
-              id: property.id,
-              options: propertyOptions
-            });
-            setPropertyName('');
-            close();
-          }
-        }}
+        onClick={onSubmit}
         sx={{
           width: 'fit-content'
         }}
