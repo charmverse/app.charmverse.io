@@ -96,6 +96,16 @@ export class CdkDeployStack extends Stack {
       } 
     ];
 
+    # add ddenabled tag to instance to enable datadog aws integration.
+    if (process.env.ddenabled === "true") {
+        resourceTags.push(
+          {
+            key: 'ddenabled'
+            value: 'true'
+          }
+        )
+    }
+
     // Create an Elastic Beanstalk environment to run the application
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
