@@ -5,7 +5,7 @@ import { deleteArchivedPages } from 'lib/pages/server/deleteArchivedPages';
 
 const MAX_ARCHIVE_DAYS = process.env.MAX_ARCHIVE_DAYS ? parseInt(process.env.MAX_ARCHIVE_DAYS) : 30;
 
-export default async function task () {
+export async function task () {
 
   log.debug('Running delete-archived cron job');
 

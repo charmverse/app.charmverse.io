@@ -1,5 +1,3 @@
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import BountyIcon from '@mui/icons-material/RequestPage';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -8,6 +6,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { DateTime } from 'luxon';
 import { useEffect, useMemo } from 'react';
@@ -44,63 +43,64 @@ function MentionedTaskRow (
     if (type === 'bounty' && bountyId) {
       return {
         mentionLink: `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`,
-        mentionTitle: `${pageTitle} in ${spaceName}`
+        mentionTitle: `${pageTitle}`
       };
     }
     else {
       return {
         mentionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`,
-        mentionTitle: `${pageTitle} in ${spaceName}`
+        mentionTitle: `${pageTitle}`
       };
     }
-  }, [type, bountyId, spaceDomain, pageTitle, spaceName, pagePath, commentId, mentionId]);
+  }, [type, bountyId, spaceDomain, pageTitle, pagePath, commentId, mentionId]);
 
   return (
     <TableRow>
       <TableCell>
-        {!marked && (
-          <VisibilityIcon
-            fontSize='small'
-            sx={{
-              position: 'absolute',
-              left: '-15px'
-            }}
-          />
-        )}
-        <Link
-          color='inherit'
-          href={mentionLink}
-          sx={{
-            maxWidth: {
-              xs: '130px',
-              sm: '200px',
-              md: '400px'
-            }
-          }}
-          display='flex'
-        >
-          {type === 'bounty' ? <BountyIcon fontSize='small' /> : type === 'page' ? <DescriptionOutlinedIcon fontSize='small' /> : null}
-          <Typography
-            marginLeft='5px'
+        <Box display='flex'>
+          {!marked && (
+            <VisibilityIcon
+              fontSize='small'
+              sx={{
+                position: 'absolute',
+                left: '-15px'
+              }}
+            />
+          )}
+          {createdBy && (
+            <Tooltip title={createdBy.username}>
+              <div>
+                <UserDisplay avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
+              </div>
+            </Tooltip>
+          )}
+          <Link
+            href={mentionLink}
+            variant='body1'
             noWrap
-          >{text}
-          </Typography>
-        </Link>
-      </TableCell>
-      <TableCell>
-        {createdBy && (
-          <Link color='inherit' href={mentionLink}>
-            <UserDisplay avatarSize='small' user={createdBy} />
+            color='inherit'
+            sx={{
+              maxWidth: {
+                xs: '130px',
+                sm: '200px',
+                md: '400px'
+              }
+            }}
+          >
+            {text}
           </Link>
-        )}
+        </Box>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={mentionLink} variant='body1'>
+        <Typography noWrap>{spaceName}</Typography>
+      </TableCell>
+      <TableCell>
+        <Link color='inherit' href={mentionLink} variant='body1' noWrap>
           {mentionTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={mentionLink} variant='body1'>
+        <Link color='inherit' href={mentionLink} variant='body1' noWrap>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -169,8 +169,8 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
           <TableHead>
             <TableRow>
               <TableCell>Comment</TableCell>
-              <TableCell width={160}>Commenter</TableCell>
-              <TableCell>Page</TableCell>
+              <TableCell width={200}>Workspace</TableCell>
+              <TableCell width={200}>Page</TableCell>
               <TableCell width={140} align='center'>Date</TableCell>
             </TableRow>
           </TableHead>
@@ -181,6 +181,5 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
         </Table>
       </Box>
     </Box>
-
   );
 }

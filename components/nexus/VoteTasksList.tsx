@@ -44,7 +44,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
-  const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  const voteLocation = pageTitle || 'Untitled';
 
   return (
     <TableRow>
@@ -58,6 +58,9 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
         <Link href={voteLink} variant='body1' color='inherit'>
           {voteLocation}
         </Link>
+      </TableCell>
+      <TableCell>
+        <Typography>{spaceName}</Typography>
       </TableCell>
       <TableCell align='center'>
         <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
@@ -151,7 +154,8 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
         <TableHead>
           <TableRow>
             <TableCell>Poll</TableCell>
-            <TableCell>Page</TableCell>
+            <TableCell width={300}>Page</TableCell>
+            <TableCell width={200}>Workspace</TableCell>
             <TableCell align='center'>Due</TableCell>
             <TableCell width='135' align='center'>Action</TableCell>
           </TableRow>
