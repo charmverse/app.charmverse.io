@@ -825,11 +825,13 @@ model MemberPropertyPermission {
   userId                        String?                       @db.Uuid
   spaceId                       String?                       @db.Uuid
   roleId                        String?                       @db.Uuid
-  public                        Boolean?
   memberPropertyPermissionLevel MemberPropertyPermissionLevel
   memberPropertyId              String                        @db.Uuid
   memberProperty                MemberProperty                @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
   role                          Role?                         @relation(fields: [roleId], references: [id], onDelete: Cascade)
   space                         Space?                        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user                          User?                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, memberPropertyId])
+  @@unique([roleId, memberPropertyId])
 }

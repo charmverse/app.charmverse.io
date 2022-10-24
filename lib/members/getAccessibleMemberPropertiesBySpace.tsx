@@ -26,6 +26,11 @@ export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVi
             userId
           })
         },
+        // No permissions are set, permission visible for everyone
+        {
+          spaceId: { in: spaceIdQuery },
+          permissions: { none: {} }
+        },
         // Admin override to always return all pages
         {
           space: {
@@ -68,19 +73,6 @@ export function accessiblePropertiesByPermissionsQuery ({ spaceIds, userId }:
         },
         {
           userId
-        },
-        {
-          space: {
-            spaceRoles: {
-              some: {
-                userId,
-                spaceId: { in: spaceIds }
-              }
-            }
-          }
-        },
-        {
-          public: true
         }
       ]
     }

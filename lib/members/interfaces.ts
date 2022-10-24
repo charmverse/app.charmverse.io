@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyType, MemberPropertyValue, Role, Space, User, UserDetails } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission, MemberPropertyType, MemberPropertyValue, Role, Space, User, UserDetails } from '@prisma/client';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 
@@ -45,3 +45,5 @@ export type CommonSpacesInput = {
   requestingUserId?: string;
   spaceId?: string | undefined;
 }
+
+export type CreateMemberPropertyPermissionInput = { memberPropertyId: string } & Partial<Pick<MemberPropertyPermission, 'userId' | 'roleId' >>
