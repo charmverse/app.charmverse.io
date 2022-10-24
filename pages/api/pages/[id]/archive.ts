@@ -7,10 +7,8 @@ import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { PageNotFoundError } from 'lib/pages/server';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,17 +20,6 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
   const pageId = req.query.id as string;
   const { archive } = req.body as { archive: boolean };
   const userId = req.session.user.id;
-
-  const pageSpaceId = await prisma.page.findUnique({ where: {
-    id: pageId
-  },
-  select: {
-    spaceId: true
-  } });
-
-  if (!pageSpaceId) {
-    throw new PageNotFoundError(pageId);
-  }
 
   const permissions = await computeUserPagePermissions({
     pageId,
@@ -87,13 +74,6 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
   }
 
   trackPageAction(archive ? 'archive_page' : 'restore_page', { userId, pageId });
-
-  const deletedAt = archive ? new Date() : null;
-
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: modifiedChildPageIds.map(id => ({ id, deletedAt, spaceId: pageSpaceId.spaceId }))
-  }, pageSpaceId.spaceId);
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
