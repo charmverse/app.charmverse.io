@@ -52,6 +52,7 @@ enum NotificationType {
   mention
   vote
   proposal
+  bounty
 }
 
 enum BountyStatus {
@@ -179,6 +180,8 @@ model Space {
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
   proposalCategory            ProposalCategory[]
+  MemberProperty              MemberProperty[]
+  MemberPropertyValue         MemberPropertyValue[]
 }
 
 model SpaceApiToken {
@@ -311,47 +314,48 @@ model Vote {
 }
 
 model User {
-  id                String                 @id @default(uuid()) @db.Uuid
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @default(now())
-  addresses         String[]
-  avatar            String?
-  avatarContract    String?
-  avatarTokenId     String?
-  avatarChain       Int?
-  username          String
-  isBot             Boolean?               @default(false)
-  path              String?                @unique
-  identityType      IdentityType?
-  email             String?
-  applications      Application[]
-  blocks            Block[]
-  bounties          Bounty[]
-  bountyPermissions BountyPermission[]
-  comments          Comment[]
-  discordUser       DiscordUser?
-  favorites         FavoritePage[]
-  inviteLinks       InviteLink[]
-  pages             Page[]
-  permissions       PagePermission[]
-  poaps             Poap[]
-  spacesCreated     Space[]
-  spacePermissions  SpacePermission[]
-  spaceRoles        SpaceRole[]
-  telegramUser      TelegramUser?
-  threads           Thread[]
-  profile           UserDetails?
-  gnosisSafes       UserGnosisSafe[]
-  UserNotification  UserNotification[]
-  notificationState UserNotificationState?
-  userVotes         UserVote[]
-  initiatedVotes    Vote[]
-  profileItems      ProfileItem[]
-  proposalsAuthored ProposalAuthor[]
-  proposalsReviewed ProposalReviewer[]
-  reviewedProposals Proposal[]
-  workspaceEvents   WorkspaceEvent[]
-  wallets           UserWallet[]
+  id                   String                 @id @default(uuid()) @db.Uuid
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  addresses            String[]
+  avatar               String?
+  avatarContract       String?
+  avatarTokenId        String?
+  avatarChain          Int?
+  username             String
+  isBot                Boolean?               @default(false)
+  path                 String?                @unique
+  identityType         IdentityType?
+  email                String?
+  applications         Application[]
+  blocks               Block[]
+  bounties             Bounty[]
+  bountyPermissions    BountyPermission[]
+  comments             Comment[]
+  discordUser          DiscordUser?
+  favorites            FavoritePage[]
+  inviteLinks          InviteLink[]
+  pages                Page[]
+  permissions          PagePermission[]
+  poaps                Poap[]
+  spacesCreated        Space[]
+  spacePermissions     SpacePermission[]
+  spaceRoles           SpaceRole[]
+  telegramUser         TelegramUser?
+  threads              Thread[]
+  profile              UserDetails?
+  gnosisSafes          UserGnosisSafe[]
+  UserNotification     UserNotification[]
+  notificationState    UserNotificationState?
+  userVotes            UserVote[]
+  initiatedVotes       Vote[]
+  profileItems         ProfileItem[]
+  proposalsAuthored    ProposalAuthor[]
+  proposalsReviewed    ProposalReviewer[]
+  reviewedProposals    Proposal[]
+  workspaceEvents      WorkspaceEvent[]
+  wallets              UserWallet[]
+  memberPropertyValues MemberPropertyValue[]
 }
 
 model UserWallet {
@@ -692,19 +696,19 @@ model Comment {
 }
 
 model Proposal {
-  id         String             @id @default(uuid()) @db.Uuid
-  createdBy  String             @db.Uuid
-  spaceId    String             @db.Uuid
-  status     ProposalStatus
-  authors    ProposalAuthor[]
-  reviewers  ProposalReviewer[]
-  space      Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  page       Page?
-  reviewedBy String?            @db.Uuid
-  reviewer   User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
-  reviewedAt DateTime?
-  categoryId String?            @db.Uuid
-  category   ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  id                     String             @id @default(uuid()) @db.Uuid
+  createdBy              String             @db.Uuid
+  spaceId                String             @db.Uuid
+  status                 ProposalStatus
+  authors                ProposalAuthor[]
+  reviewers              ProposalReviewer[]
+  space                  Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page                   Page?
+  reviewedBy             String?            @db.Uuid
+  reviewer               User?              @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
+  reviewedAt             DateTime?
+  categoryId             String?            @db.Uuid
+  category               ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   snapshotProposalExpiry DateTime?
 }
 
@@ -759,4 +763,51 @@ model ProposalCategory {
   title    String
   color    String
   proposal Proposal[]
+}
+
+enum MemberPropertyType {
+  text
+  text_multiline
+  number
+  email
+  phone
+  url
+  select
+  multiselect
+  role
+  profile_pic
+  timezone
+  name
+  discord
+  twitter
+}
+
+model MemberProperty {
+  id                   String                @id @default(uuid()) @db.Uuid
+  createdAt            DateTime              @default(now())
+  createdBy            String                @db.Uuid
+  updatedAt            DateTime              @updatedAt
+  updatedBy            String                @db.Uuid
+  spaceId              String                @db.Uuid
+  space                Space                 @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  name                 String
+  type                 MemberPropertyType
+  options              Json?
+  index                Int                   @default(-1)
+  memberPropertyValues MemberPropertyValue[]
+}
+
+model MemberPropertyValue {
+  id               String         @id @default(uuid()) @db.Uuid
+  updatedAt        DateTime       @updatedAt
+  updatedBy        String         @db.Uuid
+  memberPropertyId String         @db.Uuid
+  memberProperty   MemberProperty @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
+  spaceId          String         @db.Uuid
+  space            Space          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId           String         @db.Uuid
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value            Json?
+
+  @@unique([memberPropertyId, spaceId, userId])
 }

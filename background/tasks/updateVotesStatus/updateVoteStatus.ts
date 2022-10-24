@@ -1,10 +1,7 @@
-import type { UserVote, Vote, VoteOptions } from '@prisma/client';
 
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-
-type VoteWithUserVotes = (Vote & { userVotes: UserVote[], voteOptions: VoteOptions[] })
 
 const updateVoteStatus = async () => {
 
@@ -21,56 +18,49 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline as VoteWithUserVotes[]);
+  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
 
-  await prisma.vote.updateMany({
-    where: {
-      id: {
-        in: passedVotes
-      }
-    },
-    data: {
-      status: 'Passed'
-    }
-  });
+  const proposalPageIds = votesPassedDeadline
+    .filter(v => v.context === 'proposal')
+    .map(v => v.pageId);
 
-  await prisma.vote.updateMany({
-    where: {
-      id: {
-        in: rejectedVotes
-      }
-    },
-    data: {
-      status: 'Rejected'
-    }
-  });
-
-  const closedProposals = await prisma.vote.findMany({
-    where: {
-      pageId: {
-        in: [...rejectedVotes, ...passedVotes]
+  await prisma.$transaction([
+    // update passed votes
+    prisma.vote.updateMany({
+      where: {
+        id: {
+          in: passedVotes.map(v => v.id)
+        }
       },
-      context: 'proposal'
-    },
-    select: {
-      pageId: true
-    }
-  });
-
-  const closedProposalIds = closedProposals.map(closedProposal => closedProposal.pageId);
-
-  await prisma.proposal.updateMany({
-    where: {
-      id: {
-        in: closedProposalIds
+      data: {
+        status: 'Passed'
       }
-    },
-    data: {
-      status: 'vote_closed'
-    }
-  });
+    }),
+    // update rejected votes
+    prisma.vote.updateMany({
+      where: {
+        id: {
+          in: rejectedVotes.map(v => v.id)
+        }
+      },
+      data: {
+        status: 'Rejected'
+      }
+    }),
+    // update proposals
+    prisma.proposal.updateMany({
+      where: {
+        id: {
+          in: proposalPageIds
+        }
+      },
+      data: {
+        status: 'vote_closed'
+      }
+    })
+  ]);
 
-  return passedVotes.length + rejectedVotes.length;
+  return votesPassedDeadline.length;
 };
 
 export default updateVoteStatus;

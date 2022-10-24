@@ -3,24 +3,26 @@ import { VoteType } from '@prisma/client';
 
 const YES_OPTION = 'Yes';
 
-export const getVotesByState = (votes: (Omit<Vote, 'pageId' | 'status' | 'createdBy' | 'context'> & { userVotes: (Pick<UserVote, 'choice'>)[], voteOptions: VoteOptions[] })[]) => {
+export type VoteWithUserVotes = (Vote & { userVotes: UserVote[], voteOptions: VoteOptions[] })
 
-  const passedVotes: string[] = [];
-  const rejectedVotes: string[] = [];
+export const getVotesByState = (votes: VoteWithUserVotes[]) => {
+
+  const passedVotes: Vote[] = [];
+  const rejectedVotes: Vote[] = [];
 
   for (const vote of votes) {
     if (vote.userVotes.length === 0) {
-      rejectedVotes.push(vote.id);
+      rejectedVotes.push(vote);
     }
     else if (vote.type === VoteType.Approval) {
       const yesVoteCount = vote.userVotes.filter((uv) => uv.choice === YES_OPTION).length;
       const isPassed = ((yesVoteCount * 100) / vote.userVotes.length) >= vote.threshold;
 
       if (isPassed) {
-        passedVotes.push(vote.id);
+        passedVotes.push(vote);
       }
       else {
-        rejectedVotes.push(vote.id);
+        rejectedVotes.push(vote);
       }
     }
     else {
@@ -51,10 +53,10 @@ export const getVotesByState = (votes: (Omit<Vote, 'pageId' | 'status' | 'create
       const maxChoicePercentage = (maxCount * 100) / choices.length;
 
       if (maxChoicePercentage < vote.threshold) {
-        rejectedVotes.push(vote.id);
+        rejectedVotes.push(vote);
       }
       else {
-        passedVotes.push(vote.id);
+        passedVotes.push(vote);
       }
     }
   }

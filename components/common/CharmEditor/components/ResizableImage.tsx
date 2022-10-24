@@ -84,6 +84,12 @@ function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes
   );
 }
 
+const StyledImageContainer = styled.div<{ size: number }>`
+  max-width: 100%;
+  width: ${({ size }) => size}px;
+  margin: 0 auto;
+`;
+
 const StyledImage = styled.img`
   object-fit: contain;
   max-width: 100%;
@@ -235,13 +241,14 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
   }
   else if (readOnly) {
     return (
-      <StyledImage
-        draggable={false}
-        src={node.attrs.src}
-        alt={node.attrs.alt}
-        width={node.attrs.size}
-        // height={node.attrs.size / aspectRatio}
-      />
+      <StyledImageContainer size={node.attrs.size}>
+        <StyledImage
+          draggable={false}
+          src={node.attrs.src}
+          alt={node.attrs.alt}
+          width={node.attrs.size}
+        />
+      </StyledImageContainer>
     );
   }
   else {

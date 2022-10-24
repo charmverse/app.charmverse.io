@@ -15,7 +15,7 @@ export default function RedirectToMainPage () {
   const { pages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;
-  const staticCommonPages = ['bounties', 'votes', 'settings/workspace', 'settings/members', 'settings/roles', 'settings/invites'];
+  const staticCommonPages = ['bounties', 'members', 'proposals', 'settings/workspace', 'settings/members', 'settings/roles', 'settings/invites'];
 
   useEffect(() => {
     const isCommonDefaultPage = defaultPage && staticCommonPages.some(page => defaultPage.includes(`/${page}`));

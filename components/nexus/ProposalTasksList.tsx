@@ -1,7 +1,6 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -18,6 +17,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusBadge';
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
+
+import Table from './components/NexusTable';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
   discuss: 'Discuss',
@@ -91,9 +92,9 @@ export function ProposalTasksListRow (
             }
           }}
           href={proposalLink}
-          disabled={!action}
+          variant={action ? 'contained' : 'outlined'}
         >
-          {action ? ProposalActionRecord[action] : 'No action'}
+          {action ? ProposalActionRecord[action] : 'View'}
         </Button>
       </TableCell>
     </TableRow>

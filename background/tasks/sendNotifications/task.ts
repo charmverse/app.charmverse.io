@@ -4,7 +4,7 @@ import { count } from 'lib/metrics';
 
 import { sendUserNotifications } from './sendNotifications';
 
-export default async function task () {
+export async function task () {
 
   log.debug('Running notifications cron job');
 

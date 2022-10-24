@@ -27,7 +27,7 @@ export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPlu
 }
 
 function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
-  const [members] = useMembers();
+  const { members } = useMembers();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,

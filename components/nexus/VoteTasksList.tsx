@@ -1,10 +1,12 @@
 import HowToVote from '@mui/icons-material/HowToVote';
-import { Alert, Box, Card, Grid, Typography } from '@mui/material';
-import Table from '@mui/material/Table';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -20,6 +22,8 @@ import VoteIcon from 'components/votes/components/VoteIcon';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import Table from './components/NexusTable';
+
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
@@ -33,11 +37,14 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id
+    deadline, title: voteTitle, id, userChoice
   } = voteTask;
 
+  const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
+  const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
+
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
-  const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  const voteLocation = pageTitle || 'Untitled';
 
   return (
     <TableRow>
@@ -48,12 +55,15 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant='body1'>
+        <Link href={voteLink} variant='body1' color='inherit'>
           {voteLocation}
         </Link>
       </TableCell>
+      <TableCell>
+        <Typography>{spaceName}</Typography>
+      </TableCell>
       <TableCell align='center'>
-        <Typography>due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}</Typography>
+        <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
       </TableCell>
       <TableCell align='center'>
         <Button
@@ -64,9 +74,10 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
               md: '100px'
             }
           }}
+          variant={isDeadlineOverdue || userChoice ? 'outlined' : 'contained'}
           onClick={() => handleVoteId(voteTask.id)}
         >
-          Vote now
+          {isDeadlineOverdue || userChoice ? 'View' : 'Vote'}
         </Button>
       </TableCell>
     </TableRow>
@@ -76,6 +87,8 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
 export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
 
   const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
+
+  const closeModal = () => setSelectedVoteId(undefined);
 
   const handleVoteId = (voteId: string) => setSelectedVoteId(voteId);
 
@@ -92,7 +105,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
     const userVote = await charmClient.votes.castVote(voteId, choice);
-    removeVoteFromTask(voteId);
+    closeModal();
     return userVote;
   };
 
@@ -140,14 +153,14 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
       <Table size='medium' aria-label='Nexus polls table'>
         <TableHead>
           <TableRow>
-            <TableCell>Poll name</TableCell>
-            <TableCell>Page name</TableCell>
+            <TableCell>Poll</TableCell>
+            <TableCell width={300}>Page</TableCell>
+            <TableCell width={200}>Workspace</TableCell>
             <TableCell align='center'>Due</TableCell>
             <TableCell width='135' align='center'>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
           {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
         </TableBody>
       </Table>
@@ -155,7 +168,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
         title='Poll details'
         size='large'
         open={!!selectedVoteId && !!voteTask}
-        onClose={() => setSelectedVoteId(undefined)}
+        onClose={closeModal}
       >
         {voteTask && (
           <VoteDetail
