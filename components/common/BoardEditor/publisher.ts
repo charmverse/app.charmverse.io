@@ -16,10 +16,10 @@ import { deleteViews, updateViews } from './focalboard/src/store/views';
 export const publishIncrementalUpdate = async (blocks: Block[]) => {
   store.dispatch((dispatch) => {
     batch(() => {
-      dispatch(updateBoards(blocks.filter((b: Block) => b.type === 'board' || b.deletedAt !== 0) as Board[]));
-      dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view' || b.deletedAt !== 0) as BoardView[]));
-      dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card' || b.deletedAt !== 0) as Card[]));
-      dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment' || b.deletedAt !== 0) as CommentBlock[]));
+      dispatch(updateBoards(blocks.filter((b: Block) => b.type === 'board') as Board[]));
+      dispatch(updateViews(blocks.filter((b: Block) => b.type === 'view') as BoardView[]));
+      dispatch(updateCards(blocks.filter((b: Block) => b.type === 'card') as Card[]));
+      dispatch(updateComments(blocks.filter((b: Block) => b.type === 'comment') as CommentBlock[]));
     });
   });
 };
