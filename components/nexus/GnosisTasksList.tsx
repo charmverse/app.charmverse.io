@@ -46,7 +46,7 @@ function TransactionRow (
   return (
     <>
       <TableRow onClick={() => setExpanded(prevState => !prevState)} role='button' aria-pressed={expanded} sx={{ ...(!isLastTransaction && { '& > .MuiTableCell-root': { borderBottom: 0 } }) }}>
-        <TableCell>
+        <TableCell align='center'>
           <strong>{!!showNonce && transaction.nonce}</strong>
         </TableCell>
         <TableCell>
@@ -220,7 +220,7 @@ function SafeTasks (
         <Table size='medium' aria-label='Nexus multisign table'>
           <TableHead>
             <TableRow>
-              <TableCell width='20px'></TableCell>
+              <TableCell align='center'>Nonse</TableCell>
               <TableCell sx={{ minWidth: { xs: 150, sm: 'inherit' } }}>Payment</TableCell>
               <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Date</TableCell>
               <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Required Signers</TableCell>
@@ -234,8 +234,8 @@ function SafeTasks (
               <Fragment key={task.nonce}>
                 {task.transactions.length > 1 && (
                   <TableRow sx={{ '& > .MuiTableCell-root': { borderBottom: 0 } }}>
-                    <TableCell>
-                      <Typography fontWeight='bold' marginRight='10px'>{task.transactions[0].nonce}</Typography>
+                    <TableCell align='center'>
+                      <Typography fontWeight='bold'>{task.transactions[0].nonce}</Typography>
                     </TableCell>
                     <TableCell colSpan={4}>
                       <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
