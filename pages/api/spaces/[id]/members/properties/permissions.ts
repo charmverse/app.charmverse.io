@@ -1,4 +1,3 @@
-import type { MemberPropertyPermission } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
