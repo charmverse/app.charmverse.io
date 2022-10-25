@@ -99,7 +99,7 @@
     "@prisma/client": "^4.4.0",
     "@react-dnd/shallowequal": "^4.0.0",
     "@reduxjs/toolkit": "^1.6.0",
-    "@skiff-org/prosemirror-tables": "^3.4.21",
+    "@skiff-org/prosemirror-tables": "^3.5.1",
     "@snapshot-labs/snapshot.js": "^0.3.77",
     "@socket.io/redis-adapter": "^7.2.0",
     "@types/cookies": "^0.7.7",
