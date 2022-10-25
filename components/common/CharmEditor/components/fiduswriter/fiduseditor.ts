@@ -3,11 +3,6 @@ import type {
   EditorView,
   EditorState } from '@bangle.dev/pm';
 import {
-  baseKeymap,
-  gapCursor,
-  keymap
-} from '@bangle.dev/pm';
-import {
   collab,
   sendableSteps
 } from 'prosemirror-collab';
@@ -74,7 +69,7 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor (public user: Participant, docId: string, view: EditorView) {
+  constructor (public user: { id: string, username: string }, docId: string, view: EditorView, private enableSuggestedEdits: boolean = false) {
 
     this.user = user;
 
@@ -250,16 +245,16 @@ export class FidusEditor {
   }
 
   initEditor (view: EditorView) {
-
+    // console.log('init editor');
     view.setProps({
       dispatchTransaction: tr => {
-        const trackedUser = { id: this.user?.id ?? '', username: this.user?.name ?? '' };
-        const trackedTr = amendTransaction(tr, this.view.state, trackedUser, true);
+        const trackedTr = amendTransaction(tr, this.view.state, this, this.enableSuggestedEdits);
         const { state: newState } = this.view.state.applyTransaction(trackedTr);
         this.view.updateState(newState);
         if (tr.steps) {
           this.docInfo.updated = new Date();
         }
+        // console.log('send to collaborators');
         this.mod.collab.doc.sendToCollaborators();
       }
     });

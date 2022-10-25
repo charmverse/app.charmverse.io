@@ -16,6 +16,7 @@ import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import { amendTransaction } from '../../fiduswriter/track/amendTransaction';
 
 import { NodeViewWrapper } from './NodeViewWrapper';
@@ -35,26 +36,6 @@ interface BangleEditorProps<PluginMetadata = any>
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
 }
-
-const updatePluginWatcher = (editor: CoreBangleEditor) => {
-  return (watcher: Plugin, remove = false) => {
-    if (editor.destroyed) {
-      return;
-    }
-
-    let state = editor.view.state;
-
-    const newPlugins = remove
-      ? state.plugins.filter((p) => p !== watcher)
-      : [...state.plugins, watcher];
-
-    state = state.reconfigure({
-      plugins: newPlugins
-    });
-
-    editor.view.updateState(state);
-  };
-};
 
 export const BangleEditor = React.forwardRef<
   CoreBangleEditor | undefined,
@@ -110,16 +91,11 @@ export const BangleEditor = React.forwardRef<
         renderRef.current!,
         editorViewPayloadRef.current
       );
-      (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
-      if (trackChanges) {
-        (_editor.view as any)._props.dispatchTransaction = (transaction: Transaction) => {
-          const view = _editor.view;
-          const trackedUser = { id: user?.id ?? '', username: user?.username ?? '' };
-          const trackedTr = amendTransaction(transaction, view.state, trackedUser, editorViewPayloadRef.current.enableSuggestions);
-          const { state: newState } = view.state.applyTransaction(trackedTr);
-          view.updateState(newState);
-        };
+      if (user && id) {
+        // eslint-disable-next-line no-new
+        new FidusEditor(user, id, _editor.view, trackChanges);
       }
+      (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       onReadyRef.current(_editor);
       setEditor(_editor);
       return () => {
@@ -155,3 +131,23 @@ export const BangleEditor = React.forwardRef<
     );
   }
 );
+
+function updatePluginWatcher (editor: CoreBangleEditor) {
+  return (watcher: Plugin, remove = false) => {
+    if (editor.destroyed) {
+      return;
+    }
+
+    let state = editor.view.state;
+
+    const newPlugins = remove
+      ? state.plugins.filter((p) => p !== watcher)
+      : [...state.plugins, watcher];
+
+    state = state.reconfigure({
+      plugins: newPlugins
+    });
+
+    editor.view.updateState(state);
+  };
+}
