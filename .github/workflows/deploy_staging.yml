@@ -43,9 +43,11 @@ jobs:
               ' .ebextensions/00_env_vars.config
 
             COMPOSE_PROFILES=$(yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config)
+            echo $COMPOSE_PROFILES
             if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
               echo "DDENABLED=true" >> $GITHUB_ENV
-            fi 
+            fi
+            echo $GITHUB_ENV 
 
       - name: Set STAGE variable in environment for build and deploy steps
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
