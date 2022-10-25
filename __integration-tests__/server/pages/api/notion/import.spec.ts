@@ -8,16 +8,19 @@ import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } fro
 
 describe('POST /api/notion/import - Import from Notion', () => {
 
-  it('should validate request params for space admin and respond 400', async () => {
+  it('should validate request params for space admin and respond 200', async () => {
 
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const sessionCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl)
+    const response = await request(baseUrl)
       .post('/api/notion/import')
       .set('Cookie', sessionCookie)
-      .expect(400);
+      .send({ code: 'code', spaceId: space.id })
+      .expect(200);
+
+    expect(response.body).toStrictEqual({ failedImports: [] });
 
   });
 
