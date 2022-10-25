@@ -131,6 +131,7 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
       roles
     } as Member;
   })
+    .filter(member => !member.deletedAt) // filter out deleted members
     .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first
 
   return res.status(200).json(members);
