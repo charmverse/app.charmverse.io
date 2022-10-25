@@ -1,7 +1,6 @@
-import { getPage, PageNotFoundError } from "lib/pages/server";
 import {prisma} from 'db'
 import { MissingDataError } from "lib/utilities/errors";
-import { PrintSharp } from "@mui/icons-material";
+import { Prisma } from "@prisma/client";
 
 
 async function copyPage({pagePath, spaceDomain, targetDomains}: {pagePath: string, spaceDomain: string, targetDomains: string[]}): Promise<void> {
@@ -12,6 +11,7 @@ async function copyPage({pagePath, spaceDomain, targetDomains}: {pagePath: strin
   const page = await prisma.page.findFirst({
     where: {
       path: pagePath,
+      type: 'page',
       space: {
         domain: spaceDomain
       },
@@ -22,12 +22,15 @@ async function copyPage({pagePath, spaceDomain, targetDomains}: {pagePath: strin
       content: true,
       contentText: true,
       type: true,
+      title: true,
+      headerImage: true,
+      icon: true,
 
     }
   });
 
   if (!page) {
-    throw new PageNotFoundError(`${spaceDomain}/${pagePath}`);
+    throw new MissingDataError(`${spaceDomain}/${pagePath}`);
   }
 
   const spaces = await prisma.space.findMany({
@@ -52,15 +55,43 @@ async function copyPage({pagePath, spaceDomain, targetDomains}: {pagePath: strin
   }
 
  
-  // await prisma.$transaction(spaces.map(space => {
-  //   return prisma.page.create({
-  //     ...page,
-  //     spaceId: space.id
-  //   })
-  // }))
+  await prisma.$transaction(spaces.map(space => {
+    return prisma.page.create({
+      data: {
+        ...page,
+        content: page.content as Prisma.InputJsonValue,
+        author: {
+          connect: {
+            id: space.createdBy
+          }
+        },
+        updatedBy: space.createdBy,
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        permissions: {
+          createMany: {
+            data: [{
+              spaceId: space.id,
+              permissionLevel: 'full_access'
+            }]
+          }
+        }
+      }
+    })
+  }))
   
-
-  // const targetPage = await createPage(page, targetDomains);
-  // await createPageContent(pageContent, targetPage, targetDomains);
-  // await createPageAttachments(pageAttachments, targetPage, targetDomains);
 }
+
+// copyPage({
+//   spaceDomain: 'cvt-andy-land',
+//   pagePath: 'page-9682955150602588',
+//   targetDomains: ['gerals-station', 'charmverse-demo']
+// }).then(() => {
+//   console.log('Done')
+// })
+// .catch(e => {
+//   console.warn(e)
+// })
