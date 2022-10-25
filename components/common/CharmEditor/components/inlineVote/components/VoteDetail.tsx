@@ -132,10 +132,7 @@ export default function VoteDetail ({ cancelVote, castVote, deleteVote, detailed
               onChange={async () => {
                 if (user) {
                   const userVote = await castVote(id, voteOption.name);
-                  // Only refetch tasks if the user hasn't voted yet
-                  if (!userVoteChoice) {
-                    refetchTasks();
-                  }
+                  refetchTasks();
                   mutate((_userVotes) => {
                     if (_userVotes) {
                       const existingUserVoteIndex = _userVotes.findIndex(_userVote => _userVote.userId === user.id);
