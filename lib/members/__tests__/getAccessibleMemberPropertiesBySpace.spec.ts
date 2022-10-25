@@ -44,7 +44,7 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     expect(properties.length).toBe(0);
   });
 
-  it('should  not return properties if user does not has access to space', async () => {
+  it('should not return properties if user does not have access to space', async () => {
 
     const { user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
     const { user: nonAdminUser, space: space2 } = await generateUserAndSpaceWithApiToken(undefined, false);
