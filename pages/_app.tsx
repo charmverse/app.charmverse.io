@@ -18,7 +18,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
 import charmClient from 'charmClient';
-import GlobalComponents from 'components/_app/GlobalComponents';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
@@ -239,7 +238,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                   />
                                   {getLayout(<Component {...pageProps} />)}
                                   <MemberPropertiesOnBoardingModal />
-                                  <GlobalComponents />
                                 </ErrorBoundary>
                               </RouteGuard>
                             </SnackbarProvider>
