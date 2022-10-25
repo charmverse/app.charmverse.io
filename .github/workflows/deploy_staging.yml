@@ -53,7 +53,7 @@ jobs:
           echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
-          if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
+          if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then 
             echo "DDENABLED=true" >> $GITHUB_ENV
           fi
           cat $GITHUB_ENV 
