@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
+import type { MemberProperty } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyPermissionWithRole, MemberPropertyValuesBySpace, MemberPropertyWithPermissions, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';

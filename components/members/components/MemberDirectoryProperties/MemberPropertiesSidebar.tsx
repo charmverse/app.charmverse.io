@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -157,25 +157,29 @@ export function MemberPropertySidebarItem ({
               opacity: 0
             }}
           >
-            <EditIcon
-              cursor='pointer'
-              fontSize='small'
-              color='secondary'
-              onClick={(e) => {
-                e.stopPropagation();
-                propertyRenamePopupState.open();
-              }}
-            />
-            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
-              <DeleteIcon
+            <Tooltip title={`Edit ${property.name} property.`}>
+              <EditIcon
                 cursor='pointer'
                 fontSize='small'
                 color='secondary'
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteConfirmation.open();
+                  propertyRenamePopupState.open();
                 }}
               />
+            </Tooltip>
+            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+              <Tooltip title={`Delete ${property.name} property.`}>
+                <DeleteIcon
+                  cursor='pointer'
+                  fontSize='small'
+                  color='secondary'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteConfirmation.open();
+                  }}
+                />
+              </Tooltip>
             )}
             <ConfirmDeleteModal
               title='Delete property'

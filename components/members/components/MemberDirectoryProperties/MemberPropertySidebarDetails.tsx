@@ -1,7 +1,7 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Collapse, IconButton, InputLabel, Stack, Typography } from '@mui/material';
+import { Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberPropertyPermission } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -44,36 +44,63 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
   return (
     <>
       <Collapse in={isExpanded}>
-        <Stack pl={5} pr={2.5} mb={1}>
+        <Stack mb={1}>
           {property?.permissions.length ? (
             <Stack>
-              <Typography variant='overline'>Restricted to roles:</Typography>
+              <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
+                <Typography variant='overline' pl={4}>Restricted to roles:</Typography>
+              </Tooltip>
               {property?.permissions.map(permission => (
                 <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
-                  <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                  {!readOnly && (
-                    <IconButton size='small' color='secondary'>
-                      <DeleteIcon fontSize='small' onClick={() => setDeleteConfirmPermission(permission)} />
-                    </IconButton>
-                  )}
+                  <MenuItem
+                    dense
+                    sx={{
+                      pl: 4,
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      '&:hover .icons': {
+                        opacity: 1
+                      },
+                      flex: 1,
+                      '& .MuiListItemIcon-root': {
+                        minWidth: 30
+                      }
+                    }}
+                  >
+                    <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                    {!readOnly && (
+                      <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
+                        <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions.`}>
+                          <DeleteIcon fontSize='small' onClick={() => setDeleteConfirmPermission(permission)} />
+                        </Tooltip>
+                      </IconButton>
+                    )}
+                  </MenuItem>
                 </Stack>
               ))}
             </Stack>
           ) : (
-            <Typography variant='overline' alignItems='center' display='flex'>Everyone in workspace
-              <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
-            </Typography>
+            <Tooltip title={`Everyone in workspace can see ${property.name} property.`}>
+              <Typography variant='overline' alignItems='center' display='flex' pl={4}>
+                Everyone in workspace
+                <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
+              </Typography>
+            </Tooltip>
           )}
           {!readOnly && (
             <Button
               variant='text'
               size='small'
               color='secondary'
-              sx={{
-                width: 'fit-content'
-              }}
               startIcon={<AddOutlinedIcon />}
               onClick={memberPropertySidebarItemPopupState.open}
+              sx={{
+                flex: 1,
+                justifyContent: 'flex-start',
+                width: '100%',
+                pl: 4
+              }}
             >
               Add Role
             </Button>
@@ -99,7 +126,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
             }}
             onClick={savePermissions}
           >
-            Add
+            Add selected roles
           </Button>
 
         </Stack>
