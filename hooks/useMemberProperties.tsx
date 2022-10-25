@@ -110,7 +110,7 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
 
   const removePropertyPermission = useCallback(async (permission: MemberPropertyPermission) => {
     if (space) {
-      await charmClient.members.deleteMemberProperty(space.id, permission.id);
+      await charmClient.members.deleteMemberPropertyPermission(space.id, permission.id);
 
       mutateProperties(state => {
         return state ? state.map(p => {

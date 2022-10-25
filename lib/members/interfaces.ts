@@ -48,4 +48,10 @@ export type CommonSpacesInput = {
 
 export type CreateMemberPropertyPermissionInput = { memberPropertyId: string } & Partial<Pick<MemberPropertyPermission, 'userId' | 'roleId' >>
 
-export type MemberPropertyWithPermissions = MemberProperty & { permissions: MemberPropertyPermission[] }
+export type MemberPropertyPermissionWithRole = MemberPropertyPermission & { role?:
+  { name: string };
+}
+
+export type MemberPropertyWithPermissions = MemberProperty & {
+   permissions: MemberPropertyPermissionWithRole[];
+  }

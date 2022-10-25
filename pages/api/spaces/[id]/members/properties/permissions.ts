@@ -24,9 +24,9 @@ async function createMemberPropertyPermissionHandler (req: NextApiRequest, res: 
 }
 
 async function deleteMemberPropertyPermissionHandler (req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.body as { id: string };
+  const { permissionId } = req.body as { permissionId: string };
 
-  await deleteMemberPropertyPermission(id);
+  await deleteMemberPropertyPermission(permissionId);
 
   return res.status(200).json({
     success: true

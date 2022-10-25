@@ -10,6 +10,11 @@ export function createMemberPropertyPermission (data: CreateMemberPropertyPermis
       ...data,
       // we only have view permission for now
       memberPropertyPermissionLevel: MemberPropertyPermissionLevel.view
+    },
+    include: {
+      role: {
+        select: { name: true }
+      }
     }
   });
 }

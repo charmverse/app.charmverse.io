@@ -1,4 +1,5 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Collapse, IconButton, InputLabel, Stack, Typography } from '@mui/material';
 import type { MemberPropertyPermission } from '@prisma/client';
@@ -8,6 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Button from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 type Props = {
@@ -20,11 +22,12 @@ type Props = {
 
 export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermissions, removePermission, property }: Props) {
   const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
+  const [deleteConfirmPermission, setDeleteConfirmPermission] = useState<null | MemberPropertyPermission>(null);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
   const filterRoleIds = useMemo(() => {
     return [...new Set([...property.permissions.map(p => p.roleId), ...selectedRoleIds])].filter(Boolean) as string[];
-  }, []);
+  }, [property.permissions, selectedRoleIds]);
 
   function savePermissions () {
     addPermissions(property.id, selectedRoleIds.map(roleId => ({ roleId, memberPropertyId: property.id })));
@@ -42,27 +45,39 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
     <>
       <Collapse in={isExpanded}>
         <Stack pl={5} pr={2.5} mb={1}>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <Typography variant='subtitle2'>Workspace</Typography>
-            <IconButton disabled={readOnly} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
-          </Stack>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <Typography variant='subtitle2'>Admins</Typography>
-            <IconButton disabled={readOnly} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
-          </Stack>
-          <Button
-            variant='text'
-            size='small'
-            color='secondary'
-            sx={{
-              width: 'fit-content'
-            }}
-            startIcon={<AddOutlinedIcon />}
-            onClick={memberPropertySidebarItemPopupState.open}
-            disabled={readOnly}
-          >
-            Add Role
-          </Button>
+          {property?.permissions.length ? (
+            <Stack>
+              <Typography variant='overline'>Restricted to roles:</Typography>
+              {property?.permissions.map(permission => (
+                <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+                  <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                  {!readOnly && (
+                    <IconButton size='small' color='secondary'>
+                      <DeleteIcon fontSize='small' onClick={() => setDeleteConfirmPermission(permission)} />
+                    </IconButton>
+                  )}
+                </Stack>
+              ))}
+            </Stack>
+          ) : (
+            <Typography variant='overline' alignItems='center' display='flex'>Everyone in workspace
+              <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
+            </Typography>
+          )}
+          {!readOnly && (
+            <Button
+              variant='text'
+              size='small'
+              color='secondary'
+              sx={{
+                width: 'fit-content'
+              }}
+              startIcon={<AddOutlinedIcon />}
+              onClick={memberPropertySidebarItemPopupState.open}
+            >
+              Add Role
+            </Button>
+          )}
         </Stack>
       </Collapse>
 
@@ -89,6 +104,18 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
 
         </Stack>
       </Modal>
+
+      <ConfirmDeleteModal
+        title='Delete property role permission'
+        question='Are you sure you delete this role permission?'
+        onConfirm={() => {
+          if (deleteConfirmPermission) {
+            removePermission(deleteConfirmPermission);
+          }
+        }}
+        onClose={() => setDeleteConfirmPermission(null)}
+        open={!!deleteConfirmPermission}
+      />
     </>
   );
 }

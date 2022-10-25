@@ -50,7 +50,15 @@ export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVi
     },
     include: {
       space: true,
-      permissions: true
+      permissions: {
+        include: {
+          role: {
+            select: {
+              name: true
+            }
+          }
+        }
+      }
     }
   });
 }

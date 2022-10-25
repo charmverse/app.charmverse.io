@@ -1,7 +1,7 @@
 import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyValuesBySpace, MemberPropertyWithPermissions, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyPermissionWithRole, MemberPropertyValuesBySpace, MemberPropertyWithPermissions, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 export class MembersApi {
   getMembers (spaceId: string, search?: string) {
@@ -37,10 +37,10 @@ export class MembersApi {
   }
 
   createMemberPropertyPermission (spaceId: string, permission: CreateMemberPropertyPermissionInput) {
-    return http.POST<MemberPropertyPermission>(`/api/spaces/${spaceId}/members/properties/permissions`, permission);
+    return http.POST<MemberPropertyPermissionWithRole>(`/api/spaces/${spaceId}/members/properties/permissions`, permission);
   }
 
   deleteMemberPropertyPermission (spaceId: string, permissionId: string) {
-    return http.DELETE<MemberPropertyPermission>(`/api/spaces/${spaceId}/members/properties/permissions`, { id: permissionId });
+    return http.DELETE<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/permissions`, { permissionId });
   }
 }
