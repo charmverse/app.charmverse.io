@@ -95,7 +95,7 @@ const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   font-weight: 500;
   padding-top: 4px;
   padding-bottom: 4px;
-  &:hover {
+  &:hover {f
     background-color: ${theme.palette.action.hover};
     color: inherit;
   }
@@ -115,7 +115,7 @@ const SectionName = styled(Typography)`
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledSidebarLink = styled(Link)<{ active: boolean }>`
+const StyledSidebarLink = styled(Link, { shouldForwardProp: prop => prop !== 'active' })<{ active: boolean }>`
   ${sidebarItemStyles}
   ${({ active, theme }) => active ? `
     background-color: ${theme.palette.action.selected};
