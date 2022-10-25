@@ -8,7 +8,10 @@ import Button from 'components/common/Button';
 import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+
+import UserDetails from '../../UserDetails';
 
 type Props = {
   spaceId: string | null;
@@ -16,15 +19,17 @@ type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   onClose: VoidFunction;
   title?: string;
+  showUserDetailsForm?: boolean;
 };
 
-export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm ({ showUserDetailsForm = false, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
   );
   const { showMessage } = useSnackbar();
+  const { setUser, user } = useUser();
 
   const defaultValues = useMemo(() => {
     if (data) {
@@ -68,6 +73,14 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
+        {showUserDetailsForm && user && (
+          <Box mb={2}>
+            <UserDetails
+              user={user}
+              updateUser={setUser}
+            />
+          </Box>
+        )}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>
             {data.map(property => {

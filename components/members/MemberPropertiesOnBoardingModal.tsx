@@ -19,6 +19,7 @@ function MemberPropertiesOnBoardingForm ({ user, spaceId, onClose }: { onClose: 
       memberId={user.id}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
+      showUserDetailsForm
     />
   );
 }
