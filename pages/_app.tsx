@@ -34,6 +34,7 @@ import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
+import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
@@ -215,34 +216,36 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <Web3AccountProvider>
                   <ReactDndProvider>
                     <DataProviders>
-                      <FocalBoardProvider>
-                        <IntlProvider>
-                          <SnackbarProvider>
-                            <PageMetaTags />
-                            <CssBaseline enableColorScheme={true} />
-                            <Global styles={cssVariables} />
-                            <RouteGuard>
-                              <ErrorBoundary>
-                                <Snackbar
-                                  isOpen={isOldBuild}
-                                  message='New CharmVerse platform update available. Please refresh.'
-                                  actions={[
-                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                      <RefreshIcon fontSize='small' />
-                                    </IconButton>
-                                  ]}
-                                  origin={{ vertical: 'top', horizontal: 'center' }}
-                                  severity='warning'
-                                  handleClose={() => setIsOldBuild(false)}
-                                />
-                                {getLayout(<Component {...pageProps} />)}
-                                <MemberPropertiesOnBoardingModal />
-                                <GlobalComponents />
-                              </ErrorBoundary>
-                            </RouteGuard>
-                          </SnackbarProvider>
-                        </IntlProvider>
-                      </FocalBoardProvider>
+                      <OnboardingProvider>
+                        <FocalBoardProvider>
+                          <IntlProvider>
+                            <SnackbarProvider>
+                              <PageMetaTags />
+                              <CssBaseline enableColorScheme={true} />
+                              <Global styles={cssVariables} />
+                              <RouteGuard>
+                                <ErrorBoundary>
+                                  <Snackbar
+                                    isOpen={isOldBuild}
+                                    message='New CharmVerse platform update available. Please refresh.'
+                                    actions={[
+                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                        <RefreshIcon fontSize='small' />
+                                      </IconButton>
+                                    ]}
+                                    origin={{ vertical: 'top', horizontal: 'center' }}
+                                    severity='warning'
+                                    handleClose={() => setIsOldBuild(false)}
+                                  />
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <MemberPropertiesOnBoardingModal />
+                                  <GlobalComponents />
+                                </ErrorBoundary>
+                              </RouteGuard>
+                            </SnackbarProvider>
+                          </IntlProvider>
+                        </FocalBoardProvider>
+                      </OnboardingProvider>
                     </DataProviders>
                   </ReactDndProvider>
                 </Web3AccountProvider>

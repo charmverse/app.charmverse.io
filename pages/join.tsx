@@ -11,6 +11,7 @@ import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
 import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
+import { useOnboarding } from 'hooks/useOnboarding';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
@@ -34,10 +35,12 @@ export default function JoinWorkspace () {
   const router = useRouter();
   const domain = router.query.domain;
   const { spaces } = useSpaces();
+  const { setOnboarding } = useOnboarding();
 
   useEffect(() => {
     if (spaces.some(space => space.domain === router.query.domain)) {
-      router.push(`/${router.query.domain}?onboarding=true`);
+      router.push(`/${router.query.domain}`);
+      setOnboarding(true);
     }
   }, [spaces]);
 

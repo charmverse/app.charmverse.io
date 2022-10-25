@@ -6,8 +6,8 @@ import Modal from 'components/common/Modal';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
+import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
 function MemberPropertiesOnBoardingForm ({ user, spaceId, onClose }: { onClose: () => void, spaceId: string, user: LoggedInUser }) {
@@ -29,16 +29,16 @@ export function MemberPropertiesOnBoardingModal () {
   const memberDirectoryFormModal = usePopupState({ variant: 'popover', popupId: 'member-directory-onboarding' });
   const [space] = useCurrentSpace();
   const { user } = useUser();
+  const { onboarding, setOnboarding } = useOnboarding();
 
   useEffect(() => {
-    const onboarding = router.query.onboarding;
-    if (onboarding === 'true') {
+    if (onboarding) {
       memberDirectoryFormModal.open();
     }
   }, [router]);
 
   function onClose () {
-    setUrlWithoutRerender(window.location.href, { onboarding: null });
+    setOnboarding(false);
     memberDirectoryFormModal.close();
   }
 

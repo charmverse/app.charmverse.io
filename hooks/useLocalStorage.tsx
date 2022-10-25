@@ -27,18 +27,22 @@ export function setStorageValue<T = any> (key: string, value: T, noPrefix?: bool
   return value;
 }
 
-export function useLocalStorage<T = any> (key: string, defaultValue: T, noPrefix?: boolean) {
+export function useLocalStorage<T = any> (key: string | null, defaultValue: T, noPrefix?: boolean) {
   const [value, setValue] = useState<T>(() => {
-    return getStorageValue(key, defaultValue, noPrefix);
+    return key ? getStorageValue(key, defaultValue, noPrefix) : defaultValue;
   });
 
   // Any time the key changes we need to get the value from ls again
   useEffect(() => {
-    setValue(getStorageValue(key, defaultValue, noPrefix));
+    if (key) {
+      setValue(getStorageValue(key, defaultValue, noPrefix));
+    }
   }, [key]);
 
   useEffect(() => {
-    setStorageValue(key, value, noPrefix);
+    if (key) {
+      setStorageValue(key, value, noPrefix);
+    }
   }, [key, value]);
   return [value, setValue] as const;
 }
