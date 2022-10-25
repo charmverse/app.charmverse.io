@@ -13,7 +13,6 @@ type Context = {
   addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
   updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<MemberProperty>;
   deleteProperty: (id: string) => Promise<void>;
-  addPropertyPermission: (permission: CreateMemberPropertyPermissionInput) => Promise<MemberPropertyPermission>;
   addPropertyPermissions: (propertyId: string, permission: CreateMemberPropertyPermissionInput[]) => Promise<MemberPropertyPermission[]>;
   removePropertyPermission: (permission: MemberPropertyPermission) => Promise<void>;
 };
@@ -23,7 +22,6 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
   addProperty: () => Promise.resolve({} as any),
   updateProperty: () => Promise.resolve({} as any),
   deleteProperty: () => Promise.resolve(),
-  addPropertyPermission: () => Promise.resolve({} as any),
   addPropertyPermissions: () => Promise.resolve({} as any),
   removePropertyPermission: () => Promise.resolve()
 });
@@ -63,26 +61,6 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
       mutateProperties(state => {
         return state ? state.filter(p => p.id !== id) : undefined;
       });
-    }
-  }, [space]);
-
-  const addPropertyPermission = useCallback(async (permissionData: CreateMemberPropertyPermissionInput) => {
-    if (space) {
-      const createdPermission = await charmClient.members.createMemberPropertyPermission(space.id, permissionData);
-      mutateProperties(state => {
-        return state ? state.map(p => {
-          if (p.id === createdPermission.memberPropertyId) {
-            return {
-              ...p,
-              permissions: p.permissions ? [...p.permissions, createdPermission] : [createdPermission]
-            };
-          }
-
-          return p;
-        }) : undefined;
-      });
-
-      return createdPermission;
     }
   }, [space]);
 
@@ -133,7 +111,6 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
     updateProperty,
     deleteProperty,
     removePropertyPermission,
-    addPropertyPermission,
     addPropertyPermissions
   }) as Context, [properties, addProperty]);
 
