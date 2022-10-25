@@ -356,7 +356,6 @@ model User {
   workspaceEvents           WorkspaceEvent[]
   wallets                   UserWallet[]
   memberPropertyValues      MemberPropertyValue[]
-  memberPropertyPermissions MemberPropertyPermission[]
 }
 
 model UserWallet {
@@ -821,14 +820,11 @@ model MemberPropertyValue {
 
 model MemberPropertyPermission {
   id                            String                        @id @default(uuid()) @db.Uuid
-  userId                        String?                       @db.Uuid
   roleId                        String?                       @db.Uuid
   memberPropertyPermissionLevel MemberPropertyPermissionLevel
   memberPropertyId              String                        @db.Uuid
   memberProperty                MemberProperty                @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
   role                          Role?                         @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user                          User?                         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, memberPropertyId])
   @@unique([roleId, memberPropertyId])
 }

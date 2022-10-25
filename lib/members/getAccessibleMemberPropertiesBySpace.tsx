@@ -81,23 +81,16 @@ export function accessiblePropertiesByPermissionsQuery ({ spaceIds, userId }:
   { spaceIds: string[], userId: string }): Prisma.MemberPropertyPermissionListRelationFilter {
   return {
     some: {
-      OR: [
-        {
-          role: {
-            spaceRolesToRole: {
-              some: {
-                spaceRole: {
-                  userId,
-                  spaceId: { in: spaceIds }
-                }
-              }
+      role: {
+        spaceRolesToRole: {
+          some: {
+            spaceRole: {
+              userId,
+              spaceId: { in: spaceIds }
             }
           }
-        },
-        {
-          userId
         }
-      ]
+      }
     }
   };
 }
