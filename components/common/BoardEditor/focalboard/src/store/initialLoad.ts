@@ -1,7 +1,11 @@
 
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 
 import charmClient from 'charmClient';
+
+import type { Subscription } from '../wsclient';
+
+import type { RootState } from './index';
 
 export const initialLoad = createAsyncThunk(
   'initialLoad',
@@ -25,4 +29,11 @@ export const initialReadOnlyLoad = createAsyncThunk(
     const blocks = charmClient.getSubtree(boardId, 3);
     return blocks;
   }
+);
+
+export const getUserBlockSubscriptions = (state: RootState): Subscription[] => state.users.blockSubscriptions;
+
+export const getUserBlockSubscriptionList = createSelector(
+  getUserBlockSubscriptions,
+  (subscriptions) => subscriptions
 );

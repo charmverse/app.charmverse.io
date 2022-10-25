@@ -711,6 +711,32 @@ class Mutator {
     }
   }
 
+  async followBlock (blockId: string, blockType: string, userId: string) {
+    await undoManager.perform(
+      async () => {
+        await octoClient.followBlock(blockId, blockType, userId);
+      },
+      async () => {
+        await octoClient.unfollowBlock(blockId, blockType, userId);
+      },
+      'follow block',
+      this.undoGroupId
+    );
+  }
+
+  async unfollowBlock (blockId: string, blockType: string, userId: string) {
+    await undoManager.perform(
+      async () => {
+        await octoClient.unfollowBlock(blockId, blockType, userId);
+      },
+      async () => {
+        await octoClient.followBlock(blockId, blockType, userId);
+      },
+      'follow block',
+      this.undoGroupId
+    );
+  }
+
   // Duplicate
 
   async duplicateCard (

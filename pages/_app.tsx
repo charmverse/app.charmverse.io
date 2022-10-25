@@ -38,7 +38,6 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
@@ -82,6 +81,7 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCar
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
+import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
@@ -260,23 +260,20 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <WebSocketClientProvider>
-          <MembersProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PagesProvider>
-                  <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>
-                      {children}
-                    </PageTitleProvider>
-                  </PrimaryCharmEditorProvider>
-                </PagesProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </MembersProvider>
-        </WebSocketClientProvider>
+        <MembersProvider>
+          <BountiesProvider>
+            <PaymentMethodsProvider>
+              <PagesProvider>
+                <PrimaryCharmEditorProvider>
+                  <PageTitleProvider>
+                    {children}
+                  </PageTitleProvider>
+                </PrimaryCharmEditorProvider>
+              </PagesProvider>
+            </PaymentMethodsProvider>
+          </BountiesProvider>
+        </MembersProvider>
       </SpacesProvider>
-
     </UserProvider>
 
   );
