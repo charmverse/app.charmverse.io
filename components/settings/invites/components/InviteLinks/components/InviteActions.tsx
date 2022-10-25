@@ -1,14 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, ListItemText, Typography } from '@mui/material';
+import { Box, ListItemText } from '@mui/material';
 import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import type { bindTrigger } from 'material-ui-popup-state';
-import { memo, useState } from 'react';
 import type { MouseEvent, SyntheticEvent } from 'react';
+import { memo, useContext, useState } from 'react';
 
+import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Button from 'components/common/Button';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
@@ -63,6 +64,7 @@ interface InviteActionsProps {
 function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { openWalletSelectorModal } = useContext(Web3Connection);
 
   const handleAddClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -119,7 +121,19 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
             />
           </Box>
         </MenuItem>
-        <MenuItem disabled={!account} onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
+        <MenuItem
+          onClick={(e) => {
+            if (account) {
+              handleTokenGate(e);
+            }
+            else {
+              openWalletSelectorModal();
+            }
+          }}
+          disableRipple
+          dense
+          {...restTokenGateProps}
+        >
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
