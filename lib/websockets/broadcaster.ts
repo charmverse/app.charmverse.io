@@ -2,7 +2,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { redisClient } from 'adapters/redis/redisClient';
+import { getRedisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
@@ -29,24 +29,29 @@ export class WebsocketBroadcaster {
   async bindServer (io: Server): Promise<void> {
     this.io = io;
 
-    const pubClient = redisClient;
-    const subClient = pubClient.duplicate();
+    const redisClient = getRedisClient();
 
-    await Promise.all([
-      pubClient.connect(),
-      subClient.connect()
-    ]);
+    if (redisClient) {
 
-    io.adapter(createAdapter(pubClient, subClient));
+      const pubClient = redisClient;
+      const subClient = pubClient.duplicate();
 
-    // Function for debugging amount of connections
-    // setInterval(() => {
-    //   this.io.sockets.allSockets().then(sockets => {
-    //     // eslint-disable-next-line no-console
-    //     console.log('Connected socket amount', sockets.size);
-    //   });
+      await Promise.all([
+        pubClient.connect(),
+        subClient.connect()
+      ]);
 
-    // }, 1000);
+      io.adapter(createAdapter(pubClient, subClient));
+
+      // Function for debugging amount of connections
+      // setInterval(() => {
+      //   this.io.sockets.allSockets().then(sockets => {
+      //     // eslint-disable-next-line no-console
+      //     console.log('Connected socket amount', sockets.size);
+      //   });
+
+      // }, 1000);
+    }
 
   }
 
