@@ -1,11 +1,11 @@
 diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-index aefc8ee..3bd7988 100644
+index aefc8ee..56b87fe 100644
 --- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
 +++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
-@@ -7,10 +7,11 @@ import { createHash } from 'crypto';
- import { Transform } from 'prosemirror-transform';
+@@ -8,9 +8,11 @@ import { Transform } from 'prosemirror-transform';
  import { splitBlockKeepMarks } from 'prosemirror-commands';
  import { MenuItem as MenuItem$1, Dropdown, renderGrouped } from 'prosemirror-menu';
+ import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 -import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 -import { createGenerateClassName, StylesProvider, ThemeProvider } from '@material-ui/core/styles';
 -import { createTheme } from '@material-ui/core';
@@ -17,7 +17,7 @@ index aefc8ee..3bd7988 100644
  import ReactDOM from 'react-dom';
 
  function ownKeys(object, enumerableOnly) {
-@@ -4982,7 +4983,7 @@ var deleteMenuItem = function deleteMenuItem() {
+@@ -4982,7 +4984,7 @@ var deleteMenuItem = function deleteMenuItem() {
    });
  };
 
@@ -26,7 +26,7 @@ index aefc8ee..3bd7988 100644
 
  var cellBackgroundColorItem = function cellBackgroundColorItem(color) {
    return new MenuItem$1({
-@@ -5054,7 +5055,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+@@ -5054,7 +5056,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
      } // append popup to dom
 
 
@@ -37,7 +37,7 @@ index aefc8ee..3bd7988 100644
 
      this.popUpDOM.addEventListener('mouseover', addDeleteHoverClass);
      this.popUpDOM.addEventListener('mouseout', removeDeleteHoverClass); // render prosemirror menu to popUpDom
-@@ -5290,217 +5293,6 @@ var withLocale = function (dayjs, locale) {
+@@ -5290,217 +5294,6 @@ var withLocale = function (dayjs, locale) {
          return dayjs.apply(void 0, args).locale(locale);
      };
  };
@@ -255,7 +255,7 @@ index aefc8ee..3bd7988 100644
 
  /**
   * customizes/overrides the mui-picker theme
-@@ -5955,9 +5747,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+@@ -5955,9 +5748,6 @@ var DateEventEmitter = function DateEventEmitter() {};
 
  ee(DateEventEmitter.prototype);
  var datePopupEmitter = new DateEventEmitter();
@@ -265,7 +265,7 @@ index aefc8ee..3bd7988 100644
 
  var DateComponent = function DateComponent(_ref) {
    var view = _ref.view,
-@@ -6031,19 +5820,19 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+@@ -6031,19 +5821,19 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
    return /*#__PURE__*/React.createElement("div", {
      className: "date-picker",
      ref: ref
@@ -291,7 +291,7 @@ index aefc8ee..3bd7988 100644
  };
 
  var ReactNodeView = /*#__PURE__*/function () {
-@@ -8405,7 +8194,7 @@ var deleteItem = function deleteItem() {
+@@ -8405,7 +8195,7 @@ var deleteItem = function deleteItem() {
    });
  };
 
@@ -300,7 +300,7 @@ index aefc8ee..3bd7988 100644
 
  // ::- The type of field that `FieldPrompt` expects to be passed to it.
  var Field = /*#__PURE__*/function () {
-@@ -8519,7 +8308,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+@@ -8519,7 +8309,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
        }
      }); // append popup to dom
 
@@ -311,7 +311,7 @@ index aefc8ee..3bd7988 100644
 
      var _renderGrouped = renderGrouped(this.view, items),
          itemsDOM = _renderGrouped.dom,
-@@ -8621,6 +8412,7 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+@@ -8621,6 +8413,7 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
    }, {
      key: "setTypesDropdownContent",
      value: function setTypesDropdownContent() {
@@ -319,7 +319,7 @@ index aefc8ee..3bd7988 100644
        var _this$popUpDOM$getEle = this.popUpDOM.getElementsByClassName(dropdownClassName),
            _this$popUpDOM$getEle2 = _slicedToArray(_this$popUpDOM$getEle, 1),
            dropDown = _this$popUpDOM$getEle2[0];
-@@ -8694,6 +8486,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+@@ -8694,6 +8487,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
          tr.deleteRange(pos + 2, pos + node.nodeSize - 2);
        }
 
@@ -329,7 +329,7 @@ index aefc8ee..3bd7988 100644
        this.view.dispatch(tr);
      }
    }, {
-@@ -8833,7 +8628,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
+@@ -8833,7 +8629,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
      this.view = view;
      this.buildMenuDOM(); // append popup to dom
 
@@ -340,7 +340,7 @@ index aefc8ee..3bd7988 100644
    }
 
    _createClass(TableDateMenuView, [{
-@@ -9016,7 +8813,9 @@ var TableLabelsMenu = /*#__PURE__*/function () {
+@@ -9016,7 +8814,9 @@ var TableLabelsMenu = /*#__PURE__*/function () {
      this.view = view;
      this.buildMenuDOM(); // append popup to dom
 
@@ -351,7 +351,7 @@ index aefc8ee..3bd7988 100644
    }
 
    _createClass(TableLabelsMenu, [{
-@@ -9407,10 +9206,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+@@ -9407,10 +9207,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
    })));
  };
 
@@ -362,7 +362,7 @@ index aefc8ee..3bd7988 100644
  var FiltersDatePicker = function FiltersDatePicker(_ref) {
    var onFilterChange = _ref.onFilterChange,
        filterHandler = _ref.filterHandler;
-@@ -9420,28 +9215,27 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+@@ -9420,28 +9216,27 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
        date = _useState2[0],
        setDate = _useState2[1];
 
@@ -398,7 +398,7 @@ index aefc8ee..3bd7988 100644
  };
 
  var FiltersInputDropdown = function FiltersInputDropdown(_ref2) {
-@@ -9775,7 +9569,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
+@@ -9775,7 +9570,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
      this.view = view;
      this.buildMenuDOM(); // append popup to dom
 
