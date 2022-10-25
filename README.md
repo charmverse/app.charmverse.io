@@ -279,3 +279,9 @@ Currently resolving the Secrets Manager template placeholder is not supported in
 specify template variable using the `{{resolve:secretsmanager}}` format, it will be stripped out entirely
 from `.env` file. So we came up with a modified version `{{pull:secretsmanager}}`. 
 Should/when Secrets Manager template variable placeholder becomes supported in Elastic beanstalk, we can simply do a global replace of `pull` to `resolve` to leverage that support. 
+
+## To set up datadog in staging environment
+
+Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit 
+`.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
+
