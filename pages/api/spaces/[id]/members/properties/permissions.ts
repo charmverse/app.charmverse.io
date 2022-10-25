@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
 import { deleteMemberPropertyPermission } from 'lib/members/deleteMemberPropertyPermission';
-import type { CreateMemberPropertyPermissionInput } from 'lib/members/interfaces';
+import type { CreateMemberPropertyPermissionInput, MemberPropertyPermissionWithRole } from 'lib/members/interfaces';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -15,7 +15,7 @@ handler
   .post(createMemberPropertyPermissionHandler)
   .delete(deleteMemberPropertyPermissionHandler);
 
-async function createMemberPropertyPermissionHandler (req: NextApiRequest, res: NextApiResponse<MemberPropertyPermission>) {
+async function createMemberPropertyPermissionHandler (req: NextApiRequest, res: NextApiResponse<MemberPropertyPermissionWithRole>) {
   const permissionData = req.body as CreateMemberPropertyPermissionInput;
 
   const permission = await createMemberPropertyPermission(permissionData);
