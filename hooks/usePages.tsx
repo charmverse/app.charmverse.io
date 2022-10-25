@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useCallback, createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -13,10 +13,12 @@ import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
+import type { WebsocketPayload } from 'lib/websockets/interfaces';
 import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
+import { useWebSocketClient } from './useSocketClient';
 import { useUser } from './useUser';
 
 export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
@@ -59,6 +61,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();
+  const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
 
@@ -208,6 +211,75 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     return freshPageVersion;
   }
+
+  const handlePagesUpdate = useCallback((value: WebsocketPayload<'pages_meta_updated'>) => {
+    const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
+
+      const existingPage = pages[updatedPageMeta.id];
+
+      if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
+        pageMap[updatedPageMeta.id] = {
+          ...existingPage,
+          ...updatedPageMeta
+        };
+      }
+
+      return pageMap;
+
+    }, {} as PagesMap);
+
+    mutatePagesList(existingPages => {
+      return {
+        ...(existingPages ?? {}),
+        ...pagesToUpdate
+      };
+    });
+  }, []);
+
+  const handleNewPages = useCallback((value: WebsocketPayload<'pages_created'>) => {
+
+    const newPages = value.reduce((pageMap, page) => {
+      if (page.spaceId === currentSpace?.id) {
+        pageMap[page.id] = page;
+      }
+
+      return pageMap;
+
+    }, {} as PagesMap);
+
+    mutatePagesList(existingPages => {
+      return {
+        ...(existingPages ?? {}),
+        ...newPages
+      };
+    });
+  }, []);
+
+  const handlePageDeletes = useCallback((value: WebsocketPayload<'pages_deleted'>) => {
+
+    mutatePagesList(existingPages => {
+
+      const newValue = { ...existingPages };
+
+      value.forEach(deletedPage => {
+        delete newValue[deletedPage.id];
+      });
+
+      return newValue;
+    });
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handlePagesUpdate);
+    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPages);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handlePageDeletes);
+
+    return () => {
+      unsubscribeFromPageUpdates();
+      unsubscribeFromNewPages();
+      unsubscribeFromPageDeletes();
+    };
+  }, []);
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,
