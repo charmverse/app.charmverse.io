@@ -110,7 +110,7 @@ export class CdkDeployStack extends Stack {
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
-      solutionStackName: '64bit Amazon Linux 2 v3.4.13 running Docker',
+      solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       versionLabel: appVersionProps.ref,
