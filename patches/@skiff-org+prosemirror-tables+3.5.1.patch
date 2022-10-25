@@ -1,0 +1,862 @@
+diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+index aefc8ee..56b87fe 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
++++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.es.js
+@@ -8,9 +8,11 @@ import { Transform } from 'prosemirror-transform';
+ import { splitBlockKeepMarks } from 'prosemirror-commands';
+ import { MenuItem as MenuItem$1, Dropdown, renderGrouped } from 'prosemirror-menu';
+ import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+-import { createGenerateClassName, StylesProvider, ThemeProvider } from '@material-ui/core/styles';
+-import { createTheme } from '@material-ui/core';
++import { DatePicker } from '@mui/x-date-pickers';
++import LocalizationProvider from '@mui/lab/LocalizationProvider';
++import AdapterDayjs from '@mui/lab/AdapterDayjs';
++import { ThemeProvider } from '@mui/material/styles';
++import { createTheme } from '@mui/material/styles';
+ import ReactDOM from 'react-dom';
+ 
+ function ownKeys(object, enumerableOnly) {
+@@ -4982,7 +4984,7 @@ var deleteMenuItem = function deleteMenuItem() {
+   });
+ };
+ 
+-var colors = ['rgb(255, 191, 181)', 'rgb(247, 204, 98)', 'rgb(181, 220, 175)', 'rgb(214, 232, 250)', 'rgb(216, 195, 255)', 'transparent'];
++var colors = ['var(--bg-gray)', 'var(--bg-brown)', 'var(--bg-orange)', 'var(--bg-yellow)', 'var(--bg-green)', 'var(--bg-blue)', 'var(--bg-purple)', 'var(--bg-pink)', 'var(--bg-red)', 'transparent'];
+ 
+ var cellBackgroundColorItem = function cellBackgroundColorItem(color) {
+   return new MenuItem$1({
+@@ -5054,7 +5056,9 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+     } // append popup to dom
+ 
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // add event listeners to color in red before deleting rows/cols
++    }
+ 
+     this.popUpDOM.addEventListener('mouseover', addDeleteHoverClass);
+     this.popUpDOM.addEventListener('mouseout', removeDeleteHoverClass); // render prosemirror menu to popUpDom
+@@ -5290,217 +5294,6 @@ var withLocale = function (dayjs, locale) {
+         return dayjs.apply(void 0, args).locale(locale);
+     };
+ };
+-var DayjsUtils = /** @class */ (function () {
+-    function DayjsUtils(_a) {
+-        var _b = _a === void 0 ? {} : _a, locale = _b.locale, instance = _b.instance, dayjs = _b.dayjs;
+-        this.yearFormat = "YYYY";
+-        this.yearMonthFormat = "MMMM YYYY";
+-        this.dateTime12hFormat = "MMMM Do hh:mm a";
+-        this.dateTime24hFormat = "MMMM Do HH:mm";
+-        this.time12hFormat = "hh:mm A";
+-        this.time24hFormat = "HH:mm";
+-        this.dateFormat = "MMMM Do";
+-        this.dayjs = withLocale(instance || dayjs || defaultDayjs, locale);
+-        this.locale = locale;
+-    }
+-    DayjsUtils.prototype.parse = function (value, format) {
+-        if (value === "") {
+-            return null;
+-        }
+-        return this.dayjs(value, format);
+-    };
+-    DayjsUtils.prototype.date = function (value) {
+-        if (value === null) {
+-            return null;
+-        }
+-        return this.dayjs(value);
+-    };
+-    DayjsUtils.prototype.isValid = function (value) {
+-        return this.dayjs(value).isValid();
+-    };
+-    DayjsUtils.prototype.isNull = function (date) {
+-        return date === null;
+-    };
+-    DayjsUtils.prototype.getDiff = function (date, comparing, units, float) {
+-        return date.diff(comparing, units, float);
+-    };
+-    DayjsUtils.prototype.isAfter = function (date, value) {
+-        return date.isAfter(value);
+-    };
+-    DayjsUtils.prototype.isBefore = function (date, value) {
+-        return date.isBefore(value);
+-    };
+-    DayjsUtils.prototype.isAfterDay = function (date, value) {
+-        return date.isAfter(value, "day");
+-    };
+-    DayjsUtils.prototype.isBeforeDay = function (date, value) {
+-        return date.isBefore(value, "day");
+-    };
+-    DayjsUtils.prototype.isBeforeYear = function (date, value) {
+-        return date.isBefore(value, "year");
+-    };
+-    DayjsUtils.prototype.isAfterYear = function (date, value) {
+-        return date.isAfter(value, "year");
+-    };
+-    DayjsUtils.prototype.startOfDay = function (date) {
+-        return date.clone().startOf("day");
+-    };
+-    DayjsUtils.prototype.endOfDay = function (date) {
+-        return date.clone().endOf("day");
+-    };
+-    DayjsUtils.prototype.format = function (date, formatString) {
+-        return this.dayjs(date).format(formatString);
+-    };
+-    DayjsUtils.prototype.formatNumber = function (numberToFormat) {
+-        return numberToFormat;
+-    };
+-    DayjsUtils.prototype.getHours = function (date) {
+-        return date.hour();
+-    };
+-    DayjsUtils.prototype.addDays = function (date, count) {
+-        return count < 0
+-            ? date.clone().subtract(Math.abs(count), "day")
+-            : date.clone().add(count, "day");
+-    };
+-    DayjsUtils.prototype.setMonth = function (date, count) {
+-        return date.clone().set("month", count);
+-    };
+-    DayjsUtils.prototype.setHours = function (date, count) {
+-        return date.clone().set("hour", count);
+-    };
+-    DayjsUtils.prototype.getMinutes = function (date) {
+-        return date.minute();
+-    };
+-    DayjsUtils.prototype.setMinutes = function (date, count) {
+-        return date.clone().set("minute", count);
+-    };
+-    DayjsUtils.prototype.getSeconds = function (date) {
+-        return date.second();
+-    };
+-    DayjsUtils.prototype.setSeconds = function (date, count) {
+-        return date.clone().set("second", count);
+-    };
+-    DayjsUtils.prototype.getMonth = function (date) {
+-        return date.month();
+-    };
+-    DayjsUtils.prototype.isSameDay = function (date, comparing) {
+-        return date.isSame(comparing, "day");
+-    };
+-    DayjsUtils.prototype.isSameMonth = function (date, comparing) {
+-        return date.isSame(comparing, "month");
+-    };
+-    DayjsUtils.prototype.isSameYear = function (date, comparing) {
+-        return date.isSame(comparing, "year");
+-    };
+-    DayjsUtils.prototype.isSameHour = function (date, comparing) {
+-        return date.isSame(comparing, "hour");
+-    };
+-    DayjsUtils.prototype.getMeridiemText = function (ampm) {
+-        return ampm === "am" ? "AM" : "PM";
+-    };
+-    DayjsUtils.prototype.startOfMonth = function (date) {
+-        return date.clone().startOf("month");
+-    };
+-    DayjsUtils.prototype.endOfMonth = function (date) {
+-        return date.clone().endOf("month");
+-    };
+-    DayjsUtils.prototype.getNextMonth = function (date) {
+-        return date.clone().add(1, "month");
+-    };
+-    DayjsUtils.prototype.getPreviousMonth = function (date) {
+-        return date.clone().subtract(1, "month");
+-    };
+-    DayjsUtils.prototype.getMonthArray = function (date) {
+-        var firstMonth = date.clone().startOf("year");
+-        var monthArray = [firstMonth];
+-        while (monthArray.length < 12) {
+-            var prevMonth = monthArray[monthArray.length - 1];
+-            monthArray.push(this.getNextMonth(prevMonth));
+-        }
+-        return monthArray;
+-    };
+-    DayjsUtils.prototype.getMonthText = function (date) {
+-        return this.format(date, "MMMM");
+-    };
+-    DayjsUtils.prototype.getYear = function (date) {
+-        return date.year();
+-    };
+-    DayjsUtils.prototype.setYear = function (date, year) {
+-        return date.clone().set("year", year);
+-    };
+-    DayjsUtils.prototype.mergeDateAndTime = function (date, time) {
+-        return this.setMinutes(this.setHours(date, this.getHours(time)), this.getMinutes(time));
+-    };
+-    DayjsUtils.prototype.getWeekdays = function () {
+-        var _this = this;
+-        var start = this.dayjs().startOf("week");
+-        return [0, 1, 2, 3, 4, 5, 6].map(function (diff) { return _this.format(start.add(diff, "day"), "dd"); });
+-    };
+-    DayjsUtils.prototype.isEqual = function (value, comparing) {
+-        if (value === null && comparing === null) {
+-            return true;
+-        }
+-        return this.dayjs(value).isSame(comparing);
+-    };
+-    DayjsUtils.prototype.getWeekArray = function (date) {
+-        var start = this.dayjs(date)
+-            .clone()
+-            .startOf("month")
+-            .startOf("week");
+-        var end = this.dayjs(date)
+-            .clone()
+-            .endOf("month")
+-            .endOf("week");
+-        var count = 0;
+-        var current = start;
+-        var nestedWeeks = [];
+-        while (current.isBefore(end)) {
+-            var weekNumber = Math.floor(count / 7);
+-            nestedWeeks[weekNumber] = nestedWeeks[weekNumber] || [];
+-            nestedWeeks[weekNumber].push(current);
+-            current = current.clone().add(1, "day");
+-            count += 1;
+-        }
+-        return nestedWeeks;
+-    };
+-    DayjsUtils.prototype.getYearRange = function (start, end) {
+-        var startDate = this.dayjs(start).startOf("year");
+-        var endDate = this.dayjs(end).endOf("year");
+-        var years = [];
+-        var current = startDate;
+-        while (current.isBefore(endDate)) {
+-            years.push(current);
+-            current = current.clone().add(1, "year");
+-        }
+-        return years;
+-    };
+-    // displaying methods
+-    DayjsUtils.prototype.getCalendarHeaderText = function (date) {
+-        return this.format(date, "MMMM YYYY");
+-    };
+-    DayjsUtils.prototype.getYearText = function (date) {
+-        return this.format(date, "YYYY");
+-    };
+-    DayjsUtils.prototype.getDatePickerHeaderText = function (date) {
+-        return this.format(date, "ddd, MMM D");
+-    };
+-    DayjsUtils.prototype.getDateTimePickerHeaderText = function (date) {
+-        return this.format(date, "MMM D");
+-    };
+-    DayjsUtils.prototype.getDayText = function (date) {
+-        return this.format(date, "D");
+-    };
+-    DayjsUtils.prototype.getHourText = function (date, ampm) {
+-        return this.format(date, ampm ? "hh" : "HH");
+-    };
+-    DayjsUtils.prototype.getMinuteText = function (date) {
+-        return this.format(date, "mm");
+-    };
+-    DayjsUtils.prototype.getSecondText = function (date) {
+-        return this.format(date, "ss");
+-    };
+-    return DayjsUtils;
+-}());
+ 
+ /**
+  * customizes/overrides the mui-picker theme
+@@ -5955,9 +5748,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+ 
+ ee(DateEventEmitter.prototype);
+ var datePopupEmitter = new DateEventEmitter();
+-var generateClassName$1 = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+ 
+ var DateComponent = function DateComponent(_ref) {
+   var view = _ref.view,
+@@ -6031,19 +5821,19 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+   return /*#__PURE__*/React.createElement("div", {
+     className: "date-picker",
+     ref: ref
+-  }, /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName$1
+   }, /*#__PURE__*/React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+     autoOk: true,
++    inputFormat: DATE_FORMAT,
+     onChange: handleChange,
+-    openTo: "date",
++    openTo: "dat",
++    renderInput: (params) =>  new TextField(params),
+     value: date,
+     variant: "static"
+-  })))));
++  }))));
+ };
+ 
+ var ReactNodeView = /*#__PURE__*/function () {
+@@ -8405,7 +8195,7 @@ var deleteItem = function deleteItem() {
+   });
+ };
+ 
+-var menuItems = [[columnTypeDropdown()], [filterItem(), sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
++var menuItems = [/*[columnTypeDropdown()]*/ [/*filterItem(),*/ sortItem(1), sortItem(-1), insertColumnItem(1), insertColumnItem(-1), deleteItem()]];
+ 
+ // ::- The type of field that `FieldPrompt` expects to be passed to it.
+ var Field = /*#__PURE__*/function () {
+@@ -8519,7 +8309,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+       }
+     }); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM); // render prosemirror menu to popUpDom
++    }
+ 
+     var _renderGrouped = renderGrouped(this.view, items),
+         itemsDOM = _renderGrouped.dom,
+@@ -8621,6 +8413,7 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+   }, {
+     key: "setTypesDropdownContent",
+     value: function setTypesDropdownContent() {
++      return; // disabled type dropdown
+       var _this$popUpDOM$getEle = this.popUpDOM.getElementsByClassName(dropdownClassName),
+           _this$popUpDOM$getEle2 = _slicedToArray(_this$popUpDOM$getEle, 1),
+           dropDown = _this$popUpDOM$getEle2[0];
+@@ -8694,6 +8487,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+         tr.deleteRange(pos + 2, pos + node.nodeSize - 2);
+       }
+ 
++      // prevent infinite recursion
++      this.headerData = null;
++
+       this.view.dispatch(tr);
+     }
+   }, {
+@@ -8833,7 +8629,9 @@ var TableDateMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableDateMenuView, [{
+@@ -9016,7 +8814,9 @@ var TableLabelsMenu = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableLabelsMenu, [{
+@@ -9407,10 +9207,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+   })));
+ };
+ 
+-var generateClassName = createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+-
+ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+   var onFilterChange = _ref.onFilterChange,
+       filterHandler = _ref.filterHandler;
+@@ -9420,28 +9216,27 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+       date = _useState2[0],
+       setDate = _useState2[1];
+ 
+-  return /*#__PURE__*/React.createElement(StylesProvider, {
+-    generateClassName: generateClassName
+-  }, /*#__PURE__*/React.createElement(ThemeProvider, {
++  return React.createElement(ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React.createElement(MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React.createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React.createElement(DatePicker, {
+-    format: DATE_FORMAT,
++    inputFormat: DATE_FORMAT,
+     onChange: function onChange(newValue) {
+       setDate(newValue.toDate().getTime());
+       onFilterChange(_objectSpread2(_objectSpread2({}, filterHandler.toAttrsValue()), {}, {
+         filterValue: newValue.toDate().getTime()
+       }));
+     },
+-    openTo: "date",
++    openTo: "day",
++    renderInput: (params) =>  new TextField(params),
+     style: {
+       width: '100px',
+       cursor: 'pointer'
+     },
+     value: date,
+     variant: "inline"
+-  }))));
++  })));
+ };
+ 
+ var FiltersInputDropdown = function FiltersInputDropdown(_ref2) {
+@@ -9775,7 +9570,9 @@ var TableFiltersMenuView = /*#__PURE__*/function () {
+     this.view = view;
+     this.buildMenuDOM(); // append popup to dom
+ 
+-    this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    if (this.popUpRelativeContainer) {
++      this.popUpRelativeContainer.appendChild(this.popUpDOM);
++    }
+   }
+ 
+   _createClass(TableFiltersMenuView, [{
+diff --git a/node_modules/@skiff-org/prosemirror-tables/dist/index.js b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
+index 8ab5414..af73455 100644
+--- a/node_modules/@skiff-org/prosemirror-tables/dist/index.js
++++ b/node_modules/@skiff-org/prosemirror-tables/dist/index.js
+@@ -12,9 +12,10 @@ var prosemirrorTransform = require('prosemirror-transform');
+ var prosemirrorCommands = require('prosemirror-commands');
+ var prosemirrorMenu = require('prosemirror-menu');
+ var React = require('react');
+-var pickers = require('@material-ui/pickers');
+-var styles = require('@material-ui/core/styles');
+-var core = require('@material-ui/core');
++var pickers = require('@mui/x-date-pickers');
++var AdapterDayjs = require('@mui/lab/AdapterDayjs');
++var styles = require('@mui/material/styles');
++var core = require('@mui/material/styles');
+ var ReactDOM = require('react-dom');
+ 
+ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+@@ -1509,6 +1510,8 @@ function normalizeSelection(state, tr, allowTableNodeSelection) {
+ var getSelectedCellsCoords = function getSelectedCellsCoords(view) {
+   var state = view.state; // get all selected cells dom
+ 
++  if (typeof document === 'undefined') return;
++
+   var selectedCells = document.getElementsByClassName('selectedCell'); // get rects of first and last cells
+ 
+   var firstCellRect = selectedCells[0].getBoundingClientRect();
+@@ -1857,6 +1860,9 @@ var setDateFormat = function setDateFormat(format) {
+ };
+ var tableDateMenuKey = new prosemirrorState.PluginKey('TableDateMenu');
+ var generateMenuPopup$4 = function generateMenuPopup() {
++
++  if (typeof document === 'undefined') return;
++
+   var menuElement = document.createElement('div');
+   menuElement.className = "tableDateMenu";
+   menuElement.dataset.test = "table-date-menu";
+@@ -1889,6 +1895,8 @@ var calculateMenuPosition$3 = function calculateMenuPosition(menuDOM, _ref) {
+ 
+   if (left === 0 || bottom === 0 || cellHeight === 0 || top === 0) return; // scroll offset
+ 
++  if (typeof document === 'undefined') return;
++
+   var _document$getElements = document.getElementsByClassName("".concat(getBaseName(), "-editor-frame-body")),
+       _document$getElements2 = _slicedToArray(_document$getElements, 1),
+       scrolledEl = _document$getElements2[0];
+@@ -1952,6 +1960,9 @@ var buildDateObjectFromText = function buildDateObjectFromText(text, format) {
+   return date;
+ };
+ var getSelectedNode = function getSelectedNode() {
++
++  if (typeof document === 'undefined') return;
++
+   if (document.selection) return document.selection.createRange().parentElement();else {
+     var selection = window.getSelection();
+     if (selection.rangeCount > 0) return selection.getRangeAt(0).startContainer.parentNode;
+@@ -2116,6 +2127,9 @@ var updateCellLabels = function updateCellLabels(view, pos, node, labels) {
+   view.dispatch(tr);
+ };
+ var generateMenuPopup$3 = function generateMenuPopup() {
++
++  if (typeof document === 'undefined') return;
++
+   var menuElement = document.createElement('div');
+   menuElement.className = "tableLabelsMenu";
+   menuElement.dataset.test = "table-labels-menu";
+@@ -2147,6 +2161,8 @@ var calculateMenuPosition$2 = function calculateMenuPosition(menuDOM, _ref) {
+ 
+   if (left === 0 || top === 0) return; // scroll offset
+ 
++  if (typeof document === 'undefined') return;
++
+   var _document$getElements = document.getElementsByClassName("".concat(getBaseName(), "-editor-frame-body")),
+       _document$getElements2 = _slicedToArray(_document$getElements, 1),
+       scrolledEl = _document$getElements2[0];
+@@ -3791,6 +3807,9 @@ var getColIndexFromSelectedRect = function getColIndexFromSelectedRect(state, po
+   return cellIndex % tableRect.map.width;
+ };
+ var createElementWithClass = function createElementWithClass(type, className, datatest) {
++
++  if (typeof document === 'undefined') return;
++
+   var el = document.createElement(type);
+   el.className = className;
+ 
+@@ -4237,6 +4256,9 @@ var reusedRange = null; // Note that this will always return the same range, bec
+ // updates, for some reason.
+ 
+ var textRange = function textRange(node, from, to) {
++
++  if (typeof document === 'undefined') return;
++
+   var range = reusedRange || (reusedRange = document.createRange());
+   range.setEnd(node, to == null ? node.nodeValue.length : to);
+   range.setStart(node, from || 0);
+@@ -4740,6 +4762,9 @@ function enableDeleteItem(view) {
+   return sel.isColSelection() || sel.isRowSelection();
+ }
+ var generateMenuPopup$2 = function generateMenuPopup() {
++
++  if (typeof document === 'undefined') return;
++
+   var menuElement = document.createElement('div');
+   menuElement.className = "tablePopup";
+   menuElement.dataset.test = "table-popup";
+@@ -4749,6 +4774,9 @@ var generateMenuPopup$2 = function generateMenuPopup() {
+   return menuElement;
+ };
+ var generateColorItemDOM = function generateColorItemDOM(color) {
++
++  if (typeof document === 'undefined') return;
++
+   var container = createElementWithClass('div', 'colorItemContainer');
+   var button = createElementWithClass(color === 'transparent' ? 'span' : 'button', 'colorItemButton');
+   var indicator = createElementWithClass('div', 'colorItemIndicator');
+@@ -4789,6 +4817,8 @@ var displayPopup$2 = function displayPopup(view, popupDOM) {
+ var calculatePopupPosition = function calculatePopupPosition(view, popupDOM) {
+   var state = view.state; // get all selected cells dom
+ 
++  if (typeof document === 'undefined') return;
++
+   var selectedCells = document.getElementsByClassName('selectedCell'); // get rects of first and last cells
+ 
+   var firstCellRect = selectedCells[0].getBoundingClientRect();
+@@ -4891,6 +4921,8 @@ var addTooltips = function addTooltips(popupDOM, classes) {
+ var addDeleteHoverClass = function addDeleteHoverClass(e) {
+   if (e.target.className !== 'deleteMenuButton') return;
+ 
++  if (typeof document === 'undefined') return;
++
+   var _document$getElements3 = document.getElementsByClassName('tableFocus'),
+       _document$getElements4 = _slicedToArray(_document$getElements3, 1),
+       tableWrapper = _document$getElements4[0];
+@@ -5046,6 +5078,8 @@ var TablePopUpMenuView = /*#__PURE__*/function () {
+   function TablePopUpMenuView(items, view) {
+     var _this = this;
+ 
++    if (typeof document === 'undefined') return;
++
+     _classCallCheck(this, TablePopUpMenuView);
+ 
+     this.view = view;
+@@ -5299,217 +5333,6 @@ var withLocale = function (dayjs, locale) {
+         return dayjs.apply(void 0, args).locale(locale);
+     };
+ };
+-var DayjsUtils = /** @class */ (function () {
+-    function DayjsUtils(_a) {
+-        var _b = _a === void 0 ? {} : _a, locale = _b.locale, instance = _b.instance, dayjs = _b.dayjs;
+-        this.yearFormat = "YYYY";
+-        this.yearMonthFormat = "MMMM YYYY";
+-        this.dateTime12hFormat = "MMMM Do hh:mm a";
+-        this.dateTime24hFormat = "MMMM Do HH:mm";
+-        this.time12hFormat = "hh:mm A";
+-        this.time24hFormat = "HH:mm";
+-        this.dateFormat = "MMMM Do";
+-        this.dayjs = withLocale(instance || dayjs || defaultDayjs, locale);
+-        this.locale = locale;
+-    }
+-    DayjsUtils.prototype.parse = function (value, format) {
+-        if (value === "") {
+-            return null;
+-        }
+-        return this.dayjs(value, format);
+-    };
+-    DayjsUtils.prototype.date = function (value) {
+-        if (value === null) {
+-            return null;
+-        }
+-        return this.dayjs(value);
+-    };
+-    DayjsUtils.prototype.isValid = function (value) {
+-        return this.dayjs(value).isValid();
+-    };
+-    DayjsUtils.prototype.isNull = function (date) {
+-        return date === null;
+-    };
+-    DayjsUtils.prototype.getDiff = function (date, comparing, units, float) {
+-        return date.diff(comparing, units, float);
+-    };
+-    DayjsUtils.prototype.isAfter = function (date, value) {
+-        return date.isAfter(value);
+-    };
+-    DayjsUtils.prototype.isBefore = function (date, value) {
+-        return date.isBefore(value);
+-    };
+-    DayjsUtils.prototype.isAfterDay = function (date, value) {
+-        return date.isAfter(value, "day");
+-    };
+-    DayjsUtils.prototype.isBeforeDay = function (date, value) {
+-        return date.isBefore(value, "day");
+-    };
+-    DayjsUtils.prototype.isBeforeYear = function (date, value) {
+-        return date.isBefore(value, "year");
+-    };
+-    DayjsUtils.prototype.isAfterYear = function (date, value) {
+-        return date.isAfter(value, "year");
+-    };
+-    DayjsUtils.prototype.startOfDay = function (date) {
+-        return date.clone().startOf("day");
+-    };
+-    DayjsUtils.prototype.endOfDay = function (date) {
+-        return date.clone().endOf("day");
+-    };
+-    DayjsUtils.prototype.format = function (date, formatString) {
+-        return this.dayjs(date).format(formatString);
+-    };
+-    DayjsUtils.prototype.formatNumber = function (numberToFormat) {
+-        return numberToFormat;
+-    };
+-    DayjsUtils.prototype.getHours = function (date) {
+-        return date.hour();
+-    };
+-    DayjsUtils.prototype.addDays = function (date, count) {
+-        return count < 0
+-            ? date.clone().subtract(Math.abs(count), "day")
+-            : date.clone().add(count, "day");
+-    };
+-    DayjsUtils.prototype.setMonth = function (date, count) {
+-        return date.clone().set("month", count);
+-    };
+-    DayjsUtils.prototype.setHours = function (date, count) {
+-        return date.clone().set("hour", count);
+-    };
+-    DayjsUtils.prototype.getMinutes = function (date) {
+-        return date.minute();
+-    };
+-    DayjsUtils.prototype.setMinutes = function (date, count) {
+-        return date.clone().set("minute", count);
+-    };
+-    DayjsUtils.prototype.getSeconds = function (date) {
+-        return date.second();
+-    };
+-    DayjsUtils.prototype.setSeconds = function (date, count) {
+-        return date.clone().set("second", count);
+-    };
+-    DayjsUtils.prototype.getMonth = function (date) {
+-        return date.month();
+-    };
+-    DayjsUtils.prototype.isSameDay = function (date, comparing) {
+-        return date.isSame(comparing, "day");
+-    };
+-    DayjsUtils.prototype.isSameMonth = function (date, comparing) {
+-        return date.isSame(comparing, "month");
+-    };
+-    DayjsUtils.prototype.isSameYear = function (date, comparing) {
+-        return date.isSame(comparing, "year");
+-    };
+-    DayjsUtils.prototype.isSameHour = function (date, comparing) {
+-        return date.isSame(comparing, "hour");
+-    };
+-    DayjsUtils.prototype.getMeridiemText = function (ampm) {
+-        return ampm === "am" ? "AM" : "PM";
+-    };
+-    DayjsUtils.prototype.startOfMonth = function (date) {
+-        return date.clone().startOf("month");
+-    };
+-    DayjsUtils.prototype.endOfMonth = function (date) {
+-        return date.clone().endOf("month");
+-    };
+-    DayjsUtils.prototype.getNextMonth = function (date) {
+-        return date.clone().add(1, "month");
+-    };
+-    DayjsUtils.prototype.getPreviousMonth = function (date) {
+-        return date.clone().subtract(1, "month");
+-    };
+-    DayjsUtils.prototype.getMonthArray = function (date) {
+-        var firstMonth = date.clone().startOf("year");
+-        var monthArray = [firstMonth];
+-        while (monthArray.length < 12) {
+-            var prevMonth = monthArray[monthArray.length - 1];
+-            monthArray.push(this.getNextMonth(prevMonth));
+-        }
+-        return monthArray;
+-    };
+-    DayjsUtils.prototype.getMonthText = function (date) {
+-        return this.format(date, "MMMM");
+-    };
+-    DayjsUtils.prototype.getYear = function (date) {
+-        return date.year();
+-    };
+-    DayjsUtils.prototype.setYear = function (date, year) {
+-        return date.clone().set("year", year);
+-    };
+-    DayjsUtils.prototype.mergeDateAndTime = function (date, time) {
+-        return this.setMinutes(this.setHours(date, this.getHours(time)), this.getMinutes(time));
+-    };
+-    DayjsUtils.prototype.getWeekdays = function () {
+-        var _this = this;
+-        var start = this.dayjs().startOf("week");
+-        return [0, 1, 2, 3, 4, 5, 6].map(function (diff) { return _this.format(start.add(diff, "day"), "dd"); });
+-    };
+-    DayjsUtils.prototype.isEqual = function (value, comparing) {
+-        if (value === null && comparing === null) {
+-            return true;
+-        }
+-        return this.dayjs(value).isSame(comparing);
+-    };
+-    DayjsUtils.prototype.getWeekArray = function (date) {
+-        var start = this.dayjs(date)
+-            .clone()
+-            .startOf("month")
+-            .startOf("week");
+-        var end = this.dayjs(date)
+-            .clone()
+-            .endOf("month")
+-            .endOf("week");
+-        var count = 0;
+-        var current = start;
+-        var nestedWeeks = [];
+-        while (current.isBefore(end)) {
+-            var weekNumber = Math.floor(count / 7);
+-            nestedWeeks[weekNumber] = nestedWeeks[weekNumber] || [];
+-            nestedWeeks[weekNumber].push(current);
+-            current = current.clone().add(1, "day");
+-            count += 1;
+-        }
+-        return nestedWeeks;
+-    };
+-    DayjsUtils.prototype.getYearRange = function (start, end) {
+-        var startDate = this.dayjs(start).startOf("year");
+-        var endDate = this.dayjs(end).endOf("year");
+-        var years = [];
+-        var current = startDate;
+-        while (current.isBefore(endDate)) {
+-            years.push(current);
+-            current = current.clone().add(1, "year");
+-        }
+-        return years;
+-    };
+-    // displaying methods
+-    DayjsUtils.prototype.getCalendarHeaderText = function (date) {
+-        return this.format(date, "MMMM YYYY");
+-    };
+-    DayjsUtils.prototype.getYearText = function (date) {
+-        return this.format(date, "YYYY");
+-    };
+-    DayjsUtils.prototype.getDatePickerHeaderText = function (date) {
+-        return this.format(date, "ddd, MMM D");
+-    };
+-    DayjsUtils.prototype.getDateTimePickerHeaderText = function (date) {
+-        return this.format(date, "MMM D");
+-    };
+-    DayjsUtils.prototype.getDayText = function (date) {
+-        return this.format(date, "D");
+-    };
+-    DayjsUtils.prototype.getHourText = function (date, ampm) {
+-        return this.format(date, ampm ? "hh" : "HH");
+-    };
+-    DayjsUtils.prototype.getMinuteText = function (date) {
+-        return this.format(date, "mm");
+-    };
+-    DayjsUtils.prototype.getSecondText = function (date) {
+-        return this.format(date, "ss");
+-    };
+-    return DayjsUtils;
+-}());
+ 
+ /**
+  * customizes/overrides the mui-picker theme
+@@ -5964,9 +5787,6 @@ var DateEventEmitter = function DateEventEmitter() {};
+ 
+ ee(DateEventEmitter.prototype);
+ var datePopupEmitter = new DateEventEmitter();
+-var generateClassName$1 = styles.createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+ 
+ var DateComponent = function DateComponent(_ref) {
+   var view = _ref.view,
+@@ -6040,19 +5860,17 @@ var DatePickerComponent = function DatePickerComponent(_ref2) {
+   return /*#__PURE__*/React__default["default"].createElement("div", {
+     className: "date-picker",
+     ref: ref
+-  }, /*#__PURE__*/React__default["default"].createElement(styles.StylesProvider, {
+-    generateClassName: generateClassName$1
+-  }, /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
++  },  /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React__default["default"].createElement(pickers.MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React__default["default"].createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React__default["default"].createElement(pickers.DatePicker, {
+     autoOk: true,
+     onChange: handleChange,
+     openTo: "date",
+     value: date,
+     variant: "static"
+-  })))));
++  }))));
+ };
+ 
+ var ReactNodeView = /*#__PURE__*/function () {
+@@ -8295,6 +8113,9 @@ var HoverDropdown = /*#__PURE__*/function () {
+ 
+ var getTypesItems = function getTypesItems() {
+   return types.map(function (type) {
++
++    if (typeof document === 'undefined') return;
++
+     var dom = document.createElement('div');
+     dom.dataset.test = "".concat(type.id, "-type-item");
+     var icon = createElementWithClass('div', "".concat(type.id, "ItemIcon"));
+@@ -8713,7 +8534,9 @@ var TableHeadersMenuView = /*#__PURE__*/function () {
+   return TableHeadersMenuView;
+ }();
+ 
+-window.id = "user_".concat(new Date().getTime());
++if (typeof window !== 'undefined') {
++  window.id = "user_".concat(new Date().getTime());
++}
+ var tableHeadersMenu = function tableHeadersMenu() {
+   return new prosemirrorState.Plugin({
+     key: tableHeadersMenuKey,
+@@ -9416,10 +9239,6 @@ var SelectDropdown = function SelectDropdown(_ref3) {
+   })));
+ };
+ 
+-var generateClassName = styles.createGenerateClassName({
+-  seed: 'sgo-tables-plugin-'
+-});
+-
+ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+   var onFilterChange = _ref.onFilterChange,
+       filterHandler = _ref.filterHandler;
+@@ -9429,12 +9248,10 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+       date = _useState2[0],
+       setDate = _useState2[1];
+ 
+-  return /*#__PURE__*/React__default["default"].createElement(styles.StylesProvider, {
+-    generateClassName: generateClassName
+-  }, /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
++  return /*#__PURE__*/React__default["default"].createElement(styles.ThemeProvider, {
+     theme: DatePickerTheme
+-  }, /*#__PURE__*/React__default["default"].createElement(pickers.MuiPickersUtilsProvider, {
+-    utils: DayjsUtils
++  }, /*#__PURE__*/React__default["default"].createElement(LocalizationProvider, {
++    dateAdapter: AdapterDayjs
+   }, /*#__PURE__*/React__default["default"].createElement(pickers.DatePicker, {
+     format: DATE_FORMAT,
+     onChange: function onChange(newValue) {
+@@ -9450,7 +9267,7 @@ var FiltersDatePicker = function FiltersDatePicker(_ref) {
+     },
+     value: date,
+     variant: "inline"
+-  }))));
++  })));
+ };
+ 
+ var FiltersInputDropdown = function FiltersInputDropdown(_ref2) {
