@@ -14,11 +14,10 @@ export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVi
 
   const spaceIdQuery = typeof spaceId === 'string' ? [spaceId] : spaceId;
 
-  // TODO - handle permissions and select only properties accessible by userId
   return prisma.memberProperty.findMany({
     where: {
-      // spaceId: { in: spaceIdQuery }
       OR: [
+        // User has permission to view property
         {
           spaceId: { in: spaceIdQuery },
           permissions: accessiblePropertiesByPermissionsQuery({
