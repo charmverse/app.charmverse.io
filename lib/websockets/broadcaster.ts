@@ -27,6 +27,11 @@ export class WebsocketBroadcaster {
 
   // Only called once in the app lifecycle once the server is initialised
   async bindServer (io: Server): Promise<void> {
+
+    if (!redisClient) {
+      return;
+    }
+
     this.io = io;
 
     const pubClient = redisClient;

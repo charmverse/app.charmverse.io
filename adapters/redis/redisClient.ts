@@ -9,11 +9,20 @@ declare global {
   var redisClient: RedisClientType;
 }
 
-export const redisClient = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
+let redisClientInstance: RedisClientType | null = null;
 
-redisClient.on('error', (err) => log.debug(`Redis Client Error ${err}`));
+try {
+
+  redisClientInstance = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
+  redisClientInstance.on('error', (err) => log.debug(`Redis Client Error ${err}`));
+}
+catch (err) {
+  log.debug(`Could not instantiate Redis. Error occurred: ${err}`);
+}
 
 // remember this instance of prisma in development to avoid too many clients
-if (process.env.NODE_ENV === 'development') {
-  global.redisClient = redisClient;
+if (process.env.NODE_ENV === 'development' && redisClientInstance) {
+  global.redisClient = redisClientInstance;
 }
+
+export const redisClient = redisClientInstance;
