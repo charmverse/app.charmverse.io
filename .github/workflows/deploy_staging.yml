@@ -42,7 +42,7 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
-            COMPOSE_PROFILES=$(yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' 00_env_vars.config)
+            COMPOSE_PROFILES=$(yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config)
             if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
               echo "DDENABLED=true" >> $GITHUB_ENV
             fi 
