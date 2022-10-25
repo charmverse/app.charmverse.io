@@ -13,11 +13,12 @@ import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from '
 type Props = {
   spaceId: string | null;
   memberId: string;
-  updateMemberPropertyValues: (spsaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
+  updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   onClose: VoidFunction;
+  title?: string;
 };
 
-export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onClose }: Props) {
+export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -65,7 +66,7 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
 
   return (
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-      <DialogTitle>Edit workspace profile</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>

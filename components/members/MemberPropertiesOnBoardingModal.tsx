@@ -8,14 +8,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import type { LoggedInUser } from 'models';
 
-function MemberPropertiesOnBoardingForm ({ memberId, spaceId, onClose }: { onClose: () => void, spaceId: string, memberId: string }) {
-  const { updateSpaceValues } = useMemberPropertyValues(memberId);
-
+function MemberPropertiesOnBoardingForm ({ user, spaceId, onClose }: { onClose: () => void, spaceId: string, user: LoggedInUser }) {
+  const { updateSpaceValues } = useMemberPropertyValues(user.id);
   return (
     <MemberPropertiesPopupForm
+      title={`Welcome ${user.username}. Setup your profile`}
       onClose={onClose}
-      memberId={memberId}
+      memberId={user.id}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
     />
@@ -44,7 +45,7 @@ export function MemberPropertiesOnBoardingModal () {
     <Modal size='large' open={memberDirectoryFormModal.isOpen} onClose={onClose}>
       {space && user && (
         <MemberPropertiesOnBoardingForm
-          memberId={user.id}
+          user={user}
           spaceId={space.id}
           onClose={onClose}
         />
