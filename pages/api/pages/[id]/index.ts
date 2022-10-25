@@ -15,7 +15,6 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UndesirableOperationError } from 'lib/utilities/errors';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -127,28 +126,12 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     updateTrackPageProfile(pageWithPermission.id);
   }
 
-  const { content, contentText, ...updatedPageMeta } = req.body as Page;
-
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: [{ ...updatedPageMeta, id: pageId }]
-  }, page.spaceId);
-
   return res.status(200).json(pageWithPermission);
 }
 
 async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
-
-  const pageToDelete = await prisma.page.findUnique({
-    where: {
-      id: pageId
-    },
-    select: {
-      spaceId: true
-    }
-  });
 
   const permissions = await computeUserPagePermissions({
     pageId,
@@ -169,13 +152,6 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
 
   trackPageAction('delete_page', { userId, pageId });
   updateTrackPageProfile(pageId);
-
-  if (pageToDelete) {
-    relay.broadcast({
-      type: 'pages_deleted',
-      payload: modifiedChildPageIds.map(id => ({ id }))
-    }, pageToDelete?.spaceId as string);
-  }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }
