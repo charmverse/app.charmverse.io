@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import request from 'supertest';
 
-import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
-import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/notion/import - Import from Notion', () => {
 
