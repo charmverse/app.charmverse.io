@@ -1,7 +1,7 @@
 import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
-import { Web3Provider } from '@ethersproject/providers';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,8 +14,8 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
@@ -27,7 +27,6 @@ import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { MemberPropertiesOnBoardingModal } from 'components/members/MemberPropertiesOnBoardingModal';
 import { isDevEnv } from 'config/constants';
 import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
@@ -51,14 +50,14 @@ import {
   lightTheme
 } from 'theme/focalboard/theme';
 
-import '@skiff-org/prosemirror-tables/style/tables.css';
-import '@skiff-org/prosemirror-tables/style/table-popup.css';
-import '@skiff-org/prosemirror-tables/style/table-headers.css';
-import '@skiff-org/prosemirror-tables/style/table-filters.css';
-import 'prosemirror-menu/style/menu.css';
-import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import '@bangle.dev/tooltip/style.css';
+import '@skiff-org/prosemirror-tables/style/table-filters.css';
+import '@skiff-org/prosemirror-tables/style/table-headers.css';
+import '@skiff-org/prosemirror-tables/style/table-popup.css';
+import '@skiff-org/prosemirror-tables/style/tables.css';
+import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
 // fullcalendar css
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
@@ -133,8 +132,8 @@ import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
-import 'theme/lit-protocol/lit-protocol.scss';
 import 'react-resizable/css/styles.css';
+import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
@@ -238,7 +237,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                     handleClose={() => setIsOldBuild(false)}
                                   />
                                   {getLayout(<Component {...pageProps} />)}
-                                  <MemberPropertiesOnBoardingModal />
                                   <GlobalComponents />
                                 </ErrorBoundary>
                               </RouteGuard>

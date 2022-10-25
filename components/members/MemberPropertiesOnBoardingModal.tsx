@@ -1,6 +1,4 @@
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 import Modal from 'components/common/Modal';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
@@ -25,17 +23,10 @@ function MemberPropertiesOnBoardingForm ({ user, spaceId, onClose }: { onClose: 
 }
 
 export function MemberPropertiesOnBoardingModal () {
-  const router = useRouter();
   const memberDirectoryFormModal = usePopupState({ variant: 'popover', popupId: 'member-directory-onboarding' });
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { onboarding, setOnboarding } = useOnboarding();
-
-  useEffect(() => {
-    if (onboarding) {
-      memberDirectoryFormModal.open();
-    }
-  }, [router]);
+  const { setOnboarding } = useOnboarding();
 
   function onClose () {
     setOnboarding(false);
@@ -43,7 +34,7 @@ export function MemberPropertiesOnBoardingModal () {
   }
 
   return (
-    <Modal size='large' open={memberDirectoryFormModal.isOpen} onClose={onClose}>
+    <Modal size='large' open={true} onClose={onClose}>
       {space && user && (
         <MemberPropertiesOnBoardingForm
           user={user}
