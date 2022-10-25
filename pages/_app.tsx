@@ -82,7 +82,6 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCar
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
-import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
@@ -261,20 +260,23 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <MembersProvider>
-          <BountiesProvider>
-            <PaymentMethodsProvider>
-              <PagesProvider>
-                <PrimaryCharmEditorProvider>
-                  <PageTitleProvider>
-                    {children}
-                  </PageTitleProvider>
-                </PrimaryCharmEditorProvider>
-              </PagesProvider>
-            </PaymentMethodsProvider>
-          </BountiesProvider>
-        </MembersProvider>
+        <WebSocketClientProvider>
+          <MembersProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PrimaryCharmEditorProvider>
+                    <PageTitleProvider>
+                      {children}
+                    </PageTitleProvider>
+                  </PrimaryCharmEditorProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </MembersProvider>
+        </WebSocketClientProvider>
       </SpacesProvider>
+
     </UserProvider>
 
   );
