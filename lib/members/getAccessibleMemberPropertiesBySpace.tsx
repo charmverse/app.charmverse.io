@@ -49,7 +49,8 @@ export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVi
       index: 'asc'
     },
     include: {
-      space: true
+      space: true,
+      permissions: true
     }
   });
 }

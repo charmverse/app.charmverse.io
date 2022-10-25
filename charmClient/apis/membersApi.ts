@@ -1,7 +1,7 @@
-import type { MemberProperty } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { Member, MemberPropertyValuesBySpace, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyValuesBySpace, MemberPropertyWithPermissions, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 export class MembersApi {
   getMembers (spaceId: string, search?: string) {
@@ -9,19 +9,19 @@ export class MembersApi {
   }
 
   getMemberProperties (spaceId: string) {
-    return http.GET<MemberProperty[]>(`/api/spaces/${spaceId}/members/properties`);
+    return http.GET<MemberPropertyWithPermissions[]>(`/api/spaces/${spaceId}/members/properties`);
   }
 
   createMemberProperty (spaceId: string, property: Partial<MemberProperty>) {
-    return http.POST<MemberProperty>(`/api/spaces/${spaceId}/members/properties`, property);
+    return http.POST<MemberPropertyWithPermissions>(`/api/spaces/${spaceId}/members/properties`, property);
   }
 
   updateMemberProperty (spaceId: string, { id, ...property }: Partial<MemberProperty> & { id: string }) {
-    return http.PUT<MemberProperty>(`/api/spaces/${spaceId}/members/properties/${id}`, property);
+    return http.PUT<MemberPropertyWithPermissions>(`/api/spaces/${spaceId}/members/properties/${id}`, property);
   }
 
   deleteMemberProperty (spaceId: string, id: string) {
-    return http.DELETE<MemberProperty>(`/api/spaces/${spaceId}/members/properties/${id}`);
+    return http.DELETE<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/${id}`);
   }
 
   getPropertyValues (memberId: string) {
@@ -34,5 +34,13 @@ export class MembersApi {
 
   updateSpacePropertyValues (memberId: string, spaceId: string, updateData: UpdateMemberPropertyValuePayload[]) {
     return http.PUT<PropertyValueWithDetails[]>(`/api/members/${memberId}/values/${spaceId}`, updateData);
+  }
+
+  createMemberPropertyPermission (spaceId: string, permission: CreateMemberPropertyPermissionInput) {
+    return http.POST<MemberPropertyPermission>(`/api/spaces/${spaceId}/members/properties/permissions`, permission);
+  }
+
+  deleteMemberPropertyPermission (spaceId: string, permissionId: string) {
+    return http.DELETE<MemberPropertyPermission>(`/api/spaces/${spaceId}/members/properties/permissions`, { id: permissionId });
   }
 }
