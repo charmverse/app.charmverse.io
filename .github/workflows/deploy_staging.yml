@@ -42,15 +42,21 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 
-            COMPOSE_PROFILES=$(yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config)
-            echo $COMPOSE_PROFILES
-            if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
-              echo "DDENABLED=true" >> $GITHUB_ENV
-            fi
-            cat $GITHUB_ENV 
+      - name: Parse compose profile to see if we need to enable datadog
+        id: get_compose_profiles
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
 
-      - name: Set STAGE variable in environment for build and deploy steps
-        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+      - name: Set STAGE and DDENABLED variable in environment for build and deploy steps
+        run: |
+          echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+
+          COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
+          if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
+            echo "DDENABLED=true" >> $GITHUB_ENV
+          fi
+          cat $GITHUB_ENV 
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2
