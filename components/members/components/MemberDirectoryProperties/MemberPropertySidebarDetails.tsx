@@ -9,7 +9,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Button from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 type Props = {
@@ -22,7 +21,6 @@ type Props = {
 
 export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermissions, removePermission, property }: Props) {
   const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
-  const [deleteConfirmPermission, setDeleteConfirmPermission] = useState<null | MemberPropertyPermission>(null);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
   const filterRoleIds = useMemo(() => {
@@ -71,8 +69,8 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
                     <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
                     {!readOnly && (
                       <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
-                        <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions.`}>
-                          <DeleteIcon fontSize='small' onClick={() => setDeleteConfirmPermission(permission)} />
+                        <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
+                          <DeleteIcon fontSize='small' onClick={() => removePermission(permission)} />
                         </Tooltip>
                       </IconButton>
                     )}
@@ -81,7 +79,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
               ))}
             </Stack>
           ) : (
-            <Tooltip title={`Everyone in workspace can see ${property.name} property.`}>
+            <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
               <Typography variant='overline' alignItems='center' display='flex' pl={4}>
                 Everyone in workspace
                 <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
@@ -131,18 +129,6 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
 
         </Stack>
       </Modal>
-
-      <ConfirmDeleteModal
-        title='Delete property role permission'
-        question='Are you sure you delete this role permission?'
-        onConfirm={() => {
-          if (deleteConfirmPermission) {
-            removePermission(deleteConfirmPermission);
-          }
-        }}
-        onClose={() => setDeleteConfirmPermission(null)}
-        open={!!deleteConfirmPermission}
-      />
     </>
   );
 }
