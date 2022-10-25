@@ -23,6 +23,15 @@ export default function LoginPage () {
   const { user, isLoaded, loginFromWeb3Account } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
 
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  useEffect(() => {
+    if (!initialLoadComplete) {
+      setInitialLoadComplete(true);
+    }
+
+  }, []);
+
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
 

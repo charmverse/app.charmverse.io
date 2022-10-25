@@ -3,7 +3,19 @@ import type { IdentityType } from 'models/User';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 
-export interface UserCreatedEvent extends BaseEventWithoutGroup {
+export type SignupSource = 'twitter' | 'facebook' | 'linkedin' | 'youtube' | 'organic-search' | 'marketing-site' | 'direct' | 'other'
+
+export type SignupAnalytics = {
+  signupLandingUrl: string;
+  signupSource: SignupSource;
+  signupCampaign: string;
+}
+
+export interface UserSignupEvent extends BaseEventWithoutGroup, SignupAnalytics {
+  identityType: IdentityType;
+}
+
+export interface UserLoginEvent extends BaseEventWithoutGroup {
   identityType: IdentityType;
 }
 
@@ -17,8 +29,8 @@ export interface SpaceJoined extends BaseEvent{
 }
 
 export interface UserEventMap {
-  sign_up: UserCreatedEvent;
-  sign_in: UserCreatedEvent;
+  sign_up: UserSignupEvent;
+  sign_in: UserLoginEvent;
   load_a_workspace: BaseEvent;
   create_new_workspace: BaseEvent;
   join_a_workspace: SpaceJoined;
