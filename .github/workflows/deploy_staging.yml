@@ -47,7 +47,7 @@ jobs:
             if [[ "$COMPOSE_PROFILE" =~ ddtst ]]; then 
               echo "DDENABLED=true" >> $GITHUB_ENV
             fi
-            echo $GITHUB_ENV 
+            cat $GITHUB_ENV 
 
       - name: Set STAGE variable in environment for build and deploy steps
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
