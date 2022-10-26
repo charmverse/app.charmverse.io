@@ -1,35 +1,17 @@
 import { Autocomplete, Box, Stack, TextField } from '@mui/material';
 import * as moment from 'moment-timezone';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Modal, { DialogTitle } from 'components/common/Modal';
 
-type SelectOption = {
-  label: string;
-  value: string;
-}
-
-const getTimeZoneOptions = (showTimezoneOffset: boolean = true) => {
+const getTimeZoneOptions = () => {
   const timeZones = moment.tz.names();
-  const offsetTmz: SelectOption[] = [];
+  const offsetTmz: string[] = [];
 
   timeZones.forEach(timeZone => {
     const tzOffset = moment.tz(timeZone).format('Z');
-    const value: string = parseInt(
-      tzOffset
-        .replace(':00', '.00')
-        .replace(':15', '.25')
-        .replace(':30', '.50')
-        .replace(':45', '.75')
-    ).toFixed(2);
-
-    const timeZoneOption: SelectOption = {
-      label: showTimezoneOffset ? `${timeZone} (GMT${tzOffset})` : timeZone,
-      value
-    };
-
-    offsetTmz.push(timeZoneOption);
+    offsetTmz.push(`${timeZone} (GMT${tzOffset})`);
   });
 
   return offsetTmz;
@@ -37,51 +19,74 @@ const getTimeZoneOptions = (showTimezoneOffset: boolean = true) => {
 
 export function TimezoneModal ({
   close,
-  isOpen
+  isOpen,
+  onSave,
+  initialTimezone
 }: {
+  onSave: (timezone: string | null) => void;
   isOpen: boolean;
   close: VoidFunction;
+  initialTimezone?: string | null;
 }) {
 
   const timezoneOptions = useMemo(() => getTimeZoneOptions(), []);
-  const [timezone, setTimezone] = useState<null | SelectOption>(null);
+  const [timezone, setTimezone] = useState<null | string | undefined>(initialTimezone);
+
+  useEffect(() => {
+    if (initialTimezone) {
+      setTimezone(initialTimezone);
+    }
+  }, [initialTimezone]);
+
+  function onClose () {
+    close();
+    setTimezone(initialTimezone);
+  }
+
   return (
     <Modal
       open={isOpen}
-      onClose={close}
+      onClose={onClose}
       size='large'
     >
-      <DialogTitle onClose={close}>Setup your timezone</DialogTitle>
-      <Stack gap={1}>
-        <Autocomplete<SelectOption>
-          fullWidth
-          value={timezone}
-          onChange={(_, selectOption) => {
-            setTimezone(selectOption);
-          }}
-          options={timezoneOptions}
-          size='small'
-          renderOption={(props, option) => (
-            <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-              <Box component='span'>
-                {option.label}
+      <DialogTitle onClose={onClose}>Setup your timezone</DialogTitle>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        onSave(timezone ?? null);
+        close();
+      }}
+      >
+        <Stack gap={1}>
+          <Autocomplete<string>
+            fullWidth
+            value={timezone}
+            onChange={(_, selectOption) => {
+              setTimezone(selectOption);
+            }}
+            options={timezoneOptions}
+            size='small'
+            renderOption={(props, option) => (
+              <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+                <Box component='span'>
+                  {option}
+                </Box>
               </Box>
-            </Box>
-          )}
-          getOptionLabel={option => option.label}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              inputProps={{
-                ...params.inputProps
-              }}
-            />
-          )}
-        />
-        <Button>
-          Update
-        </Button>
-      </Stack>
+            )}
+            getOptionLabel={option => option}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                inputProps={{
+                  ...params.inputProps
+                }}
+              />
+            )}
+          />
+          <Button type='submit'>
+            Update
+          </Button>
+        </Stack>
+      </form>
     </Modal>
   );
 }

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
@@ -206,7 +207,8 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
             </Grid>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
+            <Grid item xs={11} sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AccessTimeIcon fontSize='small' />
               <span>
                 {
                   userDetails?.timezone || (readOnly ? '' : 'Update your timezone')
@@ -276,6 +278,14 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           <TimezoneModal
             isOpen={timezoneModalState.isOpen}
             close={timezoneModalState.close}
+            onSave={async (timezone) => {
+              await charmClient.updateUserDetails({
+                timezone
+              });
+              mutate();
+              timezoneModalState.close();
+            }}
+            initialTimezone={userDetails?.timezone}
           />
         </>
       )}
