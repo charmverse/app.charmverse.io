@@ -387,6 +387,7 @@ model UserDetails {
   description String?
   social      Json?
   user        User    @relation(fields: [id], references: [id], onDelete: Cascade)
+  timezone    String?
 }
 
 model TelegramUser {

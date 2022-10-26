@@ -29,6 +29,7 @@ import DescriptionModal from '../DescriptionModal';
 import type { IntegrationModel } from '../IdentityModal';
 import IdentityModal, { getIdentityIcon } from '../IdentityModal';
 import SocialModal from '../SocialModal';
+import { TimezoneModal } from '../TimezoneModal';
 import UserPathModal from '../UserPathModal';
 
 import { SocialIcons } from './SocialIcons';
@@ -59,6 +60,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
   const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
+  const timezoneModalState = usePopupState({ variant: 'popover', popupId: 'timezone-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
   const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
@@ -203,6 +205,22 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
               )}
             </Grid>
           </Grid>
+          <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+            <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
+              <span>
+                {
+                  userDetails?.timezone || (readOnly ? '' : 'Update your timezone')
+                }
+              </span>
+            </Grid>
+            <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
+              {!readOnly && (
+                <IconButton onClick={timezoneModalState.open} data-testid='edit-description'>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              )}
+            </Grid>
+          </Grid>
         </Grid>
       </Stack>
       {!isPublicUser(user) && (
@@ -254,6 +272,10 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
               socialModalState.close();
             }}
             social={socialDetails}
+          />
+          <TimezoneModal
+            isOpen={timezoneModalState.isOpen}
+            close={timezoneModalState.close}
           />
         </>
       )}
