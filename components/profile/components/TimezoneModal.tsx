@@ -28,6 +28,8 @@ export function TimezoneModal ({
   close: VoidFunction;
   initialTimezone?: string | null;
 }) {
+  const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const currentTzOffset = moment.tz(currentTz).format('Z');
 
   const timezoneOptions = useMemo(() => getTimeZoneOptions(), []);
   const [timezone, setTimezone] = useState<null | string | undefined>(initialTimezone);
@@ -79,6 +81,7 @@ export function TimezoneModal ({
                 inputProps={{
                   ...params.inputProps
                 }}
+                placeholder={`${currentTz} (${currentTzOffset})`}
               />
             )}
           />

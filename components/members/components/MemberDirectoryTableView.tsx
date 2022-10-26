@@ -20,7 +20,6 @@ export function MemberDirectoryTableView ({
   const { properties = [] } = useMemberProperties();
   // const timezoneProperty = properties.find(property => property.type === 'timezone');
 
-  const filteredProperties = properties.filter(property => property.type !== 'timezone');
   return (
     <Table
       size='small'
@@ -36,7 +35,7 @@ export function MemberDirectoryTableView ({
     >
       <TableHead>
         <TableRow>
-          {filteredProperties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
+          {properties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -48,7 +47,7 @@ export function MemberDirectoryTableView ({
             <TableRow
               key={member.id}
             >
-              {filteredProperties.map(property => {
+              {properties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
                 if (memberProperty) {
                   switch (property.type) {
