@@ -11,8 +11,10 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
+import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage () {
@@ -22,10 +24,10 @@ export default function LoginPage () {
   const [, setTitleState] = usePageTitle();
   const { user, isLoaded, loginFromWeb3Account } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
+  const discordCookie = getCookie(AUTH_CODE_COOKIE);
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
-  const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
-
+  const isLogInWithDiscord = Boolean(discordCookie);
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   const isLoggedIn = !!user;
   const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);
@@ -58,6 +60,9 @@ export default function LoginPage () {
 
   useEffect(() => {
     setTitleState('Welcome');
+    if (discordCookie) {
+      deleteCookie(AUTH_CODE_COOKIE);
+    }
   }, []);
 
   useEffect(() => {
