@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { WebsocketMessage } from 'lib/websockets/interfaces';
+import type { SocketAuthReponse, WebsocketMessage } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -23,18 +23,22 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
   };
 }
 
+type SealedUserId = {
+  userId: string;
+}
+
 const authSecret = process.env.AUTH_SECRET as string;
 const safeUserIdTtl = 15;
 
 // Subscribe user to messages
-async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer<{ safeUserId: string }>) {
+async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
 
   // capture value of userId on connect
   const userId = req.session.user.id;
 
   const sealedUserId = await sealData({
     userId
-  }, {
+  } as SealedUserId, {
     password: authSecret,
     ttl: safeUserIdTtl
   });
@@ -42,7 +46,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   // It means that socket server was already initialised
   if (res.socket?.server?.io) {
 
-    res.send({ safeUserId: sealedUserId });
+    res.send({ authToken: sealedUserId });
     return;
   }
 
@@ -56,7 +60,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
     socket.on('message', async (message: WebsocketMessage<'subscribe'>) => {
 
       try {
-        const decryptedUserId = (await unsealData<{ userId: string }>(message.payload.safeUserId, {
+        const decryptedUserId = (await unsealData<SealedUserId>(message.payload.authToken, {
           password: authSecret,
           ttl: safeUserIdTtl
         }))?.userId;
@@ -80,7 +84,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
 
   relay.bindServer(io);
 
-  res.send({ safeUserId: sealedUserId });
+  res.send({ authToken: sealedUserId });
 }
 
 export default withSessionRoute(handler);

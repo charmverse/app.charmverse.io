@@ -17,10 +17,13 @@ export type BlockDelete = Resource & Pick<Block, 'type'>;
 
 export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
 
+export type SocketAuthReponse = {
+  authToken: string;
+}
+
 export type SubscribeRequest = {
   spaceId: string;
-  safeUserId: string;
-}
+} & SocketAuthReponse
 
 // Map of event type to event payload
 export type Updates = {

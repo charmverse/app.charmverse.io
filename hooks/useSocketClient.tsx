@@ -61,7 +61,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   }
 
   async function connect () {
-    const accessToken = await charmClient.socket();
+    const { authToken } = await charmClient.socket();
 
     if (socket?.connected) {
       socket.disconnect();
@@ -81,7 +81,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
         payload: {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           spaceId: space!.id,
-          safeUserId: accessToken.safeUserId
+          authToken
         }
       });
     });
