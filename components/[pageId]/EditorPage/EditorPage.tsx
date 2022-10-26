@@ -17,7 +17,7 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { pages, setCurrentPageId, mutatePage, getPagePermissions, updatePage } = usePages();
+  const { pages, setCurrentPageId, mutatePage, getPagePermissions, loadingPages, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -26,15 +26,13 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const { user } = useUser();
   const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);
 
-  const pagesLoaded = Object.keys(pages).length > 0;
-
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
   const readOnly = (currentPagePermissions.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && pagesLoaded && space) {
+      if (pageId && !loadingPages && space) {
         try {
           const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
@@ -65,11 +63,11 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setCurrentPageId('');
     };
 
-  }, [pageId, pagesLoaded, space, user]);
+  }, [pageId, loadingPages, space, user]);
 
   // set page attributes of the primary charm editor
   useEffect(() => {
-    if (!pagesLoaded) {
+    if (loadingPages) {
       // wait for pages loaded for permissions to be correct
       return;
     }
@@ -88,7 +86,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
     return () => {
       resetPageProps();
     };
-  }, [currentPagePermissions, pagesLoaded]);
+  }, [currentPagePermissions, loadingPages]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     setPageProps({ isSaving: true });
