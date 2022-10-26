@@ -2,7 +2,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { getRedisClient } from 'adapters/redis/redisClient';
+import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
@@ -10,29 +10,15 @@ import type { WebsocketEvent, WebsocketMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
-  private userSockets: Record<string, Socket> = {
-
-  };
-
-  private async setUserSocket ({ userId, socket }: { userId: string, socket: Socket }) {
-    this.userSockets[userId] = socket;
-  }
-
-  private async getUserSocket (userId: string): Promise<Socket | undefined> {
-    return this.userSockets[userId];
-  }
-
   // Server will be set after the first request
   private io: Server = new Server();
 
   // Only called once in the app lifecycle once the server is initialised
   async bindServer (io: Server): Promise<void> {
+
     this.io = io;
 
-    const redisClient = getRedisClient();
-
     if (redisClient) {
-
       const pubClient = redisClient;
       const subClient = pubClient.duplicate();
 
@@ -42,16 +28,16 @@ export class WebsocketBroadcaster {
       ]);
 
       io.adapter(createAdapter(pubClient, subClient));
-
-      // Function for debugging amount of connections
-      // setInterval(() => {
-      //   this.io.sockets.allSockets().then(sockets => {
-      //     // eslint-disable-next-line no-console
-      //     console.log('Connected socket amount', sockets.size);
-      //   });
-
-      // }, 1000);
     }
+
+    // Function for debugging amount of connections
+    // setInterval(() => {
+    //   this.io.sockets.allSockets().then(sockets => {
+    //     // eslint-disable-next-line no-console
+    //     console.log('Connected socket amount', sockets.size);
+    //   });
+
+    // }, 1000);
 
   }
 
@@ -77,29 +63,15 @@ export class WebsocketBroadcaster {
     });
 
     if (!spaceRole) {
-      socket.send(new SpaceMembershipRequiredError());
+      socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
       return;
     }
 
-    const existingSocket = await this.getUserSocket(userId);
-
-    // Handle undefined and existing socket
-    if (!existingSocket) {
-      await this.setUserSocket({ userId, socket });
-
-    }
-    else if (existingSocket.id !== socket.id) {
-      // existingSocket.disconnect();
-      await this.setUserSocket({ userId, socket });
-    }
-
     Object.keys(socket.rooms).forEach(room => {
-      if (room !== userId && room !== roomId) {
-        socket.leave(room);
-      }
+      socket.leave(room);
     });
 
-    socket.join([roomId, userId]);
+    socket.join([roomId]);
 
   }
 

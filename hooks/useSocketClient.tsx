@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
+import charmClient from 'charmClient';
 import log from 'lib/log';
 import type { WebsocketEvent, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
 import { WebsocketEvents } from 'lib/websockets/interfaces';
@@ -51,7 +52,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket?.disconnect();
       socket?.off();
     };
-  }, [space, user]);
+  }, [space?.id, user?.id]);
 
   function pushToMessageLog (message: LoggedMessage) {
     if (process.env.NODE_ENV === 'development') {
@@ -60,7 +61,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   }
 
   async function connect () {
-    await fetch('/api/socket');
+    const { authToken } = await charmClient.socket();
 
     if (socket?.connected) {
       socket.disconnect();
@@ -78,7 +79,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
         type: 'subscribe',
         payload: {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          spaceId: space!.id
+          spaceId: space!.id,
+          authToken
         }
       });
     });
