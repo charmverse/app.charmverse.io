@@ -16,7 +16,7 @@ export default function useKeydownPress (callback: VoidFunction, { key, ctrl, sh
 
   useEffect(() => {
     function onKeydown (event: globalThis.KeyboardEvent) {
-      if (key && event.key?.toLowerCase() !== key.toLowerCase()) {
+      if (key && event.key.toLowerCase() !== key.toLowerCase()) {
         return;
       }
 
