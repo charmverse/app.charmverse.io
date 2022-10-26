@@ -27,6 +27,7 @@ export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promis
 
 export type PagesContext = {
   currentPageId: string;
+  loadingPages: boolean;
   pages: PagesMap;
   setPages: Dispatch<SetStateAction<PagesMap>>;
   setCurrentPageId: Dispatch<SetStateAction<string>>;
@@ -43,6 +44,7 @@ const refreshInterval = 1000 * 5 * 60; // 5 minutes
 
 export const PagesContext = createContext<Readonly<PagesContext>>({
   currentPageId: '',
+  loadingPages: true,
   pages: {},
   setCurrentPageId: () => '',
   setPages: () => undefined,
@@ -284,6 +286,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const value: PagesContext = useMemo(() => ({
     currentPageId,
     deletePage,
+    loadingPages: !data,
     pages,
     setCurrentPageId,
     setPages: _setPages,
@@ -293,7 +296,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     mutatePage,
     mutatePagesRemove,
     mutatePagesList
-  }), [currentPageId, router, pages, user]);
+  }), [currentPageId, router, !!data, pages, user]);
 
   return (
     <PagesContext.Provider value={value}>
