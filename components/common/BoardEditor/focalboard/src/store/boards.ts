@@ -38,6 +38,11 @@ const boardsSlice = createSlice({
           state.boards[board.id] = board;
         }
       }
+    },
+    deleteBoards: (state, action: PayloadAction<Pick<Board, 'id'>[]>) => {
+      action.payload.forEach(deletedBoard => {
+        delete state.boards[deletedBoard.id];
+      });
     }
   },
   extraReducers: (builder) => {
@@ -68,7 +73,7 @@ const boardsSlice = createSlice({
   }
 });
 
-export const { updateBoards, setCurrent, addBoard } = boardsSlice.actions;
+export const { updateBoards, setCurrent, addBoard, deleteBoards } = boardsSlice.actions;
 export const { reducer } = boardsSlice;
 export const getBoards = (state: RootState): { [key: string]: Board } => state.boards.boards;
 

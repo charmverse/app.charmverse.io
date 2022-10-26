@@ -106,7 +106,7 @@ class CharmClient {
   }
 
   checkNexusPath (path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/checkPathAvailability', { path });
+    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails () {

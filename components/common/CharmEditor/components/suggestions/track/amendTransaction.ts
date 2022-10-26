@@ -1,5 +1,6 @@
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
-import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping, CellSelection } from '@bangle.dev/pm';
+import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping } from '@bangle.dev/pm';
+import { CellSelection } from '@skiff-org/prosemirror-tables';
 import { Selection, TextSelection } from 'prosemirror-state';
 
 import type { TrackAttribute } from './interfaces';

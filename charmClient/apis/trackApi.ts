@@ -4,7 +4,7 @@ import type { MixpanelEventMap, MixpanelEventName } from 'lib/metrics/mixpanel/i
 
 export class TrackApi {
   trackAction<T extends MixpanelEventName> (event: T, payload: Omit<MixpanelEventMap[T], 'userId'>) {
-    return http.POST<{ success: 'ok' }>(`/api/track?event=${event}`, payload);
+    return http.POST<{ success: 'ok' }>(`/api/events?event=${event}`, payload);
   }
 }
 

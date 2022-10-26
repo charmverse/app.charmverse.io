@@ -38,6 +38,9 @@ export default function RedirectToMainPage () {
       if (firstPage && space && firstPage?.spaceId === space.id) {
         router.push(`/${space.domain}/${firstPage.path}`);
       }
+      else if (space && sortedPages.length === 0) {
+        router.push(`/${space.domain}/members`);
+      }
     }
 
   }, [space, pages]);

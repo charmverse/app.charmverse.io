@@ -2,18 +2,22 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import * as http from 'adapters/http';
+import { isTestEnv } from 'config/constants';
 import log from 'lib/log';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import type { FailedImportsError } from 'lib/notion/types';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc({
   onError,
   onNoMatch
 });
 
-handler.use(requireUser).post(importNotion);
+handler
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId' }))
+  .post(importNotion);
 
 interface NotionApiResponse {
   workspace_name: string;
@@ -37,7 +41,11 @@ async function importNotion (req: NextApiRequest, res: NextApiResponse<{
   const tempAuthCode = req.body.code;
 
   if (!spaceId || !tempAuthCode) {
-    res.status(400).send({ error: 'Invalid code or space' });
+    throw new MissingDataError('Invalid code or space');
+  }
+
+  if (isTestEnv) {
+    res.status(200).json({ failedImports: [] });
     return;
   }
 
