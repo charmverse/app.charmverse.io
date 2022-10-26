@@ -40,36 +40,3 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 
 });
-
-test.only('login - allows user to login and see their workspace even when a wallet is connected (regression check)', async ({ discordServer, loginPage }) => {
-
-  const { address, user, space, page } = await generateUserAndSpace();
-  await createDiscordUser({ userId: user.id, discordUserId });
-
-  await mockWeb3({
-    page: loginPage.page,
-    context: { address, privateKey: false },
-    init: ({ Web3Mock, context }) => {
-
-      Web3Mock.mock({
-        blockchain: 'ethereum',
-        accounts: {
-          return: [context.address]
-        }
-      });
-
-    }
-  });
-
-  await loginPage.goto();
-
-  await expect(loginPage.verifyWalletButton).toBeVisible();
-
-  const discordApiUrl = getServerHost(discordServer);
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
-
-  // should auto redirect to workspace
-  await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
-
-});
