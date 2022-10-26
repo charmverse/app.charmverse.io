@@ -93,10 +93,10 @@ export async function mockWeb3<T extends MockContext> ({ page, context, init }: 
           return window.ethereum.request({ method }, opts);
         };
 
-        // mock wallet signature
-        if (walletSig) {
+        ${walletSig ? `
+          // mock wallet signature
           window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.address}', '${walletSig}');
-        }
+        ` : ''}
 
       `
       + `(${init.toString()})({ ethers, Web3Mock, context: ${JSON.stringify(context)} });`

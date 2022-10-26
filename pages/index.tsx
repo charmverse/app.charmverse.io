@@ -25,7 +25,8 @@ export default function LoginPage () {
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = typeof router.query.code === 'string' && router.query.discord === '1' && router.query.type === 'login';
-
+  // console.log('router', router.query);
+  // console.log({ isLogInWithDiscord });
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   const isLoggedIn = !!user;
   const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);

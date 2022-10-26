@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
 import { v4 as uuid } from 'uuid';
 
 import type { WorkerFixture } from '../fixtures/discordServer';
@@ -62,6 +62,8 @@ test.only('login - allows user to login and see their workspace even when a wall
   });
 
   await loginPage.goto();
+
+  await expect(loginPage.verifyWalletButton).toBeVisible();
 
   const discordApiUrl = getServerHost(discordServer);
   const discordWebsiteUrl = await loginPage.getDiscordUrl();
