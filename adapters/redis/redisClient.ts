@@ -11,13 +11,14 @@ declare global {
 
 let redisClientInstance: RedisClientType | null = null;
 
-try {
-
-  redisClientInstance = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
-  redisClientInstance.on('error', (err) => log.debug(`Redis Client Error ${err}`));
-}
-catch (err) {
-  log.debug(`Could not instantiate Redis. Error occurred: ${err}`);
+if (process.env.REDIS_URI) {
+  try {
+    redisClientInstance = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
+    redisClientInstance.on('error', (err) => log.debug(`Redis Client Error ${err}`));
+  }
+  catch (err) {
+    log.debug(`Could not instantiate Redis. Error occurred: ${err}`);
+  }
 }
 
 // remember this instance of prisma in development to avoid too many clients

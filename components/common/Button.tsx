@@ -30,16 +30,23 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
 
   const { children, loading, loadingMessage, disabledTooltip, ...props } = _props;
 
-  return (
-    <Tooltip title={props.disabled ? disabledTooltip : ''}>
-      <span>
-        <StyledButton ref={ref} disabled={loading} {...props}>
-          {(loading && loadingMessage) ? loadingMessage : children}
-          {loading && <StyledSpinner color='inherit' size={15} />}
-        </StyledButton>
-      </span>
-    </Tooltip>
+  const buttonComponent = (
+    <StyledButton ref={ref} disabled={loading} {...props}>
+      {(loading && loadingMessage) ? loadingMessage : children}
+      {loading && <StyledSpinner color='inherit' size={15} />}
+    </StyledButton>
   );
+
+  if (disabledTooltip) {
+    return (
+      <Tooltip title={props.disabled ? disabledTooltip : ''}>
+        <span>
+          {buttonComponent}
+        </span>
+      </Tooltip>
+    );
+  }
+  return buttonComponent;
 });
 
 // make sure teh id prop is on the same element as onClick
