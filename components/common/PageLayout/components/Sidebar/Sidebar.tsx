@@ -24,6 +24,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
+import { useWebSocketClient } from 'hooks/useSocketClient';
 import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
@@ -199,7 +200,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         createdBy: user.id,
         spaceId: space.id
       };
-      addPageAndRedirect(newPage, router);
+      addPageAndRedirect(newPage, router)
+        .then();
     }
   }, []);
 
