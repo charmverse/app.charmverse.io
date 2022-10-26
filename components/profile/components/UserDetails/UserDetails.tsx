@@ -19,6 +19,7 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import useENSName from 'hooks/useENSName';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { convertTZ } from 'lib/utilities/browser';
 import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType, LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -211,7 +212,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
               <AccessTimeIcon fontSize='small' />
               <span>
                 {
-                  userDetails?.timezone || (readOnly ? '' : 'Update your timezone')
+                  userDetails?.timezone ? convertTZ(userDetails.timezone.split(' ')[0]) : (readOnly ? 'N/A' : 'Update your timezone')
                 }
               </span>
             </Grid>

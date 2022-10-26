@@ -7,6 +7,7 @@ import { SocialIcons } from 'components/profile/components/UserDetails/SocialIco
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
+import { convertTZ } from 'lib/utilities/browser';
 
 import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
 
@@ -51,7 +52,7 @@ function MemberDirectoryGalleryCard ({
           </Stack>
           <Stack flexDirection='row' gap={1}>
             <AccessTimeIcon fontSize='small' />
-            <Typography variant='body2'>{member.profile?.timezone ?? 'N/A'}</Typography>
+            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone.split(' ')[0]) : 'N/A'}</Typography>
           </Stack>
           {properties.map(property => {
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);

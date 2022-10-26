@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Box, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
@@ -7,6 +8,7 @@ import { DiscordSocialIcon } from 'components/profile/components/UserDetails/Dis
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
+import { convertTZ } from 'lib/utilities/browser';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -18,8 +20,6 @@ export function MemberDirectoryTableView ({
   members: Member[];
 }) {
   const { properties = [] } = useMemberProperties();
-  // const timezoneProperty = properties.find(property => property.type === 'timezone');
-
   return (
     <Table
       size='small'
@@ -84,13 +84,21 @@ export function MemberDirectoryTableView ({
                         </TableCell>
                       );
                     }
-                    // case 'timezone': {
-                    //   return (
-                    //     <TableCell>
-                    //       <Typography variant='body2'>{member.properties.find(_property => _property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
-                    //     </TableCell>
-                    //   );
-                    // }
+                    case 'timezone': {
+                      return (
+                        <TableCell>
+                          <Box sx={{
+                            gap: 1,
+                            display: 'flex',
+                            flexDirection: 'row'
+                          }}
+                          >
+                            <AccessTimeIcon fontSize='small' />
+                            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone.split(' ')[0]) : 'N/A'}</Typography>
+                          </Box>
+                        </TableCell>
+                      );
+                    }
                     case 'name': {
                       return (
                         <TableCell>
