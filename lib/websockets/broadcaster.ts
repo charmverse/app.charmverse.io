@@ -10,18 +10,6 @@ import type { WebsocketEvent, WebsocketMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
-  private userSockets: Record<string, Socket> = {
-
-  };
-
-  private async setUserSocket ({ userId, socket }: { userId: string, socket: Socket }) {
-    this.userSockets[userId] = socket;
-  }
-
-  private async getUserSocket (userId: string): Promise<Socket | undefined> {
-    return this.userSockets[userId];
-  }
-
   // Server will be set after the first request
   private io: Server = new Server();
 
@@ -54,6 +42,7 @@ export class WebsocketBroadcaster {
   }
 
   broadcastToAll (message: WebsocketMessage): void {
+
     this.io.emit('message', message);
   }
 
@@ -75,29 +64,15 @@ export class WebsocketBroadcaster {
     });
 
     if (!spaceRole) {
-      socket.send(new SpaceMembershipRequiredError());
+      socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
       return;
     }
 
-    const existingSocket = await this.getUserSocket(userId);
-
-    // Handle undefined and existing socket
-    if (!existingSocket) {
-      await this.setUserSocket({ userId, socket });
-
-    }
-    else if (existingSocket.id !== socket.id) {
-      // existingSocket.disconnect();
-      await this.setUserSocket({ userId, socket });
-    }
-
     Object.keys(socket.rooms).forEach(room => {
-      if (room !== userId && room !== roomId) {
-        socket.leave(room);
-      }
+      socket.leave(room);
     });
 
-    socket.join([roomId, userId]);
+    socket.join([roomId]);
 
   }
 
