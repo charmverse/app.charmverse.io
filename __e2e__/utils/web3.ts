@@ -60,7 +60,7 @@ type MockWeb3Options<T> = {
   init (params: InitParams<T>): void;
 }
 
-type MockContext = { address: string, chainId?: number, privateKey: string };
+type MockContext = { address: string, chainId?: number, privateKey: string | false };
 
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
 export async function mockWeb3<T extends MockContext> ({ page, context, init }: MockWeb3Options<T>) {
@@ -68,7 +68,7 @@ export async function mockWeb3<T extends MockContext> ({ page, context, init }: 
   const wallet = Wallet.createRandom();
   context ||= {} as T;
   context.address ||= wallet.address;
-  context.privateKey ||= wallet.privateKey;
+  context.privateKey ??= wallet.privateKey; // allow setting to false to skip signing
 
   const walletSig = await mockWalletSignature(context as MockContext);
 
@@ -93,8 +93,10 @@ export async function mockWeb3<T extends MockContext> ({ page, context, init }: 
           return window.ethereum.request({ method }, opts);
         };
 
-        // mock wallet signature
-        window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.address}', '${walletSig}');
+        ${walletSig ? `
+          // mock wallet signature
+          window.localStorage.setItem('charm.v1.wallet-auth-sig-${context.address}', '${walletSig}');
+        ` : ''}
 
       `
       + `(${init.toString()})({ ethers, Web3Mock, context: ${JSON.stringify(context)} });`
@@ -103,6 +105,10 @@ export async function mockWeb3<T extends MockContext> ({ page, context, init }: 
 
 // mock the result of the wallet signature, this gets checked on login by the backend
 async function mockWalletSignature ({ address, chainId = 1, privateKey }: MockContext) {
+
+  if (privateKey === false) {
+    return null;
+  }
 
   const payload = generateSignaturePayload({ address, chainId, host: baseUrl });
   const message = new SiweMessage(payload);
