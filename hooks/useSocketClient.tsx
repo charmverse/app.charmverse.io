@@ -52,7 +52,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket?.disconnect();
       socket?.off();
     };
-  }, [space, user]);
+  }, [space?.id, user?.id]);
 
   function pushToMessageLog (message: LoggedMessage) {
     if (process.env.NODE_ENV === 'development') {
