@@ -69,12 +69,10 @@ export class WebsocketBroadcaster {
     }
 
     Object.keys(socket.rooms).forEach(room => {
-      if (room !== userId && room !== roomId) {
-        socket.leave(room);
-      }
+      socket.leave(room);
     });
 
-    socket.join([roomId, userId]);
+    socket.join([roomId]);
 
   }
 
