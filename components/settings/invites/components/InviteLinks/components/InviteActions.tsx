@@ -87,6 +87,15 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
     handleClose();
   };
 
+  function onClick (event: SyntheticEvent<any, Event>) {
+    if (account) {
+      handleTokenGate(event);
+    }
+    else {
+      openWalletSelectorModal();
+    }
+  }
+
   return (
     <>
       <Button
@@ -122,14 +131,7 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
           </Box>
         </MenuItem>
         <MenuItem
-          onClick={(e) => {
-            if (account) {
-              handleTokenGate(e);
-            }
-            else {
-              openWalletSelectorModal();
-            }
-          }}
+          onClick={onClick}
           disableRipple
           dense
           {...restTokenGateProps}
