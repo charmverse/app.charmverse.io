@@ -14,7 +14,7 @@ type IContext = {
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
-  loginFromWeb3Account:() => Promise<LoggedInUser>;
+  loginFromWeb3Account: () => Promise<LoggedInUser>;
   refreshUserWithWeb3Account: () => Promise<void>;
 };
 
@@ -77,11 +77,9 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    *
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
-  async function refreshUserWithWeb3Account () {
-    if (!account) {
-      throw new MissingWeb3AccountError();
-    }
-    else if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
+  async function refreshUserWithWeb3Account (address: string) {
+    // a hack for now to support users that are trying to log in thru discord
+    if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, address))) {
       await charmClient.logout();
       setUser(null);
     }
@@ -92,7 +90,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (account) {
-      refreshUserWithWeb3Account();
+      refreshUserWithWeb3Account(account);
     }
     else {
       getCharmUser();
