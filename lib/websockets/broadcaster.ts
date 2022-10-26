@@ -31,13 +31,13 @@ export class WebsocketBroadcaster {
     }
 
     // Function for debugging amount of connections
-    setInterval(() => {
-      this.io.sockets.allSockets().then(sockets => {
-        // eslint-disable-next-line no-console
-        console.log('Connected socket amount', sockets.size);
-      });
+    // setInterval(() => {
+    //   this.io.sockets.allSockets().then(sockets => {
+    //     // eslint-disable-next-line no-console
+    //     console.log('Connected socket amount', sockets.size);
+    //   });
 
-    }, 1000);
+    // }, 1000);
 
   }
 
