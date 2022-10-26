@@ -8,7 +8,7 @@ export async function mergeUserDiscordAccounts ({ currentUserId, toDeleteUserId,
   discordId: string;
 }): Promise<DiscordUser> {
 
-  const [discordUser] = await Promise.all([
+  const [discordUser] = await prisma.$transaction([
     prisma.discordUser.update({
       where: {
         discordId
