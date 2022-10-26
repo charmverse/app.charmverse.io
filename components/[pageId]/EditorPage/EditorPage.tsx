@@ -29,7 +29,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const pagesLoaded = Object.keys(pages).length > 0;
 
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
-  const readOnly = (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
+  const readOnly = (currentPagePermissions.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
@@ -69,8 +69,12 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
 
   // set page attributes of the primary charm editor
   useEffect(() => {
+    if (!pagesLoaded) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
     if (!editMode) {
-      if (currentPagePermissions?.edit_content) {
+      if (currentPagePermissions.edit_content) {
         setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
       }
       else {
@@ -78,12 +82,13 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       }
     }
     else {
-      setPageProps({ permissions: currentPagePermissions });
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: currentPagePermissions, editMode });
     }
     return () => {
       resetPageProps();
     };
-  }, [currentPagePermissions]);
+  }, [currentPagePermissions, pagesLoaded]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     setPageProps({ isSaving: true });
