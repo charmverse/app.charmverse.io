@@ -25,7 +25,7 @@ beforeAll(async () => {
   role1 = await generateRole({ spaceId: space.id, roleName: 'test role 1', createdBy: adminUser.id });
 });
 
-describe('GET /api/space/[id]/members/properties/permissions - Create and delete property permissions', () => {
+describe('POST /api/space/[id]/members/properties/permissions - Create member property permissions', () => {
   let property1: MemberProperty;
 
   beforeEach(async () => {
@@ -56,7 +56,7 @@ describe('GET /api/space/[id]/members/properties/permissions - Create and delete
       .expect(401)).body as MemberProperty[];
   });
 
-  it('should return error for user from other space', async () => {
+  it('should return error for user from other space when they try to create a permission', async () => {
     const { user: otherSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
     const otherSpaceUserCookie = await loginUser(otherSpaceUser.id);
 
@@ -68,6 +68,14 @@ describe('GET /api/space/[id]/members/properties/permissions - Create and delete
         roleId: role1.id
       })
       .expect(401)).body as MemberProperty[];
+  });
+});
+
+describe('DELETE /api/space/[id]/members/properties/permissions - Delete member property permissions', () => {
+  let property1: MemberProperty;
+
+  beforeEach(async () => {
+    property1 = await generateMemberProperty({ type: 'text', userId: adminUser.id, spaceId: space.id, name: 'test text' });
   });
 
   it('should delete member property permission for admin user', async () => {
@@ -94,7 +102,7 @@ describe('GET /api/space/[id]/members/properties/permissions - Create and delete
       .expect(401)).body as MemberPropertyPermissionWithRole;
   });
 
-  it('should return error for user from other space when trying to delete space', async () => {
+  it('should return error for user from other space when trying to delete permissions inside the space', async () => {
     const { user: otherSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
     const otherSpaceUserCookie = await loginUser(otherSpaceUser.id);
     const permission = await createMemberPropertyPermission({ memberPropertyId: property1.id, roleId: role1.id });
