@@ -95,7 +95,7 @@ const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   font-weight: 500;
   padding-top: 4px;
   padding-bottom: 4px;
-  &:hover {f
+  &:hover {
     background-color: ${theme.palette.action.hover};
     color: inherit;
   }
