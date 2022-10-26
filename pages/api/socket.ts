@@ -34,6 +34,9 @@ function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer
 
   const io = new Server(res.socket.server);
 
+  // capture value of userId on connect
+  const userId = req.session.user.id;
+
   // Define actions inside
   io.on('connect', (socket) => {
 
@@ -42,7 +45,7 @@ function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer
 
       if (message.type === 'subscribe') {
         relay.registerSubscriber({
-          userId: req.session.user.id,
+          userId,
           socket,
           roomId: (message as WebsocketMessage<'subscribe'>).payload.spaceId
         });

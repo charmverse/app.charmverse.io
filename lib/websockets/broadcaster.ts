@@ -75,7 +75,7 @@ export class WebsocketBroadcaster {
     });
 
     if (!spaceRole) {
-      socket.send(new SpaceMembershipRequiredError());
+      socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
       return;
     }
 
