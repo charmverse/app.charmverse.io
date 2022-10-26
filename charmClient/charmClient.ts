@@ -74,6 +74,10 @@ class CharmClient {
 
   track = new TrackApi();
 
+  async socket () {
+    return http.GET<{ safeUserId: string }>('/api/socket');
+  }
+
   async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address,

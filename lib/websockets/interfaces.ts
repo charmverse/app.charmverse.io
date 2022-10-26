@@ -19,6 +19,7 @@ export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
 
 export type SubscribeRequest = {
   spaceId: string;
+  safeUserId: string;
 }
 
 // Map of event type to event payload
