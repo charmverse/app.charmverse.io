@@ -26,6 +26,7 @@ import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors }
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
+import type { SocketAuthReponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
@@ -74,6 +75,10 @@ class CharmClient {
 
   track = new TrackApi();
 
+  async socket () {
+    return http.GET<SocketAuthReponse>('/api/socket');
+  }
+
   async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
       address,
@@ -106,7 +111,7 @@ class CharmClient {
   }
 
   checkNexusPath (path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/checkPathAvailability', { path });
+    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails () {
