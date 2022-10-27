@@ -92,6 +92,7 @@ export class WebsocketBroadcaster {
     }
 
     socket.join([roomId]);
+    socket.send({ type: 'subscribed' });
   }
 
 }

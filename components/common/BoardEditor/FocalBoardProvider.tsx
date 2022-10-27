@@ -3,9 +3,9 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { publishDeletes, publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWebSocketClient } from 'hooks/useSocketClient';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import log from 'lib/log';
-import type { WebsocketPayload } from 'lib/websockets/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import store from './focalboard/src/store';
 import { useAppDispatch } from './focalboard/src/store/hooks';
@@ -25,11 +25,11 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
     }
   }, [space?.id]);
 
-  const handleBlockUpdates = useCallback((value: WebsocketPayload<'blocks_updated' | 'blocks_created'>) => {
+  const handleBlockUpdates = useCallback((value: WebSocketPayload<'blocks_updated' | 'blocks_created'>) => {
     publishIncrementalUpdate(value instanceof Array ? value : [value] as any);
   }, []);
 
-  const handleBlockDeletes = useCallback((value: WebsocketPayload<'blocks_deleted'>) => {
+  const handleBlockDeletes = useCallback((value: WebSocketPayload<'blocks_deleted'>) => {
     publishDeletes(value);
   }, []);
 

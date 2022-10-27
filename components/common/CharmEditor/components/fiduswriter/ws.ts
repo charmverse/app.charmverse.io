@@ -1,22 +1,28 @@
 import type { Node } from '@bangle.dev/pm';
 import io from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
-import type { SocketConnection } from 'hooks/useSocketClient';
+import type { SocketConnection } from 'hooks/useWebSocketClient';
+import log from 'lib/log';
 
 import type { Participant } from './collab';
 
 const gettext = (text: string) => text;
 
 type BaseSocketMessage<T> = T & {
-  c?: number; // client
-  s?: number; // server
-  v?: number; // version
-}
+  c: number; // client
+  s: number; // server
+  v: number; // version
+};
 
-export type ClientSubscribeMessage = BaseSocketMessage<{
-  type: 'subscribe';
-  connection?: number;
-}>
+export type ClientRequestResendMessage = BaseSocketMessage<{
+  type: 'request_resend';
+  from: number;
+}>;
+
+type ClientGetDocumentMessage = {
+  type: 'get_document';
+};
 
 export type ClientSelectionMessage = BaseSocketMessage<{
   type: 'selection_change';
@@ -28,31 +34,33 @@ export type ClientSelectionMessage = BaseSocketMessage<{
 
 export type ClientDiffMessage = BaseSocketMessage<{
   type: 'diff';
-  v: number;
   rid: number;
   cid?: number; // client id
   ds?: any[]; // steps to send
   jd?: any; // used by python backend in fiduswriter - maybe we dont need it?
   ti?: string; // new title
   doc?: Node;
-}>
+}>;
 
-type ClientMessageType = 'get_document' | 'subscribe';
-type ClientMessage = ClientSubscribeMessage | ClientDiffMessage | ClientSelectionMessage | BaseSocketMessage<{
-  type: ClientMessageType;
-}>
+export type ClientSubscribeMessage = {
+  type: 'subscribe';
+  roomId: string;
+  authToken: string;
+}
+
+type ClientMessage = ClientSubscribeMessage | ClientDiffMessage | ClientSelectionMessage | ClientRequestResendMessage | ClientGetDocumentMessage;
 
 type ServerConnectionsMessage = BaseSocketMessage<{
   type: 'connections';
   participant_list: Participant[];
-}>
+}>;
 
 export type ServerDocDataMessage = BaseSocketMessage<{
   type: 'doc_data';
   doc: { content: Node, v: number };
   doc_info: any;
   time: number;
-}>
+}>;
 
 export type ServerDiffMessage = BaseSocketMessage<{
   type: 'confirm_diff' | 'reject_diff';
@@ -66,25 +74,28 @@ type ServerMessage = ServerConnectionsMessage | ServerDocDataMessage | ServerDif
 
 export type SocketMessage = ClientMessage | ServerMessage;
 
+type PageContentListenEvents = {
+  page_message: (message: SocketMessage) => void;
+}
+
+type WebSocketConnectorProps = {
+  socket: Socket;
+  appLoaded: () => boolean;
+  anythingToSend: () => boolean;
+  sendMessage?: (message: string) => void;
+  initialMessage: () => SocketMessage;
+  restartMessage: () => SocketMessage; // Too many messages have been lost and we need to restart
+  receiveData: (data: SocketMessage) => void;
+  resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
+}
+
+export interface WebSocketConnector extends WebSocketConnectorProps {}
+
 /* Sets up communicating with server (retrieving document, saving, collaboration, etc.).
  */
 export class WebSocketConnector {
 
-  socket: SocketConnection;
-
-  appLoaded: () => boolean;
-
-  anythingToSend: () => boolean;
-
-  sendMessage: (message: string) => void;
-
-  initialMessage: () => SocketMessage;
-
-  restartMessage: () => SocketMessage;
-
-  receiveData: (data: SocketMessage) => void;
-
-  resubscribed: () => void;
+  socket: Socket<PageContentListenEvents>;
 
   // Messages object used to ensure that data is received in right order.
   messages: { server: number, client: number, lastTen: SocketMessage[] } = {
@@ -102,8 +113,6 @@ export class WebSocketConnector {
 
   online = true;
 
-  connected = false;
-
   /* Increases when connection has to be reestablished */
   /* 0 = before first connection. */
   /* 1 = first connection established, etc. */
@@ -119,16 +128,15 @@ export class WebSocketConnector {
   infoDisconnected = gettext('Disconnected. Attempting to reconnect...');// Info to show while disconnected WITHOUT unsaved data
 
   constructor ({
-    socket = io(), // needs to be specified
-    appLoaded = () => false, // required argument
-    anythingToSend = () => false, // required argument
-    sendMessage = (() => null) as WebSocketConnector['sendMessage'],
-    initialMessage = (() => ({ type: 'subscribe' })) as WebSocketConnector['initialMessage'],
-    resubscribed = () => {}, // Cleanup when the client connects a second or subsequent time
-    restartMessage = (() => ({ type: 'get_document' })) as WebSocketConnector['restartMessage'], // Too many messages have been lost and we need to restart
-    receiveData = (() => {}) as WebSocketConnector['receiveData']
-  }) {
-    this.socket = socket;
+    socket,
+    appLoaded,
+    anythingToSend,
+    sendMessage,
+    initialMessage,
+    resubscribed,
+    restartMessage,
+    receiveData
+  }: WebSocketConnectorProps) {
     this.appLoaded = appLoaded;
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
@@ -136,34 +144,36 @@ export class WebSocketConnector {
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
+    this.socket = socket;
+    this.createWSConnection();
   }
 
   init () {
-    this.createWSConnection();
 
     // Close the socket manually for now when the connection is lost. Sometimes the socket isn't closed on disconnection.
-    const onOffline = () => this.ws?.close();
-    this.listeners.onOffline = onOffline;
-    window.addEventListener('offline', onOffline);
+    // const onOffline = () => this.ws?.close();
+    // this.listeners.onOffline = onOffline;
+    // window.addEventListener('offline', onOffline);
   }
 
-  goOffline () {
-    // Simulate offline mode due to lack of ways of doing this in Chrome/Firefox
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1421357
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=423246
-    this.online = false;
-    this.ws?.close();
-  }
+  // these methods are for testing
+  // goOffline () {
+  //   // Simulate offline mode due to lack of ways of doing this in Chrome/Firefox
+  //   // https://bugzilla.mozilla.org/show_bug.cgi?id=1421357
+  //   // https://bugs.chromium.org/p/chromium/issues/detail?id=423246
+  //   this.online = false;
+  //   this.ws?.close();
+  // }
 
-  goOnline () {
-    // Reconnect from offline mode
-    this.online = true;
-  }
+  // goOnline () {
+  //   // Reconnect from offline mode
+  //   this.online = true;
+  // }
 
   close () {
-    this.ws.onclose = () => {};
-    this.ws.close();
-    window.removeEventListener('offline', this.listeners.onOffline);
+    // this.ws.onclose = () => {};
+    // this.ws.close();
+    // window.removeEventListener('offline', this.listeners.onOffline);
   }
 
   createWSConnection () {
@@ -173,18 +183,10 @@ export class WebSocketConnector {
       client: 0,
       lastTen: []
     };
-    const location = window.location;
-    const url = this.online
-      ? `${socketsHost}${this.url}`
-      : `${
-        location.protocol === 'https:'
-          ? 'wss://offline'
-          : 'ws://offline'
-      }`;
-    this.ws = new window.WebSocket(url);
 
-    this.ws.onmessage = event => {
-      const data = JSON.parse(event.data);
+    this.open();
+
+    this.socket.on('page_message', data => {
       const expectedServer = this.messages.server + 1;
       if (data.type === 'request_resend') {
         this.resend_messages(data.from);
@@ -196,10 +198,10 @@ export class WebSocketConnector {
       else if (data.s > expectedServer) {
         // Messages from the server have been lost.
         // Request resend.
-        this.ws?.send(JSON.stringify({
+        this.socket.emit('page_message', {
           type: 'request_resend',
           from: this.messages.server
-        }));
+        });
       }
       else {
         this.messages.server = expectedServer;
@@ -222,18 +224,18 @@ export class WebSocketConnector {
             this.messages.client += 1;
             _data.c = this.messages.client;
             _data.s = this.messages.server;
-            this.ws?.send(JSON.stringify(_data));
+            this.socket.emit('page_message', _data);
           });
           this.receive(data);
         }
       }
-    };
+    });
 
-    this.ws.onclose = () => {
-      this.connected = false;
-      window.setTimeout(() => {
-        this.createWSConnection();
-      }, 2000);
+    this.socket.on('connect', () => {
+      log.debug('ws connected!', { anythingToSend: this.anythingToSend() });
+      // window.setTimeout(() => {
+      //   this.createWSConnection();
+      // }, 2000);
       if (!this.appLoaded()) {
         // doc not initiated
         return;
@@ -249,11 +251,10 @@ export class WebSocketConnector {
 
       }
 
-    };
+    });
   }
 
   open () {
-    this.connected = true;
 
     const message = this.initialMessage();
     this.connectionCount += 1;
@@ -277,12 +278,12 @@ export class WebSocketConnector {
 
   /** Sends data to server or keeps it in a list if currently offline. */
   send (getData: () => SocketMessage, timer = 80) {
-    const ws = this.ws;
-    if (ws && this.connected && ws.readyState !== ws.OPEN) {
-      // @ts-ignore
-      ws.onclose();
-    }
-    if (this.connected && !this.recentlySent) {
+    // logic from original source: reconnect if not connected anymore
+    // if (this.connected && socket.readyState !== socket.OPEN) {
+    //   // @ts-ignore
+    //   ws.onclose();
+    // }
+    if (this.socket.connected && !this.recentlySent) {
       const data = getData();
       if (!data) {
         // message is empty
@@ -293,7 +294,7 @@ export class WebSocketConnector {
       data.s = this.messages.server;
       this.messages.lastTen.push(data);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
-      this.ws?.send(JSON.stringify(data));
+      this.socket.emit('page_message', data);
       this.setRecentlySentTimer(timer);
     }
     else {
@@ -328,15 +329,15 @@ export class WebSocketConnector {
       this.messages.client += 1;
       data.c = this.messages.client;
       data.s = this.messages.server;
-      this.ws?.send(JSON.stringify(data));
+      this.socket?.emit('page_message', data);
     });
   }
 
   receive (data: SocketMessage) {
     switch (data.type) {
-      case 'welcome':
-        this.open();
-        break;
+      // case 'welcome':
+      //   this.open();
+      //   break;
       case 'subscribed':
         this.subscribed();
         break;

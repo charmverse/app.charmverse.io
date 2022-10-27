@@ -2,7 +2,7 @@
 import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -14,7 +14,7 @@ import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-per
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
-export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
+function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
 
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
@@ -96,3 +96,5 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
     </>
   );
 }
+
+export default memo(ShareButton);

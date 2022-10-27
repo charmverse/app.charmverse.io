@@ -11,6 +11,7 @@ import { objectUid } from '@bangle.dev/utils';
 import type { ReactNode, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import type { Socket } from 'socket.io-client';
 
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
@@ -21,8 +22,9 @@ import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
-interface BangleEditorProps<PluginMetadata = any>
-  extends CoreBangleEditorProps<PluginMetadata> {
+interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
+  authToken?: string;
+  socket?: Socket | null;
   id?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
@@ -42,6 +44,8 @@ export const BangleEditor = React.forwardRef<
 >(
   (
     {
+      authToken,
+      socket,
       id,
       state,
       children,
@@ -92,14 +96,15 @@ export const BangleEditor = React.forwardRef<
         editorViewPayloadRef.current
       );
       // console.log('init editor', user, id);
-      if (user && id) {
+      if (user && id && socket && authToken && trackChanges) {
         // eslint-disable-next-line no-new
         new FidusEditor({
+          authToken,
+          socket,
           user,
           docId: id,
-          socket,
           view: _editor.view,
-          enableSuggestionMode: trackChanges
+          enableSuggestionMode: enableSuggestions
         });
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);

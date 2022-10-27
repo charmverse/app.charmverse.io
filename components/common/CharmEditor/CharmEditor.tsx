@@ -35,6 +35,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
@@ -381,6 +382,7 @@ function CharmEditor (
   const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
+  const { authToken, socket } = useWebSocketClient();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
@@ -492,6 +494,8 @@ function CharmEditor (
   return (
     <StyledReactBangleEditor
       id={pageId}
+      authToken={authToken}
+      socket={socket}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       enableSuggestions={enableSuggestingMode}
       trackChanges={true}

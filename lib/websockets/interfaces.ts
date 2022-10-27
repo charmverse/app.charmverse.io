@@ -51,23 +51,7 @@ type SubscribeToWorkspace = {
   } & SocketAuthReponse;
 };
 
-type SubscribeToPage = {
-  type: 'subscribe_to_page';
-  payload: {
-    pageId: string;
-  } & SocketAuthReponse;
-}
-
-type Unsubscribe = {
-  type: 'unsubscribe';
-  payload: {
-    roomId: string;
-  };
-}
-
-export type ClientMessage = SubscribeToWorkspace
-  | SubscribeToPage
-  | Unsubscribe;
+export type ClientMessage = SubscribeToWorkspace;
 
 export type ServerMessage = BlocksUpdated
   | BlocksCreated
@@ -77,6 +61,6 @@ export type ServerMessage = BlocksUpdated
   | PagesDeleted
   | ErrorMessage;
 
-export type WebsocketMessage = ClientMessage | ServerMessage;
+export type WebSocketMessage = ClientMessage | ServerMessage;
 
-export type WebsocketPayload<T extends WebsocketMessage['type']> = Extract<WebsocketMessage, { type: T }>['payload'];
+export type WebSocketPayload<T extends WebSocketMessage['type']> = Extract<WebSocketMessage, { type: T }>['payload'];

@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
+import type { SocketMessage } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -56,7 +57,8 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   // Define actions inside
   io.on('connect', (socket) => {
 
-    socket.emit('message', 'Connection established');
+    socket.emit('message', { type: 'welcome' });
+    socket.emit('page_message', { type: 'welcome' });
 
     socket.on('message', async (message: ClientMessage) => {
 
@@ -77,8 +79,22 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
             break;
           }
 
-          case 'subscribe_to_page': {
-            const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
+          default:
+            log.debug('Unhandled socket message type', message);
+        }
+      }
+      catch (err) {
+        socket.emit('error', 'Unable to register user');
+      }
+    });
+
+    socket.on('page_message', async (message: SocketMessage) => {
+      log.debug('page message message', message);
+      try {
+        switch (message.type) {
+
+          case 'subscribe': {
+            const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.authToken, {
               password: authSecret,
               ttl: safeUserIdTtl
             });
@@ -86,14 +102,14 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
               relay.registerPageSubscriber({
                 userId: decryptedUserId,
                 socket,
-                roomId: message.payload.pageId
+                roomId: message.roomId
               });
             }
             break;
           }
 
           case 'unsubscribe':
-            socket.leave(message.payload.roomId);
+            socket.leave(message.roomId);
             break;
 
           default:
@@ -104,6 +120,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
         socket.emit('error', 'Unable to register user');
       }
     });
+
   });
 
   res.socket.server.io = io;

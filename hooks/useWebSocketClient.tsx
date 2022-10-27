@@ -1,11 +1,13 @@
+import type { EventsMap } from '@socket.io/component-emitter';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import log from 'lib/log';
-import type { ClientMessage, ServerMessage, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
+import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -13,17 +15,20 @@ import { useUser } from './useUser';
 
 type LoggedMessage = { type: string, payload: any }
 
-export type SocketConnection = Socket<{
-  message: (message: WebsocketMessage) => void;
-}>;
+type WorkspaceListenEvents = {
+  message: (message: WebSocketMessage) => void;
+}
+
+export type SocketConnection<ListenEvents extends EventsMap = WorkspaceListenEvents> = Socket<ListenEvents>;
 
 type IContext = {
+  authToken?: string;
   sendMessage: (message: ClientMessage) => void;
   socket: SocketConnection | null;
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  subscribe: <T extends ServerMessage['type']>(event: T, callback: (payload: WebsocketPayload<T>) => void) => () => void;
+  subscribe: <T extends ServerMessage['type']>(event: T, callback: (payload: WebSocketPayload<T>) => void) => () => void;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
@@ -48,18 +53,19 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   );
 
   const { user } = useUser();
+  const { data: authResponse } = useSWRImmutable(user?.id, () => charmClient.socket()); // refresh when user
 
   useEffect(() => {
 
-    if (space) {
-      connect();
+    if (space && authResponse) {
+      connect(space.id, authResponse.authToken);
     }
 
     return () => {
       socket?.disconnect();
       socket?.off();
     };
-  }, [space?.id, user?.id]);
+  }, [space?.id, user?.id, authResponse]);
 
   function pushToMessageLog (message: LoggedMessage) {
     if (process.env.NODE_ENV === 'development') {
@@ -67,8 +73,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     }
   }
 
-  async function connect () {
-    const { authToken } = await charmClient.socket();
+  async function connect (spaceId: string, authToken: string) {
 
     if (socket?.connected) {
       socket.disconnect();
@@ -85,8 +90,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket.emit('message', {
         type: 'subscribe',
         payload: {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          spaceId: space!.id,
+          spaceId,
           authToken
         }
       });
@@ -121,12 +125,13 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   }
 
   const value: IContext = useMemo(() => ({
+    authToken: authResponse?.authToken,
     sendMessage,
     messageLog,
     clearLog,
     socket,
     subscribe: eventFeed.subscribe as IContext['subscribe']
-  }), [messageLog, Boolean(socket)]);
+  }), [authResponse, messageLog, Boolean(socket)]);
 
   return (
     <WebSocketClientContext.Provider value={value}>
@@ -136,7 +141,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
 }
 
-function isServerMessage (message: WebsocketMessage): message is ServerMessage {
+function isServerMessage (message: WebSocketMessage): message is ServerMessage {
   return Boolean(message?.type && message?.payload);
 }
 

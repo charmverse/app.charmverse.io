@@ -13,13 +13,13 @@ import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
-import type { WebsocketPayload } from 'lib/websockets/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
-import { useWebSocketClient } from './useSocketClient';
 import { useUser } from './useUser';
+import { useWebSocketClient } from './useWebSocketClient';
 
 export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
 
@@ -214,7 +214,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
-  const handlePagesUpdate = useCallback((value: WebsocketPayload<'pages_meta_updated'>) => {
+  const handlePagesUpdate = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
     const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
 
       const existingPage = pages[updatedPageMeta.id];
@@ -238,7 +238,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const handleNewPages = useCallback((value: WebsocketPayload<'pages_created'>) => {
+  const handleNewPages = useCallback((value: WebSocketPayload<'pages_created'>) => {
 
     const newPages = value.reduce((pageMap, page) => {
       if (page.spaceId === currentSpace?.id) {
@@ -257,7 +257,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const handlePageDeletes = useCallback((value: WebsocketPayload<'pages_deleted'>) => {
+  const handlePageDeletes = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
 
     mutatePagesList(existingPages => {
 

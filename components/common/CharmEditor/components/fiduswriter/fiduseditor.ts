@@ -6,8 +6,8 @@ import {
   collab,
   sendableSteps
 } from 'prosemirror-collab';
+import type { Socket } from 'socket.io-client';
 
-import type { SocketConnection } from 'hooks/useSocketClient';
 import log from 'lib/log';
 
 import { ModCollab } from './collab';
@@ -40,11 +40,12 @@ const gettext = (text: string) => text;
 type User = { id: string, username: string }
 
 type EditorProps = {
+  authToken: string;
+  socket: Socket;
   user: User;
   docId: string;
   view: EditorView;
   enableSuggestionMode: boolean;
-  socket: SocketConnection;
 }
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -83,7 +84,7 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor ({ user, docId, view, socket, enableSuggestionMode }: EditorProps) {
+  constructor ({ authToken, user, docId, view, socket, enableSuggestionMode }: EditorProps) {
 
     this.user = user;
 
@@ -103,10 +104,10 @@ export class FidusEditor {
       [trackPlugin, () => ({ editor: this })]
     ];
 
-    this.init(view, socket);
+    this.init(view, socket, authToken);
   }
 
-  init (view: EditorView, socket: SocketConnection) {
+  init (view: EditorView, socket: WebSocketConnector['socket'], authToken: string) {
 
     let resubscribed = false;
 
@@ -116,12 +117,14 @@ export class FidusEditor {
       anythingToSend: () => Boolean(sendableSteps(this.view.state)),
       initialMessage: () => {
         const message: ClientSubscribeMessage = {
+          roomId: this.docInfo.id,
+          authToken,
           type: 'subscribe'
         };
 
-        if (this.ws.connectionCount) {
-          message.connection = this.ws.connectionCount;
-        }
+        // if (this.ws.connectionCount) {
+        //   message.connection = this.ws.connectionCount;
+        // }
         return message;
       },
       resubscribed: () => {
@@ -215,6 +218,7 @@ export class FidusEditor {
       //   }
       // }
     });
+    log.debug('enabled ws');
 
     this.initEditor(view);
 
