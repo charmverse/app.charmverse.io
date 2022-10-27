@@ -2,9 +2,10 @@ import styled from '@emotion/styled';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import DoneIcon from '@mui/icons-material/Done';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Tooltip, Typography } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
@@ -88,30 +89,37 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
   return (
     <Box mb={3}>
-      <Box display='flex' justifyContent='space-between' alignItems='center' pb={0.5}>
-        <Box display='flex' gap={1} alignItems='center'>
-          <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {role.name} {role.source === 'guild_xyz' ? (
-              <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
-                <span style={{ display: 'flex' }}>
-                  <GuildXYZIcon style={{
-                    transform: 'scale(0.75)'
-                  }}
-                  />
-                </span>
-              </Tooltip>
-            ) : null} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
-          </Typography>
-        </Box>
-        {isEditable && (
-          <IconButton size='small' {...bindTrigger(menuState)}>
-            <MoreHorizIcon />
-          </IconButton>
-        )}
-      </Box>
-      <Divider />
+      <Accordion style={{ boxShadow: 'none' }}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+        >
 
-      {
+          <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
+            <Box display='flex' justifyContent='space-between'>
+              <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                {role.name} {role.source === 'guild_xyz' ? (
+                  <Tooltip placement='top' arrow title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'>
+                    <span style={{ display: 'flex' }}>
+                      <GuildXYZIcon style={{
+                        transform: 'scale(0.75)'
+                      }}
+                      />
+                    </span>
+                  </Tooltip>
+                ) : null} {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
+              </Typography>
+
+            </Box>
+            {isEditable && (
+              <IconButton size='small' {...bindTrigger(menuState)}>
+                <MoreHorizIcon />
+              </IconButton>
+            )}
+          </Box>
+
+        </AccordionSummary>
+        <Divider />
+        {
         roleSpacePermissions.length > 0 && (
           <Box sx={{ mt: 1, mb: 1, display: 'flex', gap: 1 }}>
             {
@@ -134,26 +142,62 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
         )
       }
 
-      <ScrollableBox rows={assignedMembers.length}>
-        {assignedMembers.map(member => (
-          <RoleMemberRow
-            key={member.id}
-            member={member}
-            isEditable={isEditable && role.source !== 'guild_xyz'}
-            onRemove={(userId) => {
-              removeMember(userId);
-              userIdsToHide = userIdsToHide.filter(id => id !== userId);
-            }}
-          />
-        ))}
-      </ScrollableBox>
-      { role.source !== 'guild_xyz'
-        ? assignedMembers.length < members.length ? (
-          isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
-        ) : (
-          <Typography variant='caption'>All space members have been added to this role</Typography>
-        ) : null}
+        <AccordionDetails>
 
+          <ScrollableBox rows={assignedMembers.length}>
+            {assignedMembers.map(member => (
+              <>
+
+                <RoleMemberRow
+                  key={member.id}
+                  member={member}
+                  isEditable={isEditable && role.source !== 'guild_xyz'}
+                  onRemove={(userId) => {
+                    removeMember(userId);
+                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
+                  }}
+                />
+                <RoleMemberRow
+                  key={member.id}
+                  member={member}
+                  isEditable={isEditable && role.source !== 'guild_xyz'}
+                  onRemove={(userId) => {
+                    removeMember(userId);
+                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
+                  }}
+                />
+                <RoleMemberRow
+                  key={member.id}
+                  member={member}
+                  isEditable={isEditable && role.source !== 'guild_xyz'}
+                  onRemove={(userId) => {
+                    removeMember(userId);
+                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
+                  }}
+                />
+                <RoleMemberRow
+                  key={member.id}
+                  member={member}
+                  isEditable={isEditable && role.source !== 'guild_xyz'}
+                  onRemove={(userId) => {
+                    removeMember(userId);
+                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
+                  }}
+                />
+              </>
+            ))}
+          </ScrollableBox>
+        </AccordionDetails>
+      </Accordion>
+      <Box px={2} pb={1}>
+        { role.source !== 'guild_xyz'
+          ? assignedMembers.length < members.length ? (
+            isEditable && <Button onClick={showMembersPopup} variant='text' color='secondary'>+ Add members</Button>
+          ) : (
+            <Typography variant='caption'>All space members have been added to this role</Typography>
+          ) : null}
+      </Box>
+      <Divider />
       <Menu
         {...bindMenu(menuState)}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
