@@ -35,7 +35,6 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: s
       id: v4(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      deletedAt: new Date(),
       email: '',
       username: '',
       avatar: '',
