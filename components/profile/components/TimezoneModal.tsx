@@ -25,7 +25,7 @@ const getTimeZoneOptions = () => {
   return offsetTmz;
 };
 
-export function TimezoneModal ({
+export default function TimezoneModal ({
   close,
   isOpen,
   onSave,
