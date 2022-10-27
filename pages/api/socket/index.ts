@@ -7,9 +7,9 @@ import { Server } from 'socket.io';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
+import { registerPageEvents } from 'lib/websockets/pageEvents';
 import { relay } from 'lib/websockets/relay';
 
-import { registerPageEvents } from './pageEvents';
 import { registerSpaceEvents } from './spaceEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

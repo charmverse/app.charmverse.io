@@ -9,6 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
+import type { ClientSubscribeMessage, SocketMessage } from 'lib/websockets/pageEvents';
 
 import { ModCollab } from './collab';
 import {
@@ -20,7 +21,6 @@ import {
   acceptAllNoInsertions,
   amendTransaction
 } from './track';
-import type { ClientSubscribeMessage, SocketMessage } from './ws';
 import { WebSocketConnector } from './ws';
 
 type EditorModules = {
@@ -121,10 +121,10 @@ export class FidusEditor {
           authToken,
           type: 'subscribe'
         };
-
-        // if (this.ws.connectionCount) {
-        //   message.connection = this.ws.connectionCount;
-        // }
+        log.debug('initialMessage connectionCount', this.ws?.connectionCount);
+        if (this.ws?.connectionCount) {
+          message.connection = this.ws.connectionCount;
+        }
         return message;
       },
       resubscribed: () => {

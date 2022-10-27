@@ -1,7 +1,7 @@
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import type { ClientMessage as ClientWorkspaceMessage, SealedUserId } from 'lib/websockets/interfaces';
+import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const authSecret = process.env.AUTH_SECRET as string;
@@ -11,12 +11,11 @@ export async function registerSpaceEvents (socket: Socket) {
 
   socket.emit(socketEvent, { type: 'welcome' });
 
-  socket.on(socketEvent, async (message: ClientWorkspaceMessage) => {
+  socket.on(socketEvent, async (message: ClientMessage) => {
     if (message.type === 'subscribe') {
       try {
         const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
           password: authSecret
-          // ttl: safeUserIdTtl
         });
         if (typeof decryptedUserId === 'string') {
           relay.registerWorkspaceSubscriber({

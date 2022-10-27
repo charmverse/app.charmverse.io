@@ -1,15 +1,10 @@
+import type { Participant } from 'lib/websockets/pageEvents';
+
 import type { FidusEditor } from '../fiduseditor';
 import { removeCollaboratorSelection } from '../state_plugins';
 
 import { ModCollabColors } from './colors';
 import { ModCollabDoc } from './doc';
-
-export type Participant = {
-  id: string;
-  name: string;
-  session_id: string | undefined;
-  sessionIds: string[];
-};
 
 export class ModCollab {
 

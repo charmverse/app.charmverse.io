@@ -1,88 +1,9 @@
-import type { Node } from '@bangle.dev/pm';
-import io from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 
-import type { SocketConnection } from 'hooks/useWebSocketClient';
 import log from 'lib/log';
-
-import type { Participant } from './collab';
+import type { SocketMessage } from 'lib/websockets/pageEvents';
 
 const gettext = (text: string) => text;
-
-type BaseSocketMessage<T> = T & {
-  c: number; // client
-  s: number; // server
-  v: number; // version
-};
-
-export type ClientRequestResendMessage = BaseSocketMessage<{
-  type: 'request_resend';
-  from: number;
-}>;
-
-type ClientGetDocumentMessage = {
-  type: 'get_document';
-};
-
-export type ClientSelectionMessage = BaseSocketMessage<{
-  type: 'selection_change';
-  id: string;
-  session_id: string;
-  anchor: number;
-  head: number;
-}>;
-
-export type ClientDiffMessage = BaseSocketMessage<{
-  type: 'diff';
-  rid: number;
-  cid?: number; // client id
-  ds?: any[]; // steps to send
-  jd?: any; // used by python backend in fiduswriter - maybe we dont need it?
-  ti?: string; // new title
-  doc?: Node;
-}>;
-
-export type ClientSubscribeMessage = {
-  type: 'subscribe';
-  roomId: string;
-  authToken: string;
-}
-
-export type ClientUnsubscribeMessage = {
-  type: 'unsubscribe';
-  roomId: string;
-}
-
-export type ClientMessage = ClientSubscribeMessage
-  | ClientDiffMessage
-  | ClientSelectionMessage
-  | ClientRequestResendMessage
-  | ClientGetDocumentMessage
-  | ClientUnsubscribeMessage;
-
-type ServerConnectionsMessage = BaseSocketMessage<{
-  type: 'connections';
-  participant_list: Participant[];
-}>;
-
-export type ServerDocDataMessage = BaseSocketMessage<{
-  type: 'doc_data';
-  doc: { content: Node, v: number };
-  doc_info: any;
-  time: number;
-}>;
-
-export type ServerDiffMessage = BaseSocketMessage<{
-  type: 'confirm_diff' | 'reject_diff';
-  rid: number;
-}>;
-
-type ServerMessageType = 'confirm_version' | 'subscribed' | 'welcome' | 'patch_error';
-type ServerMessage = ServerConnectionsMessage | ServerDocDataMessage | ServerDiffMessage | BaseSocketMessage<{
-  type: ServerMessageType;
-}>;
-
-export type SocketMessage = ClientMessage | ServerMessage;
 
 const socketEvent = 'page_message';
 

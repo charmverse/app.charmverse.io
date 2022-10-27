@@ -13,7 +13,7 @@ import {
   updateCollaboratorSelection
 } from '../state_plugins';
 
-import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from '../ws';
+import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/pageEvents';
 
 
 export class ModCollabDoc {
@@ -115,7 +115,7 @@ export class ModCollabDoc {
         return plugin[0]();
       }
     });
-
+    console.log('load plugins!')
     const stateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,

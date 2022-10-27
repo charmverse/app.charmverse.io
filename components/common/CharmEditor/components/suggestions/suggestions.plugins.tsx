@@ -5,7 +5,7 @@ import { RateReviewOutlined } from '@mui/icons-material';
 import reactDOM from 'react-dom';
 
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { trackPlugin } from '../fiduswriter/state_plugins/track';
+import { trackPlugin } from '../fiduswriter/state_plugins';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';
