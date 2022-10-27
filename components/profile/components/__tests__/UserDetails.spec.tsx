@@ -18,7 +18,8 @@ const userDetails: UserDetails = {
     githubURL: 'https://github.com/charmverse',
     twitterURL: 'https://mobile.twitter.com/charmverse',
     linkedinURL: 'https://www.linkedin.com/in/alexchibunpoon/'
-  }
+  },
+  timezone: null
 };
 
 function WrappedUserDetails () {
@@ -46,6 +47,11 @@ jest.mock('../IdentityModal', () => ({
   __esModule: true,
   default: () => IdentityModal,
   getIdentityIcon: jest.fn()
+}));
+
+jest.mock('public/images/discord_logo.svg', () => ({
+  __esModule: true,
+  default: () => null
 }));
 
 jest.mock('swr/immutable', () => ({

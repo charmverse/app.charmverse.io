@@ -1,5 +1,5 @@
 import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -9,6 +9,7 @@ export function DiscordSocialIcon (
   { username: string, showLogo?: boolean, showUsername?: boolean }
 ) {
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
+
   const onDiscordUsernameCopy = () => {
     setIsDiscordUsernameCopied(true);
     setTimeout(() => setIsDiscordUsernameCopied(false), 1000);
