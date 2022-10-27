@@ -4,9 +4,11 @@ import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
+import { ActionNotPermittedError } from 'lib/middleware';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
+import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
-import type { WebsocketEvent, WebsocketMessage } from './interfaces';
+import type { ServerMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
@@ -41,19 +43,23 @@ export class WebsocketBroadcaster {
 
   }
 
-  broadcastToAll (message: WebsocketMessage): void {
+  broadcastToAll (message: ServerMessage): void {
     this.io.emit('message', message);
   }
 
-  broadcast<T extends WebsocketEvent> (message: WebsocketMessage<T>, roomId: string): void {
+  broadcast (message: ServerMessage, roomId: string): void {
     this.io.to(roomId).emit('message', message);
+  }
+
+  leaveRoom (socket: Socket, roomId: string): void {
+    socket.leave(roomId);
   }
 
   /**
    * Subscribe a user to all events for themselves and a specific room
    * Unsubscribes user from all other rooms
    */
-  async registerSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }): Promise<void> {
+  async registerWorkspaceSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }) {
 
     const spaceRole = await prisma.spaceRole.findFirst({
       where: {
@@ -72,7 +78,20 @@ export class WebsocketBroadcaster {
     });
 
     socket.join([roomId]);
+  }
 
+  async registerPageSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }) {
+    const permissions = await computeUserPagePermissions({
+      pageId: roomId,
+      userId
+    });
+
+    if (permissions.read !== true) {
+      socket.send(new ActionNotPermittedError('You do not have permission to view this page'));
+      return;
+    }
+
+    socket.join([roomId]);
   }
 
 }

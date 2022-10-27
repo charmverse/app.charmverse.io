@@ -1,6 +1,7 @@
 import type { Node } from '@bangle.dev/pm';
+import io from 'socket.io-client';
 
-import { socketsHost } from 'config/constants';
+import type { SocketConnection } from 'hooks/useSocketClient';
 
 import type { Participant } from './collab';
 
@@ -69,7 +70,7 @@ export type SocketMessage = ClientMessage | ServerMessage;
  */
 export class WebSocketConnector {
 
-  url: string;
+  socket: SocketConnection;
 
   appLoaded: () => boolean;
 
@@ -113,14 +114,12 @@ export class WebSocketConnector {
   // @ts-ignore set up during init()
   listeners: { onOffline: () => any };
 
-  ws?: WebSocket;
-
   warningNotAllSent = gettext('Warning! Not all your changes have been saved! You could suffer data loss. Attempting to reconnect...'); // Info to show while disconnected WITH unsaved data
 
   infoDisconnected = gettext('Disconnected. Attempting to reconnect...');// Info to show while disconnected WITHOUT unsaved data
 
   constructor ({
-    url = '', // needs to be specified
+    socket = io(), // needs to be specified
     appLoaded = () => false, // required argument
     anythingToSend = () => false, // required argument
     sendMessage = (() => null) as WebSocketConnector['sendMessage'],
@@ -129,7 +128,7 @@ export class WebSocketConnector {
     restartMessage = (() => ({ type: 'get_document' })) as WebSocketConnector['restartMessage'], // Too many messages have been lost and we need to restart
     receiveData = (() => {}) as WebSocketConnector['receiveData']
   }) {
-    this.url = url;
+    this.socket = socket;
     this.appLoaded = appLoaded;
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
@@ -162,10 +161,8 @@ export class WebSocketConnector {
   }
 
   close () {
-    if (this.ws) {
-      this.ws.onclose = () => {};
-      this.ws.close();
-    }
+    this.ws.onclose = () => {};
+    this.ws.close();
     window.removeEventListener('offline', this.listeners.onOffline);
   }
 

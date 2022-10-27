@@ -4,9 +4,10 @@ import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
+import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { SocketAuthReponse, WebsocketMessage } from 'lib/websockets/interfaces';
+import type { SocketAuthReponse, ClientMessage } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -57,22 +58,47 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
 
     socket.emit('message', 'Connection established');
 
-    socket.on('message', async (message: WebsocketMessage<'subscribe'>) => {
+    socket.on('message', async (message: ClientMessage) => {
 
       try {
-        const decryptedUserId = (await unsealData<SealedUserId>(message.payload.authToken, {
-          password: authSecret,
-          ttl: safeUserIdTtl
-        }))?.userId;
+        switch (message.type) {
+          case 'subscribe': {
+            const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
+              password: authSecret,
+              ttl: safeUserIdTtl
+            });
+            if (typeof decryptedUserId === 'string') {
+              relay.registerWorkspaceSubscriber({
+                userId: decryptedUserId,
+                socket,
+                roomId: message.payload.spaceId
+              });
+            }
+            break;
+          }
 
-        if (message.type === 'subscribe' && typeof decryptedUserId === 'string') {
-          relay.registerSubscriber({
-            userId: decryptedUserId,
-            socket,
-            roomId: (message).payload.spaceId
-          });
+          case 'subscribe_to_page': {
+            const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
+              password: authSecret,
+              ttl: safeUserIdTtl
+            });
+            if (typeof decryptedUserId === 'string') {
+              relay.registerPageSubscriber({
+                userId: decryptedUserId,
+                socket,
+                roomId: message.payload.pageId
+              });
+            }
+            break;
+          }
+
+          case 'unsubscribe':
+            socket.leave(message.payload.roomId);
+            break;
+
+          default:
+            log.debug('Unhandled socket message type', message);
         }
-
       }
       catch (err) {
         socket.emit('error', 'Unable to register user');

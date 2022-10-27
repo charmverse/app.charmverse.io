@@ -5,8 +5,7 @@ import io from 'socket.io-client';
 
 import charmClient from 'charmClient';
 import log from 'lib/log';
-import type { WebsocketEvent, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
-import { WebsocketEvents } from 'lib/websockets/interfaces';
+import type { ClientMessage, ServerMessage, WebsocketMessage, WebsocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -14,15 +13,21 @@ import { useUser } from './useUser';
 
 type LoggedMessage = { type: string, payload: any }
 
+export type SocketConnection = Socket<{
+  message: (message: WebsocketMessage) => void;
+}>;
+
 type IContext = {
-  sendMessage: (message: WebsocketMessage) => void;
+  sendMessage: (message: ClientMessage) => void;
+  socket: SocketConnection | null;
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  subscribe: <T extends WebsocketEvent>(event: T, callback: (payload: WebsocketPayload<T>) => void) => () => void;
+  subscribe: <T extends ServerMessage['type']>(event: T, callback: (payload: WebsocketPayload<T>) => void) => () => void;
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
+  socket: null,
   sendMessage: () => null,
   // Development only
   messageLog: [],
@@ -30,7 +35,7 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   subscribe: () => () => null
 });
 
-let socket: Socket<{ message: (message: WebsocketMessage) => void }>;
+let socket: SocketConnection;
 
 export function WebSocketClientProvider ({ children }: { children: ReactNode }) {
 
@@ -38,7 +43,9 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   const [space] = useCurrentSpace();
 
-  const { current: eventFeed } = useRef(new PubSub<WebsocketEvent, WebsocketPayload>());
+  const { current: eventFeed } = useRef(
+    new PubSub<ServerMessage['type'], ServerMessage['payload']>()
+  );
 
   const { user } = useUser();
 
@@ -85,10 +92,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       });
     });
 
-    socket.on('message', (message: WebsocketMessage) => {
-      const isValidMessage = !!message && WebsocketEvents.includes(message.type);
-
-      if (isValidMessage) {
+    socket.on('message', message => {
+      if (isServerMessage(message)) {
         // Key part when we relay messages from the server to consumers
         eventFeed.publish(message.type, message.payload);
         pushToMessageLog(message);
@@ -106,7 +111,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   }
 
-  function sendMessage (message: WebsocketMessage) {
+  function sendMessage (message: ClientMessage) {
     pushToMessageLog(message);
     socket.emit('message', message);
   }
@@ -119,9 +124,9 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     sendMessage,
     messageLog,
     clearLog,
-    // Wrapper exists as there was an issue directly exporting the function itself
-    subscribe: <T extends WebsocketEvent>(event: T, callback: (payload: WebsocketPayload<T>) => void) => eventFeed.subscribe(event, callback)
-  }), [messageLog]);
+    socket,
+    subscribe: eventFeed.subscribe as IContext['subscribe']
+  }), [messageLog, Boolean(socket)]);
 
   return (
     <WebSocketClientContext.Provider value={value}>
@@ -129,6 +134,10 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     </WebSocketClientContext.Provider>
   );
 
+}
+
+function isServerMessage (message: WebsocketMessage): message is ServerMessage {
+  return Boolean(message?.type && message?.payload);
 }
 
 export const useWebSocketClient = () => useContext(WebSocketClientContext);

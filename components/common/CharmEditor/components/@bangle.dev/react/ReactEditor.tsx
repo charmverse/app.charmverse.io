@@ -4,7 +4,7 @@ import type {
 import {
   BangleEditor as CoreBangleEditor
 } from '@bangle.dev/core';
-import type { Plugin, Transaction } from '@bangle.dev/pm';
+import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
@@ -17,7 +17,6 @@ import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
-import { amendTransaction } from '../../fiduswriter/track/amendTransaction';
 
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
@@ -87,28 +86,37 @@ export const BangleEditor = React.forwardRef<
     );
 
     useEffect(() => {
+      // console.log('editor ref changed', ref);
       const _editor = new CoreBangleEditor(
         renderRef.current!,
         editorViewPayloadRef.current
       );
+      // console.log('init editor', user, id);
       if (user && id) {
         // eslint-disable-next-line no-new
-        new FidusEditor(user, id, _editor.view, trackChanges);
+        new FidusEditor({
+          user,
+          docId: id,
+          socket,
+          view: _editor.view,
+          enableSuggestionMode: trackChanges
+        });
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       onReadyRef.current(_editor);
       setEditor(_editor);
       return () => {
+        // console.log('destroy editor');
         _editor.destroy();
       };
-    }, [ref]);
+    }, [id, ref, renderRef]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(
         'When using nodeViews, you must provide renderNodeViews callback'
       );
     }
-
+    // console.log('render node views');
     return (
       <EditorViewContext.Provider value={editor?.view as any}>
         <div ref={editorRef} className='bangle-editor-core'>

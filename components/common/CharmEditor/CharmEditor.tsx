@@ -491,6 +491,7 @@ function CharmEditor (
 
   return (
     <StyledReactBangleEditor
+      id={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       enableSuggestions={enableSuggestingMode}
       trackChanges={true}

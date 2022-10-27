@@ -7,9 +7,9 @@ import {
   sendableSteps
 } from 'prosemirror-collab';
 
+import type { SocketConnection } from 'hooks/useSocketClient';
 import log from 'lib/log';
 
-import type { Participant } from './collab';
 import { ModCollab } from './collab';
 import {
   collabCaretsPlugin,
@@ -37,14 +37,28 @@ type DocInfo = {
 
 const gettext = (text: string) => text;
 
+type User = { id: string, username: string }
+
+type EditorProps = {
+  user: User;
+  docId: string;
+  view: EditorView;
+  enableSuggestionMode: boolean;
+  socket: SocketConnection;
+}
+
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
 export class FidusEditor {
+
+  user: User;
 
   client_id: number = Math.floor(Math.random() * 0xFFFFFFFF);
 
   clientTimeAdjustment = 0;
 
   docInfo: DocInfo;
+
+  enableSuggestionMode: boolean = false;
 
   // @ts-ignore gets defined in initEditor
   mod: EditorModules = {};
@@ -69,9 +83,11 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor (public user: { id: string, username: string }, docId: string, view: EditorView, private enableSuggestedEdits: boolean = false) {
+  constructor ({ user, docId, view, socket, enableSuggestionMode }: EditorProps) {
 
     this.user = user;
+
+    this.enableSuggestionMode = enableSuggestionMode;
 
     this.docInfo = {
       id: docId,
@@ -87,15 +103,15 @@ export class FidusEditor {
       [trackPlugin, () => ({ editor: this })]
     ];
 
-    this.init(view);
+    this.init(view, socket);
   }
 
-  init (view: EditorView) {
+  init (view: EditorView, socket: SocketConnection) {
 
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
-      url: `/ws/document/${this.docInfo.id}/`,
+      socket,
       appLoaded: () => Boolean(this.view.state.plugins.length),
       anythingToSend: () => Boolean(sendableSteps(this.view.state)),
       initialMessage: () => {
@@ -245,10 +261,10 @@ export class FidusEditor {
   }
 
   initEditor (view: EditorView) {
-    // console.log('init editor');
+
     view.setProps({
       dispatchTransaction: tr => {
-        const trackedTr = amendTransaction(tr, this.view.state, this, this.enableSuggestedEdits);
+        const trackedTr = amendTransaction(tr, this.view.state, this, this.enableSuggestionMode);
         const { state: newState } = this.view.state.applyTransaction(trackedTr);
         this.view.updateState(newState);
         if (tr.steps) {

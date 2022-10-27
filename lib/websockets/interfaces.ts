@@ -1,49 +1,82 @@
 import type { Block } from '@prisma/client';
 
 import type { PageMeta } from 'lib/pages';
-import type { SystemError } from 'lib/utilities/errors';
 
-export const WebsocketEvents = ['blocks_updated', 'blocks_created', 'blocks_deleted', 'pages_meta_updated', 'pages_created', 'pages_deleted', 'subscribe', 'error'] as const;
-
-export type WebsocketEvent = typeof WebsocketEvents[number]
-
-export type Resource = { id: string }
-export type ResourceWithSpaceId = Resource & { spaceId: string }
-
-// List of event payloads
-export type BlockUpdate = Partial<Block> & ResourceWithSpaceId
-
-export type BlockDelete = Resource & Pick<Block, 'type'>;
-
-export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
+export type Resource = { id: string };
+export type ResourceWithSpaceId = Resource & { spaceId: string };
 
 export type SocketAuthReponse = {
   authToken: string;
+};
+
+type BlocksUpdated = {
+  type: 'blocks_updated';
+  payload: (Partial<Block> & ResourceWithSpaceId)[];
+};
+
+type BlocksCreated = {
+  type: 'blocks_created';
+  payload: Block[];
+};
+
+type BlocksDeleted = {
+  type: 'blocks_deleted';
+  payload: (Resource & Pick<Block, 'type'>)[];
+};
+
+type PagesMetaUpdated = {
+  type: 'pages_meta_updated';
+  payload: (Partial<PageMeta> & ResourceWithSpaceId)[];
+};
+
+type PagesCreated = {
+  type: 'pages_created';
+  payload: PageMeta[];
+};
+
+type PagesDeleted = {
+  type: 'pages_deleted';
+  payload: Resource[];
+};
+
+type ErrorMessage = {
+  type: 'error';
+  payload: string;
 }
 
-export type SubscribeRequest = {
-  spaceId: string;
-} & SocketAuthReponse
+type SubscribeToWorkspace = {
+  type: 'subscribe';
+  payload: {
+    spaceId: string;
+  } & SocketAuthReponse;
+};
 
-// Map of event type to event payload
-export type Updates = {
-  blocks_updated: BlockUpdate[];
-  blocks_created: Block[];
-  blocks_deleted: BlockDelete[];
-  pages_meta_updated: PageMetaUpdate[];
-  pages_created: PageMeta[];
-  pages_deleted: Resource[];
-  subscribe: SubscribeRequest;
-  error: SystemError;
+type SubscribeToPage = {
+  type: 'subscribe_to_page';
+  payload: {
+    pageId: string;
+  } & SocketAuthReponse;
 }
 
-export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Updates[T]
-
-export type WebsocketMessage<T extends WebsocketEvent = WebsocketEvent> = {
-  type: T;
-  payload: WebsocketPayload<T>;
+type Unsubscribe = {
+  type: 'unsubscribe';
+  payload: {
+    roomId: string;
+  };
 }
 
-export type WebsocketSubscriber = {
-  userId: string;
-}
+export type ClientMessage = SubscribeToWorkspace
+  | SubscribeToPage
+  | Unsubscribe;
+
+export type ServerMessage = BlocksUpdated
+  | BlocksCreated
+  | BlocksDeleted
+  | PagesMetaUpdated
+  | PagesCreated
+  | PagesDeleted
+  | ErrorMessage;
+
+export type WebsocketMessage = ClientMessage | ServerMessage;
+
+export type WebsocketPayload<T extends WebsocketMessage['type']> = Extract<WebsocketMessage, { type: T }>['payload'];
