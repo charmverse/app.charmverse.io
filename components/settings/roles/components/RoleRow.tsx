@@ -146,45 +146,15 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
 
           <ScrollableBox rows={assignedMembers.length}>
             {assignedMembers.map(member => (
-              <>
-
-                <RoleMemberRow
-                  key={member.id}
-                  member={member}
-                  isEditable={isEditable && role.source !== 'guild_xyz'}
-                  onRemove={(userId) => {
-                    removeMember(userId);
-                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
-                  }}
-                />
-                <RoleMemberRow
-                  key={member.id}
-                  member={member}
-                  isEditable={isEditable && role.source !== 'guild_xyz'}
-                  onRemove={(userId) => {
-                    removeMember(userId);
-                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
-                  }}
-                />
-                <RoleMemberRow
-                  key={member.id}
-                  member={member}
-                  isEditable={isEditable && role.source !== 'guild_xyz'}
-                  onRemove={(userId) => {
-                    removeMember(userId);
-                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
-                  }}
-                />
-                <RoleMemberRow
-                  key={member.id}
-                  member={member}
-                  isEditable={isEditable && role.source !== 'guild_xyz'}
-                  onRemove={(userId) => {
-                    removeMember(userId);
-                    userIdsToHide = userIdsToHide.filter(id => id !== userId);
-                  }}
-                />
-              </>
+              <RoleMemberRow
+                key={member.id}
+                member={member}
+                isEditable={isEditable && role.source !== 'guild_xyz'}
+                onRemove={(userId) => {
+                  removeMember(userId);
+                  userIdsToHide = userIdsToHide.filter(id => id !== userId);
+                }}
+              />
             ))}
           </ScrollableBox>
         </AccordionDetails>
