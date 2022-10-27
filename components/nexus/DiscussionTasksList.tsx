@@ -119,7 +119,7 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
   useEffect(() => {
     async function main () {
       if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
-        await charmClient.tasks.markTasks(tasks.discussions.unmarked.map(unmarkedDiscussion => ({ id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '', type: 'comment' })));
+        await charmClient.tasks.markTasks(tasks.discussions.unmarked.map(unmarkedDiscussion => ({ id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '', type: 'mention' })));
       }
     }
 

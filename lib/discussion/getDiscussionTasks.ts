@@ -84,7 +84,7 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
     spaceRecord[space.id] = space;
   });
 
-  // Get the marked mention task ids (all the discussion type tasks that exist in the db)
+  // Get the marked comment/mention task ids (all the discussion type tasks that exist in the db)
   const notifiedTaskIds = new Set(notifications.map(notification => notification.taskId));
 
   const context: GetDiscussionsInput = { userId, username, spaceRecord, spaceIds };
