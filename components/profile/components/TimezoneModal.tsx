@@ -5,13 +5,21 @@ import { useEffect, useMemo, useState } from 'react';
 import Button from 'components/common/Button';
 import Modal, { DialogTitle } from 'components/common/Modal';
 
+interface Timezone {
+  tz: string;
+  offset: string;
+}
+
 const getTimeZoneOptions = () => {
   const timeZones = moment.tz.names();
-  const offsetTmz: string[] = [];
+  const offsetTmz: Timezone[] = [];
 
   timeZones.forEach(timeZone => {
     const tzOffset = moment.tz(timeZone).format('Z');
-    offsetTmz.push(`${timeZone} (GMT${tzOffset})`);
+    offsetTmz.push({
+      offset: tzOffset,
+      tz: timeZone
+    });
   });
 
   return offsetTmz;
@@ -32,17 +40,26 @@ export function TimezoneModal ({
   const currentTzOffset = moment.tz(currentTz).format('Z');
 
   const timezoneOptions = useMemo(() => getTimeZoneOptions(), []);
-  const [timezone, setTimezone] = useState<null | string | undefined>(initialTimezone);
+  const [timezone, setTimezone] = useState<null | Timezone | undefined>(initialTimezone ? {
+    tz: initialTimezone,
+    offset: moment.tz(initialTimezone).format('Z')
+  } : null);
 
   useEffect(() => {
     if (initialTimezone) {
-      setTimezone(initialTimezone);
+      setTimezone({
+        tz: initialTimezone,
+        offset: moment.tz(initialTimezone).format('Z')
+      });
     }
   }, [initialTimezone]);
 
   function onClose () {
     close();
-    setTimezone(initialTimezone);
+    setTimezone(initialTimezone ? {
+      tz: initialTimezone,
+      offset: moment.tz(initialTimezone).format('Z')
+    } : null);
   }
 
   return (
@@ -54,12 +71,12 @@ export function TimezoneModal ({
       <DialogTitle onClose={onClose}>Setup your timezone</DialogTitle>
       <form onSubmit={(e) => {
         e.preventDefault();
-        onSave(timezone ?? null);
+        onSave(timezone?.tz ?? null);
         close();
       }}
       >
         <Stack gap={1}>
-          <Autocomplete<string>
+          <Autocomplete<Timezone>
             fullWidth
             value={timezone}
             onChange={(_, selectOption) => {
@@ -70,11 +87,11 @@ export function TimezoneModal ({
             renderOption={(props, option) => (
               <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
                 <Box component='span'>
-                  {option}
+                  {option.tz} GMT({option.offset})
                 </Box>
               </Box>
             )}
-            getOptionLabel={option => option}
+            getOptionLabel={option => `${option.tz} GMT(${option.offset})`}
             renderInput={(params) => (
               <TextField
                 {...params}

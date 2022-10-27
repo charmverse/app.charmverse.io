@@ -52,7 +52,7 @@ function MemberDirectoryGalleryCard ({
           </Stack>
           <Stack flexDirection='row' gap={1}>
             <AccessTimeIcon fontSize='small' />
-            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone.split(' ')[0]) : 'N/A'}</Typography>
+            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone) : 'N/A'}</Typography>
           </Stack>
           {properties.map(property => {
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);

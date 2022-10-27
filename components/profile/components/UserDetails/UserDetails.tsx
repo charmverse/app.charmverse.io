@@ -212,7 +212,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
               <AccessTimeIcon fontSize='small' />
               <span>
                 {
-                  userDetails?.timezone ? convertTZ(userDetails.timezone.split(' ')[0]) : (readOnly ? 'N/A' : 'Update your timezone')
+                  userDetails?.timezone ? convertTZ(userDetails.timezone) : (readOnly ? 'N/A' : 'Update your timezone')
                 }
               </span>
             </Grid>

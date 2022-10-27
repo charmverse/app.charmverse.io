@@ -94,7 +94,7 @@ export function MemberDirectoryTableView ({
                           }}
                           >
                             <AccessTimeIcon fontSize='small' />
-                            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone.split(' ')[0]) : 'N/A'}</Typography>
+                            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone) : 'N/A'}</Typography>
                           </Box>
                         </TableCell>
                       );
