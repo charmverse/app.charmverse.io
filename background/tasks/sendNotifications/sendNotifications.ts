@@ -1,5 +1,6 @@
 
 import { prisma } from 'db';
+import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import * as emails from 'lib/emails';
 import type { PendingTasksProps } from 'lib/emails/templates/PendingTasks';
@@ -65,6 +66,7 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
     const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
     const mentionedTasks = await getDiscussionTasks(user.id);
     const voteTasks = await getVoteTasks(user.id);
+    const bountyTasks = await getBountyTasks(user.id);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {
@@ -91,10 +93,18 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
     const { proposalTasks = [], unmarkedWorkspaceEvents = [] } = workspaceEventsNotSent.length !== 0
       ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent) : {};
 
-    const totalTasks = myGnosisTasks.length + mentionedTasks.unmarked.length + voteTasksNotSent.length + proposalTasks.length;
+    const totalTasks = myGnosisTasks.length
+      + mentionedTasks.unmarked.length
+      + voteTasksNotSent.length
+      + proposalTasks.length
+      + bountyTasks.unmarked.length;
 
     log.debug('Found tasks for notification', {
-      notSent: gnosisSafeTasksNotSent.length + voteTasksNotSent.length + mentionedTasks.unmarked.length + proposalTasks.length,
+      notSent: gnosisSafeTasksNotSent.length
+        + voteTasksNotSent.length
+        + mentionedTasks.unmarked.length
+        + proposalTasks.length
+        + bountyTasks.unmarked.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
       myGnosisTasks: myGnosisTasks.length
     });
@@ -107,6 +117,7 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
       mentionedTasks: mentionedTasks.unmarked,
       voteTasks: voteTasksNotSent,
       proposalTasks,
+      bountyTasks: bountyTasks.unmarked,
       unmarkedWorkspaceEvents
     };
   }));

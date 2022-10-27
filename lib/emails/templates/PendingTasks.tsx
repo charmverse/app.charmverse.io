@@ -4,7 +4,9 @@ import {
   MjmlColumn, MjmlDivider, MjmlSection, MjmlText
 } from 'mjml-react';
 
+import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
@@ -30,6 +32,7 @@ export interface PendingTasksProps {
   totalTasks: number;
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
+  bountyTasks: BountyTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }
@@ -52,11 +55,13 @@ export default function PendingTasks (props: PendingTasksProps) {
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
+  const totalBountyTasks = props.bountyTasks.length;
 
   const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
   const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
   const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
   const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
+  const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
 
   const mentionSection = totalMentionTasks > 0 ? (
     <>
@@ -116,6 +121,37 @@ export default function PendingTasks (props: PendingTasksProps) {
         />
       ))}
       {totalProposalTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
+
+  const bountySection = totalBountyTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusBountyLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalBountyTasks} Proposal{totalBountyTasks > 1 ? 's' : ''}</span>
+          </a>
+          <a href={nexusBountyLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
+      </MjmlText>
+      {props.bountyTasks.slice(0, MAX_ITEMS_PER_TASK).map(proposalTask => (
+        <BountyTaskMjml
+          key={proposalTask.id}
+          task={proposalTask}
+        />
+      ))}
+      {totalBountyTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -190,6 +226,7 @@ export default function PendingTasks (props: PendingTasksProps) {
           {proposalSection}
           {voteSection}
           {mentionSection}
+          {bountySection}
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
@@ -243,6 +280,30 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
       <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[ProposalStatusColors[task.status]], fontWeight: 500 }}>
         <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
           {PROPOSAL_STATUS_LABELS[task.status]}
+        </span>
+      </div>
+    </MjmlText>
+  );
+}
+
+function BountyTaskMjml ({ task }: { task: BountyTask }) {
+  const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
+  return (
+    <MjmlText>
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{
+          display: 'block'
+        }}
+      >
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+          {pageWorkspaceTitle}
+        </div>
+      </a>
+
+      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[BOUNTY_STATUS_COLORS[task.status]], fontWeight: 500 }}>
+        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          {BOUNTY_STATUS_LABELS[task.status]}
         </span>
       </div>
     </MjmlText>
