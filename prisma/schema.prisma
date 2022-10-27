@@ -318,6 +318,7 @@ model User {
   createdAt                 DateTime                   @default(now())
   updatedAt                 DateTime                   @default(now())
   addresses                 String[]
+  deletedAt                 DateTime?
   avatar                    String?
   avatarContract            String?
   avatarTokenId             String?
