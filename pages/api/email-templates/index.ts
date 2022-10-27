@@ -1,8 +1,8 @@
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
-import type { MentionedTask } from 'lib/mentions/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -14,7 +14,7 @@ const handler = nc({
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): MentionedTask => {
+const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): DiscussionTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),

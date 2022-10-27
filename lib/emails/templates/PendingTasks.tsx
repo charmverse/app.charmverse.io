@@ -5,9 +5,9 @@ import {
 } from 'mjml-react';
 
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
-import type { MentionedTask } from 'lib/mentions/interfaces';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { shortenHex } from 'lib/utilities/strings';
@@ -26,7 +26,7 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: MentionedTask[];
+  mentionedTasks: DiscussionTask[];
   totalTasks: number;
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
@@ -79,7 +79,7 @@ export default function PendingTasks (props: PendingTasksProps) {
         </div>
       </MjmlText>
       {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
-        <MentionTask
+        <DiscussionTask
           key={mentionedTask.mentionId}
           task={mentionedTask}
         />
@@ -249,7 +249,7 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
   );
 }
 
-function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask }) {
+function DiscussionTask ({ task: { text, spaceName, pageTitle } }: { task: DiscussionTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

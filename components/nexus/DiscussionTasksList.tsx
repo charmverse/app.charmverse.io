@@ -16,12 +16,12 @@ import charmClient from 'charmClient';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import type { MentionedTask } from 'lib/mentions/interfaces';
+import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import Table from './components/NexusTable';
 
-function MentionedTaskRow (
+function DiscussionTaskRow (
   {
     createdAt,
     marked,
@@ -35,21 +35,21 @@ function MentionedTaskRow (
     bountyId,
     type,
     commentId
-  }: MentionedTask & { marked: boolean }
+  }: DiscussionTask & { marked: boolean }
 ) {
-  const { mentionLink, mentionTitle } = useMemo(() => {
+  const { discussionLink, discussionTitle } = useMemo(() => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
     if (type === 'bounty' && bountyId) {
       return {
-        mentionLink: `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`,
-        mentionTitle: `${pageTitle}`
+        discussionLink: `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`,
+        discussionTitle: `${pageTitle}`
       };
     }
     else {
       return {
-        mentionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`,
-        mentionTitle: `${pageTitle}`
+        discussionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`,
+        discussionTitle: `${pageTitle}`
       };
     }
   }, [type, bountyId, spaceDomain, pageTitle, pagePath, commentId, mentionId]);
@@ -75,7 +75,7 @@ function MentionedTaskRow (
             </Tooltip>
           )}
           <Link
-            href={mentionLink}
+            href={discussionLink}
             variant='body1'
             noWrap
             color='inherit'
@@ -95,12 +95,12 @@ function MentionedTaskRow (
         <Typography noWrap>{spaceName}</Typography>
       </TableCell>
       <TableCell>
-        <Link color='inherit' href={mentionLink} variant='body1' noWrap>
-          {mentionTitle}
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
+          {discussionTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>
-        <Link color='inherit' href={mentionLink} variant='body1' noWrap>
+        <Link color='inherit' href={discussionLink} variant='body1' noWrap>
           {DateTime.fromISO(createdAt).toRelative({ base: DateTime.now() })}
         </Link>
       </TableCell>
@@ -108,23 +108,31 @@ function MentionedTaskRow (
   );
 }
 
-interface MentionedTasksListProps {
+interface DiscussionTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
   mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
-export default function MentionedTasksList ({ tasks, error, mutateTasks }: MentionedTasksListProps) {
+export default function DiscussionTasksList ({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
+
   useEffect(() => {
     async function main () {
-      if (tasks?.mentioned && tasks.mentioned.unmarked.length !== 0) {
-        await charmClient.tasks.markTasks(tasks.mentioned.unmarked.map(unmarkedMentions => ({ id: unmarkedMentions.mentionId, type: 'mention' })));
+      if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
+        await charmClient.tasks.markTasks(tasks.discussions.unmarked.map(unmarkedDiscussion => ({ id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '', type: 'comment' })));
+      }
+    }
+
+    main();
+
+    return () => {
+      if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
         mutateTasks((_tasks) => {
-          const unmarked = _tasks?.mentioned.unmarked ?? [];
+          const unmarked = _tasks?.discussions.unmarked ?? [];
           return _tasks ? {
             ..._tasks,
-            mentioned: {
-              marked: [...unmarked, ..._tasks.mentioned.marked],
+            discussions: {
+              marked: [...unmarked, ..._tasks.discussions.marked],
               unmarked: []
             }
           } : undefined;
@@ -132,9 +140,7 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
           revalidate: false
         });
       }
-    }
-
-    main();
+    };
   }, [tasks]);
 
   if (error) {
@@ -146,11 +152,11 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
       </Box>
     );
   }
-  else if (!tasks?.mentioned) {
+  else if (!tasks?.discussions) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const totalMentions = (tasks.mentioned.unmarked.length ?? 0) + (tasks.mentioned.marked.length ?? 0);
+  const totalMentions = (tasks.discussions.unmarked.length ?? 0) + (tasks.discussions.marked.length ?? 0);
 
   if (totalMentions === 0) {
     return (
@@ -175,8 +181,8 @@ export default function MentionedTasksList ({ tasks, error, mutateTasks }: Menti
             </TableRow>
           </TableHead>
           <TableBody>
-            {tasks.mentioned.unmarked.map((mentionedTask) => <MentionedTaskRow key={mentionedTask.mentionId} {...mentionedTask} marked={false} />)}
-            {tasks.mentioned.marked.map((mentionedTask) => <MentionedTaskRow key={mentionedTask.mentionId} {...mentionedTask} marked />)}
+            {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked={false} />)}
+            {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked />)}
           </TableBody>
         </Table>
       </Box>

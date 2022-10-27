@@ -3,8 +3,8 @@ import nc from 'next-connect';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
-import type { MentionedTasksGroup } from 'lib/mentions/getMentionedTasks';
-import { getMentionedTasks } from 'lib/mentions/getMentionedTasks';
+import type { DiscussionTasksGroup } from 'lib/discussion/getDiscussionTasks';
+import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
 import { getProposalTasks } from 'lib/proposal/getProposalTasks';
@@ -17,7 +17,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getTasks);
 
 export interface GetTasksResponse {
-  mentioned: MentionedTasksGroup;
+  discussions: DiscussionTasksGroup;
   votes: VoteTask[];
   proposals: ProposalTasksGroup;
   bounties: BountyTasksGroup;
@@ -25,11 +25,11 @@ export interface GetTasksResponse {
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
   const userId = req.session.user.id;
-  const mentionedTasksGroup = await getMentionedTasks(userId);
+  const mentionedTasksGroup = await getDiscussionTasks(userId);
   const voteTasks = await getVoteTasks(userId);
   const proposalTasks = await getProposalTasks(userId);
   const bountiesTasks = await getBountyTasks(userId);
-  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, mentioned: mentionedTasksGroup, bounties: bountiesTasks });
+  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, discussions: mentionedTasksGroup, bounties: bountiesTasks });
 }
 
 export default withSessionRoute(handler);
