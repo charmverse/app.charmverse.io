@@ -1,23 +1,26 @@
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import Modal from 'components/common/Modal';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
-import type { LoggedInUser } from 'models';
 
-function MemberPropertiesOnBoardingForm ({ user, spaceId, onClose }: { onClose: () => void, spaceId: string, user: LoggedInUser }) {
-  const { updateSpaceValues } = useMemberPropertyValues(user.id);
+function MemberPropertiesOnBoardingForm (
+  { userId, spaceId, spaceName, onClose }:
+  { onClose: () => void, spaceName: string, spaceId: string, userId: string }
+) {
+  const { updateSpaceValues } = useMemberPropertyValues(userId);
   return (
     <MemberPropertiesPopupForm
-      title={`Welcome ${user.username}. Setup your profile`}
+      title={`Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
-      memberId={user.id}
+      memberId={userId}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
       showUserDetailsForm
+      cancelButtonText='Set up later'
+      spaceName={spaceName}
     />
   );
 }
@@ -34,14 +37,13 @@ export function MemberPropertiesOnBoardingModal () {
   }
 
   return (
-    <Modal size='large' open={true} onClose={onClose}>
-      {space && user && (
-        <MemberPropertiesOnBoardingForm
-          user={user}
-          spaceId={space.id}
-          onClose={onClose}
-        />
-      )}
-    </Modal>
+    space && user && (
+      <MemberPropertiesOnBoardingForm
+        userId={user.id}
+        spaceName={space.name}
+        spaceId={space.id}
+        onClose={onClose}
+      />
+    )
   );
 }

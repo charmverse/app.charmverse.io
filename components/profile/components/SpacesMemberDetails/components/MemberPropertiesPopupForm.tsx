@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
@@ -20,9 +20,11 @@ type Props = {
   onClose: VoidFunction;
   title?: string;
   showUserDetailsForm?: boolean;
+  cancelButtonText?: string;
+  spaceName: string;
 };
 
-export function MemberPropertiesPopupForm ({ showUserDetailsForm = false, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', showUserDetailsForm = false, memberId, spaceId, spaceName, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -81,6 +83,7 @@ export function MemberPropertiesPopupForm ({ showUserDetailsForm = false, member
             />
           </Box>
         )}
+        <Typography fontWeight={600}>{spaceName} Member details</Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>
             {data.map(property => {
@@ -106,7 +109,7 @@ export function MemberPropertiesPopupForm ({ showUserDetailsForm = false, member
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
+        <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
         <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
       </DialogActions>
     </Dialog>
