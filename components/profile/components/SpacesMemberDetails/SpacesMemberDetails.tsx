@@ -40,7 +40,6 @@ export function SpacesMemberDetails ({ memberId }: Props) {
         memberId={memberId}
         spaceId={editSpaceId}
         updateMemberPropertyValues={updateSpaceValues}
-        spaceName={editSpaceId ? memberPropertyValues.find(pv => pv.spaceId === editSpaceId)?.spaceName ?? '' : ''}
       />
     </Box>
   );

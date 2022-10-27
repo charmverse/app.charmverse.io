@@ -1,4 +1,5 @@
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Typography } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
@@ -8,10 +9,7 @@ import Button from 'components/common/Button';
 import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-
-import UserDetails from '../../UserDetails';
 
 type Props = {
   spaceId: string | null;
@@ -19,19 +17,17 @@ type Props = {
   updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   onClose: VoidFunction;
   title?: string;
-  showUserDetailsForm?: boolean;
   cancelButtonText?: string;
-  spaceName: string;
+  children?: ReactNode;
 };
 
-export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', showUserDetailsForm = false, memberId, spaceId, spaceName, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
   );
   const { showMessage } = useSnackbar();
-  const { setUser, user } = useUser();
 
   const defaultValues = useMemo(() => {
     if (data) {
@@ -75,22 +71,7 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', showUs
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
-        {showUserDetailsForm && user && (
-          <>
-            <UserDetails
-              sx={{
-                mt: 0
-              }}
-              user={user}
-              updateUser={setUser}
-            />
-            <Divider sx={{
-              my: 1
-            }}
-            />
-          </>
-        )}
-        <Typography fontWeight={600}>{spaceName} Member details</Typography>
+        {children}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>
             {data.map(property => {
