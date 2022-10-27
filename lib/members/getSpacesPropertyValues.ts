@@ -22,7 +22,7 @@ export async function getSpacesPropertyValues ({ memberId, requestingUserId, spa
   let propertyValues = getPropertiesWithValues(visibleMemberProperties, memberPropertyValues);
 
   if (visibleMemberProperties.find(mp => mp.type === 'role')) {
-    const spaceRolesMap = await getSpaceMemberRoles(spaceIds);
+    const spaceRolesMap = await getSpaceMemberRoles({ spaceIds, memberId });
     propertyValues = propertyValues.map(pv => pv.type === 'role' ? { ...pv, value: spaceRolesMap[pv.spaceId]?.map(r => r.name) || [] } : pv);
   }
 
