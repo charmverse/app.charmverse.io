@@ -3,7 +3,7 @@ import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo, useEffect } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -18,7 +18,7 @@ function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: 
 
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { data: pagePermissions, mutate: refreshPermissions } = useSWR(pageId ? `/api/pages/${pageId}/permissions` : null, () => charmClient.listPagePermissions(pageId));
+  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(pageId ? `/api/pages/${pageId}/permissions` : null, () => charmClient.listPagePermissions(pageId));
 
   const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
