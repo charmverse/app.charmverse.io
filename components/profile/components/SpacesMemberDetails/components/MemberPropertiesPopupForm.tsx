@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
@@ -76,12 +76,19 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', showUs
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         {showUserDetailsForm && user && (
-          <Box mb={2}>
+          <>
             <UserDetails
+              sx={{
+                mt: 0
+              }}
               user={user}
               updateUser={setUser}
             />
-          </Box>
+            <Divider sx={{
+              my: 1
+            }}
+            />
+          </>
         )}
         <Typography fontWeight={600}>{spaceName} Member details</Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
