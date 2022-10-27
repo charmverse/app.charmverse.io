@@ -129,10 +129,13 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   const { content, contentText, ...updatedPageMeta } = req.body as Page;
 
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: [{ ...updatedPageMeta, id: pageId }]
-  }, page.spaceId);
+  if (!content) {
+    // only update if content is not provided
+    relay.broadcast({
+      type: 'pages_meta_updated',
+      payload: [{ ...updatedPageMeta, id: pageId }]
+    }, page.spaceId);
+  }
 
   return res.status(200).json(pageWithPermission);
 }

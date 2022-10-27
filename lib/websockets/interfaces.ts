@@ -5,6 +5,10 @@ import type { PageMeta } from 'lib/pages';
 export type Resource = { id: string };
 export type ResourceWithSpaceId = Resource & { spaceId: string };
 
+export type SealedUserId = {
+  userId: string;
+};
+
 export type SocketAuthReponse = {
   authToken: string;
 };

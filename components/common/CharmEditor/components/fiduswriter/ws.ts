@@ -48,7 +48,17 @@ export type ClientSubscribeMessage = {
   authToken: string;
 }
 
-type ClientMessage = ClientSubscribeMessage | ClientDiffMessage | ClientSelectionMessage | ClientRequestResendMessage | ClientGetDocumentMessage;
+export type ClientUnsubscribeMessage = {
+  type: 'unsubscribe';
+  roomId: string;
+}
+
+export type ClientMessage = ClientSubscribeMessage
+  | ClientDiffMessage
+  | ClientSelectionMessage
+  | ClientRequestResendMessage
+  | ClientGetDocumentMessage
+  | ClientUnsubscribeMessage;
 
 type ServerConnectionsMessage = BaseSocketMessage<{
   type: 'connections';
@@ -73,6 +83,8 @@ type ServerMessage = ServerConnectionsMessage | ServerDocDataMessage | ServerDif
 }>;
 
 export type SocketMessage = ClientMessage | ServerMessage;
+
+const socketEvent = 'page_message';
 
 type PageContentListenEvents = {
   page_message: (message: SocketMessage) => void;
@@ -186,7 +198,7 @@ export class WebSocketConnector {
 
     this.open();
 
-    this.socket.on('page_message', data => {
+    this.socket.on(socketEvent, data => {
       const expectedServer = this.messages.server + 1;
       if (data.type === 'request_resend') {
         this.resend_messages(data.from);
@@ -198,7 +210,7 @@ export class WebSocketConnector {
       else if (data.s > expectedServer) {
         // Messages from the server have been lost.
         // Request resend.
-        this.socket.emit('page_message', {
+        this.socket.emit(socketEvent, {
           type: 'request_resend',
           from: this.messages.server
         });
@@ -224,7 +236,7 @@ export class WebSocketConnector {
             this.messages.client += 1;
             _data.c = this.messages.client;
             _data.s = this.messages.server;
-            this.socket.emit('page_message', _data);
+            this.socket.emit(socketEvent, _data);
           });
           this.receive(data);
         }
@@ -294,7 +306,7 @@ export class WebSocketConnector {
       data.s = this.messages.server;
       this.messages.lastTen.push(data);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
-      this.socket.emit('page_message', data);
+      this.socket.emit(socketEvent, data);
       this.setRecentlySentTimer(timer);
     }
     else {
@@ -329,7 +341,7 @@ export class WebSocketConnector {
       this.messages.client += 1;
       data.c = this.messages.client;
       data.s = this.messages.server;
-      this.socket?.emit('page_message', data);
+      this.socket?.emit(socketEvent, data);
     });
   }
 
