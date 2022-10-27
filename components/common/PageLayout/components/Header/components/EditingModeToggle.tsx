@@ -1,6 +1,7 @@
 import { ArrowDropDown } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import { memo } from 'react';
 
 import Button from 'components/common/Button';
 import { usePrimaryCharmEditor, EDIT_MODE_CONFIG } from 'hooks/usePrimaryCharmEditor';
@@ -21,7 +22,7 @@ const editModeConfig = {
   }
 } as const;
 
-export default function EditModeToggle () {
+function EditModeToggle () {
 
   const { availableEditModes, editMode, setPageProps } = usePrimaryCharmEditor();
 
@@ -81,3 +82,5 @@ export default function EditModeToggle () {
     </PopupState>
   );
 }
+
+export default memo(EditModeToggle);
