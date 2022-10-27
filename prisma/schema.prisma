@@ -180,8 +180,8 @@ model Space {
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
   proposalCategory            ProposalCategory[]
-  MemberProperty              MemberProperty[]
-  MemberPropertyValue         MemberPropertyValue[]
+  memberProperty              MemberProperty[]
+  memberPropertyValue         MemberPropertyValue[]
 }
 
 model SpaceApiToken {
@@ -314,48 +314,49 @@ model Vote {
 }
 
 model User {
-  id                   String                 @id @default(uuid()) @db.Uuid
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @default(now())
-  addresses            String[]
-  avatar               String?
-  avatarContract       String?
-  avatarTokenId        String?
-  avatarChain          Int?
-  username             String
-  isBot                Boolean?               @default(false)
-  path                 String?                @unique
-  identityType         IdentityType?
-  email                String?
-  applications         Application[]
-  blocks               Block[]
-  bounties             Bounty[]
-  bountyPermissions    BountyPermission[]
-  comments             Comment[]
-  discordUser          DiscordUser?
-  favorites            FavoritePage[]
-  inviteLinks          InviteLink[]
-  pages                Page[]
-  permissions          PagePermission[]
-  poaps                Poap[]
-  spacesCreated        Space[]
-  spacePermissions     SpacePermission[]
-  spaceRoles           SpaceRole[]
-  telegramUser         TelegramUser?
-  threads              Thread[]
-  profile              UserDetails?
-  gnosisSafes          UserGnosisSafe[]
-  UserNotification     UserNotification[]
-  notificationState    UserNotificationState?
-  userVotes            UserVote[]
-  initiatedVotes       Vote[]
-  profileItems         ProfileItem[]
-  proposalsAuthored    ProposalAuthor[]
-  proposalsReviewed    ProposalReviewer[]
-  reviewedProposals    Proposal[]
-  workspaceEvents      WorkspaceEvent[]
-  wallets              UserWallet[]
-  memberPropertyValues MemberPropertyValue[]
+  id                        String                     @id @default(uuid()) @db.Uuid
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @default(now())
+  addresses                 String[]
+  deletedAt                 DateTime?
+  avatar                    String?
+  avatarContract            String?
+  avatarTokenId             String?
+  avatarChain               Int?
+  username                  String
+  isBot                     Boolean?                   @default(false)
+  path                      String?                    @unique
+  identityType              IdentityType?
+  email                     String?
+  applications              Application[]
+  blocks                    Block[]
+  bounties                  Bounty[]
+  bountyPermissions         BountyPermission[]
+  comments                  Comment[]
+  discordUser               DiscordUser?
+  favorites                 FavoritePage[]
+  inviteLinks               InviteLink[]
+  pages                     Page[]
+  permissions               PagePermission[]
+  poaps                     Poap[]
+  spacesCreated             Space[]
+  spacePermissions          SpacePermission[]
+  spaceRoles                SpaceRole[]
+  telegramUser              TelegramUser?
+  threads                   Thread[]
+  profile                   UserDetails?
+  gnosisSafes               UserGnosisSafe[]
+  UserNotification          UserNotification[]
+  notificationState         UserNotificationState?
+  userVotes                 UserVote[]
+  initiatedVotes            Vote[]
+  profileItems              ProfileItem[]
+  proposalsAuthored         ProposalAuthor[]
+  proposalsReviewed         ProposalReviewer[]
+  reviewedProposals         Proposal[]
+  workspaceEvents           WorkspaceEvent[]
+  wallets                   UserWallet[]
+  memberPropertyValues      MemberPropertyValue[]
 }
 
 model UserWallet {
@@ -572,21 +573,22 @@ model UserGnosisSafe {
 }
 
 model Role {
-  id                String             @id @default(uuid()) @db.Uuid
-  createdAt         DateTime           @default(now())
-  createdBy         String             @db.Uuid
-  name              String
-  spaceId           String             @db.Uuid
-  source            RoleSource?
-  sourceId          String?
-  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  bountyPermissions BountyPermission[]
-  permissions       PagePermission[]
-  spacePermissions  SpacePermission[]
-  spaceRolesToRole  SpaceRoleToRole[]
-  TokenGateToRole   TokenGateToRole[]
-  proposalReviewer  ProposalReviewer[]
-  InviteLinkToRole  InviteLinkToRole[]
+  id                        String                     @id @default(uuid()) @db.Uuid
+  createdAt                 DateTime                   @default(now())
+  createdBy                 String                     @db.Uuid
+  name                      String
+  spaceId                   String                     @db.Uuid
+  source                    RoleSource?
+  sourceId                  String?
+  space                     Space                      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  bountyPermissions         BountyPermission[]
+  permissions               PagePermission[]
+  spacePermissions          SpacePermission[]
+  spaceRolesToRole          SpaceRoleToRole[]
+  TokenGateToRole           TokenGateToRole[]
+  proposalReviewer          ProposalReviewer[]
+  InviteLinkToRole          InviteLinkToRole[]
+  memberPropertyPermissions MemberPropertyPermission[]
 
   @@unique([spaceId, name])
 }
@@ -782,19 +784,24 @@ enum MemberPropertyType {
   twitter
 }
 
+enum MemberPropertyPermissionLevel {
+  view
+}
+
 model MemberProperty {
-  id                   String                @id @default(uuid()) @db.Uuid
-  createdAt            DateTime              @default(now())
-  createdBy            String                @db.Uuid
-  updatedAt            DateTime              @updatedAt
-  updatedBy            String                @db.Uuid
-  spaceId              String                @db.Uuid
-  space                Space                 @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  id                   String                     @id @default(uuid()) @db.Uuid
+  createdAt            DateTime                   @default(now())
+  createdBy            String                     @db.Uuid
+  updatedAt            DateTime                   @updatedAt
+  updatedBy            String                     @db.Uuid
+  spaceId              String                     @db.Uuid
+  space                Space                      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   name                 String
   type                 MemberPropertyType
   options              Json?
-  index                Int                   @default(-1)
+  index                Int                        @default(-1)
   memberPropertyValues MemberPropertyValue[]
+  permissions          MemberPropertyPermission[]
 }
 
 model MemberPropertyValue {
@@ -810,4 +817,15 @@ model MemberPropertyValue {
   value            Json?
 
   @@unique([memberPropertyId, spaceId, userId])
+}
+
+model MemberPropertyPermission {
+  id                            String                        @id @default(uuid()) @db.Uuid
+  roleId                        String?                       @db.Uuid
+  memberPropertyPermissionLevel MemberPropertyPermissionLevel
+  memberPropertyId              String                        @db.Uuid
+  memberProperty                MemberProperty                @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
+  role                          Role?                         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, memberPropertyId])
 }
