@@ -29,21 +29,25 @@ export function MemberPropertiesOnBoardingModal () {
   const memberDirectoryFormModal = usePopupState({ variant: 'popover', popupId: 'member-directory-onboarding' });
   const [space] = useCurrentSpace();
   const { user } = useUser();
-  const { setOnboarding } = useOnboarding();
+  const { hideOnboarding } = useOnboarding();
 
   function onClose () {
-    setOnboarding(false);
-    memberDirectoryFormModal.close();
+    if (space) {
+      hideOnboarding(space.id);
+      memberDirectoryFormModal.close();
+    }
+  }
+
+  if (!space || !user) {
+    return null;
   }
 
   return (
-    space && user && (
-      <MemberPropertiesOnBoardingForm
-        userId={user.id}
-        spaceName={space.name}
-        spaceId={space.id}
-        onClose={onClose}
-      />
-    )
+    <MemberPropertiesOnBoardingForm
+      userId={user.id}
+      spaceName={space.name}
+      spaceId={space.id}
+      onClose={onClose}
+    />
   );
 }

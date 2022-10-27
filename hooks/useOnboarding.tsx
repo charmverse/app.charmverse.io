@@ -1,26 +1,43 @@
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 
 import { useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
 
 type IContext = {
-  onboarding: boolean;
-  setOnboarding: Dispatch<SetStateAction<boolean>>;
+  onboarding: Record<string, boolean>;
+  showOnboarding: (spaceId: string) => void;
+  hideOnboarding: (spaceId: string) => void;
 }
 
 export const OnboardingContext = createContext<Readonly<IContext>>({
-  onboarding: false,
-  setOnboarding: () => {}
+  onboarding: {},
+  showOnboarding: () => {},
+  hideOnboarding: () => {}
 });
 
 export function OnboardingProvider ({ children }: { children: ReactNode }) {
   const { user } = useUser();
-  const [onboarding, setOnboarding] = useLocalStorage(user ? `onboarding-${user.id}` : null, false);
+  const [onboarding, setOnboarding] = useLocalStorage(user ? `onboarding-${user.id}` : null, {});
+
+  function showOnboarding (spaceId: string) {
+    setOnboarding((_onboarding) => ({
+      ..._onboarding,
+      [spaceId]: true
+    }));
+  }
+
+  function hideOnboarding (spaceId: string) {
+    setOnboarding((_onboarding) => ({
+      ..._onboarding,
+      [spaceId]: false
+    }));
+  }
 
   const value: IContext = useMemo(() => ({
     onboarding,
-    setOnboarding
+    showOnboarding,
+    hideOnboarding
   }), [onboarding]);
 
   return (

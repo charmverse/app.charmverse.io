@@ -35,12 +35,13 @@ export default function JoinWorkspace () {
   const router = useRouter();
   const domain = router.query.domain;
   const { spaces } = useSpaces();
-  const { setOnboarding } = useOnboarding();
+  const { showOnboarding } = useOnboarding();
 
   useEffect(() => {
-    if (spaces.some(space => space.domain === router.query.domain)) {
+    const space = spaces.find(_space => _space.domain === router.query.domain);
+    if (space) {
       router.push(`/${router.query.domain}`);
-      setOnboarding(true);
+      showOnboarding(space.id);
     }
   }, [spaces]);
 

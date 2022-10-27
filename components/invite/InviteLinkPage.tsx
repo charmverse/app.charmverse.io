@@ -19,7 +19,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
   const { user } = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account, walletAuthSignature } = useWeb3AuthSig();
-  const { setOnboarding } = useOnboarding();
+  const { showOnboarding } = useOnboarding();
 
   async function joinSpace () {
     if (!user && account && walletAuthSignature) {
@@ -27,7 +27,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
     }
     await charmClient.acceptInvite({ id: invite.id });
     window.location.href = `/${invite.space.domain}`;
-    setOnboarding(true);
+    showOnboarding(invite.space.id);
   }
 
   return (
