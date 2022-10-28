@@ -45,7 +45,7 @@ export default function TimezoneModal ({
       onClose={onClose}
       size='large'
     >
-      <DialogTitle onClose={onClose}>Setup your timezone</DialogTitle>
+      <DialogTitle onClose={onClose}>Set up your timezone</DialogTitle>
       <form onSubmit={(e) => {
         e.preventDefault();
         onSave(timezone?.tz ?? null);
@@ -57,7 +57,13 @@ export default function TimezoneModal ({
             setTimezone={setTimezone}
             timezone={timezone}
           />
-          <Button type='submit'>
+          <Button
+            fullWidth
+            type='submit'
+            sx={{
+              width: 'fit-content'
+            }}
+          >
             Update
           </Button>
         </Stack>

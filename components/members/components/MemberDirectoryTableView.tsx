@@ -94,6 +94,7 @@ export function MemberDirectoryTableView ({
                           }}
                           >
                             <TimezoneDisplay
+                              showTimezone
                               timezone={member.profile?.timezone}
                             />
                           </Box>

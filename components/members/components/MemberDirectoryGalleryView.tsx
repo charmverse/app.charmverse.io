@@ -51,6 +51,7 @@ function MemberDirectoryGalleryCard ({
           </Stack>
           <Stack flexDirection='row' gap={1}>
             <TimezoneDisplay
+              showTimezone
               timezone={member.profile?.timezone}
             />
           </Stack>
