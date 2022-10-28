@@ -215,7 +215,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (
-                <IconButton onClick={timezoneModalState.open} data-testid='edit-description'>
+                <IconButton onClick={timezoneModalState.open} data-testid='edit-timezone'>
                   <EditIcon fontSize='small' />
                 </IconButton>
               )}
