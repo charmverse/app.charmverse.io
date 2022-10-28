@@ -108,7 +108,7 @@ const templates = {
       bountyTasks: [
         createBountyTask({
           action: 'application_pending',
-          pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
+          pageTitle: 'Create a new protocol',
           spaceName: 'Uniswap',
           status: 'open'
         })

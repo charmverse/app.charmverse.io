@@ -138,7 +138,7 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalBountyTasks} Proposal{totalBountyTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalBountyTasks} Bount{totalBountyTasks > 1 ? 'ies' : 'y'}</span>
           </a>
           <a href={nexusBountyLink} style={buttonStyle}>
             View
