@@ -128,3 +128,18 @@ export function toHoursAndMinutes (totalMinutes: number) {
   const minutes = totalMinutes % 60;
   return `${padToTwoDigits(hours)}:${padToTwoDigits(minutes, false)}`;
 }
+
+export function getTimezonesWithOffset () {
+  let timezones: string[] = [];
+  if ((Intl as any).supportedValuesOf) {
+    timezones = (Intl as any).supportedValuesOf('timeZone');
+  }
+
+  return timezones.map(timeZone => {
+    const tzOffset = DateTime.local().setZone(timeZone).offset;
+    return {
+      offset: toHoursAndMinutes(tzOffset),
+      tz: timeZone
+    };
+  });
+}
