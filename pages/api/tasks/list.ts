@@ -25,11 +25,11 @@ export interface GetTasksResponse {
 
 async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
   const userId = req.session.user.id;
-  const mentionedTasksGroup = await getDiscussionTasks(userId);
+  const discussionTasks = await getDiscussionTasks(userId);
   const voteTasks = await getVoteTasks(userId);
   const proposalTasks = await getProposalTasks(userId);
   const bountiesTasks = await getBountyTasks(userId);
-  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, discussions: mentionedTasksGroup, bounties: bountiesTasks });
+  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, discussions: discussionTasks, bounties: bountiesTasks });
 }
 
 export default withSessionRoute(handler);

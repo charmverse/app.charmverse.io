@@ -1,5 +1,4 @@
 import type { Page, Space } from '@prisma/client';
-import findLastIndex from 'lodash/findLastIndex';
 
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';

@@ -36,24 +36,28 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
   const addProperty = useCallback(async (propertyData: CreateMemberPropertyPayload) => {
     if (space) {
       const createdProperty = await charmClient.members.createMemberProperty(space.id, propertyData);
+      const propertyWithPermissions = { ...createdProperty, permissions: [] };
       mutateProperties(state => {
-        return state ? [...state, createdProperty] : [createdProperty];
+        return state ? [...state, propertyWithPermissions] : [propertyWithPermissions];
       });
 
-      return createdProperty;
+      return propertyWithPermissions;
     }
-  }, [space]);
+  }, [space?.id]);
 
   const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }) => {
     if (space) {
       const updatedProperty = await charmClient.members.updateMemberProperty(space.id, propertyData);
       mutateProperties(state => {
-        return state ? state.map(p => p.id === updatedProperty.id ? { ...updatedProperty } : p) : [updatedProperty];
+        if (state) {
+          return state.map(p => p.id === updatedProperty.id ? { ...p, ...updatedProperty } : p);
+        }
+        return state;
       });
 
       return updatedProperty;
     }
-  }, [space]);
+  }, [space?.id]);
 
   const deleteProperty = useCallback(async (id: string) => {
     if (space) {
@@ -62,7 +66,7 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
         return state ? state.filter(p => p.id !== id) : undefined;
       });
     }
-  }, [space]);
+  }, [space?.id]);
 
   const addPropertyPermissions = useCallback(async (memberPropertyId: string, permissionsData: CreateMemberPropertyPermissionInput[]) => {
     if (space) {
@@ -84,7 +88,7 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
 
       return createdPermissions;
     }
-  }, [space]);
+  }, [space?.id]);
 
   const removePropertyPermission = useCallback(async (permission: MemberPropertyPermission) => {
     if (space) {
@@ -103,7 +107,7 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
         }) : undefined;
       });
     }
-  }, [space]);
+  }, [space?.id]);
 
   const value = useMemo(() => ({
     properties,

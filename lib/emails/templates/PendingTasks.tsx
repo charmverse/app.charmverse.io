@@ -28,7 +28,7 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: DiscussionTask[];
+  discussionTasks: DiscussionTask[];
   totalTasks: number;
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
@@ -51,7 +51,7 @@ function ViewAllText ({ href }: { href: string }) {
 
 export default function PendingTasks (props: PendingTasksProps) {
 
-  const totalMentionTasks = props.mentionedTasks.length;
+  const totalDiscussionTasks = props.discussionTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
@@ -63,7 +63,7 @@ export default function PendingTasks (props: PendingTasksProps) {
   const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
   const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
 
-  const mentionSection = totalMentionTasks > 0 ? (
+  const discussionSection = totalDiscussionTasks > 0 ? (
     <>
       <MjmlText>
         <div style={{
@@ -76,20 +76,20 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalDiscussionTasks} Comment{totalDiscussionTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusDiscussionLink} style={buttonStyle}>
             View
           </a>
         </div>
       </MjmlText>
-      {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
+      {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map(discussionTask => (
         <DiscussionTask
-          key={mentionedTask.mentionId}
-          task={mentionedTask}
+          key={discussionTask.mentionId}
+          task={discussionTask}
         />
       ))}
-      {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+      {totalDiscussionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -225,8 +225,8 @@ export default function PendingTasks (props: PendingTasksProps) {
           {multisigSection}
           {proposalSection}
           {voteSection}
-          {mentionSection}
           {bountySection}
+          {discussionSection}
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
