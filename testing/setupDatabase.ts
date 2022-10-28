@@ -207,6 +207,40 @@ export async function generateComment ({ content, pageId, spaceId, userId, conte
   return thread.comments?.[0];
 }
 
+export async function generateThread (props: { thread: Partial<Thread> & { comments: Partial<Comment>[] } }):
+  Promise<{ comments: Comment[] }> {
+
+  const { thread } = props;
+  const { pageId = v4(), spaceId = v4(), userId = v4(), context = '', resolved = false, id: threadId = v4(), comments } = thread;
+
+  const createdThread = await prisma.thread.create({
+    data: {
+      id: threadId,
+      context,
+      pageId,
+      spaceId,
+      userId,
+      resolved,
+      comments: {
+        createMany: {
+          data: comments.filter((item): item is Comment => !!item && !!item.content).map(item => ({
+            ...item,
+            content: item.content ?? '',
+            userId: item.userId,
+            pageId: item.pageId,
+            spaceId: item.spaceId
+          }))
+        }
+      }
+    },
+    select: {
+      comments: true
+    }
+  });
+
+  return createdThread;
+}
+
 export function generateTransaction ({ applicationId, chainId = '4', transactionId = '123' }: { applicationId: string } & Partial<Transaction>): Promise<Transaction> {
   return prisma.transaction.create({
     data: {

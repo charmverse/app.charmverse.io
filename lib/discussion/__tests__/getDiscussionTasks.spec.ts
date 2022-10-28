@@ -2,12 +2,13 @@ import type { Comment, Block, Bounty, Page, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { createPage, createBlock, generateBounty, generateComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createBlock, generateBounty, generateComment, generateThread, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getDiscussionTasks } from '../getDiscussionTasks';
 
 let user1: User;
 let user2: User;
+let user3: User;
 let space1: Space;
 let space2: Space;
 let page1: Page;
@@ -18,16 +19,26 @@ let comment1: Comment;
 let comment2: Comment;
 let commentBlock: Block;
 
-const discussionIds = new Array(13).fill(0).map(() => v4());
+const discussionIds = new Array(19).fill(0).map(() => v4());
+
+const threadId1 = v4();
+const threadId2 = v4();
+const commentId1 = discussionIds[14];
+const commentId2 = discussionIds[15];
+const commentId3 = discussionIds[16];
+const commentId4 = discussionIds[17];
+const commentId5 = discussionIds[18];
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpaceWithApiToken();
   const generated2 = await generateUserAndSpaceWithApiToken();
+  const generated3 = await generateUserAndSpaceWithApiToken();
 
   user1 = generated1.user;
   space1 = generated1.space;
   user2 = generated2.user;
   space2 = generated2.space;
+  user3 = generated3.user;
 
   // Making user 1 a member of space 2
   await prisma.spaceRole.create({
@@ -146,20 +157,79 @@ beforeAll(async () => {
       }
     ]
   });
+
+  await generateThread({
+    thread: {
+      id: threadId1,
+      spaceId: space1.id,
+      userId: user1.id,
+      pageId: page1.id,
+      comments: [{
+        id: commentId1,
+        spaceId: space1.id,
+        pageId: page1.id,
+        userId: user1.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'New text', type: 'text' }] }] }
+      }, {
+        id: commentId2,
+        spaceId: space1.id,
+        pageId: page1.id,
+        userId: user2.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'New text 2', type: 'text' }] }] }
+      }, {
+        id: commentId3,
+        spaceId: space1.id,
+        pageId: page1.id,
+        userId: user3.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'New text 3', type: 'text' }] }] }
+      }]
+    }
+  });
+
+  await generateThread({
+    thread: {
+      id: threadId2,
+      spaceId: space2.id,
+      userId: user2.id,
+      pageId: page2.id,
+      comments: [{
+        id: commentId4,
+        spaceId: space2.id,
+        pageId: page2.id,
+        userId: user1.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'New text 12', type: 'text' }] }] }
+      }, {
+        id: commentId5,
+        spaceId: space2.id,
+        pageId: page2.id,
+        userId: user3.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'New text 13', type: 'text' }] }] }
+      }]
+    }
+  });
 });
 
 describe('getDiscussionTasks', () => {
+  function expectSome <T> (arr: T[], condition: (item: T) => boolean) {
+    expect(arr.some(condition)).toBeTruthy();
+  }
 
   it('Should return marked and unmarked mention tasks', async () => {
 
     const { marked, unmarked } = await getDiscussionTasks(user1.id);
 
-    function expectSome <T> (arr: T[], condition: (item: T) => boolean) {
-      expect(arr.some(condition)).toBeTruthy();
-    }
-
     expect(marked.length).toBe(1);
-    expect(unmarked.length).toBe(6);
+    expect(unmarked.length).toBe(9);
 
     expectSome(marked, (item) => item.mentionId === discussionIds[0] && item.pageId === page1.id);
 
@@ -181,5 +251,33 @@ describe('getDiscussionTasks', () => {
 
     // finds the comment block mention
     expectSome(unmarked, (item) => item.mentionId === discussionIds[12] && item.pageId === page2.id);
+  });
+
+  it('Should return unmarked comments from users that replied to the user thread', async () => {
+    const { unmarked } = await getDiscussionTasks(user1.id);
+
+    expectSome(unmarked, (item) => (
+      item.commentId === commentId2
+      && item.pageId === page1.id
+    ));
+
+    expectSome(unmarked, (item) => (
+      item.commentId === commentId3
+      && item.pageId === page1.id
+    ));
+  });
+
+  it('Should return unmarked comments from users who commented on another user owned page', async () => {
+    const { unmarked } = await getDiscussionTasks(user2.id);
+
+    expectSome(unmarked, (item) => (
+      item.commentId === commentId4
+      && item.pageId === page2.id
+    ));
+
+    expectSome(unmarked, (item) => (
+      item.commentId === commentId5
+      && item.pageId === page2.id
+    ));
   });
 });
