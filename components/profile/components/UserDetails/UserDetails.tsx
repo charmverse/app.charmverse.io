@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
+import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { useWeb3React } from '@web3-react/core';
@@ -45,9 +46,10 @@ export interface UserDetailsProps {
   readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
+  sx?: SxProps;
 }
 
-function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
+function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
   const { account } = useWeb3React();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -129,8 +131,8 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
-    <Box>
-      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
+    <>
+      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3} sx={sx}>
         <Avatar
           name={user?.username || ''}
           image={user?.avatar}
@@ -291,7 +293,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           }
         </>
       )}
-    </Box>
+    </>
   );
 }
 

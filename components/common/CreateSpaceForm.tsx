@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -16,6 +16,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
+import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { DOMAIN_BLACKLIST } from 'lib/spaces';
@@ -43,13 +44,12 @@ export type FormValues = yup.InferType<typeof schema>;
 interface Props {
   defaultValues?: { name: string, domain: string };
   onCancel?: () => void;
-  onSubmit: (values: Prisma.SpaceCreateInput) => void;
+  onSubmit: (values: Prisma.SpaceCreateInput) => Promise<Space | null>;
   submitText?: string;
   isSubmitting: boolean;
 }
 
 export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
-
   const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
@@ -62,15 +62,16 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
     defaultValues: defaultValues || getDefaultName(),
     resolver: yupResolver(schema)
   });
+  const { showOnboarding } = useOnboarding();
 
   const watchName = watch('name');
   const watchDomain = watch('domain');
   const watchSpaceImage = watch('spaceImage');
 
-  function onSubmit (values: FormValues) {
+  async function onSubmit (values: FormValues) {
     try {
       setSaveError(null);
-      _onSubmit({
+      const space = await _onSubmit({
         author: {
           connect: {
             id: user!.id
@@ -91,6 +92,9 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         },
         ...values
       });
+      if (space) {
+        showOnboarding(space.id);
+      }
     }
     catch (err) {
       log.error('Error creating space', err);

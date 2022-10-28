@@ -49,6 +49,11 @@ jest.mock('../IdentityModal', () => ({
   getIdentityIcon: jest.fn()
 }));
 
+jest.mock('public/images/discord_logo.svg', () => ({
+  __esModule: true,
+  default: () => null
+}));
+
 jest.mock('swr/immutable', () => ({
   __esModule: true,
   default: () => ({

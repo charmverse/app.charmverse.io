@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import PrimaryButton from 'components/common/PrimaryButton';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
+import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { InviteLinkPopulated } from 'lib/invites';
@@ -18,6 +19,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
   const { user } = useUser();
   const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
   const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { showOnboarding } = useOnboarding();
 
   async function joinSpace () {
     if (!user && account && walletAuthSignature) {
@@ -25,6 +27,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
     }
     await charmClient.acceptInvite({ id: invite.id });
     window.location.href = `/${invite.space.domain}`;
+    showOnboarding(invite.space.id);
   }
 
   return (
