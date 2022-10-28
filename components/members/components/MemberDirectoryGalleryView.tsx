@@ -1,4 +1,3 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
@@ -9,6 +8,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
 import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
+import { TimezoneDisplay } from './TimezoneDisplay';
 
 function MemberDirectoryGalleryCard ({
   member
@@ -16,7 +16,6 @@ function MemberDirectoryGalleryCard ({
   member: Member;
 }) {
   const { properties = [] } = useMemberProperties();
-  // const timezoneProperty = properties.find(property => property.type === 'timezone');
   const nameProperty = properties.find(property => property.type === 'name');
 
   return (
@@ -50,10 +49,12 @@ function MemberDirectoryGalleryCard ({
               {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
             </Stack>
           </Stack>
-          {/* <Stack flexDirection='row' gap={1}>
-            <AccessTimeIcon fontSize='small' />
-            <Typography variant='body2'>{member.properties.find(property => property.memberPropertyId === timezoneProperty?.id)?.value ?? 'N/A'}</Typography>
-          </Stack> */}
+          <Stack flexDirection='row' gap={1}>
+            <TimezoneDisplay
+              showTimezone
+              timezone={member.profile?.timezone}
+            />
+          </Stack>
           {properties.map(property => {
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
             switch (property.type) {

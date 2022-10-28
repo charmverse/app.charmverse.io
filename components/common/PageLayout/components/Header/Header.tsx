@@ -52,6 +52,8 @@ interface HeaderProps {
   openSidebar: () => void;
 }
 
+const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
+
 export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
@@ -112,7 +114,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const isFullWidth = basePage?.fullWidth ?? false;
-  const isBasePageDocument = ['page', 'card', 'proposal', 'proposal_template', 'bounty'].includes(basePage?.type ?? '');
+  const isBasePageDocument = documentTypes.includes(basePage?.type ?? '');
   const isBasePageDatabase = /board/.test(basePage?.type ?? '');
 
   const onSwitchChange = () => {

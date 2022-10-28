@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
+import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { useWeb3React } from '@web3-react/core';
@@ -12,6 +13,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
+import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
@@ -29,6 +31,7 @@ import DescriptionModal from '../DescriptionModal';
 import type { IntegrationModel } from '../IdentityModal';
 import IdentityModal, { getIdentityIcon } from '../IdentityModal';
 import SocialModal from '../SocialModal';
+import { TimezoneModal } from '../TimezoneModal';
 import UserPathModal from '../UserPathModal';
 
 import { SocialIcons } from './SocialIcons';
@@ -43,9 +46,10 @@ export interface UserDetailsProps {
   readOnly?: boolean;
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
+  sx?: SxProps;
 }
 
-function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
+function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
   const { account } = useWeb3React();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -59,6 +63,7 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const userPathModalState = usePopupState({ variant: 'popover', popupId: 'path-modal' });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
   const socialModalState = usePopupState({ variant: 'popover', popupId: 'social-modal' });
+  const timezoneModalState = usePopupState({ variant: 'popover', popupId: 'timezone-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
   const { handleUserUpdate } = useUserDetails({ readOnly, user, updateUser });
@@ -126,8 +131,8 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
   const userLink = `${hostname}/u/${userPath}`;
 
   return (
-    <Box>
-      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3}>
+    <>
+      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={3} sx={sx}>
         <Avatar
           name={user?.username || ''}
           image={user?.avatar}
@@ -203,6 +208,21 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
               )}
             </Grid>
           </Grid>
+          <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+            <Grid item xs={11} sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TimezoneDisplay
+                timezone={userDetails?.timezone}
+                defaultValue={(readOnly ? 'N/A' : 'Update your timezone')}
+              />
+            </Grid>
+            <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
+              {!readOnly && (
+                <IconButton onClick={timezoneModalState.open} data-testid='edit-timezone'>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              )}
+            </Grid>
+          </Grid>
         </Grid>
       </Stack>
       {!isPublicUser(user) && (
@@ -255,9 +275,25 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
             }}
             social={socialDetails}
           />
+          {
+            timezoneModalState.isOpen && (
+              <TimezoneModal
+                isOpen={timezoneModalState.isOpen}
+                close={timezoneModalState.close}
+                onSave={async (timezone) => {
+                  await charmClient.updateUserDetails({
+                    timezone
+                  });
+                  mutate();
+                  timezoneModalState.close();
+                }}
+                initialTimezone={userDetails?.timezone}
+              />
+            )
+          }
         </>
       )}
-    </Box>
+    </>
   );
 }
 

@@ -3,12 +3,13 @@ import type { Role } from '@prisma/client';
 
 import { prisma } from 'db';
 
-export async function getSpaceMemberRoles (spaceId: string | string[]) {
+export async function getSpaceMemberRoles ({ spaceIds, memberId }:{ spaceIds: string | string[], memberId: string }) {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId: {
-        in: Array.isArray(spaceId) ? spaceId : [spaceId]
-      }
+        in: Array.isArray(spaceIds) ? spaceIds : [spaceIds]
+      },
+      userId: memberId
     },
     include: {
       spaceRoleToRole: {
