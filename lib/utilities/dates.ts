@@ -1,6 +1,6 @@
 
 import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
-import { DateTime } from 'luxon';
+import { Duration, DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
 
@@ -106,27 +106,10 @@ export function coerceToMilliseconds (timestamp: DateInput): number {
   return timestamp instanceof DateTime ? timestamp.toMillis() : new Date(timestamp).valueOf();
 }
 
-function padToTwoDigits (num: number, showSign = true) {
-  if (num < 0) {
-    if (showSign) {
-      return `-${Math.abs(num).toString().padStart(2, '0')}`;
-    }
-    else {
-      return `-${num.toString().padStart(2, '0')}`;
-    }
-  }
-  else if (showSign) {
-    return `+${num.toString().padStart(2, '0')}`;
-  }
-  else {
-    return num.toString().padStart(2, '0');
-  }
-}
-
 export function toHoursAndMinutes (totalMinutes: number) {
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${padToTwoDigits(hours)}:${padToTwoDigits(minutes, false)}`;
+  return `${Duration.fromObject({ hours: totalMinutes / 60 }, {
+    numberingSystem: ''
+  }).toFormat('hh')}:${Duration.fromObject({ minutes: totalMinutes % 60 }).toFormat('mm')}`;
 }
 
 export function getTimezonesWithOffset () {
