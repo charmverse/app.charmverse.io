@@ -12,7 +12,7 @@ export async function readUserNotifications (): Promise<number> {
     log.info(`\nNotifications to user: ${notification.user.email}`
       + `\n--------------------------------------------------------------`
       + `\ngnosis: ${notification.gnosisSafeTasks.length}`
-      + `\nmentions: ${notification.mentionedTasks.length}`
+      + `\ndiscussions: ${notification.discussionTasks.length}`
       + `\nvotes: ${notification.voteTasks.length}`
       + `\nproposals: ${notification.proposalTasks.length}`
       + `\n  ${notification.proposalTasks.map(task =>

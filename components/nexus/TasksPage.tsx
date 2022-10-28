@@ -17,9 +17,9 @@ import BountyTasksList from './BountyTasksList';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
+import DiscussionTasksList from './DiscussionTasksList';
 import GnosisTasksList from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
-import MentionedTasksList from './MentionedTasksList';
 import ProposalTasksList from './ProposalTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import { VoteTasksList } from './VoteTasksList';
@@ -78,7 +78,7 @@ export default function TasksPage () {
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig: (gnosisTasks && !hasSnoozedNotifications) ? gnosisTasks.length : 0,
     vote: unvoted ? unvoted.length : 0,
-    discussion: tasks ? tasks.mentioned.unmarked.length : 0,
+    discussion: tasks ? tasks.discussions.unmarked.length : 0,
     proposal: tasks ? tasks.proposals.unmarked.length : 0,
     bounty: tasks ? tasks.bounties?.unmarked.length : 0
   };
@@ -170,7 +170,7 @@ export default function TasksPage () {
         currentTaskType === 'multisig' && <GnosisTasksList error={gnosisTasksServerError} mutateTasks={mutateGnosisTasks} tasks={gnosisTasks} />
       }
       {
-        currentTaskType === 'discussion' && <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+        currentTaskType === 'discussion' && <DiscussionTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
       }
       {
         currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
