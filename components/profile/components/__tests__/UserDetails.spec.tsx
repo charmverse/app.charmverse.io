@@ -18,8 +18,7 @@ const userDetails: UserDetails = {
     githubURL: 'https://github.com/charmverse',
     twitterURL: 'https://mobile.twitter.com/charmverse',
     linkedinURL: 'https://www.linkedin.com/in/alexchibunpoon/'
-  },
-  timezone: null
+  }
 };
 
 function WrappedUserDetails () {
