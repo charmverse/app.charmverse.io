@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
@@ -14,13 +13,13 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
+import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import useENSName from 'hooks/useENSName';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { convertTZ } from 'lib/utilities/browser';
 import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType, LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -211,12 +210,10 @@ function UserDetails ({ readOnly, user, updateUser }: UserDetailsProps) {
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <Grid item xs={11} sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AccessTimeIcon fontSize='small' />
-              <span>
-                {
-                  userDetails?.timezone ? convertTZ(userDetails.timezone) : (readOnly ? 'N/A' : 'Update your timezone')
-                }
-              </span>
+              <TimezoneDisplay
+                timezone={userDetails?.timezone}
+                defaultValue={(readOnly ? 'N/A' : 'Update your timezone')}
+              />
             </Grid>
             <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
               {!readOnly && (

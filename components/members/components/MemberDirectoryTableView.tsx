@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Box, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
@@ -8,7 +7,8 @@ import { DiscordSocialIcon } from 'components/profile/components/UserDetails/Dis
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
-import { convertTZ } from 'lib/utilities/browser';
+
+import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -93,8 +93,9 @@ export function MemberDirectoryTableView ({
                             flexDirection: 'row'
                           }}
                           >
-                            <AccessTimeIcon fontSize='small' />
-                            <Typography variant='body2'>{member.profile?.timezone ? convertTZ(member.profile.timezone) : 'N/A'}</Typography>
+                            <TimezoneDisplay
+                              timezone={member.profile?.timezone}
+                            />
                           </Box>
                         </TableCell>
                       );
