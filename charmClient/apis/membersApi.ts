@@ -13,11 +13,11 @@ export class MembersApi {
   }
 
   createMemberProperty (spaceId: string, property: Partial<MemberProperty>) {
-    return http.POST<MemberPropertyWithPermissions>(`/api/spaces/${spaceId}/members/properties`, property);
+    return http.POST<MemberProperty>(`/api/spaces/${spaceId}/members/properties`, property);
   }
 
   updateMemberProperty (spaceId: string, { id, ...property }: Partial<MemberProperty> & { id: string }) {
-    return http.PUT<MemberPropertyWithPermissions>(`/api/spaces/${spaceId}/members/properties/${id}`, property);
+    return http.PUT<MemberProperty>(`/api/spaces/${spaceId}/members/properties/${id}`, property);
   }
 
   deleteMemberProperty (spaceId: string, id: string) {
