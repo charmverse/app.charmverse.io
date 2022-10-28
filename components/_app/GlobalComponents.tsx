@@ -1,13 +1,13 @@
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
-import { MemberPropertiesOnBoardingModal } from 'components/members/MemberPropertiesOnBoardingModal';
+import { MemberOnboardingModal } from 'components/members/MemberOnboardingModal';
 
 export default function GlobalComponents () {
 
   return (
     <>
       <HexagonalAvatarMask id='hexagon-avatar' />
-      <MemberPropertiesOnBoardingModal />
+      <MemberOnboardingModal />
       <Snackbar />
     </>
   );

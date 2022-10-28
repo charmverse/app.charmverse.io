@@ -1,13 +1,10 @@
-import { usePopupState } from 'material-ui-popup-state/hooks';
-
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 
 import { MemberOnboardingForm } from './components/MemberOnboardingForm';
 
-export function MemberPropertiesOnBoardingModal () {
-  const memberDirectoryFormModal = usePopupState({ variant: 'popover', popupId: 'member-directory-onboarding' });
+export function MemberOnboardingModal () {
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const { hideOnboarding } = useOnboarding();
@@ -16,15 +13,10 @@ export function MemberPropertiesOnBoardingModal () {
   function onClose () {
     if (space) {
       hideOnboarding(space.id);
-      memberDirectoryFormModal.close();
     }
   }
 
-  if (!space || !user) {
-    return null;
-  }
-
-  if (!onboarding[space.id]) {
+  if (!space || !onboarding[space.id] || !user) {
     return null;
   }
 
