@@ -1,9 +1,11 @@
 import { useTheme } from '@emotion/react';
+import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
+import { Options } from 'components/common/BoardEditor/focalboard/src/components/calculations/options';
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
@@ -65,17 +67,21 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           <FieldLabel variant='subtitle2'>Color</FieldLabel>
         </Stack>
         {brandColorNames.map(color => (
-          <MenuItem key={color} sx={{ textTransform: 'capitalize', display: 'flex', gap: 1 }} onClick={() => onColorChange(color)}>
-            <div style={{
-              width: 20,
-              height: 20,
-              borderRadius: '20%',
-              backgroundColor: theme.palette[color].main
-            }}
-            />
-            <Typography variant='subtitle1'>
-              {color}
-            </Typography>
+          <MenuItem key={color} sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }} onClick={() => onColorChange(color)}>
+            <Stack flexDirection='row' gap={1} alignContent='center'>
+              <div style={{
+                width: 20,
+                height: 20,
+                borderRadius: '20%',
+                backgroundColor: theme.palette[color].main
+              }}
+              />
+              <Typography variant='subtitle1'>
+                {color}
+              </Typography>
+            </Stack>
+
+            {color === option.color && <CheckIcon fontSize='small' />}
           </MenuItem>
         ))}
 
