@@ -36,14 +36,14 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
     return undefined;
   }, [data]);
 
-  const { control, handleSubmit, formState: { touchedFields, errors, isSubmitting }, reset } = useForm();
+  const { control, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
 
   const onSubmit = async (submitData: any) => {
     if (!spaceId) {
       return;
     }
 
-    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(touchedFields)
+    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData)
       .map(key => ({ memberPropertyId: key, value: submitData[key] }));
 
     await updateMemberPropertyValues(spaceId, updateData);
@@ -74,7 +74,8 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
                 type: property.type,
                 label: property.name,
                 error: errors[property.memberPropertyId],
-                inline: true
+                inline: true,
+                options: property.options
               });
 
               return fieldRendererConfig.renderer

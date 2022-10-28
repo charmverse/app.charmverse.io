@@ -59,12 +59,18 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               }
               case 'multiselect':
               case 'select': {
-                const values = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean)) as SelectOptionType[];
+                const values: string[] = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean));
+                const valueOptions = values.map(value => property.options?.find(
+                  o => (o as SelectOptionType).id === value
+                )).filter(Boolean) as SelectOptionType[];
+
                 return (
                   <Stack gap={0.5} key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
                     <Stack gap={1} flexDirection='row'>
-                      {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
+                      {values.length !== 0 ? valueOptions.map(
+                        valueOption => <Chip sx={{ px: 0.5 }} label={valueOption.name} color={valueOption.color} key={valueOption.name} size='small' />
+                      ) : 'N/A'}
                     </Stack>
                   </Stack>
                 );

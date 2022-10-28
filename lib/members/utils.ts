@@ -3,14 +3,15 @@ import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client'
 import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, MemberPropertyWithSpace } from 'lib/members/interfaces';
 
 export function getPropertiesWithValues (properties: MemberPropertyWithSpace[], propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[]): PropertyValueWithDetails[] {
-  return properties.map(({ id, spaceId, type, name, space: { name: spaceName, spaceImage } }) => ({
+  return properties.map(({ id, spaceId, type, name, options, space: { name: spaceName, spaceImage } }) => ({
     memberPropertyId: id,
     spaceId,
     spaceName,
     spaceImage,
     type,
     name,
-    value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null
+    value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null,
+    options: options as []
   }));
 }
 

@@ -12,7 +12,7 @@ import { brandColorNames } from 'theme/colors';
 
 type Props = {
   option: SelectOptionType;
-  onChange: (option: SelectOptionType) => void;
+  onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
 };
 
@@ -26,13 +26,13 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
 
   function onSave () {
     if (tempName !== option.name) {
-      onChange({ ...option, name: tempName });
+      onChange?.({ ...option, name: tempName });
       setTempName(option.name || '');
     }
   }
 
   function onColorChange (value: BrandColor) {
-    onChange({ ...option, color: value });
+    onChange?.({ ...option, color: value });
   }
 
   const popupContent = useMemo(() => (
