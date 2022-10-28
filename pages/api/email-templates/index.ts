@@ -14,7 +14,9 @@ const handler = nc({
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): DiscussionTask => {
+const createDiscussionTask = (
+  { pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }
+): DiscussionTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
@@ -102,23 +104,23 @@ const templates = {
           status: 'private_draft'
         })
       ],
-      mentionedTasks: [
-        createMentionTask({
+      discussionTasks: [
+        createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'Let\'s have a meeting @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'Take a look at this @ghostpepper',
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
