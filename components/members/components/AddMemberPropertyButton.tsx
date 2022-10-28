@@ -4,6 +4,9 @@ import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
+import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -22,7 +25,7 @@ export function AddMemberPropertyButton () {
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
   const { properties, addProperty } = useMemberProperties();
-  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>([]);
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>([]);
 
   async function onSubmit () {
     if (propertyName && selectedPropertyType) {
@@ -65,7 +68,7 @@ export function AddMemberPropertyButton () {
         }}
       >
         {Object.keys(MEMBER_PROPERTY_LABELS).map((memberPropertyType) => (
-          !memberPropertyType.match(/select/) && !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
+          !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
             <MenuItem
               key={memberPropertyType}
               onClick={() => {
@@ -99,11 +102,12 @@ export function AddMemberPropertyButton () {
               }
             }}
           />
-          {selectedPropertyType?.match(/select/) && (
-            <MemberPropertySelectInput
-              onChange={setPropertyOptions}
-              options={propertyOptions}
-            />
+          {isSelectType(selectedPropertyType) && (
+            // <MemberPropertySelectInput
+            //   onChange={setPropertyOptions}
+            //   options={propertyOptions}
+            // />
+            <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
           )}
           <Button
             disabled={!propertyName || !selectedPropertyType}

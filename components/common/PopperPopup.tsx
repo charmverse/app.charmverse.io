@@ -49,7 +49,7 @@ export default function PopperPopup (props: PopperPopupProps) {
   return (
     <div ref={toggleRef}>
       {children && (
-        <div {...bindToggle(popupState)}>
+        <div {...bindToggle(popupState)} onMouseDown={e => e.preventDefault()}>
           {children}
         </div>
       )}

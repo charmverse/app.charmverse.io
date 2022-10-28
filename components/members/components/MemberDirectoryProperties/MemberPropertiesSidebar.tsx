@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
@@ -52,7 +53,7 @@ function MemberPropertyItemForm ({
     setPropertyName(property.name);
   }, []);
 
-  const isSelectPropertyType = (property.type.match(/select/));
+  const isSelectPropertyType = isSelectType(property.type);
 
   const isDisabled = propertyName.length === 0
     || (isSelectPropertyType
