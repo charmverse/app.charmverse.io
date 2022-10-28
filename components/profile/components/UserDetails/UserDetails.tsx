@@ -5,7 +5,6 @@ import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import dynamic from 'next/dynamic';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -31,6 +30,7 @@ import DescriptionModal from '../DescriptionModal';
 import type { IntegrationModel } from '../IdentityModal';
 import IdentityModal, { getIdentityIcon } from '../IdentityModal';
 import SocialModal from '../SocialModal';
+import { TimezoneModal } from '../TimezoneModal';
 import UserPathModal from '../UserPathModal';
 
 import { SocialIcons } from './SocialIcons';
@@ -38,8 +38,6 @@ import { SocialIcons } from './SocialIcons';
 const StyledDivider = styled(Divider)`
   height: 36px;
 `;
-
-const TimezoneModal = dynamic(() => import('../TimezoneModal'), { ssr: false });
 
 export const isPublicUser = (user: PublicUser | LoggedInUser): user is PublicUser => user.hasOwnProperty('profile');
 

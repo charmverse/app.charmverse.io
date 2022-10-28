@@ -9,7 +9,7 @@ import { toHoursAndMinutes } from 'lib/utilities/dates';
 import type { Timezone } from './TimezoneAutocomplete';
 import { TimezoneAutocomplete } from './TimezoneAutocomplete';
 
-export default function TimezoneModal ({
+export function TimezoneModal ({
   close,
   isOpen,
   onSave,
