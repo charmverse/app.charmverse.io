@@ -1,4 +1,4 @@
-import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, Proposal, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
+import type { ApplicationStatus, Block, Bounty, BountyStatus, Comment, Page, Prisma, ProposalStatus, Role, RoleSource, Thread, Transaction, Vote, WorkspaceEvent } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
@@ -211,11 +211,10 @@ export async function generateThread (props: { thread: Partial<Thread> & { comme
   Promise<{ comments: Comment[] }> {
 
   const { thread } = props;
-  const { pageId = v4(), spaceId = v4(), userId = v4(), context = '', resolved = false, id: threadId = v4(), comments } = thread;
+  const { pageId = v4(), spaceId = v4(), userId = v4(), context = '', resolved = false, comments } = thread;
 
   const createdThread = await prisma.thread.create({
     data: {
-      id: threadId,
       context,
       pageId,
       spaceId,
