@@ -1,4 +1,5 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWR from 'swr';
@@ -13,11 +14,14 @@ import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from '
 type Props = {
   spaceId: string | null;
   memberId: string;
-  updateMemberPropertyValues: (spsaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
+  updateMemberPropertyValues: (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => Promise<void>;
   onClose: VoidFunction;
+  title?: string;
+  cancelButtonText?: string;
+  children?: ReactNode;
 };
 
-export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberPropertyValues, onClose }: Props) {
+export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -65,8 +69,9 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
 
   return (
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-      <DialogTitle>Edit workspace profile</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
+        {children}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box display='flex' flexDirection='column'>
             {data.map(property => {
@@ -93,7 +98,7 @@ export function MemberPropertiesPopupForm ({ memberId, spaceId, updateMemberProp
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>Cancel</Button>
+        <Button data-test='close-member-properties-modal' onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
         <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
       </DialogActions>
     </Dialog>
