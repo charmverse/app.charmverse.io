@@ -1,14 +1,12 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
-
-import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
 
 function MemberDirectoryGalleryCard ({
   member
@@ -71,7 +69,7 @@ function MemberDirectoryGalleryCard ({
                 );
               }
               case 'multiselect': {
-                const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
+                const values = (memberPropertyValue?.value ?? []) as SelectOptionType[];
                 return (
                   <Stack gap={0.5} key={property.id}>
                     <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
@@ -82,7 +80,7 @@ function MemberDirectoryGalleryCard ({
                 );
               }
               case 'select': {
-                const propertyValue = memberPropertyValue?.value as PropertyOption;
+                const propertyValue = memberPropertyValue?.value as SelectOptionType;
                 return (
                   <Stack gap={0.5} key={property.id}>
                     <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>

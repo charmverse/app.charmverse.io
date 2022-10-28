@@ -1,10 +1,10 @@
 
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Button, IconButton, MenuList, Stack, TextField, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuList, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
-import type { ExistingSelectOption, SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
@@ -17,18 +17,32 @@ type Props = {
 export function SelectOptionsList ({ options, readOnly, onChange }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [newOptionName, setNewOptionName] = useState('');
+  const [listError, setListError] = useState('');
+
+  function validateOption (option: SelectOptionType) {
+    if (!option.name) {
+      setListError('Option name cannot be empty.');
+      return false;
+    }
+
+    if (options.some(o => o.name === option.name && o.id !== option.id)) {
+      setListError('Option with this name already exists.');
+      return false;
+    }
+
+    return true;
+  }
 
   function createOption () {
-    if (newOptionName) {
-      // validate if name does not already exist
+    const newOption = { name: newOptionName, color: getRandomThemeColor(), id: v4(), index: options.length };
+    if (newOption.name && validateOption(newOption)) {
       onChange([...options, { name: newOptionName, color: getRandomThemeColor(), id: v4(), index: options.length }]);
       setNewOptionName('');
     }
   }
 
   function updateOption (option: SelectOptionType) {
-    // validate if name does not already exist
-    if (option.id) {
+    if (option.id && validateOption(option)) {
       const updatedOptions = options.map(o => o.id === option.id ? option : o);
       onChange(updatedOptions);
     }
@@ -48,7 +62,7 @@ export function SelectOptionsList ({ options, readOnly, onChange }: Props) {
   return (
     <Stack>
       <Stack direction='row' alignItems='center' gap={0.5}>
-        <Typography variant='subtitle1' sx={{ my: 1 }}>Options</Typography>
+        <Typography variant='subtitle1'>Options</Typography>
         {!!options.length && !isEditing && !readOnly && (
           <IconButton size='small' onClick={() => setIsEditing(true)}>
             <AddOutlinedIcon fontSize='small' />
@@ -58,7 +72,7 @@ export function SelectOptionsList ({ options, readOnly, onChange }: Props) {
       {!options.length && readOnly && <Typography variant='overline'>No options available.</Typography>}
       {!readOnly && (
         isEditing ? (
-          <Stack flexDirection='row' alignItems='center' gap={0.5}>
+          <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
             <TextField
               placeholder='Type option name..'
               size='small'
@@ -110,9 +124,33 @@ export function SelectOptionsList ({ options, readOnly, onChange }: Props) {
         ) : null)
       )}
 
-      <MenuList>
-        {options.map((option) => (<SelectOptionItem key={option.id} option={option} onChange={updateOption} onDelete={deleteOption} />))}
+      <MenuList sx={{ pt: 0 }}>
+        {options.map((option) => (
+          <SelectOptionItem
+            key={option.id}
+            option={option}
+            onChange={updateOption}
+            onDelete={deleteOption}
+          />
+        ))}
       </MenuList>
+
+      <Dialog
+        open={!!listError}
+        onClose={() => setListError('')}
+      >
+        <DialogTitle>
+          Invalid option
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {listError}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button color='error' onClick={() => setListError('')}>Ok</Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }

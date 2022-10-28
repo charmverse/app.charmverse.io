@@ -10,11 +10,12 @@ interface PopperPopupProps {
   children?: React.ReactNode | null;
   autoOpen?: boolean;
   closeOnClick?: boolean;
+  onClose?: () => void;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
 
-  const { closeOnClick = false, popupContent, children, autoOpen = false } = props;
+  const { closeOnClick = false, popupContent, children, autoOpen = false, onClose } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -33,6 +34,13 @@ export default function PopperPopup (props: PopperPopupProps) {
 
   if (closeOnClick) {
     popoverProps.onClick = () => {
+      popupState.close();
+    };
+  }
+
+  if (onClose) {
+    popoverProps.onClose = () => {
+      onClose();
       popupState.close();
     };
   }

@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button, Menu, MenuItem, Stack, TextField } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
@@ -14,8 +14,6 @@ import { useMembers } from 'hooks/useMembers';
 import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
-import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
-import { MemberPropertySelectInput } from './MemberDirectoryProperties/MemberPropertySelectInput';
 
 export function AddMemberPropertyButton () {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
@@ -27,6 +25,13 @@ export function AddMemberPropertyButton () {
   const { properties, addProperty } = useMemberProperties();
   const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>([]);
 
+  useEffect(() => {
+    if (!propertyNamePopupState.isOpen) {
+      setPropertyName('');
+      setPropertyOptions([]);
+    }
+  }, [propertyNamePopupState.isOpen]);
+
   async function onSubmit () {
     if (propertyName && selectedPropertyType) {
       await addProperty({
@@ -35,7 +40,7 @@ export function AddMemberPropertyButton () {
         options: propertyOptions,
         type: selectedPropertyType
       });
-      setPropertyName('');
+
       mutateMembers();
       propertyNamePopupState.close();
     }
@@ -103,19 +108,16 @@ export function AddMemberPropertyButton () {
             }}
           />
           {isSelectType(selectedPropertyType) && (
-            // <MemberPropertySelectInput
-            //   onChange={setPropertyOptions}
-            //   options={propertyOptions}
-            // />
             <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
           )}
           <Button
+            onMouseDown={e => e.preventDefault()}
             disabled={!propertyName || !selectedPropertyType}
             sx={{
               width: 'fit-content'
             }}
             onClick={onSubmit}
-          >Add
+          >Add property
           </Button>
         </Stack>
       </Modal>

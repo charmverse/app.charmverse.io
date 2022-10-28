@@ -2,8 +2,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
-import type { PropertyOption } from 'components/members/components/MemberDirectoryProperties/MemberPropertySelectInput';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
 type Props = {
@@ -59,7 +59,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               }
               case 'multiselect':
               case 'select': {
-                const values = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean)) as PropertyOption[];
+                const values = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean)) as SelectOptionType[];
                 return (
                   <Stack gap={0.5} key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>

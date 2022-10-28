@@ -1,9 +1,12 @@
 import { useTheme } from '@emotion/react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Divider, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import PopperPopup from 'components/common/PopperPopup';
 import type { BrandColor } from 'theme/colors';
 import { brandColorNames } from 'theme/colors';
 
@@ -15,21 +18,39 @@ type Props = {
 
 export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
   const theme = useTheme();
+  const [tempName, setTempName] = useState(option.name || '');
 
-  function onNameChange (value: string) {
-    onChange({ ...option, name: value });
+  useEffect(() => {
+    setTempName(option.name || '');
+  }, [option.name]);
+
+  function onSave () {
+    if (tempName !== option.name) {
+      onChange({ ...option, name: tempName });
+      setTempName(option.name || '');
+    }
   }
 
   function onColorChange (value: BrandColor) {
     onChange({ ...option, color: value });
   }
 
-  return (
+  const popupContent = useMemo(() => (
     <Stack>
       <MenuList>
         <Stack p={1}>
           <FieldLabel variant='subtitle2'>Option name</FieldLabel>
-          <TextField value={option.name} onChange={e => onNameChange(e.target.value)} autoFocus />
+          <TextField
+            value={tempName}
+            onChange={e => setTempName(e.target.value)}
+            autoFocus
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.code === 'Enter') {
+                onSave();
+              }
+            }}
+          />
         </Stack>
         {!!onDelete && (
           <MenuItem onClick={() => onDelete(option)}>
@@ -44,7 +65,7 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           <FieldLabel variant='subtitle2'>Color</FieldLabel>
         </Stack>
         {brandColorNames.map(color => (
-          <MenuItem sx={{ textTransform: 'capitalize', display: 'flex', gap: 1 }} onClick={() => onColorChange(color)}>
+          <MenuItem key={color} sx={{ textTransform: 'capitalize', display: 'flex', gap: 1 }} onClick={() => onColorChange(color)}>
             <div style={{
               width: 20,
               height: 20,
@@ -60,5 +81,13 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
 
       </MenuList>
     </Stack>
+  ), [option, onColorChange, tempName]);
+
+  return (
+    <PopperPopup popupContent={popupContent} onClose={onSave}>
+      <IconButton size='small'>
+        <MoreHorizIcon fontSize='small' />
+      </IconButton>
+    </PopperPopup>
   );
 }
