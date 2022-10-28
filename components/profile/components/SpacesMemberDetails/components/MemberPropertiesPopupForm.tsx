@@ -97,7 +97,7 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
+        <Button data-test='close-member-properties-modal' onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
         <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
       </DialogActions>
     </Dialog>
