@@ -1,7 +1,6 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { zones } from 'tzdata';
 
 import { toHoursAndMinutes } from 'lib/utilities/dates';
 
@@ -21,13 +20,12 @@ export function TimezoneAutocomplete ({
   const currentTzOffset = toHoursAndMinutes(DateTime.local().offset);
 
   const timezoneOptions = useMemo(() => {
-    // Code copied from https://github.com/moment/luxon/issues/353#issuecomment-514203601
-    const luxonValidTimezones = Object.entries(zones)
-      .filter(([, v]) => Array.isArray(v))
-      .map(([zoneName]) => zoneName)
-      .filter(tz => DateTime.local().setZone(tz).isValid);
+    let timezones: string[] = [];
+    if ((Intl as any).supportedValuesOf) {
+      timezones = (Intl as any).supportedValuesOf('timeZone');
+    }
 
-    return luxonValidTimezones.map(timeZone => {
+    return timezones.map(timeZone => {
       const tzOffset = DateTime.local().setZone(timeZone).offset;
       return {
         offset: toHoursAndMinutes(tzOffset),
