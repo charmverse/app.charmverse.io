@@ -105,3 +105,26 @@ export function coerceToMilliseconds (timestamp: DateInput): number {
 
   return timestamp instanceof DateTime ? timestamp.toMillis() : new Date(timestamp).valueOf();
 }
+
+function padToTwoDigits (num: number, showSign = true) {
+  if (num < 0) {
+    if (showSign) {
+      return `-${Math.abs(num).toString().padStart(2, '0')}`;
+    }
+    else {
+      return `-${num.toString().padStart(2, '0')}`;
+    }
+  }
+  else if (showSign) {
+    return `+${num.toString().padStart(2, '0')}`;
+  }
+  else {
+    return num.toString().padStart(2, '0');
+  }
+}
+
+export function toHoursAndMinutes (totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${padToTwoDigits(hours)}:${padToTwoDigits(minutes, false)}`;
+}

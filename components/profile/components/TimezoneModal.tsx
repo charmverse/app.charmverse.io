@@ -1,29 +1,16 @@
 import { Autocomplete, Box, Stack, TextField } from '@mui/material';
-import * as moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 import { useEffect, useMemo, useState } from 'react';
+import { zones } from 'tzdata';
 
 import Button from 'components/common/Button';
 import Modal, { DialogTitle } from 'components/common/Modal';
+import { toHoursAndMinutes } from 'lib/utilities/dates';
 
 interface Timezone {
   tz: string;
   offset: string;
 }
-
-const getTimeZoneOptions = () => {
-  const timeZones = moment.tz.names();
-  const offsetTmz: Timezone[] = [];
-
-  timeZones.forEach(timeZone => {
-    const tzOffset = moment.tz(timeZone).format('Z');
-    offsetTmz.push({
-      offset: tzOffset,
-      tz: timeZone
-    });
-  });
-
-  return offsetTmz;
-};
 
 export default function TimezoneModal ({
   close,
@@ -37,29 +24,41 @@ export default function TimezoneModal ({
   initialTimezone?: string | null;
 }) {
   const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const currentTzOffset = moment.tz(currentTz).format('Z');
+  const currentTzOffset = toHoursAndMinutes(DateTime.local().offset);
 
-  const timezoneOptions = useMemo(() => getTimeZoneOptions(), []);
-  const [timezone, setTimezone] = useState<null | Timezone | undefined>(initialTimezone ? {
-    tz: initialTimezone,
-    offset: moment.tz(initialTimezone).format('Z')
-  } : null);
+  const timezoneOptions = useMemo(() => {
+    // Code copied from https://github.com/moment/luxon/issues/353#issuecomment-514203601
+    const luxonValidTimezones = Object.entries(zones)
+      .filter(([, v]) => Array.isArray(v))
+      .map(([zoneName]) => zoneName)
+      .filter(tz => DateTime.local().setZone(tz).isValid);
+
+    return luxonValidTimezones.map(timeZone => {
+      const tzOffset = DateTime.local().setZone(timeZone).offset;
+      return {
+        offset: toHoursAndMinutes(tzOffset),
+        tz: timeZone
+      };
+    });
+  }, []);
+
+  const [timezone, setTimezone] = useState<null | Timezone | undefined>(null);
+
+  function updateTimezone () {
+    setTimezone(initialTimezone ? {
+      tz: initialTimezone,
+      // luxon provides the offset in terms of minutes
+      offset: toHoursAndMinutes(DateTime.local().setZone(initialTimezone).offset)
+    } : null);
+  }
 
   useEffect(() => {
-    if (initialTimezone) {
-      setTimezone({
-        tz: initialTimezone,
-        offset: moment.tz(initialTimezone).format('Z')
-      });
-    }
+    updateTimezone();
   }, [initialTimezone]);
 
   function onClose () {
     close();
-    setTimezone(initialTimezone ? {
-      tz: initialTimezone,
-      offset: moment.tz(initialTimezone).format('Z')
-    } : null);
+    updateTimezone();
   }
 
   return (
@@ -87,11 +86,11 @@ export default function TimezoneModal ({
             renderOption={(props, option) => (
               <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
                 <Box component='span'>
-                  {option.tz} GMT({option.offset})
+                  {option.tz} (GMT{option.offset})
                 </Box>
               </Box>
             )}
-            getOptionLabel={option => `${option.tz} GMT(${option.offset})`}
+            getOptionLabel={option => `${option.tz} (GMT${option.offset})`}
             renderInput={(params) => (
               <TextField
                 {...params}
