@@ -12,12 +12,11 @@ import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
-  buttonText?: string;
   buttonStyle?: SxProps<Theme>;
   buttonSize?: 'small' | 'medium' | 'large';
 }
 
-export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }: Props) {
+export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
 
   const { account, sign, getStoredSignature, walletAuthSignature } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
@@ -73,6 +72,8 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
   }
 
   return (
-    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
+    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
+      Verify wallet
+    </PrimaryButton>
   );
 }

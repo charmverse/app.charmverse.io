@@ -139,10 +139,11 @@ interface CharmEditorProps {
   style?: CSSProperties;
   noPadding?: boolean;
   placeholderText?: string;
+  focusOnInit?: boolean;
 }
 
 export default function CharmEditor (
-  { content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
+  { focusOnInit, content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
   CharmEditorProps
 ) {
   const [currentSpace] = useCurrentSpace();
@@ -193,6 +194,7 @@ export default function CharmEditor (
 
   return (
     <StyledReactBangleEditor
+      focusOnInit={focusOnInit}
       style={{
         ...(style ?? {}),
         width: '100%',

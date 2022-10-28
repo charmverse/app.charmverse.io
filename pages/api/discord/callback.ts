@@ -31,6 +31,8 @@ handler.get(async (req, res) => {
     return;
   }
 
+  cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict' });
+
   if (type === 'login') {
     try {
       const discordApiUrl = isTestEnv ? req.query.discordApiUrl as string : undefined;
@@ -48,8 +50,6 @@ handler.get(async (req, res) => {
     await req.session.save();
     return res.redirect(redirect);
   }
-
-  cookies.set(AUTH_CODE_COOKIE, tempAuthCode, { httpOnly: false, sameSite: 'strict' });
 
   // When login with discord ?returnUrl is passed after oauth flow, that messes up the whole url
   res.redirect(`${redirect.split('?')[0]}?code=${tempAuthCode}&discord=1&type=${type}${req.query.guild_id ? `&guild_id=${req.query.guild_id}` : ''}`);

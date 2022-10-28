@@ -96,6 +96,7 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
         }}
         placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
         style={{ fontSize: '14px' }}
+        focusOnInit={false}
       />
 
       {newComment && (
