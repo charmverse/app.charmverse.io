@@ -1,6 +1,7 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
@@ -26,7 +27,7 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,
   email: <AlternateEmailIcon fontSize='small' />,
-  select: <FormatListBulletedIcon fontSize='small' />,
+  select: <ArrowDropDownCircleIcon fontSize='small' />,
   multiselect: <ListIcon fontSize='small' />,
   role: <MilitaryTechIcon fontSize='small' />,
   profile_pic: <InsertPhotoIcon fontSize='small' />,

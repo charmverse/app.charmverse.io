@@ -2,7 +2,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
@@ -59,20 +59,12 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               }
               case 'multiselect':
               case 'select': {
-                const values: string[] = (Array.isArray(property.value) ? property.value : [property.value].filter(Boolean));
-                const valueOptions = values.map(value => property.options?.find(
-                  o => (o as SelectOptionType).id === value
-                )).filter(Boolean) as SelectOptionType[];
-
                 return (
-                  <Stack gap={0.5} key={property.memberPropertyId}>
-                    <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Stack gap={1} flexDirection='row'>
-                      {values.length !== 0 ? valueOptions.map(
-                        valueOption => <Chip sx={{ px: 0.5 }} label={valueOption.name} color={valueOption.color} key={valueOption.name} size='small' />
-                      ) : 'N/A'}
-                    </Stack>
-                  </Stack>
+                  <SelectPreview
+                    value={property.value as (string | string[])}
+                    name={property.name}
+                    options={property.options}
+                  />
                 );
               }
 
