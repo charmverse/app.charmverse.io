@@ -106,6 +106,11 @@ const templates = {
       ],
       discussionTasks: [
         createDiscussionTask({
+          mentionText: 'Hey there, please respond to this message.',
+          pageTitle: 'Attention please',
+          spaceName: 'CharmVerse'
+        }),
+        createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
