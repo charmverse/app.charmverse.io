@@ -1,16 +1,13 @@
-import { Autocomplete, Box, Stack, TextField } from '@mui/material';
+import { Stack } from '@mui/material';
 import { DateTime } from 'luxon';
-import { useEffect, useMemo, useState } from 'react';
-import { zones } from 'tzdata';
+import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
 import Modal, { DialogTitle } from 'components/common/Modal';
 import { toHoursAndMinutes } from 'lib/utilities/dates';
 
-interface Timezone {
-  tz: string;
-  offset: string;
-}
+import type { Timezone } from './TimezoneAutocomplete';
+import { TimezoneAutocomplete } from './TimezoneAutocomplete';
 
 export default function TimezoneModal ({
   close,
@@ -23,28 +20,9 @@ export default function TimezoneModal ({
   close: VoidFunction;
   initialTimezone?: string | null;
 }) {
-  const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const currentTzOffset = toHoursAndMinutes(DateTime.local().offset);
-
-  const timezoneOptions = useMemo(() => {
-    // Code copied from https://github.com/moment/luxon/issues/353#issuecomment-514203601
-    const luxonValidTimezones = Object.entries(zones)
-      .filter(([, v]) => Array.isArray(v))
-      .map(([zoneName]) => zoneName)
-      .filter(tz => DateTime.local().setZone(tz).isValid);
-
-    return luxonValidTimezones.map(timeZone => {
-      const tzOffset = DateTime.local().setZone(timeZone).offset;
-      return {
-        offset: toHoursAndMinutes(tzOffset),
-        tz: timeZone
-      };
-    });
-  }, []);
-
   const [timezone, setTimezone] = useState<null | Timezone | undefined>(null);
 
-  function updateTimezone () {
+  function setInitialTimezone () {
     setTimezone(initialTimezone ? {
       tz: initialTimezone,
       // luxon provides the offset in terms of minutes
@@ -53,12 +31,12 @@ export default function TimezoneModal ({
   }
 
   useEffect(() => {
-    updateTimezone();
+    setInitialTimezone();
   }, [initialTimezone]);
 
   function onClose () {
     close();
-    updateTimezone();
+    setInitialTimezone();
   }
 
   return (
@@ -75,31 +53,9 @@ export default function TimezoneModal ({
       }}
       >
         <Stack gap={1}>
-          <Autocomplete<Timezone>
-            fullWidth
-            value={timezone}
-            onChange={(_, selectOption) => {
-              setTimezone(selectOption);
-            }}
-            options={timezoneOptions}
-            size='small'
-            renderOption={(props, option) => (
-              <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-                <Box component='span'>
-                  {option.tz} (GMT{option.offset})
-                </Box>
-              </Box>
-            )}
-            getOptionLabel={option => `${option.tz} (GMT${option.offset})`}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                inputProps={{
-                  ...params.inputProps
-                }}
-                placeholder={`${currentTz} (${currentTzOffset})`}
-              />
-            )}
+          <TimezoneAutocomplete
+            setTimezone={setTimezone}
+            timezone={timezone}
           />
           <Button type='submit'>
             Update
