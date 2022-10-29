@@ -3,7 +3,7 @@ import { MoreHoriz } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
@@ -86,7 +86,11 @@ export default function MemberDirectoryPage () {
   const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>(router.query.view as View ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
-  const [sortedProperty, setSortedProperty] = useState<string | null>(properties.find(property => property.type === 'name')?.name ?? null);
+  const [sortedProperty, setSortedProperty] = useState<string>('');
+
+  useEffect(() => {
+    setSortedProperty(properties.find(property => property.type === 'name')?.name ?? '');
+  }, [properties]);
 
   const sortedMembers = useMemo(() => {
     const memberProperty = sortedProperty ? properties.find(property => property.name === sortedProperty) : null;

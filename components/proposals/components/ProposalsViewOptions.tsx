@@ -1,19 +1,10 @@
-import styled from '@emotion/styled';
 import { Chip, InputLabel, MenuItem, Select } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
+import { StyledViewOptions } from 'components/common/ViewOptions';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
-
-const StyledViewOptions = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
-  .MuiInputLabel-root, .MuiSelect-select {
-    font-size: .85em;
-  }
-`;
 
 export type ProposalSort = 'latest_created'
 export type ProposalFilter = ProposalStatus | 'all'

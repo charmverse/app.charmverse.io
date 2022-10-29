@@ -1,18 +1,24 @@
-import { InputLabel, MenuItem, Select, Stack } from '@mui/material';
+import { InputLabel, ListItemIcon, MenuItem, Select, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 
+import { StyledViewOptions } from 'components/common/ViewOptions';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+
+import { MemberPropertyIcons } from './MemberDirectoryProperties/MemberPropertyItem';
 
 export function MemberDirectorySort ({
   setSortedProperty,
   sortedProperty
 }: {
-  sortedProperty: string | null;
-  setSortedProperty: Dispatch<SetStateAction<string | null>>;
+  sortedProperty: string;
+  setSortedProperty: Dispatch<SetStateAction<string>>;
 }) {
   const { properties = [] } = useMemberProperties();
+  const sortableProperties = properties
+    .filter(property => !['profile_pic', 'role'].includes(property.type));
+
   return (
-    <Stack flexDirection='row' alignItems='center' gap={1}>
+    <StyledViewOptions>
       <InputLabel>Sort</InputLabel>
       <Select
         variant='outlined'
@@ -20,12 +26,21 @@ export function MemberDirectorySort ({
         onChange={(e) => {
           setSortedProperty(e.target.value);
         }}
+        renderValue={(value) => value}
       >
         {
-          properties.filter(property => !property.type.match(/role|profile_pic/)).sort((propA, propB) => propA.name > propB.name ? -1 : 1)
-            .map(property => <MenuItem key={property.name} value={property.name}>{property.name}</MenuItem>)
+          sortableProperties
+            .sort((propA, propB) => propA.name > propB.name ? 1 : -1)
+            .map(property => (
+              <MenuItem key={property.name} value={property.name}>
+                <ListItemIcon>
+                  {MemberPropertyIcons[property.type]}
+                </ListItemIcon>
+                <Typography>{property.name}</Typography>
+              </MenuItem>
+            ))
         }
       </Select>
-    </Stack>
+    </StyledViewOptions>
   );
 }

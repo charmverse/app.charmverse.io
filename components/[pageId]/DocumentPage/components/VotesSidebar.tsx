@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { StyledViewOptions } from 'components/common/ViewOptions';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
@@ -102,15 +103,6 @@ interface ViewOptionsProps {
   setVoteFilter: (value: VoteFilter) => void;
   setVoteSort: (value: VoteSort) => void;
 }
-
-const StyledViewOptions = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
-  .MuiInputLabel-root, .MuiSelect-select {
-    font-size: .85em;
-  }
-`;
 
 export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition, showVotes }: ViewOptionsProps) {
   return (
