@@ -132,8 +132,8 @@ export function MemberPropertySidebarItem ({
           width: '100%',
           '& .MuiListItemIcon-root': {
             minWidth: 30
-          }
-          // pl: 1
+          },
+          pl: 1
         }}
         onClick={() => setToggled(!toggled)}
       >
