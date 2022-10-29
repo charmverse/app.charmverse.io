@@ -36,6 +36,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
       <Autocomplete
         ref={ref}
         disabled={disabled}
+        disableCloseOnSelect={multiselect}
         value={selectedOptions}
         selectOnFocus
         clearOnBlur
