@@ -1,5 +1,12 @@
 import HowToVote from '@mui/icons-material/HowToVote';
-import { Alert, Box, Card, Grid, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -15,6 +22,8 @@ import VoteIcon from 'components/votes/components/VoteIcon';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import Table from './components/NexusTable';
+
 interface VoteTasksListProps {
   tasks: GetTasksResponse | undefined;
   error: any;
@@ -24,39 +33,79 @@ interface VoteTasksListProps {
 /**
  * Page only needs to be provided for proposal type votes
  */
-export function VoteTasksListRow (
-  props: { voteTask: VoteTask, mutateTasks: KeyedMutator<GetTasksResponse> }
-) {
-  const {
-    voteTask,
-    mutateTasks
-  } = props;
-
+export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTask, handleVoteId: (voteId: string) => void }) {
   const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id
+    deadline, title: voteTitle, id, userChoice
   } = voteTask;
 
-  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+  const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
+  const dueText = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 
   const voteLink = `/${spaceDomain}/${pagePath}?voteId=${id}`;
-  const voteLocation = `${pageTitle || 'Untitled'} in ${spaceName}`;
+  const voteLocation = pageTitle || 'Untitled';
 
-  function removeVoteFromTask (voteId: string) {
-    mutateTasks((tasks) => {
-      return tasks ? {
-        ...tasks,
-        votes: tasks.votes.filter(vote => vote.id !== voteId)
+  return (
+    <TableRow>
+      <TableCell>
+        <Box alignItems='center' display='flex'>
+          <VoteIcon {...voteTask} />
+          <Typography variant='body1' variantMapping={{ body1: 'span' }} marginLeft='5px'>{voteTitle}</Typography>
+        </Box>
+      </TableCell>
+      <TableCell>
+        <Link href={voteLink} variant='body1' color='inherit'>
+          {voteLocation}
+        </Link>
+      </TableCell>
+      <TableCell>
+        <Typography>{spaceName}</Typography>
+      </TableCell>
+      <TableCell align='center'>
+        <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
+      </TableCell>
+      <TableCell align='center'>
+        <Button
+          sx={{
+            borderRadius: '18px',
+            width: {
+              xs: '100%',
+              md: '100px'
+            }
+          }}
+          variant={isDeadlineOverdue || userChoice ? 'outlined' : 'contained'}
+          onClick={() => handleVoteId(voteTask.id)}
+        >
+          {isDeadlineOverdue || userChoice ? 'View' : 'Vote'}
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
+
+  const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
+
+  const closeModal = () => setSelectedVoteId(undefined);
+
+  const handleVoteId = (voteId: string) => setSelectedVoteId(voteId);
+
+  const removeVoteFromTask = (voteId: string) => {
+    mutateTasks((taskList) => {
+      return taskList ? {
+        ...taskList,
+        votes: taskList.votes.filter(vote => vote.id !== voteId)
       } : undefined;
     }, {
       revalidate: false
     });
-  }
+  };
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
     const userVote = await charmClient.votes.castVote(voteId, choice);
-    removeVoteFromTask(voteId);
+    closeModal();
     return userVote;
   };
 
@@ -70,89 +119,6 @@ export function VoteTasksListRow (
     await charmClient.votes.cancelVote(voteId);
     removeVoteFromTask(voteId);
   };
-
-  return (
-    <Box>
-      <Card sx={{ width: '100%', px: 2, py: 1, my: 2, borderLeft: 0, borderRight: 0 }} variant='outlined'>
-        <Grid justifyContent='space-between' alignItems='center' gap={1} container>
-          <Grid
-            item
-            xs={12}
-            sm={12}
-            md={4}
-            sx={{
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
-              mr: 1,
-              alignItems: 'center',
-              display: 'flex',
-              gap: 0.5
-            }}
-            fontSize={{ sm: 16, xs: 18 }}
-          >
-            <VoteIcon {...voteTask} />
-            {voteTitle}
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={12}
-            md={4}
-            sx={{
-              fontSize: { xs: 14, sm: 'inherit' }
-            }}
-          >
-            <Link href={voteLink}>
-              {voteLocation}
-            </Link>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={2}
-            sx={{
-              fontSize: { xs: 14, sm: 'inherit' }
-            }}
-          >
-            due {DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() })}
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={2}
-            md={1}
-          >
-            <Button onClick={() => {
-              setIsVoteModalOpen(true);
-            }}
-            >Vote now
-            </Button>
-          </Grid>
-        </Grid>
-      </Card>
-      <Modal
-        title='Poll details'
-        size='large'
-        open={isVoteModalOpen}
-        onClose={() => {
-          setIsVoteModalOpen(false);
-        }}
-      >
-        <VoteDetail
-          vote={voteTask}
-          detailed
-          castVote={castVote}
-          deleteVote={deleteVote}
-          cancelVote={cancelVote}
-        />
-      </Modal>
-    </Box>
-  );
-}
-
-export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
 
   if (error) {
     return (
@@ -180,9 +146,40 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
     );
   }
 
+  const voteTask = tasks.votes.find(v => v.id === selectedVoteId);
+
   return (
-    <>
-      {tasks.votes.map(vote => <VoteTasksListRow mutateTasks={mutateTasks} key={vote.id} voteTask={vote} />)}
-    </>
+    <Box overflow='auto'>
+      <Table size='medium' aria-label='Nexus polls table'>
+        <TableHead>
+          <TableRow>
+            <TableCell>Poll</TableCell>
+            <TableCell width={300}>Page</TableCell>
+            <TableCell width={200}>Workspace</TableCell>
+            <TableCell align='center'>Due</TableCell>
+            <TableCell width='135' align='center'>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
+        </TableBody>
+      </Table>
+      <Modal
+        title='Poll details'
+        size='large'
+        open={!!selectedVoteId && !!voteTask}
+        onClose={closeModal}
+      >
+        {voteTask && (
+          <VoteDetail
+            vote={voteTask}
+            detailed
+            castVote={castVote}
+            deleteVote={deleteVote}
+            cancelVote={cancelVote}
+          />
+        )}
+      </Modal>
+    </Box>
   );
 }

@@ -17,7 +17,7 @@ import BoardPage from '../BoardPage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
-  const { pages, setCurrentPageId, mutatePage, getPagePermissions, updatePage } = usePages();
+  const { pages, setCurrentPageId, mutatePage, getPagePermissions, loadingPages, updatePage } = usePages();
   const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
@@ -26,15 +26,13 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const { user } = useUser();
   const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);
 
-  const pagesLoaded = Object.keys(pages).length > 0;
-
   const parentProposalId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
-  const readOnly = (currentPagePermissions?.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
+  const readOnly = (currentPagePermissions.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
     async function main () {
       setIsAccessDenied(false);
-      if (pageId && pagesLoaded && space) {
+      if (pageId && !loadingPages && space) {
         try {
           const page = await charmClient.pages.getPage(pageId, space.id);
           if (page) {
@@ -42,7 +40,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
             setPageNotFound(false);
             setCurrentPageId(page.id);
             setTitleState(page.title);
-            charmClient.track.trackAction('page_view', { spaceId: page.spaceId, resourceId: page.id, type: page.type });
+            charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
           }
           else {
             setPageNotFound(true);
@@ -65,12 +63,16 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       setCurrentPageId('');
     };
 
-  }, [pageId, pagesLoaded, space, user]);
+  }, [pageId, loadingPages, space, user]);
 
   // set page attributes of the primary charm editor
   useEffect(() => {
+    if (loadingPages) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
     if (!editMode) {
-      if (currentPagePermissions?.edit_content) {
+      if (currentPagePermissions.edit_content) {
         setPageProps({ permissions: currentPagePermissions, editMode: 'editing' });
       }
       else {
@@ -78,12 +80,13 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       }
     }
     else {
-      setPageProps({ permissions: currentPagePermissions });
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: currentPagePermissions, editMode });
     }
     return () => {
       resetPageProps();
     };
-  }, [currentPagePermissions]);
+  }, [currentPagePermissions, loadingPages]);
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     setPageProps({ isSaving: true });

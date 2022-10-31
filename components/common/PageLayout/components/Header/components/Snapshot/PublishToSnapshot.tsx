@@ -15,9 +15,13 @@ import { getSnapshotProposal } from 'lib/snapshot';
 
 import PublishingForm from './PublishingForm';
 
-export default function PublishToSnapshot ({ pageId, renderContent }: {
-  renderContent: (props: { onClick?: () => void, label: string, icon: ReactNode }) => ReactNode; pageId: string;
-}) {
+interface Props {
+  pageId: string;
+  renderContent: (props: { onClick?: () => void, label: string, icon: ReactNode }) => ReactNode;
+  onPublish?: () => void;
+}
+
+export default function PublishToSnapshot ({ pageId, renderContent, onPublish = () => null }: Props) {
   const { pages, mutatePage } = usePages();
   const page = pages[pageId]!;
 
@@ -74,7 +78,13 @@ export default function PublishToSnapshot ({ pageId, renderContent }: {
             icon: <PublishIcon fontSize='small' sx={{ mr: 1 }} />
           })}
           <Modal size='large' open={isOpen} onClose={close} title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}>
-            <PublishingForm onSubmit={close} page={page} />
+            <PublishingForm
+              onSubmit={() => {
+                close();
+                onPublish();
+              }}
+              page={page}
+            />
           </Modal>
         </>
       )

@@ -1,8 +1,10 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DeleteIcon from '@mui/icons-material/Delete';
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +24,7 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
+import { useWebSocketClient } from 'hooks/useSocketClient';
 import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
@@ -113,7 +116,7 @@ const SectionName = styled(Typography)`
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledSidebarLink = styled(Link)<{ active: boolean }>`
+const StyledSidebarLink = styled(Link, { shouldForwardProp: prop => prop !== 'active' })<{ active: boolean }>`
   ${sidebarItemStyles}
   ${({ active, theme }) => active ? `
     background-color: ${theme.palette.action.selected};
@@ -197,7 +200,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         createdBy: user.id,
         spaceId: space.id
       };
-      addPageAndRedirect(newPage, router);
+      addPageAndRedirect(newPage, router)
+        .then();
     }
   }, []);
 
@@ -213,17 +217,24 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
             </IconButton>
           </SidebarHeader>
           <Box mb={2}>
+            { /** New navigation order: 1. Member Director, 2. Proposals, 3. Bounties */}
             <SidebarLink
-              href={`/${space.domain}/bounties`}
-              active={router.pathname.startsWith('/[domain]/bounties')}
-              icon={<BountyIcon fontSize='small' />}
-              label='Bounties'
+              href={`/${space.domain}/members`}
+              active={router.pathname.startsWith('/[domain]/members')}
+              icon={<AccountCircleIcon fontSize='small' />}
+              label='Member Directory'
             />
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
               icon={<TaskOutlinedIcon fontSize='small' />}
               label='Proposals'
+            />
+            <SidebarLink
+              href={`/${space.domain}/bounties`}
+              active={router.pathname.startsWith('/[domain]/bounties')}
+              icon={<BountyIcon fontSize='small' />}
+              label='Bounties'
             />
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
@@ -235,13 +246,18 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 />
               </div>
             </Tooltip>
-
+            <SidebarLink
+              active={router.pathname.startsWith('/[domain]/settings/invites')}
+              href={`/${space.domain}/settings/invites`}
+              icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+              label='Invite Members'
+            />
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
               close={searchInWorkspaceModalState.close}
             />
             <SidebarLink
-              active={router.pathname.startsWith('/[domain]/settings')}
+              active={router.pathname.startsWith('/[domain]/settings/workspace')}
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings & Members'

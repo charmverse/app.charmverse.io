@@ -13,8 +13,8 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
 import { useUser } from 'hooks/useUser';
-import { isTouchScreen } from 'lib/browser';
 import log from 'lib/log';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import { amendTransaction } from '../../suggestions/track/amendTransaction';
 

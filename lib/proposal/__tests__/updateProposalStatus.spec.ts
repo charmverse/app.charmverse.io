@@ -1,5 +1,6 @@
 import type { ProposalStatus, Role, Space, User } from '@prisma/client';
 
+import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
@@ -32,7 +33,7 @@ describe('Updates the proposal of a page', () => {
     });
 
     const { proposal } = await updateProposalStatus({
-      proposal: pageWithProposal.proposal!,
+      proposalId: pageWithProposal.proposal?.id as string,
       newStatus: 'reviewed',
       userId: user.id
     });
@@ -51,7 +52,7 @@ describe('Updates the proposal of a page', () => {
     });
 
     const { proposal } = await updateProposalStatus({
-      proposal: pageWithProposal.proposal!,
+      proposalId: pageWithProposal.proposal?.id as string,
       newStatus: 'discussion',
       userId: user.id
     });
@@ -69,7 +70,7 @@ describe('Updates the proposal of a page', () => {
       proposalStatus: 'reviewed'
     });
     await expect(updateProposalStatus({
-      proposal: pageWithProposal.proposal!,
+      proposalId: pageWithProposal.proposal?.id as string,
       newStatus: 'review',
       userId: user.id
     })).rejects.toBeInstanceOf(InvalidStateError);
@@ -84,7 +85,7 @@ describe('Updates the proposal of a page', () => {
       proposalStatus: 'discussion'
     });
     await expect(updateProposalStatus({
-      proposal: pageWithProposal.proposal!,
+      proposalId: pageWithProposal.proposal?.id as string,
       newStatus: 'review',
       userId: user.id
     })).rejects.toBeInstanceOf(InvalidStateError);
@@ -105,7 +106,7 @@ describe('Updates the proposal of a page', () => {
     });
 
     const { proposal } = await updateProposalStatus({
-      proposal: pageWithProposal.proposalId as string,
+      proposalId: pageWithProposal.proposalId as string,
       newStatus,
       userId: user.id
     });
@@ -133,5 +134,34 @@ describe('Updates the proposal of a page', () => {
     if (permissionTemplate.community) {
       expect(permissions.some(p => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)).toBe(true);
     }
+  });
+
+  it('should save the snapshot expiry date when changing the status of the proposal to vote active if it was exported to snapshot', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      proposalStatus: 'reviewed',
+      userId: user.id,
+      authors: [],
+      reviewers: [reviewer.id, { type: 'role', roleId: reviewerRole.id }]
+    });
+
+    await prisma.page.update({
+      where: {
+        id: pageWithProposal.id
+      },
+      data: {
+        // https://snapshot.org/#/olympusdao.eth/proposal/0x3236041d0857f7548c8da12f3890c6f590a016f02fd2f100230e1b8cbcfed078
+        snapshotProposalId: '0x3236041d0857f7548c8da12f3890c6f590a016f02fd2f100230e1b8cbcfed078'
+      }
+    });
+
+    const { proposal } = await updateProposalStatus({
+      proposalId: pageWithProposal.proposalId as string,
+      newStatus: 'vote_active',
+      userId: user.id
+    });
+
+    expect(proposal.snapshotProposalExpiry?.toISOString()).toMatch('2022-10-13T20:55:51');
+
   });
 });

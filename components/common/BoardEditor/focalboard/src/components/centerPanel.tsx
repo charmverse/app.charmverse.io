@@ -16,7 +16,7 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
@@ -62,7 +62,7 @@ type Props = WrappedComponentProps & PropsFromRedux & {
   addCard: (card: Card) => void;
   setPage: (p: Partial<Page>) => void;
   updateView: (view: BoardView) => void;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
   onViewTabClick?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
@@ -91,14 +91,13 @@ function CenterPanel (props: Props) {
   const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
-  const boards = useAppSelector(getSortedBoards);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = pages[board.id]?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
-  const activeBoard = boards.find(b => b.id === activeBoardId);
+  const activeBoard = useAppSelector(getBoard(activeBoardId));
   const activePage = pages[activeBoardId];
 
   const _cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
@@ -158,7 +157,7 @@ function CenterPanel (props: Props) {
     }
   }
 
-  const showCard = React.useCallback((cardId?: string) => {
+  const showCard = React.useCallback((cardId: string | null) => {
     if (state.selectedCardIds.length > 0) {
       setState({ ...state, selectedCardIds: [] });
     }
@@ -229,7 +228,7 @@ function CenterPanel (props: Props) {
           }
         },
         async () => {
-          showCard(undefined);
+          showCard(null);
         }
       );
     });

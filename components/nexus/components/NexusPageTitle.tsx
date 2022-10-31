@@ -1,18 +1,26 @@
 import { Box, Tooltip, Typography } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 export default function PageTitle ({ subPage }: { subPage?: string }) {
   const MyNexus = 'My Nexus';
-  const { account } = useWeb3React();
+  const { account, disconnectWallet } = useWeb3AuthSig();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { setUser } = useUser();
   const router = useRouter();
+
+  async function logoutUser () {
+    disconnectWallet();
+    setIsLoggingOut(true);
+    await charmClient.logout();
+    setUser(null);
+    router.push('/');
+  }
 
   return (
     <Typography
@@ -36,24 +44,17 @@ export default function PageTitle ({ subPage }: { subPage?: string }) {
         : (
           <Box display='flex' justifyContent='space-between' width='100%' alignItems='center'>
             <strong>{MyNexus}</strong>
-            <Tooltip arrow placement='top' title={account ? 'User cant be logged out so long as their wallet is connected' : ''}>
-              <Box display='flex' justifyContent='flex-end' mt={2}>
-                <Button
-                  disabled={Boolean(account)}
-                  variant='outlined'
-                  color='secondary'
-                  loading={isLoggingOut}
-                  onClick={async () => {
-                    setIsLoggingOut(true);
-                    await charmClient.logout();
-                    setUser(null);
-                    router.push('/');
-                  }}
-                >
-                  Logout
-                </Button>
-              </Box>
-            </Tooltip>
+            <Box display='flex' justifyContent='flex-end' mt={2}>
+              <Button
+                data-test='logout-button'
+                variant='outlined'
+                color='secondary'
+                loading={isLoggingOut}
+                onClick={logoutUser}
+              >
+                Logout
+              </Button>
+            </Box>
           </Box>
         ) }
     </Typography>

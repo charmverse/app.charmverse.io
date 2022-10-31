@@ -29,7 +29,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
 }

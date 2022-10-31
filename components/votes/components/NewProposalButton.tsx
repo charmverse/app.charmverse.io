@@ -1,12 +1,12 @@
-import Box from '@mui/material/Box';
-import Tooltip from '@mui/material/Tooltip';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { Box, ButtonGroup, Tooltip } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { DownIcon } from 'components/common/Icons/DownIcon';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import useTasks from 'components/nexus/hooks/useTasks';
@@ -18,8 +18,10 @@ import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+  const router = useRouter();
   const { user } = useUser();
   const [currentSpace] = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -29,7 +31,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   const { mutate } = useTasks();
 
   // MUI Menu specific content
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
   const [proposalTemplates, setProposalTemplates] = useState<PageMeta[]>([]);
@@ -59,9 +61,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
 
       mutateProposals();
       mutatePage(newProposal);
-
+      setUrlWithoutRerender(router.pathname, { id: newProposal.id });
       showPage({
-        pageId: newProposal.id
+        pageId: newProposal.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -71,8 +76,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
       mutatePage(newTemplate);
+      setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
       showPage({
-        pageId: newTemplate.id
+        pageId: newTemplate.id,
+        onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
+        }
       });
     }
   }
@@ -92,39 +101,39 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       showPage({
         pageId: newPage.id,
         onClose () {
+          setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
       });
+      setUrlWithoutRerender(router.pathname, { id: newPage.id });
     }
   }
 
   return (
 
     <>
-
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
-          <Button disabled={!canCreateProposal} ref={buttonRef}>
-            <Box
-              onClick={onClickCreate}
-            >
+          <ButtonGroup variant='contained' ref={buttonRef}>
+            <Button disabled={!canCreateProposal} onClick={onClickCreate}>
               Create Proposal
-            </Box>
-
-            <Box
-            // Negative right margin fixes issue with too much whitespace on right of button
-              sx={{ pl: 1, mr: -2 }}
-              {...bindTrigger(popupState)}
-            >
-              <DownIcon />
-            </Box>
-          </Button>
+            </Button>
+            <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
+              <KeyboardArrowDown />
+            </Button>
+          </ButtonGroup>
         </Box>
       </Tooltip>
       <TemplatesMenu
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
-        editTemplate={(pageId) => showPage({ pageId })}
+        editTemplate={(pageId) => {
+          setUrlWithoutRerender(router.pathname, { id: pageId });
+          showPage({ pageId,
+            onClose () {
+              setUrlWithoutRerender(router.pathname, { id: null });
+            } });
+        }}
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}

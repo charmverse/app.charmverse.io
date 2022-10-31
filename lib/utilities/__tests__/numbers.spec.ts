@@ -1,4 +1,4 @@
-import { countValueOccurrences, nanofy } from '../numbers';
+import { countValueOccurrences, nanofy, percent } from '../numbers';
 
 type Fruit = 'banana' | 'watermelon' | 'mango'
 
@@ -117,4 +117,12 @@ describe('nanofy', () => {
 
   });
 
+});
+
+describe('percent', () => {
+  it('should return a percentage with the correct amount of significant digits, with a default of 0', () => {
+    expect(percent({ value: 50, total: 100 })).toBe('50%');
+    expect(percent({ value: 50, total: 100, significantDigits: 1 })).toBe('50.0%');
+    expect(percent({ value: 1 / 3, total: 1, significantDigits: 3 })).toBe('33.333%');
+  });
 });

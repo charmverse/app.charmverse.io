@@ -4,8 +4,8 @@ import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/materia
 import { memo, useMemo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
-import type { Contributor } from 'hooks/useContributors';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 
 import { RelativeDate } from '../PageThread';
 
@@ -69,7 +69,7 @@ type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
 
 function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
-  const [contributors] = useContributors();
+  const { members } = useMembers();
   // get parentNode for lists
   const parentNode = useMemo(() => (
     pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null
@@ -88,7 +88,7 @@ function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, 
       <Stack gap={1}>
         <Box display='flex' justifyContent='space-between'>
           <Box display='flex' alignItems='center' gap={1}>
-            <SidebarUser user={contributors.find(contributor => contributor.id === data.user)} />
+            <SidebarUser user={members.find(member => member.id === data.user)} />
             <RelativeDate createdAt={data.date} />
           </Box>
           <Box display='flex' gap={1}>
@@ -160,7 +160,7 @@ function FormatChangeDisplay ({ before, after }: { before: string[], after: stri
   return null;
 }
 
-function SidebarUser ({ user }: { user?: Contributor }) {
+function SidebarUser ({ user }: { user?: Member }) {
   if (!user) return null;
   return (
     <UserDisplay

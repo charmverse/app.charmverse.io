@@ -4,15 +4,15 @@ import { useMemo, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import type { BountyPermissions } from 'lib/bounties';
+import type { Member } from 'lib/members/interfaces';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { Contributor } from 'models';
 
 type ReviewersData = {
-  roles: ({ id: string, name: string, users: Contributor[] })[];
+  roles: ({ id: string, name: string, users: Member[] })[];
   users: ({ id: string, name: string, profilePic?: string | null, hasNftAvatar?: boolean })[];
 }
 
@@ -26,7 +26,7 @@ const defaultAvatarGroupIncrement = 2;
 
 export default function BountyReviewers ({ bounty, permissions }: BountyReviewersProps) {
   const [maxVisibleUsers, setMaxVisibleUsers] = useState<number>(defaultAvatarGroupIncrement);
-  const [contributors] = useContributors();
+  const { members } = useMembers();
   const { roleups } = useRoles();
 
   const reviewerNames: ReviewersData = useMemo(() => {
@@ -40,7 +40,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
         };
       }
       else {
-        const reviewerUser: Contributor | undefined = contributors?.find(c => c.id === reviewer.id);
+        const reviewerUser: Member | undefined = members?.find(c => c.id === reviewer.id);
         return {
           ...(reviewer as TargetPermissionGroup<'user'>),
           name: reviewerUser?.username ?? '',
@@ -56,7 +56,7 @@ export default function BountyReviewers ({ bounty, permissions }: BountyReviewer
 
       if (reviewer.group === 'role') {
 
-        const roleAsReviewer = reviewer as { id: string, name: string, users: Contributor[] };
+        const roleAsReviewer = reviewer as { id: string, name: string, users: Member[] };
 
         reviewersByGroup.roles.push(roleAsReviewer);
 

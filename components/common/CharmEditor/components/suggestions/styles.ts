@@ -13,9 +13,9 @@ export default `
   }
 
   .tag.selected-insertion,
-  .contributor.selected-insertion,
+  .member.selected-insertion,
   .tag.selected-deletion,
-  .contributor.selected-deletion {
+  .member.selected-deletion {
     background-color: var(--charmeditor-active);
     color: var(--cs-white-text);
   }

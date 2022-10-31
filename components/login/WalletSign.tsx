@@ -12,12 +12,11 @@ import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
-  buttonText?: string;
   buttonStyle?: SxProps<Theme>;
   buttonSize?: 'small' | 'medium' | 'large';
 }
 
-export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }: Props) {
+export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
 
   const { account, sign, getStoredSignature, walletAuthSignature } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
@@ -35,14 +34,12 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   useEffect(() => {
     if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
-
       userClickedConnect.current = false;
       generateWalletAuth();
     }
   }, [account]);
 
   async function generateWalletAuth () {
-
     if (isSigning) {
       return;
     }
@@ -68,13 +65,15 @@ export function WalletSign ({ signSuccess, buttonText, buttonStyle, buttonSize }
 
   if (!account) {
     return (
-      <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <PrimaryButton data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
         Connect Wallet
       </PrimaryButton>
     );
   }
 
   return (
-    <PrimaryButton sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>{buttonText ?? 'Verify wallet'}</PrimaryButton>
+    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
+      Verify wallet
+    </PrimaryButton>
   );
 }

@@ -5,9 +5,9 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
-import { Box, ClickAwayListener, Portal, Collapse, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
@@ -41,7 +41,7 @@ type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by';
 
 const initialState: SidebarView = 'view-options';
 
-export default function ViewOptionsSidebar (props: Props) {
+function ViewOptionsSidebar (props: Props) {
 
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
 
@@ -64,7 +64,7 @@ export default function ViewOptionsSidebar (props: Props) {
   const currentProperties = visiblePropertyIds.filter(id => props.board.fields.cardProperties.some(c => c.id === id)).length;
 
   return (
-    <ClickAwayListener onClickAway={props.closeSidebar}>
+    <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
       <Collapse in={props.isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
 
         <StyledSidebar>
@@ -138,7 +138,7 @@ function MenuRow ({ icon, title, value, onClick }: { icon: JSX.Element, title: s
   );
 }
 
-function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => void, goBack?: () => void, title: string }) {
+export function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => void, goBack?: () => void, title: string }) {
 
   return (
     <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
@@ -156,3 +156,5 @@ function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => 
     </Box>
   );
 }
+
+export default memo(ViewOptionsSidebar);

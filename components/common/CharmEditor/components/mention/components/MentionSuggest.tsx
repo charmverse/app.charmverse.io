@@ -5,10 +5,10 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, useEffect, memo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { safeScrollIntoViewIfNeeded } from 'lib/browser';
 import type { PageMeta } from 'lib/pages';
+import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
 import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -27,7 +27,7 @@ export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPlu
 }
 
 function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
-  const [contributors] = useContributors();
+  const { members } = useMembers();
   const view = useEditorViewContext();
   const {
     tooltipContentDOM,
@@ -43,16 +43,16 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
-  const filteredContributors = triggerText.length !== 0 ? contributors.filter(
-    contributor => (
-      contributor.username?.toLowerCase()?.startsWith(triggerText.toLowerCase()))
-  ) : contributors;
+  const filteredMembers = triggerText.length !== 0 ? members.filter(
+    member => (
+      member.username?.toLowerCase()?.startsWith(triggerText.toLowerCase()))
+  ) : members;
 
   const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
-  const totalItems = (filteredContributors.length + filteredPages.length);
+  const totalItems = (filteredMembers.length + filteredPages.length);
   const roundedCounter = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
-  const selectedGroup = roundedCounter < filteredContributors.length ? 'contributors' : 'pages';
-  const activeItemIndex = selectedGroup === 'contributors' ? roundedCounter : roundedCounter - filteredContributors.length;
+  const selectedGroup = roundedCounter < filteredMembers.length ? 'members' : 'pages';
+  const activeItemIndex = selectedGroup === 'members' ? roundedCounter : roundedCounter - filteredMembers.length;
 
   useEffect(() => {
     const activeDomElement = document.querySelector('.mention-selected') as HTMLDivElement;
@@ -75,24 +75,24 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
           py: 1
         }}
       >
-        <GroupLabel>Contributors</GroupLabel>
-        {filteredContributors.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No contributors found</Typography> : (
+        <GroupLabel>Members</GroupLabel>
+        {filteredMembers.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No members found</Typography> : (
           <div>
-            {filteredContributors.map((contributor, contributorIndex) => {
-              const isSelected = selectedGroup === 'contributors' ? activeItemIndex === contributorIndex : false;
+            {filteredMembers.map((member, memberIndex) => {
+              const isSelected = selectedGroup === 'members' ? activeItemIndex === memberIndex : false;
               return (
                 <MenuItem
                   component='div'
-                  onClick={() => onSelectMention(contributor.id, 'user')}
-                  key={contributor.id}
+                  onClick={() => onSelectMention(member.id, 'user')}
+                  key={member.id}
                   selected={isSelected}
-                  data-value={contributor.id}
+                  data-value={member.id}
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
                   <UserDisplay
                     fontSize={14}
-                    user={contributor}
+                    user={member}
                     avatarSize='small'
                   />
                 </MenuItem>

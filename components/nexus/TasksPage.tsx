@@ -4,20 +4,22 @@ import styled from '@emotion/styled';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useUser } from 'hooks/useUser';
-import { silentlyUpdateURL } from 'lib/browser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
+import BountyTasksList from './BountyTasksList';
 import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
+import DiscussionTasksList from './DiscussionTasksList';
 import GnosisTasksList from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
-import MentionedTasksList from './MentionedTasksList';
 import ProposalTasksList from './ProposalTasksList';
 import TasksPageHeader from './TasksPageHeader';
 import { VoteTasksList } from './VoteTasksList';
@@ -51,7 +53,7 @@ const StyledTypography = styled(Typography)`
 
 const TASK_TABS = [
   { icon: <KeyIcon />, label: 'Multisig', type: 'multisig' },
-  // { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
+  { icon: <BountyIcon />, label: 'Bounty', type: 'bounty' },
   { icon: <HowToVoteIcon />, label: 'Poll', type: 'vote' },
   { icon: <ForumIcon />, label: 'Discussion', type: 'discussion' },
   { icon: <TaskOutlinedIcon />, label: 'Proposal', type: 'proposal' }
@@ -71,11 +73,14 @@ export default function TasksPage () {
     && userNotificationState.snoozedUntil
     && new Date(userNotificationState.snoozedUntil) > new Date();
 
+  const unvoted = tasks?.votes.filter(vote => !vote.userChoice && new Date() < new Date(vote.deadline));
+
   const notificationCount: Record<(typeof TASK_TABS)[number]['type'], number> = {
     multisig: (gnosisTasks && !hasSnoozedNotifications) ? gnosisTasks.length : 0,
-    vote: tasks ? tasks.votes.length : 0,
-    discussion: tasks ? tasks.mentioned.unmarked.length : 0,
-    proposal: tasks ? tasks.proposals.unmarked.length : 0
+    vote: unvoted ? unvoted.length : 0,
+    discussion: tasks ? tasks.discussions.unmarked.length : 0,
+    proposal: tasks ? tasks.proposals.unmarked.length : 0,
+    bounty: tasks ? tasks.bounties?.unmarked.length : 0
   };
 
   return (
@@ -155,7 +160,7 @@ export default function TasksPage () {
               </Badge>
             )}
             onClick={() => {
-              silentlyUpdateURL(`${window.location.origin}/nexus?task=${task.type}`);
+              setUrlWithoutRerender(router.pathname, { task: task.type });
               setCurrentTaskType(task.type);
             }}
           />
@@ -165,13 +170,16 @@ export default function TasksPage () {
         currentTaskType === 'multisig' && <GnosisTasksList error={gnosisTasksServerError} mutateTasks={mutateGnosisTasks} tasks={gnosisTasks} />
       }
       {
-        currentTaskType === 'discussion' && <MentionedTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
+        currentTaskType === 'discussion' && <DiscussionTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
       }
       {
         currentTaskType === 'vote' && <VoteTasksList mutateTasks={mutateTasks} error={error} tasks={tasks} />
       }
       {
         currentTaskType === 'proposal' && <ProposalTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
+      }
+      {
+        currentTaskType === 'bounty' && <BountyTasksList error={error} tasks={tasks} mutateTasks={mutateTasks} />
       }
     </>
   );

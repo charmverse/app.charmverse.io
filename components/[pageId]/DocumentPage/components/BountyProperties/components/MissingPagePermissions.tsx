@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import type { BountyPermissionLevel } from '@prisma/client';
 
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import useRoles from 'hooks/useRoles';
 import type { BountyPermissions } from 'lib/bounties';
 import type { PagePermissionMeta, TargetPermissionGroup } from 'lib/permissions/interfaces';
@@ -17,7 +17,7 @@ interface Props {
 export default function MissingPagePermissions ({ bountyPermissions, pagePermissions, target }: Props) {
 
   const { roleups } = useRoles();
-  const [contributors] = useContributors();
+  const { members } = useMembers();
 
   const visibleToSpace = pagePermissions.some(p => (isTruthy(p.spaceId) || p.public === true));
 
@@ -42,7 +42,7 @@ export default function MissingPagePermissions ({ bountyPermissions, pagePermiss
   const missingPermissionsWithName: (TargetPermissionGroup & { name: string })[] = assigneesMissingPermissions.map(assignee => {
     return {
       ...assignee,
-      name: (assignee.group === 'user' ? contributors.find(c => c.id === assignee.id)?.username : roleups?.find(r => r.id === assignee.id)?.name) as string
+      name: (assignee.group === 'user' ? members.find(c => c.id === assignee.id)?.username : roleups?.find(r => r.id === assignee.id)?.name) as string
     };
   });
 

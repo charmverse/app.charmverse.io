@@ -5,7 +5,9 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/log/userEvents';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
+import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPageWithPermissions } from 'lib/pages/server';
@@ -17,6 +19,7 @@ import { createProposal } from 'lib/proposal/createProposal';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 import type { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -105,6 +108,16 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
         spaceId
       });
     }
+
+    updateTrackPageProfile(page.id);
+    trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
+
+    const { content, contentText, ...newPageToNotify } = pageWithPermissions;
+
+    relay.broadcast({
+      type: 'pages_created',
+      payload: [newPageToNotify]
+    }, page.spaceId);
 
     res.status(201).json(pageWithPermissions);
   }

@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { useContributors } from 'hooks/useContributors';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 
 import type { CommentBlock } from '../../blocks/commentBlock';
@@ -23,7 +23,7 @@ type Props = {
 
 const CommentsList = React.memo((props: Props) => {
   const { user } = useUser();
-  const [contributors] = useContributors();
+  const { members } = useMembers();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
   const onSendClicked = (newComment: CommentBlock['fields']) => {
@@ -61,7 +61,7 @@ const CommentsList = React.memo((props: Props) => {
         <Comment
           key={comment.id}
           comment={comment}
-          contributor={contributors.find(_contributor => _contributor.id === comment.createdBy)}
+          member={members.find(_member => _member.id === comment.createdBy)}
           readOnly={props.readOnly}
         />
       ))}
@@ -96,6 +96,7 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
         }}
         placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
         style={{ fontSize: '14px' }}
+        focusOnInit={false}
       />
 
       {newComment && (

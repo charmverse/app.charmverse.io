@@ -34,13 +34,13 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedProposal } = await updateProposalStatus({
-      proposal: authoredDraftProposal.proposal,
+      proposalId: authoredDraftProposal.proposal.id,
       newStatus: 'discussion',
       userId: user1.id
     });
 
     await updateProposalStatus({
-      proposal: updatedProposal,
+      proposalId: updatedProposal.id,
       newStatus: 'private_draft',
       userId: user1.id
     });
@@ -60,13 +60,13 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
-      proposal: reviewProposal.proposal,
+      proposalId: reviewProposal.proposal.id,
       newStatus: 'discussion',
       userId: user2.id
     });
 
     await updateProposalStatus({
-      proposal: updatedReviewProposal,
+      proposalId: updatedReviewProposal.id,
       newStatus: 'review',
       userId: user2.id
     });
@@ -83,14 +83,14 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: authoredStartReviewProposal.proposal,
+      proposalId: authoredStartReviewProposal.proposal.id,
       newStatus: 'discussion',
       userId: user1.id
     });
 
     // User is not an author or reviewer of proposal, but have access to the space
     // Move a private_draft proposal to discussion
-    // Should create a single proposal task with action discuss (as a workspace contributor)
+    // Should create a single proposal task with action discuss (as a workspace member)
     const discussedProposal = await generateProposal({
       authors: [user2.id],
       proposalStatus: 'private_draft',
@@ -100,7 +100,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: discussedProposal.proposal,
+      proposalId: discussedProposal.proposal.id,
       newStatus: 'discussion',
       userId: user2.id
     });
@@ -120,12 +120,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: reviewedProposal.proposal,
+      proposalId: reviewedProposal.proposal.id,
       newStatus: 'reviewed',
       userId: user1.id
     });
 
-    // User is a space contributor
+    // User is a space member
     // Move a reviewed proposal to vote_active
     // Single proposal task with action vote
     const voteActiveProposal = await generateProposal({
@@ -137,7 +137,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     });
 
     await updateProposalStatus({
-      proposal: voteActiveProposal.proposal,
+      proposalId: voteActiveProposal.proposal.id,
       newStatus: 'vote_active',
       userId: user2.id
     });

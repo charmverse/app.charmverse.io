@@ -1,6 +1,6 @@
 
 import type { DateTimeUnit as LuxonTimeUnit } from 'luxon';
-import { DateTime } from 'luxon';
+import { Duration, DateTime } from 'luxon';
 
 export type DateInput = DateTime | Date | string | number;
 
@@ -86,4 +86,43 @@ export function showDateWithMonthAndYear (dateInput: Date | string, showDate?: b
   return `${date.toLocaleString('default', {
     month: 'long'
   })}${showDate ? ` ${date.getDate()},` : ''} ${date.getFullYear()}`;
+}
+
+/**
+ * Returns a string representation of a this time relative to now, such as "in two days".
+ */
+export function relativeTime (dateInput: DateInput) {
+
+  dateInput = coerceToMilliseconds(dateInput);
+
+  return DateTime.fromJSDate(new Date(dateInput)).toRelative({ base: DateTime.now() });
+}
+
+export function coerceToMilliseconds (timestamp: DateInput): number {
+  if (typeof timestamp === 'number' && timestamp.toString().length <= 10) {
+    return timestamp * 1000;
+  }
+
+  return timestamp instanceof DateTime ? timestamp.toMillis() : new Date(timestamp).valueOf();
+}
+
+export function toHoursAndMinutes (totalMinutes: number) {
+  return `${Duration.fromObject({ hours: totalMinutes / 60 }, {
+    numberingSystem: ''
+  }).toFormat('hh')}:${Duration.fromObject({ minutes: totalMinutes % 60 }).toFormat('mm')}`;
+}
+
+export function getTimezonesWithOffset () {
+  let timezones: string[] = [];
+  if ((Intl as any).supportedValuesOf) {
+    timezones = (Intl as any).supportedValuesOf('timeZone');
+  }
+
+  return timezones.map(timeZone => {
+    const tzOffset = DateTime.local().setZone(timeZone).offset;
+    return {
+      offset: toHoursAndMinutes(tzOffset),
+      tz: timeZone
+    };
+  });
 }

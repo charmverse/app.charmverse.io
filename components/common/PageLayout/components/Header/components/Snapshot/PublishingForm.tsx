@@ -227,7 +227,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     });
 
     mutatePage(updatedPage);
-    charmClient.track.trackAction('new_vote_created', { platform: 'snapshot', resourceId: receipt.id, spaceId: space?.id || '' });
+    charmClient.track.trackAction('new_vote_created', { platform: 'snapshot', pageId: page.id, resourceId: receipt.id, spaceId: space?.id || '' });
 
     onSubmit();
     setPublishing(false);

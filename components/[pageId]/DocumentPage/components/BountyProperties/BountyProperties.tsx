@@ -417,12 +417,12 @@ export default function BountyProperties (props: {
                 disableCloseOnSelect={true}
                 onChange={async (e, options) => {
                   const roles = options.filter(option => option.group === 'role');
-                  const contributors = options.filter(option => option.group === 'user');
+                  const members = options.filter(option => option.group === 'user');
                   await applyBountyUpdates({
                     permissions: rollupPermissions({
                       assignedRoleSubmitters,
                       selectedReviewerRoles: roles.map(role => role.id),
-                      selectedReviewerUsers: contributors.map(contributor => contributor.id),
+                      selectedReviewerUsers: members.map(member => member.id),
                       spaceId: space!.id
                     })
                   });

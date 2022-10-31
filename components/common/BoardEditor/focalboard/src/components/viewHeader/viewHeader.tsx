@@ -1,6 +1,5 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { IconButton, Tooltip } from '@mui/material';
-import { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { useState } from 'react';
@@ -35,7 +34,7 @@ type Props = {
   cards: Card[];
   groupByProperty?: IPropertyTemplate;
   addCard: () => void;
-  showCard: (cardId?: string) => void;
+  showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;

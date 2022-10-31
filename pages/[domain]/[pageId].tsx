@@ -15,12 +15,7 @@ export default function BlocksEditorPage () {
   const pageIdList = Object.values(pages ?? {}) as PageMeta[];
   const pageId = pageIdList.find(p => p.path === pagePath)?.id;
 
-  if (!pageId) {
-    return null;
-  }
-
   return <EditorPage pageId={pageId ?? pagePath} />;
-
 }
 
 BlocksEditorPage.getLayout = getPageLayout;

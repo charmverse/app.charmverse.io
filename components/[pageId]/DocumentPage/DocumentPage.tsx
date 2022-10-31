@@ -12,6 +12,7 @@ import CommentsList from 'components/common/BoardEditor/focalboard/src/component
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -42,10 +43,9 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   margin: 0 auto ${({ top }) => top + 100}px;
   position: relative;
   top: ${({ top }) => top}px;
-  padding-bottom: ${({ theme }) => theme.spacing(5)};
+  padding: ${({ theme }) => theme.spacing(0, 3)};
 
-  padding: 0 24px;
-  ${({ theme }) => theme.breakpoints.up('md')} {
+  ${({ theme }) => theme.breakpoints.up('sm')} {
     padding: 0 80px;
   }
 `;
@@ -148,9 +148,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         id='document-scroll-container'
         sx={{
           transition: 'width ease-in 0.25s',
-          minWidth: {
-            md: 700
-          },
           width: {
             md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
           },
@@ -189,11 +186,18 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
                 headerImage={page.headerImage}
+                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+                // key={page.title}
                 icon={page.icon}
                 title={page.title}
                 readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
+              {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+                <Box my={2}>
+                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
+                </Box>
+              )}
               {page.type === 'proposal' && !isLoading && pageVote && (
                 <Box my={2}>
                   <VoteDetail

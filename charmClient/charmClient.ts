@@ -12,6 +12,7 @@ import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -25,7 +26,8 @@ import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors }
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateVerification, TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { Contributor, LoggedInUser, PageContent } from 'models';
+import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
 import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
@@ -40,6 +42,7 @@ import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
+import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
@@ -51,6 +54,8 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 // CharmClient is the client interface to the server APIs
 //
 class CharmClient {
+
+  members = new MembersApi();
 
   blockchain = new BlockchainApi();
 
@@ -69,6 +74,10 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  async socket () {
+    return http.GET<SocketAuthReponse>('/api/socket');
+  }
 
   async login ({ address, walletSignature }: Web3LoginRequest) {
     const user = await http.POST<LoggedInUser>('/api/session/login', {
@@ -102,7 +111,7 @@ class CharmClient {
   }
 
   checkNexusPath (path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/checkPathAvailability', { path });
+    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails () {
@@ -142,16 +151,12 @@ class CharmClient {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  getContributors (spaceId: string) {
-    return http.GET<Contributor[]>(`/api/spaces/${spaceId}/contributors`);
+  updateMember ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
+    return http.PUT<Member[]>(`/api/spaces/${spaceId}/members/${userId}`, { isAdmin });
   }
 
-  updateContributor ({ spaceId, userId, isAdmin }: { spaceId: string, userId: string, isAdmin: boolean }) {
-    return http.PUT<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`, { isAdmin });
-  }
-
-  removeContributor ({ spaceId, userId }: { spaceId: string, userId: string }) {
-    return http.DELETE<Contributor[]>(`/api/spaces/${spaceId}/contributors/${userId}`);
+  removeMember ({ spaceId, userId }: { spaceId: string, userId: string }) {
+    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
   }
 
   getPublicPageByViewId (viewId: string) {
@@ -267,15 +272,15 @@ class CharmClient {
   }
 
   async getWorkspaceUsers (spaceId: string): Promise<IUser[]> {
-    const contributors = await this.getContributors(spaceId);
+    const members = await this.members.getMembers(spaceId);
 
-    return contributors.map((contributor: Contributor) => ({
-      id: contributor.id,
-      username: contributor.username,
+    return members.map((member: Member) => ({
+      id: member.id,
+      username: member.username,
       email: '',
       props: {},
-      create_at: new Date(contributor.createdAt).getTime(),
-      update_at: new Date(contributor.updatedAt).getTime(),
+      create_at: new Date(member.createdAt).getTime(),
+      update_at: new Date(member.updatedAt).getTime(),
       is_bot: false
     }));
   }

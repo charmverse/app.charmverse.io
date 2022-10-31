@@ -8,6 +8,7 @@ import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useOnboarding } from 'hooks/useOnboarding';
 
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
@@ -27,9 +28,11 @@ export function JoinDynamicSpaceForm () {
   const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
   const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
   const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
+  const { showOnboarding } = useOnboarding();
 
   async function onJoinSpace (joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
+    showOnboarding(joinedSpace.id);
   }
 
   const debouncedGetPublicSpaces = useMemo(() => {
@@ -72,9 +75,12 @@ export function JoinDynamicSpaceForm () {
         }}
         getOptionLabel={(space) => space.name}
         fullWidth
+        filterOptions={(x) => x}
+        clearOnEscape={false}
+        clearOnBlur={false}
         PopperComponent={StyledPopper}
         renderOption={(props, space) => (
-          <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+          <Box data-test={`join-workspace-autocomplete-${space.domain}`} component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
             <AvatarWithIcons
               avatar={space.spaceImage}
               icons={[]}
@@ -93,7 +99,7 @@ export function JoinDynamicSpaceForm () {
           </Box>
         )}
         noOptionsText='No spaces found'
-        renderInput={(params) => <TextField placeholder='my-space' {...params} value={spaceDomain} onChange={onChangeDomainName} />}
+        renderInput={(params) => <TextField data-test='join-workspace-textfield' placeholder='my-space' {...params} value={spaceDomain} onChange={onChangeDomainName} />}
       />
       {selectedSpace && <TokenGateForm onSuccess={onJoinSpace} spaceDomain={selectedSpace.domain} />}
     </>

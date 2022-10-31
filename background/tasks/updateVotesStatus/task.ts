@@ -4,7 +4,7 @@ import { count } from 'lib/metrics';
 
 import updateVoteStatus from './updateVoteStatus';
 
-export default async function task () {
+export async function task () {
 
   log.debug('Running update vote status cron job');
 

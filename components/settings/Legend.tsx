@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
-import type { TypographyTypeMap } from '@mui/material/Typography';
+import type { TypographyProps } from '@mui/material/Typography';
 import Typography from '@mui/material/Typography';
 import { Box } from '@mui/system';
 import type { ReactNode } from 'react';
 
-const StyledBox = styled(Box)`
+const StyledBox = styled(Box)<{ noBorder?: boolean }>`
   white-space: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  border-bottom: ${({ noBorder, theme }) => noBorder ? '0' : `1px solid ${theme.palette.divider}`};
   padding-bottom: ${({ theme }) => theme.spacing(2)};
   margin-top: ${({ theme }) => theme.spacing(6)};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
@@ -25,9 +25,15 @@ const StyledTypography = styled(Typography)`
   font-weight: bold;
 `;
 
-function Legend ({ children, helperText, ...props }: TypographyTypeMap['props'] & { children: string | ReactNode, helperText?: string | ReactNode }) {
+interface LegendProps extends TypographyProps {
+  children: string | ReactNode;
+  helperText?: string | ReactNode;
+  noBorder?: boolean;
+}
+
+function Legend ({ children, helperText, noBorder, ...props }: LegendProps) {
   return (
-    <StyledBox>
+    <StyledBox noBorder={noBorder}>
       <StyledTypography {...props}>
         {children}
       </StyledTypography>

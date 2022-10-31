@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { duplicatePage } from 'lib/pages/server/duplicatePage';
@@ -27,6 +29,8 @@ async function duplicatePageRoute (req: NextApiRequest, res: NextApiResponse<IPa
   }
 
   const pageWithPermissions = await duplicatePage(pageId, userId, parentId);
+  updateTrackPageProfile(pageWithPermissions.id);
+  trackUserAction('create_page', { userId, spaceId: pageWithPermissions.spaceId, pageId: pageWithPermissions.id, type: pageWithPermissions.type });
 
   return res.status(200).json(pageWithPermissions);
 }

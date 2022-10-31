@@ -1,19 +1,19 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { InputLabel, MenuItem, Select } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
-import { highlightDomElement, silentlyUpdateURL } from 'lib/browser';
 import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
+import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { StyledSidebar as CommentsSidebar } from './CommentsSidebar';
-import PageActionToggle from './PageActionToggle';
 
 const StyledSidebar = styled(CommentsSidebar)`
   height: calc(100%);
@@ -23,6 +23,7 @@ export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'lates
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
 export default function VotesSidebar () {
+  const router = useRouter();
   const { votes, cancelVote, castVote, deleteVote } = useVotes();
   const votesArray = Object.values(votes);
   const view = useEditorViewContext();
@@ -38,8 +39,8 @@ export default function VotesSidebar () {
 
   useEffect(() => {
     // Highlight the vote id when navigation from nexus votes tasks list tab
-    const highlightedVoteId = (new URLSearchParams(window.location.search)).get('voteId');
-    if (highlightedVoteId) {
+    const highlightedVoteId = router.query.voteId;
+    if (typeof highlightedVoteId === 'string') {
       const highlightedVote = votes[highlightedVoteId];
       if (highlightedVote && votes[highlightedVoteId].context !== 'proposal') {
         const highlightedVoteDomNode = document.getElementById(`vote.${highlightedVoteId}`);
@@ -48,7 +49,7 @@ export default function VotesSidebar () {
             setCurrentPageActionDisplay('polls');
             setVoteFilter('all');
             // Remove query parameters from url
-            silentlyUpdateURL(window.location.href.split('?')[0]);
+            setUrlWithoutRerender(router.pathname, { voteId: null });
             requestAnimationFrame(() => {
               highlightedVoteDomNode.scrollIntoView({
                 behavior: 'smooth'
