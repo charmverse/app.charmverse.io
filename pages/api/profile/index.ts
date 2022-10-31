@@ -22,8 +22,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .post(requireWalletSignature, createUser)
-  .use(requireUser)
   .get(getUser)
+  .use(requireUser)
   .put(updateUser);
 
 async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
@@ -63,19 +63,37 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   res.status(200).json(user);
 }
 
+// Endpoint for a user to retrieve their own profile
 async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+
+  async function handleNoProfile () {
+    if (!req.session.anonymousUserId) {
+      req.session.anonymousUserId = v4();
+      await req.session.save();
+    }
+    return res.status(404).json({ error: 'No user found' });
+  }
+
+  if (!req.session?.user?.id) {
+    return handleNoProfile();
+  }
+
   const profile = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
     },
     include: sessionUserRelations
   });
+
   if (!profile) {
-    if (!req.session.anonymousUserId) {
-      req.session.anonymousUserId = v4();
-    }
-    return res.status(404).json({ error: 'No user found' });
+    return handleNoProfile();
   }
+
+  // Clean up the anonymous id if the user has a profile
+  req.session.anonymousUserId = undefined;
+
+  await req.session.save();
+
   return res.status(200).json(profile);
 }
 
