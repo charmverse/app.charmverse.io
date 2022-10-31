@@ -10,6 +10,7 @@ import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
@@ -26,12 +27,10 @@ export default function LoginPage () {
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
 
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const { refreshSignupData } = useUserAcquisition();
 
   useEffect(() => {
-    if (!initialLoadComplete) {
-      setInitialLoadComplete(true);
-    }
+    refreshSignupData();
 
   }, []);
 

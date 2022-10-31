@@ -1,11 +1,15 @@
-
+import { deleteCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvents';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
+import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utils-signup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
+import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
+import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
@@ -32,7 +36,12 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
     user = await getUserProfile('addresses', address);
   }
   catch {
-    user = await createUserFromWallet(address);
+
+    const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
+
+    const signupAnalytics = extractSignupAnalytics(cookiesToParse);
+
+    user = await createUserFromWallet(address, signupAnalytics);
     user.isNew = true;
 
     logSignupViaWallet();
@@ -41,6 +50,13 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   req.session.user = { id: user.id };
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
+
+  signupCookieNames.forEach(cookie => {
+    deleteCookie(cookie, {
+      req,
+      res
+    });
+  });
 
   res.status(200).json(user);
 }
