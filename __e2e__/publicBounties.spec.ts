@@ -12,7 +12,7 @@ test.beforeAll(async () => {
   browser = await chromium.launch();
 });
 
-test('visit a public bounty a page public', async () => {
+test('visit a public bounty page', async () => {
 
   // Arrange ------------------
   const loggedInUserContext = await browser.newContext();
