@@ -6,17 +6,17 @@
 <script type="text/javascript">
 
   function record() {
-  const cookieAge2Weeks = 60 * 60 * 24 * 14;
+    const cookieAge2Weeks = 60 * 60 * 24 * 14;
     const cookieDomain = '.charmverse.io';
   
     // Referrer cookie
-    document.cookie = `marketingReferrer=${document.referrer}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; Secure`;
+    if (document.referrer) {
+      document.cookie = `marketingReferrer=${document.referrer}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; Secure`;
+    }
+      
   
     // Landing page cookie
-    const landingPageCookie = `marketingLandingPage=${window.location.pathname}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; SameSite=strict; Secure`;
-    document.cookie = landingPageCookie;
-  
-    console.log('Landing cookie', landingPageCookie, document);
+    document.cookie = `marketingLandingPage=${window.location.href.split('?')[0]}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; Secure`;
   
     // Campaign cookie
     const query = window.location.search;
@@ -24,13 +24,15 @@
   
     if (query.match(campaignPrefix)) {
       const marketingCampaign = query.split(campaignPrefix)[1].split('&')[0];
-  
-      document.cookie = `marketingCampaign=${marketingCampaign}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; SameSite`;
+
+      if (marketingCampaign) {
+        document.cookie = `marketingCampaign=${marketingCampaign}; max-age=${cookieAge2Weeks}; domain=${cookieDomain}; path=/; SameSite`;
+      }
   
     }
   }
-  
-  // This timeout added so that Wix has time to load and does not overwrite the cookies
+
+  // Wait for wix operations to happen before adding the cookies
   setTimeout(() => {record()}, 2000)
   
   

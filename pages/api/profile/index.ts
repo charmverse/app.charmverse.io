@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvents';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utils-signup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
