@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import { prisma } from 'db';
 import getENSName from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvents';
@@ -9,7 +11,12 @@ import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 
-export async function createUserFromWallet (address: string, signupAnalytics: Partial<SignupAnalytics> = {}): Promise<LoggedInUser> {
+export async function createUserFromWallet (
+  address: string,
+  signupAnalytics: Partial<SignupAnalytics> = {},
+  // An ID set by analytics tools to have pre signup user journey
+  preExistingId: string = v4()
+): Promise<LoggedInUser> {
   const user = await prisma.user.findFirst({
     where: {
       wallets: {
@@ -32,6 +39,7 @@ export async function createUserFromWallet (address: string, signupAnalytics: Pa
 
     const newUser = await prisma.user.create({
       data: {
+        id: preExistingId,
         identityType: IDENTITY_TYPES[0],
         username,
         path: isUserPathAvailable ? userPath : null,

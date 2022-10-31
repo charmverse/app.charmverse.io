@@ -1,6 +1,7 @@
 import { deleteCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
@@ -40,12 +41,14 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet(address, signupAnalytics);
+    user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId);
     user.isNew = true;
 
     logSignupViaWallet();
   }
 
+  // Null out the anonmyous user id after successful login
+  req.session.anonymousUserId = undefined;
   req.session.user = { id: user.id };
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
@@ -68,6 +71,9 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
     include: sessionUserRelations
   });
   if (!profile) {
+    if (!req.session.anonymousUserId) {
+      req.session.anonymousUserId = v4();
+    }
     return res.status(404).json({ error: 'No user found' });
   }
   return res.status(200).json(profile);

@@ -34,7 +34,7 @@ async function trackHandler (req: NextApiRequest, res: NextApiResponse<{ success
     }
   }
 
-  trackUserAction(eventName, eventPayload);
+  trackUserAction(eventName, { ...eventPayload, userId: req.session.anonymousUserId ?? req.session.user?.id });
 
   res.status(200).json({ success: 'ok' });
 }
