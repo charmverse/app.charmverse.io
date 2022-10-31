@@ -12,7 +12,6 @@ export function useUserAcquisition () {
   const { user } = useUser();
 
   const router = useRouter();
-  // console.log('Router path', router);
 
   function setReferrer () {
 
@@ -28,7 +27,7 @@ export function useUserAcquisition () {
   }
 
   function setLandingPage () {
-    const currentPage = router.asPath;
+    const currentPage = window.location.href.split('?')[0];
 
     if (currentPage) {
       setCookie('appLandingPage' as SignupCookieType, currentPage, {

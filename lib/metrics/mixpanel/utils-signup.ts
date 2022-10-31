@@ -16,7 +16,7 @@ const referrerMapping: Record<Exclude<SignupSource, '' | 'direct' | 'other'>, st
 
 const campaignPrefix = 'utm_campaign=';
 
-function extractCampaign (url: string): string {
+function extractCampaign (url: string = ''): string {
 
   if (url.match(campaignPrefix)) {
 
@@ -28,21 +28,27 @@ function extractCampaign (url: string): string {
   return '';
 }
 
-function extractSignupSource (url: string): SignupSource {
+function extractSignupSource (url: string = ''): SignupSource {
 
-  const referrer = new URL(url).hostname;
+  try {
+    const referrer = new URL(url).hostname;
 
-  const reffererKeys = typedKeys(referrerMapping);
+    const reffererKeys = typedKeys(referrerMapping);
 
-  for (const referrerKey of reffererKeys) {
+    for (const referrerKey of reffererKeys) {
 
-    if (referrer.match(referrerMapping[referrerKey])) {
+      if (referrer.match(referrerMapping[referrerKey])) {
 
-      return referrerKey;
+        return referrerKey;
+      }
     }
+  }
+  catch {
+    return '';
   }
 
   return '';
+
 }
 
 export function extractSignupAnalytics (data: Record<SignupCookieType, string>): SignupAnalytics {
