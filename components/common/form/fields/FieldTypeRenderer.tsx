@@ -31,7 +31,14 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...f
     }
 
     case 'multiselect': {
-      return <SelectField {...fieldProps} ref={ref} multiselect iconLabel={MemberPropertyIcons[type]} />;
+      return (
+        <SelectField
+          {...fieldProps}
+          ref={ref}
+          multiselect
+          iconLabel={MemberPropertyIcons[type]}
+        />
+      );
     }
 
     default: {

@@ -1,19 +1,10 @@
 import type { BrandColor } from 'theme/colors';
 
-export type NewSelectOptionType = {
-  id?: string;
-  index?: number;
+export type SelectOptionType = {
+  id: string;
   name: string;
   color: BrandColor;
+  index?: number;
+  temp?: boolean;
 };
-
-export type TempSelectOption = NewSelectOptionType & {
-  id: string;
-}
-
-export type ExistingSelectOption = NewSelectOptionType & {
-  inputValue: string;
-}
-
-export type SelectOptionType = ExistingSelectOption | TempSelectOption;
 

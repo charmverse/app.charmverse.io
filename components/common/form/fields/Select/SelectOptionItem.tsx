@@ -9,6 +9,7 @@ type Props = {
   menuItemProps?: HTMLAttributes<HTMLLIElement>;
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
+  isEditable?: boolean;
 };
 
 export function SelectOptionItem ({ option, onChange, onDelete, menuItemProps = {} }: Props) {

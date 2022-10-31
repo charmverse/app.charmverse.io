@@ -11,10 +11,18 @@ export type ControlFieldProps = {
   value: string;
 }
 
+export type SelectFieldProps = {
+  options?: SelectOptionType[];
+  isEditable?: boolean;
+  onCreateOption?: (option: SelectOptionType) => void;
+  onUpdateOption?: (option: SelectOptionType) => void;
+  onDeleteOption?: (option: SelectOptionType) => void;
+}
+
 export type FieldProps = {
   label?: string;
   iconLabel?: ReactNode;
   inline?: boolean;
   error?: string;
-  options?: SelectOptionType[];
-};
+  disabled?: boolean;
+} & SelectFieldProps;
