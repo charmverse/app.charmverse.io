@@ -1,7 +1,7 @@
 import { Chip, InputLabel, MenuItem, Select } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
-import { StyledViewOptions } from 'components/common/ViewOptions';
+import { ViewOptions } from 'components/common/ViewOptions';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
@@ -30,8 +30,7 @@ export default function ProposalsViewOptions ({
 
 }: Props) {
   return (
-    <StyledViewOptions>
-      <InputLabel>Sort</InputLabel>
+    <ViewOptions label='Sort'>
       <Select variant='outlined' value={proposalSort} onChange={(e) => setProposalSort(e.target.value as ProposalSort)} sx={{ mr: 2 }}>
         <MenuItem value='latest_created'>Created</MenuItem>
       </Select>
@@ -50,6 +49,6 @@ export default function ProposalsViewOptions ({
           categories.map(({ id, title, color }) => <MenuItem key={id} value={id}><Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} /></MenuItem>)
         }
       </Select>
-    </StyledViewOptions>
+    </ViewOptions>
   );
 }

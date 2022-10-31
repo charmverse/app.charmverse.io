@@ -1,7 +1,7 @@
-import { InputLabel, ListItemIcon, MenuItem, Select, Typography } from '@mui/material';
+import { ListItemIcon, MenuItem, Select, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 
-import { StyledViewOptions } from 'components/common/ViewOptions';
+import { ViewOptions } from 'components/common/ViewOptions';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 
 import { MemberPropertyIcons } from '../MemberDirectoryProperties/MemberPropertyItem';
@@ -18,8 +18,7 @@ export function MemberDirectorySort ({
     .filter(property => !['profile_pic', 'role'].includes(property.type));
 
   return (
-    <StyledViewOptions>
-      <InputLabel>Sort</InputLabel>
+    <ViewOptions label='Sort'>
       <Select
         variant='outlined'
         value={sortedProperty}
@@ -41,6 +40,6 @@ export function MemberDirectorySort ({
             ))
         }
       </Select>
-    </StyledViewOptions>
+    </ViewOptions>
   );
 }
