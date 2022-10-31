@@ -52,12 +52,8 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   const io = new Server(res.socket.server);
 
   // Define actions inside
-  io.on('connect', (socket) => {
-
-    registerPageEvents(socket);
-    registerSpaceEvents(socket);
-
-  });
+  io.on('connect', (socket) => registerSpaceEvents(socket));
+  io.of('/ceditor').on('connect', (socket) => registerPageEvents(socket));
 
   res.socket.server.io = io;
 

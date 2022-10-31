@@ -11,6 +11,7 @@ import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
 import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
+import { useOnboarding } from 'hooks/useOnboarding';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
@@ -30,14 +31,17 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
   );
 }
 
-export default function CreateSpace () {
+export default function JoinWorkspace () {
   const router = useRouter();
   const domain = router.query.domain;
   const { spaces } = useSpaces();
+  const { showOnboarding } = useOnboarding();
 
   useEffect(() => {
-    if (spaces.some(space => space.domain === router.query.domain)) {
+    const space = spaces.find(_space => _space.domain === router.query.domain);
+    if (space) {
       router.push(`/${router.query.domain}`);
+      showOnboarding(space.id);
     }
   }, [spaces]);
 
@@ -55,4 +59,4 @@ export default function CreateSpace () {
   );
 }
 
-CreateSpace.getLayout = getBaseLayout;
+JoinWorkspace.getLayout = getBaseLayout;

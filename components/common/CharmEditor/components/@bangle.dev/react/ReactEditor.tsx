@@ -95,8 +95,8 @@ export const BangleEditor = React.forwardRef<
         renderRef.current!,
         editorViewPayloadRef.current
       );
-      // console.log('init editor', user, id);
-      if (user && id && socket && authToken && trackChanges) {
+
+      if (user && id && trackChanges) {
         // eslint-disable-next-line no-new
         new FidusEditor({
           authToken,

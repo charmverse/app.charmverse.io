@@ -121,7 +121,7 @@ export class FidusEditor {
           authToken,
           type: 'subscribe'
         };
-        log.debug('initialMessage connectionCount', this.ws?.connectionCount);
+        // console.log('initialMessage connectionCount', this.ws?.connectionCount);
         if (this.ws?.connectionCount) {
           message.connection = this.ws.connectionCount;
         }
@@ -138,6 +138,7 @@ export class FidusEditor {
         // if (document.body !== this.dom) {
         //   return; // user navigated away.
         // }
+        // console.log('received data', data);
         switch (data.type) {
           case 'connections':
             this.mod.collab.updateParticipantList(data.participant_list);
@@ -274,7 +275,7 @@ export class FidusEditor {
         if (tr.steps) {
           this.docInfo.updated = new Date();
         }
-        // console.log('send to collaborators');
+        // // console.log('send to collaborators');
         this.mod.collab.doc.sendToCollaborators();
       }
     });

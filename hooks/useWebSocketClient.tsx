@@ -1,4 +1,4 @@
-import type { EventsMap } from '@socket.io/component-emitter';
+
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
@@ -15,11 +15,7 @@ import { useUser } from './useUser';
 
 type LoggedMessage = { type: string, payload: any }
 
-type WorkspaceListenEvents = {
-  message: (message: WebSocketMessage) => void;
-}
-
-export type SocketConnection<ListenEvents extends EventsMap = WorkspaceListenEvents> = Socket<ListenEvents>;
+export type SocketConnection = Socket<{ message: (message: WebSocketMessage) => void }>;
 
 type IContext = {
   authToken?: string;

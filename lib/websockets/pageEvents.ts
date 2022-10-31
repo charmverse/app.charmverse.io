@@ -2,12 +2,13 @@ import type { Node } from '@bangle.dev/pm';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { prisma } from 'db';
 import log from 'lib/log';
 import type { SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const authSecret = process.env.AUTH_SECRET as string;
-const socketEvent = 'page_message';
+const socketEvent = 'message';
 
 export type Participant = {
   id: string;
@@ -94,6 +95,7 @@ export type SocketMessage = ClientMessage | ServerMessage;
 
 export async function registerPageEvents (socket: Socket) {
 
+  // console.log('send welcome!');
   socket.emit(socketEvent, { type: 'welcome' });
 
   socket.on(socketEvent, async (message: ClientMessage) => {
@@ -115,7 +117,7 @@ export async function registerPageEvents (socket: Socket) {
               roomId: message.roomId
             });
             if (typeof message.connection !== 'number' || message.connection < 1) {
-              sendDocument(socket, message.roomId);
+              await sendDocument(socket, message.roomId);
             }
           }
           break;
@@ -135,10 +137,25 @@ export async function registerPageEvents (socket: Socket) {
   });
 }
 
-function sendDocument (socket: Socket, pageId: string) {
+async function sendDocument (socket: Socket, pageId: string) {
+  const page = await prisma.page.findUniqueOrThrow({
+    where: { id: pageId }
+  });
   const message: ServerDocDataMessage = {
-    type: 'doc_data'
-
+    type: 'doc_data',
+    doc: {
+      content: page.content as any,
+      v: page.version
+    },
+    doc_info: {
+      id: page.id,
+      updated: page.updatedAt
+    },
+    time: Date.now()
   };
+  send(socket, message);
+}
+
+function send (socket: Socket, message: ServerMessage) {
   socket.emit(socketEvent, message);
 }

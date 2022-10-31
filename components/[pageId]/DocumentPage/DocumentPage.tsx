@@ -170,8 +170,8 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
           >
             <CharmEditor
               key={page.id + editMode + !!pageDetails}
-              content={pageDetails?.content as PageContent}
-              onContentChange={updatePageContent}
+              // content={pageDetails?.content as PageContent}
+              // onContentChange={updatePageContent}
               readOnly={readOnly || !pageDetails}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}

@@ -1,6 +1,7 @@
 import type { NodeSelection } from '@bangle.dev/pm';
 import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
 
+import type { FidusEditor } from '../../fiduseditor';
 import type { TrackAttribute } from '../../track/interfaces';
 
 import { findSelectedChanges } from './findSelectedChanges';
@@ -13,8 +14,7 @@ export const selectedChangeFormatSpec = {};
 export const selectedChangeBlockSpec = {};
 
 interface Options {
-  userId: string;
-  username: string;
+  editor: FidusEditor;
 }
 
 export function trackPlugin (options: Options) {
@@ -26,7 +26,7 @@ export function trackPlugin (options: Options) {
         // in the document and that they are registered as past
         // participants for the marginbox filter.
         const users: Record<string, string> = {};
-        users[options.userId] = options.username;
+        users[options.editor.user.id] = options.editor.user.username;
         state.doc.descendants(node => {
           if (node.attrs.track) {
             node.attrs.track.forEach((track: TrackAttribute) => {

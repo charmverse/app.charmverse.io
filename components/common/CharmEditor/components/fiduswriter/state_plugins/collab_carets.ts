@@ -3,7 +3,7 @@ import { sendableSteps } from 'prosemirror-collab';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
-import type { ClientSelectionMessage } from '../ws';
+import type { ClientSelectionMessage } from 'lib/websockets/pageEvents';
 
 const key = new PluginKey('collabCarets');
 

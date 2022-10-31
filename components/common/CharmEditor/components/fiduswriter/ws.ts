@@ -1,15 +1,13 @@
 import type { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 import log from 'lib/log';
 import type { SocketMessage } from 'lib/websockets/pageEvents';
 
 const gettext = (text: string) => text;
 
-const socketEvent = 'page_message';
-
-type PageContentListenEvents = {
-  page_message: (message: SocketMessage) => void;
-}
+const namespace = '/ceditor';
+const socketEvent = 'message';
 
 type WebSocketConnectorProps = {
   socket: Socket;
@@ -28,7 +26,7 @@ export interface WebSocketConnector extends WebSocketConnectorProps {}
  */
 export class WebSocketConnector {
 
-  socket: Socket<PageContentListenEvents>;
+  socket: Socket<{ message: (message: SocketMessage) => void }>;
 
   // Messages object used to ensure that data is received in right order.
   messages: { server: number, client: number, lastTen: SocketMessage[] } = {
@@ -77,7 +75,11 @@ export class WebSocketConnector {
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
-    this.socket = socket;
+    // console.log('load socket');
+    this.socket = io('/ceditor', {
+      withCredentials: true
+      // path: '/api/socket'
+    }).connect();
     this.createWSConnection();
   }
 
@@ -117,9 +119,10 @@ export class WebSocketConnector {
       lastTen: []
     };
 
-    this.open();
+    // this.open();
 
-    this.socket.on(socketEvent, data => {
+    this.socket.on('message', data => {
+      // console.log('on socket events', data);
       const expectedServer = this.messages.server + 1;
       if (data.type === 'request_resend') {
         this.resend_messages(data.from);
@@ -165,7 +168,15 @@ export class WebSocketConnector {
     });
 
     this.socket.on('connect', () => {
-      log.debug('ws connected!', { anythingToSend: this.anythingToSend() });
+      // console.log('connected');
+      try {
+        const sendable = this.anythingToSend();
+      }
+      catch (e) {
+        // console.error('error getting sendable steps', e);
+      }
+      return;
+      // console.log('[charm] socket connected!', { anythingToSend: this.anythingToSend() });
       // window.setTimeout(() => {
       //   this.createWSConnection();
       // }, 2000);
@@ -188,11 +199,13 @@ export class WebSocketConnector {
   }
 
   open () {
-
+    // console.log('open socket');
     const message = this.initialMessage();
+    // console.log('open socket', message);
     this.connectionCount += 1;
     this.oldMessages = this.messagesToSend;
     this.messagesToSend = [];
+    // console.log('[charm] open web socket');
 
     this.send(() => message);
   }
@@ -267,10 +280,11 @@ export class WebSocketConnector {
   }
 
   receive (data: SocketMessage) {
+    // console.log('receive', data);
     switch (data.type) {
-      // case 'welcome':
-      //   this.open();
-      //   break;
+      case 'welcome':
+        this.open();
+        break;
       case 'subscribed':
         this.subscribed();
         break;
