@@ -239,7 +239,7 @@ function VoteTaskMjml ({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
         {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
       </div>
       <div style={{
@@ -269,10 +269,11 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
       <a
         href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{
-          display: 'block'
+          display: 'block',
+          color: 'inherit'
         }}
       >
-        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10 }}>
           {pageWorkspaceTitle}
         </div>
       </a>
@@ -293,10 +294,11 @@ function BountyTaskMjml ({ task }: { task: BountyTask }) {
       <a
         href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{
+          color: 'inherit',
           display: 'block'
         }}
       >
-        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10 }}>
           {pageWorkspaceTitle}
         </div>
       </a>
@@ -314,7 +316,7 @@ function DiscussionTask ({ task: { text, spaceName, pageTitle } }: { task: Discu
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
         {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
       </div>
       <div style={{
@@ -333,7 +335,7 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
   return (
     <MjmlText>
-      <strong style={{ color: '#000' }}>
+      <strong>
         Safe address: {shortenHex(task.safeAddress)}<br />
         {task.tasks[0].transactions[0].description}
       </strong>
