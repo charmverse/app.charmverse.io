@@ -4,7 +4,8 @@ import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
 
-import { createUserAndSpace, generatePageWithLinkedPage } from './utils/mocks';
+import { createUserAndSpace } from './utils/mocks';
+import { generatePageWithLinkedPage } from './utils/pages';
 
 let browser: Browser;
 
