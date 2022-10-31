@@ -1,5 +1,6 @@
 import { Box } from '@mui/system';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
@@ -14,6 +15,8 @@ export function SpacesMemberDetails ({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
 
+  const { query } = useRouter();
+
   if (isLoading) {
     return <LoadingComponent isLoading />;
   }
@@ -21,6 +24,17 @@ export function SpacesMemberDetails ({ memberId }: Props) {
   if (!memberPropertyValues?.length) {
     return null;
   }
+
+  useEffect(() => {
+    if (query.workspace) {
+      const expandedWorkspaceAccordion = document.getElementById(`workspace-properties-accordion-${query.workspace}`);
+      if (expandedWorkspaceAccordion) {
+        expandedWorkspaceAccordion.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [query]);
 
   return (
     <Box mt={2}>
@@ -32,6 +46,8 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           properties={pv.properties}
           readOnly={!canEditSpaceProfile(pv.spaceId)}
           onEdit={() => setEditSpaceId(pv.spaceId)}
+          expanded={query.workspace === pv.spaceId}
+          spaceId={pv.spaceId}
         />
       ))}
 

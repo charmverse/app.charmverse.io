@@ -1,9 +1,11 @@
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { useRouter } from 'next/router';
 
 import Avatar from 'components/common/Avatar';
-import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
@@ -17,12 +19,17 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const nameProperty = properties.find(property => property.type === 'name');
+  const router = useRouter();
+  const [currentSpace] = useCurrentSpace();
 
   return (
-    <Link
-      href={`/u/${member.path || member.id}`}
+    <Box
+      onClick={() => {
+        router.push(`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`);
+      }}
       color='primary'
       sx={{
+        cursor: 'pointer',
         '&:hover': {
           opacity: 0.8
         }
@@ -102,7 +109,7 @@ function MemberDirectoryGalleryCard ({
           })}
         </Stack>
       </Card>
-    </Link>
+    </Box>
   );
 }
 
