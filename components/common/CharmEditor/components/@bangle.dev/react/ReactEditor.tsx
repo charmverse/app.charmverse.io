@@ -94,7 +94,6 @@ export const BangleEditor = React.forwardRef<
       let fEditor: FidusEditor;
 
       if (user && pageId && authToken && trackChanges) {
-        // console.log('init fidus writer');
         // eslint-disable-next-line no-new
         fEditor = new FidusEditor({
           authToken,
