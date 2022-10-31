@@ -1,6 +1,7 @@
 import type { MemberProperty, MemberPropertyPermission } from '@prisma/client';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useMemo } from 'react';
+import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,10 +12,11 @@ import { useCurrentSpace } from './useCurrentSpace';
 type Context = {
   properties: MemberPropertyWithPermissions[] | undefined;
   addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
-  updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<MemberProperty>;
+  updateProperty: (property: Partial<MemberProperty> & { id: string }, mutate?: boolean) => Promise<MemberProperty>;
   deleteProperty: (id: string) => Promise<void>;
   addPropertyPermissions: (propertyId: string, permission: CreateMemberPropertyPermissionInput[]) => Promise<MemberPropertyPermission[]>;
   removePropertyPermission: (permission: MemberPropertyPermission) => Promise<void>;
+  mutateProperties: KeyedMutator<MemberPropertyWithPermissions[]>;
 };
 
 const MemberPropertiesContext = createContext<Readonly<Context>>({
@@ -23,7 +25,8 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
   updateProperty: () => Promise.resolve({} as any),
   deleteProperty: () => Promise.resolve(),
   addPropertyPermissions: () => Promise.resolve({} as any),
-  removePropertyPermission: () => Promise.resolve()
+  removePropertyPermission: () => Promise.resolve(),
+  mutateProperties: () => Promise.resolve({} as any)
 });
 
 export function MemberPropertiesProvider ({ children }: { children: ReactNode }) {
@@ -45,15 +48,17 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
     }
   }, [space?.id]);
 
-  const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }) => {
+  const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }, mutate: boolean = true) => {
     if (space) {
       const updatedProperty = await charmClient.members.updateMemberProperty(space.id, propertyData);
-      mutateProperties(state => {
-        if (state) {
-          return state.map(p => p.id === updatedProperty.id ? { ...p, ...updatedProperty } : p);
-        }
-        return state;
-      });
+      if (mutate) {
+        mutateProperties(state => {
+          if (state) {
+            return state.map(p => p.id === updatedProperty.id ? { ...p, ...updatedProperty } : p);
+          }
+          return state;
+        });
+      }
 
       return updatedProperty;
     }
@@ -115,7 +120,8 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
     updateProperty,
     deleteProperty,
     removePropertyPermission,
-    addPropertyPermissions
+    addPropertyPermissions,
+    mutateProperties
   }) as Context, [properties, addProperty]);
 
   return (

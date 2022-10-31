@@ -27,5 +27,5 @@ export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: s
     });
   });
 
-  return defaultPropertiesInput;
+  return defaultPropertiesInput.sort((propA, propB) => propA.name > propB.name ? 1 : -1).map((property, index) => ({ ...property, index }));
 }

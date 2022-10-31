@@ -191,7 +191,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
 }
 
 // pulled from react-merge-refs
-function mergeRefs (refs: any) {
+export function mergeRefs (refs: any) {
   return (value: any) => {
     refs.forEach((ref: any) => {
       if (typeof ref === 'function') {
