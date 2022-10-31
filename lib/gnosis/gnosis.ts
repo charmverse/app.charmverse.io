@@ -67,7 +67,7 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
 }
 
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-  const safes = await Promise.all(Object.values(RPC).filter(network => network.chainId !== 4).map(network => {
+  const safes = await Promise.all(Object.values(RPC).map(network => {
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 

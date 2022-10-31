@@ -197,23 +197,6 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true
   },
-  RINKEBY: {
-    chainId: 4,
-    chainName: 'Ethereum - Rinkeby',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
-    blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
-    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
-    testnet: true
-  },
   MUMBAI: {
     chainId: 80001,
     chainName: 'Polygon - Mumbai',
@@ -290,7 +273,6 @@ const supportedChains: Blockchain[] = [
   'HARMONY_DEVNET',
   'BSC',
   'GOERLI',
-  'RINKEBY',
   'MUMBAI'
 ];
 
