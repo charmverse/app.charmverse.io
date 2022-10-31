@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { StyledViewOptions } from 'components/common/ViewOptions';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 
-import { MemberPropertyIcons } from './MemberDirectoryProperties/MemberPropertyItem';
+import { MemberPropertyIcons } from '../MemberDirectoryProperties/MemberPropertyItem';
 
 export function MemberDirectorySort ({
   setSortedProperty,
