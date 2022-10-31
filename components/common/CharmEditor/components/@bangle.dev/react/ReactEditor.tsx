@@ -11,7 +11,6 @@ import { objectUid } from '@bangle.dev/utils';
 import type { ReactNode, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
-import type { Socket } from 'socket.io-client';
 
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
@@ -24,8 +23,7 @@ import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   authToken?: string;
-  socket?: Socket | null;
-  id?: string;
+  pageId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
   className?: string;
@@ -45,8 +43,7 @@ export const BangleEditor = React.forwardRef<
   (
     {
       authToken,
-      socket,
-      id,
+      pageId,
       state,
       children,
       focusOnInit = !isTouchScreen(),
@@ -90,19 +87,19 @@ export const BangleEditor = React.forwardRef<
     );
 
     useEffect(() => {
-      // console.log('editor ref changed', ref);
       const _editor = new CoreBangleEditor(
         renderRef.current!,
         editorViewPayloadRef.current
       );
+      let fEditor: FidusEditor;
 
-      if (user && id && trackChanges) {
+      if (user && pageId && authToken && trackChanges) {
+        // console.log('init fidus writer');
         // eslint-disable-next-line no-new
-        new FidusEditor({
+        fEditor = new FidusEditor({
           authToken,
-          socket,
           user,
-          docId: id,
+          docId: pageId,
           view: _editor.view,
           enableSuggestionMode: enableSuggestions
         });
@@ -112,9 +109,10 @@ export const BangleEditor = React.forwardRef<
       setEditor(_editor);
       return () => {
         // console.log('destroy editor');
+        fEditor?.close();
         _editor.destroy();
       };
-    }, [id, ref, authToken, renderRef]);
+    }, [pageId, ref, authToken]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(
@@ -126,7 +124,7 @@ export const BangleEditor = React.forwardRef<
       <EditorViewContext.Provider value={editor?.view as any}>
         <div ref={editorRef} className='bangle-editor-core'>
           {editor ? children : null}
-          <div ref={renderRef} id={id} className={className} style={style} />
+          <div ref={renderRef} id={pageId} className={className} style={style} />
           {editor ? placeholderComponent : null}
         </div>
         {nodeViews.map((nodeView) => {

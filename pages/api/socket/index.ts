@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { registerCharmEditorEvents } from 'lib/websockets/charmEditorEvents';
+import { CharmEditorEventHandler } from 'lib/websockets/charmEditorEvents';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
@@ -53,7 +53,9 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
 
   // Define actions inside
   io.on('connect', (socket) => registerSpaceEvents(socket));
-  io.of('/ceditor').on('connect', (socket) => registerCharmEditorEvents(socket));
+  io.of('/ceditor').on('connect', (socket) => {
+    new CharmEditorEventHandler(socket).open();
+  });
 
   res.socket.server.io = io;
 

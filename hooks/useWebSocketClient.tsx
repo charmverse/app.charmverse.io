@@ -20,7 +20,6 @@ export type SocketConnection = Socket<{ message: (message: WebSocketMessage) => 
 type IContext = {
   authToken?: string;
   sendMessage: (message: ClientMessage) => void;
-  socket: SocketConnection | null;
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
@@ -28,7 +27,6 @@ type IContext = {
 }
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
-  socket: null,
   sendMessage: () => null,
   // Development only
   messageLog: [],
@@ -65,7 +63,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   function pushToMessageLog (message: LoggedMessage) {
     if (process.env.NODE_ENV === 'development') {
-      setMessageLog((prev) => [message, ...prev.slice(0, 50)]);
+      // setMessageLog((prev) => [message, ...prev.slice(0, 50)]);
     }
   }
 
@@ -125,9 +123,8 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     sendMessage,
     messageLog,
     clearLog,
-    socket,
     subscribe: eventFeed.subscribe as IContext['subscribe']
-  }), [authResponse, messageLog, Boolean(socket)]);
+  }), [authResponse, messageLog]);
 
   return (
     <WebSocketClientContext.Provider value={value}>

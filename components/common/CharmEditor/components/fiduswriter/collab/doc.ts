@@ -41,9 +41,9 @@ export class ModCollabDoc {
   }
 
   checkVersion () {
-    this.mod.editor.ws.send(() => {
+    this.mod.editor.ws?.send(() => {
       if (this.currentlyCheckingVersion || !this.mod.editor.docInfo.version) {
-        return;
+        return false;
       }
       this.currentlyCheckingVersion = true;
       this.enableCheckVersion = window.setTimeout(
@@ -52,7 +52,7 @@ export class ModCollabDoc {
         },
         1000
       );
-      if (this.mod.editor.ws.connected) {
+      if (this.mod.editor.ws?.socket.connected) {
         this.disableDiffSending();
       }
       return {
@@ -88,7 +88,7 @@ export class ModCollabDoc {
       console.error('TODO: merge document updates');
     }
     else {
-      console.log('load doc', data)
+      console.log('loadDocument()');
       this.loadDocument(data);
     }
   }
@@ -107,7 +107,7 @@ export class ModCollabDoc {
     this.mod.editor.docInfo = doc_info;
     this.mod.editor.docInfo.version = doc.v;
     this.mod.editor.docInfo.updated = new Date();
-    const stateDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [doc.content] });
+    const stateDoc = this.mod.editor.schema.nodeFromJSON(doc.content);
     const plugins = this.mod.editor.statePlugins.map(plugin => {
       if (plugin[1]) {
         return plugin[0](plugin[1](doc));
@@ -116,7 +116,7 @@ export class ModCollabDoc {
         return plugin[0]();
       }
     });
-    console.log('load plugins!')
+    console.log('load plugins!', stateDoc)
     const stateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,
@@ -140,7 +140,7 @@ export class ModCollabDoc {
   sendToCollaborators () {
     // Handle either doc change and comment updates OR caret update. Priority
     // for doc change/comment update.
-    this.mod.editor.ws.send(() => {
+    this.mod.editor.ws?.send(() => {
       if (
         this.awaitingDiffResponse
                 || this.mod.editor.waitingForDocument
@@ -157,7 +157,7 @@ export class ModCollabDoc {
 
         if (!stepsToSend) {
           // no diff. abandon operation
-          return;
+          return false;
         }
         const rid = this.confirmStepsRequestCounter++;
 

@@ -9,7 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
-import type { ClientSubscribeMessage, SocketMessage } from 'lib/websockets/charmEditorEvents';
+import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/charmEditorEvents';
 
 import { ModCollab } from './collab';
 import {
@@ -29,7 +29,7 @@ type EditorModules = {
 
 type DocInfo = {
   id: string;
-  confirmedDoc: false | Node;
+  confirmedDoc?: false | Node;
   session_id?: string;
   updated: Date | false;
   version: number;
@@ -41,7 +41,6 @@ type User = { id: string, username: string }
 
 type EditorProps = {
   authToken: string;
-  socket: Socket;
   user: User;
   docId: string;
   view: EditorView;
@@ -73,10 +72,11 @@ export class FidusEditor {
 
   currentView: EditorView | null = null;
 
-  ws?: any;
+  ws?: WebSocketConnector;
 
   isOffline () {
-    return !navigator.onLine || (this.ws?.connectionCount > 0 && !this.ws?.connected);
+    // console.log('isOffline?', navigator.onLine, this.ws?.connectionCount, this.ws?.socket?.connected);
+    return !navigator.onLine || (this.ws?.connectionCount && this.ws?.connectionCount > 0 && !this.ws?.socket.connected);
   }
 
   // Whether the editor is currently waiting for a document update. Set to true
@@ -84,8 +84,7 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor ({ authToken, user, docId, view, socket, enableSuggestionMode }: EditorProps) {
-
+  constructor ({ authToken, user, docId, view, enableSuggestionMode }: EditorProps) {
     this.user = user;
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -104,15 +103,14 @@ export class FidusEditor {
       [trackPlugin, () => ({ editor: this })]
     ];
 
-    this.init(view, socket, authToken);
+    this.init(view, authToken);
   }
 
-  init (view: EditorView, socket: WebSocketConnector['socket'], authToken: string) {
+  init (view: EditorView, authToken: string) {
 
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
-      socket,
       appLoaded: () => Boolean(this.view.state.plugins.length),
       anythingToSend: () => Boolean(sendableSteps(this.view.state)),
       initialMessage: () => {
@@ -134,7 +132,7 @@ export class FidusEditor {
         }
       },
       restartMessage: () => ({ type: 'get_document' }), // Too many messages have been lost and we need to restart
-      receiveData: (data: SocketMessage) => {
+      receiveData: (data: WrappedSocketMessage<SocketMessage>) => {
         // if (document.body !== this.dom) {
         //   return; // user navigated away.
         // }
@@ -251,6 +249,7 @@ export class FidusEditor {
   }
 
   close () {
+    // console.log('close ws', !!this.ws);
     if (this.ws) {
       this.ws.close();
     }
@@ -285,7 +284,7 @@ export class FidusEditor {
     // eslint-disable-next-line no-new
     new ModCollab(this);
     // new ModTrack(this);
-    this.ws.init();
+    // this.ws.init();
 
   }
 

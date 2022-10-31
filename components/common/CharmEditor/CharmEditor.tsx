@@ -107,8 +107,7 @@ export function charmEditorPlugins (
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null,
-    username = null
+    spaceId = null
   }:
     {
       spaceId?: string | null;
@@ -120,14 +119,13 @@ export function charmEditorPlugins (
       disablePageSpecificFeatures?: boolean;
       enableVoting?: boolean;
       enableComments?: boolean;
-      username?: string | null;
     } = {}
 ): () => RawPlugins[] {
 
   const basePlugins: RawPlugins[] = [
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
-    (username && userId ? trackPlugins({ readOnly, userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
+    trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -382,7 +380,7 @@ function CharmEditor (
   const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
-  const { authToken, socket } = useWebSocketClient();
+  const { authToken } = useWebSocketClient();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
@@ -456,8 +454,7 @@ function CharmEditor (
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id,
-      username: user?.username
+      userId: user?.id
     }),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
@@ -493,9 +490,8 @@ function CharmEditor (
 
   return (
     <StyledReactBangleEditor
-      id={pageId}
+      pageId={pageId}
       authToken={authToken}
-      socket={socket}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       enableSuggestions={enableSuggestingMode}
       trackChanges={true}

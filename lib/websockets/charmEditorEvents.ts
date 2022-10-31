@@ -1,6 +1,7 @@
 import type { Node } from '@bangle.dev/pm';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
+import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import log from 'lib/log';
@@ -17,30 +18,35 @@ export type Participant = {
   sessionIds: string[];
 };
 
-type BaseSocketMessage<T> = T & {
+export type WrappedSocketMessage<T> = T & {
   c: number; // client
   s: number; // server
-  v: number; // version
 };
 
-export type ClientRequestResendMessage = BaseSocketMessage<{
+export type RequestResendMessage = {
   type: 'request_resend';
   from: number;
-}>;
+};
 
 type ClientGetDocumentMessage = {
   type: 'get_document';
 };
 
-export type ClientSelectionMessage = BaseSocketMessage<{
+type ClientCheckVersionMessage = {
+  type: 'check_version';
+  v: number;
+};
+
+export type ClientSelectionMessage = {
   type: 'selection_change';
   id: string;
   session_id: string;
   anchor: number;
   head: number;
-}>;
+  v: number;
+};
 
-export type ClientDiffMessage = BaseSocketMessage<{
+export type ClientDiffMessage = {
   type: 'diff';
   rid: number;
   cid?: number; // client id
@@ -48,7 +54,8 @@ export type ClientDiffMessage = BaseSocketMessage<{
   jd?: any; // used by python backend in fiduswriter - maybe we dont need it?
   ti?: string; // new title
   doc?: Node;
-}>;
+  v: number;
+};
 
 export type ClientSubscribeMessage = {
   type: 'subscribe';
@@ -63,9 +70,10 @@ export type ClientUnsubscribeMessage = {
 }
 
 export type ClientMessage = ClientSubscribeMessage
+  | ClientCheckVersionMessage
   | ClientDiffMessage
   | ClientSelectionMessage
-  | ClientRequestResendMessage
+  | RequestResendMessage
   | ClientGetDocumentMessage
   | ClientUnsubscribeMessage;
 
@@ -77,7 +85,7 @@ type ServerConnectionsMessage = {
 export type ServerDocDataMessage = {
   type: 'doc_data';
   doc: { content: Node, v: number };
-  doc_info: { id: string, session_id: string, updated: any }; // TODO: do we need this?
+  doc_info: { id: string, session_id: string, updated: any, version: number }; // TODO: do we need this?
   time: number;
 };
 
@@ -95,6 +103,7 @@ type ServerMessage = ServerConnectionsMessage
   | ServerDocDataMessage
   | ServerDiffMessage
   | ServerErrorMessage
+  | RequestResendMessage
   | { type: 'confirm_version' | 'subscribed' | 'patch_error' | 'welcome' };
 
 export type SocketMessage = ClientMessage | ServerMessage;
@@ -110,7 +119,7 @@ type DocumentState = {
 
 const docState = new Map<string, DocumentState>();
 
-class CharmEditorEvents {
+export class CharmEditorEventHandler {
   messages: { server: number, client: number, lastTen: ServerMessage[] } = {
     server: 0,
     client: 0,
@@ -121,7 +130,7 @@ class CharmEditorEvents {
 
     socket.on(socketEvent, async message => {
       try {
-        await this.handleMessage(message);
+        await this.onMessage(message);
       }
       catch (error) {
         log.error('Error handling message', error);
@@ -130,39 +139,82 @@ class CharmEditorEvents {
   }
 
   open () {
-    // console.log('send welcome!');
     this.sendMessage({ type: 'welcome' });
   }
 
-  async handleMessage (message: ClientMessage) {
-
-    const socket = this.socket;
+  async onMessage (message: WrappedSocketMessage<ClientMessage>) {
 
     log.debug('Socket server received message:', message);
 
+    if (message.type === 'request_resend') {
+      await this.resendMessages(message.from);
+      return;
+    }
+
+    if (!('c' in message) || !('s' in message)) {
+      this.sendError('Invalid message');
+      return;
+    }
+    else if (message.c < this.messages.client + 1) {
+      // Receive a message already received at least once. Ignore.
+      return;
+    }
+    else if (message.c > this.messages.client + 1) {
+      log.debug('Request resent of lost messages from client');
+      this.sendMessage({ type: 'request_resend', from: this.messages.client });
+      return;
+    }
+    else if (message.s < this.messages.server) {
+      /* Message was sent either simultaneously with message from server
+         or a message from the server previously sent never arrived.
+         Resend the messages the client missed. */
+      log.debug('Resend messages to client');
+      this.messages.client += 1;
+      await this.resendMessages(message.s);
+      await this.rejectMessage(message);
+      return;
+    }
+
+    // message order is correct. continue processing message
+    this.messages.client += 1;
+    await this.handleMessage(message);
+  }
+
+  async handleMessage (message: WrappedSocketMessage<ClientMessage>) {
+
+    const socket = this.socket;
+
     switch (message.type) {
 
-      case 'subscribe': {
+      case 'subscribe':
         try {
           const r = await unsealData<SealedUserId>(message.authToken, {
             password: authSecret
           });
           const userId = r.userId;
           const pageId = message.roomId;
+          log.debug('[charm ws] subscribe event', { r, userId, pageId });
 
           if (typeof userId === 'string') {
+            const isValidUserId = validate(userId);
+            if (!isValidUserId) {
+              throw new Error(`Invalid user id: ${userId}`);
+            }
+            const isValidPageId = validate(pageId);
+            if (!isValidPageId) {
+              throw new Error(`Invalid page id: ${pageId}`);
+            }
             const permissions = await computeUserPagePermissions({
               pageId,
               userId
             });
-
             if (permissions.edit_content !== true) {
-              this.sendMessage({ type: 'error', message: 'You do not have permission to view this page' });
+              this.sendError('You do not have permission to view this page');
               return;
             }
 
             socket.join([pageId]);
-            socket.pageId = pageId;
+            // socket.pageId = pageId;
             this.sendMessage({ type: 'subscribed' });
             if (typeof message.connection !== 'number' || message.connection < 1) {
               await this.sendDocument(socket, message.roomId);
@@ -170,13 +222,14 @@ class CharmEditorEvents {
             }
           }
         }
-        catch (err) {
-          socket.emit('error', 'Unable to register user');
+        catch (error) {
+          log.error('Error registering user to page events', { error });
+          this.sendError('Unable to register user');
         }
         break;
-      }
 
       case 'unsubscribe':
+        log.debug('[charm ws] unsubscribe event', { roomId: message.roomId });
         socket.leave(message.roomId);
         break;
 
@@ -185,7 +238,7 @@ class CharmEditorEvents {
     }
   }
 
-  async handleDiff (socket: Socket, message: ClientDiffMessage) {
+  async handleDiff (socket: Socket, message: WrappedSocketMessage<ClientDiffMessage>) {
     const pv = message.v;
     const dv = docState.get(socket.id)?.doc.version;
   }
@@ -204,30 +257,43 @@ class CharmEditorEvents {
       doc_info: {
         id: page.id,
         session_id: socket.id,
-        updated: page.updatedAt
+        updated: page.updatedAt,
+        version: page.version
       },
       time: Date.now()
     };
     this.sendMessage(message);
   }
 
+  resendMessages (from: number) {
+    log.error('TODO: Implement resend messages', from);
+  }
+
+  rejectMessage (message: WrappedSocketMessage<ClientMessage>) {
+    if (message.type === 'diff') {
+      this.sendMessage({ type: 'reject_diff', rid: message.rid });
+    }
+  }
+
   sendMessage (message: ServerMessage) {
     this.messages.server += 1;
-    message.c = this.messages.client;
-    message.s = this.messages.server;
+    const wrappedMessage: WrappedSocketMessage<ServerMessage> = {
+      ...message,
+      c: this.messages.client,
+      s: this.messages.server
+    };
     this.messages.lastTen.push(message);
     this.messages.lastTen = this.messages.lastTen.slice(-10);
     try {
-      this.socket.emit(socketEvent, message);
+      this.socket.emit(socketEvent, wrappedMessage);
     }
     catch (err) {
       log.error('Error sending message', err);
     }
   }
 
-}
+  sendError (message: string) {
+    this.sendMessage({ type: 'error', message });
+  }
 
-export async function registerCharmEditorEvents (socket: Socket) {
-  const handler = new CharmEditorEvents(socket);
-  handler.open();
 }

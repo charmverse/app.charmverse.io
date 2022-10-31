@@ -2,21 +2,22 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import log from 'lib/log';
-import type { SocketMessage } from 'lib/websockets/charmEditorEvents';
+import type { SocketMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/charmEditorEvents';
 
 const gettext = (text: string) => text;
 
 const namespace = '/ceditor';
 const socketEvent = 'message';
 
+type WrappedMessage = WrappedSocketMessage<SocketMessage>;
+
 type WebSocketConnectorProps = {
-  socket: Socket;
   appLoaded: () => boolean;
   anythingToSend: () => boolean;
   sendMessage?: (message: string) => void;
   initialMessage: () => SocketMessage;
   restartMessage: () => SocketMessage; // Too many messages have been lost and we need to restart
-  receiveData: (data: SocketMessage) => void;
+  receiveData: (data: WrappedMessage) => void;
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
 }
 
@@ -26,10 +27,10 @@ export interface WebSocketConnector extends WebSocketConnectorProps {}
  */
 export class WebSocketConnector {
 
-  socket: Socket<{ message: (message: SocketMessage) => void }>;
+  socket: Socket<{ message: (message: WrappedMessage | RequestResendMessage) => void }>;
 
   // Messages object used to ensure that data is received in right order.
-  messages: { server: number, client: number, lastTen: SocketMessage[] } = {
+  messages: { server: number, client: number, lastTen: WrappedMessage[] } = {
     server: 0,
     client: 0,
     lastTen: []
@@ -37,10 +38,10 @@ export class WebSocketConnector {
 
   /* A list of messages to be sent. Only used when temporarily offline.
           Messages will be sent when returning back online. */
-  messagesToSend: (() => SocketMessage)[] = [];
+  messagesToSend: (() => SocketMessage | false)[] = [];
 
   /* A list of messages from a previous connection */
-  oldMessages: (() => SocketMessage)[] = [];
+  oldMessages: (() => SocketMessage | false)[] = [];
 
   online = true;
 
@@ -59,7 +60,6 @@ export class WebSocketConnector {
   infoDisconnected = gettext('Disconnected. Attempting to reconnect...');// Info to show while disconnected WITHOUT unsaved data
 
   constructor ({
-    socket,
     appLoaded,
     anythingToSend,
     sendMessage,
@@ -68,6 +68,7 @@ export class WebSocketConnector {
     restartMessage,
     receiveData
   }: WebSocketConnectorProps) {
+    // console.log('create connection');
     this.appLoaded = appLoaded;
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
@@ -106,8 +107,9 @@ export class WebSocketConnector {
   // }
 
   close () {
-    // this.ws.onclose = () => {};
-    // this.ws.close();
+    this.socket.off();
+    this.socket.close();
+    // console.log('close socket');
     // window.removeEventListener('offline', this.listeners.onOffline);
   }
 
@@ -122,7 +124,7 @@ export class WebSocketConnector {
     // this.open()//;
 
     this.socket.on('message', data => {
-      // console.log('on socket events', data);
+      // console.log('ws - on socket events', data);
       const expectedServer = this.messages.server + 1;
       // console.log('[charm ws] socket message', data, expectedServer);
       if (data.type === 'request_resend') {
@@ -149,7 +151,6 @@ export class WebSocketConnector {
           this.receive(data);
         }
         else if (data.c < this.messages.client) {
-          // console.log('[charm] client diff');
           // We have received all server messages, but the server seems
           // to have missed some of the client's messages. They could
           // have been sent simultaneously.
@@ -163,9 +164,12 @@ export class WebSocketConnector {
           }
           this.messages.lastTen.slice(0 - clientDifference).forEach(_data => {
             this.messages.client += 1;
-            _data.c = this.messages.client;
-            _data.s = this.messages.server;
-            this.socket.emit(socketEvent, _data);
+            const wrappedMessage: WrappedMessage = {
+              ..._data,
+              c: this.messages.client,
+              s: this.messages.server
+            };
+            this.socket.emit(socketEvent, wrappedMessage);
           });
           this.receive(data);
         }
@@ -180,31 +184,30 @@ export class WebSocketConnector {
       catch (e) {
         // console.error('error getting sendable steps', e);
       }
-      return;
       // // console.log('[charm] socket connected!', { anythingToSend: this.anythingToSend() });
       // window.setTimeout(() => {
       //   this.createWSConnection();
       // }, 2000);
-      if (!this.appLoaded()) {
-        // doc not initiated
-        return;
-      }
+      // if (!this.appLoaded()) {
+      //   // doc not initiated
+      //   return;
+      // }
 
-      if (this.sendMessage) {
-        if (this.anythingToSend()) {
-          this.sendMessage(this.warningNotAllSent);
-        }
-        else {
-          this.sendMessage(this.infoDisconnected);
-        }
+      // if (this.sendMessage) {
+      //   if (this.anythingToSend()) {
+      //     this.sendMessage(this.warningNotAllSent);
+      //   }
+      //   else {
+      //     this.sendMessage(this.infoDisconnected);
+      //   }
 
-      }
+      // }
 
     });
   }
 
   open () {
-    // console.log('open socket');
+    // console.log('[charm ws] - welcome received, request subscription');
     const message = this.initialMessage();
     // console.log('open socket message', message);
     this.connectionCount += 1;
@@ -228,13 +231,12 @@ export class WebSocketConnector {
   }
 
   /** Sends data to server or keeps it in a list if currently offline. */
-  send (getData: () => SocketMessage, timer = 80) {
+  send (getData: () => SocketMessage | false, timer = 80) {
     // logic from original source: reconnect if not connected anymore
     // if (this.connected && socket.readyState !== socket.OPEN) {
     //   // @ts-ignore
     //   ws.onclose();
     // }
-
     if (this.socket.connected && !this.recentlySent) {
       const data = getData();
       if (!data) {
@@ -242,14 +244,18 @@ export class WebSocketConnector {
         return;
       }
       this.messages.client += 1;
-      data.c = this.messages.client;
-      data.s = this.messages.server;
-      this.messages.lastTen.push(data);
+      const wrappedMessage: WrappedMessage = {
+        ...data,
+        c: this.messages.client,
+        s: this.messages.server
+      };
+      this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
-      this.socket.emit(socketEvent, data);
+      this.socket.emit(socketEvent, wrappedMessage);
       this.setRecentlySentTimer(timer);
     }
     else {
+      log.debug('queue socket message', { connected: this.socket.connected, recentlySent: this.recentlySent });
       this.messagesToSend.push(getData);
     }
   }
@@ -285,7 +291,7 @@ export class WebSocketConnector {
     });
   }
 
-  receive (data: SocketMessage) {
+  receive (data: WrappedMessage) {
     // console.log('receive', data);
     switch (data.type) {
       case 'welcome':
@@ -298,7 +304,6 @@ export class WebSocketConnector {
       //   this.failedAuth();
       //   break;
       default:
-        // console.log('receive', data);
         this.receiveData(data);
         break;
     }
