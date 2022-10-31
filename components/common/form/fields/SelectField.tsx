@@ -15,7 +15,6 @@ type SelectProps = {
   multiselect?: boolean;
   options?: SelectOptionType[];
   disabled?: boolean;
-  isEditable?: boolean;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
@@ -32,11 +31,11 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
     disabled,
     multiselect = false,
     options = [],
-    isEditable,
     onDeleteOption,
     onUpdateOption,
     onCreateOption,
-    ...inputProps },
+    ...inputProps
+  },
   ref
 ) => {
   const selectedValues: string[] = Array.isArray(inputProps.value) ? inputProps.value : [inputProps.value];
@@ -44,7 +43,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 
   function onValueChange (updatedSelectedOptions: SelectOptionType[]) {
     const values = updatedSelectedOptions.map(option => option.id).filter(Boolean) as string[];
-    const tempValueOption = updatedSelectedOptions.find(option => !option.temp);
+    const tempValueOption = updatedSelectedOptions.find(option => option.temp);
     const newValue = multiselect ? values : values.pop();
 
     if (tempValueOption && onCreateOption) {
@@ -54,6 +53,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 
     inputProps.onChange(newValue || '');
   }
+
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
@@ -80,8 +80,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
               key={option.id || option.name}
               option={option}
               menuItemProps={selectProps}
-              onDelete={isEditable ? onDeleteOption : undefined}
-              onChange={isEditable ? onUpdateOption : undefined}
+              onDelete={onDeleteOption || undefined}
+              onChange={onUpdateOption || undefined}
             />
           );
         }}
@@ -110,7 +110,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 
           // Suggest the creation of a new value
           const isExisting = options.some((option) => inputValue.toLowerCase() === option.name?.toLocaleLowerCase());
-          if (inputValue !== '' && !isExisting && isEditable && onCreateOption) {
+          if (inputValue !== '' && !isExisting && onCreateOption) {
             filtered.push({
               temp: true,
               id: v4(),

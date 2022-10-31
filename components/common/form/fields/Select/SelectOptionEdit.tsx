@@ -67,7 +67,14 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           <FieldLabel variant='subtitle2'>Color</FieldLabel>
         </Stack>
         {brandColorNames.map(color => (
-          <MenuItem key={color} sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }} onClick={() => onColorChange(color)}>
+          <MenuItem
+            key={color}
+            sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onColorChange(color);
+            }}
+          >
             <Stack flexDirection='row' gap={1} alignContent='center'>
               <div style={{
                 width: 20,
