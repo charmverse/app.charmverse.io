@@ -113,6 +113,7 @@ export default function DefaultSpacePagePermissions () {
 
               return (
                 <MenuItem
+                  key={permissionLevel}
                   selected={isSelected}
                   onClick={() => {
                     setSelectedPagePermission(permissionLevel);
