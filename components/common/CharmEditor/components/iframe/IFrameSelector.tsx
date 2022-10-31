@@ -29,12 +29,14 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
             ...tabs,
             [
               'Link',
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                alignItems: 'center'
-              }}
+              <Box
+                key='link'
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  alignItems: 'center'
+                }}
               >
                 <TextField
                   autoFocus
