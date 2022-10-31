@@ -9,7 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
-import type { ClientSubscribeMessage, SocketMessage } from 'lib/websockets/pageEvents';
+import type { ClientSubscribeMessage, SocketMessage } from 'lib/websockets/charmEditorEvents';
 
 import { ModCollab } from './collab';
 import {
@@ -138,7 +138,6 @@ export class FidusEditor {
         // if (document.body !== this.dom) {
         //   return; // user navigated away.
         // }
-        // console.log('received data', data);
         switch (data.type) {
           case 'connections':
             this.mod.collab.updateParticipantList(data.participant_list);

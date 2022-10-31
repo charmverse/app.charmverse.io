@@ -47,8 +47,8 @@ export class WebsocketBroadcaster {
     this.io.emit('message', message);
   }
 
-  broadcast (message: ServerMessage, roomId: string): void {
-    this.io.to(roomId).emit('message', message);
+  broadcast (io: Socket, eventName: string, message: ServerMessage, roomId: string): void {
+    io.to(roomId).emit(eventName, message);
   }
 
   leaveRoom (socket: Socket, roomId: string): void {
@@ -78,21 +78,6 @@ export class WebsocketBroadcaster {
     });
 
     socket.join([roomId]);
-  }
-
-  async registerPageSubscriber ({ userId, socket, roomId }: { userId: string, socket: Socket, roomId: string }) {
-    const permissions = await computeUserPagePermissions({
-      pageId: roomId,
-      userId
-    });
-
-    if (permissions.read !== true) {
-      socket.send(new ActionNotPermittedError('You do not have permission to view this page'));
-      return;
-    }
-
-    socket.join([roomId]);
-    socket.send({ type: 'subscribed' });
   }
 
 }

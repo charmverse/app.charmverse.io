@@ -2,7 +2,7 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import log from 'lib/log';
-import type { SocketMessage } from 'lib/websockets/pageEvents';
+import type { SocketMessage } from 'lib/websockets/charmEditorEvents';
 
 const gettext = (text: string) => text;
 
@@ -76,7 +76,7 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     // console.log('load socket');
-    this.socket = io('/ceditor', {
+    this.socket = io(namespace, {
       withCredentials: true
       // path: '/api/socket'
     }).connect();
@@ -119,19 +119,22 @@ export class WebSocketConnector {
       lastTen: []
     };
 
-    // this.open();
+    // this.open()//;
 
     this.socket.on('message', data => {
       // console.log('on socket events', data);
       const expectedServer = this.messages.server + 1;
+      // console.log('[charm ws] socket message', data, expectedServer);
       if (data.type === 'request_resend') {
         this.resend_messages(data.from);
       }
       else if (data.s < expectedServer) {
+        // console.log('[charm ws] ignore old message');
         // Receive a message already received at least once. Ignore.
 
       }
       else if (data.s > expectedServer) {
+        // console.log('[charm ws] resend messages');
         // Messages from the server have been lost.
         // Request resend.
         this.socket.emit(socketEvent, {
@@ -142,9 +145,11 @@ export class WebSocketConnector {
       else {
         this.messages.server = expectedServer;
         if (data.c === this.messages.client) {
+          // console.log('[charm] receive messages');
           this.receive(data);
         }
         else if (data.c < this.messages.client) {
+          // console.log('[charm] client diff');
           // We have received all server messages, but the server seems
           // to have missed some of the client's messages. They could
           // have been sent simultaneously.
@@ -168,7 +173,7 @@ export class WebSocketConnector {
     });
 
     this.socket.on('connect', () => {
-      // console.log('connected');
+      // // console.log('connected');
       try {
         const sendable = this.anythingToSend();
       }
@@ -176,7 +181,7 @@ export class WebSocketConnector {
         // console.error('error getting sendable steps', e);
       }
       return;
-      // console.log('[charm] socket connected!', { anythingToSend: this.anythingToSend() });
+      // // console.log('[charm] socket connected!', { anythingToSend: this.anythingToSend() });
       // window.setTimeout(() => {
       //   this.createWSConnection();
       // }, 2000);
@@ -201,11 +206,11 @@ export class WebSocketConnector {
   open () {
     // console.log('open socket');
     const message = this.initialMessage();
-    // console.log('open socket', message);
+    // console.log('open socket message', message);
     this.connectionCount += 1;
     this.oldMessages = this.messagesToSend;
     this.messagesToSend = [];
-    // console.log('[charm] open web socket');
+    // // console.log('[charm] open web socket');
 
     this.send(() => message);
   }
@@ -229,6 +234,7 @@ export class WebSocketConnector {
     //   // @ts-ignore
     //   ws.onclose();
     // }
+
     if (this.socket.connected && !this.recentlySent) {
       const data = getData();
       if (!data) {
@@ -292,6 +298,7 @@ export class WebSocketConnector {
       //   this.failedAuth();
       //   break;
       default:
+        // console.log('receive', data);
         this.receiveData(data);
         break;
     }

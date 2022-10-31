@@ -114,7 +114,7 @@ export const BangleEditor = React.forwardRef<
         // console.log('destroy editor');
         _editor.destroy();
       };
-    }, [id, ref, renderRef]);
+    }, [id, ref, authToken, renderRef]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(

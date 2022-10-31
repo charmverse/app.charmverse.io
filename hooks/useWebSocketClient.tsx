@@ -75,7 +75,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket.disconnect();
     }
 
-    socket = io(window.location.origin, {
+    socket = io('/', {
       withCredentials: true
       // path: '/api/socket'
     }).connect();

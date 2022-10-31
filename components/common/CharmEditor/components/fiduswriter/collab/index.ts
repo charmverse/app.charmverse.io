@@ -1,4 +1,4 @@
-import type { Participant } from 'lib/websockets/pageEvents';
+import type { Participant } from 'lib/websockets/charmEditorEvents';
 
 import type { FidusEditor } from '../fiduseditor';
 import { removeCollaboratorSelection } from '../state_plugins';

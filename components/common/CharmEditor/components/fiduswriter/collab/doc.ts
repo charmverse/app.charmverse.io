@@ -13,7 +13,7 @@ import {
   updateCollaboratorSelection
 } from '../state_plugins';
 
-import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/pageEvents';
+import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/charmEditorEvents';
 
 
 export class ModCollabDoc {
