@@ -17,6 +17,7 @@ import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
@@ -48,6 +49,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const { account, library } = useWeb3React();
 
   const [space] = useCurrentSpace();
+  const isAdmin = useIsAdmin();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -125,7 +127,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         new SystemError({
           errorType: 'Data not found',
           severity: 'warning',
-          message: 'This space must be connected to Snapshot.org before you can export proposals there.'
+          message: 'This space must be connected to Snapshot.org before you can export proposals there. Only workspace admins can configure this.'
         })
       );
     }
@@ -252,7 +254,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
               <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
             </Box>
             {
-          !snapshotSpace && (
+          !snapshotSpace && isAdmin && (
             <ConnectSnapshot />
           )
         }
