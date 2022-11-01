@@ -145,7 +145,7 @@ async function sendNotification (notification: PendingTasksProps & {
     );
   }
   catch (err) {
-    log.debug(`GnosisSafe error with userId: ${notification.user.id}, taskIds: ${notification.gnosisSafeTasks.map(item => getGnosisSafeTaskId(item)).join(',')}`, { error: err });
+    log.debug(`GnosisSafe error with userId: ${notification.user.id}, taskIds: ${notification.gnosisSafeTasks.map(item => getGnosisSafeTaskId(item)).join(', ')}`, { error: err });
     return undefined;
   }
 
@@ -162,7 +162,7 @@ async function sendNotification (notification: PendingTasksProps & {
     );
   }
   catch (err) {
-    log.debug(`ProposalTasks error  with userId: ${notification.user.id} , taskIds: ${notification.proposalTasks.map(item => item.id).join(',')}`, { error: err });
+    log.debug(`ProposalTasks error  with userId: ${notification.user.id} , taskIds: ${notification.proposalTasks.map(item => item.id).join(', ')}`, { error: err });
     return undefined;
   }
 
@@ -179,7 +179,7 @@ async function sendNotification (notification: PendingTasksProps & {
     );
   }
   catch (err) {
-    log.debug(`Notifications task error with userId: ${notification.user.id} , taskIds: ${notification.unmarkedWorkspaceEvents.join(',')}`, { error: err });
+    log.debug(`Notifications task error with userId: ${notification.user.id} , taskIds: ${notification.unmarkedWorkspaceEvents.join(', ')}`, { error: err });
     return undefined;
   }
 
@@ -196,7 +196,7 @@ async function sendNotification (notification: PendingTasksProps & {
     );
   }
   catch (err) {
-    log.debug(`Votes Tasks error for  userId: ${notification.user.id}, taskIds: ${notification.voteTasks.map(voteTask => voteTask.id).join(',')}`, { error: err });
+    log.debug(`Votes Tasks error for  userId: ${notification.user.id}, taskIds: ${notification.voteTasks.map(voteTask => voteTask.id).join(', ')}`, { error: err });
     return undefined;
   }
 
@@ -213,7 +213,7 @@ async function sendNotification (notification: PendingTasksProps & {
     );
   }
   catch (err) {
-    log.debug(`Discussion Tasks error with userId:${notification.user.id} , tasksMentionIds: ${notification.discussionTasks.map(item => item.mentionId).join(',')}, tasksCommentIds: ${notification.discussionTasks.map(item => item.commentId)}`, { error: err });
+    log.debug(`Discussion Tasks error with userId:${notification.user.id} , tasksIds: ${notification.discussionTasks.map(item => `${item.mentionId}&${item.commentId}`).join(', ')}`, { error: err });
     return undefined;
   }
 
