@@ -6,11 +6,10 @@ import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { CharmEditorEventHandler } from 'lib/websockets/charmEditorEvents';
+import { DocumentEventHandler } from 'lib/websockets/documentEvents';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
-
-import { registerSpaceEvents } from './spaceEvents';
+import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -51,10 +50,13 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
 
   const io = new Server(res.socket.server);
 
-  // Define actions inside
-  io.on('connect', (socket) => registerSpaceEvents(socket));
+  // Define listeners
+  io.on('connect', (socket) => {
+    new SpaceEventHandler(socket).open();
+  });
+
   io.of('/ceditor').on('connect', (socket) => {
-    new CharmEditorEventHandler(socket).open();
+    new DocumentEventHandler(socket).open();
   });
 
   res.socket.server.io = io;

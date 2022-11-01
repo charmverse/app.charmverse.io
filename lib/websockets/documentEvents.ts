@@ -9,7 +9,6 @@ import { computeUserPagePermissions } from 'lib/permissions/pages/page-permissio
 import type { SealedUserId } from 'lib/websockets/interfaces';
 
 const authSecret = process.env.AUTH_SECRET as string;
-const socketEvent = 'message';
 
 export type Participant = {
   id: string;
@@ -119,7 +118,10 @@ type DocumentState = {
 
 const docState = new Map<string, DocumentState>();
 
-export class CharmEditorEventHandler {
+export class DocumentEventHandler {
+
+  socketEvent = 'message';
+
   messages: { server: number, client: number, lastTen: ServerMessage[] } = {
     server: 0,
     client: 0,
@@ -127,13 +129,16 @@ export class CharmEditorEventHandler {
   };
 
   constructor (private socket: Socket) {
+    this.listen();
+  }
 
-    socket.on(socketEvent, async message => {
+  private listen () {
+    this.socket.on(this.socketEvent, async message => {
       try {
         await this.onMessage(message);
       }
       catch (error) {
-        log.error('Error handling message', error);
+        log.error('Error handling web socket document message', error);
       }
     });
   }
@@ -285,7 +290,7 @@ export class CharmEditorEventHandler {
     this.messages.lastTen.push(message);
     this.messages.lastTen = this.messages.lastTen.slice(-10);
     try {
-      this.socket.emit(socketEvent, wrappedMessage);
+      this.socket.emit(this.socketEvent, wrappedMessage);
     }
     catch (err) {
       log.error('Error sending message', err);

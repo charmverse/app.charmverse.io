@@ -2,7 +2,7 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import log from 'lib/log';
-import type { SocketMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/charmEditorEvents';
+import type { SocketMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents';
 
 const gettext = (text: string) => text;
 

@@ -9,7 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
-import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/charmEditorEvents';
+import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents';
 
 import { ModCollab } from './collab';
 import {

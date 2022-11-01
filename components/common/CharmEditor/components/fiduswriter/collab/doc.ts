@@ -13,7 +13,7 @@ import {
   updateCollaboratorSelection
 } from '../state_plugins';
 
-import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/charmEditorEvents';
+import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/documentEvents';
 
 
 export class ModCollabDoc {
@@ -120,7 +120,7 @@ export class ModCollabDoc {
     const stateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,
-      plugins
+      plugins: this.mod.editor.view.state.plugins.concat(plugins)
     };
 
     // Set document in prosemirror
