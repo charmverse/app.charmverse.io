@@ -1,5 +1,6 @@
 
 import * as http from 'adapters/http';
+import log from 'lib/log';
 import type { MixpanelEventMap, MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 
 export class TrackApi {
@@ -18,6 +19,11 @@ export class TrackApi {
         payload: payloadAsString,
         timestamp: now
       };
+
+      if (process.env.NODE_ENV === 'development') {
+        log.warn('Dropping duplicate track event because it occurred less than 1 second after the previous event, which was identical');
+      }
+
       return Promise.resolve({ success: 'ignored' });
     }
 
