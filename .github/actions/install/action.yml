@@ -1,17 +1,16 @@
-
-name: "Install dependencies"
+name: 'Install dependencies'
 
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
       with:
         node-version: 18
 
     - name: Cache Next.js build # copied from https://github.com/vercel/next.js/blob/canary/errors/no-cache.md
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.npm
@@ -24,7 +23,7 @@ runs:
 
     - name: Cache dependencies
       id: cache_node_modules
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ./node_modules

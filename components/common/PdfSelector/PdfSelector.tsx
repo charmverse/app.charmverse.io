@@ -27,11 +27,13 @@ export default function PdfSelector ({ autoOpen = false, children, onPdfSelect }
             ...tabs,
             [
               'Upload',
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                width: '100%'
-              }}
+              <Box
+                key='upload'
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%'
+                }}
               >
                 <Button component='label' variant='contained'>
                   Choose a PDF

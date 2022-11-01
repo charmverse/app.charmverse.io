@@ -24,7 +24,7 @@ import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import { nanofy } from 'lib/utilities/numbers';
 import type { BrandColor } from 'theme/colors';
 
-const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
+export const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   inProgress: 'In Progress',
@@ -32,7 +32,7 @@ const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+export const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   inProgress: <AssignmentIndIcon />,

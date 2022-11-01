@@ -2,38 +2,32 @@
 import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { memo, useEffect } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import Loader from 'components/common/Loader';
 import { usePages } from 'hooks/usePages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
-import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
-export default function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
+function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
 
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const [pagePermissions, setPagePermissions] = useState<IPagePermissionWithAssignee[] | null>(null);
-
-  async function refreshPageAndPermissions () {
-    charmClient.listPagePermissions(pageId)
-      .then(permissions => {
-        setPagePermissions(permissions);
-        refreshPage(pageId);
-      });
-  }
+  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(pageId ? `/api/pages/${pageId}/permissions` : null, () => charmClient.listPagePermissions(pageId));
 
   const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
   // watch changes to the page in case permissions get updated
   useEffect(() => {
-    refreshPageAndPermissions();
-  }, [pageId, popupState.isOpen]);
+    if (pageId) {
+      refreshPage(pageId);
+    }
+  }, [pageId, pagePermissions]);
 
   return (
     <>
@@ -44,7 +38,7 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
           variant='text'
           size='small'
           onClick={() => {
-            refreshPageAndPermissions();
+            refreshPermissions();
             popupState.open();
           }}
         >
@@ -78,13 +72,13 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
                 <ShareToWeb
                   pageId={pageId}
                   pagePermissions={pagePermissions}
-                  refreshPermissions={refreshPageAndPermissions}
+                  refreshPermissions={refreshPermissions}
                   proposalParentId={proposalParentId}
                 />
                 <Divider />
                 <PagePermissions
                   pageId={pageId}
-                  refreshPermissions={refreshPageAndPermissions}
+                  refreshPermissions={refreshPermissions}
                   pagePermissions={pagePermissions}
                   pageType={pages[pageId]?.type as PageType}
                   proposalParentId={proposalParentId}
@@ -96,3 +90,5 @@ export default function ShareButton ({ headerHeight, pageId }: { headerHeight: n
     </>
   );
 }
+
+export default memo(ShareButton);

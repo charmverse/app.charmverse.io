@@ -21,23 +21,15 @@ export async function getSnapshotSpace (spaceDomain: string): Promise<SnapshotSp
         admins
         avatar
         terms
-        
         filters {
           minScore
           onlyMembers
-        }
-        validation {
-          name
         }
         plugins
         private
         __typename
         members
         categories
-        validation {
-          network
-          params
-        }
         about
       }
     }

@@ -4,10 +4,12 @@ import {
   MjmlColumn, MjmlDivider, MjmlSection, MjmlText
 } from 'mjml-react';
 
+import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import type { BountyTask } from 'lib/bounties/getBountyTasks';
+import { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 import log from 'lib/log';
-import type { MentionedTask } from 'lib/mentions/interfaces';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { shortenHex } from 'lib/utilities/strings';
@@ -26,10 +28,11 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 
 export interface PendingTasksProps {
   gnosisSafeTasks: GnosisSafeTasks[];
-  mentionedTasks: MentionedTask[];
+  discussionTasks: DiscussionTask[];
   totalTasks: number;
   voteTasks: VoteTask[];
   proposalTasks: ProposalTask[];
+  bountyTasks: BountyTask[];
   // eslint-disable-next-line
   user: TemplateUser
 }
@@ -48,17 +51,19 @@ function ViewAllText ({ href }: { href: string }) {
 
 export default function PendingTasks (props: PendingTasksProps) {
 
-  const totalMentionTasks = props.mentionedTasks.length;
+  const totalDiscussionTasks = props.discussionTasks.length;
   const totalVoteTasks = props.voteTasks.length;
   const totalGnosisSafeTasks = props.gnosisSafeTasks.length;
   const totalProposalTasks = props.proposalTasks.length;
+  const totalBountyTasks = props.bountyTasks.length;
 
   const nexusDiscussionLink = `${charmverseUrl}/nexus?task=discussion`;
   const nexusVoteLink = `${charmverseUrl}/nexus?task=vote`;
   const nexusMultisigLink = `${charmverseUrl}/nexus?task=multisig`;
   const nexusProposalLink = `${charmverseUrl}/nexus?task=proposal`;
+  const nexusBountyLink = `${charmverseUrl}/nexus?task=bounty`;
 
-  const mentionSection = totalMentionTasks > 0 ? (
+  const discussionSection = totalDiscussionTasks > 0 ? (
     <>
       <MjmlText>
         <div style={{
@@ -71,20 +76,20 @@ export default function PendingTasks (props: PendingTasksProps) {
               marginRight: 15
             }}
           >
-            <span style={h2Style}>{totalMentionTasks} Mention{totalMentionTasks > 1 ? 's' : ''}</span>
+            <span style={h2Style}>{totalDiscussionTasks} Comment{totalDiscussionTasks > 1 ? 's' : ''}</span>
           </a>
           <a href={nexusDiscussionLink} style={buttonStyle}>
             View
           </a>
         </div>
       </MjmlText>
-      {props.mentionedTasks.slice(0, MAX_ITEMS_PER_TASK).map(mentionedTask => (
-        <MentionTask
-          key={mentionedTask.mentionId}
-          task={mentionedTask}
+      {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map(discussionTask => (
+        <DiscussionTask
+          key={discussionTask.mentionId}
+          task={discussionTask}
         />
       ))}
-      {totalMentionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+      {totalDiscussionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -116,6 +121,37 @@ export default function PendingTasks (props: PendingTasksProps) {
         />
       ))}
       {totalProposalTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
+      <MjmlDivider />
+    </>
+  ) : null;
+
+  const bountySection = totalBountyTasks > 0 ? (
+    <>
+      <MjmlText>
+        <div style={{
+          marginBottom: 15
+        }}
+        >
+          <a
+            href={nexusBountyLink}
+            style={{
+              marginRight: 15
+            }}
+          >
+            <span style={h2Style}>{totalBountyTasks} Bount{totalBountyTasks > 1 ? 'ies' : 'y'}</span>
+          </a>
+          <a href={nexusBountyLink} style={buttonStyle}>
+            View
+          </a>
+        </div>
+      </MjmlText>
+      {props.bountyTasks.slice(0, MAX_ITEMS_PER_TASK).map(proposalTask => (
+        <BountyTaskMjml
+          key={proposalTask.id}
+          task={proposalTask}
+        />
+      ))}
+      {totalBountyTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
       <MjmlDivider />
     </>
   ) : null;
@@ -189,7 +225,8 @@ export default function PendingTasks (props: PendingTasksProps) {
           {multisigSection}
           {proposalSection}
           {voteSection}
-          {mentionSection}
+          {bountySection}
+          {discussionSection}
         </MjmlColumn>
       </MjmlSection>
       <Feedback />
@@ -202,7 +239,7 @@ function VoteTaskMjml ({ task }: { task: VoteTask }) {
   const pageWorkspaceTitle = `${task.page.title || 'Untitled'} | ${task.space.name}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
         {task.title.length > MAX_CHAR ? `${task.title.slice(0, MAX_CHAR)}...` : task.title}
       </div>
       <div style={{
@@ -232,10 +269,11 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
       <a
         href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
         style={{
-          display: 'block'
+          display: 'block',
+          color: 'inherit'
         }}
       >
-        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10, color: '#000' }}>
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10 }}>
           {pageWorkspaceTitle}
         </div>
       </a>
@@ -249,11 +287,36 @@ function ProposalTaskMjml ({ task }: { task: ProposalTask }) {
   );
 }
 
-function MentionTask ({ task: { text, spaceName, pageTitle } }: { task: MentionedTask }) {
+function BountyTaskMjml ({ task }: { task: BountyTask }) {
+  const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
+  return (
+    <MjmlText>
+      <a
+        href={`${charmverseUrl}/${task.spaceDomain}/${task.pagePath}`}
+        style={{
+          color: 'inherit',
+          display: 'block'
+        }}
+      >
+        <div style={{ ...h2Style, fontSize: '18px', fontWeight: 'bold', marginBottom: 10 }}>
+          {pageWorkspaceTitle}
+        </div>
+      </a>
+
+      <div style={{ fontSize: '0.75rem', width: 'fit-content', display: 'flex', alignItems: 'center', height: '24px', borderRadius: '16px', backgroundColor: lightModeColors[BOUNTY_STATUS_COLORS[task.status]], fontWeight: 500 }}>
+        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          {BOUNTY_STATUS_LABELS[task.status]}
+        </span>
+      </div>
+    </MjmlText>
+  );
+}
+
+function DiscussionTask ({ task: { text, spaceName, pageTitle } }: { task: DiscussionTask }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
-      <div style={{ fontWeight: 'bold', color: '#000', marginBottom: 5 }}>
+      <div style={{ fontWeight: 'bold', marginBottom: 5 }}>
         {text.length > MAX_CHAR ? `${text.slice(0, MAX_CHAR)}...` : text}
       </div>
       <div style={{
@@ -272,7 +335,7 @@ function MultisigTask ({ task }: { task: GnosisSafeTasks }) {
   log.debug('multi sig task', task);
   return (
     <MjmlText>
-      <strong style={{ color: '#000' }}>
+      <strong>
         Safe address: {shortenHex(task.safeAddress)}<br />
         {task.tasks[0].transactions[0].description}
       </strong>
