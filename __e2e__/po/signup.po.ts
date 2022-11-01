@@ -6,8 +6,6 @@ export class SignUpPage {
 
   readonly page: Page;
 
-  readonly closeAvatarButton: Locator;
-
   readonly selectNewWorkspaceButton: Locator;
 
   readonly workspaceFormDomainInput: Locator;
@@ -16,7 +14,6 @@ export class SignUpPage {
 
   constructor (page: Page) {
     this.page = page;
-    this.closeAvatarButton = page.locator('data-test=close-profile-avatar');
     this.selectNewWorkspaceButton = page.locator('data-test=goto-create-workspace');
     this.workspaceFormDomainInput = page.locator('data-test=workspace-domain-input');
     this.workspaceFormSubmit = page.locator('data-test=create-workspace');
@@ -36,8 +33,6 @@ export class SignUpPage {
   }
 
   async selectCreateWorkspace () {
-    // skip avatar selection
-    await this.closeAvatarButton.click();
     await this.selectNewWorkspaceButton.click();
   }
 

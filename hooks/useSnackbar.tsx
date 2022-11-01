@@ -75,7 +75,6 @@ export function SnackbarProvider ({ children }: { children: ReactNode }) {
       {children}
     </SnackbarContext.Provider>
   );
-
 }
 
 export const useSnackbar = () => useContext(SnackbarContext);

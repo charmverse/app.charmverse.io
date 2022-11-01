@@ -269,6 +269,7 @@ function MobileStepper ({ openVoteModal, currentStatus, proposalUserGroups, upda
 
                 return (
                   <MenuItem
+                    key={status}
                     sx={{
                       p: 1
                     }}

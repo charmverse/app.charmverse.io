@@ -5,18 +5,19 @@ import { useCallback, createContext, useContext, useEffect, useMemo, useState } 
 
 import charmClient from 'charmClient';
 
+import { useOnboarding } from './useOnboarding';
 import { useUser } from './useUser';
 
 type IContext = {
   spaces: Space[];
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<void>;
+  createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<Space | null>;
   isCreatingSpace: boolean;
 };
 
 export const SpacesContext = createContext<Readonly<IContext>>({
-  spaces: [], setSpaces: () => undefined, isLoaded: false, createNewSpace: () => Promise.resolve(), isCreatingSpace: false
+  spaces: [], setSpaces: () => undefined, isLoaded: false, createNewSpace: () => Promise.resolve() as any, isCreatingSpace: false
 });
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
@@ -56,11 +57,13 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
         router.push(`/${space.domain}`);
         setIsCreatingSpace(false);
       }, 200);
+      return space;
     }
     catch (e) {
       setIsCreatingSpace(false);
     }
 
+    return null;
   }, []);
 
   const value = useMemo(() => ({ spaces, setSpaces, isLoaded, createNewSpace, isCreatingSpace }) as IContext, [spaces, isLoaded, isCreatingSpace]);
