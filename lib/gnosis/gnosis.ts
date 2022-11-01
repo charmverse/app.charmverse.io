@@ -66,8 +66,15 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   return [];
 }
 
+const gnosisUnsupportedChainIds = [4];
+
+export function gnosisSupportedNetworks () {
+  // ChainId 4 Rinkeby is not supported by gnosis anymore
+  return Object.values(RPC).filter(network => !gnosisUnsupportedChainIds.includes(network.chainId));
+}
+
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-  const safes = await Promise.all(Object.values(RPC).map(network => {
+  const safes = await Promise.all(gnosisSupportedNetworks().map(network => {
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 
