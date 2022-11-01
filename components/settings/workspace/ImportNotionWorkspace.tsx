@@ -13,6 +13,7 @@ import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -32,6 +33,7 @@ export default function ImportNotionWorkspace () {
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
   const [space] = useCurrentSpace();
+  const isAdmin = useIsAdmin();
   const dispatch = useAppDispatch();
 
   const notionCode = getCookie(AUTH_CODE_COOKIE);
@@ -93,6 +95,8 @@ export default function ImportNotionWorkspace () {
   return (
     <div>
       <Button
+        disabled={!isAdmin}
+        disabledTooltip='Only admins can import content from Notion'
         loading={notionState.loading}
         href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
         variant='outlined'
@@ -146,7 +150,7 @@ export default function ImportNotionWorkspace () {
             }}
             >
               {notionState.failedImports.map(failedImport => (
-                <div>
+                <div key={failedImport.pageId}>
                   <Box sx={{
                     display: 'flex',
                     gap: 1
@@ -160,7 +164,8 @@ export default function ImportNotionWorkspace () {
                     <div>
                       Blocks that failed to import for the page
                       {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
-                        <div>
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div key={blockTrailsIndex}>
                           {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
                         </div>
                       ))}

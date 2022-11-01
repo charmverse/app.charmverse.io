@@ -1,11 +1,12 @@
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
 import { v4 as uuid } from 'uuid';
 
 import type { WorkerFixture } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture, getServerHost } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
 import { generateUserAndSpace, createDiscordUser } from '../utils/mocks';
+import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
   sandboxPage: Page;

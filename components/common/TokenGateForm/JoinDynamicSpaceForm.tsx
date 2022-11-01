@@ -8,6 +8,7 @@ import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useOnboarding } from 'hooks/useOnboarding';
 
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
@@ -27,9 +28,11 @@ export function JoinDynamicSpaceForm () {
   const [spaceDomain, setSpaceDomain] = useState<string>(router.query.domain as string);
   const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
   const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
+  const { showOnboarding } = useOnboarding();
 
   async function onJoinSpace (joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
+    showOnboarding(joinedSpace.id);
   }
 
   const debouncedGetPublicSpaces = useMemo(() => {

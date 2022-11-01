@@ -1,7 +1,7 @@
 import createCache from '@emotion/cache';
 import { CacheProvider, Global } from '@emotion/react'; // create a cache so we dont conflict with emotion from react-windowed-select
-import { Web3Provider } from '@ethersproject/providers';
 import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import type { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,8 +14,8 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import GlobalComponents from 'components/_app/GlobalComponents';
@@ -33,11 +33,13 @@ import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { MembersProvider } from 'hooks/useMembers';
+import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SnackbarProvider } from 'hooks/useSnackbar';
+import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
@@ -49,14 +51,14 @@ import {
   lightTheme
 } from 'theme/focalboard/theme';
 
-import '@skiff-org/prosemirror-tables/style/tables.css';
-import '@skiff-org/prosemirror-tables/style/table-popup.css';
-import '@skiff-org/prosemirror-tables/style/table-headers.css';
-import '@skiff-org/prosemirror-tables/style/table-filters.css';
-import 'prosemirror-menu/style/menu.css';
-import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import '@bangle.dev/tooltip/style.css';
+import '@skiff-org/prosemirror-tables/style/table-filters.css';
+import '@skiff-org/prosemirror-tables/style/table-headers.css';
+import '@skiff-org/prosemirror-tables/style/table-popup.css';
+import '@skiff-org/prosemirror-tables/style/tables.css';
+import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
 // fullcalendar css
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
@@ -81,7 +83,6 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCar
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modal.scss';
 import 'components/common/BoardEditor/focalboard/src/components/modalWrapper.scss';
-import 'components/common/BoardEditor/focalboard/src/components/newVersionBanner.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
@@ -131,8 +132,8 @@ import 'theme/focalboard/focalboard.typography.scss';
 
 // Lit Protocol CSS
 import 'lit-share-modal-v3-react-17/dist/ShareModal.css';
-import 'theme/lit-protocol/lit-protocol.scss';
 import 'react-resizable/css/styles.css';
+import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
 
 const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
@@ -214,34 +215,35 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <Web3AccountProvider>
                   <ReactDndProvider>
                     <DataProviders>
-                      <FocalBoardProvider>
-                        <IntlProvider>
-                          <SnackbarProvider>
-                            <PageMetaTags />
-                            <CssBaseline enableColorScheme={true} />
-                            <Global styles={cssVariables} />
-                            <RouteGuard>
-                              <ErrorBoundary>
-                                <Snackbar
-                                  isOpen={isOldBuild}
-                                  message='New CharmVerse platform update available. Please refresh.'
-                                  actions={[
-                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                      <RefreshIcon fontSize='small' />
-                                    </IconButton>
-                                  ]}
-                                  origin={{ vertical: 'top', horizontal: 'center' }}
-                                  severity='warning'
-                                  handleClose={() => setIsOldBuild(false)}
-                                />
-                                {getLayout(<Component {...pageProps} />)}
-
-                                <GlobalComponents />
-                              </ErrorBoundary>
-                            </RouteGuard>
-                          </SnackbarProvider>
-                        </IntlProvider>
-                      </FocalBoardProvider>
+                      <OnboardingProvider>
+                        <FocalBoardProvider>
+                          <IntlProvider>
+                            <SnackbarProvider>
+                              <PageMetaTags />
+                              <CssBaseline enableColorScheme={true} />
+                              <Global styles={cssVariables} />
+                              <RouteGuard>
+                                <ErrorBoundary>
+                                  <Snackbar
+                                    isOpen={isOldBuild}
+                                    message='New CharmVerse platform update available. Please refresh.'
+                                    actions={[
+                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                        <RefreshIcon fontSize='small' />
+                                      </IconButton>
+                                    ]}
+                                    origin={{ vertical: 'top', horizontal: 'center' }}
+                                    severity='warning'
+                                    handleClose={() => setIsOldBuild(false)}
+                                  />
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <GlobalComponents />
+                                </ErrorBoundary>
+                              </RouteGuard>
+                            </SnackbarProvider>
+                          </IntlProvider>
+                        </FocalBoardProvider>
+                      </OnboardingProvider>
                     </DataProviders>
                   </ReactDndProvider>
                 </Web3AccountProvider>
@@ -260,20 +262,23 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
     <UserProvider>
       <SpacesProvider>
-        <MembersProvider>
-          <BountiesProvider>
-            <PaymentMethodsProvider>
-              <PagesProvider>
-                <PrimaryCharmEditorProvider>
-                  <PageTitleProvider>
-                    {children}
-                  </PageTitleProvider>
-                </PrimaryCharmEditorProvider>
-              </PagesProvider>
-            </PaymentMethodsProvider>
-          </BountiesProvider>
-        </MembersProvider>
+        <WebSocketClientProvider>
+          <MembersProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PrimaryCharmEditorProvider>
+                    <PageTitleProvider>
+                      {children}
+                    </PageTitleProvider>
+                  </PrimaryCharmEditorProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </MembersProvider>
+        </WebSocketClientProvider>
       </SpacesProvider>
+
     </UserProvider>
 
   );

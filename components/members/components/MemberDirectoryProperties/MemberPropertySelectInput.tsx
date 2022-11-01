@@ -26,7 +26,7 @@ export function MemberPropertySelectInput ({
       {
             options.map((propertyOption, propertyOptionIndex) => {
               return (
-                <Stack flexDirection='row' justifyContent='space-between' mb={1}>
+                <Stack key={propertyOption.name} flexDirection='row' justifyContent='space-between' mb={1}>
                   <TextField
                     // Using name would cause textfield to lose focus on each stroke
                     key={`${propertyOptionIndex.toString()}`}

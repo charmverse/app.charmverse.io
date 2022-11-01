@@ -1,10 +1,7 @@
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
-import type { Page } from '@prisma/client';
 
 import { baseUrl } from 'config/constants';
-import { prisma } from 'db';
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 
 import { createUserAndSpace } from './utils/mocks';
 import { mockWeb3 } from './utils/web3';
@@ -68,6 +65,11 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
 
     await page.waitForURL(`**/${uniqueDomainName}`);
 
+    // Await new onboarding form popup so we can close it and click on new space
+    let closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    await expect(closePropertiesModalBtn).toBeVisible();
+    await closePropertiesModalBtn.click();
+
     await expect(addNewSpaceBtn).toBeVisible();
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
@@ -82,6 +84,11 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
     await nameInput.fill(uniqueDomainName2);
     await page.locator('data-test=create-workspace').click();
     await page.waitForURL(`**/${uniqueDomainName2}`);
+
+    // Close the modal again
+    closePropertiesModalBtn = await page.locator('data-test=close-member-properties-modal');
+    await expect(closePropertiesModalBtn).toBeVisible();
+    await closePropertiesModalBtn.click();
 
     const sidebarSpaceName2 = await page.locator('data-test=sidebar-space-name').textContent();
     expect(sidebarSpaceName2).toBe(uniqueDomainName2);

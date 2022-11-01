@@ -5,11 +5,12 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -190,6 +191,24 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
         }
       }
 
+      const blocksToNotify = await prisma.block.findMany({ where: {
+        id: {
+          in: newBlocks.map(b => b.id)
+        }
+      } });
+
+      relay.broadcast({
+        type: 'blocks_created',
+        payload: blocksToNotify
+      }, space.id);
+
+      const createdPages = await getPageMetaList(newBlocks.map(b => b.id));
+
+      relay.broadcast({
+        type: 'pages_created',
+        payload: createdPages
+      }, space.id);
+
       return res.status(200).json(newBlocks);
     }
   }
@@ -216,6 +235,29 @@ async function updateBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
   });
 
   const updatedBlocks = await prisma.$transaction(blockOps);
+
+  // We expect blocks to only be updated in a single space, but some future-proofing doesn't hurt
+  const bySpaceId = blocks.reduce((acc, block, index) => {
+
+    const spaceId = updatedBlocks[index].spaceId;
+
+    if (!acc[spaceId]) {
+      acc[spaceId] = [];
+    }
+
+    acc[spaceId].push(block);
+
+    return acc;
+
+  }, {} as Record<string, Block[]>);
+
+  Object.entries(bySpaceId).forEach(([spaceId, blockList]) => {
+    relay.broadcast({
+      type: 'blocks_updated',
+      payload: blockList
+    }, spaceId);
+  });
+
   return res.status(200).json(updatedBlocks);
 }
 

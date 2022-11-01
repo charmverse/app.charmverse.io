@@ -1,5 +1,4 @@
-
-name: "Deploy to staging"
+name: 'Deploy to staging'
 
 on:
   pull_request:
@@ -14,7 +13,7 @@ jobs:
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
