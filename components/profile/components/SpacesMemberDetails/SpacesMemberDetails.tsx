@@ -18,7 +18,7 @@ export function SpacesMemberDetails ({ memberId }: Props) {
   const { query, pathname } = useRouter();
 
   useEffect(() => {
-    if (query.workspace) {
+    if (query.workspace && !isLoading) {
       const expandedWorkspaceAccordion = document.getElementById(`workspace-properties-accordion-${query.workspace}`);
       if (expandedWorkspaceAccordion) {
         expandedWorkspaceAccordion.scrollIntoView({
@@ -27,7 +27,7 @@ export function SpacesMemberDetails ({ memberId }: Props) {
         setUrlWithoutRerender(pathname, { workspace: null });
       }
     }
-  }, [query]);
+  }, [query, isLoading]);
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
