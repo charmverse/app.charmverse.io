@@ -15,16 +15,7 @@ type Props = {
 export function SpacesMemberDetails ({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
-
   const { query, pathname } = useRouter();
-
-  if (isLoading) {
-    return <LoadingComponent isLoading />;
-  }
-
-  if (!memberPropertyValues?.length) {
-    return null;
-  }
 
   useEffect(() => {
     if (query.workspace) {
@@ -37,6 +28,14 @@ export function SpacesMemberDetails ({ memberId }: Props) {
       }
     }
   }, [query]);
+
+  if (isLoading) {
+    return <LoadingComponent isLoading />;
+  }
+
+  if (!memberPropertyValues?.length) {
+    return null;
+  }
 
   return (
     <Box mt={2}>
