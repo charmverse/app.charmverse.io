@@ -277,4 +277,52 @@ describe('getDiscussionTasks', () => {
       && item.pageId === page.id
     ));
   });
+
+  it('Should return unique taskIds for two users that have the same comment to be notified about', async () => {
+    const pageAuthor = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter2 = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const page = await createPage({
+      spaceId: space1.id,
+      createdBy: pageAuthor.id,
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', value: 'Some simple text' }] }] }
+    });
+
+    await generateThread({
+      thread: {
+        spaceId: space1.id,
+        userId: pageAuthor.id,
+        pageId: page.id,
+        comments: [{
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageAuthor.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Authors comment', type: 'text' }] }] }
+        }, {
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Commenter 1 comment', type: 'text' }] }] }
+        }, {
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter2.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Commenter 2 comment', type: 'text' }] }] }
+        }]
+      }
+    });
+
+    const { unmarked: newNotificationsForAuthor } = await getDiscussionTasks(pageAuthor.id);
+    const { unmarked: newNotificationsForFirstCommenter } = await getDiscussionTasks(pageCommenter.id);
+
+    const notificationIds = [...newNotificationsForAuthor, ...newNotificationsForFirstCommenter].map(notification => notification.taskId);
+
+    expect(new Set(notificationIds).size === notificationIds.length).toBeTruthy();
+  });
 });
