@@ -1,5 +1,6 @@
 import { setCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import { useUser } from 'hooks/useUser';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
@@ -8,6 +9,8 @@ import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 const maxCookieAge = 60 * 60 * 24 * 14;
 
 export function useUserAcquisition () {
+
+  const [refreshedData, setRefreshedData] = useState(false);
 
   const { user } = useUser();
 
@@ -59,7 +62,9 @@ export function useUserAcquisition () {
    */
   function refreshSignupData () {
 
-    if (!user) {
+    // Ensure this only runs once per session
+    if (!user && !refreshedData) {
+      setRefreshedData(true);
       setLandingPage();
       setReferrer();
       setCampaign();

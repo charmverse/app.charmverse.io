@@ -10,12 +10,11 @@ import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
-import { getCookie, deleteCookie } from 'lib/utilities/browser';
+import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage () {
@@ -26,13 +25,6 @@ export default function LoginPage () {
   const { user, isLoaded, loginFromWeb3Account } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
-
-  const { refreshSignupData } = useUserAcquisition();
-
-  useEffect(() => {
-    refreshSignupData();
-
-  }, []);
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = Boolean(discordCookie);
