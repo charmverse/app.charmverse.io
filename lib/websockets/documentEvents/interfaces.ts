@@ -12,6 +12,8 @@ export type WrappedSocketMessage<T> = T & {
   s: number; // server
 };
 
+// Messages sent by both client and server
+
 export type RequestResendMessage = {
   type: 'request_resend';
   from: number;
@@ -22,14 +24,15 @@ export type ConfirmVersionMessage = {
   v: number;
 }
 
-// messages from both client and server
 type StandardMessage = ConfirmVersionMessage | RequestResendMessage;
+
+// Messages sent by the client
 
 export type ClientRestartMessage = {
   type: 'get_document';
 };
 
-type ClientCheckVersionMessage = {
+export type ClientCheckVersionMessage = {
   type: 'check_version';
   v: number;
 };
@@ -74,6 +77,8 @@ export type ClientMessage = StandardMessage
   | ClientRestartMessage
   | ClientUnsubscribeMessage;
 
+// Messages sent by the server
+
 type ServerConnectionsMessage = {
   type: 'connections';
   participant_list: Participant[];
@@ -84,6 +89,7 @@ export type ServerDocDataMessage = {
   doc: { content: Node, v: number };
   doc_info: { id: string, session_id: string, updated: any, version: number }; // TODO: do we need this?
   time: number;
+  m?: ClientDiffMessage[];
 };
 
 export type ServerDiffMessage = {

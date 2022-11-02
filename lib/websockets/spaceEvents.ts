@@ -12,15 +12,7 @@ export class SpaceEventHandler {
   socketEvent = 'message';
 
   constructor (private socket: Socket) {
-    this.listen();
-    this.open();
-  }
 
-  open () {
-    this.socket.emit(this.socketEvent, { type: 'welcome' });
-  }
-
-  private listen () {
     this.socket.on(this.socketEvent, async message => {
       try {
         await this.onMessage(message);
@@ -29,6 +21,8 @@ export class SpaceEventHandler {
         log.error('Error handling workspace socket message', error);
       }
     });
+
+    this.socket.emit(this.socketEvent, { type: 'welcome' });
   }
 
   async onMessage (message: ClientMessage) {

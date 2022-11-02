@@ -1,3 +1,4 @@
+import type { Node } from '@bangle.dev/pm';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
@@ -8,7 +9,7 @@ import { computeUserPagePermissions } from 'lib/permissions/pages/page-permissio
 
 import type { AuthenticatedSocket } from '../authentication';
 
-import type { Participant, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientDiffMessage, ServerMessage } from './interfaces';
+import type { Participant, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientCheckVersionMessage, ClientDiffMessage, ClientSelectionMessage, ServerMessage } from './interfaces';
 
 type SocketSessionData = AuthenticatedSocket & {
   documentId?: string;
@@ -16,22 +17,32 @@ type SocketSessionData = AuthenticatedSocket & {
   permissions: Partial<IPagePermissionFlags>;
 }
 
-type DocumentState = {
-  participants: Record<string, Participant>;
+type DocumentRoom = {
+  // eslint-disable-next-line no-use-before-define
+  participants: Record<string, DocumentEventHandler>;
   doc: {
     id: string;
     version: number;
     content: any;
+    diffs: ClientDiffMessage[];
   };
+  lastSavedVersion?: number;
+  node: Node;
 }
 
-const docState = new Map<string, DocumentState>();
+const docRooms = new Map<string | undefined, DocumentRoom>();
 
 export class DocumentEventHandler {
 
+  id: string;
+
+  docSaveInterval = 1; // how often to save document to database
+
+  historyLength = 1000; // Only keep the last 1000 diffs
+
   socketEvent = 'message';
 
-  messages: { server: number, client: number, lastTen: ServerMessage[] } = {
+  messages: { server: number, client: number, lastTen: (ClientMessage | ServerMessage)[] } = {
     server: 0,
     client: 0,
     lastTen: []
@@ -46,20 +57,26 @@ export class DocumentEventHandler {
     Object.assign(this.socket.data, data);
   }
 
+  getDocumentRoom () {
+    const docId = this.getSession().documentId;
+    const room = docRooms.get(docId);
+    if (!room) {
+      throw new Error(`Could not find room by id: ${docId}`);
+    }
+    return room;
+  }
+
   constructor (private socket: Socket) {
+
+    this.id = socket.id;
 
     const user = socket.data.user;
 
     this.setSession({
-      user: { id: user.id },
+      user: { id: user.id, name: user.username },
       permissions: {}
     });
 
-    this.listen();
-    this.open();
-  }
-
-  private listen () {
     this.socket.on(this.socketEvent, async message => {
       try {
         await this.onMessage(message);
@@ -68,9 +85,7 @@ export class DocumentEventHandler {
         log.error('Error handling web socket document message', error);
       }
     });
-  }
 
-  open () {
     this.sendMessage({ type: 'welcome' });
   }
 
@@ -109,58 +124,29 @@ export class DocumentEventHandler {
 
     // message order is correct. continue processing message
     this.messages.client += 1;
-    await this.handleMessage(message);
+    try {
+      await this.handleMessage(message);
+    }
+    catch (error) {
+      log.error('Error handling socket message', { error, userId: this.getSession().user.id });
+    }
   }
 
   async handleMessage (message: WrappedSocketMessage<ClientMessage>) {
 
-    const socket = this.socket;
+    const session = this.getSession();
 
     // handle subscription to document
     if (message.type === 'subscribe') {
-      try {
-        const userId = this.getSession().user.id;
-        const pageId = message.roomId;
-        log.debug('[charm ws] subscribe event', { userId, pageId });
-
-        const isValidPageId = validate(pageId);
-        if (!isValidPageId) {
-          throw new Error(`Invalid page id: ${pageId}`);
-        }
-        const permissions = await computeUserPagePermissions({
-          pageId,
-          userId
-        });
-
-        this.setSession({ permissions });
-
-        if (permissions.edit_content !== true) {
-          this.sendError('You do not have permission to view this page');
-          return;
-        }
-
-        socket.join([pageId]);
-        // socket.pageId = pageId;
-        this.sendMessage({ type: 'subscribed' });
-        if (typeof message.connection !== 'number' || message.connection < 1) {
-          await this.sendDocument(socket, message.roomId);
-          log.debug('Sent document to new subscriber');
-        }
-      }
-      catch (error) {
-        log.error('Error registering user to page events', { error });
-        this.sendError('Unable to register user');
-      }
+      await this.subscribeToDoc({ pageId: message.roomId, connectionCount: message.connection });
     }
 
-    // handle event from closed document
-    const session = socket.data as SocketSessionData;
-
     if (!session.documentId) {
+      log.warn('Ignore message because session is missing document', { userId: session.user.id });
       return;
     }
 
-    if (!docState.has(session.documentId ?? '')) {
+    if (!docRooms.has(session.documentId)) {
       log.debug('Ignore message from closed document', { pageId: session.documentId });
       return;
     }
@@ -168,7 +154,21 @@ export class DocumentEventHandler {
     switch (message.type) {
 
       case 'get_document':
-        // socket.leave(message.roomId);
+        await this.sendDocument();
+        break;
+
+      case 'check_version':
+        await this.checkVersion(message);
+        break;
+
+      case 'selection_change':
+        await this.handleSelectionChange(message);
+        break;
+
+      case 'diff':
+        if (session.permissions.edit_content) {
+          await this.handleDiff(message);
+        }
         break;
 
       default:
@@ -176,14 +176,190 @@ export class DocumentEventHandler {
     }
   }
 
-  async handleDiff (socket: Socket, message: WrappedSocketMessage<ClientDiffMessage>) {
-    const pv = message.v;
-    const dv = docState.get(socket.id)?.doc.version;
+  async subscribeToDoc ({ pageId, connectionCount = 0 }: { pageId: string, connectionCount?: number }) {
+
+    try {
+      const userId = this.getSession().user.id;
+      log.debug('[charm ws] subscribe event', { pageId, userId });
+
+      const isValidPageId = validate(pageId);
+      if (!isValidPageId) {
+        throw new Error(`Invalid page id: ${pageId}`);
+      }
+      const permissions = await computeUserPagePermissions({
+        pageId,
+        userId
+      });
+
+      if (permissions.edit_content !== true) {
+        this.sendError('You do not have permission to view this page');
+        return;
+      }
+
+      this.setSession({ documentId: pageId, permissions });
+
+      const docRoom = docRooms.get(pageId);
+      if (docRoom && Object.keys(docRoom.participants).length > 0) {
+        log.debug('Join existing document room', { pageId, userId });
+        docRoom.participants[this.id] = this;
+      }
+      else {
+        log.debug('Opening new document room', { pageId, userId });
+        const page = await prisma.page.findUniqueOrThrow({
+          where: { id: pageId }
+        });
+        const room: DocumentRoom = {
+          doc: {
+            id: page.id,
+            content: page.content,
+            version: page.version,
+            diffs: []
+          },
+          node: page.content,
+          participants: { [this.id]: this }
+        };
+        docRooms.set(pageId, room);
+      }
+
+      this.sendMessage({ type: 'subscribed' });
+      if (connectionCount < 1) {
+        await this.sendDocument();
+        log.debug('Sent document to new subscriber');
+      }
+      this.handleParticipantUpdate();
+    }
+    catch (error) {
+      log.error('Error registering user to page events', { error });
+      this.sendError('Unable to register user');
+    }
   }
 
-  async sendDocument (socket: Socket, pageId: string) {
+  confirmDiff (rid: number) {
+    this.sendMessage({ type: 'confirm_diff', rid });
+  }
+
+  handleParticipantUpdate () {
+    this.sendParticipantList();
+  }
+
+  sendParticipantList () {
+    const room = this.getDocumentRoom();
+    const participantList: Participant[] = [];
+    for (const participant of Object.values(room.participants)) {
+      const session = participant.getSession();
+      participantList.push({
+        id: session.user.id,
+        name: session.user.name,
+        sessionIds: [],
+        session_id: participant.id
+      });
+    }
+    this.sendUpdates({ type: 'connections', participant_list: participantList });
+  }
+
+  handleSelectionChange (message: ClientSelectionMessage) {
+    const room = this.getDocumentRoom();
+    if (message.v === room.doc.version) {
+      this.sendUpdates(message);
+    }
+  }
+
+  async handleDiff (message: WrappedSocketMessage<ClientDiffMessage>) {
+    const session = this.getSession();
+    const room = this.getDocumentRoom();
+    const pv = message.v;
+    const dv = room.doc.version;
+    log.debug('Handling diff');
+    if (pv === dv) {
+      if ('ds' in message) {
+        const updatedNode = prosemirror.apply(message.ds, room.node);
+        if (updatedNode) {
+          room.node = updatedNode;
+        }
+        else {
+          this.unfixable();
+          const patchError = { type: 'patch_error' } as const;
+          this.sendMessage(patchError);
+          // Reset collaboration to avoid any data loss issues.
+          this.resetCollaboration(patchError);
+          return;
+        }
+        room.doc.content = prosemirror.encode(updatedNode);
+      }
+      room.doc.diffs.push(message);
+      room.doc.diffs = room.doc.diffs.slice(this.historyLength);
+      room.doc.version += 1;
+      if (room.doc.version % this.docSaveInterval === 0) {
+        await this.saveDocument();
+      }
+      this.confirmDiff(message.rid);
+      this.sendUpdates(message);
+    }
+    else if (pv < dv) {
+      if (pv + room.doc.diffs.length >= dv) {
+        const numberDiffs = pv - dv;
+        log.debug('Client is behind. Resend document diffs', { numberDiffs });
+        const messages = room.doc.diffs.slice(numberDiffs);
+        for (const m of messages) {
+          const newMessage = { ...m, server_fix: true };
+          await this.sendMessage(newMessage);
+        }
+      }
+      else {
+        log.debug('Client is too far behind. Resend document');
+        await this.unfixable();
+      }
+    }
+    else {
+      log.debug('Ignore message from user with higher document version than server');
+    }
+  }
+
+  async checkVersion (message: ClientCheckVersionMessage) {
+    const session = this.getSession();
+    const room = this.getDocumentRoom();
+    const pv = message.v;
+    const dv = room?.doc.version;
+    log.debug('Check version of document', { client: pv, server: dv, userId: session.user.id });
+    if (pv === dv) {
+      this.sendMessage({ type: 'confirm_version', v: pv });
+    }
+    else if (pv + room.doc.diffs.length >= dv) {
+      const numberDiffs = pv - dv;
+      log.debug('Resending document diffs', { numberDiffs, userId: session.user.id });
+      const messages = room?.doc.diffs.slice(numberDiffs);
+      this.sendDocument(messages);
+    }
+    else {
+      log.debug('User is on a very old version of the document');
+      this.unfixable();
+    }
+  }
+
+  unfixable () {
+    return this.sendDocument();
+  }
+
+  resendMessages (from: number) {
+    const toSend = this.messages.server - from;
+    log.debug('Resending messages to user');
+    this.messages.server -= toSend;
+    if (toSend > this.messages.lastTen.length) {
+      log.debug('Too many messages to resend. Send full document');
+      this.unfixable();
+    }
+    else {
+      for (const message of this.messages.lastTen.slice(-toSend)) {
+        this.sendMessage(message);
+      }
+    }
+  }
+
+  async sendDocument (messages?: ClientDiffMessage[]) {
+    const session = this.getSession();
+
     const page = await prisma.page.findUniqueOrThrow({
-      where: { id: pageId },
+      where: { id: session.documentId },
       select: { content: true, updatedAt: true, id: true, version: true }
     });
     const message: ServerDocDataMessage = {
@@ -194,17 +370,16 @@ export class DocumentEventHandler {
       },
       doc_info: {
         id: page.id,
-        session_id: socket.id,
+        session_id: this.id,
         updated: page.updatedAt,
         version: page.version
       },
       time: Date.now()
     };
+    if (messages) {
+      message.m = messages;
+    }
     this.sendMessage(message);
-  }
-
-  resendMessages (from: number) {
-    log.error('TODO: Implement resend messages', from);
   }
 
   rejectMessage (message: WrappedSocketMessage<ClientMessage>) {
@@ -213,9 +388,9 @@ export class DocumentEventHandler {
     }
   }
 
-  sendMessage (message: ServerMessage) {
+  sendMessage (message: ClientMessage | ServerMessage) {
     this.messages.server += 1;
-    const wrappedMessage: WrappedSocketMessage<ServerMessage> = {
+    const wrappedMessage: WrappedSocketMessage<ClientMessage | ServerMessage> = {
       ...message,
       c: this.messages.client,
       s: this.messages.server
@@ -232,6 +407,50 @@ export class DocumentEventHandler {
 
   sendError (message: string) {
     this.sendMessage({ type: 'error', message });
+  }
+
+  async resetCollaboration (message: ServerMessage) {
+    log.debug('Resetting collaboration');
+    const room = this.getDocumentRoom();
+    for (const participant of Object.values(room.participants)) {
+      if (participant.id !== this.id) {
+        await participant.unfixable();
+        participant.sendMessage(message);
+      }
+    }
+  }
+
+  sendUpdates (message: ClientMessage | ServerMessage) {
+    const pageId = this.getSession().documentId;
+    log.debug('Sending message to waiters', { pageId });
+    const room = this.getDocumentRoom();
+    for (const participant of Object.values(room.participants)) {
+      if (participant.id !== this.id) {
+        participant.sendMessage(message);
+      }
+    }
+  }
+
+  async saveDocument () {
+    const room = this.getDocumentRoom();
+    const userId = this.getSession().user.id;
+    if (room.doc.version === room.lastSavedVersion) {
+      return;
+    }
+
+    log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
+
+    await prisma.page.update({
+      where: { id: room.doc.id },
+      data: {
+        content: room.doc.content,
+        version: room.doc.version,
+        updatedAt: new Date(),
+        updatedBy: userId
+      }
+    });
+
+    room.lastSavedVersion = room.doc.version;
   }
 
 }
