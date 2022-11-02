@@ -14,10 +14,9 @@ type Props = {
   readOnly?: boolean;
   onEdit: VoidFunction;
   expanded?: boolean;
-  spaceId: string;
 };
 
-export function SpaceDetailsAccordion ({ spaceId, spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
+export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
 
   useEffect(() => {
@@ -30,7 +29,6 @@ export function SpaceDetailsAccordion ({ spaceId, spaceName, properties, spaceIm
       onChange={() => {
         setExpanded(!expanded);
       }}
-      id={`workspace-properties-accordion-${spaceId}`}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar

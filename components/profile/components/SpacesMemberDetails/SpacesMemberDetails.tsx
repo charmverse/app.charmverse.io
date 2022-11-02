@@ -1,6 +1,6 @@
 import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
@@ -16,17 +16,6 @@ export function SpacesMemberDetails ({ memberId }: Props) {
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
   const { query } = useRouter();
 
-  useEffect(() => {
-    if (query.workspace && !isLoading) {
-      const expandedWorkspaceAccordion = document.getElementById(`workspace-properties-accordion-${query.workspace}`);
-      if (expandedWorkspaceAccordion) {
-        expandedWorkspaceAccordion.scrollIntoView({
-          behavior: 'smooth'
-        });
-      }
-    }
-  }, [query, isLoading]);
-
   if (isLoading) {
     return <LoadingComponent isLoading />;
   }
@@ -35,9 +24,21 @@ export function SpacesMemberDetails ({ memberId }: Props) {
     return null;
   }
 
+  const expandedWorkspaceIndex = memberPropertyValues.findIndex(mpv => mpv.spaceId === query.workspace);
+
+  // make sure the expanded workspace is always at the top
+  const propertyValues = (
+    expandedWorkspaceIndex !== -1
+      ? [
+        memberPropertyValues[expandedWorkspaceIndex],
+        ...memberPropertyValues.slice(0, expandedWorkspaceIndex),
+        ...memberPropertyValues.slice(expandedWorkspaceIndex + 1)
+      ] : memberPropertyValues
+  );
+
   return (
     <Box mt={2}>
-      {memberPropertyValues.map(pv => (
+      {propertyValues.map(pv => (
         <SpaceDetailsAccordion
           key={pv.spaceId}
           spaceName={pv.spaceName}
@@ -46,7 +47,6 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           readOnly={!canEditSpaceProfile(pv.spaceId)}
           onEdit={() => setEditSpaceId(pv.spaceId)}
           expanded={query.workspace === pv.spaceId}
-          spaceId={pv.spaceId}
         />
       ))}
 
