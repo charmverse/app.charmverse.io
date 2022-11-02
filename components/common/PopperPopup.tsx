@@ -11,12 +11,13 @@ interface PopperPopupProps {
   autoOpen?: boolean;
   closeOnClick?: boolean;
   onClose?: () => void;
+  onOpen?: () => void;
   onClick?: () => void;
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
 
-  const { closeOnClick = false, popupContent, children, autoOpen = false, onClose } = props;
+  const { closeOnClick = false, popupContent, children, autoOpen = false, onClose, onOpen } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -42,6 +43,7 @@ export default function PopperPopup (props: PopperPopupProps) {
     ...popoverToggle,
     onClick: (e) => {
       e.stopPropagation();
+      onOpen?.();
       popoverToggle.onClick(e);
     }
   };

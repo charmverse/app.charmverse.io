@@ -1,6 +1,6 @@
 import { Chip, MenuItem, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { forwardRef } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -40,6 +40,15 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 ) => {
   const selectedValues: string[] = Array.isArray(inputProps.value) ? inputProps.value : [inputProps.value];
   const selectedOptions = options.filter(option => option.id && selectedValues.includes(option.id));
+  const [isOptionEditOpened, setIsOptionEditOpened] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>();
+
+  function toggleOptionEdit (opened: boolean) {
+    setIsOptionEditOpened(opened);
+    setIsOpened(true);
+  }
 
   function onValueChange (updatedSelectedOptions: SelectOptionType[]) {
     const values = updatedSelectedOptions.map(option => option.id).filter(Boolean) as string[];
@@ -57,6 +66,15 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
+        onClose={(e) => {
+          if (e.type === 'blur' && isOptionEditOpened) {
+            return;
+          }
+
+          setIsOpened(false);
+        }}
+        onOpen={() => setIsOpened(true)}
+        open={isOpened || isOptionEditOpened}
         ref={ref}
         disabled={disabled}
         disableCloseOnSelect={multiselect}
@@ -82,6 +100,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
               menuItemProps={selectProps}
               onDelete={onDeleteOption || undefined}
               onChange={onUpdateOption || undefined}
+              onToggleOptionEdit={toggleOptionEdit}
             />
           );
         }}
@@ -96,6 +115,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
         noOptionsText='No options available'
         renderInput={(params) => (
           <TextField
+            inputRef={inputRef}
             {...params}
             size='small'
           />

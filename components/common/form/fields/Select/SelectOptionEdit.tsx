@@ -5,7 +5,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
-import { Options } from 'components/common/BoardEditor/focalboard/src/components/calculations/options';
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
@@ -16,9 +15,10 @@ type Props = {
   option: SelectOptionType;
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
+  onToggleOptionEdit?: (isOpened: boolean) => void;
 };
 
-export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
+export function SelectOptionEdit ({ option, onChange, onDelete, onToggleOptionEdit }: Props) {
   const theme = useTheme();
   const [tempName, setTempName] = useState(option.name || '');
 
@@ -27,6 +27,8 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
   }, [option.name]);
 
   function onSave () {
+    onToggleOptionEdit?.(false);
+
     if (tempName !== option.name) {
       onChange?.({ ...option, name: tempName });
       setTempName(option.name || '');
@@ -48,6 +50,7 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
+
               if (e.code === 'Enter') {
                 onSave();
               }
@@ -55,7 +58,11 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           />
         </Stack>
         {!!onDelete && (
-          <MenuItem onClick={() => onDelete(option)}>
+          <MenuItem onClick={() => {
+            onDelete(option);
+            onToggleOptionEdit?.(false);
+          }}
+          >
             <ListItemIcon>
               <DeleteIcon fontSize='small' />
             </ListItemIcon>
@@ -97,7 +104,7 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
   ), [option, onColorChange, tempName]);
 
   return (
-    <PopperPopup popupContent={popupContent} onClose={onSave}>
+    <PopperPopup popupContent={popupContent} onClose={onSave} onOpen={() => onToggleOptionEdit?.(true)}>
       <IconButton size='small'>
         <MoreHorizIcon fontSize='small' />
       </IconButton>

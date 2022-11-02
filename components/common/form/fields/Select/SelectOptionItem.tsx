@@ -9,10 +9,11 @@ type Props = {
   menuItemProps?: HTMLAttributes<HTMLLIElement>;
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
+  onToggleOptionEdit?: (isOpened: boolean) => void;
   isEditable?: boolean;
 };
 
-export function SelectOptionItem ({ option, onChange, onDelete, menuItemProps = {} }: Props) {
+export function SelectOptionItem ({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {
   const readOnly = !onChange && !onDelete;
 
   return (
@@ -20,7 +21,7 @@ export function SelectOptionItem ({ option, onChange, onDelete, menuItemProps = 
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1}>
         <Chip label={option.name} color={option.color} size='small' sx={{ px: 0.5 }} />
 
-        {!readOnly && <SelectOptionEdit option={option} onChange={onChange} onDelete={onDelete} />}
+        {!readOnly && <SelectOptionEdit option={option} onChange={onChange} onDelete={onDelete} onToggleOptionEdit={onToggleOptionEdit} />}
       </Stack>
     </MenuItem>
   );
