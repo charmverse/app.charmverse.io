@@ -28,10 +28,7 @@ export function useUserAcquisition () {
   function setLandingPage () {
     const currentPage = window.location.href.split('?')[0];
 
-    if (currentPage) {
-      setCookie({ name: 'appLandingPage' as SignupCookieType, value: currentPage, expiresInDays: maxCookieAge });
-    }
-
+    setCookie({ name: 'appLandingPage' as SignupCookieType, value: currentPage, expiresInDays: maxCookieAge });
   }
 
   function setCampaign () {
