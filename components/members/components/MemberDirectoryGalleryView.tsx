@@ -4,6 +4,7 @@ import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
@@ -17,10 +18,11 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const nameProperty = properties.find(property => property.type === 'name');
+  const [currentSpace] = useCurrentSpace();
 
   return (
     <Link
-      href={`/u/${member.path || member.id}`}
+      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
       color='primary'
       sx={{
         '&:hover': {
