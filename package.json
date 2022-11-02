@@ -116,7 +116,6 @@
     "color": "^4.2.0",
     "concurrently": "^7.1.0",
     "cookies": "^0.8.0",
-    "cookies-next": "^2.1.1",
     "dd-trace": "^3.3.1",
     "dotenv": "^16.0.0",
     "dotenv-cli": "^5.1.0",

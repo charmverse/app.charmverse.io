@@ -1,12 +1,12 @@
-import { setCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useUser } from 'hooks/useUser';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
+import { setCookie } from 'lib/utilities/browser';
 
 // 2 weeks maximum age
-const maxCookieAge = 60 * 60 * 24 * 14;
+const maxCookieAge = 14;
 
 export function useUserAcquisition () {
 
@@ -21,11 +21,7 @@ export function useUserAcquisition () {
     const currentReferrer = document.referrer;
 
     if (currentReferrer && !currentReferrer.match(window.location.origin)) {
-      setCookie('appReferrer' as SignupCookieType, currentReferrer, {
-        sameSite: 'strict',
-        maxAge: maxCookieAge,
-        path: '/'
-      });
+      setCookie({ name: 'appReferrer' as SignupCookieType, value: currentReferrer, expiresInDays: maxCookieAge });
     }
   }
 
@@ -33,11 +29,7 @@ export function useUserAcquisition () {
     const currentPage = window.location.href.split('?')[0];
 
     if (currentPage) {
-      setCookie('appLandingPage' as SignupCookieType, currentPage, {
-        sameSite: 'strict',
-        maxAge: maxCookieAge,
-        path: '/'
-      });
+      setCookie({ name: 'appLandingPage' as SignupCookieType, value: currentPage, expiresInDays: maxCookieAge });
     }
 
   }
@@ -46,11 +38,7 @@ export function useUserAcquisition () {
     const currentCampaign = router.query.utm_campaign;
 
     if (currentCampaign) {
-      setCookie('appCampaign' as SignupCookieType, currentCampaign, {
-        sameSite: 'strict',
-        maxAge: maxCookieAge,
-        path: '/'
-      });
+      setCookie({ name: 'appCampaign' as SignupCookieType, value: currentCampaign as string, expiresInDays: maxCookieAge });
     }
 
   }
