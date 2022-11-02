@@ -1,4 +1,4 @@
-import type { Participant } from 'lib/websockets/documentEvents/documentEvents';
+import type { Participant } from 'lib/websockets/documentEvents/interfaces';
 
 import type { FidusEditor } from '../fiduseditor';
 import { removeCollaboratorSelection } from '../state_plugins';
