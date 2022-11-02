@@ -6,7 +6,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 type Props = {
   memberId: string;
@@ -15,7 +14,7 @@ type Props = {
 export function SpacesMemberDetails ({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
-  const { query, pathname } = useRouter();
+  const { query } = useRouter();
 
   useEffect(() => {
     if (query.workspace && !isLoading) {
@@ -24,7 +23,6 @@ export function SpacesMemberDetails ({ memberId }: Props) {
         expandedWorkspaceAccordion.scrollIntoView({
           behavior: 'smooth'
         });
-        setUrlWithoutRerender(pathname, { workspace: null });
       }
     }
   }, [query, isLoading]);
