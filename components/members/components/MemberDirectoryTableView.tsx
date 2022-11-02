@@ -20,6 +20,7 @@ export function MemberDirectoryTableView ({
   members: Member[];
 }) {
   const { properties = [] } = useMemberProperties();
+
   return (
     <Table
       size='small'
@@ -35,7 +36,7 @@ export function MemberDirectoryTableView ({
     >
       <TableHead>
         <TableRow>
-          {properties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
+          {properties.filter(property => !property.memberPropertyVisibilities.find(propertyVisibility => propertyVisibility.view === 'table')).map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -49,6 +50,10 @@ export function MemberDirectoryTableView ({
             >
               {properties.map(property => {
                 const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
+                const hiddenInGallery = property.memberPropertyVisibilities.find(propertyVisibility => propertyVisibility.view === 'table');
+                if (hiddenInGallery) {
+                  return null;
+                }
                 if (memberProperty) {
                   switch (property.type) {
                     case 'profile_pic': {

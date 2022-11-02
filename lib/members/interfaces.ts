@@ -1,4 +1,4 @@
-import type { MemberProperty, MemberPropertyPermission, MemberPropertyType, MemberPropertyValue, Role, Space, User, UserDetails } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission, MemberPropertyType, MemberPropertyValue, MemberPropertyVisibility, MemberPropertyVisibilityView, Role, Space, User, UserDetails } from '@prisma/client';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 
@@ -53,5 +53,15 @@ export type MemberPropertyPermissionWithRole = MemberPropertyPermission & { role
 }
 
 export type MemberPropertyWithPermissions = MemberProperty & {
-   permissions: MemberPropertyPermissionWithRole[];
-  }
+  permissions: MemberPropertyPermissionWithRole[];
+}
+
+export type MemberPropertyWithMetadata = MemberPropertyWithPermissions & {
+  memberPropertyVisibilities: MemberPropertyVisibility[];
+}
+
+export type UpdateMemberPropertyVisibilityPayload = {
+  memberPropertyId: string;
+  visible: boolean;
+  view: MemberPropertyVisibilityView;
+}

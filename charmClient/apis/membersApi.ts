@@ -1,7 +1,7 @@
 import type { MemberProperty } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyPermissionWithRole, MemberPropertyValuesBySpace, MemberPropertyWithPermissions, PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { CreateMemberPropertyPermissionInput, Member, MemberPropertyPermissionWithRole, MemberPropertyValuesBySpace, MemberPropertyWithMetadata, PropertyValueWithDetails, UpdateMemberPropertyValuePayload, UpdateMemberPropertyVisibilityPayload } from 'lib/members/interfaces';
 
 export class MembersApi {
   getMembers (spaceId: string, search?: string) {
@@ -9,7 +9,7 @@ export class MembersApi {
   }
 
   getMemberProperties (spaceId: string) {
-    return http.GET<MemberPropertyWithPermissions[]>(`/api/spaces/${spaceId}/members/properties`);
+    return http.GET<MemberPropertyWithMetadata[]>(`/api/spaces/${spaceId}/members/properties`);
   }
 
   createMemberProperty (spaceId: string, property: Partial<MemberProperty>) {
@@ -42,5 +42,9 @@ export class MembersApi {
 
   deleteMemberPropertyPermission (spaceId: string, permissionId: string) {
     return http.DELETE<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/permissions`, { permissionId });
+  }
+
+  updateMemberPropertyVisibility (spaceId: string, payload: UpdateMemberPropertyVisibilityPayload) {
+    return http.PUT<{ success: 'ok' }>(`/api/spaces/${spaceId}/members/properties/visibility`, payload);
   }
 }

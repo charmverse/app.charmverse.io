@@ -64,6 +64,7 @@ export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVi
     },
     include: {
       space: true,
+      memberPropertyVisibilities: true,
       permissions: {
         include: {
           role: {

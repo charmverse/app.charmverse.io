@@ -17,6 +17,12 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const nameProperty = properties.find(property => property.type === 'name');
+  const timezoneProperty = properties.find(property => property.type === 'timezone');
+  const rolesProperty = properties.find(property => property.type === 'role');
+
+  const isNameHidden = nameProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
+  const isTimezoneHidden = timezoneProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
+  const isRolesHidden = rolesProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
 
   return (
     <Link
@@ -39,24 +45,34 @@ function MemberDirectoryGalleryCard ({
           variant='square'
         />
         <Stack p={2} gap={1}>
-          <Typography gutterBottom variant='h6' mb={0} component='div'>
-            {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
-          </Typography>
+          {!isNameHidden && (
+            <Typography gutterBottom variant='h6' mb={0} component='div'>
+              {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
+            </Typography>
+          )}
           <SocialIcons gap={1} social={member.profile?.social as Social} />
-          <Stack gap={0.5}>
-            <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-            <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-              {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+          {!isRolesHidden && (
+            <Stack gap={0.5}>
+              <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
+              <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+              </Stack>
             </Stack>
-          </Stack>
-          <Stack flexDirection='row' gap={1}>
-            <TimezoneDisplay
-              showTimezone
-              timezone={member.profile?.timezone}
-            />
-          </Stack>
+          )}
+          {!isTimezoneHidden && (
+            <Stack flexDirection='row' gap={1}>
+              <TimezoneDisplay
+                showTimezone
+                timezone={member.profile?.timezone}
+              />
+            </Stack>
+          )}
           {properties.map(property => {
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
+            const hiddenInGallery = property.memberPropertyVisibilities.find(propertyVisibility => propertyVisibility.view === 'gallery');
+            if (hiddenInGallery) {
+              return null;
+            }
             switch (property.type) {
               case 'text':
               case 'text_multiline':

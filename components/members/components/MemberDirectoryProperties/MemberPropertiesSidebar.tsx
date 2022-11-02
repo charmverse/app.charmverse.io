@@ -8,6 +8,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
+import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
+import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -16,7 +18,7 @@ import { MemberPropertySidebarDetails } from 'components/members/components/Memb
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
+import type { MemberPropertyWithMetadata } from 'lib/members/interfaces';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
@@ -109,12 +111,16 @@ function MemberPropertyItemForm ({
 export function MemberPropertySidebarItem ({
   property
 }: {
-  property: MemberPropertyWithPermissions;
+  property: MemberPropertyWithMetadata;
 }) {
   const [toggled, setToggled] = useState(false);
-  const { deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
+  const { deleteProperty, addPropertyPermissions, removePropertyPermission, updateMemberPropertyVisibility } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
+
+  const propertyVisibilities = property.memberPropertyVisibilities;
+  const disabledInTableView = !!propertyVisibilities.find(visibility => visibility.view === 'table');
+  const disabledInGalleryView = !!propertyVisibilities.find(visibility => visibility.view === 'gallery');
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -154,9 +160,54 @@ export function MemberPropertySidebarItem ({
             gap={0.5}
             className='icons'
             sx={{
-              opacity: 0
+              opacity: 0,
+              alignItems: 'center'
             }}
           >
+            <Tooltip title={`Property is ${disabledInGalleryView ? 'invisible' : 'visible'} in gallery view`}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              >
+                <GalleryIcon
+                  width={20}
+                  height={20}
+                  disabled={disabledInGalleryView}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    updateMemberPropertyVisibility({
+                      memberPropertyId: property.id,
+                      view: 'gallery',
+                      visible: !disabledInGalleryView
+                    });
+                  }}
+                />
+              </div>
+            </Tooltip>
+            <Tooltip title={`Property is ${disabledInTableView ? 'invisible' : 'visible'} in table view`}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              >
+                <TableIcon
+                  width={20}
+                  height={20}
+                  disabled={disabledInTableView}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    updateMemberPropertyVisibility({
+                      memberPropertyId: property.id,
+                      view: 'table',
+                      visible: !disabledInTableView
+                    });
+                  }}
+                />
+              </div>
+            </Tooltip>
             <Tooltip title={`Edit ${property.name} property.`}>
               <EditIcon
                 cursor='pointer'
