@@ -249,6 +249,16 @@ model Page {
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
+  diffs              PageDiff[]
+}
+
+model PageDiff {
+  id        String   @id
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  pageId    String   @db.Uuid
+  page      Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  data      Json
 }
 
 model Block {

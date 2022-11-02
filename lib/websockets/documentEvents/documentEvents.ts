@@ -88,6 +88,10 @@ export class DocumentEventHandler {
       }
     });
 
+    this.socket.on('disconnect', () => {
+      this.onClose();
+    });
+
     this.sendMessage({ type: 'welcome' });
   }
 
@@ -432,6 +436,21 @@ export class DocumentEventHandler {
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== this.id) {
         participant.sendMessage(message);
+      }
+    }
+  }
+
+  onClose () {
+    log.debug('Closing collaboration session');
+    const room = this.getDocumentRoom();
+    delete room.participants[this.id];
+    if (room) {
+      delete room.participants[this.id];
+      if (Object.keys(room.participants).length === 0) {
+        docRooms.delete(room.doc.id);
+      }
+      else {
+        this.sendParticipantList();
       }
     }
   }
