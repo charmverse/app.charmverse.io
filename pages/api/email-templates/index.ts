@@ -19,6 +19,7 @@ const createDiscussionTask = (
   { pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }
 ): DiscussionTask => {
   return {
+    taskId: v4(),
     mentionId: v4(),
     createdAt: new Date().toISOString(),
     pageId: v4(),
