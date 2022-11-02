@@ -5,6 +5,7 @@ import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
@@ -20,6 +21,8 @@ export function MemberDirectoryTableView ({
   members: Member[];
 }) {
   const { properties = [] } = useMemberProperties();
+  const [currentSpace] = useCurrentSpace();
+
   return (
     <Table
       size='small'
@@ -104,7 +107,7 @@ export function MemberDirectoryTableView ({
                     case 'name': {
                       return (
                         <TableCell>
-                          <Link color='inherit' href={`/u/${member.path || member.id}`}>
+                          <Link color='inherit' href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}>
                             <Typography fontWeight='bold'>
                               {memberProperty.value ?? member.username}
                             </Typography>

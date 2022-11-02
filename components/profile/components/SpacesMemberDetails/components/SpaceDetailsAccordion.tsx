@@ -1,6 +1,7 @@
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyOption } from 'components/members/components/MemberDirectoryProperties/MemberPropertySelectInput';
@@ -12,16 +13,28 @@ type Props = {
   spaceImage: string | null;
   readOnly?: boolean;
   onEdit: VoidFunction;
+  expanded?: boolean;
 };
 
-export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit }: Props) {
+export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
+  const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
+
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+  }, [defaultExpanded]);
 
   return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}><WorkspaceAvatar
-        name={spaceName}
-        image={spaceImage}
-      />
+    <Accordion
+      expanded={expanded}
+      onChange={() => {
+        setExpanded(!expanded);
+      }}
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <WorkspaceAvatar
+          name={spaceName}
+          image={spaceImage}
+        />
         <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
           <Typography ml={2} variant='h6'>{spaceName}</Typography>
           {!readOnly && (
