@@ -85,7 +85,7 @@ export default function PendingTasks (props: PendingTasksProps) {
       </MjmlText>
       {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map(discussionTask => (
         <DiscussionTask
-          key={discussionTask.mentionId}
+          key={discussionTask.taskId}
           task={discussionTask}
         />
       ))}

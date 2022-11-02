@@ -181,8 +181,8 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
             </TableRow>
           </TableHead>
           <TableBody>
-            {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked={false} />)}
-            {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked />)}
+            {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.taskId} {...discussionTask} marked={false} />)}
+            {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.taskId} {...discussionTask} marked />)}
           </TableBody>
         </Table>
       </Box>
