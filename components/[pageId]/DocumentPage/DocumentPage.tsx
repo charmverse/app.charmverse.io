@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
@@ -11,20 +11,17 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import LoadingComponent from 'components/common/LoadingComponent';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { usePageDetails } from 'hooks/usePageDetails';
 import { usePages } from 'hooks/usePages';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import type { Page, PageContent } from 'models';
+import type { Page } from 'models';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
@@ -62,7 +59,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
-  const { pageDetails, debouncedUpdatePageDetails } = usePageDetails(page.id);
 
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
@@ -123,11 +119,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     pageTop = 200;
   }
 
-  const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText });
-    // setPage({ content: content.doc, contentText: content.rawText });
-  }, [setPage]);
-
   const card = cards.find(_card => _card.id === page.id);
 
   const comments = useAppSelector(getCardComments(card?.id ?? page.id));
@@ -169,10 +160,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id + editMode + !!pageDetails}
+              key={page.id + editMode}
               // content={pageDetails?.content as PageContent}
               // onContentChange={updatePageContent}
-              readOnly={readOnly || !pageDetails}
+              readOnly={readOnly}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}
@@ -181,7 +172,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
-              placeholder={!pageDetails ? <LoadingComponent isLoading /> : null}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader

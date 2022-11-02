@@ -86,7 +86,7 @@ export class ModCollabDoc {
       console.error('TODO: merge document updates');
     }
     else {
-      console.log('loadDocument()');
+      console.log('loadDocument()', data);
       this.loadDocument(data);
     }
   }
@@ -174,32 +174,32 @@ export class ModCollabDoc {
           // In case the title changed, we also add a title field to
           // update the title field instantly - important for the
           // document overview page.
-          let newTitle = '';
-          this.mod.editor.view.state.doc.firstChild?.firstChild?.forEach(
-            child => {
-              if (!child.marks.find(mark => mark.type.name === 'deletion')) {
-                newTitle += child.textContent;
-              }
-            }
-          );
-          newTitle = newTitle.slice(0, 255);
-          let oldTitle = '';
-          const confirmedDoc = this.mod.editor.docInfo.confirmedDoc;
-          if (confirmedDoc) {
-            confirmedDoc.firstChild?.firstChild?.forEach(
-              (child: Node) => {
-                if (!child.marks.find(mark => mark.type.name === 'deletion')) {
-                  oldTitle += child.textContent;
-                }
-              }
-            );
-          }
-          oldTitle = oldTitle.slice(0, 255);
-          if (
-            newTitle !== oldTitle
-          ) {
-            unconfirmedDiff.ti = newTitle;
-          }
+          // let newTitle = '';
+          // this.mod.editor.view.state.doc.firstChild?.firstChild?.forEach(
+          //   child => {
+          //     if (!child.marks.find(mark => mark.type.name === 'deletion')) {
+          //       newTitle += child.textContent;
+          //     }
+          //   }
+          // );
+          // newTitle = newTitle.slice(0, 255);
+          // let oldTitle = '';
+          // const confirmedDoc = this.mod.editor.docInfo.confirmedDoc;
+          // if (confirmedDoc) {
+          //   confirmedDoc.firstChild?.firstChild?.forEach(
+          //     (child: Node) => {
+          //       if (!child.marks.find(mark => mark.type.name === 'deletion')) {
+          //         oldTitle += child.textContent;
+          //       }
+          //     }
+          //   );
+          // }
+          // oldTitle = oldTitle.slice(0, 255);
+          // if (
+          //   newTitle !== oldTitle
+          // ) {
+          //   unconfirmedDiff.ti = newTitle;
+          // }
         }
 
         this.unconfirmedDiffs[rid] = {

@@ -12,6 +12,8 @@ import type { ReactNode, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
+import LoadingComponent from 'components/common/LoadingComponent';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -29,8 +31,6 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   style?: React.CSSProperties;
   onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorRef?: RefObject<HTMLDivElement>;
-  // Components that should be placed underneath the editor
-  placeholderComponent?: ReactNode;
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
 }
@@ -50,7 +50,6 @@ export const BangleEditor = React.forwardRef<
       className,
       style,
       onReady = () => {},
-      placeholderComponent,
       editorRef,
       enableSuggestions = false,
       trackChanges = false
@@ -68,6 +67,10 @@ export const BangleEditor = React.forwardRef<
     const [editor, setEditor] = useState<CoreBangleEditor>();
     const nodeViews = useNodeViews(renderRef);
     const { user } = useUser();
+    const { showMessage } = useSnackbar();
+
+    const enableFidusEditor = Boolean(user && pageId && trackChanges);
+    const [isLoading, setIsLoading] = useState(enableFidusEditor);
 
     if (enableSuggestions && !trackChanges) {
       log.error('CharmEditor: Suggestions require trackChanges to be enabled');
@@ -84,6 +87,10 @@ export const BangleEditor = React.forwardRef<
       [editor]
     );
 
+    function onError (message: string) {
+      showMessage(message, 'error');
+    }
+
     useEffect(() => {
       const _editor = new CoreBangleEditor(
         renderRef.current!,
@@ -96,9 +103,12 @@ export const BangleEditor = React.forwardRef<
         fEditor = new FidusEditor({
           user,
           docId: pageId,
-          view: _editor.view,
-          enableSuggestionMode: enableSuggestions
+          enableSuggestionMode: enableSuggestions,
+          onDocLoaded: () => {
+            setIsLoading(false);
+          }
         });
+        fEditor.init(_editor.view, onError);
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       onReadyRef.current(_editor);
@@ -108,20 +118,29 @@ export const BangleEditor = React.forwardRef<
         fEditor?.close();
         _editor.destroy();
       };
-    }, [pageId, ref]);
+    }, [user, pageId, trackChanges, ref]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(
         'When using nodeViews, you must provide renderNodeViews callback'
       );
     }
-    // console.log('render node views');
+
     return (
       <EditorViewContext.Provider value={editor?.view as any}>
         <div ref={editorRef} className='bangle-editor-core'>
           {editor ? children : null}
           <div ref={renderRef} id={pageId} className={className} style={style} />
-          {editor ? placeholderComponent : null}
+          <LoadingComponent isLoading={isLoading} />
+          {/* {editor
+            ? (
+              <Placeholder
+                sx={placeholderSX}
+                text={placeholderText}
+                show={!!editor.view.state.doc.textContent}
+              />
+            )
+            : null} */}
         </div>
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(

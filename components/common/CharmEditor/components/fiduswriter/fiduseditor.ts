@@ -9,7 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
-import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
+import type { ClientSubscribeMessage, ServerErrorMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { ModCollab } from './collab';
 import {
@@ -42,8 +42,8 @@ type User = { id: string, username: string }
 type EditorProps = {
   user: User;
   docId: string;
-  view: EditorView;
   enableSuggestionMode: boolean;
+  onDocLoaded?: () => void;
 }
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -83,8 +83,13 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor ({ user, docId, view, enableSuggestionMode }: EditorProps) {
+  onDocLoaded: () => void = () => {};
+
+  constructor ({ user, docId, enableSuggestionMode, onDocLoaded }: EditorProps) {
     this.user = user;
+    if (onDocLoaded) {
+      this.onDocLoaded = onDocLoaded;
+    }
 
     this.enableSuggestionMode = enableSuggestionMode;
 
@@ -101,17 +106,15 @@ export class FidusEditor {
       // [accessRightsPlugin, () => ({ editor: this })],
       [trackPlugin, () => ({ editor: this })]
     ];
-
-    this.init(view);
   }
 
-  init (view: EditorView) {
+  init (view: EditorView, onError: (error: string) => void) {
 
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
-      appLoaded: () => Boolean(this.view.state.plugins.length),
-      anythingToSend: () => Boolean(sendableSteps(this.view.state)),
+      appLoaded: () => Boolean(view.state.plugins.length),
+      anythingToSend: () => Boolean(sendableSteps(view.state)),
       initialMessage: () => {
         const message: ClientSubscribeMessage = {
           roomId: this.docInfo.id,
@@ -144,6 +147,7 @@ export class FidusEditor {
             break;
           case 'doc_data':
             this.mod.collab.doc.receiveDocument(data);
+            this.onDocLoaded();
             break;
           case 'confirm_version':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();
@@ -180,7 +184,11 @@ export class FidusEditor {
             this.mod.collab.doc.rejectDiff(data.rid);
             break;
           case 'patch_error':
-            alert(gettext('Your document was out of sync and has been reset.'));
+            onError('Your document was out of sync and has been reset.');
+            break;
+          case 'error':
+            log.error('Error talking to socket server', data.message);
+            onError(data.message);
             break;
           default:
             break;
@@ -265,9 +273,9 @@ export class FidusEditor {
 
     view.setProps({
       dispatchTransaction: tr => {
-        const trackedTr = amendTransaction(tr, this.view.state, this, this.enableSuggestionMode);
-        const { state: newState } = this.view.state.applyTransaction(trackedTr);
-        this.view.updateState(newState);
+        const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
+        const { state: newState } = view.state.applyTransaction(trackedTr);
+        view.updateState(newState);
         if (tr.steps) {
           this.docInfo.updated = new Date();
         }

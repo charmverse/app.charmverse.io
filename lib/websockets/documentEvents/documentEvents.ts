@@ -101,7 +101,7 @@ export class DocumentEventHandler {
     }
 
     if (!('c' in message) || !('s' in message)) {
-      this.sendError('Invalid message');
+      this.sendError('Received invalid message');
       return;
     }
     else if (message.c < this.messages.client + 1) {
@@ -141,6 +141,7 @@ export class DocumentEventHandler {
     // handle subscription to document
     if (message.type === 'subscribe') {
       await this.subscribeToDoc({ pageId: message.roomId, connectionCount: message.connection });
+      return;
     }
 
     if (!session.documentId) {
@@ -210,14 +211,16 @@ export class DocumentEventHandler {
         const page = await prisma.page.findUniqueOrThrow({
           where: { id: pageId }
         });
+        const content = page.content || { type: 'doc', content: [] };
         const room: DocumentRoom = {
           doc: {
             id: page.id,
-            content: page.content,
+            content,
             version: page.version,
+            // TODO: populate with diffs from the db
             diffs: []
           },
-          node: getNodeFromJson(page.content),
+          node: getNodeFromJson(content),
           participants: { [this.id]: this }
         };
         docRooms.set(pageId, room);
@@ -231,8 +234,8 @@ export class DocumentEventHandler {
       this.handleParticipantUpdate();
     }
     catch (error) {
-      log.error('Error registering user to page events', { error });
-      this.sendError('Unable to register user');
+      log.error('Error subscribing user to page', { error });
+      this.sendError('There was an error loading the page! Please try again later.');
     }
   }
 
@@ -268,10 +271,10 @@ export class DocumentEventHandler {
 
   async handleDiff (message: WrappedSocketMessage<ClientDiffMessage>) {
     const room = this.getDocumentRoom();
-    const pv = message.v;
+    const clientVersion = message.v;
     const dv = room.doc.version;
     log.debug('Handling diff');
-    if (pv === dv) {
+    if (clientVersion === dv) {
       if (message.ds) {
         const updatedNode = applyStepsToNode(message.ds, room.node);
         if (updatedNode) {
@@ -296,9 +299,9 @@ export class DocumentEventHandler {
       this.confirmDiff(message.rid);
       this.sendUpdates(message);
     }
-    else if (pv < dv) {
-      if (pv + room.doc.diffs.length >= dv) {
-        const numberDiffs = pv - dv;
+    else if (clientVersion < dv) {
+      if (clientVersion + room.doc.diffs.length >= dv) {
+        const numberDiffs = clientVersion - dv;
         log.debug('Client is behind. Resend document diffs', { numberDiffs });
         const messages = room.doc.diffs.slice(numberDiffs);
         for (const m of messages) {
@@ -363,10 +366,11 @@ export class DocumentEventHandler {
       where: { id: session.documentId },
       select: { content: true, updatedAt: true, id: true, version: true }
     });
+    const content = page.content as any || { type: 'doc', content: [] };
     const message: ServerDocDataMessage = {
       type: 'doc_data',
       doc: {
-        content: page.content as any,
+        content,
         v: page.version
       },
       doc_info: {

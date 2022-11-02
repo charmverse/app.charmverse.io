@@ -1,9 +1,9 @@
 import type { PageType, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { IPageWithPermissions } from 'lib/pages/server';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 type CurrentPageData = {

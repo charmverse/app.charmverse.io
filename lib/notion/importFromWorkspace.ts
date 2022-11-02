@@ -14,10 +14,10 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 import log from 'lib/log';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 import type { BlockNode, CalloutNode, ColumnBlockNode, ColumnLayoutNode, DisclosureDetailsNode, ListItemNode, MentionNode, Page, PageContent, TableNode, TableRowNode, TextContent } from 'models';
 

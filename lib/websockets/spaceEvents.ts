@@ -39,8 +39,9 @@ export class SpaceEventHandler {
           });
         }
       }
-      catch (err) {
-        this.sendError('Unable to register user');
+      catch (error) {
+        log.error('Error subscribing user to space events', { error });
+        this.sendError('Error subscribing to workspace');
       }
     }
   }

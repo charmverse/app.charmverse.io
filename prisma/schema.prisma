@@ -236,6 +236,7 @@ model Page {
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
   version            Int              @default(0)
+  //diffs: Json @default('[]')
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author             User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   space              Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)

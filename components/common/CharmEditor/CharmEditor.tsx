@@ -35,11 +35,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
@@ -68,7 +67,7 @@ import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from '.
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
-import Placeholder from './components/Placeholder';
+import { placeholderPlugin } from './components/placeholder/index';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
@@ -107,7 +106,8 @@ export function charmEditorPlugins (
     enableComments = true,
     userId = null,
     pageId = null,
-    spaceId = null
+    spaceId = null,
+    placeholderText
   }:
     {
       spaceId?: string | null;
@@ -119,6 +119,7 @@ export function charmEditorPlugins (
       disablePageSpecificFeatures?: boolean;
       enableVoting?: boolean;
       enableComments?: boolean;
+      placeholderText?: string;
     } = {}
 ): () => RawPlugins[] {
 
@@ -231,6 +232,7 @@ export function charmEditorPlugins (
     basePlugins.push(rowActions.plugins({
       key: actionsPluginKey
     }));
+    basePlugins.push(placeholderPlugin(placeholderText));
   }
 
   if (!disablePageSpecificFeatures) {
@@ -307,11 +309,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
 
 const defaultContent: PageContent = {
   type: 'doc',
-  content: [
-    {
-      type: 'paragraph'
-    }
-  ]
+  content: []
 };
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
@@ -330,7 +328,6 @@ interface CharmEditorProps {
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
-  placeholder?: JSX.Element | undefined | null;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -367,8 +364,7 @@ function CharmEditor (
     pageId,
     containerWidth,
     pageType,
-    pagePermissions,
-    placeholder
+    pagePermissions
   }:
   CharmEditorProps
 ) {
@@ -417,7 +413,7 @@ function CharmEditor (
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
     // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
+    setIsEmpty(checkIsContentEmpty(view.state.doc.textContent.trim() === ''));
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view, prevDoc);
     }
@@ -504,17 +500,10 @@ function CharmEditor (
         editable: () => !readOnly,
         plugins: []
       }}
-      placeholderComponent={(
-        placeholder || (
-          <Placeholder
-            sx={{
-              // This fixes the placeholder and cursor not being aligned
-              top: -34
-            }}
-            show={isEmpty && !readOnly}
-          />
-        )
-      )}
+      placeholderSX={{
+        // This fixes the placeholder and cursor not being aligned
+        top: -34
+      }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {

@@ -14,8 +14,7 @@
     background-color: var(--editorCore-selectionChange-bgColor);
   }
 
-  to {
-  }
+  to {}
 }
 
 :root {
@@ -31,8 +30,7 @@
   text-decoration: underline;
 }
 
-.bangle-editor p > code {
-}
+.bangle-editor p > code {}
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
@@ -552,4 +550,15 @@ details {
     color: rgba(var(--center-channel-color-rgb), 0.8);
     font-size: 0.8rem;
   }
+}
+
+/** placeholder **/
+.ProseMirror[data-placeholder]::before {
+  color: var(--prop-gray);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+.ProseMirror:focus[data-placeholder]::before {
+  display: none;
 }

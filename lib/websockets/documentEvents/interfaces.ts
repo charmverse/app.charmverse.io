@@ -51,8 +51,7 @@ export type ClientDiffMessage = {
   rid: number;
   cid?: number; // client id
   ds?: any[]; // steps to send
-  jd?: any; // used by python backend in fiduswriter - maybe we dont need it?
-  ti?: string; // new title
+  // ti?: string; // new title
   doc?: Node;
   v: number;
 };

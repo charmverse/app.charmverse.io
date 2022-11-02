@@ -6,7 +6,7 @@ import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 const NestedPageContainer = styled(Link)`
