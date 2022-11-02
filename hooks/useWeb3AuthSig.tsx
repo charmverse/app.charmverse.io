@@ -18,6 +18,8 @@ import { PREFIX, useLocalStorage } from './useLocalStorage';
 type IContext = {
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
+  library: any;
+  chainId: any;
   sign: () => Promise<AuthSig>;
   triedEager: boolean;
   getStoredSignature: (account: string) => AuthSig | null;
@@ -30,13 +32,15 @@ export const Web3Context = createContext<Readonly<IContext>>({
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
   getStoredSignature: () => null,
-  disconnectWallet: () => null
+  disconnectWallet: () => null,
+  library: null,
+  chainId: null
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
-  const { account, library } = useWeb3React();
+  const { account, library, chainId } = useWeb3React();
   const { triedEager } = useContext(Web3Connection);
 
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
@@ -101,14 +105,14 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       throw new ExternalServiceError('Missing signer');
     }
 
-    const chainId = await signer.getChainId();
+    const signerChainId = await signer.getChainId();
 
     const preparedMessage = {
       domain: window.location.host,
       address: getAddress(account), // convert to EIP-55 format or else SIWE complains
       uri: globalThis.location.origin,
       version: '1',
-      chainId
+      chainId: signerChainId
     };
 
     const message = new SiweMessage(preparedMessage);
@@ -144,7 +148,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo(() => ({
-    account, walletAuthSignature, triedEager, sign, getStoredSignature, disconnectWallet
+    account, walletAuthSignature, triedEager, sign, getStoredSignature, disconnectWallet, library, chainId
   }) as IContext, [account, walletAuthSignature, triedEager]);
 
   return (
