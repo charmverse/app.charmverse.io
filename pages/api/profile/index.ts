@@ -1,4 +1,4 @@
-import { deleteCookie } from 'cookies-next';
+import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
@@ -54,11 +54,10 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
   await req.session.save();
 
+  const cookies = new Cookies(req, res);
+
   signupCookieNames.forEach(cookie => {
-    deleteCookie(cookie, {
-      req,
-      res
-    });
+    cookies.set(cookie, null);
   });
 
   res.status(200).json(user);
