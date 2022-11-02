@@ -48,6 +48,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   }
 
   // Null out the anonmyous user id after successful login
+
   req.session.anonymousUserId = undefined;
   req.session.user = { id: user.id };
   await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
@@ -90,9 +91,11 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   }
 
   // Clean up the anonymous id if the user has a profile
-  req.session.anonymousUserId = undefined;
+  if (req.session.anonymousUserId) {
+    req.session.anonymousUserId = undefined;
 
-  await req.session.save();
+    await req.session.save();
+  }
 
   return res.status(200).json(profile);
 }
