@@ -47,8 +47,8 @@ export class WebsocketBroadcaster {
     this.io.emit('message', message);
   }
 
-  broadcast (io: Socket, eventName: string, message: ServerMessage, roomId: string): void {
-    io.to(roomId).emit(eventName, message);
+  broadcast (message: ServerMessage, roomId: string): void {
+    this.io.to(roomId).emit('message', message);
   }
 
   leaveRoom (socket: Socket, roomId: string): void {
