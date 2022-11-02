@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { authOnConnect } from 'lib/websockets/authentication';
 import { DocumentEventHandler } from 'lib/websockets/documentEvents';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
@@ -51,13 +52,11 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   const io = new Server(res.socket.server);
 
   // Define listeners
-  io.on('connect', (socket) => {
-    new SpaceEventHandler(socket).open();
-  });
+  io.on('connect', (socket) => new SpaceEventHandler(socket));
 
-  io.of('/ceditor').on('connect', (socket) => {
-    new DocumentEventHandler(socket).open();
-  });
+  io.of('/ceditor')
+    .use(authOnConnect)
+    .on('connect', (socket) => new DocumentEventHandler(socket));
 
   res.socket.server.io = io;
 

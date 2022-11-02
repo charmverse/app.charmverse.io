@@ -6,14 +6,12 @@ import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 
 import type { ModCollab } from './index';
 
-import { toMiniJSON } from '../schema/mini_json';
 import {
   getSelectionUpdate,
-  removeCollaboratorSelection,
   updateCollaboratorSelection
 } from '../state_plugins';
 
-import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/documentEvents';
+import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/documentEvents/interfaces';
 
 
 export class ModCollabDoc {
@@ -230,10 +228,8 @@ export class ModCollabDoc {
           v: this.mod.editor.docInfo.version,
           session_id: this.mod.editor.docInfo.session_id,
           anchor: selectionUpdate.anchor,
-          head: selectionUpdate.head,
-          // Whether the selection is in the footnote or the main editor
-          editor: 'main'
-        };
+          head: selectionUpdate.head
+        } as ClientSelectionMessage;
       }
       else {
         return false;

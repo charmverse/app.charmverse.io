@@ -13,6 +13,7 @@ export class SpaceEventHandler {
 
   constructor (private socket: Socket) {
     this.listen();
+    this.open();
   }
 
   open () {

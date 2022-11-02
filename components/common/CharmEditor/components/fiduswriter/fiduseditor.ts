@@ -9,7 +9,7 @@ import {
 import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
-import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents';
+import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { ModCollab } from './collab';
 import {
@@ -113,6 +113,7 @@ export class FidusEditor {
     this.ws = new WebSocketConnector({
       appLoaded: () => Boolean(this.view.state.plugins.length),
       anythingToSend: () => Boolean(sendableSteps(this.view.state)),
+      authToken,
       initialMessage: () => {
         const message: ClientSubscribeMessage = {
           roomId: this.docInfo.id,

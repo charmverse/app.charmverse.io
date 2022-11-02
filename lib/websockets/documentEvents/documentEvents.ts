@@ -1,111 +1,20 @@
-import type { Node } from '@bangle.dev/pm';
-import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import log from 'lib/log';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
-import type { SealedUserId } from 'lib/websockets/interfaces';
 
-const authSecret = process.env.AUTH_SECRET as string;
+import type { AuthenticatedSocket } from '../authentication';
 
-export type Participant = {
-  id: string;
-  name: string;
-  session_id: string | undefined;
-  sessionIds: string[];
-};
+import type { Participant, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientDiffMessage, ServerMessage } from './interfaces';
 
-export type WrappedSocketMessage<T> = T & {
-  c: number; // client
-  s: number; // server
-};
-
-export type RequestResendMessage = {
-  type: 'request_resend';
-  from: number;
-};
-
-type ClientGetDocumentMessage = {
-  type: 'get_document';
-};
-
-type ClientCheckVersionMessage = {
-  type: 'check_version';
-  v: number;
-};
-
-export type ClientSelectionMessage = {
-  type: 'selection_change';
-  id: string;
-  session_id: string;
-  anchor: number;
-  head: number;
-  v: number;
-};
-
-export type ClientDiffMessage = {
-  type: 'diff';
-  rid: number;
-  cid?: number; // client id
-  ds?: any[]; // steps to send
-  jd?: any; // used by python backend in fiduswriter - maybe we dont need it?
-  ti?: string; // new title
-  doc?: Node;
-  v: number;
-};
-
-export type ClientSubscribeMessage = {
-  type: 'subscribe';
-  roomId: string;
-  authToken: string;
-  connection?: number;
+type SocketSessionData = AuthenticatedSocket & {
+  documentId?: string;
+  isOwner?: boolean;
+  permissions: Partial<IPagePermissionFlags>;
 }
-
-export type ClientUnsubscribeMessage = {
-  type: 'unsubscribe';
-  roomId: string;
-}
-
-export type ClientMessage = ClientSubscribeMessage
-  | ClientCheckVersionMessage
-  | ClientDiffMessage
-  | ClientSelectionMessage
-  | RequestResendMessage
-  | ClientGetDocumentMessage
-  | ClientUnsubscribeMessage;
-
-type ServerConnectionsMessage = {
-  type: 'connections';
-  participant_list: Participant[];
-};
-
-export type ServerDocDataMessage = {
-  type: 'doc_data';
-  doc: { content: Node, v: number };
-  doc_info: { id: string, session_id: string, updated: any, version: number }; // TODO: do we need this?
-  time: number;
-};
-
-export type ServerDiffMessage = {
-  type: 'confirm_diff' | 'reject_diff';
-  rid: number;
-};
-
-export type ServerErrorMessage = {
-  type: 'error';
-  message: string;
-}
-
-type ServerMessage = ServerConnectionsMessage
-  | ServerDocDataMessage
-  | ServerDiffMessage
-  | ServerErrorMessage
-  | RequestResendMessage
-  | { type: 'confirm_version' | 'subscribed' | 'patch_error' | 'welcome' };
-
-export type SocketMessage = ClientMessage | ServerMessage;
 
 type DocumentState = {
   participants: Record<string, Participant>;
@@ -128,8 +37,26 @@ export class DocumentEventHandler {
     lastTen: []
   };
 
+  // store session data on the socket from socket-io
+  getSession () {
+    return this.socket.data as SocketSessionData;
+  }
+
+  setSession (data: Partial<SocketSessionData>) {
+    Object.assign(this.socket.data, data);
+  }
+
   constructor (private socket: Socket) {
+
+    const user = socket.data.user;
+
+    this.setSession({
+      user: { id: user.id },
+      permissions: {}
+    });
+
     this.listen();
+    this.open();
   }
 
   private listen () {
@@ -189,53 +116,59 @@ export class DocumentEventHandler {
 
     const socket = this.socket;
 
+    // handle subscription to document
+    if (message.type === 'subscribe') {
+      try {
+        const userId = this.getSession().user.id;
+        const pageId = message.roomId;
+        log.debug('[charm ws] subscribe event', { userId, pageId });
+
+        const isValidPageId = validate(pageId);
+        if (!isValidPageId) {
+          throw new Error(`Invalid page id: ${pageId}`);
+        }
+        const permissions = await computeUserPagePermissions({
+          pageId,
+          userId
+        });
+
+        this.setSession({ permissions });
+
+        if (permissions.edit_content !== true) {
+          this.sendError('You do not have permission to view this page');
+          return;
+        }
+
+        socket.join([pageId]);
+        // socket.pageId = pageId;
+        this.sendMessage({ type: 'subscribed' });
+        if (typeof message.connection !== 'number' || message.connection < 1) {
+          await this.sendDocument(socket, message.roomId);
+          log.debug('Sent document to new subscriber');
+        }
+      }
+      catch (error) {
+        log.error('Error registering user to page events', { error });
+        this.sendError('Unable to register user');
+      }
+    }
+
+    // handle event from closed document
+    const session = socket.data as SocketSessionData;
+
+    if (!session.documentId) {
+      return;
+    }
+
+    if (!docState.has(session.documentId ?? '')) {
+      log.debug('Ignore message from closed document', { pageId: session.documentId });
+      return;
+    }
+
     switch (message.type) {
 
-      case 'subscribe':
-        try {
-          const r = await unsealData<SealedUserId>(message.authToken, {
-            password: authSecret
-          });
-          const userId = r.userId;
-          const pageId = message.roomId;
-          log.debug('[charm ws] subscribe event', { r, userId, pageId });
-
-          if (typeof userId === 'string') {
-            const isValidUserId = validate(userId);
-            if (!isValidUserId) {
-              throw new Error(`Invalid user id: ${userId}`);
-            }
-            const isValidPageId = validate(pageId);
-            if (!isValidPageId) {
-              throw new Error(`Invalid page id: ${pageId}`);
-            }
-            const permissions = await computeUserPagePermissions({
-              pageId,
-              userId
-            });
-            if (permissions.edit_content !== true) {
-              this.sendError('You do not have permission to view this page');
-              return;
-            }
-
-            socket.join([pageId]);
-            // socket.pageId = pageId;
-            this.sendMessage({ type: 'subscribed' });
-            if (typeof message.connection !== 'number' || message.connection < 1) {
-              await this.sendDocument(socket, message.roomId);
-              log.debug('Sent document to new subscriber');
-            }
-          }
-        }
-        catch (error) {
-          log.error('Error registering user to page events', { error });
-          this.sendError('Unable to register user');
-        }
-        break;
-
-      case 'unsubscribe':
-        log.debug('[charm ws] unsubscribe event', { roomId: message.roomId });
-        socket.leave(message.roomId);
+      case 'get_document':
+        // socket.leave(message.roomId);
         break;
 
       default:

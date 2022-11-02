@@ -2,22 +2,24 @@ import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import log from 'lib/log';
-import type { SocketMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents';
+import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, ServerMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 const gettext = (text: string) => text;
 
 const namespace = '/ceditor';
 const socketEvent = 'message';
 
-type WrappedMessage = WrappedSocketMessage<SocketMessage>;
+type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
+type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 
 type WebSocketConnectorProps = {
   appLoaded: () => boolean;
   anythingToSend: () => boolean;
+  authToken: string;
   sendMessage?: (message: string) => void;
-  initialMessage: () => SocketMessage;
-  restartMessage: () => SocketMessage; // Too many messages have been lost and we need to restart
-  receiveData: (data: WrappedMessage) => void;
+  initialMessage: () => ClientSubscribeMessage;
+  restartMessage: () => ClientRestartMessage; // Too many messages have been lost and we need to restart
+  receiveData: (data: WrappedServerMessage) => void;
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
 }
 
@@ -38,10 +40,10 @@ export class WebSocketConnector {
 
   /* A list of messages to be sent. Only used when temporarily offline.
           Messages will be sent when returning back online. */
-  messagesToSend: (() => SocketMessage | false)[] = [];
+  messagesToSend: (() => ClientMessage | false)[] = [];
 
   /* A list of messages from a previous connection */
-  oldMessages: (() => SocketMessage | false)[] = [];
+  oldMessages: (() => ClientMessage | false)[] = [];
 
   online = true;
 
@@ -62,6 +64,7 @@ export class WebSocketConnector {
   constructor ({
     appLoaded,
     anythingToSend,
+    authToken,
     sendMessage,
     initialMessage,
     resubscribed,
@@ -78,7 +81,10 @@ export class WebSocketConnector {
     this.receiveData = receiveData;
     // console.log('load socket');
     this.socket = io(namespace, {
-      withCredentials: true
+      withCredentials: true,
+      query: {
+        token: authToken
+      }
       // path: '/api/socket'
     }).connect();
     this.createWSConnection();
@@ -123,7 +129,10 @@ export class WebSocketConnector {
 
     // this.open()//;
 
-    this.socket.on('message', data => {
+    this.socket.on('message', _data => {
+
+      const data = _data as WrappedServerMessage;
+
       // console.log('ws - on socket events', data);
       const expectedServer = this.messages.server + 1;
       // console.log('[charm ws] socket message', data, expectedServer);
@@ -162,10 +171,10 @@ export class WebSocketConnector {
             this.send(this.restartMessage);
             return;
           }
-          this.messages.lastTen.slice(0 - clientDifference).forEach(_data => {
+          this.messages.lastTen.slice(0 - clientDifference).forEach(__data => {
             this.messages.client += 1;
-            const wrappedMessage: WrappedMessage = {
-              ..._data,
+            const wrappedMessage = {
+              ...__data,
               c: this.messages.client,
               s: this.messages.server
             };
@@ -231,7 +240,7 @@ export class WebSocketConnector {
   }
 
   /** Sends data to server or keeps it in a list if currently offline. */
-  send (getData: () => SocketMessage | false, timer = 80) {
+  send (getData: () => ClientMessage | false, timer = 80) {
     // logic from original source: reconnect if not connected anymore
     // if (this.connected && socket.readyState !== socket.OPEN) {
     //   // @ts-ignore
@@ -291,7 +300,7 @@ export class WebSocketConnector {
     });
   }
 
-  receive (data: WrappedMessage) {
+  receive (data: WrappedServerMessage) {
     // console.log('receive', data);
     switch (data.type) {
       case 'welcome':
