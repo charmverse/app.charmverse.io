@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utils-signup';
+import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
