@@ -1,6 +1,7 @@
 import type { User } from '@prisma/client';
 
 export interface DiscussionTask {
+  taskId: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;

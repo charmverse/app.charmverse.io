@@ -141,79 +141,39 @@ async function sendNotification (notification: PendingTasksProps & {
           channel: 'email',
           type: 'multisig'
         }
-      }))]
-    );
-  }
-  catch (err) {
-    log.debug(`GnosisSafe error with userId: ${notification.user.id}, taskIds: ${notification.gnosisSafeTasks.map(item => getGnosisSafeTaskId(item)).join(', ')}`, { error: err });
-    return undefined;
-  }
-
-  try {
-    await prisma.$transaction(
-      [...notification.proposalTasks.map(proposalTask => prisma.userNotification.create({
+      })), ...notification.proposalTasks.map(proposalTask => prisma.userNotification.create({
         data: {
           userId: notification.user.id,
           taskId: proposalTask.id,
           channel: 'email',
           type: 'proposal'
         }
-      }))]
-    );
-  }
-  catch (err) {
-    log.debug(`ProposalTasks error  with userId: ${notification.user.id} , taskIds: ${notification.proposalTasks.map(item => item.id).join(', ')}`, { error: err });
-    return undefined;
-  }
-
-  try {
-    await prisma.$transaction(
-      [...notification.unmarkedWorkspaceEvents.map(unmarkedWorkspaceEvent => prisma.userNotification.create({
+      })), ...notification.unmarkedWorkspaceEvents.map(unmarkedWorkspaceEvent => prisma.userNotification.create({
         data: {
           userId: notification.user.id,
           taskId: unmarkedWorkspaceEvent,
           channel: 'email',
           type: 'proposal'
         }
-      }))]
-    );
-  }
-  catch (err) {
-    log.debug(`Notifications task error with userId: ${notification.user.id} , taskIds: ${notification.unmarkedWorkspaceEvents.join(', ')}`, { error: err });
-    return undefined;
-  }
-
-  try {
-    await prisma.$transaction(
-      [...notification.voteTasks.map(voteTask => prisma.userNotification.create({
+      })), ...notification.voteTasks.map(voteTask => prisma.userNotification.create({
         data: {
           userId: notification.user.id,
           taskId: voteTask.id,
           channel: 'email',
           type: 'vote'
         }
-      }))]
-    );
-  }
-  catch (err) {
-    log.debug(`Votes Tasks error for  userId: ${notification.user.id}, taskIds: ${notification.voteTasks.map(voteTask => voteTask.id).join(', ')}`, { error: err });
-    return undefined;
-  }
-
-  try {
-    await prisma.$transaction(
-      [...notification.discussionTasks.map(discussionTask => prisma.userNotification.create({
+      })), ...notification.discussionTasks.map(discussionTask => prisma.userNotification.create({
         data: {
           userId: notification.user.id,
-          taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
+          taskId: discussionTask.taskId,
           channel: 'email',
           type: 'mention'
         }
       }))]
     );
   }
-  catch (err) {
-    log.debug(`Discussion Tasks error with userId:${notification.user.id} , tasksIds: ${notification.discussionTasks.map(item => `${item.mentionId}&${item.commentId}`).join(', ')}`, { error: err });
+  catch (error) {
+    log.error(`Adding user notifications in db failed for user ${notification.user.id}.`, { error });
     return undefined;
   }
 

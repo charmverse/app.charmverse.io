@@ -12,7 +12,7 @@ export type DiscussionTasksGroup = {
   unmarked: DiscussionTask[];
 }
 
-type Discussion = Omit<DiscussionTask, 'createdBy'> & { userId: string };
+type Discussion = Omit<DiscussionTask, 'createdBy' | 'taskId'> & { userId: string };
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
 interface GetDiscussionsInput {
@@ -126,10 +126,11 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
 
     const mentionedTask = {
       ...mentionedTaskWithoutUser,
-      createdBy: usersRecord[mentionedTaskWithoutUser.userId]
+      createdBy: usersRecord[mentionedTaskWithoutUser.userId],
+      taskId: mentionedTaskWithoutUser.mentionId // MentionId is unique enough for UserNotifications
     } as DiscussionTask;
 
-    const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
+    const taskList = notifiedTaskIds.has(mentionedTask.taskId) ? acc.marked : acc.unmarked;
     taskList.push(mentionedTask);
 
     return acc;
@@ -140,10 +141,11 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
 
     const commentTask = {
       ...commentTaskWithoutUser,
-      createdBy: usersRecord[commentTaskWithoutUser.userId]
+      createdBy: usersRecord[commentTaskWithoutUser.userId],
+      taskId: `${commentTaskWithoutUser.commentId}.${userId}` // Creating an unique identifier for Prisma UserNotifications
     } as DiscussionTask;
 
-    const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
+    const taskList = notifiedTaskIds.has(commentTask.taskId) ? acc.marked : acc.unmarked;
     taskList.push(commentTask);
 
     return acc;
