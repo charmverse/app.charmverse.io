@@ -5,7 +5,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 type Props = {
   value: string | string[];
   options?: SelectOptionType[] | null;
-  name: string;
+  name?: string;
   size?: 'small' | 'medium';
 };
 
@@ -18,7 +18,7 @@ export function SelectPreview ({ value, options = [], name, size }: Props) {
   return (
     <Stack gap={0.5}>
       <Typography fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>{name}</Typography>
-      <Stack gap={1} flexDirection='row'>
+      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
         {values.length !== 0 ? valueOptions.map(
           valueOption => <Chip sx={{ px: 0.5 }} label={valueOption.name} color={valueOption.color} key={valueOption.name} size='small' />
         ) : 'N/A'}
