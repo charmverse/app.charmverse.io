@@ -42,12 +42,12 @@ export default function NestedPage ({ node }: NodeViewProps) {
 
   const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
 
-  const appPath = isPublicShareMode ? `share/${nestedPage?.id}` : `${space?.domain}/${nestedPage?.path}`;
+  const appPath = `${isPublicShareMode ? 'share/' : ''}${space?.domain}/${nestedPage?.path}`;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
   return (
-    <NestedPageContainer href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
+    <NestedPageContainer data-test={`nested-page-${nestedPage?.id}`} href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
       <div>
         {nestedPage && <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />}
       </div>

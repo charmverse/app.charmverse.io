@@ -14,6 +14,7 @@ import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
+import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
 import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
@@ -27,8 +28,6 @@ export interface ConnectDiscordPayload {
 
 export interface ConnectDiscordResponse {
   discordUser: DiscordUser;
-  avatar: string | null;
-  username: string | null;
 }
 
 // TODO: Add nonce for oauth state
@@ -60,48 +59,47 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
   let discordUser: DiscordUser;
 
   try {
-    discordUser = await prisma.discordUser.create({
-      data: {
-        account: rest as any,
-        discordId: id,
-        user: {
-          connect: {
-            id: userId
-          }
-        }
+    // discordUser =
+
+    // We check if a user was already created using discord oauth
+    const existingDiscordUser = await prisma.discordUser.findFirst({
+      where: {
+        discordId: id
       }
     });
+
+    // If the entry exists we merge the user accounts
+    if (existingDiscordUser) {
+      discordUser = await mergeUserDiscordAccounts({
+        discordId: existingDiscordUser.discordId,
+        currentUserId: userId,
+        toDeleteUserId: existingDiscordUser.userId
+      });
+    }
+    else {
+      // If not created we create a new entry
+      discordUser = await prisma.discordUser.create({
+        data: {
+          account: rest as any,
+          discordId: id,
+          user: {
+            connect: {
+              id: userId
+            }
+          }
+        }
+      });
+    }
+
   }
   catch (error) {
-    log.warn('Error while creating Discord record - probably a duplicate account', error);
+    log.warn('Error while creating Discord record', error);
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
-      error: 'Connection to Discord failed. Another CharmVerse account is already associated with this Discord account.'
+      error: 'Connection to Discord failed.'
     });
     return;
   }
-
-  const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
-  let avatar: string | null = null;
-  if (avatarUrl) {
-    try {
-      ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
-    }
-    catch (err) {
-      log.warn('Error while uploading avatar to S3', err);
-    }
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: userId
-    },
-    data: {
-      username: discordAccount.username,
-      avatar,
-      identityType: IDENTITY_TYPES[1]
-    }
-  });
 
   // Get the discord guild attached with the spaceId
   const spaceRoles = await prisma.spaceRole.findMany({
@@ -139,10 +137,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     }
   }
 
-  res.status(200).json({
-    ...updatedUser,
-    discordUser
-  });
+  res.status(200).json({ discordUser });
 }
 
 handler.use(requireUser).post(connectDiscord);

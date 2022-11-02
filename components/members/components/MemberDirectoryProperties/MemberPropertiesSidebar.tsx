@@ -1,10 +1,8 @@
 import styled from '@emotion/styled';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, ClickAwayListener, Collapse, IconButton, InputLabel, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -12,12 +10,13 @@ import { useEffect, useState } from 'react';
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
@@ -110,15 +109,13 @@ function MemberPropertyItemForm ({
 export function MemberPropertySidebarItem ({
   property
 }: {
-  property: MemberProperty;
+  property: MemberPropertyWithPermissions;
 }) {
   const [toggled, setToggled] = useState(false);
-  const { deleteProperty } = useMemberProperties();
+  const { deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
-  const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
 
-  const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
   return (
@@ -140,13 +137,13 @@ export function MemberPropertySidebarItem ({
         }}
         onClick={() => setToggled(!toggled)}
       >
-        {/* <ArrowRightIcon
+        <ArrowRightIcon
           onClick={() => setToggled(!toggled)}
           sx={{
             transform: toggled ? 'rotate(90deg)' : 'rotate(0deg)',
             transition: 'transform 150ms ease-in-out'
           }}
-        /> */}
+        />
         <MemberPropertyItem
           type={property.type}
           name={property.name}
@@ -160,25 +157,29 @@ export function MemberPropertySidebarItem ({
               opacity: 0
             }}
           >
-            <EditIcon
-              cursor='pointer'
-              fontSize='small'
-              color='secondary'
-              onClick={(e) => {
-                e.stopPropagation();
-                propertyRenamePopupState.open();
-              }}
-            />
-            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
-              <DeleteIcon
+            <Tooltip title={`Edit ${property.name} property.`}>
+              <EditIcon
                 cursor='pointer'
                 fontSize='small'
                 color='secondary'
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteConfirmation.open();
+                  propertyRenamePopupState.open();
                 }}
               />
+            </Tooltip>
+            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+              <Tooltip title={`Delete ${property.name} property.`}>
+                <DeleteIcon
+                  cursor='pointer'
+                  fontSize='small'
+                  color='secondary'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteConfirmation.open();
+                  }}
+                />
+              </Tooltip>
             )}
             <ConfirmDeleteModal
               title='Delete property'
@@ -192,55 +193,18 @@ export function MemberPropertySidebarItem ({
           </Box>
         )}
       </MenuItem>
-      {/* <Collapse in={toggled}>
-        <Stack pl={5} pr={2.5} mb={1}>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <Typography variant='subtitle2'>Workspace</Typography>
-            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
-          </Stack>
-          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <Typography variant='subtitle2'>Admins</Typography>
-            <IconButton disabled={!admin} size='small' color='secondary'><VisibilityOutlinedIcon fontSize='small' /></IconButton>
-          </Stack>
-          <Button
-            variant='text'
-            size='small'
-            color='secondary'
-            sx={{
-              width: 'fit-content'
-            }}
-            startIcon={<AddOutlinedIcon />}
-            onClick={memberPropertySidebarItemPopupState.open}
-            disabled={!admin}
-          >
-            Add Role
-          </Button>
-        </Stack>
-      </Collapse> */}
+      <MemberPropertySidebarDetails
+        isExpanded={toggled}
+        readOnly={!admin}
+        property={property}
+        addPermissions={addPropertyPermissions}
+        removePermission={removePropertyPermission}
+      />
       <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title={`Update ${property.name}`}>
         <MemberPropertyItemForm
           close={propertyRenamePopupState.close}
           property={property}
         />
-      </Modal>
-
-      <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
-        <Stack gap={0.5}>
-          <InputLabel>Roles</InputLabel>
-          <InputSearchRoleMultiple
-            onChange={setSelectedRoleIds}
-            filter={{
-              mode: 'exclude',
-              userIds: selectedRoleIds
-            }}
-          />
-          <Button sx={{
-            mt: 1,
-            width: 'fit-content'
-          }}
-          >Add
-          </Button>
-        </Stack>
       </Modal>
     </Stack>
   );
@@ -264,7 +228,7 @@ export function MemberPropertiesSidebar ({
             title='Properties'
           />
           <Stack height='fit-content'>
-            {properties.filter(property => property.type !== 'timezone').map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
+            {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
           </Stack>
           <AddMemberPropertyButton />
         </StyledSidebar>

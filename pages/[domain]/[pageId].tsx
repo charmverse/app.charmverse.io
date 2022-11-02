@@ -16,7 +16,6 @@ export default function BlocksEditorPage () {
   const pageId = pageIdList.find(p => p.path === pagePath)?.id;
 
   return <EditorPage pageId={pageId ?? pagePath} />;
-
 }
 
 BlocksEditorPage.getLayout = getPageLayout;

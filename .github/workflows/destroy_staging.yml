@@ -1,5 +1,4 @@
-
-name: "Clean up staging"
+name: 'Clean up staging'
 
 on:
   pull_request:
@@ -26,7 +25,7 @@ jobs:
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: checkout the files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies and build app
         uses: ./.github/actions/install

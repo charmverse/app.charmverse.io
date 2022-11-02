@@ -98,6 +98,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
               return (
                 <MenuItem
+                  key={mode}
                   selected={isSelected}
                   onClick={() => {
                     setSelectedConfigurationMode(mode);
@@ -140,7 +141,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
               {
               templateExplanation[0].map(canDo => (
-                <Grid item xs={12} display='flex'>
+                <Grid key={canDo} item xs={12} display='flex'>
                   <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{canDo}</Typography>
                 </Grid>
@@ -151,7 +152,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
             <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
               {
               templateExplanation[1].map(cannotDo => (
-                <Grid item xs={12} display='flex'>
+                <Grid key={cannotDo} item xs={12} display='flex'>
                   <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{cannotDo}</Typography>
                 </Grid>

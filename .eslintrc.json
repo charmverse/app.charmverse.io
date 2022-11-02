@@ -27,6 +27,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/jsx-key": "error",
     "react/forbid-prop-types": 0,
     "@next/next/no-img-element": "off",
     "@typescript-eslint/array-type": "error",

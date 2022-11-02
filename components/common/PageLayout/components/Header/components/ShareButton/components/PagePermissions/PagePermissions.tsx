@@ -217,7 +217,7 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
       {
         sortedPermissions.map(permission => {
           return (
-            <Box display='block' py={0.5}>
+            <Box display='block' py={0.5} key={permission.id}>
               <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
                 <Typography variant='body2'>
                   {permission.displayName}

@@ -15,7 +15,16 @@ export function FieldWrapper ({ children, label, inline, iconLabel }: Props): JS
       {(label || !!iconLabel) && (
         <Box maxWidth={150} width={150} alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
-          {label && <Typography variant='subtitle2' fontWeight='bold'>{label}</Typography>}
+          {label && (
+            <Typography
+              sx={{
+                wordBreak: 'break-word'
+              }}
+              variant='subtitle2'
+              fontWeight='bold'
+            >{label}
+            </Typography>
+          )}
         </Box>
       )}
       {children}

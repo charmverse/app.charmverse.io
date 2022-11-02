@@ -1,8 +1,9 @@
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import type { BountyTask } from 'lib/bounties/getBountyTasks';
+import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
-import type { MentionedTask } from 'lib/mentions/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
@@ -14,7 +15,9 @@ const handler = nc({
   onNoMatch
 });
 
-const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }): MentionedTask => {
+const createDiscussionTask = (
+  { pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }
+): DiscussionTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
@@ -42,7 +45,8 @@ const createMentionTask = ({ pageTitle, spaceName, mentionText }: { spaceName: s
       identityType: 'Discord',
       avatarContract: null,
       avatarTokenId: null,
-      avatarChain: null
+      avatarChain: null,
+      deletedAt: null
     }
   };
 };
@@ -78,6 +82,20 @@ const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<Prop
   };
 };
 
+const createBountyTask = ({ action, pageTitle, spaceName, status }: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+  return {
+    id: v4(),
+    action,
+    pagePath: randomName(),
+    pageTitle,
+    status,
+    spaceDomain: randomName(),
+    spaceName,
+    pageId: v4(),
+    eventDate: new Date()
+  };
+};
+
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
@@ -87,6 +105,14 @@ const templates = {
         username: 'ghostpepper'
       },
       totalTasks: 6,
+      bountyTasks: [
+        createBountyTask({
+          action: 'application_pending',
+          pageTitle: 'Create a new protocol',
+          spaceName: 'Uniswap',
+          status: 'open'
+        })
+      ],
       proposalTasks: [
         createProposalTasks({
           action: 'discuss',
@@ -101,23 +127,28 @@ const templates = {
           status: 'private_draft'
         })
       ],
-      mentionedTasks: [
-        createMentionTask({
+      discussionTasks: [
+        createDiscussionTask({
+          mentionText: 'Hey there, please respond to this message.',
+          pageTitle: 'Attention please',
+          spaceName: 'CharmVerse'
+        }),
+        createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'Let\'s have a meeting @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'Take a look at this @ghostpepper',
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse'
         }),
-        createMentionTask({
+        createDiscussionTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
