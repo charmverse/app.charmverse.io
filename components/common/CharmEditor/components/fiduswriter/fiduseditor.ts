@@ -146,8 +146,8 @@ export class FidusEditor {
             }
             break;
           case 'doc_data':
+            this.onDocLoaded(); // call this first so that the loading state is up-to-date before transactions occur
             this.mod.collab.doc.receiveDocument(data);
-            this.onDocLoaded();
             break;
           case 'confirm_version':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();

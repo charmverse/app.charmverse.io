@@ -8,7 +8,7 @@ import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
-import type { ReactNode, RefObject } from 'react';
+import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
@@ -29,7 +29,6 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   renderNodeViews?: RenderNodeViewsFunction;
   className?: string;
   style?: React.CSSProperties;
-  onReady?: (editor: CoreBangleEditor<PluginMetadata>) => void;
   editorRef?: RefObject<HTMLDivElement>;
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
@@ -49,7 +48,6 @@ export const BangleEditor = React.forwardRef<
       renderNodeViews,
       className,
       style,
-      onReady = () => {},
       editorRef,
       enableSuggestions = false,
       trackChanges = false
@@ -57,7 +55,14 @@ export const BangleEditor = React.forwardRef<
     ref
   ) => {
     const renderRef = useRef<HTMLDivElement>(null);
-    const onReadyRef = useRef(onReady);
+    const { user } = useUser();
+    const enableFidusEditor = Boolean(user && pageId && trackChanges);
+    const [isLoading, setIsLoading] = useState(enableFidusEditor);
+    const isLoadingRef = useRef(enableFidusEditor);
+
+    pmViewOpts ||= {};
+    pmViewOpts.editable = () => !isLoadingRef.current;
+
     const editorViewPayloadRef = useRef({
       state,
       focusOnInit,
@@ -66,11 +71,7 @@ export const BangleEditor = React.forwardRef<
     });
     const [editor, setEditor] = useState<CoreBangleEditor>();
     const nodeViews = useNodeViews(renderRef);
-    const { user } = useUser();
     const { showMessage } = useSnackbar();
-
-    const enableFidusEditor = Boolean(user && pageId && trackChanges);
-    const [isLoading, setIsLoading] = useState(enableFidusEditor);
 
     if (enableSuggestions && !trackChanges) {
       log.error('CharmEditor: Suggestions require trackChanges to be enabled');
@@ -106,12 +107,12 @@ export const BangleEditor = React.forwardRef<
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
             setIsLoading(false);
+            isLoadingRef.current = false;
           }
         });
         fEditor.init(_editor.view, onError);
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
-      onReadyRef.current(_editor);
       setEditor(_editor);
       return () => {
         // console.log('destroy editor');
@@ -131,16 +132,7 @@ export const BangleEditor = React.forwardRef<
         <div ref={editorRef} className='bangle-editor-core'>
           {editor ? children : null}
           <div ref={renderRef} id={pageId} className={className} style={style} />
-          <LoadingComponent isLoading={isLoading} />
-          {/* {editor
-            ? (
-              <Placeholder
-                sx={placeholderSX}
-                text={placeholderText}
-                show={!!editor.view.state.doc.textContent}
-              />
-            )
-            : null} */}
+          <LoadingComponent height='200px' isLoading={isLoading} />
         </div>
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(

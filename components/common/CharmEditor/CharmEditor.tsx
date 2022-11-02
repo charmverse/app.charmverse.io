@@ -500,10 +500,6 @@ function CharmEditor (
         editable: () => !readOnly,
         plugins: []
       }}
-      placeholderSX={{
-        // This fixes the placeholder and cursor not being aligned
-        top: -34
-      }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
