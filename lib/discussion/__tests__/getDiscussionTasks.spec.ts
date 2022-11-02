@@ -277,4 +277,50 @@ describe('getDiscussionTasks', () => {
       && item.pageId === page.id
     ));
   });
+
+  it('Should return just one comment with the first valid text from all the available texts', async () => {
+    const pageAuthor = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter2 = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const page = await createPage({
+      spaceId: space1.id,
+      createdBy: pageAuthor.id,
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', value: 'xxxx' }] }] }
+    });
+
+    const commentsThread = await generateThread({
+      thread: {
+        spaceId: space1.id,
+        userId: pageCommenter.id,
+        pageId: page.id,
+        comments: [{
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Commenter just commented', type: 'text' }] }] }
+        }, {
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter2.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: '  ', type: 'text' }, { text: 'Another user just commented', type: 'text' }, { text: 'Another user just commented again', type: 'text' }] }] }
+        }]
+      }
+    });
+
+    const commentId = commentsThread.comments[1].id;
+
+    const { unmarked: newNotifications } = await getDiscussionTasks(pageCommenter.id);
+
+    expect(newNotifications).toHaveLength(1);
+
+    expectSome(newNotifications, (item) => (
+      item.commentId === commentId
+      && item.pageId === page.id
+      && item.text === 'Another user just commented'
+    ));
+  });
 });
