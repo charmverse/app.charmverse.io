@@ -11,26 +11,23 @@ export type AuthenticatedSocket = { user: SocketUser };
 
 export async function authOnConnect (socket: Socket, next: (err?: Error) => void) {
 
-  if (socket.handshake.query && typeof socket.handshake.query.token === 'string') {
-    try {
-      const session = await getSessionFromCookies(socket);
-      if (!session.user) {
-        throw new Error('User not logged in');
-      }
-
-      const user = await prisma.user.findUniqueOrThrow({
-        where: { id: session.user.id }
-      });
-
-      socket.data.user = user;
-      next();
+  try {
+    const session = await getSessionFromCookies(socket);
+    if (!session.user) {
+      throw new Error('User not logged in');
     }
-    catch (error) {
-      next(error as Error);
-    }
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: session.user.id }
+    });
+
+    // add data to the individual client socket
+    socket.data.user = user;
+
+    next();
   }
-  else {
-    next(new Error('Authentication error'));
+  catch (error) {
+    next(error as Error);
   }
 }
 

@@ -22,7 +22,6 @@ import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
-  authToken?: string;
   pageId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
@@ -42,7 +41,6 @@ export const BangleEditor = React.forwardRef<
 >(
   (
     {
-      authToken,
       pageId,
       state,
       children,
@@ -93,10 +91,9 @@ export const BangleEditor = React.forwardRef<
       );
       let fEditor: FidusEditor;
 
-      if (user && pageId && authToken && trackChanges) {
+      if (user && pageId && trackChanges) {
         // eslint-disable-next-line no-new
         fEditor = new FidusEditor({
-          authToken,
           user,
           docId: pageId,
           view: _editor.view,
@@ -111,7 +108,7 @@ export const BangleEditor = React.forwardRef<
         fEditor?.close();
         _editor.destroy();
       };
-    }, [pageId, ref, authToken]);
+    }, [pageId, ref]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(

@@ -15,7 +15,6 @@ type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 type WebSocketConnectorProps = {
   appLoaded: () => boolean;
   anythingToSend: () => boolean;
-  authToken: string;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
   restartMessage: () => ClientRestartMessage; // Too many messages have been lost and we need to restart
@@ -64,7 +63,6 @@ export class WebSocketConnector {
   constructor ({
     appLoaded,
     anythingToSend,
-    authToken,
     sendMessage,
     initialMessage,
     resubscribed,
@@ -81,10 +79,7 @@ export class WebSocketConnector {
     this.receiveData = receiveData;
     // console.log('load socket');
     this.socket = io(namespace, {
-      withCredentials: true,
-      query: {
-        token: authToken
-      }
+      withCredentials: true
       // path: '/api/socket'
     }).connect();
     this.createWSConnection();

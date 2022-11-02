@@ -40,7 +40,6 @@ const gettext = (text: string) => text;
 type User = { id: string, username: string }
 
 type EditorProps = {
-  authToken: string;
   user: User;
   docId: string;
   view: EditorView;
@@ -84,7 +83,7 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  constructor ({ authToken, user, docId, view, enableSuggestionMode }: EditorProps) {
+  constructor ({ user, docId, view, enableSuggestionMode }: EditorProps) {
     this.user = user;
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -103,21 +102,19 @@ export class FidusEditor {
       [trackPlugin, () => ({ editor: this })]
     ];
 
-    this.init(view, authToken);
+    this.init(view);
   }
 
-  init (view: EditorView, authToken: string) {
+  init (view: EditorView) {
 
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
       appLoaded: () => Boolean(this.view.state.plugins.length),
       anythingToSend: () => Boolean(sendableSteps(this.view.state)),
-      authToken,
       initialMessage: () => {
         const message: ClientSubscribeMessage = {
           roomId: this.docInfo.id,
-          authToken,
           type: 'subscribe'
         };
         // console.log('initialMessage connectionCount', this.ws?.connectionCount);

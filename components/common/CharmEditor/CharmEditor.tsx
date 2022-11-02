@@ -380,7 +380,6 @@ function CharmEditor (
   const _isEmpty = checkIsContentEmpty(content);
   const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
-  const { authToken } = useWebSocketClient();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
@@ -491,7 +490,6 @@ function CharmEditor (
   return (
     <StyledReactBangleEditor
       pageId={pageId}
-      authToken={authToken}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       enableSuggestions={enableSuggestingMode}
       trackChanges={true}

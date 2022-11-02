@@ -60,7 +60,6 @@ export type ClientDiffMessage = {
 export type ClientSubscribeMessage = {
   type: 'subscribe';
   roomId: string;
-  authToken: string;
   connection?: number;
 }
 
