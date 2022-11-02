@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
 import Button from 'components/common/Button';
@@ -15,6 +15,8 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
+import { MemberDirectorySort } from './components/MemberDirectorySort/MemberDirectorySort';
+import { sortMembers } from './components/MemberDirectorySort/utils';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
 
 const StyledButton = styled(Button)`
@@ -33,11 +35,24 @@ export default function MemberDirectoryPage () {
   const router = useRouter();
   const { members } = useMembers();
   const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
-  const { properties } = useMemberProperties();
+  const { properties = [] } = useMemberProperties();
   const [currentView, setCurrentView] = useState<View>(router.query.view as View ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
+  const [sortedProperty, setSortedProperty] = useState<string>('');
 
-  return properties && searchedMembers ? (
+  useEffect(() => {
+    setSortedProperty(properties.find(property => property.type === 'name')?.name ?? '');
+  }, [properties]);
+
+  const sortedMembers = useMemo(() => {
+    const memberProperty = sortedProperty ? properties.find(property => property.name === sortedProperty) : null;
+    if (sortedProperty && memberProperty) {
+      return sortMembers(searchedMembers, memberProperty);
+    }
+    return searchedMembers;
+  }, [sortedProperty, properties]);
+
+  return (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>Member Directory</Typography>
       <MemberDirectorySearchBar
@@ -69,19 +84,25 @@ export default function MemberDirectoryPage () {
             />
           ))}
         </Tabs>
-        <IconButton onClick={() => {
-          setTimeout(() => {
-            setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
-          });
-        }}
-        >
-          <MoreHoriz color='secondary' />
-        </IconButton>
+        <Stack flexDirection='row' gap={1}>
+          <MemberDirectorySort
+            setSortedProperty={setSortedProperty}
+            sortedProperty={sortedProperty}
+          />
+          <IconButton onClick={() => {
+            setTimeout(() => {
+              setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+            });
+          }}
+          >
+            <MoreHoriz color='secondary' />
+          </IconButton>
+        </Stack>
       </Stack>
       <Box position='relative' display='flex' height='100%'>
         <Box width='100%' overflow='auto' height='fit-content'>
-          {currentView === 'table' && <MemberDirectoryTableView members={searchedMembers} />}
-          {currentView === 'gallery' && <MemberDirectoryGalleryView members={searchedMembers} />}
+          {currentView === 'table' && <MemberDirectoryTableView members={sortedMembers} />}
+          {currentView === 'gallery' && <MemberDirectoryGalleryView members={sortedMembers} />}
         </Box>
         <MemberPropertiesSidebar
           isOpen={isPropertiesDrawerVisible}
@@ -91,5 +112,5 @@ export default function MemberDirectoryPage () {
         />
       </Box>
     </CenteredPageContent>
-  ) : null;
+  );
 }

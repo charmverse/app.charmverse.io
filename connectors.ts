@@ -290,8 +290,8 @@ const supportedChains: Blockchain[] = [
   'HARMONY_DEVNET',
   'BSC',
   'GOERLI',
-  'RINKEBY',
-  'MUMBAI'
+  'MUMBAI',
+  'RINKEBY'
 ];
 
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);

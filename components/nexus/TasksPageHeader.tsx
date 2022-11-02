@@ -141,7 +141,7 @@ export default function TasksPageHeader () {
                       }
                     }}
                   >
-                    Multisig accounts
+                    Multisig Accounts
                   </Typography>
                 </Box>
               </Box>
