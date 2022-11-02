@@ -6,6 +6,8 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocket } from '../authentication';
 
@@ -215,7 +217,7 @@ export class DocumentEventHandler {
             version: page.version,
             diffs: []
           },
-          node: page.content,
+          node: getNodeFromJson(page.content),
           participants: { [this.id]: this }
         };
         docRooms.set(pageId, room);
@@ -265,14 +267,13 @@ export class DocumentEventHandler {
   }
 
   async handleDiff (message: WrappedSocketMessage<ClientDiffMessage>) {
-    const session = this.getSession();
     const room = this.getDocumentRoom();
     const pv = message.v;
     const dv = room.doc.version;
     log.debug('Handling diff');
     if (pv === dv) {
-      if ('ds' in message) {
-        const updatedNode = prosemirror.apply(message.ds, room.node);
+      if (message.ds) {
+        const updatedNode = applyStepsToNode(message.ds, room.node);
         if (updatedNode) {
           room.node = updatedNode;
         }
@@ -284,7 +285,7 @@ export class DocumentEventHandler {
           this.resetCollaboration(patchError);
           return;
         }
-        room.doc.content = prosemirror.encode(updatedNode);
+        room.doc.content = updatedNode.toJSON();
       }
       room.doc.diffs.push(message);
       room.doc.diffs = room.doc.diffs.slice(this.historyLength);
@@ -444,6 +445,7 @@ export class DocumentEventHandler {
       where: { id: room.doc.id },
       data: {
         content: room.doc.content,
+        contentText: room.node.textContent,
         version: room.doc.version,
         updatedAt: new Date(),
         updatedBy: userId

@@ -114,7 +114,7 @@ export class ModCollabDoc {
         return plugin[0]();
       }
     });
-    console.log('load plugins!', stateDoc)
+
     const stateConfig = {
       schema: this.mod.editor.schema,
       doc: stateDoc,
