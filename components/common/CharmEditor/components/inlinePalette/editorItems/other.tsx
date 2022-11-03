@@ -23,6 +23,8 @@ interface ItemsProps {
   pageType?: PageType;
 }
 
+const iconSize = 30;
+
 export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
 
   const { addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType } = props;
@@ -30,7 +32,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
     {
       uid: 'price',
       title: 'Crypto price',
-      icon: <InsertChartIcon sx={{ fontSize: 16 }} />,
+      icon: <InsertChartIcon sx={{ fontSize: iconSize }} />,
       description: 'Display a crypto price',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -60,7 +62,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       uid: 'horizontal_rule',
       title: 'Horizontal Rule',
       keywords: ['divider', 'hr'],
-      icon: <HorizontalRuleIcon sx={{ fontSize: 16 }} />,
+      icon: <HorizontalRuleIcon sx={{ fontSize: iconSize }} />,
       description: 'Display horizontal rule',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -91,7 +93,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       requiredSpacePermission: 'createPage',
       keywords: ['page'],
       icon: <DescriptionOutlinedIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Insert a new page',
@@ -114,7 +116,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Link to page',
       keywords: ['link', 'page'],
       icon: <DescriptionOutlinedIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Link to a new page',

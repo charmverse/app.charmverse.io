@@ -1,5 +1,6 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, ListItemText, Paper, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
@@ -10,6 +11,7 @@ import {
 interface InlinePaletteRowProps {
   dataId: string;
   title?: string;
+  description?: string;
   isActive?: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   icon?: JSX.Element | null;
@@ -22,12 +24,11 @@ interface InlinePaletteRowProps {
 }
 
 const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
-  padding: 0.5rem 0;
+  padding: 0.3rem 0;
+  min-height: 55px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(1.5)};
-  width: 100%;
   font-weight: bold;
   font-size: 14px;
 `;
@@ -35,6 +36,7 @@ const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
 export default function InlinePaletteRow ({
   dataId,
   title,
+  description,
   isActive,
   onClick,
   icon = null,
@@ -46,6 +48,7 @@ export default function InlinePaletteRow ({
   allowHover = !isTouchDevice()
 }: InlinePaletteRowProps) {
   const ref = useRef<HTMLInputElement>(null);
+  const theme = useTheme();
 
   const [, setHover] = useState(false);
 
@@ -79,8 +82,17 @@ export default function InlinePaletteRow ({
       className={className}
       style={style}
     >
-      <Box display='flex' sx={{ color: 'secondary.light' }} component='span'>{icon}</Box>
-      {title}
+      <Paper
+        elevation={0}
+        variant='outlined'
+        sx={{ width: 46, height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'secondary.light', marginLeft: '10px' }}
+      >
+        {icon}
+      </Paper>
+      <Box padding='0 12px 0 6px' display='flex' flexDirection='column'>
+        <Typography variant='body2' noWrap whiteSpace='normal'>{title}</Typography>
+        <Typography variant='caption' noWrap whiteSpace='normal' color='secondary.light'>{description}</Typography>
+      </Box>
     </StyledInlinePaletteRow>
   );
 }

@@ -18,6 +18,8 @@ import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
+const iconSize = 30;
+
 function createTableCell (state: EditorState, text: string) {
   return state.schema.nodes.table_cell.create(undefined, Fragment.fromArray([
     state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
@@ -39,7 +41,7 @@ function createColumnPaletteItem (colCount: number): PaletteItemTypeNoGroup {
     uid: `column ${colCount}`,
     title: `${colCount} Columns`,
     icon: <ViewColumnIcon
-      sx={{ fontSize: 16 }}
+      sx={{ fontSize: iconSize }}
     />,
     description: `${colCount} Column Layout`,
     editorExecuteCommand: () => {
@@ -92,7 +94,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'image',
       title: 'Image',
       icon: <ImageIcon
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: iconSize }}
       />,
       description: 'Insert a image block in the line below',
       editorExecuteCommand: () => {
@@ -121,7 +123,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'pdf',
       title: 'PDF',
       icon: <PictureAsPdfIcon
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: iconSize }}
       />,
       description: 'Insert a PDF block in the line below',
       editorExecuteCommand: () => {
@@ -151,7 +153,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'video',
       title: 'Video',
       icon: <VideoLibraryIcon
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: iconSize }}
       />,
       description: 'Insert a video block in the line below',
       editorExecuteCommand: () => {
@@ -187,7 +189,7 @@ export function items (): PaletteItemTypeNoGroup[] {
     {
       uid: 'embed',
       title: 'Embed',
-      icon: <PreviewIcon sx={{ fontSize: 16 }} />,
+      icon: <PreviewIcon sx={{ fontSize: iconSize }} />,
       keywords: ['iframe'],
       description: 'Insert an embed block in the line below',
       editorExecuteCommand: () => {
@@ -221,7 +223,7 @@ export function items (): PaletteItemTypeNoGroup[] {
     {
       uid: 'insertSimpleTable',
       icon: <DatabaseIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       title: 'Table',
@@ -258,7 +260,7 @@ export function items (): PaletteItemTypeNoGroup[] {
     createColumnPaletteItem(3),
     {
       uid: 'insertDisclosure',
-      icon: <ArrowForwardIcon sx={{ fontSize: 16 }} />,
+      icon: <ArrowForwardIcon sx={{ fontSize: iconSize }} />,
       title: 'Toggle List/Heading',
       keywords: ['summary', 'disclosure', 'toggle', 'collapse'],
       description: 'Insert a summary and content',

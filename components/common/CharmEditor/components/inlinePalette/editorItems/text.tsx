@@ -19,6 +19,8 @@ import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
+const iconSize = 30;
+
 const { convertToParagraph } = paragraph;
 const {
   toggleTodoList,
@@ -40,7 +42,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       keywords: ['paragraph', 'text'],
       title: 'Text',
       icon: <TextFieldsIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Convert the current block to paragraph',
@@ -71,7 +73,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'code',
       title: 'Code',
       icon: <CodeIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Insert a code block in the line below',
@@ -100,7 +102,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'callout',
       title: 'Callout',
       icon: <ChatBubbleIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Insert a callout block in the line below',
@@ -139,7 +141,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'quote',
       title: 'Quote',
       icon: <ChatOutlinedIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       description: 'Insert a quote in the line below',
@@ -178,7 +180,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       const level = i + 1;
       return {
         uid: `headingConvert${level}`,
-        icon: <svg stroke='currentColor' fill='currentColor' strokeWidth={0} viewBox='0 0 512 512' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z' /></svg>,
+        icon: <svg stroke='currentColor' fill='currentColor' strokeWidth={0} viewBox='0 0 512 512' height='30px' width='30px' xmlns='http://www.w3.org/2000/svg'><path d='M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z' /></svg>,
         title: `Heading ${level}`,
         description: `Convert the current block to heading level ${level}`,
         disabled: (state) => {
