@@ -112,7 +112,7 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
 
     return newPermission;
   }, {
-    timeout: 10000
+    timeout: 20000
   });
 
   return res.status(201).json(createdPermission);
