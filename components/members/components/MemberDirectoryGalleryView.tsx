@@ -10,6 +10,7 @@ import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesM
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
@@ -28,6 +29,7 @@ function MemberDirectoryGalleryCard ({
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
+  const admin = isAdmin();
 
   return (
     <>
@@ -41,7 +43,7 @@ function MemberDirectoryGalleryCard ({
         }}
       >
         <Card sx={{ width: '100%' }}>
-          {user?.id === member.id && currentSpace && (
+          {((user?.id === member.id && currentSpace) || admin) && (
             <IconButton
               size='small'
               sx={{
@@ -126,7 +128,7 @@ function MemberDirectoryGalleryCard ({
       {isModalOpen && user && currentSpace && (
         <MemberPropertiesPopupForm
           onClose={() => setIsModalOpen(false)}
-          memberId={user.id}
+          memberId={member.id}
           spaceId={currentSpace.id}
           updateMemberPropertyValues={updateSpaceValues}
         />
