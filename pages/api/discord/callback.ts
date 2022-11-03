@@ -36,7 +36,8 @@ handler.get(async (req, res) => {
   if (type === 'login') {
     try {
       const discordApiUrl = isTestEnv ? req.query.discordApiUrl as string : undefined;
-      const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host, discordApiUrl });
+      const user = await loginByDiscord({ code: tempAuthCode, hostName: req.headers.host, discordApiUrl, userId: req.session.anonymousUserId });
+      req.session.anonymousUserId = undefined;
       req.session.user = { id: user.id };
       await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
     }

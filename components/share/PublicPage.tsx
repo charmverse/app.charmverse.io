@@ -96,6 +96,12 @@ export default function PublicPage () {
           router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
         }
 
+        charmClient.track.trackAction('page_view', {
+          type: rootPage.type,
+          pageId: rootPage.id,
+          spaceId: rootPage.spaceId
+        });
+
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
         setBasePageId(rootPage.id);
