@@ -4,14 +4,16 @@ import type { Signer } from 'ethers';
 import { getAddress, toUtf8Bytes } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
+import charmClient from 'charmClient';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
+import { ExternalServiceError, InvalidInputError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { LoggedInUser } from 'models';
 
 import { Web3Connection } from '../components/_app/Web3ConnectionManager';
-import { ExternalServiceError } from '../lib/utilities/errors';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 
@@ -24,6 +26,13 @@ type IContext = {
   triedEager: boolean;
   getStoredSignature: (account: string) => AuthSig | null;
   disconnectWallet: () => void;
+  // Used by useUser to pass the user to the Web3 context
+  setLoggedInUser: (user: LoggedInUser | null) => void;
+  // Which tool is providing the web3 connection ie. Metamas, WalletConnect, etc.
+  connector: any;
+  connectableWalletDetected: boolean;
+  // Trigger workflow to connect a new wallet to current account
+  connectNewWallet: () => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -34,17 +43,28 @@ export const Web3Context = createContext<Readonly<IContext>>({
   getStoredSignature: () => null,
   disconnectWallet: () => null,
   library: null,
-  chainId: null
+  chainId: null,
+  setLoggedInUser: (user: LoggedInUser | null) => null,
+  connector: null,
+  connectableWalletDetected: false,
+  connectNewWallet: () => null
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
-  const { account, library, chainId } = useWeb3React();
-  const { triedEager } = useContext(Web3Connection);
+  const { account, library, chainId, connector } = useWeb3React();
+
+  const { triedEager, openWalletSelectorModal } = useContext(Web3Connection);
+
+  // We only expose this account if there is no active user, or the account is linked to the current user
+  const [storedAccount, setStoredAccount] = useState<string | null>(null);
+
+  const [isConnectableWallet, setIsConnectableWallet] = useState(false);
 
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
+  const [user, setLoggedInUser] = useState<LoggedInUser | null>(null);
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
@@ -66,6 +86,10 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     }
   }
 
+  const setCurrentUser = useCallback((updatedUser: LoggedInUser | null) => {
+    setLoggedInUser(updatedUser);
+  }, []);
+
   function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
 
     if (writeToLocalStorage) {
@@ -85,13 +109,33 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
     //  Automagic lit signature update only
     if (account) {
-      const storedWalletSignature = getStoredSignature(account);
-      setSignature(storedWalletSignature);
+
+      if (
+        (user?.wallets.some(w => w.address === account)) || !user
+      ) {
+        setStoredAccount(account);
+
+        const storedWalletSignature = getStoredSignature(account);
+        setSignature(storedWalletSignature);
+
+        setIsConnectableWallet(false);
+      // Provide access to account since there is no current user
+      }
+      // Ignore the account if it is not linked to the current user
+      else {
+        setStoredAccount(null);
+
+        charmClient.blockchain.isConnectableWallet(account)
+          .then(({ connectable }) => setIsConnectableWallet(connectable))
+          .catch(() => setIsConnectableWallet(false));
+      }
+
     }
     else {
       setSignature(null);
+      setStoredAccount(null);
     }
-  }, [account]);
+  }, [account, user]);
 
   async function sign (): Promise<AuthSig> {
 
@@ -147,9 +191,28 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     }
   }
 
+  function connectNewWallet () {
+    if (!isConnectableWallet) {
+      throw new InvalidInputError('The currently detected wallet is not connectable');
+    }
+
+    openWalletSelectorModal();
+  }
+
   const value = useMemo(() => ({
-    account, walletAuthSignature, triedEager, sign, getStoredSignature, disconnectWallet, library, chainId
-  }) as IContext, [account, walletAuthSignature, triedEager]);
+    account: storedAccount,
+    walletAuthSignature,
+    triedEager,
+    sign,
+    getStoredSignature,
+    disconnectWallet,
+    library,
+    chainId,
+    setLoggedInUser: setCurrentUser,
+    connector
+  }) as IContext, [account, walletAuthSignature, triedEager, storedAccount]);
+
+  // console.log('Current account', storedAccount);
 
   return (
     <Web3Context.Provider value={value}>

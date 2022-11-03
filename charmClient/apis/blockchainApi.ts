@@ -6,5 +6,9 @@ export class BlockchainApi {
   listNFTs (userId: string) {
     return http.GET<NftData[]>(`/api/nft/list/${userId}`);
   }
+
+  isConnectableWallet (address: string) {
+    return http.POST<{ connectable: boolean }>('/api/profile/is-connectable-wallet', { address });
+  }
 }
 

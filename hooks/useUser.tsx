@@ -29,7 +29,7 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
@@ -101,14 +101,19 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setUser(u => u ? { ...u, ...updatedUser } : null);
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    setUser,
-    isLoaded,
-    setIsLoaded,
-    updateUser,
-    loginFromWeb3Account,
-    refreshUserWithWeb3Account }) as IContext, [user, isLoaded]);
+  const value = useMemo(() => {
+
+    setLoggedInUserForWeb3Hook(user);
+
+    return {
+      user,
+      setUser,
+      isLoaded,
+      setIsLoaded,
+      updateUser,
+      loginFromWeb3Account,
+      refreshUserWithWeb3Account } as IContext;
+  }, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>
