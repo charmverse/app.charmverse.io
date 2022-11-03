@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 } from 'uuid';
 
 import { isProdEnv } from 'config/constants';
 import { prisma } from 'db';
@@ -11,7 +11,8 @@ import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
 import { IDENTITY_TYPES } from 'models';
 
-export default async function loginByDiscord ({ code, hostName, discordApiUrl }: { code: string, hostName?: string, discordApiUrl?: string }) {
+export default async function loginByDiscord ({ code, hostName, discordApiUrl, userId = v4() }:
+{ code: string, hostName?: string, discordApiUrl?: string, userId?: string }) {
 
   const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
   const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
@@ -35,7 +36,6 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
     const { id, ...rest } = discordAccount;
     const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
     let avatar: string | null = null;
-    const userId = uuid();
     if (avatarUrl) {
       try {
         ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));

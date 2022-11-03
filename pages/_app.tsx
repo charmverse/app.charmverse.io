@@ -42,6 +42,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
+import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
 import { createThemeLightSensitive } from 'theme';
 import cssVariables from 'theme/cssVariables';
@@ -199,6 +200,15 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   }, 180000);
 
   // wait for router to be ready, as we rely on the URL to know what space to load
+
+  const { refreshSignupData } = useUserAcquisition();
+
+  useEffect(() => {
+    if (router.isReady) {
+      refreshSignupData();
+    }
+
+  }, [router.isReady]);
 
   if (!router.isReady) {
     return null;

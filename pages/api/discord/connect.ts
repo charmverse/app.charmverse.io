@@ -28,8 +28,6 @@ export interface ConnectDiscordPayload {
 
 export interface ConnectDiscordResponse {
   discordUser: DiscordUser;
-  avatar: string | null;
-  username: string | null;
 }
 
 // TODO: Add nonce for oauth state
@@ -103,28 +101,6 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     return;
   }
 
-  const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
-  let avatar: string | null = null;
-  if (avatarUrl) {
-    try {
-      ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
-    }
-    catch (err) {
-      log.warn('Error while uploading avatar to S3', err);
-    }
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: userId
-    },
-    data: {
-      username: discordAccount.username,
-      avatar,
-      identityType: IDENTITY_TYPES[1]
-    }
-  });
-
   // Get the discord guild attached with the spaceId
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -161,10 +137,7 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
     }
   }
 
-  res.status(200).json({
-    ...updatedUser,
-    discordUser
-  });
+  res.status(200).json({ discordUser });
 }
 
 handler.use(requireUser).post(connectDiscord);

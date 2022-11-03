@@ -1,13 +1,15 @@
 import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import Link from 'components/common/Link';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
-import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 function MemberDirectoryGalleryCard ({
@@ -17,10 +19,11 @@ function MemberDirectoryGalleryCard ({
 }) {
   const { properties = [] } = useMemberProperties();
   const nameProperty = properties.find(property => property.type === 'name');
+  const [currentSpace] = useCurrentSpace();
 
   return (
     <Link
-      href={`/u/${member.path || member.id}`}
+      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
       color='primary'
       sx={{
         '&:hover': {
@@ -71,30 +74,20 @@ function MemberDirectoryGalleryCard ({
                   </Stack>
                 );
               }
+              case 'select':
               case 'multiselect': {
-                const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
-                return (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
-                    </Stack>
-                  </Stack>
-                );
+                return memberPropertyValue
+                  ? (
+                    <SelectPreview
+                      size='small'
+                      options={property.options as SelectOptionType[]}
+                      value={memberPropertyValue.value as (string | string[])}
+                      name={property.name}
+                    />
+                  )
+                  : null;
               }
-              case 'select': {
-                const propertyValue = memberPropertyValue?.value as PropertyOption;
-                return (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                    {propertyValue ? (
-                      <Stack gap={1} flexDirection='row'>
-                        <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
-                      </Stack>
-                    ) : <Typography variant='body2'>N/A</Typography>}
-                  </Stack>
-                );
-              }
+
               default: {
                 return null;
               }

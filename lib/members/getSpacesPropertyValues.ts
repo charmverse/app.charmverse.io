@@ -19,7 +19,7 @@ export async function getSpacesPropertyValues ({ memberId, requestingUserId, spa
     }
   });
 
-  let propertyValues = getPropertiesWithValues(visibleMemberProperties, memberPropertyValues);
+  let propertyValues = getPropertiesWithValues(visibleMemberProperties, memberPropertyValues, { withSpaceDetails: true });
 
   if (visibleMemberProperties.find(mp => mp.type === 'role')) {
     const spaceRolesMap = await getSpaceMemberRoles({ spaceIds, memberId });
