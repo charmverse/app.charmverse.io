@@ -111,6 +111,8 @@ async function addPagePermission (req: NextApiRequest, res: NextApiResponse<IPag
     updateTrackPageProfile(pageId);
 
     return newPermission;
+  }, {
+    timeout: 10000
   });
 
   return res.status(201).json(createdPermission);
