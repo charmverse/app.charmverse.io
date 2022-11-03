@@ -1,13 +1,14 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 type Props = {
   spaceName: string;
@@ -36,9 +37,16 @@ const StyledAccordionSummary = styled(AccordionSummary)`
   }
 `;
 
+function DeviceSensitiveAccordionSummary ({ children }: { children: ReactNode }) {
+  const touchScreen = isTouchScreen();
+
+  return touchScreen
+    ? <AccordionSummary expandIcon={<ExpandMoreIcon />}>{children}</AccordionSummary>
+    : <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>{children}</StyledAccordionSummary>;
+}
+
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
-  const theme = useTheme();
 
   useEffect(() => {
     setExpanded(defaultExpanded);
@@ -51,9 +59,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
         setExpanded(!expanded);
       }}
     >
-      <StyledAccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-      >
+      <DeviceSensitiveAccordionSummary>
         <WorkspaceAvatar
           name={spaceName}
           image={spaceImage}
@@ -75,7 +81,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
             </IconButton>
           )}
         </Box>
-      </StyledAccordionSummary>
+      </DeviceSensitiveAccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
