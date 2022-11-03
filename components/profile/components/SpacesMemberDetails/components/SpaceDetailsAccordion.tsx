@@ -1,3 +1,5 @@
+import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
@@ -16,8 +18,27 @@ type Props = {
   expanded?: boolean;
 };
 
+const StyledAccordionSummary = styled(AccordionSummary)`
+  &:hover .icons {
+    opacity: 1;
+    transition: ${({ theme }) => theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.enteringScreen
+  })}
+  }
+
+  & .icons {
+    opacity: 0;
+    transition: ${({ theme }) => theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.leavingScreen
+  })}
+  }
+`;
+
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
+  const theme = useTheme();
 
   useEffect(() => {
     setExpanded(defaultExpanded);
@@ -30,7 +51,9 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
         setExpanded(!expanded);
       }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <StyledAccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+      >
         <WorkspaceAvatar
           name={spaceName}
           image={spaceImage}
@@ -39,6 +62,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           <Typography ml={2} variant='h6'>{spaceName}</Typography>
           {!readOnly && (
             <IconButton
+              className='icons'
               sx={{ mx: 1 }}
               onClick={(e) => {
                 e.preventDefault();
@@ -51,7 +75,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
             </IconButton>
           )}
         </Box>
-      </AccordionSummary>
+      </StyledAccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
