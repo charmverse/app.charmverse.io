@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -20,34 +19,27 @@ type Props = {
 };
 
 const StyledAccordionSummary = styled(AccordionSummary)`
-  &:hover .icons {
-    opacity: 1;
-    transition: ${({ theme }) => theme.transitions.create('opacity', {
+  ${({ theme }) => !isTouchScreen() && `
+    &:hover .icons {
+      opacity: 1;
+      transition: ${theme.transitions.create('opacity', {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.enteringScreen
   })}
-  }
+    }
 
-  & .icons {
-    opacity: 0;
-    transition: ${({ theme }) => theme.transitions.create('opacity', {
+    & .icons {
+      opacity: 0;
+      transition: ${theme.transitions.create('opacity', {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.leavingScreen
   })}
-  }
+  `}
 `;
-
-function DeviceSensitiveAccordionSummary ({ children }: { children: ReactNode }) {
-  const touchScreen = isTouchScreen();
-
-  return touchScreen
-    ? <AccordionSummary expandIcon={<ExpandMoreIcon />}>{children}</AccordionSummary>
-    : <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>{children}</StyledAccordionSummary>;
-}
 
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
-
+  const touchScreen = isTouchScreen();
   useEffect(() => {
     setExpanded(defaultExpanded);
   }, [defaultExpanded]);
@@ -59,7 +51,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
         setExpanded(!expanded);
       }}
     >
-      <DeviceSensitiveAccordionSummary>
+      <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar
           name={spaceName}
           image={spaceImage}
@@ -69,19 +61,18 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           {!readOnly && (
             <IconButton
               className='icons'
-              sx={{ mx: 1 }}
+              sx={{ mx: 1, opacity: touchScreen ? (expanded ? 1 : 0) : 'inherit' }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onEdit();
               }}
-              data-testid='edit-identity'
             >
               <EditIcon fontSize='small' />
             </IconButton>
           )}
         </Box>
-      </DeviceSensitiveAccordionSummary>
+      </StyledAccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
