@@ -1,6 +1,7 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, ListItemText, Paper, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
@@ -48,7 +49,6 @@ export default function InlinePaletteRow ({
   allowHover = !isTouchDevice()
 }: InlinePaletteRowProps) {
   const ref = useRef<HTMLInputElement>(null);
-  const theme = useTheme();
 
   const [, setHover] = useState(false);
 
