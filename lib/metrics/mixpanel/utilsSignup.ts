@@ -14,20 +14,6 @@ const referrerMapping: Record<Exclude<SignupSource, '' | 'direct' | 'other'>, st
   youtube: 'www.youtube.com'
 };
 
-const campaignPrefix = 'utm_campaign=';
-
-function extractCampaign (url: string = ''): string {
-
-  if (url.match(campaignPrefix)) {
-
-    const campaign = url.split(campaignPrefix)[1];
-
-    return campaign.split('&')[0];
-  }
-
-  return '';
-}
-
 function extractSignupSource (url: string = ''): SignupSource {
 
   try {
@@ -59,7 +45,7 @@ export function extractSignupAnalytics (data: Record<SignupCookieType, string>):
     signupSource: ''
   };
 
-  signupAnalytics.signupCampaign = extractCampaign(data.marketingCampaign ?? data.appCampaign);
+  signupAnalytics.signupCampaign = data.marketingCampaign ?? data.appCampaign ?? '';
   signupAnalytics.signupSource = extractSignupSource(data.marketingReferrer ?? data.appReferrer);
   signupAnalytics.signupLandingUrl = decodeURIComponent(data.marketingLandingPage ?? data.appLandingPage);
 
