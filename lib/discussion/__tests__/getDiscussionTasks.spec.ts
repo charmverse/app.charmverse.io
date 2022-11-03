@@ -306,7 +306,7 @@ describe('getDiscussionTasks', () => {
           userId: pageCommenter2.id,
           createdAt: new Date(),
           updatedAt: new Date(),
-          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: '  ', type: 'text' }, { text: 'Another user just commented', type: 'text' }, { text: 'Another user just commented again', type: 'text' }] }] }
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Make this change ', type: 'text' }, { type: 'mention', attrs: { id: '9899800b-407e-4709-a15a-9b2bf1d6ad2d', type: 'user', track: [], value: pageCommenter.id, createdAt: '2022-11-03T09:37:26.670Z', createdBy: pageCommenter2.id } }, { text: ' dsadsadasd dsadsadsa', type: 'text' }] }] }
         }]
       }
     });
@@ -320,7 +320,7 @@ describe('getDiscussionTasks', () => {
     expectSome(newNotifications, (item) => (
       item.commentId === commentId
       && item.pageId === page.id
-      && item.text === 'Another user just commented'
+      && item.text === 'Make this change @Username dsadsadasd dsadsadsa'
     ));
   });
 });
