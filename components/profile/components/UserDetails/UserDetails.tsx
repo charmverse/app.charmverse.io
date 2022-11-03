@@ -3,10 +3,11 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWRImmutable from 'swr/immutable';
@@ -20,6 +21,7 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import useENSName from 'hooks/useENSName';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { isTouchScreen } from 'lib/utilities/browser';
 import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType, LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -47,6 +49,41 @@ export interface UserDetailsProps {
   user: PublicUser | LoggedInUser;
   updateUser?: Dispatch<SetStateAction<LoggedInUser | null>>;
   sx?: SxProps;
+}
+
+const StyledStack = styled(Stack)`
+  &:hover .icons {
+    opacity: 1;
+    transition: ${({ theme }) => theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.enteringScreen
+  })}
+  }
+
+  & .icons {
+    opacity: ${() => isTouchScreen() ? 1 : 0};
+    transition: ${({ theme }) => theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.leavingScreen
+  })}
+  }
+`;
+
+function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {
+  return (
+    <StyledStack
+      direction='row'
+      spacing={1}
+      alignItems='center'
+    >
+      {children}
+      {!readOnly && (
+        <IconButton onClick={onClick} {...props} className='icons'>
+          <EditIcon fontSize='small' />
+        </IconButton>
+      )}
+    </StyledStack>
+  );
 }
 
 function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
@@ -145,19 +182,18 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <Stack direction='row' spacing={1} alignItems='end'>
+            <EditIconContainer
+              data-testid='edit-identity'
+              readOnly={readOnly}
+              onClick={identityModalState.open}
+            >
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{user?.username}</Typography>
-              {!readOnly && (
-                <IconButton onClick={identityModalState.open} data-testid='edit-identity'>
-                  <EditIcon fontSize='small' />
-                </IconButton>
-              )}
-            </Stack>
+            </EditIconContainer>
           </Grid>
           {!readOnly && (
             <Grid item>
-              <Stack direction='row' spacing={1} alignItems='baseline'>
+              <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
                 <Typography>
                   {hostname}/u/<Link external href={userLink} target='_blank'>{userPath}</Link>
                 </Typography>
@@ -174,54 +210,33 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
                     </CopyToClipboard>
                   </Box>
                 </Tooltip>
-                <IconButton onClick={userPathModalState.open}>
-                  <EditIcon fontSize='small' />
-                </IconButton>
-              </Stack>
+              </EditIconContainer>
             </Grid>
           )}
           <Grid item mt={1} height={40}>
-            <SocialIcons social={socialDetails}>
+            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
+              <SocialIcons social={socialDetails} />
               {!readOnly && (
-                <>
-                  <StyledDivider orientation='vertical' flexItem />
-                  <IconButton onClick={socialModalState.open} data-testid='edit-social'>
-                    <EditIcon fontSize='small' />
-                  </IconButton>
-                </>
+                <StyledDivider orientation='vertical' flexItem />
               )}
-            </SocialIcons>
+            </EditIconContainer>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <Grid item xs={11} sx={{ wordBreak: 'break-word' }}>
+            <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
                 {
                   userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
                 }
               </span>
-            </Grid>
-            <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              {!readOnly && (
-                <IconButton onClick={descriptionModalState.open} data-testid='edit-description'>
-                  <EditIcon fontSize='small' />
-                </IconButton>
-              )}
-            </Grid>
+            </EditIconContainer>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <Grid item xs={11} sx={{ wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <EditIconContainer readOnly={readOnly} onClick={timezoneModalState.open} data-testid='edit-timezone'>
               <TimezoneDisplay
                 timezone={userDetails?.timezone}
                 defaultValue={(readOnly ? 'N/A' : 'Update your timezone')}
               />
-            </Grid>
-            <Grid item xs={1} px={1} justifyContent='end' sx={{ display: 'flex' }}>
-              {!readOnly && (
-                <IconButton onClick={timezoneModalState.open} data-testid='edit-timezone'>
-                  <EditIcon fontSize='small' />
-                </IconButton>
-              )}
-            </Grid>
+            </EditIconContainer>
           </Grid>
         </Grid>
       </Stack>
