@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { READONLY_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { updateMemberPropertyValue } from 'lib/members/updateMemberPropertyValue';
 import { mapPropertyValueWithDetails } from 'lib/members/utils';
@@ -11,7 +12,17 @@ type UpdatePropertyInput = {
 }
 
 export async function updateMemberPropertyValues ({ data, userId, spaceId, updatedBy }: UpdatePropertyInput): Promise<PropertyValueWithDetails[]> {
-  const queries = data.map(propertyValue => updateMemberPropertyValue({ data: propertyValue, userId, spaceId, updatedBy }));
+  const writableProperties = await prisma.memberProperty.findMany({
+    where: {
+      id: { in: data.map(d => d.memberPropertyId) },
+      type: { notIn: READONLY_MEMBER_PROPERTIES }
+    }
+  });
+
+  const writableIds = writableProperties.map(p => p.id);
+  const queries = data
+    .filter(pv => writableIds.includes(pv.memberPropertyId))
+    .map(pv => updateMemberPropertyValue({ data: pv, userId, spaceId, updatedBy }));
 
   const updated = await prisma.$transaction(queries);
   return updated.map(mapPropertyValueWithDetails);

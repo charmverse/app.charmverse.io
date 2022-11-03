@@ -17,9 +17,12 @@ export function updateMemberPropertyValue ({ data, userId, spaceId, updatedBy }:
         spaceId
       }
     },
-    update: { value: data.value || undefined, updatedBy },
+    update: {
+      value: data.value || '',
+      updatedBy
+    },
     create: {
-      value: data.value || undefined,
+      value: data.value || '',
       updatedBy,
       memberPropertyId: data.memberPropertyId,
       userId,

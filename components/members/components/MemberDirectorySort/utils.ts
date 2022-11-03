@@ -5,7 +5,6 @@ import type { Member } from 'lib/members/interfaces';
 
 export function sortMembers (members: Member[], property: MemberProperty) {
   switch (property.type) {
-    case 'name':
     case 'phone':
     case 'email':
     case 'text':
@@ -15,6 +14,13 @@ export function sortMembers (members: Member[], property: MemberProperty) {
         const memberAProperty = memA.properties.find(prop => prop.memberPropertyId === property.id);
         const memberBProperty = memB.properties.find(prop => prop.memberPropertyId === property.id);
         return (memberAProperty?.value ?? '') > (memberBProperty?.value ?? '') ? 1 : -1;
+      });
+    case 'name':
+      return members.sort((memA, memB) => {
+        const memberAProperty = memA.properties.find(prop => prop.memberPropertyId === property.id);
+        const memberBProperty = memB.properties.find(prop => prop.memberPropertyId === property.id);
+        // Use username if value is empty
+        return (memberAProperty?.value ?? memA.username) > (memberBProperty?.value ?? memB.username) ? 1 : -1;
       });
     case 'timezone': {
       return members.sort((memA, memB) => {

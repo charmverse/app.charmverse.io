@@ -2,9 +2,12 @@ import styled from '@emotion/styled';
 import { Box, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import Link from 'components/common/Link';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member } from 'lib/members/interfaces';
 
@@ -20,6 +23,8 @@ export function MemberDirectoryTableView ({
   members: Member[];
 }) {
   const { properties = [] } = useMemberProperties();
+  const [currentSpace] = useCurrentSpace();
+
   return (
     <Table
       size='small'
@@ -104,7 +109,7 @@ export function MemberDirectoryTableView ({
                     case 'name': {
                       return (
                         <TableCell>
-                          <Link color='inherit' href={`/u/${member.path || member.id}`}>
+                          <Link color='inherit' href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}>
                             <Typography fontWeight='bold'>
                               {memberProperty.value ?? member.username}
                             </Typography>
@@ -123,24 +128,20 @@ export function MemberDirectoryTableView ({
                         </TableCell>
                       );
                     }
+
+                    case 'select':
                     case 'multiselect': {
-                      const values = (memberProperty?.value ?? [])as string[];
                       return (
                         <TableCell key={property.id}>
-                          <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                            {values.length === 0 ? 'N/A' : values.map(propertyValue => <Chip label={propertyValue} key={propertyValue} size='small' variant='outlined' />)}
-                          </Stack>
-                        </TableCell>
-                      );
-                    }
-                    case 'select': {
-                      return (
-                        <TableCell key={property.id}>
-                          {memberProperty?.value ? (
-                            <Stack gap={1} flexDirection='row'>
-                              <Chip label={memberProperty?.value} key={memberProperty?.value?.toString() ?? ''} size='small' variant='outlined' />
-                            </Stack>
-                          ) : 'N/A'}
+                          {memberProperty.value
+                            ? (
+                              <SelectPreview
+                                size='small'
+                                options={property.options as SelectOptionType[]}
+                                value={memberProperty.value as (string | string[])}
+                              />
+                            )
+                            : null}
                         </TableCell>
                       );
                     }

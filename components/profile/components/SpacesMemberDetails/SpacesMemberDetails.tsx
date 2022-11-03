@@ -1,4 +1,5 @@
 import { Box } from '@mui/system';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -13,6 +14,7 @@ type Props = {
 export function SpacesMemberDetails ({ memberId }: Props) {
   const { isLoading, memberPropertyValues, canEditSpaceProfile, updateSpaceValues } = useMemberPropertyValues(memberId);
   const [editSpaceId, setEditSpaceId] = useState<null | string>(null);
+  const { query } = useRouter();
 
   if (isLoading) {
     return <LoadingComponent isLoading />;
@@ -22,9 +24,21 @@ export function SpacesMemberDetails ({ memberId }: Props) {
     return null;
   }
 
+  const expandedWorkspaceIndex = memberPropertyValues.findIndex(mpv => mpv.spaceId === query.workspace);
+
+  // make sure the expanded workspace is always at the top
+  const propertyValues = (
+    expandedWorkspaceIndex !== -1
+      ? [
+        memberPropertyValues[expandedWorkspaceIndex],
+        ...memberPropertyValues.slice(0, expandedWorkspaceIndex),
+        ...memberPropertyValues.slice(expandedWorkspaceIndex + 1)
+      ] : memberPropertyValues
+  );
+
   return (
     <Box mt={2}>
-      {memberPropertyValues.map(pv => (
+      {propertyValues.map(pv => (
         <SpaceDetailsAccordion
           key={pv.spaceId}
           spaceName={pv.spaceName}
@@ -32,6 +46,7 @@ export function SpacesMemberDetails ({ memberId }: Props) {
           properties={pv.properties}
           readOnly={!canEditSpaceProfile(pv.spaceId)}
           onEdit={() => setEditSpaceId(pv.spaceId)}
+          expanded={query.workspace === pv.spaceId}
         />
       ))}
 
