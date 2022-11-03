@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Add a prefix so if our schema changes, we can invalidate previous content
 export const PREFIX = 'charm.v1';
@@ -39,14 +39,12 @@ export function useLocalStorage<T = any> (key: string | null, defaultValue: T, n
     }
   }, [key]);
 
-  const setLocalValue = useCallback((v: T) => {
-    setValue(v);
+  useEffect(() => {
     if (key) {
-      setStorageValue(key, v, noPrefix);
+      setStorageValue(key, value, noPrefix);
     }
-  }, []);
-
-  return [value, setLocalValue] as const;
+  }, [key, value]);
+  return [value, setValue] as const;
 }
 
 export function getKey (key: string, noPrefix?: boolean) {
