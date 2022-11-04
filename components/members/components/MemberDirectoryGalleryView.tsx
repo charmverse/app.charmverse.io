@@ -13,6 +13,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
@@ -30,6 +31,7 @@ function MemberDirectoryGalleryCard ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const admin = isAdmin();
+  const { mutateMembers } = useMembers();
 
   return (
     <>
@@ -127,7 +129,10 @@ function MemberDirectoryGalleryCard ({
       </Link>
       {isModalOpen && user && currentSpace && (
         <MemberPropertiesPopupForm
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            mutateMembers();
+          }}
           memberId={member.id}
           spaceId={currentSpace.id}
           updateMemberPropertyValues={updateSpaceValues}

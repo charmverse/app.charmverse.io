@@ -53,7 +53,7 @@ export default function MemberDirectoryPage () {
       return sortMembers(searchedMembers, memberProperty);
     }
     return searchedMembers;
-  }, [sortedProperty, properties]);
+  }, [sortedProperty, properties, searchedMembers]);
 
   return (
     <CenteredPageContent>
