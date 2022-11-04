@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
@@ -17,11 +18,16 @@ import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
+`;
+
+const StyledTableRow = styled(TableRow)`
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
 `;
 
 function MemberDirectoryTableRow ({
@@ -45,7 +51,7 @@ function MemberDirectoryTableRow ({
   }
 
   return (
-    <TableRow>
+    <StyledTableRow>
       <TableCell sx={{
         p: 1
       }}
@@ -53,6 +59,7 @@ function MemberDirectoryTableRow ({
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
             size='small'
+            className='icons'
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -183,7 +190,7 @@ function MemberDirectoryTableRow ({
           updateMemberPropertyValues={updateSpaceValues}
         />
       )}
-    </TableRow>
+    </StyledTableRow>
   );
 }
 
