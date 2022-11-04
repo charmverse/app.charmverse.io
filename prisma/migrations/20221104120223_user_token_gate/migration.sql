@@ -2,10 +2,15 @@
   Warnings:
 
   - You are about to drop the column `tokenGateConnectedDate` on the `SpaceRole` table. All the data in the column will be lost.
+  - You are about to drop the column `tokenGateId` on the `SpaceRole` table. All the data in the column will be lost.
 
 */
+-- DropForeignKey
+ALTER TABLE "SpaceRole" DROP CONSTRAINT "SpaceRole_tokenGateId_fkey";
+
 -- AlterTable
-ALTER TABLE "SpaceRole" DROP COLUMN "tokenGateConnectedDate";
+ALTER TABLE "SpaceRole" DROP COLUMN "tokenGateConnectedDate",
+DROP COLUMN "tokenGateId";
 
 -- CreateTable
 CREATE TABLE "UserTokenGate" (
@@ -20,7 +25,7 @@ CREATE TABLE "UserTokenGate" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserTokenGate_tokenGateId_userId_key" ON "UserTokenGate"("tokenGateId", "userId");
+CREATE UNIQUE INDEX "UserTokenGate_tokenGateId_userId_spaceId_key" ON "UserTokenGate"("tokenGateId", "userId", "spaceId");
 
 -- AddForeignKey
 ALTER TABLE "UserTokenGate" ADD CONSTRAINT "UserTokenGate_tokenGateId_fkey" FOREIGN KEY ("tokenGateId") REFERENCES "TokenGate"("id") ON DELETE SET NULL ON UPDATE CASCADE;

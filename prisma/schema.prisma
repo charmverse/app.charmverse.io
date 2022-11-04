@@ -434,13 +434,13 @@ model UserTokenGate {
   spaceId                String     @db.Uuid
   userId                 String     @db.Uuid
   tokenGateConnectedDate DateTime?
-  tokenGateId            String?    @db.Uuid
-  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id])
   jwt                    String?
+  tokenGateId            String?    @db.Uuid
+  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id], onDelete: SetNull)
   space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tokenGateId, userId], name: "tokenGateUser")
+  @@unique([tokenGateId, userId, spaceId], name: "tokenGateUserSpace")
 }
 
 model SpaceRole {
@@ -452,8 +452,6 @@ model SpaceRole {
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   spaceRoleToRole SpaceRoleToRole[]
-  TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  tokenGateId     String?           @db.Uuid
 
   @@unique([spaceId, userId], name: "spaceUser")
 }
@@ -554,7 +552,6 @@ model TokenGate {
   userRole         String?
   accessTypes      String[]          @default([])
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceRoles       SpaceRole[]
   tokenGateToRoles TokenGateToRole[]
   userTokenGates   UserTokenGate[]
 }
