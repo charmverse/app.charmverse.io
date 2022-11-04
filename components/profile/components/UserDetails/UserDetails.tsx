@@ -13,6 +13,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
@@ -52,21 +53,7 @@ export interface UserDetailsProps {
 }
 
 const StyledStack = styled(Stack)`
-  &:hover .icons {
-    opacity: 1;
-    transition: ${({ theme }) => theme.transitions.create('opacity', {
-    easing: theme.transitions.easing.easeInOut,
-    duration: theme.transitions.duration.enteringScreen
-  })}
-  }
-
-  & .icons {
-    opacity: ${() => isTouchScreen() ? 1 : 0};
-    transition: ${({ theme }) => theme.transitions.create('opacity', {
-    easing: theme.transitions.easing.easeInOut,
-    duration: theme.transitions.duration.leavingScreen
-  })}
-  }
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
 `;
 
 function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {

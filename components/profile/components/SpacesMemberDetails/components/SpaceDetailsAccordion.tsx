@@ -5,6 +5,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, S
 import { useEffect, useState } from 'react';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -19,22 +20,7 @@ type Props = {
 };
 
 const StyledAccordionSummary = styled(AccordionSummary)`
-  ${({ theme }) => !isTouchScreen() && `
-    &:hover .icons {
-      opacity: 1;
-      transition: ${theme.transitions.create('opacity', {
-    easing: theme.transitions.easing.easeInOut,
-    duration: theme.transitions.duration.enteringScreen
-  })}
-    }
-
-    & .icons {
-      opacity: 0;
-      transition: ${theme.transitions.create('opacity', {
-    easing: theme.transitions.easing.easeInOut,
-    duration: theme.transitions.duration.leavingScreen
-  })}
-  `}
+  ${({ theme }) => !isTouchScreen() && hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
 `;
 
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
