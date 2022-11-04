@@ -182,6 +182,7 @@ model Space {
   proposalCategory            ProposalCategory[]
   memberProperty              MemberProperty[]
   memberPropertyValue         MemberPropertyValue[]
+  userTokenGates              UserTokenGate[]
 }
 
 model SpaceApiToken {
@@ -314,49 +315,50 @@ model Vote {
 }
 
 model User {
-  id                        String                     @id @default(uuid()) @db.Uuid
-  createdAt                 DateTime                   @default(now())
-  updatedAt                 DateTime                   @default(now())
-  addresses                 String[]
-  deletedAt                 DateTime?
-  avatar                    String?
-  avatarContract            String?
-  avatarTokenId             String?
-  avatarChain               Int?
-  username                  String
-  isBot                     Boolean?                   @default(false)
-  path                      String?                    @unique
-  identityType              IdentityType?
-  email                     String?
-  applications              Application[]
-  blocks                    Block[]
-  bounties                  Bounty[]
-  bountyPermissions         BountyPermission[]
-  comments                  Comment[]
-  discordUser               DiscordUser?
-  favorites                 FavoritePage[]
-  inviteLinks               InviteLink[]
-  pages                     Page[]
-  permissions               PagePermission[]
-  poaps                     Poap[]
-  spacesCreated             Space[]
-  spacePermissions          SpacePermission[]
-  spaceRoles                SpaceRole[]
-  telegramUser              TelegramUser?
-  threads                   Thread[]
-  profile                   UserDetails?
-  gnosisSafes               UserGnosisSafe[]
-  UserNotification          UserNotification[]
-  notificationState         UserNotificationState?
-  userVotes                 UserVote[]
-  initiatedVotes            Vote[]
-  profileItems              ProfileItem[]
-  proposalsAuthored         ProposalAuthor[]
-  proposalsReviewed         ProposalReviewer[]
-  reviewedProposals         Proposal[]
-  workspaceEvents           WorkspaceEvent[]
-  wallets                   UserWallet[]
-  memberPropertyValues      MemberPropertyValue[]
+  id                   String                 @id @default(uuid()) @db.Uuid
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  addresses            String[]
+  deletedAt            DateTime?
+  avatar               String?
+  avatarContract       String?
+  avatarTokenId        String?
+  avatarChain          Int?
+  username             String
+  isBot                Boolean?               @default(false)
+  path                 String?                @unique
+  identityType         IdentityType?
+  email                String?
+  applications         Application[]
+  blocks               Block[]
+  bounties             Bounty[]
+  bountyPermissions    BountyPermission[]
+  comments             Comment[]
+  discordUser          DiscordUser?
+  favorites            FavoritePage[]
+  inviteLinks          InviteLink[]
+  pages                Page[]
+  permissions          PagePermission[]
+  poaps                Poap[]
+  spacesCreated        Space[]
+  spacePermissions     SpacePermission[]
+  spaceRoles           SpaceRole[]
+  telegramUser         TelegramUser?
+  threads              Thread[]
+  profile              UserDetails?
+  gnosisSafes          UserGnosisSafe[]
+  UserNotification     UserNotification[]
+  notificationState    UserNotificationState?
+  userVotes            UserVote[]
+  initiatedVotes       Vote[]
+  profileItems         ProfileItem[]
+  proposalsAuthored    ProposalAuthor[]
+  proposalsReviewed    ProposalReviewer[]
+  reviewedProposals    Proposal[]
+  workspaceEvents      WorkspaceEvent[]
+  wallets              UserWallet[]
+  memberPropertyValues MemberPropertyValue[]
+  userTokenGates       UserTokenGate[]
 }
 
 model UserWallet {
@@ -427,18 +429,31 @@ model FavoritePage {
   @@unique([pageId, userId])
 }
 
-model SpaceRole {
-  spaceId                String            @db.Uuid
-  userId                 String            @db.Uuid
+model UserTokenGate {
+  id                     String     @id @default(uuid()) @db.Uuid
+  spaceId                String     @db.Uuid
+  userId                 String     @db.Uuid
   tokenGateConnectedDate DateTime?
-  tokenGateId            String?           @db.Uuid
-  id                     String            @id @default(uuid()) @db.Uuid
-  isAdmin                Boolean           @default(false)
-  createdAt              DateTime          @default(now())
-  space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceRoleToRole        SpaceRoleToRole[]
+  tokenGateId            String?    @db.Uuid
+  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id])
+  jwt                    String?
+  space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenGateId, userId], name: "tokenGateUser")
+}
+
+model SpaceRole {
+  spaceId         String            @db.Uuid
+  userId          String            @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  isAdmin         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceRoleToRole SpaceRoleToRole[]
+  TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
 
   @@unique([spaceId, userId], name: "spaceUser")
 }
@@ -541,6 +556,7 @@ model TokenGate {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceRoles       SpaceRole[]
   tokenGateToRoles TokenGateToRole[]
+  userTokenGates   UserTokenGate[]
 }
 
 model PaymentMethod {
