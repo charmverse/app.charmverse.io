@@ -19,8 +19,8 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   const { subscribe } = useWebSocketClient();
 
   useEffect(() => {
-    log.debug('Load focalboard data');
     if (space) {
+      log.debug('Load focalboard blocks');
       dispatch(initialLoad({ spaceId: space.id }));
     }
   }, [space?.id]);

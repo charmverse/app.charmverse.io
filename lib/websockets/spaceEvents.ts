@@ -12,6 +12,10 @@ export class SpaceEventHandler {
   socketEvent = 'message';
 
   constructor (private socket: Socket) {
+    this.socket = socket;
+  }
+
+  init () {
 
     this.socket.on(this.socketEvent, async message => {
       try {

@@ -6,7 +6,6 @@ import {
   collab,
   sendableSteps
 } from 'prosemirror-collab';
-import type { Socket } from 'socket.io-client';
 
 import log from 'lib/log';
 import type { ClientSubscribeMessage, ServerErrorMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
@@ -34,8 +33,6 @@ type DocInfo = {
   updated: Date | false;
   version: number;
 }
-
-const gettext = (text: string) => text;
 
 type User = { id: string, username: string }
 
@@ -113,7 +110,6 @@ export class FidusEditor {
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
-      appLoaded: () => Boolean(view.state.plugins.length),
       anythingToSend: () => Boolean(sendableSteps(view.state)),
       initialMessage: () => {
         const message: ClientSubscribeMessage = {
@@ -148,6 +144,7 @@ export class FidusEditor {
           case 'doc_data':
             this.onDocLoaded(); // call this first so that the loading state is up-to-date before transactions occur
             this.mod.collab.doc.receiveDocument(data);
+            // console.log('received doc');
             break;
           case 'confirm_version':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();
@@ -255,7 +252,7 @@ export class FidusEditor {
   }
 
   close () {
-    // console.log('close ws', !!this.ws);
+    log.debug('Disconnect socket client');
     if (this.ws) {
       this.ws.close();
     }

@@ -3,7 +3,7 @@ import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
 import { prisma } from 'db';
-import log from 'lib/log';
+import { getLogger } from 'lib/log/prefix';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
@@ -12,6 +12,8 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { AuthenticatedSocket } from '../authentication';
 
 import type { Participant, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientCheckVersionMessage, ClientDiffMessage, ClientSelectionMessage, ServerMessage } from './interfaces';
+
+const log = getLogger('ws-docs');
 
 type SocketSessionData = AuthenticatedSocket & {
   documentId?: string;
@@ -61,9 +63,13 @@ export class DocumentEventHandler {
 
   getDocumentRoom () {
     const docId = this.getSession().documentId;
-    const room = docRooms.get(docId);
+    return docRooms.get(docId);
+  }
+
+  getDocumentRoomOrThrow () {
+    const room = this.getDocumentRoom();
     if (!room) {
-      throw new Error(`Could not find room by id: ${docId}`);
+      throw new Error('Could not find a room for page');
     }
     return room;
   }
@@ -72,7 +78,11 @@ export class DocumentEventHandler {
 
     this.id = socket.id;
 
-    const user = socket.data.user;
+  }
+
+  init () {
+
+    const user = this.socket.data.user;
 
     this.setSession({
       user: { id: user.id, name: user.username },
@@ -84,20 +94,26 @@ export class DocumentEventHandler {
         await this.onMessage(message);
       }
       catch (error) {
-        log.error('Error handling web socket document message', error);
+        log.error('Error handling document event', { userId: user.id, error });
       }
     });
 
-    this.socket.on('disconnect', () => {
-      this.onClose();
+    this.socket.on('disconnect', (...args) => {
+      // console.log('disconnect', args);
+      try {
+        this.onClose();
+      }
+      catch (error) {
+        log.error('Error handling web socket disconnect', { userId: user.id, error });
+      }
     });
 
-    this.sendMessage({ type: 'welcome' });
+    // this.sendMessage({ type: 'welcome' });
   }
 
   async onMessage (message: WrappedSocketMessage<ClientMessage>) {
 
-    log.debug('Socket server received message:', message);
+    log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
       await this.resendMessages(message.from);
@@ -110,6 +126,7 @@ export class DocumentEventHandler {
     }
     else if (message.c < this.messages.client + 1) {
       // Receive a message already received at least once. Ignore.
+      log.debug(`Ignore duplicate ${message.type} message from client`);
       return;
     }
     else if (message.c > this.messages.client + 1) {
@@ -187,7 +204,7 @@ export class DocumentEventHandler {
 
     try {
       const userId = this.getSession().user.id;
-      log.debug('[charm ws] subscribe event', { pageId, userId });
+      log.debug('subscribe event', { pageId, userId });
 
       const isValidPageId = validate(pageId);
       if (!isValidPageId) {
@@ -231,9 +248,10 @@ export class DocumentEventHandler {
       }
 
       this.sendMessage({ type: 'subscribed' });
+      // console.log('connection count on subscription', connectionCount);
       if (connectionCount < 1) {
         await this.sendDocument();
-        log.debug('Sent document to new subscriber');
+        log.debug('Sent document to new subscriber', { pageId, userId });
       }
       this.handleParticipantUpdate();
     }
@@ -253,32 +271,34 @@ export class DocumentEventHandler {
 
   sendParticipantList () {
     const room = this.getDocumentRoom();
-    const participantList: Participant[] = [];
-    for (const participant of Object.values(room.participants)) {
-      const session = participant.getSession();
-      participantList.push({
-        id: session.user.id,
-        name: session.user.name,
-        sessionIds: [],
-        session_id: participant.id
-      });
+    if (room) {
+      const participantList: Participant[] = [];
+      for (const participant of Object.values(room.participants)) {
+        const session = participant.getSession();
+        participantList.push({
+          id: session.user.id,
+          name: session.user.name,
+          sessionIds: [],
+          session_id: participant.id
+        });
+      }
+      this.sendUpdates({ type: 'connections', participant_list: participantList });
     }
-    this.sendUpdates({ type: 'connections', participant_list: participantList });
   }
 
   handleSelectionChange (message: ClientSelectionMessage) {
     const room = this.getDocumentRoom();
-    if (message.v === room.doc.version) {
+    if (message.v === room?.doc.version) {
       this.sendUpdates(message);
     }
   }
 
   async handleDiff (message: WrappedSocketMessage<ClientDiffMessage>) {
-    const room = this.getDocumentRoom();
-    const clientVersion = message.v;
-    const dv = room.doc.version;
-    log.debug('Handling diff');
-    if (clientVersion === dv) {
+    const room = this.getDocumentRoomOrThrow();
+    const clientV = message.v;
+    const serverV = room.doc.version;
+    log.debug('Handling change event', { userId: this.getSession().user.id, clientV, serverV });
+    if (clientV === serverV) {
       if (message.ds) {
         const updatedNode = applyStepsToNode(message.ds, room.node);
         if (updatedNode) {
@@ -303,9 +323,9 @@ export class DocumentEventHandler {
       this.confirmDiff(message.rid);
       this.sendUpdates(message);
     }
-    else if (clientVersion < dv) {
-      if (clientVersion + room.doc.diffs.length >= dv) {
-        const numberDiffs = clientVersion - dv;
+    else if (clientV < serverV) {
+      if (clientV + room.doc.diffs.length >= serverV) {
+        const numberDiffs = clientV - serverV;
         log.debug('Client is behind. Resend document diffs', { numberDiffs });
         const messages = room.doc.diffs.slice(numberDiffs);
         for (const m of messages) {
@@ -325,15 +345,15 @@ export class DocumentEventHandler {
 
   async checkVersion (message: ClientCheckVersionMessage) {
     const session = this.getSession();
-    const room = this.getDocumentRoom();
-    const pv = message.v;
-    const dv = room?.doc.version;
-    log.debug('Check version of document', { client: pv, server: dv, userId: session.user.id });
-    if (pv === dv) {
-      this.sendMessage({ type: 'confirm_version', v: pv });
+    const room = this.getDocumentRoomOrThrow();
+    const clientV = message.v;
+    const serverV = room?.doc.version;
+    log.debug('Check version of document', { clientV, serverV, userId: session.user.id });
+    if (clientV === serverV) {
+      this.sendMessage({ type: 'confirm_version', v: clientV });
     }
-    else if (pv + room.doc.diffs.length >= dv) {
-      const numberDiffs = pv - dv;
+    else if (clientV + room.doc.diffs.length >= serverV) {
+      const numberDiffs = clientV - serverV;
       log.debug('Resending document diffs', { numberDiffs, userId: session.user.id });
       const messages = room?.doc.diffs.slice(numberDiffs);
       this.sendDocument(messages);
@@ -420,7 +440,7 @@ export class DocumentEventHandler {
 
   async resetCollaboration (message: ServerMessage) {
     log.debug('Resetting collaboration');
-    const room = this.getDocumentRoom();
+    const room = this.getDocumentRoomOrThrow();
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== this.id) {
         await participant.unfixable();
@@ -431,8 +451,8 @@ export class DocumentEventHandler {
 
   sendUpdates (message: ClientMessage | ServerMessage) {
     const pageId = this.getSession().documentId;
-    log.debug('Sending message to waiters', { pageId });
-    const room = this.getDocumentRoom();
+    log.debug(`Broadcasting ${message.type} to room`, { pageId });
+    const room = this.getDocumentRoomOrThrow();
     for (const participant of Object.values(room.participants)) {
       if (participant.id !== this.id) {
         participant.sendMessage(message);
@@ -443,7 +463,6 @@ export class DocumentEventHandler {
   onClose () {
     log.debug('Closing collaboration session');
     const room = this.getDocumentRoom();
-    delete room.participants[this.id];
     if (room) {
       delete room.participants[this.id];
       if (Object.keys(room.participants).length === 0) {
@@ -456,7 +475,7 @@ export class DocumentEventHandler {
   }
 
   async saveDocument () {
-    const room = this.getDocumentRoom();
+    const room = this.getDocumentRoomOrThrow();
     const userId = this.getSession().user.id;
     if (room.doc.version === room.lastSavedVersion) {
       return;

@@ -439,18 +439,26 @@ model FavoritePage {
   @@unique([pageId, userId])
 }
 
+model UserTokenGate {
+  spaceRoleId  String
+  spaceRole    SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
+  createdAt    DateTime?
+  tokenGateId  String?   @db.Uuid
+  tokenGateJWT String?
+}
+
 model SpaceRole {
-  spaceId                String            @db.Uuid
-  userId                 String            @db.Uuid
-  tokenGateConnectedDate DateTime?
-  tokenGateId            String?           @db.Uuid
-  id                     String            @id @default(uuid()) @db.Uuid
-  isAdmin                Boolean           @default(false)
-  createdAt              DateTime          @default(now())
-  space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceRoleToRole        SpaceRoleToRole[]
+  spaceId         String            @db.Uuid
+  userId          String            @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  isAdmin         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceRoleToRole SpaceRoleToRole[]
+  UserTokenGate   UserTokenGate[]
+  TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
 
   @@unique([spaceId, userId], name: "spaceUser")
 }

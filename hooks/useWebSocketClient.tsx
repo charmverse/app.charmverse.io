@@ -57,7 +57,6 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
     return () => {
       socket?.disconnect();
-      socket?.off();
     };
   }, [space?.id, user?.id, authResponse]);
 

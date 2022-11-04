@@ -108,6 +108,7 @@ export const BangleEditor = React.forwardRef<
           onDocLoaded: () => {
             setIsLoading(false);
             isLoadingRef.current = false;
+            // console.log('set is loading false');
           }
         });
         fEditor.init(_editor.view, onError);
@@ -115,7 +116,6 @@ export const BangleEditor = React.forwardRef<
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       setEditor(_editor);
       return () => {
-        // console.log('destroy editor');
         fEditor?.close();
         _editor.destroy();
       };
@@ -132,7 +132,7 @@ export const BangleEditor = React.forwardRef<
         <div ref={editorRef} className='bangle-editor-core'>
           {editor ? children : null}
           <div ref={renderRef} id={pageId} className={className} style={style} />
-          <LoadingComponent height='200px' isLoading={isLoading} />
+          <LoadingComponent height='400px' isLoading={isLoading} />
         </div>
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(

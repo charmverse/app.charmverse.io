@@ -13,7 +13,6 @@ type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
 type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 
 type WebSocketConnectorProps = {
-  appLoaded: () => boolean;
   anythingToSend: () => boolean;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
@@ -44,7 +43,7 @@ export class WebSocketConnector {
   /* A list of messages from a previous connection */
   oldMessages: (() => ClientMessage | false)[] = [];
 
-  online = true;
+  // online = true;
 
   /* Increases when connection has to be reestablished */
   /* 0 = before first connection. */
@@ -61,7 +60,6 @@ export class WebSocketConnector {
   infoDisconnected = gettext('Disconnected. Attempting to reconnect...');// Info to show while disconnected WITHOUT unsaved data
 
   constructor ({
-    appLoaded,
     anythingToSend,
     sendMessage,
     initialMessage,
@@ -69,15 +67,13 @@ export class WebSocketConnector {
     restartMessage,
     receiveData
   }: WebSocketConnectorProps) {
-    // console.log('create connection');
-    this.appLoaded = appLoaded;
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
     this.initialMessage = initialMessage;
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
-    // console.log('load socket');
+    log.debug('Request page socket');
     this.socket = io(namespace, {
       withCredentials: true
       // path: '/api/socket'
@@ -108,9 +104,8 @@ export class WebSocketConnector {
   // }
 
   close () {
-    this.socket.off();
-    this.socket.close();
-    // console.log('close socket');
+    this.socket.disconnect();
+    log.debug('Page socket closed');
     // window.removeEventListener('offline', this.listeners.onOffline);
   }
 
@@ -135,7 +130,7 @@ export class WebSocketConnector {
         this.resend_messages(data.from);
       }
       else if (data.s < expectedServer) {
-        // console.log('[charm ws] ignore old message');
+        log.debug('[charm ws] ignore old message');
         // Receive a message already received at least once. Ignore.
 
       }
@@ -150,11 +145,13 @@ export class WebSocketConnector {
       }
       else {
         this.messages.server = expectedServer;
+        // console.log('handle server message', expectedServer, data, this.messages.client);
         if (data.c === this.messages.client) {
           // console.log('[charm] receive messages');
           this.receive(data);
         }
         else if (data.c < this.messages.client) {
+          // console.log('received all messages but server is missing client messages');
           // We have received all server messages, but the server seems
           // to have missed some of the client's messages. They could
           // have been sent simultaneously.
@@ -180,14 +177,19 @@ export class WebSocketConnector {
       }
     });
 
+    this.socket.on('disconnect', (...args) => {
+      // console.log('socket disconnected', args);
+    });
+
     this.socket.on('connect', () => {
       // // console.log('connected');
-      try {
-        const sendable = this.anythingToSend();
-      }
-      catch (e) {
-        // console.error('error getting sendable steps', e);
-      }
+      log.info('Page socket client connected', this.connectionCount);
+      this.open();
+      // try {
+      //   const sendable = this.anythingToSend();
+      // }
+      // catch (e) {
+      // }
       // // console.log('[charm] socket connected!', { anythingToSend: this.anythingToSend() });
       // window.setTimeout(() => {
       //   this.createWSConnection();
@@ -211,18 +213,21 @@ export class WebSocketConnector {
   }
 
   open () {
-    // console.log('[charm ws] - welcome received, request subscription');
     const message = this.initialMessage();
-    // console.log('open socket message', message);
-    this.connectionCount += 1;
     this.oldMessages = this.messagesToSend;
     this.messagesToSend = [];
-    // // console.log('[charm] open web socket');
+    this.messages = {
+      server: 0,
+      client: 0,
+      lastTen: []
+    };
+    log.info('Subscribe to page');
 
     this.send(() => message);
   }
 
   subscribed () {
+    this.connectionCount += 1;
     if (this.connectionCount > 1) {
       this.resubscribed();
       while (this.oldMessages.length > 0) {
@@ -245,6 +250,7 @@ export class WebSocketConnector {
       const data = getData();
       if (!data) {
         // message is empty
+        log.debug('Ignore empty message');
         return;
       }
       this.messages.client += 1;
@@ -256,6 +262,7 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.socket.emit(socketEvent, wrappedMessage);
+      log.debug('Sent socket message', wrappedMessage);
       this.setRecentlySentTimer(timer);
     }
     else {
@@ -296,10 +303,11 @@ export class WebSocketConnector {
   }
 
   receive (data: WrappedServerMessage) {
-    // console.log('receive', data);
+    log.debug('receive event', data);
     switch (data.type) {
+
       case 'welcome':
-        this.open();
+        // this.open();
         break;
       case 'subscribed':
         this.subscribed();

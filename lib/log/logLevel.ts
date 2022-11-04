@@ -3,35 +3,45 @@ import _log from 'loglevel';
 import { DateTime } from 'luxon';
 
 import * as http from 'adapters/http';
-import { isProdEnv } from 'config/constants';
+import { isNodeEnv, isProdEnv } from 'config/constants';
 
 const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
 
-export function apply (log: Logger) {
+export function apply (log: Logger, logPrefix: string = '') {
 
-  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || (isProdEnv ? 'debug' : 'debug');
+  const defaultLevel = process.env.LOG_LEVEL as LogLevelDesc || log.levels.DEBUG;
   log.setDefaultLevel(defaultLevel);
 
-  // add timestamps and send errors to Slack channel in production
-  if (isProdEnv && ERRORS_WEBHOOK) {
+  // dont apply logger in browser because it changes the stack tracke/line number
+  if (isNodeEnv) {
 
     log.methodFactory = (methodName, logLevel, loggerName) => {
-      const rawMethod = originalFactory(methodName, logLevel, loggerName);
+
+      const originalMethod = originalFactory(methodName, logLevel, loggerName);
+
       return (message, opt) => {
 
-        const timestamp = DateTime.local().toFormat(TIMESTAMP_FORMAT);
+        let prefix = '';
+        if (isProdEnv && isNodeEnv) {
+          prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
+        }
+        if (isNodeEnv) {
+          prefix += `${prefix ? ' ' : ''}${methodName}:`;
+        }
+        if (logPrefix) {
+          prefix += `${prefix ? ' ' : ''}[${logPrefix}]`;
+        }
+        if (prefix) {
+          prefix += ' ';
+        }
 
-        if (opt) {
-          rawMethod(`[${timestamp}] ${methodName}: ${message}`, opt);
-        }
-        else {
-          rawMethod(`[${timestamp}] ${methodName}: ${message}`);
-        }
+        const args = opt ? [`${prefix}${message}`, opt] : [`${prefix}${message}`];
+        originalMethod.apply(null, args);
 
         // post errors to Discord
-        if (methodName === 'error') {
+        if (methodName === 'error' && ERRORS_WEBHOOK) {
           sendErrorToDiscord(ERRORS_WEBHOOK, message, opt)
             .catch(err => {
               // eslint-disable-next-line no-console
@@ -43,6 +53,7 @@ export function apply (log: Logger) {
 
     log.setLevel(log.getLevel()); // Be sure to call setLevel method in order to apply plugin
   }
+
   return log;
 }
 

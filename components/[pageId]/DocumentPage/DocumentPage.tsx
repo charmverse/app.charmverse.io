@@ -47,6 +47,15 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   }
 `;
 
+const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(({ showPageActionSidebar, theme }) => `
+  transition: width ease-in 0.25s;
+  ${theme.breakpoints.up('md')} {
+    width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
+    height: ${showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'};
+    overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
+  }
+`);
+
 export interface DocumentPageProps {
   page: PageMeta;
   setPage: (p: Partial<Page>) => void;
@@ -127,6 +136,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
+  // re-render when the page or edit mode changes
+  // editMode is null to start, but we dont want to re-render charmeditor in editing mode when it starts
+  const charmKey = page.id + (editMode || 'editing');
+
   return (
     <ScrollableWindow
       sx={{
@@ -135,21 +148,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         }
       }}
     >
-      <Box
-        id='document-scroll-container'
-        sx={{
-          transition: 'width ease-in 0.25s',
-          width: {
-            md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
-          },
-          height: {
-            md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
-          },
-          overflow: {
-            md: showPageActionSidebar ? 'auto' : 'inherit'
-          }
-        }}
-      >
+      <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
@@ -160,7 +159,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id + editMode}
+              key={charmKey}
               // content={pageDetails?.content as PageContent}
               // onContentChange={updatePageContent}
               readOnly={readOnly}
@@ -249,7 +248,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
 
           </Container>
         </div>
-      </Box>
+      </ScrollContainer>
     </ScrollableWindow>
   );
 }

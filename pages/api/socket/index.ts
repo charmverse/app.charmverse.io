@@ -52,11 +52,29 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   const io = new Server(res.socket.server);
 
   // Define listeners
-  io.on('connect', (socket) => new SpaceEventHandler(socket));
+  io
+    .on('connect', (socket) => {
+      new SpaceEventHandler(socket).init();
+
+      // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
+      // so we only need to keep track of the number of clients connected to the root namespace
+      log.debug('[ws] Web socket connected', {
+        // clientCount: io.engine.clientsCount,
+        clientCount: io.of('/').sockets.size
+      });
+
+      socket.on('disconnect', () => {
+        log.debug('[ws] Web socket disconnected', {
+          clientCount: io.of('/').sockets.size
+        });
+      });
+    });
 
   io.of('/ceditor')
     .use(authOnConnect)
-    .on('connect', (socket) => new DocumentEventHandler(socket));
+    .on('connect', (socket) => {
+      new DocumentEventHandler(socket).init();
+    });
 
   res.socket.server.io = io;
 
