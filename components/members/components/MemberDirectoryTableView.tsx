@@ -40,6 +40,10 @@ function MemberDirectoryTableRow ({
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const { mutateMembers } = useMembers();
 
+  if (properties.length === 0) {
+    return null;
+  }
+
   return (
     <TableRow>
       <TableCell sx={{
