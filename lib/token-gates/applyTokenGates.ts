@@ -74,8 +74,6 @@ export async function applyTokenGates ({
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
-  updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
-
   const roleIdsToAssign: string[] = verifiedTokenGates.reduce((roleList, tokenGate) => {
 
     tokenGate.tokenGateToRoles.forEach(roleMapping => {
@@ -108,7 +106,10 @@ export async function applyTokenGates ({
   if (!commit) {
     return returnValue;
   }
-  else if (spaceMembership && roleIdsToAssign.length === 0) {
+
+  updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
+
+  if (spaceMembership && roleIdsToAssign.length === 0) {
     return returnValue;
   }
   else if (spaceMembership) {
