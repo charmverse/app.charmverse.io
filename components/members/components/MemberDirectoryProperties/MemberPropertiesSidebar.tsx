@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -165,15 +165,15 @@ export function MemberPropertySidebarItem ({
             }}
           >
             <Tooltip title={`Property is ${disabledInGalleryView ? 'invisible' : 'visible'} in gallery view`}>
-              <div style={{
+              <Typography sx={{
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                color: disabledInGalleryView ? 'action.disabled' : 'inherit'
               }}
               >
                 <GalleryIcon
                   width={20}
                   height={20}
-                  disabled={disabledInGalleryView}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -184,18 +184,18 @@ export function MemberPropertySidebarItem ({
                     });
                   }}
                 />
-              </div>
+              </Typography>
             </Tooltip>
             <Tooltip title={`Property is ${disabledInTableView ? 'invisible' : 'visible'} in table view`}>
-              <div style={{
+              <Typography sx={{
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                color: disabledInTableView ? 'action.disabled' : 'inherit'
               }}
               >
                 <TableIcon
                   width={20}
                   height={20}
-                  disabled={disabledInTableView}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -206,7 +206,7 @@ export function MemberPropertySidebarItem ({
                     });
                   }}
                 />
-              </div>
+              </Typography>
             </Tooltip>
             <Tooltip title={`Edit ${property.name} property.`}>
               <EditIcon
