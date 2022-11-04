@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -5,6 +6,7 @@ import { useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
@@ -16,8 +18,13 @@ import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+`;
 
 function MemberDirectoryGalleryCard ({
   member
@@ -35,7 +42,7 @@ function MemberDirectoryGalleryCard ({
 
   return (
     <>
-      <Link
+      <StyledLink
         href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
         sx={{
           '&:hover': {
@@ -48,6 +55,7 @@ function MemberDirectoryGalleryCard ({
           {((user?.id === member.id && currentSpace) || admin) && (
             <IconButton
               size='small'
+              className='icons'
               sx={{
                 position: 'absolute',
                 top: 0,
@@ -126,7 +134,7 @@ function MemberDirectoryGalleryCard ({
             })}
           </Stack>
         </Card>
-      </Link>
+      </StyledLink>
       {isModalOpen && user && currentSpace && (
         <MemberPropertiesPopupForm
           onClose={() => {
