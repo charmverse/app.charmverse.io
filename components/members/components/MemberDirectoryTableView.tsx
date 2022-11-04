@@ -45,8 +45,9 @@ function MemberDirectoryTableRow ({
   const { properties = [] } = useMemberProperties();
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const { mutateMembers } = useMembers();
+  const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
 
-  if (properties.length === 0) {
+  if (visibleProperties.length === 0) {
     return null;
   }
 
@@ -70,7 +71,7 @@ function MemberDirectoryTableRow ({
           </IconButton>
         )}
       </TableCell>
-      {properties.map(property => {
+      {visibleProperties.map(property => {
         const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
         if (memberProperty) {
           switch (property.type) {
