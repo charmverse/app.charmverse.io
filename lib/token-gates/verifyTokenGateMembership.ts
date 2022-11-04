@@ -1,11 +1,15 @@
-import type { UserTokenGate } from '@prisma/client';
+
 import { verifyJwt } from 'lit-js-sdk';
 
 import { prisma } from 'db';
 import type { LitJwtPayload } from 'lib/token-gates/interfaces';
 import { deleteUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 
-type VerifyTokenGateMembershipProps = { userTokenGates: UserTokenGate[], userId: string, spaceId: string };
+type VerifyTokenGateMembershipProps = { userTokenGates: {
+  tokenGateId: string | null;
+  jwt: string | null;
+  id: string;
+}[]; userId: string; spaceId: string; };
 
 export async function verifyTokenGateMembership ({ userTokenGates, userId, spaceId }: VerifyTokenGateMembershipProps): Promise<boolean> {
 
