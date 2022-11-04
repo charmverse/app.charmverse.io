@@ -1,5 +1,5 @@
 import { ListItemIcon, MenuItem, Select, Typography } from '@mui/material';
-import type { MemberPropertyVisibilityView } from '@prisma/client';
+import type { VisibilityView } from '@prisma/client';
 import type { Dispatch, SetStateAction } from 'react';
 
 import { ViewOptions } from 'components/common/ViewOptions';
@@ -12,13 +12,13 @@ export function MemberDirectorySort ({
   sortedProperty,
   view
 }: {
-  view: MemberPropertyVisibilityView;
+  view: VisibilityView;
   sortedProperty: string;
   setSortedProperty: Dispatch<SetStateAction<string>>;
 }) {
   const { properties = [] } = useMemberProperties();
-  const sortableProperties = properties.filter(property => !property.memberPropertyVisibilities.find(mpv => mpv.view === view))
-    .filter(property => !['profile_pic', 'role'].includes(property.type));
+  const sortableProperties = properties.filter(property => property.enabledViews.includes(view)
+    && !['profile_pic', 'role'].includes(property.type));
 
   return (
     <ViewOptions label='Sort'>

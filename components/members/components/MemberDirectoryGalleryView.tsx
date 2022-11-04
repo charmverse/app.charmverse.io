@@ -20,9 +20,9 @@ function MemberDirectoryGalleryCard ({
   const timezoneProperty = properties.find(property => property.type === 'timezone');
   const rolesProperty = properties.find(property => property.type === 'role');
 
-  const isNameHidden = nameProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
-  const isTimezoneHidden = timezoneProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
-  const isRolesHidden = rolesProperty?.memberPropertyVisibilities.find(pv => pv.view === 'gallery');
+  const isNameHidden = !nameProperty?.enabledViews.includes('gallery');
+  const isTimezoneHidden = !timezoneProperty?.enabledViews.includes('gallery');
+  const isRolesHidden = !rolesProperty?.enabledViews.includes('gallery');
 
   return (
     <Link
@@ -69,7 +69,7 @@ function MemberDirectoryGalleryCard ({
           )}
           {properties.map(property => {
             const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
-            const hiddenInGallery = property.memberPropertyVisibilities.find(propertyVisibility => propertyVisibility.view === 'gallery');
+            const hiddenInGallery = !property.enabledViews.includes('gallery');
             if (hiddenInGallery) {
               return null;
             }

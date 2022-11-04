@@ -4,12 +4,12 @@ import { createContext, useCallback, useContext, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import type { CreateMemberPropertyPayload, CreateMemberPropertyPermissionInput, MemberPropertyWithMetadata, UpdateMemberPropertyVisibilityPayload } from 'lib/members/interfaces';
+import type { CreateMemberPropertyPayload, CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions, UpdateMemberPropertyVisibilityPayload } from 'lib/members/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
 type Context = {
-  properties: MemberPropertyWithMetadata[] | undefined;
+  properties: MemberPropertyWithPermissions[] | undefined;
   addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
   updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<MemberProperty>;
   deleteProperty: (id: string) => Promise<void>;

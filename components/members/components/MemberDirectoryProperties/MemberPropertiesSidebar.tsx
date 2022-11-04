@@ -18,7 +18,7 @@ import { MemberPropertySidebarDetails } from 'components/members/components/Memb
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { MemberPropertyWithMetadata } from 'lib/members/interfaces';
+import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
@@ -111,16 +111,16 @@ function MemberPropertyItemForm ({
 export function MemberPropertySidebarItem ({
   property
 }: {
-  property: MemberPropertyWithMetadata;
+  property: MemberPropertyWithPermissions;
 }) {
   const [toggled, setToggled] = useState(false);
   const { deleteProperty, addPropertyPermissions, removePropertyPermission, updateMemberPropertyVisibility } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
 
-  const propertyVisibilities = property.memberPropertyVisibilities;
-  const disabledInTableView = !!propertyVisibilities.find(visibility => visibility.view === 'table');
-  const disabledInGalleryView = !!propertyVisibilities.find(visibility => visibility.view === 'gallery');
+  const enabledViews = property.enabledViews;
+  const disabledInTableView = !enabledViews.includes('table');
+  const disabledInGalleryView = !enabledViews.includes('gallery');
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -180,7 +180,7 @@ export function MemberPropertySidebarItem ({
                     updateMemberPropertyVisibility({
                       memberPropertyId: property.id,
                       view: 'gallery',
-                      visible: !disabledInGalleryView
+                      visible: disabledInGalleryView
                     });
                   }}
                 />
@@ -202,7 +202,7 @@ export function MemberPropertySidebarItem ({
                     updateMemberPropertyVisibility({
                       memberPropertyId: property.id,
                       view: 'table',
-                      visible: !disabledInTableView
+                      visible: disabledInTableView
                     });
                   }}
                 />

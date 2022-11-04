@@ -7,21 +7,23 @@ export async function updateMemberPropertyVisibility ({
   view,
   visible
 }: UpdateMemberPropertyVisibilityPayload) {
+  const memberProperty = await prisma.memberProperty.findUnique({
+    where: {
+      id: memberPropertyId
+    },
+    select: {
+      enabledViews: true
+    }
+  });
 
-  if (visible) {
-    await prisma.memberPropertyVisibility.create({
-      data: {
-        memberPropertyId,
-        view
-      }
-    });
-  }
-  else {
-    await prisma.memberPropertyVisibility.deleteMany({
-      where: {
-        memberPropertyId,
-        view
-      }
-    });
-  }
+  const enabledViews = memberProperty?.enabledViews ?? [];
+
+  await prisma.memberProperty.update({
+    where: {
+      id: memberPropertyId
+    },
+    data: {
+      enabledViews: visible ? [...enabledViews, view] : enabledViews.filter(enabledView => enabledView !== view)
+    }
+  });
 }
