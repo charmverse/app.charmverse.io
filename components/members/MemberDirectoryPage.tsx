@@ -41,8 +41,11 @@ export default function MemberDirectoryPage () {
   const [sortedProperty, setSortedProperty] = useState<string>('');
 
   useEffect(() => {
-    setSortedProperty(properties.find(property => property.type === 'name')?.name ?? '');
-  }, [properties]);
+    // Only set initial property sort if none exist before
+    if (!sortedProperty) {
+      setSortedProperty(properties.find(property => property.type === 'name')?.name ?? '');
+    }
+  }, [properties, sortedProperty]);
 
   const sortedMembers = useMemo(() => {
     const memberProperty = sortedProperty ? properties.find(property => property.name === sortedProperty) : null;
@@ -50,7 +53,7 @@ export default function MemberDirectoryPage () {
       return sortMembers(searchedMembers, memberProperty);
     }
     return searchedMembers;
-  }, [sortedProperty, properties]);
+  }, [sortedProperty, properties, searchedMembers]);
 
   return (
     <CenteredPageContent>
@@ -58,7 +61,7 @@ export default function MemberDirectoryPage () {
       <MemberDirectorySearchBar
         onChange={setSearchedMembers}
       />
-      <Stack flexDirection='row' justifyContent='space-between'>
+      <Stack flexDirection='row' justifyContent='space-between' mb={1}>
         <Tabs textColor='primary' indicatorColor='secondary' value={currentView} sx={{ minHeight: 0, height: 'fit-content' }}>
           {views.map(view => (
             <Tab

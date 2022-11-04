@@ -1,0 +1,7 @@
+
+User-agent: *
+Allow: /
+# Block crawlers from workspace invites
+Disallow: /invite/*
+# Block crawlers from the API
+Disallow: /api/*

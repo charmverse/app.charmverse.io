@@ -12,7 +12,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .use(requireKeys(['snapshotDomain', 'defaultVotingDuration'], 'body'))
   .put(updateSnapshotConnection);
 
