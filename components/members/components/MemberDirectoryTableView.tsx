@@ -45,8 +45,9 @@ function MemberDirectoryTableRow ({
   const { properties = [] } = useMemberProperties();
   const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const { mutateMembers } = useMembers();
+  const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
 
-  if (properties.length === 0) {
+  if (visibleProperties.length === 0) {
     return null;
   }
 
@@ -59,7 +60,7 @@ function MemberDirectoryTableRow ({
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
             size='small'
-            className='icons'
+            className={!admin ? '' : 'icons'}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -70,7 +71,7 @@ function MemberDirectoryTableRow ({
           </IconButton>
         )}
       </TableCell>
-      {properties.map(property => {
+      {visibleProperties.map(property => {
         const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
         if (memberProperty) {
           switch (property.type) {
@@ -201,6 +202,7 @@ export function MemberDirectoryTableView ({
 }) {
   const { properties = [] } = useMemberProperties();
 
+  const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
   return (
     <Table
       size='small'
@@ -217,7 +219,7 @@ export function MemberDirectoryTableView ({
       <TableHead>
         <TableRow>
           <StyledTableCell></StyledTableCell>
-          {properties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
+          {visibleProperties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
         </TableRow>
       </TableHead>
       <TableBody>

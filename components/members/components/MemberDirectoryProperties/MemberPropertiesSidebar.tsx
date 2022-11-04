@@ -154,7 +154,8 @@ export function MemberPropertySidebarItem ({
             gap={0.5}
             className='icons'
             sx={{
-              opacity: 0
+              opacity: 0,
+              alignItems: 'center'
             }}
           >
             <Tooltip title={`Edit ${property.name} property.`}>

@@ -91,6 +91,7 @@ export default function MemberDirectoryPage () {
           <MemberDirectorySort
             setSortedProperty={setSortedProperty}
             sortedProperty={sortedProperty}
+            view={currentView}
           />
           <IconButton onClick={() => {
             setTimeout(() => {
