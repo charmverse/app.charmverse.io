@@ -30,7 +30,7 @@ export async function updateMemberPropertyVisibility ({
     throw new UndesirableOperationError(`${memberProperty.type} property visibility can't be updated`);
   }
 
-  await prisma.memberProperty.update({
+  return prisma.memberProperty.update({
     where: {
       id: memberPropertyId
     },

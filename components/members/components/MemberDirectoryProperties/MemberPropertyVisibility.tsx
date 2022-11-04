@@ -5,6 +5,7 @@ import type { SVGProps } from 'react';
 
 import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { UNHIDEABLE_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
@@ -28,8 +29,10 @@ function VisibilityViewIcon ({
 function MemberPropertyVisibilityView ({
   view,
   enabledViews,
-  memberPropertyId
+  memberPropertyId,
+  disabled
 }: {
+  disabled: boolean;
   view: VisibilityView;
   enabledViews: VisibilityView[];
   memberPropertyId: string;
@@ -38,12 +41,12 @@ function MemberPropertyVisibilityView ({
   const isDisabled = !enabledViews.includes(view);
 
   return (
-    <Tooltip title={`Property is ${isDisabled ? 'invisible' : 'visible'} in ${view} view`}>
+    <Tooltip title={!disabled ? `Property is ${isDisabled ? 'invisible' : 'visible'} in ${view} view` : ''}>
       <Typography sx={{
         display: 'flex',
         alignItems: 'center',
         color: isDisabled ? 'action.disabled' : 'inherit',
-        cursor: 'pointer'
+        cursor: disabled ? 'initial' : 'pointer'
       }}
       >
         <VisibilityViewIcon
@@ -74,6 +77,8 @@ export function MemberPropertyVisibility ({
   if (UNHIDEABLE_MEMBER_PROPERTIES.includes(property.type)) {
     return null;
   }
+
+  const admin = isAdmin();
   return (
     <>
       <Typography variant='overline' alignItems='center' display='flex'>
@@ -84,16 +89,19 @@ export function MemberPropertyVisibility ({
           enabledViews={enabledViews}
           memberPropertyId={property.id}
           view='gallery'
+          disabled={!admin}
         />
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}
           view='table'
+          disabled={!admin}
         />
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}
           view='profile'
+          disabled={!admin}
         />
       </Stack>
     </>
