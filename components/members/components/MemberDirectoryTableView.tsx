@@ -59,7 +59,7 @@ function MemberDirectoryTableRow ({
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
             size='small'
-            className='icons'
+            className={!admin ? '' : 'icons'}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

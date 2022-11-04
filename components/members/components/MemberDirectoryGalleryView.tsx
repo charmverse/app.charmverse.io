@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
@@ -11,6 +12,7 @@ import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesM
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
@@ -46,6 +48,7 @@ function MemberDirectoryGalleryCard ({
   const isRolesHidden = !rolesProperty?.enabledViews.includes('gallery');
   const isDiscordHidden = !discordProperty?.enabledViews.includes('gallery');
   const isTwitterHidden = !twitterProperty?.enabledViews.includes('gallery');
+  const admin = isAdmin();
 
   const social = member.profile?.social as Social ?? {};
   return (
@@ -56,10 +59,30 @@ function MemberDirectoryGalleryCard ({
         sx={{
           '&:hover': {
             opacity: 0.8
-          }
+          },
+          position: 'relative'
         }}
       >
         <Card sx={{ width: '100%' }}>
+          {((user?.id === member.id && currentSpace) || admin) && (
+            <IconButton
+              size='small'
+              className={!admin ? '' : 'icons'}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                zIndex: 1
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsModalOpen(true);
+              }}
+            >
+              <EditIcon fontSize='small' />
+            </IconButton>
+          )}
           <Avatar
             sx={{
               width: '100%'
