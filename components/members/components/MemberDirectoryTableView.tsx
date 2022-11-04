@@ -3,6 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Chip, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -14,7 +15,6 @@ import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
@@ -43,7 +43,6 @@ function MemberDirectoryTableRow ({
   const admin = isAdmin();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { properties = [] } = useMemberProperties();
-  const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const { mutateMembers } = useMembers();
   const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
 
@@ -184,11 +183,14 @@ function MemberDirectoryTableRow ({
         <MemberPropertiesPopupForm
           onClose={() => {
             setIsModalOpen(false);
-            mutateMembers();
           }}
+          showLoading={false}
           memberId={member.id}
           spaceId={currentSpace.id}
-          updateMemberPropertyValues={updateSpaceValues}
+          updateMemberPropertyValues={async (spaceId, values) => {
+            await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+            mutateMembers();
+          }}
         />
       )}
     </StyledTableRow>

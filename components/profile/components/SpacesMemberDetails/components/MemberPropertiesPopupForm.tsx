@@ -19,9 +19,10 @@ type Props = {
   title?: string;
   cancelButtonText?: string;
   children?: ReactNode;
+  showLoading?: boolean;
 };
 
-export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm ({ showLoading = true, cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -59,7 +60,7 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
     reset(defaultValues);
   }, [defaultValues]);
 
-  if (!data && spaceId) {
+  if (!data && spaceId && showLoading) {
     return <LoadingComponent isLoading />;
   }
 
