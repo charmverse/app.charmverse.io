@@ -1,7 +1,7 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberPropertyPermission } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -45,14 +45,16 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
     <>
       <Collapse in={isExpanded}>
         <Stack mb={1}>
-          <Stack pl={4}>
-            <MemberPropertyVisibility
-              property={property}
-            />
+          <Stack>
+            <Box pl={4}>
+              <MemberPropertyVisibility
+                property={property}
+              />
+            </Box>
             {property?.permissions.length ? (
               <Stack>
                 <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                  <Typography variant='overline'>Restricted to roles:</Typography>
+                  <Typography pl={4} variant='overline'>Restricted to roles:</Typography>
                 </Tooltip>
                 {property?.permissions.map(permission => (
                   <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
@@ -86,7 +88,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
               </Stack>
             ) : (
               <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
-                <Typography variant='overline' alignItems='center' display='flex'>
+                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                   Everyone in workspace
                   <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                 </Typography>

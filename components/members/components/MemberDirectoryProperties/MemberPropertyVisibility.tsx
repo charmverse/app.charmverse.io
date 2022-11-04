@@ -6,6 +6,7 @@ import type { SVGProps } from 'react';
 import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { UNHIDEABLE_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 function VisibilityViewIcon ({
@@ -70,6 +71,9 @@ export function MemberPropertyVisibility ({
   property: MemberPropertyWithPermissions;
 }) {
   const enabledViews = property.enabledViews;
+  if (UNHIDEABLE_MEMBER_PROPERTIES.includes(property.type)) {
+    return null;
+  }
   return (
     <>
       <Typography variant='overline' alignItems='center' display='flex'>
