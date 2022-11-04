@@ -24,6 +24,16 @@ interface InlinePaletteRowProps {
   allowHover?: boolean;
 }
 
+const StyledPaper = styled(Paper)`
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.palette.secondary.light};
+  margin-left: 10px;
+`;
+
 const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
   padding: 0.3rem 0;
   min-height: 55px;
@@ -82,13 +92,12 @@ export default function InlinePaletteRow ({
       className={className}
       style={style}
     >
-      <Paper
+      <StyledPaper
         elevation={0}
         variant='outlined'
-        sx={{ width: 46, height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'secondary.light', marginLeft: '10px' }}
       >
         {icon}
-      </Paper>
+      </StyledPaper>
       <Box padding='0 12px 0 6px' display='flex' flexDirection='column'>
         <Typography variant='body2' noWrap whiteSpace='normal'>{title}</Typography>
         <Typography variant='caption' noWrap whiteSpace='normal' color='secondary.light'>{description}</Typography>
