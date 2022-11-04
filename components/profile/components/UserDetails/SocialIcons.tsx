@@ -18,8 +18,12 @@ export function SocialIcons ({
     discordUsername: '',
     linkedinURL: ''
   },
+  showDiscord = true,
+  showTwitter = true,
   ...props
 }: {
+  showDiscord?: boolean;
+  showTwitter?: boolean;
   children?: ReactNode;
   social?: {
     twitterURL?: string;
@@ -28,16 +32,17 @@ export function SocialIcons ({
     linkedinURL?: string;
   };
 } & StackProps) {
+
   const theme = useTheme();
 
   return (
     <Stack direction='row' alignItems='center' gap={2} {...props}>
       {
-        social.twitterURL ? (
+        showTwitter && (social.twitterURL ? (
           <Link href={social.twitterURL} target='_blank' display='flex'>
             <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
           </Link>
-        ) : <TwitterIcon color='disabled' style={{ height: '22px' }} />
+        ) : <TwitterIcon color='disabled' style={{ height: '22px' }} />)
       }
       {
         social.githubURL ? (
@@ -47,12 +52,12 @@ export function SocialIcons ({
         ) : <GitHubIcon color='disabled' style={{ height: '22px' }} />
       }
       {
-        social?.discordUsername ? <DiscordSocialIcon username={social.discordUsername} />
+        showDiscord && (social?.discordUsername && showDiscord ? <DiscordSocialIcon username={social.discordUsername} />
           : (
             <SvgIcon viewBox='0 -10 70 70' sx={{ color: theme.palette.text.disabled, height: '22px' }}>
               <DiscordIcon />
             </SvgIcon>
-          )
+          ))
       }
       {
         social?.linkedinURL ? (

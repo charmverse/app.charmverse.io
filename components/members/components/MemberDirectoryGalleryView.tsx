@@ -19,11 +19,16 @@ function MemberDirectoryGalleryCard ({
   const nameProperty = properties.find(property => property.type === 'name');
   const timezoneProperty = properties.find(property => property.type === 'timezone');
   const rolesProperty = properties.find(property => property.type === 'role');
+  const discordProperty = properties.find(property => property.type === 'discord');
+  const twitterProperty = properties.find(property => property.type === 'twitter');
 
   const isNameHidden = !nameProperty?.enabledViews.includes('gallery');
   const isTimezoneHidden = !timezoneProperty?.enabledViews.includes('gallery');
   const isRolesHidden = !rolesProperty?.enabledViews.includes('gallery');
+  const isDiscordHidden = !discordProperty?.enabledViews.includes('gallery');
+  const isTwitterHidden = !twitterProperty?.enabledViews.includes('gallery');
 
+  const social = member.profile?.social as Social ?? {};
   return (
     <Link
       href={`/u/${member.path || member.id}`}
@@ -50,7 +55,12 @@ function MemberDirectoryGalleryCard ({
               {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
             </Typography>
           )}
-          <SocialIcons gap={1} social={member.profile?.social as Social} />
+          <SocialIcons
+            gap={1}
+            social={social}
+            showDiscord={!isDiscordHidden}
+            showTwitter={!isTwitterHidden}
+          />
           {!isRolesHidden && (
             <Stack gap={0.5}>
               <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
