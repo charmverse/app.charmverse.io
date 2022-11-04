@@ -2,15 +2,12 @@ import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import PersonIcon from '@mui/icons-material/Person';
-import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
-import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/gallery';
-import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
@@ -115,14 +112,9 @@ export function MemberPropertySidebarItem ({
   property: MemberPropertyWithPermissions;
 }) {
   const [toggled, setToggled] = useState(false);
-  const { deleteProperty, addPropertyPermissions, removePropertyPermission, updateMemberPropertyVisibility } = useMemberProperties();
+  const { deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
-
-  const enabledViews = property.enabledViews;
-  const disabledInTableView = !enabledViews.includes('table');
-  const disabledInGalleryView = !enabledViews.includes('gallery');
-  const disabledInProfileView = !enabledViews.includes('profile');
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -166,72 +158,6 @@ export function MemberPropertySidebarItem ({
               alignItems: 'center'
             }}
           >
-            <Tooltip title={`Property is ${disabledInGalleryView ? 'invisible' : 'visible'} in gallery view`}>
-              <Typography sx={{
-                display: 'flex',
-                alignItems: 'center',
-                color: disabledInGalleryView ? 'action.disabled' : 'inherit'
-              }}
-              >
-                <GalleryIcon
-                  width={20}
-                  height={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    updateMemberPropertyVisibility({
-                      memberPropertyId: property.id,
-                      view: 'gallery',
-                      visible: disabledInGalleryView
-                    });
-                  }}
-                />
-              </Typography>
-            </Tooltip>
-            <Tooltip title={`Property is ${disabledInTableView ? 'invisible' : 'visible'} in table view`}>
-              <Typography sx={{
-                display: 'flex',
-                alignItems: 'center',
-                color: disabledInTableView ? 'action.disabled' : 'inherit'
-              }}
-              >
-                <TableIcon
-                  width={20}
-                  height={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    updateMemberPropertyVisibility({
-                      memberPropertyId: property.id,
-                      view: 'table',
-                      visible: disabledInTableView
-                    });
-                  }}
-                />
-              </Typography>
-            </Tooltip>
-            <Tooltip title={`Property is ${disabledInProfileView ? 'invisible' : 'visible'} in profile view`}>
-              <Typography sx={{
-                display: 'flex',
-                alignItems: 'center',
-                color: disabledInProfileView ? 'action.disabled' : 'inherit'
-              }}
-              >
-                <PersonIcon
-                  width={20}
-                  height={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    updateMemberPropertyVisibility({
-                      memberPropertyId: property.id,
-                      view: 'profile',
-                      visible: disabledInProfileView
-                    });
-                  }}
-                />
-              </Typography>
-            </Tooltip>
             <Tooltip title={`Edit ${property.name} property.`}>
               <EditIcon
                 cursor='pointer'
