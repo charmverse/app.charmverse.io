@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import PersonIcon from '@mui/icons-material/Person';
 import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -121,6 +122,7 @@ export function MemberPropertySidebarItem ({
   const enabledViews = property.enabledViews;
   const disabledInTableView = !enabledViews.includes('table');
   const disabledInGalleryView = !enabledViews.includes('gallery');
+  const disabledInProfileView = !enabledViews.includes('profile');
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
 
@@ -203,6 +205,28 @@ export function MemberPropertySidebarItem ({
                       memberPropertyId: property.id,
                       view: 'table',
                       visible: disabledInTableView
+                    });
+                  }}
+                />
+              </Typography>
+            </Tooltip>
+            <Tooltip title={`Property is ${disabledInProfileView ? 'invisible' : 'visible'} in profile view`}>
+              <Typography sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: disabledInProfileView ? 'action.disabled' : 'inherit'
+              }}
+              >
+                <PersonIcon
+                  width={20}
+                  height={20}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    updateMemberPropertyVisibility({
+                      memberPropertyId: property.id,
+                      view: 'profile',
+                      visible: disabledInProfileView
                     });
                   }}
                 />

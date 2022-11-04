@@ -13,6 +13,7 @@ export type PropertyValue = {
 export type PropertyValueDetails = {
   type: MemberPropertyType;
   name: string;
+  enabledViews: VisibilityView[];
 }
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;

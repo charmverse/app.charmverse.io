@@ -42,6 +42,9 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
+            if (!property.enabledViews.includes('profile')) {
+              return null;
+            }
             switch (property.type) {
               case 'text':
               case 'text_multiline':

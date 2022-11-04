@@ -1,16 +1,17 @@
 import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client';
 
-import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, MemberPropertyWithSpace } from 'lib/members/interfaces';
+import type { MemberPropertyValuesBySpace, MemberPropertyWithSpace, PropertyValueWithDetails } from 'lib/members/interfaces';
 
 export function getPropertiesWithValues (properties: MemberPropertyWithSpace[], propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[]): PropertyValueWithDetails[] {
-  return properties.map(({ id, spaceId, type, name, space: { name: spaceName, spaceImage } }) => ({
+  return properties.map(({ enabledViews, id, spaceId, type, name, space: { name: spaceName, spaceImage } }) => ({
     memberPropertyId: id,
     spaceId,
     spaceName,
     spaceImage,
     type,
     name,
-    value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null
+    value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null,
+    enabledViews
   }));
 }
 
@@ -33,7 +34,7 @@ export function mapPropertyValueWithDetails ({
   memberPropertyId,
   spaceId,
   value,
-  memberProperty: { type, name },
+  memberProperty: { type, name, enabledViews },
   space: { spaceImage }
 }: MemberPropertyValue & { memberProperty: MemberProperty, space: Space }): PropertyValueWithDetails {
   return {
@@ -42,7 +43,8 @@ export function mapPropertyValueWithDetails ({
     value,
     type,
     name,
-    spaceImage
+    spaceImage,
+    enabledViews
   };
 
 }
