@@ -13,13 +13,13 @@ import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { mergeRefs } from 'components/common/PageLayout/components/PageNavigation/components/TreeNode';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import useRefState from 'hooks/useRefState';
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
