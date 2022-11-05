@@ -1,6 +1,8 @@
 import type { MemberProperty, Prisma, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
+import type { ExistingSelectOption } from 'lib/forms/Interfaces';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 type UpdatePropertyInput = {
   data: Prisma.MemberPropertyUpdateInput;
@@ -9,9 +11,17 @@ type UpdatePropertyInput = {
   spaceId: string;
 }
 
-export async function updateMemberProperty ({ data, userId, id, spaceId }: UpdatePropertyInput) {
+export async function updateMemberProperty ({ data, id, spaceId }: UpdatePropertyInput) {
   const transactions: PrismaPromise<any>[] = [];
   const newIndex = data.index;
+  const updateOptions = data.options as ExistingSelectOption[] || [];
+  const hasDuplicatedOptions = updateOptions
+    .some((option, index, options) => options.findIndex(o => o.name.toLowerCase() === option.name.toLowerCase()) !== index);
+
+  if (hasDuplicatedOptions) {
+    throw new InvalidInputError('Duplicated option names are not allowed.');
+  }
+
   if (newIndex !== null && newIndex !== undefined) {
     const memberProperty = await prisma.memberProperty.findUnique({
       where: {
@@ -44,13 +54,6 @@ export async function updateMemberProperty ({ data, userId, id, spaceId }: Updat
       }
     }));
   }
-
-  transactions.push(prisma.memberProperty.update({
-    where: {
-      id
-    },
-    data: { ...data, updatedBy: userId, id }
-  }));
 
   return prisma.$transaction(transactions);
 }

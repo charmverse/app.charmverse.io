@@ -1,4 +1,6 @@
-import type { MemberProperty, MemberPropertyPermission, MemberPropertyType, MemberPropertyValue, Role, Space, User, UserDetails } from '@prisma/client';
+import type { MemberProperty, MemberPropertyPermission, MemberPropertyType, MemberPropertyValue, Role, Space, User, UserDetails, VisibilityView } from '@prisma/client';
+
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 
@@ -13,6 +15,8 @@ export type PropertyValue = {
 export type PropertyValueDetails = {
   type: MemberPropertyType;
   name: string;
+  enabledViews: VisibilityView[];
+  options?: SelectOptionType[];
 }
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
@@ -53,5 +57,11 @@ export type MemberPropertyPermissionWithRole = MemberPropertyPermission & { role
 }
 
 export type MemberPropertyWithPermissions = MemberProperty & {
-   permissions: MemberPropertyPermissionWithRole[];
-  }
+  permissions: MemberPropertyPermissionWithRole[];
+}
+
+export type UpdateMemberPropertyVisibilityPayload = {
+  memberPropertyId: string;
+  visible: boolean;
+  view: VisibilityView;
+}

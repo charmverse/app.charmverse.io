@@ -190,6 +190,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
                         parts.map((part: { text: string, highlight: boolean }) => {
                           return (
                             <span
+                              key={`${part.text}${part.highlight}`}
                               style={{
                                 fontWeight: part.highlight ? 700 : 400
                               }}

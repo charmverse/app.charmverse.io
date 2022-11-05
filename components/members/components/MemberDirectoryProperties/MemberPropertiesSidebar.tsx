@@ -11,6 +11,9 @@ import { useDrag, useDrop } from 'react-dnd';
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
+import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
@@ -23,8 +26,6 @@ import { mergeRefs } from 'lib/utilities/react';
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
-import type { PropertyOption } from './MemberPropertySelectInput';
-import { MemberPropertySelectInput } from './MemberPropertySelectInput';
 
 const StyledSidebar = styled.div`
   background-color: ${({ theme }) => theme.palette.background.paper};
@@ -48,17 +49,17 @@ function MemberPropertyItemForm ({
 }) {
   const { updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
-  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>((property?.options as PropertyOption[]) ?? []);
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>((property?.options as SelectOptionType[]) ?? []);
 
   useEffect(() => {
     setPropertyName(property.name);
   }, []);
 
-  const isSelectPropertyType = (property.type.match(/select/));
+  const isSelectPropertyType = isSelectType(property.type);
 
   const isDisabled = propertyName.length === 0
     || (isSelectPropertyType
-      && (property.options as PropertyOption[])?.find(po => po.name.length === 0));
+      && (property.options as SelectOptionType[])?.find(po => po.name.length === 0));
 
   async function onSubmit () {
     if (!isDisabled) {
@@ -91,18 +92,17 @@ function MemberPropertyItemForm ({
       </Stack>
 
       {isSelectPropertyType && (
-        <MemberPropertySelectInput
-          onChange={setPropertyOptions}
-          options={propertyOptions}
-        />
+        <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
       )}
+
       <Button
         disabled={isDisabled}
         onClick={onSubmit}
         sx={{
           width: 'fit-content'
         }}
-      >Update
+      >
+        Update property
       </Button>
     </Stack>
   );
@@ -207,7 +207,8 @@ export function MemberPropertySidebarItem ({
             gap={0.5}
             className='icons'
             sx={{
-              opacity: 0
+              opacity: 0,
+              alignItems: 'center'
             }}
           >
             <Tooltip title={`Edit ${property.name} property.`}>

@@ -1,12 +1,16 @@
 import type { MemberPropertyType } from '@prisma/client';
 
-export const DEFAULT_MEMBER_PROPERTIES = [
+export const READONLY_MEMBER_PROPERTIES: MemberPropertyType[] = [
   'profile_pic',
-  'name',
   'role',
   'discord',
   'twitter',
   'timezone'
+];
+
+export const DEFAULT_MEMBER_PROPERTIES = [
+  ...READONLY_MEMBER_PROPERTIES,
+  'name'
 ] as const;
 
 export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
@@ -25,3 +29,8 @@ export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
   text_multiline: 'Multiline text',
   url: 'URL'
 };
+
+export const UNHIDEABLE_MEMBER_PROPERTIES = [
+  'name',
+  'profile_pic'
+];

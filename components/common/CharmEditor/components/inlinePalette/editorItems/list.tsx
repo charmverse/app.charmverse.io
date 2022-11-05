@@ -17,13 +17,15 @@ const {
 } = bulletList;
 const { toggleOrderedList } = orderedList;
 
+const iconSize = 30;
+
 export function items (): PaletteItemTypeNoGroup[] {
   return [
     {
       uid: 'bulletListConvert',
       title: 'Bullet List',
       icon: <FormatListBulletedIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       keywords: ['unordered', 'lists'],
@@ -46,7 +48,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       uid: 'todoListConvert',
       title: 'Todo List',
       icon: <LibraryAddCheckIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
@@ -68,7 +70,7 @@ export function items (): PaletteItemTypeNoGroup[] {
     {
       uid: 'orderedListConvert',
       icon: <FormatListNumberedIcon sx={{
-        fontSize: 16
+        fontSize: iconSize
       }}
       />,
       title: 'Ordered List',

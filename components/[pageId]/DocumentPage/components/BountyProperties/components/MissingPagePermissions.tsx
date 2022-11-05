@@ -46,14 +46,12 @@ export default function MissingPagePermissions ({ bountyPermissions, pagePermiss
     };
   });
 
-  const componentLabel = target === 'reviewer' ? 'Reviewers' : 'Submitters';
-
   return (
     <Alert severity='warning'>
       {
         missingPermissionsWithName.map(bountyPermissionAssignee => (
 
-          <Typography variant='caption' display='flex' sx={{ alignItems: 'center' }}>
+          <Typography key={bountyPermissionAssignee.id} variant='caption' display='flex' sx={{ alignItems: 'center' }}>
             {bountyPermissionAssignee.group === 'space' ? 'Workspace members' : bountyPermissionAssignee.group === 'role' ? `${bountyPermissionAssignee.name} role` : `${bountyPermissionAssignee.name}`} cannot view this page
           </Typography>
 

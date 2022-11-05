@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { ViewOptions } from 'components/common/ViewOptions';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
@@ -68,14 +69,21 @@ export default function VotesSidebar () {
 
   return (
     <>
-      <ViewOptions
-        showPosition={true}
-        showVotes={true}
-        voteSort={voteSort}
-        voteFilter={voteFilter}
-        setVoteFilter={setVoteFilter}
-        setVoteSort={setVoteSort}
-      />
+      <ViewOptions label='Sort'>
+        <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
+          <MenuItem value='position'>Position</MenuItem>
+          <MenuItem value='highest_votes'>Most voted</MenuItem>
+          <MenuItem value='latest_deadline'>Deadline</MenuItem>
+          <MenuItem value='latest_created'>Created</MenuItem>
+        </Select>
+        <InputLabel>Filter</InputLabel>
+        <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as VoteFilter)}>
+          <MenuItem value='in_progress'>In progress</MenuItem>
+          <MenuItem value='completed'>Completed</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
+        </Select>
+      </ViewOptions>
+
       <StyledSidebar>
         {sortedVotes.length === 0
           ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} polls yet`} />
@@ -91,44 +99,6 @@ export default function VotesSidebar () {
           ))}
       </StyledSidebar>
     </>
-  );
-}
-
-interface ViewOptionsProps {
-  showPosition?: boolean;
-  showVotes?: boolean;
-  voteSort: VoteSort;
-  voteFilter: VoteFilter;
-  setVoteFilter: (value: VoteFilter) => void;
-  setVoteSort: (value: VoteSort) => void;
-}
-
-const StyledViewOptions = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
-  .MuiInputLabel-root, .MuiSelect-select {
-    font-size: .85em;
-  }
-`;
-
-export function ViewOptions ({ voteSort, voteFilter, setVoteFilter, setVoteSort, showPosition, showVotes }: ViewOptionsProps) {
-  return (
-    <StyledViewOptions>
-      <InputLabel>Sort</InputLabel>
-      <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
-        {showPosition && <MenuItem value='position'>Position</MenuItem>}
-        {showVotes && <MenuItem value='highest_votes'>Most voted</MenuItem>}
-        <MenuItem value='latest_deadline'>Deadline</MenuItem>
-        <MenuItem value='latest_created'>Created</MenuItem>
-      </Select>
-      <InputLabel>Filter</InputLabel>
-      <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as VoteFilter)}>
-        <MenuItem value='in_progress'>In progress</MenuItem>
-        <MenuItem value='completed'>Completed</MenuItem>
-        <MenuItem value='all'>All</MenuItem>
-      </Select>
-    </StyledViewOptions>
   );
 }
 

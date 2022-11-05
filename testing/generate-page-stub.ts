@@ -1571,7 +1571,7 @@ export function pageContentStub (): Pick<Prisma.PageCreateInput, 'content' |'con
  * A page stub with a significant amount of content
  */
 export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt, title }:
-  { id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string }): Prisma.PageCreateInput {
+  { id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string }): Prisma.PageCreateManyInput {
 
   const pageContent = pageContentStub();
 
@@ -1580,17 +1580,9 @@ export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt,
   return {
     id: pageId ?? v4(),
     deletedAt,
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
+    createdBy,
     updatedBy: createdBy,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
+    spaceId,
     updatedAt: '2022-09-14T14:13:05.326Z',
     title: title ?? `Page ${pageId}`,
     headerImage: null,
