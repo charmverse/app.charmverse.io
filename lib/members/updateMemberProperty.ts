@@ -11,7 +11,7 @@ type UpdatePropertyInput = {
   spaceId: string;
 }
 
-export async function updateMemberProperty ({ data, id, spaceId }: UpdatePropertyInput) {
+export async function updateMemberProperty ({ data, id, userId, spaceId }: UpdatePropertyInput) {
   const transactions: PrismaPromise<any>[] = [];
   const newIndex = data.index;
   const updateOptions = data.options as ExistingSelectOption[] || [];
@@ -54,6 +54,13 @@ export async function updateMemberProperty ({ data, id, spaceId }: UpdatePropert
       }
     }));
   }
+
+  transactions.push(prisma.memberProperty.update({
+    where: {
+      id
+    },
+    data: { ...data, updatedBy: userId, id }
+  }));
 
   return prisma.$transaction(transactions);
 }
