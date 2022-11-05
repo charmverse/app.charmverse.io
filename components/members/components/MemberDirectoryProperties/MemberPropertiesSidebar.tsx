@@ -118,16 +118,13 @@ export function MemberPropertySidebarItem ({
   const ref = useRef<HTMLDivElement>(null);
 
   const [toggled, setToggled] = useState(false);
-  const { updateProperty, mutateProperties, deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
+  const { updateProperty, deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
 
   const [, drag, dragPreview] = useDrag(() => ({
     type: 'item',
-    item: property,
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
+    item: property
   }));
 
   const [{ canDrop, isOverCurrent }, drop] = useDrop<MemberPropertyWithPermissions, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
@@ -141,12 +138,7 @@ export function MemberPropertySidebarItem ({
         await updateProperty({
           id: droppedProperty.id,
           index: property.index
-        }, false);
-        await updateProperty({
-          id: property.id,
-          index: droppedProperty.index
-        }, false);
-        mutateProperties();
+        });
         setIsAdjacent(false);
       }
     },
@@ -190,7 +182,7 @@ export function MemberPropertySidebarItem ({
         canDrop: canDropItem
       };
     }
-  }));
+  }), [property]);
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
   const isAdjacentActive = isAdjacent && canDrop && isOverCurrent;

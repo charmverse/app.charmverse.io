@@ -12,7 +12,7 @@ import { useCurrentSpace } from './useCurrentSpace';
 type Context = {
   properties: MemberPropertyWithPermissions[] | undefined;
   addProperty: (property: CreateMemberPropertyPayload) => Promise<MemberProperty>;
-  updateProperty: (property: Partial<MemberProperty> & { id: string }, mutate?: boolean) => Promise<MemberProperty>;
+  updateProperty: (property: Partial<MemberProperty> & { id: string }) => Promise<void>;
   deleteProperty: (id: string) => Promise<void>;
   addPropertyPermissions: (propertyId: string, permission: CreateMemberPropertyPermissionInput[]) => Promise<MemberPropertyPermission[]>;
   removePropertyPermission: (permission: MemberPropertyPermission) => Promise<void>;
@@ -48,19 +48,10 @@ export function MemberPropertiesProvider ({ children }: { children: ReactNode })
     }
   }, [space?.id]);
 
-  const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }, mutate: boolean = true) => {
+  const updateProperty = useCallback(async (propertyData: Partial<MemberProperty> & { id: string }) => {
     if (space) {
-      const updatedProperty = await charmClient.members.updateMemberProperty(space.id, propertyData);
-      if (mutate) {
-        mutateProperties(state => {
-          if (state) {
-            return state.map(p => p.id === updatedProperty.id ? { ...p, ...updatedProperty } : p);
-          }
-          return state;
-        });
-      }
-
-      return updatedProperty;
+      await charmClient.members.updateMemberProperty(space.id, propertyData);
+      mutateProperties();
     }
   }, [space?.id]);
 
