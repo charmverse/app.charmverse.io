@@ -247,6 +247,14 @@ model Page {
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
+
+  @@index([bountyId])
+  @@index([cardId])
+  @@index([createdBy])
+  @@index([parentId])
+  @@index([proposalId])
+  @@index([spaceId])
+  @@index([title])
 }
 
 model Block {
@@ -266,6 +274,9 @@ model Block {
   user      User      @relation(fields: [createdBy], references: [id])
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   page      Page?
+
+  @@index([rootId])
+  @@index([spaceId])
 }
 
 model UserVote {
@@ -648,6 +659,11 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
+
+  @@index([pageId])
+  @@index([roleId])
+  @@index([userId])
+  @@index([spaceId])
 }
 
 model SpacePermission {
