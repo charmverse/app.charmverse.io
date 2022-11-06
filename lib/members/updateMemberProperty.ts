@@ -1,4 +1,4 @@
-import type { Prisma, PrismaPromise } from '@prisma/client';
+import type { MemberProperty, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { ExistingSelectOption } from 'lib/forms/Interfaces';
@@ -6,7 +6,7 @@ import { NotFoundError } from 'lib/middleware';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type UpdatePropertyInput = {
-  data: Prisma.MemberPropertyUpdateInput;
+  data: Partial<MemberProperty>;
   id: string;
   userId: string;
   spaceId: string;
@@ -64,7 +64,7 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
     where: {
       id
     },
-    data: { ...data, updatedBy: userId, id }
+    data: { ...data, options: data.options ?? undefined, updatedBy: userId, id }
   }));
 
   return prisma.$transaction(transactions);
