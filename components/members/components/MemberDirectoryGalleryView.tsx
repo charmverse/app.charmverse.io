@@ -104,23 +104,6 @@ function MemberDirectoryGalleryCard ({
               showDiscord={!isDiscordHidden}
               showTwitter={!isTwitterHidden}
             />
-            {!isRolesHidden && (
-              <Stack gap={0.5}>
-                <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-                <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
-                </Stack>
-              </Stack>
-            )}
-
-            {!isTimezoneHidden && (
-              <Stack flexDirection='row' gap={1}>
-                <TimezoneDisplay
-                  showTimezone
-                  timezone={member.profile?.timezone}
-                />
-              </Stack>
-            )}
             {properties.map(property => {
               const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
@@ -128,6 +111,26 @@ function MemberDirectoryGalleryCard ({
                 return null;
               }
               switch (property.type) {
+                case 'role': {
+                  return !isRolesHidden && (
+                    <Stack gap={0.5}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                      </Stack>
+                    </Stack>
+                  );
+                }
+                case 'timezone': {
+                  return !isTimezoneHidden && (
+                    <Stack flexDirection='row' gap={1}>
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile?.timezone}
+                      />
+                    </Stack>
+                  );
+                }
                 case 'text':
                 case 'text_multiline':
                 case 'phone':
