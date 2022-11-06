@@ -1,7 +1,8 @@
-import type { MemberProperty, Prisma, PrismaPromise } from '@prisma/client';
+import type { Prisma, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { ExistingSelectOption } from 'lib/forms/Interfaces';
+import { NotFoundError } from 'lib/middleware';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type UpdatePropertyInput = {
@@ -30,7 +31,11 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
       select: {
         index: true
       }
-    }) as MemberProperty;
+    });
+
+    if (!memberProperty) {
+      throw new NotFoundError('member property not found');
+    }
 
     const currentIndex = memberProperty.index;
 

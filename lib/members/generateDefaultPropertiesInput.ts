@@ -21,11 +21,11 @@ export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: s
       createdBy: userId,
       name: customMemberProperty.name,
       type: customMemberProperty.type,
-      index: customMemberPropertyIndex,
+      index: customMemberPropertyIndex + defaultPropertiesInput.length,
       updatedBy: userId,
       spaceId
     });
   });
 
-  return defaultPropertiesInput.sort((propA, propB) => propA.name > propB.name ? 1 : -1).map((property, index) => ({ ...property, index }));
+  return defaultPropertiesInput;
 }
