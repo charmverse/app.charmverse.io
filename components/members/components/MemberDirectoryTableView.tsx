@@ -17,7 +17,7 @@ import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -49,6 +49,11 @@ function MemberDirectoryTableRow ({
   if (visibleProperties.length === 0) {
     return null;
   }
+
+  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
+    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+    mutateMembers();
+  };
 
   return (
     <StyledTableRow>
@@ -187,10 +192,7 @@ function MemberDirectoryTableRow ({
           showLoading={false}
           memberId={member.id}
           spaceId={currentSpace.id}
-          updateMemberPropertyValues={async (spaceId, values) => {
-            await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
-            mutateMembers();
-          }}
+          updateMemberPropertyValues={updateMemberPropertyValues}
         />
       )}
     </StyledTableRow>

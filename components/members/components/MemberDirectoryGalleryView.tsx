@@ -17,7 +17,7 @@ import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -48,6 +48,11 @@ function MemberDirectoryGalleryCard ({
   const isDiscordHidden = !discordProperty?.enabledViews.includes('gallery');
   const isTwitterHidden = !twitterProperty?.enabledViews.includes('gallery');
   const admin = isAdmin();
+
+  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
+    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+    mutateMembers();
+  };
 
   const social = member.profile?.social as Social ?? {};
   return (
@@ -170,10 +175,7 @@ function MemberDirectoryGalleryCard ({
           memberId={member.id}
           showLoading={false}
           spaceId={currentSpace.id}
-          updateMemberPropertyValues={async (spaceId, values) => {
-            await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
-            mutateMembers();
-          }}
+          updateMemberPropertyValues={updateMemberPropertyValues}
         />
       )}
     </>
