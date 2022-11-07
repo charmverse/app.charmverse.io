@@ -103,7 +103,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
         fontSize: iconSize
       }}
       />,
-      description: 'Convert the current block to paragraph',
+      description: 'Create a plain text block',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -136,7 +136,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       }}
       />,
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
-      description: 'Convert the current block to todo list',
+      description: 'Create a todo list',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -157,7 +157,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
         uid: `headingConvert${level}`,
         icon: <svg stroke='currentColor' fill='currentColor' strokeWidth={0} viewBox='0 0 512 512' height={iconSize} width={iconSize} xmlns='http://www.w3.org/2000/svg'><path d='M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z' /></svg>,
         title: `Heading ${level}`,
-        description: `Convert the current block to heading level ${level}`,
+        description: `Create a heading level ${level}`,
         disabled: (state) => {
           const result = isList()(state);
           return result;
@@ -212,13 +212,13 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
     },
     {
       uid: 'bulletListConvert',
-      title: 'Bullet List',
+      title: 'Bulleted List',
       icon: <FormatListBulletedIcon sx={{
         fontSize: iconSize
       }}
       />,
       keywords: ['unordered', 'lists'],
-      description: 'Convert the current block to bullet list',
+      description: 'Create a simple bulleted list',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
@@ -241,7 +241,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       />,
       title: 'Ordered List',
       keywords: ['numbered', 'lists'],
-      description: 'Convert the current block to ordered list',
+      description: 'Create an ordered list',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {

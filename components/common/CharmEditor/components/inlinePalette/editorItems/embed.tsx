@@ -18,7 +18,7 @@ export function items (): PaletteItemTypeNoGroup[] {
       title: 'Embed',
       icon: <PreviewIcon sx={{ fontSize: iconSize }} />,
       keywords: ['iframe'],
-      description: 'Insert an embed block in the line below',
+      description: 'Insert an embed block',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           if (view) {
