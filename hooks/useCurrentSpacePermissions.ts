@@ -7,7 +7,7 @@ import { useUser } from './useUser';
 
 export function useCurrentSpacePermissions () {
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   // We want dependency on user so we refetch permissions on space or user change
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user } = useUser();

@@ -28,7 +28,7 @@ interface Props {
 
 export default function InvitesTable (props: Props) {
   const { isAdmin, invites, onDelete, refetchInvites } = props;
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
 

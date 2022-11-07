@@ -37,7 +37,7 @@ function MemberDirectoryGalleryCard ({
   const rolesProperty = properties.find(property => property.type === 'role');
   const discordProperty = properties.find(property => property.type === 'discord');
   const twitterProperty = properties.find(property => property.type === 'twitter');
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { updateSpaceValues } = useMemberPropertyValues(member.id);

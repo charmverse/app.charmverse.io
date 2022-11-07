@@ -22,7 +22,7 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
 `;
 
 export function PageTemplateBanner ({ page, parentPage }: { parentPage?: PageMeta | null, page: PageMeta }) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const theme = useTheme();
 
   const isShowingCard = page.type.match('card') !== null;

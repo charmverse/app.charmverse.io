@@ -153,7 +153,7 @@ function BountyPageTitle ({ basePath }: { basePath: string }) {
 }
 
 function PublicBountyPageTitle () {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   return (
     <PageTitle>
       {space && (
@@ -204,7 +204,7 @@ function EmptyPageTitle () {
 
 export default function PageTitleWithBreadcrumbs ({ pageId, pageType }: { pageId?: string, pageType?: PageType }) {
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;

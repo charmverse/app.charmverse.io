@@ -52,7 +52,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;

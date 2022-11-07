@@ -375,7 +375,7 @@ function CharmEditor (
 ) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
   const _isEmpty = checkIsContentEmpty(content);

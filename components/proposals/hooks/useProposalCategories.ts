@@ -6,7 +6,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories () {
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   // Might need better ACL in the future
   const canEditProposalCategories = useIsAdmin();
 

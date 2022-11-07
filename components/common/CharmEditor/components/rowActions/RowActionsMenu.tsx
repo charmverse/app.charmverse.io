@@ -35,7 +35,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
   const view = useEditorViewContext();
   const { deletePage, currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();
   const boards = useAppSelector(getSortedBoards);
 
