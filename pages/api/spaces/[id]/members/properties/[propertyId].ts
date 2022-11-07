@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { MemberProperty } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,7 +17,7 @@ handler
 async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<{ success: 'ok' }>) {
   const userId = req.session.user.id;
   const propertyId = req.query.propertyId as string;
-  const data = req.body as Prisma.MemberPropertyUpdateInput;
+  const data = req.body as Partial<MemberProperty>;
   const spaceId = req.query.id as string;
 
   await updateMemberProperty({ userId, id: propertyId, data, spaceId });
