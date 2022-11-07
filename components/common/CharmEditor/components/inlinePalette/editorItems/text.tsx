@@ -72,6 +72,28 @@ const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((
 export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
   const { addNestedPage, disableNestedPage, nestedPagePluginKey, pageType, userSpacePermissions } = props;
 
+  const insertPageItem = pageType !== 'card_template' && !disableNestedPage ? [{
+    uid: 'insert-page',
+    title: 'Insert page',
+    requiredSpacePermission: 'createPage' as SpaceOperation,
+    keywords: ['page'],
+    icon: <DescriptionOutlinedIcon sx={{
+      fontSize: iconSize
+    }}
+    />,
+    description: 'Insert a new page',
+    editorExecuteCommand: (() => {
+      return (async (state, dispatch, view) => {
+        await addNestedPage();
+        return replaceSuggestionMarkWith(palettePluginKey, '')(
+          state,
+          dispatch,
+          view
+        );
+      }) as PromisedCommand;
+    })
+  }] : [];
+
   const paletteItems: PaletteItemTypeNoGroup[] = [
     {
       uid: 'paraConvert',
@@ -105,27 +127,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
         };
       }
     },
-    ...(pageType !== 'card_template' && !disableNestedPage ? [{
-      uid: 'insert-page',
-      title: 'Insert page',
-      requiredSpacePermission: 'createPage' as SpaceOperation,
-      keywords: ['page'],
-      icon: <DescriptionOutlinedIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
-      description: 'Insert a new page',
-      editorExecuteCommand: (() => {
-        return (async (state, dispatch, view) => {
-          await addNestedPage();
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-        }) as PromisedCommand;
-      })
-    }] : []),
+    ...insertPageItem,
     {
       uid: 'todoListConvert',
       title: 'Todo List',
