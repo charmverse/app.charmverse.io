@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Page" ADD COLUMN     "version" INTEGER NOT NULL DEFAULT 0;

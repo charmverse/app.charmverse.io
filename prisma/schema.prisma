@@ -504,14 +504,6 @@ model FavoritePage {
   @@index([pageId])
 }
 
-model UserTokenGate {
-  spaceRoleId  String
-  spaceRole    SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
-  createdAt    DateTime?
-  tokenGateId  String?   @db.Uuid
-  tokenGateJWT String?
-}
-
 model SpaceRole {
   spaceId         String            @db.Uuid
   userId          String            @db.Uuid
@@ -521,7 +513,6 @@ model SpaceRole {
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   spaceRoleToRole SpaceRoleToRole[]
-  UserTokenGate   UserTokenGate[]
   TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateId     String?           @db.Uuid
 
