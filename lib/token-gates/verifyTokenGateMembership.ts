@@ -59,7 +59,7 @@ export async function verifyTokenGateMembership (
       if (!validRoleIds.includes(roleId) && !invalidSpaceRoleToRoleIds.includes(roleId)) {
         const spaceRoleToRoleId = userSpaceRoles?.find(sr => sr.roleId === roleId)?.id;
         if (spaceRoleToRoleId) {
-          invalidSpaceRoleToRoleIds.push(roleId);
+          invalidSpaceRoleToRoleIds.push(spaceRoleToRoleId);
         }
       }
     });
