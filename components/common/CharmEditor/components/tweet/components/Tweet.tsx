@@ -1,5 +1,6 @@
 import type { NodeViewProps } from '@bangle.dev/core';
-import { useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { useRef } from 'react';
 
 import log from 'lib/log';
 
@@ -20,27 +21,11 @@ declare global {
   }
 }
 
-let twitterJsIsLoaded = false;
-
 // embed Twitter
-async function loadScript (scriptUrl: string) {
-  if (twitterJsIsLoaded) {
-    return Promise.resolve();
-  }
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = scriptUrl;
-    document.head.appendChild(script);
-
-    script.onload = function () {
-      twitterJsIsLoaded = true;
-      resolve(null);
-    };
-  });
-}
-
 function render (el: HTMLElement, tweetId: string) {
+  if (typeof window === 'undefined') {
+    return;
+  }
   if (!window.twttr) {
     log.error('Failure to load window.twttr, aborting load');
     return;
@@ -51,14 +36,7 @@ function render (el: HTMLElement, tweetId: string) {
     );
     return;
   }
-
   window.twttr.widgets.createTweet(tweetId, el, {});
-  // .then((element: any) => {
-  //   setLoading(false);
-  //   if (props.onLoad) {
-  //     props.onLoad(element);
-  //   }
-  // });
 }
 
 export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
@@ -66,21 +44,11 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
   const ref = useRef<HTMLDivElement | null>(null);
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
 
-  useEffect(() => {
-    let isComponentMounted = true;
-    if (!ref?.current || !attrs.id) {
-      return;
+  function onLoadScript () {
+    if (ref.current && attrs.id) {
+      render(ref.current, attrs.id);
     }
-    loadScript(twitterWidgetJs).then(() => {
-      if (ref?.current && isComponentMounted) {
-        render(ref.current, node.attrs.id);
-      }
-    });
-
-    return () => {
-      isComponentMounted = false;
-    };
-  }, [ref, attrs.id]);
+  }
 
   // If there are no source for the node, return the image select component
   if (!attrs.id) {
@@ -103,5 +71,10 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
     }
   }
 
-  return <div ref={ref} />;
+  return (
+    <>
+      <Script src={twitterWidgetJs} onReady={onLoadScript} />
+      <div ref={ref} />
+    </>
+  );
 }

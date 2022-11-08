@@ -1,11 +1,8 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import { Plugin, NodeView, createElement } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import { Plugin, NodeView } from '@bangle.dev/core';
+import type { EditorView, Node, Slice } from '@bangle.dev/pm';
 
-import log from 'lib/log';
 import { insertNode } from 'lib/prosemirror/insertNode';
-
-import { twitterWidgetJs } from './twitterJSUrl';
 
 const name = 'tweet';
 
@@ -30,7 +27,6 @@ export function extractTweetId (url: string): TweetNodeAttrs | null {
 
 export function plugins () {
   return [
-
     NodeView.createPlugin({
       name: 'tweet',
       containerDOM: ['tweet-embed']
@@ -48,39 +44,6 @@ export function plugins () {
           return false;
         }
       }
-      //   nodeViews: {
-      //     tweet (node, view, getPos, decorations) {
-      //       console.log('embed tweet');
-      //       const element = createElement(['twitter-embed']);
-
-      //       if (twitterJsIsLoaded) {
-      //         render(element, node.attrs.id);
-      //       }
-      //       else {
-      //         import(twitterWidgetJs).then(() => {
-      //           twitterJsIsLoaded = true;
-      //           render(element, node.attrs.id);
-      //         });
-      //       }
-
-    //       return {
-    //         // contentDOM: element,
-    //         dom: element,
-    //         ignoreMutation (mutation) {
-    //           if ((mutation as MutationRecord).attributeName === 'open') {
-    //             return true;
-    //           }
-    //           return false;
-    //         },
-    //         node,
-    //         view,
-    //         destroy () {
-    //           this.dom = undefined;
-    //         }
-    //       };
-    //     }
-    //   }
-    // }
     })
   ];
 }
