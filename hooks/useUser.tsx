@@ -29,7 +29,7 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook, connectableWalletDetected } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
@@ -39,15 +39,15 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = getStoredSignature(account) as AuthSig;
+    let signature = getStoredSignature() as AuthSig;
 
-    if (!signature || !lowerCaseEqual(signature?.address, account)) {
+    if (!signature || !lowerCaseEqual(signature?.address, signature.address)) {
       signature = await sign();
     }
 
     try {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: account, walletSignature: signature });
+      const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
 
       setUser(refreshedProfile);
 
@@ -77,9 +77,9 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    *
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
-  async function refreshUserWithWeb3Account (address: string) {
+  async function refreshUserWithWeb3Account () {
     // a hack for now to support users that are trying to log in thru discord
-    if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, address))) {
+    if (!account && !connectableWalletDetected && !user?.discordUser) {
       await charmClient.logout();
       setUser(null);
     }
@@ -89,12 +89,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    if (account) {
-      refreshUserWithWeb3Account(account);
-    }
-    else {
-      getCharmUser();
-    }
+    refreshUserWithWeb3Account();
   }, [account]);
 
   const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {

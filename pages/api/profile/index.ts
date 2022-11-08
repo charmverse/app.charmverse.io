@@ -4,6 +4,8 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -16,6 +18,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
+import { InsecureOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -63,19 +66,19 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   res.status(200).json(user);
 }
 
+async function handleNoProfile (req: NextApiRequest, res: NextApiResponse) {
+  if (!req.session.anonymousUserId) {
+    req.session.anonymousUserId = v4();
+    await req.session.save();
+  }
+  return res.status(404).json({ error: 'No user found' });
+}
+
 // Endpoint for a user to retrieve their own profile
 async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
 
-  async function handleNoProfile () {
-    if (!req.session.anonymousUserId) {
-      req.session.anonymousUserId = v4();
-      await req.session.save();
-    }
-    return res.status(404).json({ error: 'No user found' });
-  }
-
   if (!req.session?.user?.id) {
-    return handleNoProfile();
+    return handleNoProfile(req, res);
   }
 
   const profile = await prisma.user.findUnique({
@@ -86,7 +89,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   });
 
   if (!profile) {
-    return handleNoProfile();
+    return handleNoProfile(req, res);
   }
 
   // Clean up the anonymous id if the user has a profile
@@ -101,18 +104,34 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
 
 async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
-  let user: LoggedInUser;
+  let user: LoggedInUser & { addressesToAdd?: AuthSigWithRawAddress[] };
 
-  if (req.body.addresses) {
-    for (const address of req.body.addresses) {
-      await prisma.userWallet.createMany({
-        data: [{
-          userId: req.session.user.id,
-          address
-        }]
-      });
+  const addressesToAdd = req.body.addressesToAdd as AuthSigWithRawAddress[];
+
+  if (addressesToAdd) {
+    for (const addressToVerify of addressesToAdd) {
+      if (!isValidWalletSignature({ address: addressToVerify.rawAddress, signature: addressToVerify, host: req.headers.origin as string })) {
+        throw new InsecureOperationError('Could not verify wallet');
+      }
     }
-    user = await getUserProfile('id', req.session.user.id);
+
+    await prisma.userWallet.createMany({
+      data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.rawAddress }))
+    });
+
+    const updatedProfile = await prisma.user.findUnique({
+      where: {
+        id: req.session.user.id
+      },
+      include: sessionUserRelations
+    }) as LoggedInUser;
+
+    if (!updatedProfile) {
+      return handleNoProfile(req, res);
+    }
+    else {
+      user = updatedProfile;
+    }
   }
   else {
     user = await prisma.user.update({

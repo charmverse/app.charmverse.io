@@ -1,24 +1,26 @@
+import Alert from '@mui/material/Alert';
 import type { SxProps, Theme } from '@mui/system';
 import { useContext, useEffect, useState, useRef } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
-  signSuccess: (authSig: AuthSig) => void;
+  signSuccess: (authSig: AuthSigWithRawAddress) => void;
   buttonStyle?: SxProps<Theme>;
+  ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
 }
 
-export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
+export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton }: Props) {
 
-  const { account, sign, getStoredSignature, walletAuthSignature } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, walletAuthSignature, connectableWalletDetected } = useWeb3AuthSig();
   const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
   const [isSigning, setIsSigning] = useState(false);
@@ -33,7 +35,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
+    if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature()?.address as string, account)) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
@@ -48,7 +50,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
 
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
 
-      signSuccess(walletAuthSignature);
+      signSuccess({ ...walletAuthSignature, rawAddress: account });
       setIsSigning(false);
     }
     else {
@@ -63,17 +65,21 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
     }
   }
 
-  if (!account) {
+  if (!connectableWalletDetected && !account) {
+    return <Alert severity='warning'>No connectable wallet detected. Please switch your wallet address</Alert>;
+  }
+
+  if (connectableWalletDetected) {
     return (
-      <PrimaryButton data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <ButtonComponent data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
         Connect Wallet
-      </PrimaryButton>
+      </ButtonComponent>
     );
   }
 
   return (
-    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
+    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
       Verify wallet
-    </PrimaryButton>
+    </ButtonComponent>
   );
 }
