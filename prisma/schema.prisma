@@ -178,6 +178,7 @@ enum MemberPropertyType {
   name
   discord
   twitter
+  bio
 }
 
 enum MemberPropertyPermissionLevel {
