@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { Divider, Menu, MenuItem } from '@mui/material';
+import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
@@ -18,6 +18,7 @@ import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import useGnosisSigner from 'hooks/useWeb3Signer';
+import { unsupportedChainIds } from 'lib/blockchain/constants';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -234,23 +235,30 @@ export default function BountyPaymentButton ({
     }
   };
 
+  const isChainSupported = !unsupportedChainIds.includes(bounty.chainId);
+
   return (
     <>
-      <Button
-        color='primary'
-        size='small'
-        onClick={(e) => {
-          if (safeInfos?.length === 0) {
-            onClick();
-            makePayment();
-          }
-          else {
-            handleClick(e);
-          }
-        }}
-      >
-        Send Payment
-      </Button>
+      <Tooltip title={!isChainSupported ? 'We don\'t support that chain. Please change the bounty chain to proceed with payment' : ''}>
+        <div>
+          <Button
+            color='primary'
+            size='small'
+            disabled={!isChainSupported}
+            onClick={(e) => {
+              if (safeInfos?.length === 0) {
+                onClick();
+                makePayment();
+              }
+              else {
+                handleClick(e);
+              }
+            }}
+          >
+            Send Payment
+          </Button>
+        </div>
+      </Tooltip>
       {safeInfos?.length !== 0 && (
         <Menu
           id='bounty-payment'

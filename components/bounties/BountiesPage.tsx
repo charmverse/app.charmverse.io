@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { unsupportedChainIds } from 'lib/blockchain/constants';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 
@@ -31,7 +32,8 @@ export default function BountiesPage ({ publicMode = false, bounties }: Props) {
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
-    const completedBounties = bountiesSorted.filter(bounty => bounty.status === BountyStatus.complete);
+    const completedBounties = bountiesSorted.filter(bounty => bounty.status === BountyStatus.complete
+        && !unsupportedChainIds.includes(bounty.chainId));
     if (!completedBounties.length) {
       return [];
     }

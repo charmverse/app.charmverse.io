@@ -19,6 +19,7 @@ import type { ReactNode } from 'react';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { unsupportedChainIds } from 'lib/blockchain/constants';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 import { nanofy } from 'lib/utilities/numbers';
@@ -194,6 +195,12 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus
 export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
 
   const [paymentMethods] = usePaymentMethods();
+
+  // Gracefully handle unsupported chain before migration script updates the chain
+  if (unsupportedChainIds.includes(bounty.chainId)) {
+    return null;
+  }
+
   const tokenInfo = getTokenAndChainInfoFromPayments({
     chainId: bounty.chainId,
     methods: paymentMethods,

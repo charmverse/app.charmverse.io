@@ -1,12 +1,13 @@
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import type { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import type { SafeInfoResponse, SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import type { UserGnosisSafe } from '@prisma/client';
-import { RPC, getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { getChainById, RPC } from 'connectors';
 import type { Signer } from 'ethers';
+import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 
+import { unsupportedChainIds } from 'lib/blockchain/constants';
 import log from 'lib/log';
 
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
@@ -66,11 +67,9 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   return [];
 }
 
-const gnosisUnsupportedChainIds = [4];
-
 export function gnosisSupportedNetworks () {
   // ChainId 4 Rinkeby is not supported by gnosis anymore
-  return Object.values(RPC).filter(network => !gnosisUnsupportedChainIds.includes(network.chainId));
+  return Object.values(RPC).filter(network => !unsupportedChainIds.includes(network.chainId));
 }
 
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
