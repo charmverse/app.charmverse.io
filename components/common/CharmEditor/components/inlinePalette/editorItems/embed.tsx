@@ -1,6 +1,7 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
+import TwitterIcon from '@mui/icons-material/Twitter';
 
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 
@@ -59,6 +60,34 @@ export function items (): PaletteItemTypeNoGroup[] {
             rafCommandExec(view!, (_state, _dispatch) => {
 
               const node = _state.schema.nodes.cryptoPrice.create();
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(
+            state,
+            dispatch,
+            view
+          );
+        };
+      }
+    },
+    {
+      uid: 'tweet',
+      title: 'Tweet',
+      icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
+      description: 'Embed a Tweet',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          if (view) {
+            // Execute the animation
+            rafCommandExec(view!, (_state, _dispatch) => {
+
+              const node = _state.schema.nodes.tweet.create();
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node));
