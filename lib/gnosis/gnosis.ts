@@ -51,6 +51,9 @@ interface GetSafesForAddressProps {
 export type SafeData = ({ chainId: number } & SafeInfoResponse);
 
 export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
+  if (unsupportedChainIds.includes(chainId)) {
+    return [];
+  }
 
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
@@ -82,6 +85,9 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
 }
 
 async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
+  if (unsupportedChainIds.includes(wallet.chainId)) {
+    return [];
+  }
   const service = getGnosisService({ signer, chainId: wallet.chainId });
   if (service) {
     const transactions = await service.getPendingTransactions(wallet.address);
