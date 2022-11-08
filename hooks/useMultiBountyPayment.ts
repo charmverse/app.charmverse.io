@@ -9,7 +9,6 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import useGnosisSigner from 'hooks/useWeb3Signer';
-import { unsupportedChainIds } from 'lib/blockchain/constants';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
@@ -54,8 +53,7 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
       .filter(bounty => {
         return safeData
           ? safeData.find(
-            ({ chainId: safeChainId }) => !unsupportedChainIds.includes(bounty.chainId)
-              && bounty.chainId === safeChainId
+            ({ chainId: safeChainId }) => bounty.chainId === safeChainId
               && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
           )
           : false;

@@ -1,12 +1,9 @@
-import { unsupportedChainIds } from 'lib/blockchain/constants';
 import { prisma } from '../db';
 
 (async () => {
   await prisma.bounty.updateMany({
     where: {
-      chainId: {
-        in: unsupportedChainIds
-      }
+      chainId: 4
     },
     // Transfer to goerli
     data: {
@@ -16,9 +13,13 @@ import { prisma } from '../db';
 
   await prisma.paymentMethod.deleteMany({
     where: {
-      chainId: {
-        in: unsupportedChainIds
-      }
+      chainId: 4
+    }
+  })
+
+  await prisma.userGnosisSafe.deleteMany({
+    where: {
+      chainId: 4
     }
   })
 })();

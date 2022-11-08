@@ -7,7 +7,6 @@ import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 
-import { unsupportedChainIds } from 'lib/blockchain/constants';
 import log from 'lib/log';
 
 export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
@@ -51,10 +50,6 @@ interface GetSafesForAddressProps {
 export type SafeData = ({ chainId: number } & SafeInfoResponse);
 
 export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
-  if (unsupportedChainIds.includes(chainId)) {
-    return [];
-  }
-
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
     return [];
@@ -70,13 +65,8 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   return [];
 }
 
-export function gnosisSupportedNetworks () {
-  // ChainId 4 Rinkeby is not supported by gnosis anymore
-  return Object.values(RPC).filter(network => !unsupportedChainIds.includes(network.chainId));
-}
-
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-  const safes = await Promise.all(gnosisSupportedNetworks().map(network => {
+  const safes = await Promise.all(Object.values(RPC).map(network => {
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 
@@ -85,9 +75,6 @@ export async function getSafesForAddresses (signer: ethers.Signer, addresses: st
 }
 
 async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
-  if (unsupportedChainIds.includes(wallet.chainId)) {
-    return [];
-  }
   const service = getGnosisService({ signer, chainId: wallet.chainId });
   if (service) {
     const transactions = await service.getPendingTransactions(wallet.address);
