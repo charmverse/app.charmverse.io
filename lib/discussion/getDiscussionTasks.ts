@@ -350,6 +350,7 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
           createdAt: new Date(comment.createdAt).toISOString(),
           mentionId: null
         });
+        break;
       }
     }
   }
@@ -359,7 +360,6 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
     discussionUserIds: textComments.map(comm => comm.userId).concat([userId]),
     comments: textComments
   };
-
 }
 
 async function getMentionsFromComments ({ userId, username, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {

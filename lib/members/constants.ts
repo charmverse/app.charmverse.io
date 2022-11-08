@@ -29,3 +29,8 @@ export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
   text_multiline: 'Multiline text',
   url: 'URL'
 };
+
+export const UNHIDEABLE_MEMBER_PROPERTIES = [
+  'name',
+  'profile_pic'
+];

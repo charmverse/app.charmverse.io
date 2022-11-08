@@ -1,7 +1,7 @@
 
-import React from 'react';
+import type { SVGProps } from 'react';
 
-export default function TableIcon (): JSX.Element {
+export default function TableIcon (props: SVGProps<any>): JSX.Element {
   return (
     <svg
       width='24'
@@ -10,6 +10,7 @@ export default function TableIcon (): JSX.Element {
       fill='currentColor'
       xmlns='http://www.w3.org/2000/svg'
       className='TableIcon Icon'
+      {...props}
     >
       <g opacity='0.8'>
         <path

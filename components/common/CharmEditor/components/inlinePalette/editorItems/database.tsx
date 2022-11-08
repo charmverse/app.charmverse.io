@@ -18,6 +18,8 @@ interface DatabaseItemsProps {
   pageType?: PageType;
 }
 
+const iconSize = 30;
+
 export function items ({ addNestedPage, currentPageId, userId, space, pageType }: DatabaseItemsProps): PaletteItemTypeNoGroup[] {
 
   const returnedItems: PaletteItemTypeNoGroup[] = [
@@ -28,7 +30,7 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
       {
         uid: 'database-inline',
         title: 'Database - Inline',
-        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+        icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
         description: 'Add a new inline database to this page',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
@@ -69,7 +71,7 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
         title: 'Database - Full page',
         requiredSpacePermission: 'createPage',
         icon: <DatabaseIcon sx={{
-          fontSize: 16
+          fontSize: iconSize
         }}
         />,
         description: 'Insert a new board',
@@ -91,7 +93,7 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
     {
       uid: 'database-linked',
       title: 'Linked view of database',
-      icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+      icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
       description: 'Embed a view from an existing board',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
