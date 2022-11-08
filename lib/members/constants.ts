@@ -5,7 +5,8 @@ export const READONLY_MEMBER_PROPERTIES: MemberPropertyType[] = [
   'role',
   'discord',
   'twitter',
-  'timezone'
+  'timezone',
+  'bio'
 ];
 
 export const DEFAULT_MEMBER_PROPERTIES = [
@@ -27,7 +28,8 @@ export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
   select: 'Select',
   text: 'Text',
   text_multiline: 'Multiline text',
-  url: 'URL'
+  url: 'URL',
+  bio: 'Bio'
 };
 
 export const UNHIDEABLE_MEMBER_PROPERTIES = [

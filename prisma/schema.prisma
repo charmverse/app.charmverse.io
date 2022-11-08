@@ -659,7 +659,6 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
-
   @@index([pageId])
   @@index([roleId])
   @@index([userId])
@@ -799,6 +798,7 @@ enum MemberPropertyType {
   name
   discord
   twitter
+  bio
 }
 
 enum MemberPropertyPermissionLevel {

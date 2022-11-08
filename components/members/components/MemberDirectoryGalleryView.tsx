@@ -129,6 +129,14 @@ function MemberDirectoryGalleryCard ({
                 return null;
               }
               switch (property.type) {
+                case 'bio': {
+                  return (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
+                      <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                    </Stack>
+                  );
+                }
                 case 'text':
                 case 'text_multiline':
                 case 'phone':
