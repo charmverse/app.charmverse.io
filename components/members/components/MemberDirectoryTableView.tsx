@@ -136,6 +136,15 @@ function MemberDirectoryTableRow ({
                 </TableCell>
               );
             }
+            case 'bio': {
+              return (
+                <TableCell>
+                  <Typography>
+                    {member.profile?.description ?? 'N/A'}
+                  </Typography>
+                </TableCell>
+              );
+            }
             case 'text':
             case 'phone':
             case 'email':
