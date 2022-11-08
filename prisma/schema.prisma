@@ -247,6 +247,14 @@ model Page {
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
+
+  @@index([bountyId])
+  @@index([cardId])
+  @@index([createdBy])
+  @@index([parentId])
+  @@index([proposalId])
+  @@index([spaceId])
+  @@index([title])
 }
 
 model Block {
@@ -266,6 +274,9 @@ model Block {
   user      User      @relation(fields: [createdBy], references: [id])
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   page      Page?
+
+  @@index([rootId])
+  @@index([spaceId])
 }
 
 model UserVote {
@@ -314,49 +325,49 @@ model Vote {
 }
 
 model User {
-  id                        String                     @id @default(uuid()) @db.Uuid
-  createdAt                 DateTime                   @default(now())
-  updatedAt                 DateTime                   @default(now())
-  addresses                 String[]
-  deletedAt                 DateTime?
-  avatar                    String?
-  avatarContract            String?
-  avatarTokenId             String?
-  avatarChain               Int?
-  username                  String
-  isBot                     Boolean?                   @default(false)
-  path                      String?                    @unique
-  identityType              IdentityType?
-  email                     String?
-  applications              Application[]
-  blocks                    Block[]
-  bounties                  Bounty[]
-  bountyPermissions         BountyPermission[]
-  comments                  Comment[]
-  discordUser               DiscordUser?
-  favorites                 FavoritePage[]
-  inviteLinks               InviteLink[]
-  pages                     Page[]
-  permissions               PagePermission[]
-  poaps                     Poap[]
-  spacesCreated             Space[]
-  spacePermissions          SpacePermission[]
-  spaceRoles                SpaceRole[]
-  telegramUser              TelegramUser?
-  threads                   Thread[]
-  profile                   UserDetails?
-  gnosisSafes               UserGnosisSafe[]
-  UserNotification          UserNotification[]
-  notificationState         UserNotificationState?
-  userVotes                 UserVote[]
-  initiatedVotes            Vote[]
-  profileItems              ProfileItem[]
-  proposalsAuthored         ProposalAuthor[]
-  proposalsReviewed         ProposalReviewer[]
-  reviewedProposals         Proposal[]
-  workspaceEvents           WorkspaceEvent[]
-  wallets                   UserWallet[]
-  memberPropertyValues      MemberPropertyValue[]
+  id                   String                 @id @default(uuid()) @db.Uuid
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  addresses            String[]
+  deletedAt            DateTime?
+  avatar               String?
+  avatarContract       String?
+  avatarTokenId        String?
+  avatarChain          Int?
+  username             String
+  isBot                Boolean?               @default(false)
+  path                 String?                @unique
+  identityType         IdentityType?
+  email                String?
+  applications         Application[]
+  blocks               Block[]
+  bounties             Bounty[]
+  bountyPermissions    BountyPermission[]
+  comments             Comment[]
+  discordUser          DiscordUser?
+  favorites            FavoritePage[]
+  inviteLinks          InviteLink[]
+  pages                Page[]
+  permissions          PagePermission[]
+  poaps                Poap[]
+  spacesCreated        Space[]
+  spacePermissions     SpacePermission[]
+  spaceRoles           SpaceRole[]
+  telegramUser         TelegramUser?
+  threads              Thread[]
+  profile              UserDetails?
+  gnosisSafes          UserGnosisSafe[]
+  UserNotification     UserNotification[]
+  notificationState    UserNotificationState?
+  userVotes            UserVote[]
+  initiatedVotes       Vote[]
+  profileItems         ProfileItem[]
+  proposalsAuthored    ProposalAuthor[]
+  proposalsReviewed    ProposalReviewer[]
+  reviewedProposals    Proposal[]
+  workspaceEvents      WorkspaceEvent[]
+  wallets              UserWallet[]
+  memberPropertyValues MemberPropertyValue[]
 }
 
 model UserWallet {
@@ -648,6 +659,10 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
+  @@index([pageId])
+  @@index([roleId])
+  @@index([userId])
+  @@index([spaceId])
 }
 
 model SpacePermission {
@@ -783,6 +798,7 @@ enum MemberPropertyType {
   name
   discord
   twitter
+  bio
 }
 
 enum MemberPropertyPermissionLevel {
@@ -803,6 +819,7 @@ model MemberProperty {
   index                Int                        @default(-1)
   memberPropertyValues MemberPropertyValue[]
   permissions          MemberPropertyPermission[]
+  enabledViews         VisibilityView[]           @default([gallery, table, profile])
 }
 
 model MemberPropertyValue {
@@ -818,6 +835,12 @@ model MemberPropertyValue {
   value            Json?
 
   @@unique([memberPropertyId, spaceId, userId])
+}
+
+enum VisibilityView {
+  gallery
+  table
+  profile
 }
 
 model MemberPropertyPermission {

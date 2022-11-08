@@ -53,7 +53,7 @@ export default function MemberDirectoryPage () {
       return sortMembers(searchedMembers, memberProperty);
     }
     return searchedMembers;
-  }, [sortedProperty, properties]);
+  }, [sortedProperty, properties, searchedMembers]);
 
   return (
     <CenteredPageContent>
@@ -91,6 +91,7 @@ export default function MemberDirectoryPage () {
           <MemberDirectorySort
             setSortedProperty={setSortedProperty}
             sortedProperty={sortedProperty}
+            view={currentView}
           />
           <IconButton onClick={() => {
             setTimeout(() => {

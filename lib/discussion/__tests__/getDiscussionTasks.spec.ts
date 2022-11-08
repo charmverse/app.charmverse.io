@@ -277,4 +277,50 @@ describe('getDiscussionTasks', () => {
       && item.pageId === page.id
     ));
   });
+
+  it('Should return just one comment with the first valid text from all the available texts', async () => {
+    const pageAuthor = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const pageCommenter2 = await generateSpaceUser({ spaceId: space1.id, isAdmin: false });
+    const page = await createPage({
+      spaceId: space1.id,
+      createdBy: pageAuthor.id,
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', value: 'xxxx' }] }] }
+    });
+
+    const commentsThread = await generateThread({
+      thread: {
+        spaceId: space1.id,
+        userId: pageCommenter.id,
+        pageId: page.id,
+        comments: [{
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Commenter just commented', type: 'text' }] }] }
+        }, {
+          spaceId: space1.id,
+          pageId: page.id,
+          userId: pageCommenter2.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ text: 'Make this change ', type: 'text' }, { type: 'mention', attrs: { id: '9899800b-407e-4709-a15a-9b2bf1d6ad2d', type: 'user', track: [], value: pageCommenter.id, createdAt: '2022-11-03T09:37:26.670Z', createdBy: pageCommenter2.id } }, { text: ' dsadsadasd dsadsadsa', type: 'text' }] }] }
+        }]
+      }
+    });
+
+    const commentId = commentsThread.comments[1].id;
+
+    const { unmarked: newNotifications } = await getDiscussionTasks(pageCommenter.id);
+
+    expect(newNotifications).toHaveLength(1);
+
+    expectSome(newNotifications, (item) => (
+      item.commentId === commentId
+      && item.pageId === page.id
+      && item.text === 'Make this change @Username dsadsadasd dsadsadsa'
+    ));
+  });
 });
