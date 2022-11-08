@@ -11,7 +11,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -28,10 +28,12 @@ import charmClient from 'charmClient';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
+import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
@@ -126,24 +128,31 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     }
   };
 
+  const { members } = useMembers();
+
+  const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
+
   const documentOptions = (
     <List dense>
-      {pagePermissions?.create_poll && (
-        <ListItemButton
-          onClick={() => {
-            setPageMenuOpen(false);
-            setIsModalOpen(true);
-          }}
-        >
-          <HowToVoteOutlinedIcon
-            fontSize='small'
-            sx={{
-              mr: 1
+      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!pagePermissions?.create_poll}
+            onClick={() => {
+              setPageMenuOpen(false);
+              setIsModalOpen(true);
             }}
-          />
-          <ListItemText primary='Create a poll' />
-        </ListItemButton>
-      )}
+          >
+            <HowToVoteOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Create a poll' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('polls');
@@ -232,6 +241,22 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           label={<Typography variant='body2'>Full Width</Typography>}
         />
       </ListItemButton>
+      {
+        pageCreator && basePage && (
+          <Stack sx={{
+            ml: 1,
+            my: 1
+          }}
+          >
+            <Typography variant='subtitle2'>
+              Last edited by {pageCreator.username}
+            </Typography>
+            <Typography variant='subtitle2'>
+              Last edited at {humanFriendlyDate(basePage.updatedAt)}
+            </Typography>
+          </Stack>
+        )
+      }
     </List>
   );
 
