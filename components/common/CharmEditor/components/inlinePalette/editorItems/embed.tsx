@@ -79,6 +79,7 @@ export function items (): PaletteItemTypeNoGroup[] {
     {
       uid: 'tweet',
       title: 'Tweet',
+      keywords: ['twitter', 'elon'],
       icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
       editorExecuteCommand: () => {
