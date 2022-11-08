@@ -1,5 +1,6 @@
 import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import Script from 'next/script';
 import { useRef } from 'react';
 
@@ -26,6 +27,14 @@ declare global {
     };
   }
 }
+
+const StyledTweet = styled.div`
+  // fix for twitter iframe which has color-scheme: auto, and otherwise makes the background white in dark mode
+  // @ref: https://bugs.chromium.org/p/chromium/issues/detail?id=1150352
+  iframe {
+    color-scheme: light;
+  }
+`;
 
 // embed Twitter
 function render (tweetId: string, el: HTMLElement, options: TweetOptions) {
@@ -81,7 +90,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
   return (
     <>
       <Script src={twitterWidgetJs} onReady={onLoadScript} />
-      <div ref={ref} data-chrome='transparent' />
+      <StyledTweet ref={ref} />
     </>
   );
 }

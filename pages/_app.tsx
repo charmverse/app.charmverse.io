@@ -230,7 +230,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                           <IntlProvider>
                             <SnackbarProvider>
                               <PageMetaTags />
-                              <CssBaseline />
+                              <CssBaseline enableColorScheme={true} />
                               <Global styles={cssVariables} />
                               <RouteGuard>
                                 <ErrorBoundary>

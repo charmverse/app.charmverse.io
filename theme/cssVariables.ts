@@ -4,7 +4,6 @@ import * as colors from './colors';
 
 const globalCSS = css`
   :root {
-    color-scheme: light;
     ${Object.entries(colors.lightModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
@@ -60,8 +59,6 @@ const globalCSS = css`
 
   /* dark theme */
   [data-theme='dark'] {
-    // use auto to avoid opaque background on Twitter iframe ('dark' would be better)
-    color-scheme: auto;
     ${Object.entries(colors.darkModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};
