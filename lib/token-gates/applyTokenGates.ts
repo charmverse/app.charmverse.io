@@ -112,7 +112,7 @@ export async function applyTokenGates ({
     return returnValue;
   }
 
-  updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
+  await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
   if (spaceMembership && roleIdsToAssign.length === 0) {
     return returnValue;

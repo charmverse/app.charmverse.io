@@ -1,4 +1,3 @@
-import { string } from 'yup/lib/locale';
 
 import { prisma } from 'db';
 
@@ -13,6 +12,14 @@ export async function generateTokenGate ({ userId, spaceId }: { spaceId: string,
           id: spaceId
         }
       }
+    }
+  });
+}
+
+export async function deleteTokenGate (id: string) {
+  return prisma.tokenGate.delete({
+    where: {
+      id
     }
   });
 }

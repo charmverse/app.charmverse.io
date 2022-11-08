@@ -1,6 +1,23 @@
 
+import type { Role, SpaceRole, SpaceRoleToRole, TokenGate, TokenGateToRole, User, UserTokenGate } from '@prisma/client';
+
 import { prisma } from 'db';
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
+
+export type UserToVerifyMembership = SpaceRole & {
+  user: User & {
+      userTokenGates: (UserTokenGate & {
+          tokenGate: (TokenGate & {
+              tokenGateToRoles: (TokenGateToRole & {
+                role: Role;
+              })[];
+          }) | null;
+      })[];
+  };
+  spaceRoleToRole: (SpaceRoleToRole & {
+    role: Role;
+  })[];
+}
 
 export async function verifyTokenGateMemberships () {
   const usersWithTokenGates = await prisma.spaceRole.findMany({
