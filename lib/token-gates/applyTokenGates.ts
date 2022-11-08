@@ -61,7 +61,12 @@ export async function applyTokenGates ({
       const embeddedTokenGateId = JSON.parse(result.payload.extraData).tokenGateId;
 
       if (embeddedTokenGateId === tk.tokenGateId) {
-        return { ...matchingTokenGate, jwt: tk.signedToken, verified: true };
+        return {
+          ...matchingTokenGate,
+          jwt: tk.signedToken,
+          verified: true,
+          grantedRoles: matchingTokenGate.tokenGateToRoles.map(tgr => tgr.roleId)
+        };
       }
     }
 

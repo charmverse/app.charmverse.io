@@ -16,7 +16,24 @@ export async function verifyTokenGateMemberships () {
     include: {
       user: {
         include: {
-          userTokenGates: true
+          userTokenGates: {
+            include: {
+              tokenGate: {
+                include: {
+                  tokenGateToRoles: {
+                    include: {
+                      role: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      spaceRoleToRole: {
+        include: {
+          role: true
         }
       }
     }
@@ -25,7 +42,9 @@ export async function verifyTokenGateMemberships () {
   const promises = usersWithTokenGates.map(async spaceRole => verifyTokenGateMembership({
     userTokenGates: spaceRole.user.userTokenGates,
     userId: spaceRole.user.id,
-    spaceId: spaceRole.spaceId
+    spaceId: spaceRole.spaceId,
+    userSpaceRoles: spaceRole.spaceRoleToRole,
+    canBeRemovedFromSpace: !spaceRole.joinedViaLink
   }));
 
   const res = await Promise.all(promises);

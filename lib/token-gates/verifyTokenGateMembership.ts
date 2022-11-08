@@ -1,38 +1,76 @@
 
+import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@prisma/client';
 import { verifyJwt } from 'lit-js-sdk';
 
 import { prisma } from 'db';
 import type { LitJwtPayload } from 'lib/token-gates/interfaces';
-import { deleteUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 
-type VerifyTokenGateMembershipProps = { userTokenGates: {
-  tokenGateId: string | null;
-  jwt: string | null;
-  id: string;
-}[]; userId: string; spaceId: string; };
+type TokenGateWithRoles = {
+  tokenGate: (TokenGate & {
+    tokenGateToRoles: (TokenGateToRole & {
+        role: Role;
+    })[];
+  }) | null;
+}
 
-export async function verifyTokenGateMembership ({ userTokenGates, userId, spaceId }: VerifyTokenGateMembershipProps): Promise<boolean> {
+type UserTokenGateProp = (Pick<UserTokenGate, 'id' |'jwt' | 'grantedRoles' | 'tokenGateId'> & TokenGateWithRoles);
+
+type VerifyTokenGateMembershipProps = {
+  userTokenGates: UserTokenGateProp[];
+  userId: string;
+  spaceId: string;
+  canBeRemovedFromSpace: boolean;
+  userSpaceRoles?: (SpaceRoleToRole & { role: Role })[];
+};
+
+export async function verifyTokenGateMembership (
+  { userTokenGates, userSpaceRoles, userId, spaceId, canBeRemovedFromSpace }: VerifyTokenGateMembershipProps
+): Promise<boolean> {
 
   if (!userTokenGates.length) {
     return true;
   }
 
   // We want to update only invalid token gates
-  const invalidTokenGatePromises = userTokenGates.map(async userTokenGate => {
-    if (!userTokenGate.jwt || !userTokenGate.tokenGateId) {
-      return { id: userTokenGate.id };
+  const tokenGateVerificationPromises = userTokenGates.map(async userTokenGate => {
+    if (!userTokenGate.jwt || !userTokenGate.tokenGate) {
+      return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
     }
 
     const result = await verifyJwt({ jwt: userTokenGate.jwt }) as { payload: LitJwtPayload, verified: boolean };
     const isVerified = result.verified && result.payload?.orgId === spaceId;
 
-    return isVerified ? null : { id: userTokenGate.tokenGateId };
+    return { id: userTokenGate.tokenGateId, isVerified, roleIds: userTokenGate.tokenGate.tokenGateToRoles.map(r => r.roleId) };
   });
 
-  const invalidTokenGates = (await Promise.all(invalidTokenGatePromises)).filter(Boolean) as { id: string }[];
+  const tokenGateVerificationResults = await Promise.all(tokenGateVerificationPromises);
+  const validTokenGates = tokenGateVerificationResults.filter(r => r.isVerified);
+  const invalidTokenGates = tokenGateVerificationResults.filter(r => !r.isVerified);
 
-  if (invalidTokenGates.length === userTokenGates.length) {
-    // All token gates are invalid, so we can delete user from workspace
+  let validRoleIds: string[] = [];
+  validTokenGates.forEach(tg => {
+    validRoleIds = [...validRoleIds, ...tg.roleIds];
+  });
+
+  const invalidSpaceRoleToRoleIds: string[] = [];
+  invalidTokenGates.forEach(tg => {
+    tg.roleIds.forEach(roleId => {
+      // Remove invalid role if it is not granted by other token gate
+      if (!validRoleIds.includes(roleId) && !invalidSpaceRoleToRoleIds.includes(roleId)) {
+        const spaceRoleToRoleId = userSpaceRoles?.find(sr => sr.roleId === roleId)?.id;
+        if (spaceRoleToRoleId) {
+          invalidSpaceRoleToRoleIds.push(roleId);
+        }
+      }
+    });
+  });
+
+  if (invalidSpaceRoleToRoleIds.length) {
+    await removeUserRoles(invalidSpaceRoleToRoleIds);
+  }
+
+  // All token gates are invalid and user did not join via invite link soo he should be removed from space
+  if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
     await prisma.spaceRole.delete({
       where: {
         spaceUser: {
@@ -45,7 +83,15 @@ export async function verifyTokenGateMembership ({ userTokenGates, userId, space
     return false;
   }
 
-  deleteUserTokenGates(invalidTokenGates);
-
   return true;
+}
+
+async function removeUserRoles (spaceRoleToRoleIds: string[]) {
+  return prisma.spaceRoleToRole.deleteMany({
+    where: {
+      id: {
+        in: spaceRoleToRoleIds
+      }
+    }
+  });
 }

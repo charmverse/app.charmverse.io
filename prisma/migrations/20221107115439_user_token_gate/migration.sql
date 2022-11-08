@@ -10,7 +10,8 @@ ALTER TABLE "SpaceRole" DROP CONSTRAINT "SpaceRole_tokenGateId_fkey";
 
 -- AlterTable
 ALTER TABLE "SpaceRole" DROP COLUMN "tokenGateConnectedDate",
-DROP COLUMN "tokenGateId";
+DROP COLUMN "tokenGateId",
+ADD COLUMN     "joinedViaLink" BOOLEAN;
 
 -- CreateTable
 CREATE TABLE "UserTokenGate" (
@@ -18,8 +19,9 @@ CREATE TABLE "UserTokenGate" (
     "spaceId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "tokenGateConnectedDate" TIMESTAMP(3),
-    "tokenGateId" UUID,
     "jwt" TEXT,
+    "tokenGateId" UUID,
+    "grantedRoles" TEXT[] DEFAULT ARRAY[]::TEXT[],
 
     CONSTRAINT "UserTokenGate_pkey" PRIMARY KEY ("id")
 );

@@ -439,6 +439,7 @@ model UserTokenGate {
   tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id], onDelete: SetNull)
   space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedRoles           String[]   @default([])
 
   @@unique([tokenGateId, userId, spaceId], name: "tokenGateUserSpace")
 }
@@ -451,6 +452,7 @@ model SpaceRole {
   createdAt       DateTime          @default(now())
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedViaLink   Boolean?
   spaceRoleToRole SpaceRoleToRole[]
 
   @@unique([spaceId, userId], name: "spaceUser")
