@@ -160,10 +160,10 @@ export function MemberPropertySidebarItem ({
   }), [property]);
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
-  const isAdjacentActive = canDrop && isOverCurrent;
+  const isAdjacentActive = admin && canDrop && isOverCurrent;
 
   return (
-    <Stack height='fit-content' ref={mergeRefs([ref, drag, drop, dragPreview])}>
+    <Stack height='fit-content' ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
       <MenuItem
         dense
         sx={{
