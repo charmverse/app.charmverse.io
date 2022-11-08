@@ -66,7 +66,7 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   return [];
 }
 
-const gnosisUnsupportedChainIds = [4];
+export const gnosisUnsupportedChainIds = [4];
 
 export function gnosisSupportedNetworks () {
   // ChainId 4 Rinkeby is not supported by gnosis anymore
