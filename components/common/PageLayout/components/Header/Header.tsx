@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -67,7 +68,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { updatePageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { showMessage } = useSnackbar();
 
@@ -156,20 +157,20 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         />
       )}
       <Divider /> */}
-      {/* <ListItemButton
+      <ListItemButton
         onClick={() => {
-          setCurrentPageActionDisplay('polls');
+          updatePageActionDisplay();
           setPageMenuOpen(false);
         }}
       >
-        <FormatListBulletedIcon
+        <FeedbackIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='View polls' />
-      </ListItemButton> */}
+        <ListItemText primary='View feedback' />
+      </ListItemButton>
       {/* <ListItemButton onClick={() => {
         setCurrentPageActionDisplay('comments');
         setPageMenuOpen(false);
