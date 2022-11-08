@@ -1,15 +1,14 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { RateReviewOutlined } from '@mui/icons-material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import DeleteIcon from '@mui/icons-material/Delete';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -25,12 +24,14 @@ import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { humanFriendlyDate } from 'lib/utilities/dates';
@@ -60,7 +61,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions } = usePages();
+  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
   const { user, setUser } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -68,6 +69,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const pageMenuAnchor = useRef();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
@@ -128,32 +130,33 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     }
   };
 
+  async function onDeletePage () {
+    if (basePage) {
+      await deletePage({
+        pageId: basePage.id
+      });
+    }
+  }
+
   const { members } = useMembers();
 
   const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
 
   const documentOptions = (
     <List dense>
-      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
-        <div>
-          <ListItemButton
-            disabled={!pagePermissions?.create_poll}
-            onClick={() => {
-              setPageMenuOpen(false);
-              setIsModalOpen(true);
-            }}
-          >
-            <HowToVoteOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Create a poll' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
-      <ListItemButton
+      {/* {basePage && (
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
+      )}
+      <Divider /> */}
+      {/* <ListItemButton
         onClick={() => {
           setCurrentPageActionDisplay('polls');
           setPageMenuOpen(false);
@@ -166,20 +169,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           }}
         />
         <ListItemText primary='View polls' />
-      </ListItemButton>
-      {basePage && (
-        <PublishToSnapshot
-          pageId={basePage.id}
-          renderContent={({ label, onClick, icon }) => (
-            <ListItemButton onClick={onClick}>
-              {icon}
-              <ListItemText primary={label} />
-            </ListItemButton>
-          )}
-        />
-      )}
-      <Divider />
-      <ListItemButton onClick={() => {
+      </ListItemButton> */}
+      {/* <ListItemButton onClick={() => {
         setCurrentPageActionDisplay('comments');
         setPageMenuOpen(false);
       }}
@@ -191,8 +182,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           }}
         />
         <ListItemText primary='View comments' />
-      </ListItemButton>
-      <ListItemButton onClick={() => {
+      </ListItemButton> */}
+      {/* <ListItemButton onClick={() => {
         setCurrentPageActionDisplay('suggestions');
         setPageMenuOpen(false);
       }}
@@ -204,23 +195,78 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           }}
         />
         <ListItemText primary='View suggestions' />
-      </ListItemButton>
-      {isExportablePage && (
-        <ListItemButton onClick={() => {
-          exportMarkdown();
+      </ListItemButton> */}
+      <ListItemButton
+        onClick={() => {
+          Utils.copyTextToClipboard(window.location.href);
+          showMessage('Copied link to clipboard', 'success');
           setPageMenuOpen(false);
         }}
-        >
-          <GetAppIcon
-            fontSize='small'
-            sx={{
-              mr: 1
+      >
+        <ContentCopyIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='Copy link' />
+      </ListItemButton>
+      <Divider />
+      <Tooltip title={!pagePermissions.delete ? 'You don\'t have permission to delete this page' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!pagePermissions.delete}
+            onClick={onDeletePage}
+          >
+            <DeleteIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Delete' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Divider />
+      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!pagePermissions?.create_poll}
+            onClick={() => {
+              setPageMenuOpen(false);
+              setIsModalOpen(true);
             }}
-          />
-          <ListItemText primary='Export to markdown' />
-        </ListItemButton>
-      )}
-
+          >
+            <TaskOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Convert to proposal' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
+      <Tooltip title={!isExportablePage ? 'This page can\'t be exported' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!isExportablePage}
+            onClick={() => {
+              exportMarkdown();
+              setPageMenuOpen(false);
+            }}
+          >
+            <GetAppIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Export to markdown' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <Divider />
       <ListItemButton>
         <FormControlLabel
