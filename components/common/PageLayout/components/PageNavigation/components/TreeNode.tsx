@@ -152,19 +152,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       {hideChildren
         ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
         : (
-          (item.type.match(/board/)) ? (
-            views.map(view => (
-              !view.fields.inline && (
-                <BoardViewTreeItem
-                  key={view.id}
-                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                  label={view.title}
-                  nodeId={view.id}
-                  viewType={view.fields.viewType}
-                />
-              )
-            ))
-          ) : (
+          (
             item.children.length > 0
               ? item.children.map((childItem) => (
               // eslint-disable-next-line no-use-before-define
