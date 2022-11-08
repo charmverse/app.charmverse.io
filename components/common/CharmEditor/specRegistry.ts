@@ -40,6 +40,7 @@ import {
 } from './components/suggestions/schema/common/track';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import * as tweet from './components/tweet/tweet';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -71,6 +72,7 @@ export const specRegistry = new SpecRegistry([
   code.spec(), // OK
   codeBlock.spec(), // OK
   iframe.spec(), // OK
+  tweet.spec(),
   heading.spec(), // OK
   inlinePaletteSpecs(), // Not required
   callout.spec(), // OK
