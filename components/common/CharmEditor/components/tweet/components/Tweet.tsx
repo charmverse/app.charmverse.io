@@ -1,4 +1,5 @@
 import type { NodeViewProps } from '@bangle.dev/core';
+import { useTheme } from '@emotion/react';
 import Script from 'next/script';
 import { useRef } from 'react';
 
@@ -10,11 +11,16 @@ import { twitterWidgetJs } from '../twitterJSUrl';
 
 import { TweetInput } from './TweetInput';
 
+type TweetOptions = {
+  theme?: 'dark' | 'light';
+}
+
 declare global {
   interface Window {
     twttr: {
       widgets: {
-        createTweet: (id: string, el: HTMLElement, options: { conversation?: 'none' | 'all' }) => void;
+        // @ref https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference
+        createTweet: (id: string, el: HTMLElement, options: TweetOptions) => void;
         // createTimeline - we might want this in the future?
       };
     };
@@ -22,7 +28,7 @@ declare global {
 }
 
 // embed Twitter
-function render (el: HTMLElement, tweetId: string) {
+function render (tweetId: string, el: HTMLElement, options: TweetOptions) {
   if (typeof window === 'undefined') {
     return;
   }
@@ -36,17 +42,18 @@ function render (el: HTMLElement, tweetId: string) {
     );
     return;
   }
-  window.twttr.widgets.createTweet(tweetId, el, {});
+  window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
 export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
 
   const ref = useRef<HTMLDivElement | null>(null);
+  const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
 
   function onLoadScript () {
     if (ref.current && attrs.id) {
-      render(ref.current, attrs.id);
+      render(attrs.id, ref.current, { theme: theme.palette.mode });
     }
   }
 
@@ -74,7 +81,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
   return (
     <>
       <Script src={twitterWidgetJs} onReady={onLoadScript} />
-      <div ref={ref} />
+      <div ref={ref} data-chrome='transparent' />
     </>
   );
 }
