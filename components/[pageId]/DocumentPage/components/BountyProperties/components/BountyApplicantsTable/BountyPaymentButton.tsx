@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { Divider, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import type { UserGnosisSafe } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
@@ -203,7 +203,7 @@ export default function BountyPaymentButton ({
         if (typeof tokenDecimals !== 'number') {
           try {
             const tokenInfo = await charmClient.getTokenMetaData({
-              chainId: chainToUse!.chainId as SupportedChainId,
+              chainId: chainToUse.chainId as SupportedChainId,
               contractAddress: tokenSymbolOrAddress
             });
             tokenDecimals = tokenInfo.decimals;
@@ -226,7 +226,7 @@ export default function BountyPaymentButton ({
 
         // transfer token
         const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
-        onSuccess(tx.hash, chainToUse!.chainId);
+        onSuccess(tx.hash, chainToUse.chainId);
       }
       else {
         onError('Please provide a valid contract address');
@@ -249,7 +249,7 @@ export default function BountyPaymentButton ({
       <Button
         color='primary'
         size='small'
-        onClick={(e) => {
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
           if (safeInfos?.length === 0) {
             onClick();
             makePayment();
