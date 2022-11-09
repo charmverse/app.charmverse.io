@@ -32,6 +32,7 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { LoggerProvider } from 'hooks/useLogger';
 import { MembersProvider } from 'hooks/useMembers';
 import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
@@ -269,28 +270,27 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-
     <UserProvider>
-      <SpacesProvider>
-        <WebSocketClientProvider>
-          <MembersProvider>
-            <BountiesProvider>
-              <PaymentMethodsProvider>
-                <PagesProvider>
-                  <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>
-                      {children}
-                    </PageTitleProvider>
-                  </PrimaryCharmEditorProvider>
-                </PagesProvider>
-              </PaymentMethodsProvider>
-            </BountiesProvider>
-          </MembersProvider>
-        </WebSocketClientProvider>
-      </SpacesProvider>
-
+      <LoggerProvider>
+        <SpacesProvider>
+          <WebSocketClientProvider>
+            <MembersProvider>
+              <BountiesProvider>
+                <PaymentMethodsProvider>
+                  <PagesProvider>
+                    <PrimaryCharmEditorProvider>
+                      <PageTitleProvider>
+                        {children}
+                      </PageTitleProvider>
+                    </PrimaryCharmEditorProvider>
+                  </PagesProvider>
+                </PaymentMethodsProvider>
+              </BountiesProvider>
+            </MembersProvider>
+          </WebSocketClientProvider>
+        </SpacesProvider>
+      </LoggerProvider>
     </UserProvider>
-
   );
 }
 
