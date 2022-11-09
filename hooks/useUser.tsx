@@ -29,7 +29,7 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook, connectableWalletDetected } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
@@ -60,18 +60,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  function getCharmUser () {
-    setIsLoaded(false);
-    // try retrieving the user from session
-    charmClient.getUser()
-      .then(_user => {
-        setUser(_user);
-      })
-      .finally(() => {
-        setIsLoaded(true);
-      });
-  }
-
   /**
    * Used to sync current user with current web 3 account
    *
@@ -79,12 +67,19 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    */
   async function refreshUserWithWeb3Account () {
     // a hack for now to support users that are trying to log in thru discord
-    if (!account && !connectableWalletDetected && !user?.discordUser) {
+    if ((!account || (account && !user?.wallets.some(w => w.address === account)))
+    && !user?.discordUser) {
       await charmClient.logout();
       setUser(null);
     }
     else {
-      getCharmUser();
+      charmClient.getUser()
+        .then(_user => {
+          setUser(_user);
+        })
+        .finally(() => {
+          setIsLoaded(true);
+        });
     }
   }
 
