@@ -83,7 +83,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, account, walletAuthSignature, user, spaces]);
+  }, [isLoading, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
