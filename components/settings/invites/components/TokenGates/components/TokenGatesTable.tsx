@@ -47,6 +47,12 @@ const StyledTableRow = styled(TableRow)`
   }
 `;
 
+function CopyLinkButton ({ clickable = false }: { clickable?: boolean }) {
+  return (
+    <Chip sx={{ width: 90 }} clickable={clickable} color='secondary' size='small' variant='outlined' label='Copy Link' />
+  );
+}
+
 export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, walletAuthSignature, sign } = useWeb3AuthSig();
   const [testResult, setTestResult] = useState<TestResult>({});
@@ -57,6 +63,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
+
   function onCopy () {
     showMessage('Link copied to clipboard');
   }
@@ -141,9 +148,17 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
               </TableCell>
               <TableCell width={150}>Assigned Role</TableCell>
               <TableCell width={90} align='center'>
-                <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <Chip onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()} sx={{ width: 90 }} clickable color='secondary' size='small' variant='outlined' label='Copy Link' />
-                </CopyToClipboard>
+                {sortedTokenGates.length === 0
+                  ? (
+                    <Tooltip title='Add a token gate to use this link'>
+                      <span><CopyLinkButton /></span>
+                    </Tooltip>
+                  )
+                  : (
+                    <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                      <span><CopyLinkButton clickable /></span>
+                    </CopyToClipboard>
+                  )}
               </TableCell>
               <TableCell width={30}>{/** Delete */}</TableCell>
             </StyledTableRow>
