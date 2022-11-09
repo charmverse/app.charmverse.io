@@ -65,12 +65,14 @@ function extractWalletErrorMessage (error: any): string {
 }
 
 function SafeMenuItem ({
+  tokenSymbolOrAddress,
   label,
   safeInfo,
   bounty,
   onClick,
   onError = () => {}
 }: {
+  tokenSymbolOrAddress: string;
   safeInfo: SafeData;
   label: string;
   bounty: BountyWithDetails;
@@ -85,23 +87,31 @@ function SafeMenuItem ({
     transactions
   });
 
-  return (
-    <MenuItem onClick={async () => {
-      onClick();
-      try {
-        await makePayment();
-      }
-      catch (error: any) {
-        const errorMessage = extractWalletErrorMessage(error);
+  const chainToUse = getChainById(safeInfo.chainId);
+  const isNativeToken = chainToUse?.nativeCurrency.symbol === tokenSymbolOrAddress;
 
-        if (errorMessage === 'underlying network changed') {
-          onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+  return (
+    <MenuItem
+      disabled={!isNativeToken}
+      onClick={async () => {
+        if (!isNativeToken) {
+          return;
         }
-        else {
-          onError(errorMessage);
+        onClick();
+        try {
+          await makePayment();
         }
-      }
-    }}
+        catch (error: any) {
+          const errorMessage = extractWalletErrorMessage(error);
+
+          if (errorMessage === 'underlying network changed') {
+            onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+          }
+          else {
+            onError(errorMessage);
+          }
+        }
+      }}
     >{label}
     </MenuItem>
   );
@@ -122,7 +132,7 @@ export default function BountyPaymentButton ({
   const { account, library, chainId } = useWeb3React();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const showWalletMenu = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -145,11 +155,6 @@ export default function BountyPaymentButton ({
   const [paymentMethods] = usePaymentMethods();
 
   const makePayment = async () => {
-
-    if (!chainIdToUse) {
-      onError('Please provide a chainId');
-      return;
-    }
 
     const chainToUse = getChainById(chainIdToUse);
 
@@ -245,7 +250,7 @@ export default function BountyPaymentButton ({
             makePayment();
           }
           else {
-            handleClick(e);
+            showWalletMenu(e);
           }
         }}
       >
@@ -273,6 +278,7 @@ export default function BountyPaymentButton ({
           {
           safeInfos?.map(safeInfo => (
             <SafeMenuItem
+              tokenSymbolOrAddress={tokenSymbolOrAddress}
               key={safeInfo.address}
               bounty={bounty}
               label={safeDataRecord[safeInfo.address]?.name ?? shortenHex(safeInfo.address)}
