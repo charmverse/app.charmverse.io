@@ -1,10 +1,8 @@
-
-name: "Build application"
+name: 'Build application'
 
 runs:
   using: 'composite'
   steps:
-
     # - name: Show GitHub context
     #   shell: bash
     #   env:
@@ -13,7 +11,7 @@ runs:
 
     - name: Cache build
       id: cache_build
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: .next
         key: nextjs-build-${{ github.sha }}

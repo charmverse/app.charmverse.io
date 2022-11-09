@@ -150,7 +150,7 @@ export default function ImportNotionWorkspace () {
             }}
             >
               {notionState.failedImports.map(failedImport => (
-                <div>
+                <div key={failedImport.pageId}>
                   <Box sx={{
                     display: 'flex',
                     gap: 1
@@ -164,7 +164,8 @@ export default function ImportNotionWorkspace () {
                     <div>
                       Blocks that failed to import for the page
                       {failedImport.blocks.map((blockTrails, blockTrailsIndex) => (
-                        <div>
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div key={blockTrailsIndex}>
                           {blockTrailsIndex + 1}. {blockTrails.map(([blockType, blockIndex]) => `${blockType}(${blockIndex + 1})`).join(' -> ')}
                         </div>
                       ))}

@@ -107,13 +107,14 @@ export default function InlineCommandPalette (
         paletteGroupItemsRecord[item.group] = [];
       }
       paletteGroupItemsRecord[item.group].push(
-        <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0 }}>
+        <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0, px: '4px' }}>
           <InlinePaletteRow
             dataId={item.uid}
             key={item.uid}
             disabled={item._isItemDisabled}
             title={item.title}
             icon={item.icon}
+            description={item.description}
             {...itemProps}
           />
         </MenuItem>

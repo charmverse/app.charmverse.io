@@ -1,19 +1,10 @@
-import styled from '@emotion/styled';
 import { Chip, InputLabel, MenuItem, Select } from '@mui/material';
 import type { ProposalStatus } from '@prisma/client';
 
+import { ViewOptions } from 'components/common/ViewOptions';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
-
-const StyledViewOptions = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
-  .MuiInputLabel-root, .MuiSelect-select {
-    font-size: .85em;
-  }
-`;
 
 export type ProposalSort = 'latest_created'
 export type ProposalFilter = ProposalStatus | 'all'
@@ -39,8 +30,7 @@ export default function ProposalsViewOptions ({
 
 }: Props) {
   return (
-    <StyledViewOptions>
-      <InputLabel>Sort</InputLabel>
+    <ViewOptions label='Sort'>
       <Select variant='outlined' value={proposalSort} onChange={(e) => setProposalSort(e.target.value as ProposalSort)} sx={{ mr: 2 }}>
         <MenuItem value='latest_created'>Created</MenuItem>
       </Select>
@@ -59,6 +49,6 @@ export default function ProposalsViewOptions ({
           categories.map(({ id, title, color }) => <MenuItem key={id} value={id}><Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} /></MenuItem>)
         }
       </Select>
-    </StyledViewOptions>
+    </ViewOptions>
   );
 }

@@ -105,6 +105,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
           );
         }}
         renderTags={(value, getTagProps) => value.map((option, index) => (
+          // eslint-disable-next-line react/jsx-key
           <Chip
             {...getTagProps({ index })}
             size='small'

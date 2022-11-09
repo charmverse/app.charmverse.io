@@ -70,7 +70,7 @@ export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginK
           <Box display='flex' flexDirection='column' gap={1}>
 
             {unResolvedThreads.map(resolvedThread => (
-              <ThreadContainer elevation={4}>
+              <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
               </ThreadContainer>
             ))}

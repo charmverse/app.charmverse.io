@@ -96,7 +96,7 @@ export default function IdentityProviders () {
       if (telegramAccount) {
         try {
           const telegramUser = await charmClient.connectTelegram(telegramAccount);
-          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser, username: telegramAccount.username, avatar: telegramAccount.photo_url }));
+          setUser((_user: LoggedInUser) => ({ ..._user, telegramUser }));
         }
         catch (err: any) {
           setTelegramError(err.message || err.error || 'Something went wrong. Please try again');

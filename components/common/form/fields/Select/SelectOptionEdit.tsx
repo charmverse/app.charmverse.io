@@ -50,7 +50,6 @@ export function SelectOptionEdit ({ option, onChange, onDelete, onToggleOptionEd
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
-
               if (e.code === 'Enter') {
                 onSave();
               }

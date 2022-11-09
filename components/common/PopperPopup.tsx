@@ -16,7 +16,6 @@ interface PopperPopupProps {
 }
 
 export default function PopperPopup (props: PopperPopupProps) {
-
   const { closeOnClick = false, popupContent, children, autoOpen = false, onClose, onOpen } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });

@@ -1,6 +1,6 @@
 import type { MemberProperty, MemberPropertyValue, Space } from '@prisma/client';
 
-import type { MemberPropertyValuesBySpace, PropertyValueWithDetails, MemberPropertyWithSpace } from 'lib/members/interfaces';
+import type { MemberPropertyValuesBySpace, MemberPropertyWithSpace, PropertyValueWithDetails } from 'lib/members/interfaces';
 
 type Options = {
   withSpaceDetails?: boolean;
@@ -11,14 +11,16 @@ export function getPropertiesWithValues (
   propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[],
   { withSpaceDetails }: Options = {}
 ): PropertyValueWithDetails[] {
-  return properties.map(({ id, spaceId, type, name, options, space: { name: spaceName, spaceImage } }) => {
+
+  return properties.map(({ enabledViews, id, spaceId, type, name, options, space: { name: spaceName, spaceImage } }) => {
     const propertyValue: PropertyValueWithDetails = {
       memberPropertyId: id,
       spaceId,
       type,
       name,
       value: propertyValues.find(pv => pv.memberPropertyId === id)?.value || null,
-      options: options as []
+      options: options as [],
+      enabledViews
     };
 
     if (withSpaceDetails) {
@@ -50,7 +52,7 @@ export function mapPropertyValueWithDetails ({
   memberPropertyId,
   spaceId,
   value,
-  memberProperty: { type, name },
+  memberProperty: { type, name, enabledViews },
   space: { spaceImage }
 }: MemberPropertyValue & { memberProperty: MemberProperty, space: Space }): PropertyValueWithDetails {
   return {
@@ -59,7 +61,8 @@ export function mapPropertyValueWithDetails ({
     value,
     type,
     name,
-    spaceImage
+    spaceImage,
+    enabledViews
   };
 
 }
