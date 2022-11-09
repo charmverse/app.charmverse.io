@@ -1,6 +1,6 @@
 import { Chip, MenuItem, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -19,6 +19,8 @@ type SelectProps = {
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
+  onBlur?: () => void;
+  autoOpen?: boolean;
 }
 
 type Props = ControlFieldProps & FieldProps & SelectProps;
@@ -29,11 +31,13 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
     iconLabel,
     inline,
     disabled,
+    autoOpen = false,
     multiselect = false,
     options = [],
     onDeleteOption,
     onUpdateOption,
     onCreateOption,
+    onBlur,
     ...inputProps
   },
   ref
@@ -42,17 +46,18 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   const selectedOptions = options.filter(option => option.id && selectedValues.includes(option.id));
   const [isOptionEditOpened, setIsOptionEditOpened] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
+  const focusScheduledRef = useRef(autoOpen);
 
   const inputRef = useRef<HTMLInputElement>();
 
   function toggleOptionEdit (opened: boolean) {
+    if (!opened) {
+      // schedule refocus autocomplete input after option edit is closed
+      focusScheduledRef.current = true;
+    }
+
     setIsOptionEditOpened(opened);
     setIsOpened(true);
-
-    if (!opened) {
-      // refocus autocomplete input after option edit is closed
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
   }
 
   function onValueChange (updatedSelectedOptions: SelectOptionType[]) {
@@ -67,6 +72,25 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 
     inputProps.onChange(newValue || '');
   }
+
+  useEffect(() => {
+    if (focusScheduledRef.current) {
+      inputRef.current?.focus();
+      setIsOpened(true);
+    }
+  });
+
+  useEffect(() => {
+    if (isOpened) {
+      focusScheduledRef.current = false;
+    }
+  }, [isOpened]);
+
+  useEffect(() => {
+    if (!isOpened && !isOptionEditOpened && !focusScheduledRef.current) {
+      onBlur?.();
+    }
+  }, [isOpened, isOptionEditOpened]);
 
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
