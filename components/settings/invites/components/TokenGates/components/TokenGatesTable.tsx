@@ -49,7 +49,7 @@ const StyledTableRow = styled(TableRow)`
 
 function CopyLinkButton ({ clickable = false }: { clickable?: boolean }) {
   return (
-    <Chip sx={{ width: 90 }} clickable={clickable} color='secondary' size='small' variant='outlined' label='Copy Link' />
+    <Chip sx={{ width: 90 }} clickable={clickable} disabled={!clickable} color='secondary' size='small' variant='outlined' label='Copy Link' />
   );
 }
 
@@ -135,6 +135,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   // sort oldest to newest
   const sortedTokenGates = tokenGates.sort((a, b) => b.createdAt > a.createdAt ? -1 : 1);
 
+  const padding = 32;
+
   return (
     <>
       <Box overflow='auto'>
@@ -146,8 +148,8 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                   Token Gated Link
                 </Typography>
               </TableCell>
-              <TableCell width={150}>Assigned Role</TableCell>
-              <TableCell width={90} align='center'>
+              <TableCell sx={{ width: 150 }}></TableCell>
+              <TableCell sx={{ width: 90 + padding }} align='center'>
                 {sortedTokenGates.length === 0
                   ? (
                     <Tooltip title='Add a token gate to use this link'>
@@ -160,7 +162,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                     </CopyToClipboard>
                   )}
               </TableCell>
-              <TableCell width={30}>{/** Delete */}</TableCell>
+              <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
@@ -172,11 +174,11 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
             {sortedTokenGates.map((tokenGate, tokenGateIndex, tokenGateArray) => (
               <TableRow key={tokenGate.id} sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
                 <TableCell>
-                  <Typography variant='body2' sx={{ my: 1 }}>
+                  <Typography variant='caption' sx={{ my: 1, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {descriptions[tokenGateIndex]}
                   </Typography>
                   {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='body2' sx={{ mt: 1 }}>
+                    <Typography variant='caption' sx={{ mt: 1 }}>
                       -- OR --
                     </Typography>
                   )}
