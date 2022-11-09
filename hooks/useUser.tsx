@@ -14,7 +14,7 @@ type IContext = {
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
-  loginFromWeb3Account: () => Promise<LoggedInUser>;
+  loginFromWeb3Account: (address: string) => Promise<LoggedInUser>;
   refreshUserWithWeb3Account: () => Promise<void>;
 };
 
@@ -24,7 +24,7 @@ export const UserContext = createContext<Readonly<IContext>>({
   updateUser: () => undefined,
   isLoaded: false,
   setIsLoaded: () => undefined,
-  loginFromWeb3Account: () => Promise.resolve() as any,
+  loginFromWeb3Account: (address: string) => Promise.resolve() as any,
   refreshUserWithWeb3Account: () => Promise.resolve()
 });
 
@@ -33,13 +33,13 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(true);
 
-  async function loginFromWeb3Account () {
+  async function loginFromWeb3Account (address: string) {
 
-    if (!account) {
+    if (!address) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = getStoredSignature() as AuthSig;
+    let signature = getStoredSignature(address) as AuthSig;
 
     if (!signature || !lowerCaseEqual(signature?.address, signature.address)) {
       signature = await sign();
@@ -54,7 +54,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.createUser({ address: account as string, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }
@@ -66,6 +66,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
   async function refreshUserWithWeb3Account () {
+
     // a hack for now to support users that are trying to log in thru discord
     if ((!account || (account && !user?.wallets.some(w => w.address === account)))
     && !user?.discordUser) {
@@ -91,7 +92,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setUser(u => u ? { ...u, ...updatedUser } : null);
   }, []);
 
-  const value = useMemo(() => {
+  const value = useMemo<IContext>(() => {
 
     setLoggedInUserForWeb3Hook(user);
 
@@ -102,7 +103,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setIsLoaded,
       updateUser,
       loginFromWeb3Account,
-      refreshUserWithWeb3Account } as IContext;
+      refreshUserWithWeb3Account };
   }, [user, isLoaded]);
 
   return (

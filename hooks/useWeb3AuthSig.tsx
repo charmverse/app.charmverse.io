@@ -24,7 +24,7 @@ type IContext = {
   chainId: any;
   sign: () => Promise<AuthSigWithRawAddress>;
   triedEager: boolean;
-  getStoredSignature: () => AuthSigWithRawAddress | null;
+  getStoredSignature: (address?: string) => AuthSigWithRawAddress | null;
   disconnectWallet: () => void;
   // Used by useUser to pass the user to the Web3 context
   setLoggedInUser: (user: LoggedInUser | null) => void;
@@ -34,6 +34,8 @@ type IContext = {
   verifiableWalletDetected: boolean;
   // Trigger workflow to connect a new wallet. In future, this can be used to support a situation where a browser has multiple wallets installed
   connectWallet: () => void;
+  connectWalletModalIsOpen: boolean;
+  isSigning: boolean;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -41,14 +43,16 @@ export const Web3Context = createContext<Readonly<IContext>>({
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSigWithRawAddress),
   triedEager: false,
-  getStoredSignature: () => null,
+  getStoredSignature: (address?: string) => null,
   disconnectWallet: () => null,
   library: null,
   chainId: null,
   setLoggedInUser: (user: LoggedInUser | null) => null,
   connector: null,
   verifiableWalletDetected: false,
-  connectWallet: () => null
+  connectWallet: () => null,
+  connectWalletModalIsOpen: false,
+  isSigning: false
 });
 
 // a wrapper around account and library from web3react
@@ -56,9 +60,11 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const { account, library, chainId, connector } = useWeb3React();
 
+  const [isSigning, setIsSigning] = useState(false);
+
   const verifiableWalletDetected = !!account;
 
-  const { triedEager, openWalletSelectorModal } = useContext(Web3Connection);
+  const { triedEager, openWalletSelectorModal, isWalletSelectorModalOpen } = useContext(Web3Connection);
 
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
@@ -69,23 +75,21 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
-  function getStoredSignature (): AuthSigWithRawAddress | null {
+  function getStoredSignature (address: string | undefined = account as string): AuthSigWithRawAddress | null {
 
-    if (!account) {
+    if (!address) {
       return null;
     }
 
-    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${account}`);
+    const stored = window.localStorage.getItem(`${PREFIX}.wallet-auth-sig-${address}`);
 
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as AuthSig;
 
-        const rawAddress = (storedAccount ?? account as string);
-
         return {
           ...parsed,
-          rawAddress
+          rawAddress: address
         };
 
       }
@@ -143,39 +147,49 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       throw new ExternalServiceError('Missing signer');
     }
 
-    const signerChainId = await signer.getChainId();
+    setIsSigning(true);
 
-    const preparedMessage = {
-      domain: window.location.host,
-      address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-      uri: globalThis.location.origin,
-      version: '1',
-      chainId: signerChainId
-    };
+    try {
+      const signerChainId = await signer.getChainId();
 
-    const message = new SiweMessage(preparedMessage);
+      const preparedMessage = {
+        domain: window.location.host,
+        address: getAddress(account), // convert to EIP-55 format or else SIWE complains
+        uri: globalThis.location.origin,
+        version: '1',
+        chainId: signerChainId
+      };
 
-    const body = message.prepareMessage();
+      const message = new SiweMessage(preparedMessage);
 
-    const messageBytes = toUtf8Bytes(body);
+      const body = message.prepareMessage();
 
-    const newSignature = await signer.signMessage(messageBytes);
-    const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
+      const messageBytes = toUtf8Bytes(body);
 
-    if (!lowerCaseEqual(signatureAddress, account)) {
-      throw new Error('Signature address does not match account');
+      const newSignature = await signer.signMessage(messageBytes);
+      const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
+
+      if (!lowerCaseEqual(signatureAddress, account)) {
+        throw new Error('Signature address does not match account');
+      }
+
+      const generated: AuthSig = {
+        sig: newSignature,
+        derivedVia: 'charmverse.sign',
+        signedMessage: body,
+        address: signatureAddress
+      };
+
+      setSignature(generated, true);
+      setIsSigning(false);
+
+      return { ...generated, rawAddress: account };
+    }
+    catch (err) {
+      setIsSigning(false);
+      throw err;
     }
 
-    const generated: AuthSig = {
-      sig: newSignature,
-      derivedVia: 'charmverse.sign',
-      signedMessage: body,
-      address: signatureAddress
-    };
-
-    setSignature(generated, true);
-
-    return { ...generated, rawAddress: account };
   }
 
   function disconnectWallet () {
@@ -204,8 +218,10 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     setLoggedInUser: setCurrentUser,
     connector,
     verifiableWalletDetected,
-    connectWallet
-  }), [account, walletAuthSignature, triedEager, storedAccount, connector]);
+    connectWallet,
+    connectWalletModalIsOpen: isWalletSelectorModalOpen,
+    isSigning
+  }), [account, walletAuthSignature, triedEager, storedAccount, connector, isWalletSelectorModalOpen, isSigning]);
 
   return (
     <Web3Context.Provider value={value}>

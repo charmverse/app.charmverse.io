@@ -53,14 +53,10 @@ export default function LoginPage () {
     }
   }
 
-  async function loginFromWeb3 () {
-    await loginFromWeb3Account();
-    redirectToDefaultPage();
-  }
-
   useEffect(() => {
     setTitleState('Welcome');
     if (discordCookie) {
+      // console.log('Logged in with Discord');
       deleteCookie(AUTH_CODE_COOKIE);
     }
   }, []);
@@ -71,14 +67,14 @@ export default function LoginPage () {
       if (isLoggedIn && !walletNeedsVerification) {
         redirectToDefaultPage();
       }
-      else if (!isLoggedIn && walletIsVerified) {
-        loginFromWeb3();
-      }
+      // else if (!isLoggedIn && walletIsVerified) {
+      //   loginFromWeb3Account();
+      // }
       else {
         setShowLogin(true);
       }
     }
-  }, [isDataLoaded, isLoggedIn, walletNeedsVerification]);
+  }, [isDataLoaded, isLoggedIn, walletNeedsVerification, user]);
 
   if (!showLogin) {
     return null;
@@ -87,7 +83,11 @@ export default function LoginPage () {
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent walletSigned={loginFromWeb3} />
+        <LoginPageContent walletSigned={(authSig) => {
+          // console.log('Received authSig', authSig);
+          loginFromWeb3Account(authSig.rawAddress);
+        }}
+        />
         <Footer />
       </>
     )

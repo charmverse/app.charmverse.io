@@ -20,10 +20,18 @@ interface Props {
 
 export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton }: Props) {
 
-  const { account, sign, getStoredSignature, walletAuthSignature, connectableWalletDetected } = useWeb3AuthSig();
-  const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
+  const {
+    account,
+    sign,
+    isSigning,
+    getStoredSignature,
+    walletAuthSignature,
+    verifiableWalletDetected,
+    connectWallet,
+    connectWalletModalIsOpen
+  } = useWeb3AuthSig();
+  const { isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
-  const [isSigning, setIsSigning] = useState(false);
 
   // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
   const userClickedConnect = useRef<boolean>(false);
@@ -35,43 +43,40 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature()?.address as string, account)) {
+    if (userClickedConnect.current && !isSigning && verifiableWalletDetected) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
-  }, [account]);
+  }, [verifiableWalletDetected]);
 
   async function generateWalletAuth () {
-    if (isSigning) {
-      return;
-    }
-
-    setIsSigning(true);
 
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
 
       signSuccess({ ...walletAuthSignature, rawAddress: account });
-      setIsSigning(false);
     }
     else {
-
       sign()
         .then(signSuccess)
         .catch(error => {
-          log.error('Error requesting wallet signature', error);
+          log.error('Error requesting wallet signature in login page', error);
           showMessage('Wallet signature failed', 'warning');
-        })
-        .finally(() => setIsSigning(false));
+        });
     }
   }
 
-  if (!connectableWalletDetected && !account) {
-    return <Alert severity='warning'>No connectable wallet detected. Please switch your wallet address</Alert>;
-  }
-
-  if (connectableWalletDetected) {
+  if (!verifiableWalletDetected) {
     return (
-      <ButtonComponent data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <ButtonComponent
+        data-test='connect-wallet-button'
+        sx={buttonStyle}
+        size={buttonSize ?? 'large'}
+        loading={connectWalletModalIsOpen}
+        onClick={() => {
+          userClickedConnect.current = true;
+          connectWallet();
+        }}
+      >
         Connect Wallet
       </ButtonComponent>
     );
