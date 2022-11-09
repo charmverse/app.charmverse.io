@@ -12,17 +12,18 @@ ALTER TABLE "SpaceRole" DROP COLUMN "tokenGateConnectedDate";
 
 -- CreateTable
 CREATE TABLE "PageDiff" (
-    "id" TEXT NOT NULL,
+    "data" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
     "pageId" UUID NOT NULL,
-    "data" JSONB NOT NULL,
-
-    CONSTRAINT "PageDiff_pkey" PRIMARY KEY ("id")
+    "version" INTEGER NOT NULL
 );
 
 -- CreateIndex
 CREATE INDEX "PageDiff_pageId_idx" ON "PageDiff"("pageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PageDiff_pageId_version_key" ON "PageDiff"("pageId", "version");
 
 -- AddForeignKey
 ALTER TABLE "PageDiff" ADD CONSTRAINT "PageDiff_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;

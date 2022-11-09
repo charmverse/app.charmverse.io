@@ -297,13 +297,14 @@ model Page {
 }
 
 model PageDiff {
-  id        String   @id
+  data      Json
   createdAt DateTime @default(now())
   createdBy String   @db.Uuid
   pageId    String   @db.Uuid
   page      Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  data      Json
+  version   Int
 
+  @@unique([pageId, version])
   @@index([pageId])
 }
 

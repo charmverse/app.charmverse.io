@@ -270,8 +270,9 @@ export class FidusEditor {
 
     view.setProps({
       dispatchTransaction: tr => {
+        // console.log('dispatchTransaction', tr.meta);
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
-        const { state: newState } = view.state.applyTransaction(trackedTr);
+        const { state: newState } = view.state.applyTransaction(trackedTr.setMeta('foobar', true));
         view.updateState(newState);
         if (tr.steps) {
           this.docInfo.updated = new Date();

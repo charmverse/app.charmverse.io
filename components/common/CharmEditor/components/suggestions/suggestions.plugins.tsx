@@ -1,9 +1,9 @@
 import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { RateReviewOutlined } from '@mui/icons-material';
 import reactDOM from 'react-dom';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 

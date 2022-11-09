@@ -230,7 +230,10 @@ export class DocumentEventHandler {
       else {
         log.debug('Opening new document room', { pageId, userId });
         const page = await prisma.page.findUniqueOrThrow({
-          where: { id: pageId }
+          where: { id: pageId },
+          include: {
+            diffs: true
+          }
         });
         const content = page.content || { type: 'doc', content: [] };
         const room: DocumentRoom = {
@@ -238,8 +241,7 @@ export class DocumentEventHandler {
             id: page.id,
             content,
             version: page.version,
-            // TODO: populate with diffs from the db
-            diffs: []
+            diffs: page.diffs.map(diff => diff.data as unknown as ClientDiffMessage)
           },
           node: getNodeFromJson(content),
           participants: { [this.id]: this }
@@ -320,6 +322,7 @@ export class DocumentEventHandler {
       if (room.doc.version % this.docSaveInterval === 0) {
         await this.saveDocument();
       }
+      await this.saveDiff(message);
       this.confirmDiff(message.rid);
       this.sendUpdates(message);
     }
@@ -472,6 +475,20 @@ export class DocumentEventHandler {
         this.sendParticipantList();
       }
     }
+  }
+
+  async saveDiff (diff: ClientDiffMessage) {
+    const room = this.getDocumentRoomOrThrow();
+    const userId = this.getSession().user.id;
+    await prisma.pageDiff.create({
+      data: {
+        createdAt: new Date(),
+        createdBy: userId,
+        version: diff.v,
+        pageId: room.doc.id,
+        data: diff as any
+      }
+    });
   }
 
   async saveDocument () {

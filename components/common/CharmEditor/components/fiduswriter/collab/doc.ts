@@ -326,6 +326,7 @@ export class ModCollabDoc {
       steps,
       clientIds
     );
+    tr.setMeta('addToHistory', false);
     tr.setMeta('remote', true);
     this.mod.editor.view.dispatch(tr);
     this.setConfirmedDoc(tr, steps.length);

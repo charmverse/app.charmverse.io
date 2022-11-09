@@ -2,12 +2,12 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import reactDOM from 'react-dom';
 
 import { extractInlineVoteRows } from 'lib/inline-votes/findTotalInlineVotes';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import RowDecoration from './components/InlineVoteRowDecoration';
