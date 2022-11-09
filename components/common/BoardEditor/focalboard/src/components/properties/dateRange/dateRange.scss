@@ -43,8 +43,8 @@
     }
 
     .Button {
-        width: 100%;
         height: 100%;
+        width: calc(100% - 16px);
         justify-content: left;
         padding: 0;
 
