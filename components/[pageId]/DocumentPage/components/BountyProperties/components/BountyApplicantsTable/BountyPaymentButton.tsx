@@ -1,7 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { Divider, Menu, MenuItem } from '@mui/material';
+import { Divider, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import ERC20ABI from 'abis/ERC20ABI.json';
@@ -13,6 +12,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -91,29 +91,34 @@ function SafeMenuItem ({
   const isNativeToken = chainToUse?.nativeCurrency.symbol === tokenSymbolOrAddress;
 
   return (
-    <MenuItem
-      disabled={!isNativeToken}
-      onClick={async () => {
-        if (!isNativeToken) {
-          return;
-        }
-        onClick();
-        try {
-          await makePayment();
-        }
-        catch (error: any) {
-          const errorMessage = extractWalletErrorMessage(error);
+    <Tooltip title={!isNativeToken ? `Reward token must be ${chainToUse?.nativeCurrency.symbol} for Gnosis safes` : ''}>
+      <span>
+        <MenuItem
+          dense
+          disabled={!isNativeToken}
+          onClick={async () => {
+            if (!isNativeToken) {
+              return;
+            }
+            onClick();
+            try {
+              await makePayment();
+            }
+            catch (error: any) {
+              const errorMessage = extractWalletErrorMessage(error);
 
-          if (errorMessage === 'underlying network changed') {
-            onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
-          }
-          else {
-            onError(errorMessage);
-          }
-        }
-      }}
-    >{label}
-    </MenuItem>
+              if (errorMessage === 'underlying network changed') {
+                onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+              }
+              else {
+                onError(errorMessage);
+              }
+            }
+          }}
+        >{label}
+        </MenuItem>
+      </span>
+    </Tooltip>
   );
 }
 
@@ -263,16 +268,22 @@ export default function BountyPaymentButton ({
           open={open}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => {
-            onClick();
-            makePayment();
-            handleClose();
-          }}
-          >Metamask Wallet
+          <MenuItem
+            dense
+            onClick={() => {
+              onClick();
+              makePayment();
+              handleClose();
+            }}
+          >
+            Connected wallet
           </MenuItem>
           {
           safeInfos && (
-            <Divider />
+            <>
+              <Divider />
+              <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>Gnosis Wallets</MenuItem>
+            </>
           )
         }
           {
