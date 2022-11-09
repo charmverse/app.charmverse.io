@@ -46,11 +46,24 @@ export type ClientSelectionMessage = {
   v: number;
 };
 
+export type ProsemirrorJSONStep = {
+  stepType: 'replace';
+  from: number;
+  to: number;
+  slice?: {
+    content?: {
+      type: string;
+      marks?: { type: string, attrs: any }[];
+      text: string;
+    }[];
+  };
+}
+
 export type ClientDiffMessage = {
   type: 'diff';
   rid: number;
   cid?: number; // client id
-  ds?: any[]; // steps to send
+  ds: ProsemirrorJSONStep[]; // steps to send
   // ti?: string; // new title
   doc?: Node;
   v: number;

@@ -137,13 +137,11 @@ function pluginsFactory ({
           },
           apply (tr, pluginState, _oldState, newState) {
             const meta = tr.getMeta(key);
-            // console.log('apply tooltip state', tr.meta);
             if (meta === undefined) {
               return pluginState;
             }
             // ignore remote changes
             if (tr.getMeta('remote')) {
-              // console.log('ignore tooltip change');
               return pluginState;
             }
             if (meta.type === 'RENDER_TOOLTIP') {
@@ -269,7 +267,6 @@ function tooltipController ({
       return {
         update: (view, lastState) => {
           const { state } = view;
-          // console.log('update view', lastState.tr.meta, key.getState(state));
           if (lastState === state || !state.selection.empty) {
             return;
           }
@@ -302,7 +299,6 @@ function tooltipController ({
             }
             return;
           }
-          // console.log('render tooltip?', view.state.tr.meta, lastState.tr.meta);
           renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
         }
       };
@@ -350,7 +346,6 @@ function doesQueryHaveTrigger (
 export function renderSuggestionsTooltip (key: PluginKey, value: Record<string, any>): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      // console.log('RENDER TOOLTIP!', state.tr.getMeta('remote'), state.tr.getMeta('addToHistory'));
       dispatch(
         state.tr
           .setMeta(key, { type: 'RENDER_TOOLTIP', value })

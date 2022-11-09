@@ -11,7 +11,7 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocket } from '../authentication';
 
-import type { Participant, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientCheckVersionMessage, ClientDiffMessage, ClientSelectionMessage, ServerMessage } from './interfaces';
+import type { Participant, ProsemirrorJSONStep, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientCheckVersionMessage, ClientDiffMessage, ClientSelectionMessage, ServerMessage } from './interfaces';
 
 const log = getLogger('ws-docs');
 
@@ -295,6 +295,17 @@ export class DocumentEventHandler {
     }
   }
 
+  // We need to filter out marks from the suggested-tooltip plugin (supports mentions, slash command, etc). This way the tooltip doesn't show up for others.
+  // (Not sure this is the best fix, but it's the only way I could think of for now)
+  removeTooltipMarks (diff: ProsemirrorJSONStep) {
+    if (diff.slice?.content?.[0]?.marks?.length) {
+      diff.slice.content[0].marks = diff.slice.content[0].marks.filter(mark => (
+        !mark.attrs.trigger
+      ));
+    }
+    return diff;
+  }
+
   async handleDiff (message: WrappedSocketMessage<ClientDiffMessage>) {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
@@ -302,6 +313,10 @@ export class DocumentEventHandler {
     log.debug('Handling change event', { userId: this.getSession().user.id, clientV, serverV });
     if (clientV === serverV) {
       if (message.ds) {
+
+        // do some pre-processing on the diffs
+        message.ds = message.ds.map(this.removeTooltipMarks);
+
         const updatedNode = applyStepsToNode(message.ds, room.node);
         if (updatedNode) {
           room.node = updatedNode;
