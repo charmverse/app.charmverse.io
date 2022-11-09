@@ -16,6 +16,7 @@ export const LoggerContext = createContext<Readonly<IContext>>({
 });
 
 const DD_SITE = 'datadoghq.com';
+const DD_SERVICE = 'charmverseapp';
 
 export function LoggerProvider ({ children }: { children: ReactNode }) {
   const { user } = useUser();
@@ -26,6 +27,7 @@ export function LoggerProvider ({ children }: { children: ReactNode }) {
       datadogLogs.init({
         clientToken: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN,
         site: DD_SITE,
+        service: DD_SERVICE,
         forwardErrorsToLogs: true,
         sampleRate: 100,
         env: process.env.NODE_ENV,
@@ -42,7 +44,7 @@ export function LoggerProvider ({ children }: { children: ReactNode }) {
         applicationId: process.env.NEXT_PUBLIC_DD_RUM_APP_ID,
         clientToken: process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN,
         site: DD_SITE,
-        service: 'charmverseapp',
+        service: DD_SERVICE,
         sampleRate: 100,
         sessionReplaySampleRate: 100,
         trackInteractions: true,
