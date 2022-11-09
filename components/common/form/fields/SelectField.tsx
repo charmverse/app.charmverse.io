@@ -48,6 +48,11 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   function toggleOptionEdit (opened: boolean) {
     setIsOptionEditOpened(opened);
     setIsOpened(true);
+
+    if (!opened) {
+      // refocus autocomplete input after option edit is closed
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
   }
 
   function onValueChange (updatedSelectedOptions: SelectOptionType[]) {
@@ -66,13 +71,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
-        onClose={(e) => {
-          if (e.type === 'blur' && isOptionEditOpened) {
-            return;
-          }
-
-          setIsOpened(false);
-        }}
+        onClose={() => setIsOpened(false)}
         onOpen={() => setIsOpened(true)}
         open={isOpened || isOptionEditOpened}
         ref={ref}
