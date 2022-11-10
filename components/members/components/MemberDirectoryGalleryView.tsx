@@ -173,7 +173,6 @@ function MemberDirectoryGalleryCard ({
             setIsModalOpen(false);
           }}
           memberId={member.id}
-          showLoading={false}
           spaceId={currentSpace.id}
           updateMemberPropertyValues={updateMemberPropertyValues}
         />

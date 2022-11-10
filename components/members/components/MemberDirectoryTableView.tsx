@@ -189,7 +189,6 @@ function MemberDirectoryTableRow ({
           onClose={() => {
             setIsModalOpen(false);
           }}
-          showLoading={false}
           memberId={member.id}
           spaceId={currentSpace.id}
           updateMemberPropertyValues={updateMemberPropertyValues}

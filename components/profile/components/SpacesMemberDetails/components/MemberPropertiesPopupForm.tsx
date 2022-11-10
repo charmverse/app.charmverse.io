@@ -19,10 +19,9 @@ type Props = {
   title?: string;
   cancelButtonText?: string;
   children?: ReactNode;
-  showLoading?: boolean;
 };
 
-export function MemberPropertiesPopupForm ({ showLoading = true, cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
   const { data } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -60,49 +59,46 @@ export function MemberPropertiesPopupForm ({ showLoading = true, cancelButtonTex
     reset(defaultValues);
   }, [defaultValues]);
 
-  if (!data && spaceId && showLoading) {
-    return <LoadingComponent isLoading />;
-  }
-
-  if (!data) {
-    return null;
-  }
-
   return (
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent dividers>
-        {children}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Box display='flex' flexDirection='column'>
-            {data.map(property => {
-              const fieldRendererConfig = getFieldRendererConfig({
-                type: property.type,
-                label: property.name,
-                error: errors[property.memberPropertyId],
-                inline: true,
-                options: property.options
-              });
+      {
+        !data ? <DialogContent><LoadingComponent isLoading /></DialogContent> : (
+          <>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogContent dividers>
+              {children}
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Box display='flex' flexDirection='column'>
+                  {data.map(property => {
+                    const fieldRendererConfig = getFieldRendererConfig({
+                      type: property.type,
+                      label: property.name,
+                      error: errors[property.memberPropertyId],
+                      inline: true,
+                      options: property.options
+                    });
 
-              return fieldRendererConfig.renderer
-                ? (
-                  <Controller
-                    key={property.memberPropertyId}
-                    name={property.memberPropertyId}
-                    control={control}
-                    rules={fieldRendererConfig.rules}
-                    render={fieldRendererConfig.renderer}
-                  />
-                ) : null;
-            })}
-          </Box>
-        </form>
-      </DialogContent>
-      <DialogActions>
-        <Button data-test='close-member-properties-modal' onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
-        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
-      </DialogActions>
+                    return fieldRendererConfig.renderer
+                      ? (
+                        <Controller
+                          key={property.memberPropertyId}
+                          name={property.memberPropertyId}
+                          control={control}
+                          rules={fieldRendererConfig.rules}
+                          render={fieldRendererConfig.renderer}
+                        />
+                      ) : null;
+                  })}
+                </Box>
+              </form>
+              <DialogActions>
+                <Button data-test='close-member-properties-modal' onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
+                <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
+              </DialogActions>
+            </DialogContent>
+          </>
+        )
+      }
     </Dialog>
   );
-
 }
