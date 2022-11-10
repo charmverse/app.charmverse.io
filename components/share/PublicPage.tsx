@@ -86,6 +86,9 @@ export default function PublicPage () {
       if (foundSpace) {
         setSpaces([foundSpace]);
       }
+      else {
+        setPageNotFound(true);
+      }
     }
     catch (err) {
       setPageNotFound(true);
