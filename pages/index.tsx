@@ -18,13 +18,15 @@ import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage () {
-  const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { account, walletAuthSignature, verifiableWalletDetected, getStoredSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
   const { user, isLoaded, loginFromWeb3Account } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
+
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = Boolean(discordCookie);
@@ -73,7 +75,17 @@ export default function LoginPage () {
     }
   }, [isDataLoaded, isLoggedIn, walletNeedsVerification, user]);
 
-  if (!showLogin) {
+  const signature = getStoredSignature();
+
+  useEffect(() => {
+    if (verifiableWalletDetected && signature && !user) {
+      setLoggingIn(true);
+      loginFromWeb3Account(signature)
+        .finally(() => setLoggingIn(false));
+    }
+  }, [verifiableWalletDetected]);
+
+  if (!showLogin || loggingIn) {
     return null;
   }
 

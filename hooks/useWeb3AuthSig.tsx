@@ -222,7 +222,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     connectWallet,
     connectWalletModalIsOpen: isWalletSelectorModalOpen,
     isSigning
-  }), [account, walletAuthSignature, triedEager, storedAccount, connector, isWalletSelectorModalOpen, isSigning]);
+  }), [account, walletAuthSignature, triedEager, storedAccount, connector, isWalletSelectorModalOpen, isSigning, chainId, library]);
 
   return (
     <Web3Context.Provider value={value}>
