@@ -13,7 +13,6 @@ import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
 import { eToNumber } from 'lib/utilities/numbers';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
@@ -48,7 +47,7 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const gnosisSafeChainId = gnosisSafeData?.chainId;
 
   // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
-  const transactions: ((safeAddress: string) => TransactionWithMetadata)[] = useMemo(
+  const transactions: ((safeAddress?: string) => TransactionWithMetadata)[] = useMemo(
     () => bounties
       .filter(bounty => {
         return safeData ? safeData.some(safe => bounty.chainId === safe.chainId) : false;
