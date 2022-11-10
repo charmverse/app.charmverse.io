@@ -82,7 +82,7 @@ function SafeMenuItem ({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions
+    transactions: transactions.map(getTransaction => getTransaction(safeInfo.address))
   });
 
   return (

@@ -48,34 +48,44 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const gnosisSafeChainId = gnosisSafeData?.chainId;
 
   // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
-  const transactions: TransactionWithMetadata[] = useMemo(
+  const transactions: ((safeAddress: string) => TransactionWithMetadata)[] = useMemo(
     () => bounties
       .filter(bounty => {
-        return safeData
-          ? safeData.find(
-            ({ chainId: safeChainId }) => bounty.chainId === safeChainId && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
-          )
-          : false;
+        return safeData ? safeData.some(safe => bounty.chainId === safe.chainId) : false;
       })
       .map(bounty => {
-        return bounty.applications.map(application => {
-          if (application.status === 'complete') {
-            const value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
-            return {
-              to: application.walletAddress as string,
-              value,
-              // This has to be 0x don't change it
-              data: '0x',
-              applicationId: application.id,
-              userId: application.createdBy,
-              chainId: bounty.chainId,
-              rewardAmount: bounty.rewardAmount,
-              rewardToken: bounty.rewardToken,
-              title: bounty.page?.title || 'Untitled'
+        return bounty.applications
+          .filter(application => application.status === 'complete')
+          .map(application => {
+            return (safeAddress?: string) => {
+            // todo: make transactions callable with safe address
+              let data = '0x';
+              let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();
+              // assume this is ERC20 if its not a native token
+              if (safeAddress && bounty.rewardToken !== getChainById(bounty.chainId)?.nativeCurrency.symbol) {
+                const ABI = [
+                  'function safeTransferFrom(address token, address from, address to, uint256 value)'
+                ];
+                const iface = new ethers.utils.Interface(ABI);
+                data = iface.encodeFunctionData(
+                  'safeTransferFrom',
+                  [bounty.rewardToken, safeAddress, application.walletAddress, value]
+                );
+                value = '0';
+              }
+              return {
+                to: application.walletAddress as string,
+                value,
+                data,
+                applicationId: application.id,
+                userId: application.createdBy,
+                chainId: bounty.chainId,
+                rewardAmount: bounty.rewardAmount,
+                rewardToken: bounty.rewardToken,
+                title: bounty.page?.title || 'Untitled'
+              };
             };
-          }
-          return false;
-        }).filter(isTruthy);
+          });
       })
       .flat(),
     [bounties, safeData]
