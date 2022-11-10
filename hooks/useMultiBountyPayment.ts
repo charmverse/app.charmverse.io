@@ -8,6 +8,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
@@ -33,6 +34,7 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
   const [currentSpace] = useCurrentSpace();
+  const [paymentMethods] = usePaymentMethods();
   const { account, chainId } = useWeb3React();
   const signer = useGnosisSigner();
   const { data: safeData } = useSWR(
@@ -69,10 +71,12 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
               // assume this is ERC20 if its not a native token
               const isERC20Token = safeAddress && bounty.rewardToken !== getChainById(bounty.chainId)?.nativeCurrency.symbol;
               if (isERC20Token) {
+                const paymentMethod = paymentMethods.find(method => method.contractAddress === bounty.rewardToken);
                 const erc20 = new ethers.utils.Interface(ERC20_ABI);
+                const parsedAmount = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), paymentMethod?.tokenDecimals).toString();
                 data = erc20.encodeFunctionData(
                   'transferFrom',
-                  [safeAddress, application.walletAddress, value]
+                  [safeAddress, application.walletAddress, parsedAmount]
                 );
                 // send the request to the token contract
                 to = bounty.rewardToken;
