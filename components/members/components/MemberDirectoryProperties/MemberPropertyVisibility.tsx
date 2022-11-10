@@ -7,7 +7,7 @@ import GalleryIcon from 'components/common/BoardEditor/focalboard/src/widgets/ic
 import TableIcon from 'components/common/BoardEditor/focalboard/src/widgets/icons/table';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { UNHIDEABLE_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 function VisibilityViewIcon ({
@@ -74,7 +74,7 @@ export function MemberPropertyVisibility ({
   property: MemberPropertyWithPermissions;
 }) {
   const enabledViews = property.enabledViews;
-  if (UNHIDEABLE_MEMBER_PROPERTIES.includes(property.type)) {
+  if (MEMBER_PROPERTY_CONFIG[property.type]?.unhideable) {
     return null;
   }
 

@@ -19,7 +19,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 import { mergeRefs } from 'lib/utilities/react';
 
@@ -222,7 +222,7 @@ export function MemberPropertySidebarItem ({
                 }}
               />
             </Tooltip>
-            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+            {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
               <Tooltip title={`Delete ${property.name} property.`}>
                 <DeleteIcon
                   cursor='pointer'
