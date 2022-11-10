@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
-import { Alert, Box, Card, Divider, Grid, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Alert, Card, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import { injected, walletConnect, walletLink } from 'connectors';
 import type { ReactNode } from 'react';
 import { useContext, useState } from 'react';
@@ -52,7 +51,7 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-  const { account, connector, connectableWalletDetected } = useWeb3AuthSig();
+  const { account, connector } = useWeb3AuthSig();
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
