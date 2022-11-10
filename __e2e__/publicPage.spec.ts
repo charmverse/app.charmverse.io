@@ -105,6 +105,48 @@ test.describe.serial('Make a page public and visit it', async () => {
 
   });
 
+  test('open a page with id in url', async () => {
+
+    // Arrange ------------------
+    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+    const page = await userContext.newPage();
+
+    const { pages: spacePages, address, privateKey } = await createUserAndSpace({ browserPage: page });
+
+    await mockWeb3({
+      page,
+      context: { address, privateKey },
+      init: ({ Web3Mock, context }) => {
+
+        Web3Mock.mock({
+          blockchain: 'ethereum',
+          accounts: {
+            return: [context.address]
+          }
+        });
+
+      }
+    });
+
+    pages = spacePages;
+
+    boardPage = pages.find(p => p.type === 'page' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
+
+    cardPage = await prisma.page.findFirst({
+      where: {
+        type: 'card',
+        parentId: boardPage?.id
+      }
+    }) as Page;
+
+    const targetPage = `${baseUrl}/share/${cardPage?.id}`;
+
+    await page.goto(targetPage);
+
+    await expect(page.locator(`data-test=kanban-card-${cardPage.id}`)).toBeVisible();
+
+  });
+
   test('visit the public page', async () => {
 
     // Part B - Visit this page as a non logged in user
@@ -154,4 +196,3 @@ test.describe.serial('Make a page public and visit it', async () => {
   });
 
 });
-
