@@ -107,43 +107,29 @@ test.describe.serial('Make a page public and visit it', async () => {
 
   test('open a page with id in url', async () => {
 
-    // Arrange ------------------
-    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-    const page = await userContext.newPage();
+    const publicContext = await browser.newContext({});
 
-    const { pages: spacePages, address, privateKey } = await createUserAndSpace({ browserPage: page });
+    const page = await publicContext.newPage();
 
-    await mockWeb3({
-      page,
-      context: { address, privateKey },
-      init: ({ Web3Mock, context }) => {
+    await page.goto(`share/${boardPage?.id}`);
 
-        Web3Mock.mock({
-          blockchain: 'ethereum',
-          accounts: {
-            return: [context.address]
-          }
-        });
+    const boardTitle = page.locator('data-test=board-title').locator('input');
 
-      }
-    });
+    await expect(boardTitle).toBeVisible();
 
-    pages = spacePages;
+  });
 
-    boardPage = pages.find(p => p.type === 'page' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
+  test('open a page with incorrect in url', async () => {
 
-    cardPage = await prisma.page.findFirst({
-      where: {
-        type: 'card',
-        parentId: boardPage?.id
-      }
-    }) as Page;
+    const publicContext = await browser.newContext({});
 
-    const targetPage = `${baseUrl}/share/${cardPage?.id}`;
+    const page = await publicContext.newPage();
 
-    await page.goto(targetPage);
+    await page.goto('share/not-existing-page-id');
 
-    await expect(page.locator(`data-test=kanban-card-${cardPage.id}`)).toBeVisible();
+    const errorTitle = page.locator('data-test=error-title');
+
+    await expect(errorTitle).toBeVisible();
 
   });
 
