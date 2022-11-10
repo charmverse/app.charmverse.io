@@ -122,7 +122,8 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   // Only expose account if current user and account match up
   useEffect(() => {
-    if (account && user?.wallets.some(w => w.address === account)) {
+
+    if (account && user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
       setStoredAccount(account);
 
       const storedWalletSignature = getStoredSignature();

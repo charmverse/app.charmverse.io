@@ -21,14 +21,11 @@ type Props = {
 }
 
 /**
- * This signature modal must pass, or the user will be unable to continue in logged in state
- *
- * If closed without success, triggers a disconnect
- * @returns
+ * Used to add a wallet to an account
  */
 export function WalletConnect ({ onSuccess }: Props) {
 
-  const { account, walletSignerModal } = useWeb3AuthSig();
+  const { account } = useWeb3AuthSig();
   const { updateUser } = useUser();
 
   async function signSuccess (signature: AuthSigWithRawAddress) {
@@ -37,7 +34,6 @@ export function WalletConnect ({ onSuccess }: Props) {
     });
 
     updateUser(updatedUser);
-    walletSignerModal.close();
     onSuccess();
   }
 

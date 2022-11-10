@@ -67,9 +67,6 @@ export default function LoginPage () {
       if (isLoggedIn && !walletNeedsVerification) {
         redirectToDefaultPage();
       }
-      // else if (!isLoggedIn && walletIsVerified) {
-      //   loginFromWeb3Account();
-      // }
       else {
         setShowLogin(true);
       }
@@ -85,7 +82,7 @@ export default function LoginPage () {
       <>
         <LoginPageContent walletSigned={(authSig) => {
           // console.log('Received authSig', authSig);
-          loginFromWeb3Account(authSig.rawAddress);
+          loginFromWeb3Account(authSig);
         }}
         />
         <Footer />

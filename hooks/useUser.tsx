@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import charmClient from 'charmClient';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -14,7 +14,7 @@ type IContext = {
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
-  loginFromWeb3Account: (address: string) => Promise<LoggedInUser>;
+  loginFromWeb3Account: (authSig?: AuthSigWithRawAddress) => Promise<LoggedInUser>;
   refreshUserWithWeb3Account: () => Promise<void>;
 };
 
@@ -24,22 +24,22 @@ export const UserContext = createContext<Readonly<IContext>>({
   updateUser: () => undefined,
   isLoaded: false,
   setIsLoaded: () => undefined,
-  loginFromWeb3Account: (address: string) => Promise.resolve() as any,
+  loginFromWeb3Account: () => Promise.resolve() as any,
   refreshUserWithWeb3Account: () => Promise.resolve()
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook, verifiableWalletDetected } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
-  const [isLoaded, setIsLoaded] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  async function loginFromWeb3Account (address: string) {
+  async function loginFromWeb3Account (authSig?: AuthSigWithRawAddress) {
 
-    if (!address) {
+    if (!verifiableWalletDetected && !authSig) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = getStoredSignature(address) as AuthSig;
+    let signature = authSig ?? getStoredSignature() as AuthSig;
 
     if (!signature || !lowerCaseEqual(signature?.address, signature.address)) {
       signature = await sign();
@@ -54,10 +54,15 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.createUser({ address, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }
+  }
+
+  async function logoutUser () {
+    await charmClient.logout();
+    setUser(null);
   }
 
   /**
@@ -67,13 +72,12 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    */
   async function refreshUserWithWeb3Account () {
 
-    // a hack for now to support users that are trying to log in thru discord
-    if ((!account || (account && !user?.wallets.some(w => w.address === account)))
-    && !user?.discordUser) {
-      await charmClient.logout();
-      setUser(null);
-    }
-    else {
+    const signature = getStoredSignature();
+
+    // Support the initial load
+    if (!isLoaded
+      || (account && !user?.wallets.some(w => lowerCaseEqual(w.address, account)) && lowerCaseEqual(signature?.address, account))
+      || user?.discordUser) {
       charmClient.getUser()
         .then(_user => {
           setUser(_user);
@@ -81,11 +85,21 @@ export function UserProvider ({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoaded(true);
         });
+      // a hack for now to support users that are trying to log in thru discord
+    }
+    else if (verifiableWalletDetected && signature) {
+      loginFromWeb3Account(signature)
+        .then(loggedInUser => setUser(loggedInUser))
+        .catch(logoutUser);
+    }
+    else {
+      logoutUser();
     }
   }
 
   useEffect(() => {
     refreshUserWithWeb3Account();
+
   }, [account]);
 
   const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {
