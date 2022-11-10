@@ -2,7 +2,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
+import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import { randomIntFromInterval } from 'lib/utilities/random';
+import { getThemeColorFromString } from 'theme/utils/getThemeColorFromString';
 
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from '../blocks/board';
 import type { Card } from '../blocks/card';
@@ -20,7 +22,6 @@ import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
 import MultiSelectProperty from './properties/multiSelect/multiSelect';
-import SelectProperty from './properties/select/select';
 import UserProperty from './properties/user/user';
 
 const menuColors = Object.keys(Constants.menuColors);
@@ -116,30 +117,50 @@ function PropertyValueElement (props:Props): JSX.Element {
 
   if (propertyTemplate.type === 'select') {
     return (
+    // <SelectProperty
+    //   isEditable={!readOnly && Boolean(board)}
+    //   emptyValue={emptyDisplayValue}
+    //   propertyValue={propertyValue as string}
+    //   propertyTemplate={propertyTemplate}
+    //   onCreate={async (newValue) => {
+    //     const option: IPropertyOption = {
+    //       id: Utils.createGuid(IDType.BlockID),
+    //       value: newValue,
+    //       color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
+    //     };
+    //     await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
+    //     mutator.changePropertyValue(card, propertyTemplate.id, option.id);
+    //   }}
+    //   onChange={(newValue) => {
+    //     mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+    //   }}
+    //   onChangeColor={(option: IPropertyOption, colorId: string): void => {
+    //     console.log('🔥cid', colorId);
+    //     mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId);
+    //   }}
+    //   onDeleteOption={(option: IPropertyOption): void => {
+    //     mutator.deletePropertyOption(board, propertyTemplate, option);
+    //   }}
+    //   onDeleteValue={onDeleteValue}
+    // />
+
       <SelectProperty
-        isEditable={!readOnly && Boolean(board)}
-        emptyValue={emptyDisplayValue}
+        readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
-        propertyTemplate={propertyTemplate}
-        onCreate={async (newValue) => {
-          const option: IPropertyOption = {
-            id: Utils.createGuid(IDType.BlockID),
-            value: newValue,
-            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
-          };
-          await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
-          mutator.changePropertyValue(card, propertyTemplate.id, option.id);
-        }}
+        options={propertyTemplate.options}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        onChangeColor={(option: IPropertyOption, colorId: string): void => {
-          mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId);
+        onUpdateOption={(option) => {
+          mutator.changePropertyOption(board, propertyTemplate, option);
         }}
-        onDeleteOption={(option: IPropertyOption): void => {
+        onDeleteOption={(option) => {
           mutator.deletePropertyOption(board, propertyTemplate, option);
         }}
-        onDeleteValue={onDeleteValue}
+        onCreateOption={async (newValue) => {
+          await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+          mutator.changePropertyValue(card, propertyTemplate.id, newValue.id);
+        }}
       />
     );
   }

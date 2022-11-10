@@ -13,7 +13,7 @@ export function useMutateMemberPropertyValues (
   const isAdmin = useIsAdmin(spaceId || undefined);
 
   if (!isAdmin) {
-    return { createOption: undefined, deleteOption: undefined, updateOption: undefined };
+    return { createOption: undefined, deleteOption: undefined, updateOption: undefined, canEditOptions: false };
   }
 
   async function updateAndMutatePropertyOptions (propUpdate: { id: string, options: SelectOptionType[], spaceId: string }) {
@@ -58,5 +58,5 @@ export function useMutateMemberPropertyValues (
       options: property.options ? property.options.filter(o => o.id !== option.id) : [] });
   }
 
-  return { createOption, deleteOption, updateOption };
+  return { createOption, deleteOption, updateOption, canEditOptions: true };
 }

@@ -447,6 +447,15 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'change option color');
   }
 
+  async changePropertyOption (board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
+    const newBoard = createBoard({ block: board });
+    const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!;
+    const newOption = newTemplate.options.find((o) => o.id === updatedOption.id)!;
+    newOption.color = updatedOption.color;
+    newOption.value = updatedOption.value;
+    await this.updateBlock(newBoard, board, 'change property option');
+  }
+
   changePropertyValue (card: Card, propertyId: string, value?: string | string[], description = 'change property', mutate = true) {
     const oldValue = card.fields.properties[propertyId];
 
