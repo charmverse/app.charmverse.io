@@ -73,13 +73,16 @@ export default function PublicPage () {
   const editString = router.asPath.replace('/share', '');
 
   async function onLoad () {
-
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
 
     try {
+      const { page: rootPage } = await charmClient.getPublicPage(pageIdOrPath);
       foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
+      if (validate(router.query.pageId?.[0] || '')) {
+        router.replace(`/share/${foundSpace?.domain}/${rootPage.path}`);
+      }
       if (foundSpace) {
         setSpaces([foundSpace]);
       }
@@ -90,12 +93,7 @@ export default function PublicPage () {
 
     if (!isBountiesPage && foundSpace) {
       try {
-
         const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
-
-        if (validate(router.query.pageId?.[0] || '')) {
-          router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
-        }
 
         charmClient.track.trackAction('page_view', {
           type: rootPage.type,
