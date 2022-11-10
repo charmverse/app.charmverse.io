@@ -4,6 +4,7 @@ import { Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
 import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
@@ -15,10 +16,9 @@ import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -41,7 +41,6 @@ function MemberDirectoryGalleryCard ({
   const [currentSpace] = useCurrentSpace();
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { updateSpaceValues } = useMemberPropertyValues(member.id);
   const { mutateMembers } = useMembers();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
@@ -50,6 +49,11 @@ function MemberDirectoryGalleryCard ({
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const admin = isAdmin();
+
+  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
+    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+    mutateMembers();
+  };
 
   const social = member.profile?.social as Social ?? {};
   return (
@@ -176,11 +180,10 @@ function MemberDirectoryGalleryCard ({
         <MemberPropertiesPopupForm
           onClose={() => {
             setIsModalOpen(false);
-            mutateMembers();
           }}
           memberId={member.id}
           spaceId={currentSpace.id}
-          updateMemberPropertyValues={updateSpaceValues}
+          updateMemberPropertyValues={updateMemberPropertyValues}
         />
       )}
     </>
