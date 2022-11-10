@@ -24,6 +24,7 @@ type SelectProps = {
   onBlur?: () => void;
   autoOpen?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -43,6 +44,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
     onCreateOption,
     onBlur,
     placeholder,
+    className,
     ...inputProps
   },
   ref
@@ -100,6 +102,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
+        className={className}
         onClose={() => setIsOpened(false)}
         onOpen={() => setIsOpened(true)}
         open={isOpened || isOptionEditOpened}
