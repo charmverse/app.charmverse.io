@@ -15,7 +15,7 @@ const SelectPreviewContainer = styled(Stack)<PreviewProps>`
   min-height: 32px;
   min-width: 150px;
   justify-content: center;
-  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
+  padding: ${({ theme }) => theme.spacing(0.5)};
   padding-right: ${({ theme }) => theme.spacing(2)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   transition: background-color 0.2s ease-in-out;
