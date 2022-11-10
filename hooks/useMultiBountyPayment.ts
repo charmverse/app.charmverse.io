@@ -63,7 +63,6 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
           .filter(application => application.walletAddress && application.status === 'complete')
           .map(application => {
             return (safeAddress?: string) => {
-
               let data = '0x';
               let to = application.walletAddress as string;
               let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), 18).toString();

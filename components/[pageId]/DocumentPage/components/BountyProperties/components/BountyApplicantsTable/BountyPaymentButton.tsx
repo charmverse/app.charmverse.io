@@ -237,7 +237,7 @@ export default function BountyPaymentButton ({
     }
   };
 
-  const hasSafes = safeInfos?.length > 0;
+  const hasSafes = Boolean(safeInfos?.length);
 
   return (
     <>
