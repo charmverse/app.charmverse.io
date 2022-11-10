@@ -3,7 +3,6 @@ import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';
@@ -17,6 +16,7 @@ import { useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
@@ -119,7 +119,7 @@ export default function BountyPaymentButton ({
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
   const signer = useGnosisSigner();
-  const { account, library, chainId } = useWeb3React();
+  const { account, library, chainId } = useWeb3AuthSig();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
