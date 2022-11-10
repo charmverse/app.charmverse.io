@@ -1,9 +1,44 @@
+import styled from '@emotion/styled';
+import { Stack, Typography } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
 import { mapPropertyOptionToSelectOption, mapSelectOptionToPropertyOption } from 'components/common/BoardEditor/components/properties/SelectProperty/mappers';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import type { IPropertyOption } from 'lib/focalboard/board';
+
+type PreviewProps ={
+  readOnly?: boolean;
+}
+const SelectPreviewContainer = styled(Stack)<PreviewProps>`
+  min-height: 32px;
+  min-width: 150px;
+  justify-content: center;
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1)}`};
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    cursor: pointer;
+    background-color: ${({ theme, readOnly }) => !readOnly ? theme.palette.action.hover : 'transparent'};
+  }
+
+  div {
+    pointer-events: none;
+  }
+`;
+
+const StyledSelect = styled(SelectField)`
+  .MuiInputBase-root {
+    background: transparent;
+  }
+
+  .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
+    padding: 1px;
+  }
+`;
 
 type Props = {
   readOnly?: boolean;
@@ -30,6 +65,12 @@ export function SelectProperty ({
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
 
+  const onEdit = useCallback(() => {
+    if (!readOnly) {
+      setIsOpened(true);
+    }
+  }, [readOnly]);
+
   const selectOptions = useMemo(() => {
     return options.map(o => mapPropertyOptionToSelectOption(o));
   }, [options]);
@@ -39,7 +80,7 @@ export function SelectProperty ({
       return typeof propertyValue === 'string' ? [propertyValue] : propertyValue;
     }
     else {
-      return typeof propertyValue === 'string' ? propertyValue : propertyValue[0] || '';
+      return Array.isArray(propertyValue) ? propertyValue[0] || '' : propertyValue;
     }
   }, [multiselect, propertyValue]);
 
@@ -59,11 +100,23 @@ export function SelectProperty ({
   }, [onCreateOption]);
 
   if (!isOpened) {
-    // return placeholder component
+    return (
+      <SelectPreviewContainer onClick={onEdit} readOnly={readOnly}>
+        <SelectPreview
+          value={selectValue}
+          options={selectOptions}
+          size='small'
+          emptyComponent={<Typography variant='subtitle2' sx={{ opacity: 0.4, pl: '2px', fontSize: '14px' }}>Empty</Typography>}
+        />
+      </SelectPreviewContainer>
+    );
   }
 
   return (
-    <SelectField
+
+    <StyledSelect
+      placeholder={placeholder}
+      autoOpen
       multiselect={multiselect}
       disabled={readOnly}
       value={selectValue}
@@ -72,6 +125,8 @@ export function SelectProperty ({
       onUpdateOption={onUpdate}
       onDeleteOption={onDelete}
       onCreateOption={onCreate}
+      onBlur={() => setIsOpened(false)}
     />
+
   );
 }

@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import { randomIntFromInterval } from 'lib/utilities/random';
-import { getThemeColorFromString } from 'theme/utils/getThemeColorFromString';
 
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from '../blocks/board';
 import type { Card } from '../blocks/card';
@@ -57,8 +56,6 @@ function PropertyValueElement (props:Props): JSX.Element {
     setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '');
   }, [value, props.card.fields.properties[props.propertyTemplate.id]]);
 
-  const onDeleteValue = useCallback(() => mutator.changePropertyValue(card, propertyTemplate.id, ''), [card, propertyTemplate.id]);
-
   const validateProp = (propType: string, val: string): boolean => {
     if (val === '') {
       return true;
@@ -85,37 +82,37 @@ function PropertyValueElement (props:Props): JSX.Element {
     }
   };
 
-  if (propertyTemplate.type === 'multiSelect') {
-    return (
-      <MultiSelectProperty
-        isEditable={!readOnly && Boolean(board)}
-        emptyValue={emptyDisplayValue}
-        propertyTemplate={propertyTemplate}
-        propertyValue={propertyValue}
-        onChange={async (newValue) => {
-          await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-        }}
-        onChangeColor={(option: IPropertyOption, colorId: string) => mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)}
-        onDeleteOption={(option: IPropertyOption) => mutator.deletePropertyOption(board, propertyTemplate, option)}
-        onCreate={async (newValue, currentValues) => {
-          const option: IPropertyOption = {
-            id: Utils.createGuid(IDType.BlockID),
-            value: newValue,
-            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
-          };
-          currentValues.push(option);
-          await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
-          mutator.changePropertyValue(card, propertyTemplate.id, currentValues.map((v) => v.id));
-        }}
-        onDeleteValue={(valueToDelete, currentValues) => {
-          const viewIds = currentValues.filter((currentValue) => currentValue.id !== valueToDelete.id).map((currentValue) => currentValue.id);
-          mutator.changePropertyValue(card, propertyTemplate.id, viewIds);
-        }}
-      />
-    );
-  }
+  // if (propertyTemplate.type === 'multiSelect') {
+  //   return (
+  //     <MultiSelectProperty
+  //       isEditable={!readOnly && Boolean(board)}
+  //       emptyValue={emptyDisplayValue}
+  //       propertyTemplate={propertyTemplate}
+  //       propertyValue={propertyValue}
+  //       onChange={async (newValue) => {
+  //         await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+  //       }}
+  //       onChangeColor={(option: IPropertyOption, colorId: string) => mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)}
+  //       onDeleteOption={(option: IPropertyOption) => mutator.deletePropertyOption(board, propertyTemplate, option)}
+  //       onCreate={async (newValue, currentValues) => {
+  //         const option: IPropertyOption = {
+  //           id: Utils.createGuid(IDType.BlockID),
+  //           value: newValue,
+  //           color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
+  //         };
+  //         currentValues.push(option);
+  //         await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
+  //         mutator.changePropertyValue(card, propertyTemplate.id, currentValues.map((v) => v.id));
+  //       }}
+  //       onDeleteValue={(valueToDelete, currentValues) => {
+  //         const viewIds = currentValues.filter((currentValue) => currentValue.id !== valueToDelete.id).map((currentValue) => currentValue.id);
+  //         mutator.changePropertyValue(card, propertyTemplate.id, viewIds);
+  //       }}
+  //     />
+  //   );
+  // }
 
-  if (propertyTemplate.type === 'select') {
+  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     return (
     // <SelectProperty
     //   isEditable={!readOnly && Boolean(board)}
@@ -145,6 +142,8 @@ function PropertyValueElement (props:Props): JSX.Element {
     // />
 
       <SelectProperty
+        multiselect={propertyTemplate.type === 'multiSelect'}
+        placeholder={emptyDisplayValue}
         readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
         options={propertyTemplate.options}

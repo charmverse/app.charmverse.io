@@ -23,6 +23,8 @@ type SelectProps = {
   onDeleteOption?: (option: SelectOptionType) => void;
   onBlur?: () => void;
   autoOpen?: boolean;
+  className?: string;
+  placeholder?: string;
 }
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -41,6 +43,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
     onUpdateOption,
     onCreateOption,
     onBlur,
+    className,
+    placeholder,
     ...inputProps
   },
   ref
@@ -98,6 +102,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
+        className={className}
         onClose={() => setIsOpened(false)}
         onOpen={() => setIsOpened(true)}
         open={isOpened || isOptionEditOpened}
@@ -110,7 +115,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
         handleHomeEndKeys
         multiple
         filterSelectedOptions
-        sx={{ minWidth: 150, width: '100%' }}
+        sx={{ minWidth: 150, width: '100%', background: 'transparent' }}
         options={options}
         autoHighlight
         clearIcon={null}
@@ -145,6 +150,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
             inputRef={inputRef}
             {...params}
             size='small'
+            placeholder={!selectedOptions.length ? placeholder : undefined}
           />
         )}
         getOptionLabel={(option: SelectOptionType) => {
