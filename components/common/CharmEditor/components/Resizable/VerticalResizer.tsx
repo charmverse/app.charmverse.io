@@ -25,7 +25,7 @@ function VerticalResizer (props: ResizerProps) {
         onResize={onResize}
         width={width}
         height={height}
-        resizeHandles={['s']}
+        resizeHandles={['s', 'sw', 'se', 'w', 'e']}
         minConstraints={minConstraints}
         maxConstraints={maxConstraints}
         onResizeStop={onResizeStop}
