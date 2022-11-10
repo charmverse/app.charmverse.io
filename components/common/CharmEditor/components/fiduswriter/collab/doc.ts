@@ -86,7 +86,6 @@ export class ModCollabDoc {
       console.error('TODO: merge document updates');
     }
     else {
-      console.log('loadDocument()', data);
       this.loadDocument(data);
     }
   }

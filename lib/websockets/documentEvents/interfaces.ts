@@ -3,7 +3,7 @@ import type { Node } from '@bangle.dev/pm';
 export type Participant = {
   id: string;
   name: string;
-  session_id: string | undefined;
+  session_id?: string | undefined;
   sessionIds: string[];
 };
 

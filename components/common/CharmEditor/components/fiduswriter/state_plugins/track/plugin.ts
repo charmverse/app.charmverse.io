@@ -49,16 +49,15 @@ export function trackPlugin (options: Options) {
           }
         });
 
-        // if (options.editor.mod.collab) {
-        //   Object.entries(users).forEach(([id, username]) => {
-        //     const userId = parseInt(id);
-        //     options.editor.mod.collab.colors.ensureUserColor(userId);
-        //     if (!options.editor.mod.collab.pastParticipants.find(participant => participant.id === userId)) {
-        //       options.editor.mod.collab.pastParticipants.push({ id: userId, name: username });
-        //     }
-        //   });
+        if (options.editor.mod.collab) {
+          Object.entries(users).forEach(([userId, username]) => {
+            options.editor.mod.collab.colors.ensureUserColor(userId);
+            if (!options.editor.mod.collab.pastParticipants.find(participant => participant.id === userId)) {
+              options.editor.mod.collab.pastParticipants.push({ id: userId, name: username, sessionIds: [] });
+            }
+          });
 
-        // }
+        }
 
         return {
           decos: DecorationSet.empty
