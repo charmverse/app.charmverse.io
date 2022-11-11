@@ -61,6 +61,8 @@ export default function ConnectSnapshot () {
 
   const values = watch();
 
+  const snapshotIsDefault = space?.snapshotDomain === values.snapshotDomain;
+
   async function onSubmit (formValues: FormValues) {
 
     setFormError(null);
@@ -131,7 +133,7 @@ export default function ConnectSnapshot () {
         {
           isAdmin && (
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton disabled={!isValid} type='submit'>
+              <PrimaryButton disabled={!isValid || snapshotIsDefault} type='submit'>
                 Save
               </PrimaryButton>
             </Grid>
