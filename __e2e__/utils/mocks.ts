@@ -91,7 +91,11 @@ export async function createDiscordUser ({ userId, discordUserId }: { userId: st
     data: {
       account: {},
       discordId: discordUserId,
-      userId
+      user: {
+        connect: {
+          id: userId
+        }
+      }
     }
   });
 }
