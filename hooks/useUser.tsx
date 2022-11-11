@@ -106,9 +106,11 @@ export function UserProvider ({ children }: { children: ReactNode }) {
     setUser(u => u ? { ...u, ...updatedUser } : null);
   }, []);
 
-  const value = useMemo<IContext>(() => {
-
+  useEffect(() => {
     setLoggedInUserForWeb3Hook(user);
+  }, [user]);
+
+  const value = useMemo<IContext>(() => {
 
     return {
       user,
