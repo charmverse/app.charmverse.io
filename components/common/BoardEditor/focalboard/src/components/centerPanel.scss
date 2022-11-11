@@ -11,7 +11,6 @@
   }
 }
 
-
 .BoardComponent {
   flex: 1 1 auto;
   display: flex;
@@ -19,7 +18,6 @@
   overflow: auto;
 
   > * {
-
     padding: 0 24px;
 
     @media screen and (min-width: 768px) {
@@ -76,12 +74,19 @@
     transition: opacity 0.2s ease-in-out;
   }
 
-  &.embedded-board .view-actions {
-    opacity: 0;
+  &.embedded-board {
+    &:hover {
+      .view-actions {
+        opacity: 1;
+      }
+    }
+    .view-actions {
+      opacity: 0;
+    }
+    > .container-container {
+      > div {
+        padding-bottom: 5px;
+      }
+    }
   }
-
-  &.embedded-board:hover .view-actions {
-    opacity: 1;
-  }
-
 }
