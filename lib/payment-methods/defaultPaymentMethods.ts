@@ -4,6 +4,7 @@ import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' | 'tokenLogo' | 'tokenSymbol' | 'tokenName' | 'tokenDecimals'> [] = [
+  // ethereum
   {
     chainId: 1,
     contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
@@ -12,6 +13,16 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
     tokenSymbol: 'USDC',
     tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
   },
+  // goerli
+  {
+    chainId: 5,
+    contractAddress: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+    tokenDecimals: 6,
+    tokenName: 'USD Coin',
+    tokenSymbol: 'USDC',
+    tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
+  },
+  // polygon
   {
     chainId: 137,
     contractAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
