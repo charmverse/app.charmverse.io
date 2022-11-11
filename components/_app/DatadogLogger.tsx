@@ -1,29 +1,21 @@
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 
-import { useUser } from './useUser';
+import { isProdEnv } from 'config/constants';
 
-type IContext = {
-  datadogLogs: typeof datadogLogs | null;
-  datadogRum: typeof datadogRum | null;
-};
-
-export const LoggerContext = createContext<Readonly<IContext>>({
-  datadogLogs,
-  datadogRum
-});
+import { useUser } from '../../hooks/useUser';
 
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'charmverseapp';
 
-export function LoggerProvider ({ children }: { children: ReactNode }) {
+export default function DatadogLogger ({ children }: { children: ReactNode }) {
   const { user } = useUser();
 
   // Load DD_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && process.env.NODE_ENV === 'production') {
+    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && isProdEnv) {
       datadogLogs.init({
         clientToken: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN,
         site: DD_SITE,
@@ -39,7 +31,7 @@ export function LoggerProvider ({ children }: { children: ReactNode }) {
 
   // Load DD_RUM_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN && process.env.NEXT_PUBLIC_DD_RUM_APP_ID && process.env.NODE_ENV === 'production') {
+    if (process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN && process.env.NEXT_PUBLIC_DD_RUM_APP_ID && isProdEnv) {
       datadogRum.init({
         applicationId: process.env.NEXT_PUBLIC_DD_RUM_APP_ID,
         clientToken: process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN,
@@ -63,7 +55,7 @@ export function LoggerProvider ({ children }: { children: ReactNode }) {
 
   // Load the user id for DD_LOGS & DD_RUM_LOGS
   useEffect(() => {
-    if (user && process.env.NODE_ENV === 'production') {
+    if (user && isProdEnv) {
       datadogLogs.onReady(() => {
         datadogLogs.setUser({ id: user.id });
       });
@@ -76,18 +68,7 @@ export function LoggerProvider ({ children }: { children: ReactNode }) {
       datadogLogs.clearUser();
       datadogRum.clearUser();
     };
-  }, [user]);
+  }, [user?.id]);
 
-  const value = useMemo(() => ({
-    datadogLogs,
-    datadogRum
-  }), []);
-
-  return (
-    <LoggerContext.Provider value={value}>
-      {children}
-    </LoggerContext.Provider>
-  );
+  return <div>{children}</div>;
 }
-
-export const useLogger = () => useContext(LoggerContext);

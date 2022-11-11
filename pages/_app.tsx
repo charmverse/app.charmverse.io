@@ -18,6 +18,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import DatadogLogger from 'components/_app/DatadogLogger';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
@@ -32,7 +33,6 @@ import { ColorModeContext } from 'context/darkMode';
 import { BountiesProvider } from 'hooks/useBounties';
 import { useInterval } from 'hooks/useInterval';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { LoggerProvider } from 'hooks/useLogger';
 import { MembersProvider } from 'hooks/useMembers';
 import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
@@ -226,35 +226,37 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <Web3AccountProvider>
                   <ReactDndProvider>
                     <DataProviders>
-                      <OnboardingProvider>
-                        <FocalBoardProvider>
-                          <IntlProvider>
-                            <SnackbarProvider>
-                              <PageMetaTags />
-                              <CssBaseline enableColorScheme={true} />
-                              <Global styles={cssVariables} />
-                              <RouteGuard>
-                                <ErrorBoundary>
-                                  <Snackbar
-                                    isOpen={isOldBuild}
-                                    message='New CharmVerse platform update available. Please refresh.'
-                                    actions={[
-                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                        <RefreshIcon fontSize='small' />
-                                      </IconButton>
-                                    ]}
-                                    origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity='warning'
-                                    handleClose={() => setIsOldBuild(false)}
-                                  />
-                                  {getLayout(<Component {...pageProps} />)}
-                                  <GlobalComponents />
-                                </ErrorBoundary>
-                              </RouteGuard>
-                            </SnackbarProvider>
-                          </IntlProvider>
-                        </FocalBoardProvider>
-                      </OnboardingProvider>
+                      <DatadogLogger>
+                        <OnboardingProvider>
+                          <FocalBoardProvider>
+                            <IntlProvider>
+                              <SnackbarProvider>
+                                <PageMetaTags />
+                                <CssBaseline enableColorScheme={true} />
+                                <Global styles={cssVariables} />
+                                <RouteGuard>
+                                  <ErrorBoundary>
+                                    <Snackbar
+                                      isOpen={isOldBuild}
+                                      message='New CharmVerse platform update available. Please refresh.'
+                                      actions={[
+                                        <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                          <RefreshIcon fontSize='small' />
+                                        </IconButton>
+                                      ]}
+                                      origin={{ vertical: 'top', horizontal: 'center' }}
+                                      severity='warning'
+                                      handleClose={() => setIsOldBuild(false)}
+                                    />
+                                    {getLayout(<Component {...pageProps} />)}
+                                    <GlobalComponents />
+                                  </ErrorBoundary>
+                                </RouteGuard>
+                              </SnackbarProvider>
+                            </IntlProvider>
+                          </FocalBoardProvider>
+                        </OnboardingProvider>
+                      </DatadogLogger>
                     </DataProviders>
                   </ReactDndProvider>
                 </Web3AccountProvider>
@@ -271,25 +273,23 @@ function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
     <UserProvider>
-      <LoggerProvider>
-        <SpacesProvider>
-          <WebSocketClientProvider>
-            <MembersProvider>
-              <BountiesProvider>
-                <PaymentMethodsProvider>
-                  <PagesProvider>
-                    <PrimaryCharmEditorProvider>
-                      <PageTitleProvider>
-                        {children}
-                      </PageTitleProvider>
-                    </PrimaryCharmEditorProvider>
-                  </PagesProvider>
-                </PaymentMethodsProvider>
-              </BountiesProvider>
-            </MembersProvider>
-          </WebSocketClientProvider>
-        </SpacesProvider>
-      </LoggerProvider>
+      <SpacesProvider>
+        <WebSocketClientProvider>
+          <MembersProvider>
+            <BountiesProvider>
+              <PaymentMethodsProvider>
+                <PagesProvider>
+                  <PrimaryCharmEditorProvider>
+                    <PageTitleProvider>
+                      {children}
+                    </PageTitleProvider>
+                  </PrimaryCharmEditorProvider>
+                </PagesProvider>
+              </PaymentMethodsProvider>
+            </BountiesProvider>
+          </MembersProvider>
+        </WebSocketClientProvider>
+      </SpacesProvider>
     </UserProvider>
   );
 }
