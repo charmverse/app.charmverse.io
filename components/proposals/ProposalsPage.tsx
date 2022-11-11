@@ -16,7 +16,7 @@ import ProposalsViewOptions from './components/ProposalsViewOptions';
 
 export default function ProposalsPage () {
   const { categories = [] } = useProposalCategories();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { data, mutate: mutateProposals } = useSWR(() => currentSpace ? `proposals/${currentSpace.id}` : null, () => charmClient.proposals.getProposalsBySpace(currentSpace!.id));
   const {
     filteredProposals,

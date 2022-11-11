@@ -13,7 +13,7 @@ export function MemberDirectorySearchBar ({ onChange }: {
   onChange: Dispatch<SetStateAction<Member[]>>;
 }) {
   const { members } = useMembers();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   useEffect(() => {
     onChange(members);

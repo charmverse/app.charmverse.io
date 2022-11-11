@@ -189,6 +189,7 @@ export default function InlineCommandPalette (
       open={isInlineCommandVisible || isVisible}
       anchorEl={contentDOM || tooltipContentDOM}
       placement='bottom-start'
+      sx={{ zIndex: 1301 }}
     >
       <ClickAwayListener onClickAway={() => closePalette()}>
         <Grow

@@ -33,8 +33,8 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
-  const [currentSpace] = useCurrentSpace();
   const { account, chainId } = useWeb3AuthSig();
+  const currentSpace = useCurrentSpace();
   const [paymentMethods] = usePaymentMethods();
   const signer = useGnosisSigner();
   const { data: safeData } = useSWR(

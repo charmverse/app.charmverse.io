@@ -14,7 +14,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 export default function NewBountyButton () {
   const { user } = useUser();
   const router = useRouter();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();

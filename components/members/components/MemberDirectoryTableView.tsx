@@ -38,7 +38,7 @@ function MemberDirectoryTableRow ({
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const admin = isAdmin();
   const [isModalOpen, setIsModalOpen] = useState(false);

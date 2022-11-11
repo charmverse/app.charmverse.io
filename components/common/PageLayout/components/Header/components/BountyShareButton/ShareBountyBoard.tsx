@@ -48,8 +48,8 @@ interface Props {
 export default function ShareBountyBoard ({ padding = 1 }: Props) {
 
   const [copied, setCopied] = useState<boolean>(false);
-  const { spaces, setSpaces } = useSpaces();
-  const [space] = useCurrentSpace();
+  const { setSpace } = useSpaces();
+  const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   // Current values of the public permission
@@ -62,9 +62,7 @@ export default function ShareBountyBoard ({ padding = 1 }: Props) {
       publicBountyBoard: !bountiesArePublic,
       spaceId: space?.id as string
     });
-
-    setSpaces(spaces.map(s => s.id === updatedSpace.id ? updatedSpace : s));
-
+    setSpace(updatedSpace);
   }
 
   useEffect(() => {
