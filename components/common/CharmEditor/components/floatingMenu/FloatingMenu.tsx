@@ -59,7 +59,7 @@ export default function FloatingMenuComponent (
 
         if (type === 'defaultMenu') {
           return (
-            <Menu>
+            <Menu type={type}>
               <MenuGroup>
                 <Tooltip title={<Typography component='div'>Turn into</Typography>}>
                   <Button
