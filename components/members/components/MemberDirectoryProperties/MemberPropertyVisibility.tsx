@@ -80,9 +80,9 @@ export function MemberPropertyVisibility ({
 
   const admin = isAdmin();
   return (
-    <>
+    <Stack flexDirection='row' justifyContent='space-between' mr={2}>
       <Typography variant='overline' alignItems='center' display='flex'>
-        View Visibility
+        Views
       </Typography>
       <Stack gap={1} flexDirection='row' mb={1}>
         <MemberPropertyVisibilityView
@@ -104,6 +104,6 @@ export function MemberPropertyVisibility ({
           disabled={!admin}
         />
       </Stack>
-    </>
+    </Stack>
   );
 }

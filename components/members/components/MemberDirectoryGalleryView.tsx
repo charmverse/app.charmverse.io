@@ -44,8 +44,6 @@ function MemberDirectoryGalleryCard ({
   const { mutateMembers } = useMembers();
 
   const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
-  const isTimezoneHidden = !propertiesRecord.timezone?.enabledViews.includes('gallery');
-  const isRolesHidden = !propertiesRecord.role?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const admin = isAdmin();
@@ -109,23 +107,6 @@ function MemberDirectoryGalleryCard ({
               showDiscord={!isDiscordHidden}
               showTwitter={!isTwitterHidden}
             />
-            {!isRolesHidden && (
-              <Stack gap={0.5}>
-                <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
-                <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
-                </Stack>
-              </Stack>
-            )}
-
-            {!isTimezoneHidden && (
-              <Stack flexDirection='row' gap={1}>
-                <TimezoneDisplay
-                  showTimezone
-                  timezone={member.profile?.timezone}
-                />
-              </Stack>
-            )}
             {properties.map(property => {
               const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
@@ -138,6 +119,27 @@ function MemberDirectoryGalleryCard ({
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
                       <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                    </Stack>
+                  );
+                }
+
+                case 'role': {
+                  return (
+                    <Stack gap={0.5}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                      </Stack>
+                    </Stack>
+                  );
+                }
+                case 'timezone': {
+                  return (
+                    <Stack flexDirection='row' gap={1}>
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile?.timezone}
+                      />
                     </Stack>
                   );
                 }

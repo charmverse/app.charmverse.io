@@ -69,3 +69,13 @@ const propertyTypes = Object.keys(MEMBER_PROPERTY_CONFIG) as MemberPropertyType[
 export const READONLY_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].readonly);
 
 export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].default);
+
+export const MEMBER_PROPERTIES_ORDER = [
+  'name',
+  'role',
+  'profile_pic',
+  'bio',
+  'discord',
+  'twitter',
+  'timezone'
+] as const;
