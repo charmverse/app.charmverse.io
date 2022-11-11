@@ -1,11 +1,10 @@
-import Alert from '@mui/material/Alert';
 import type { SxProps, Theme } from '@mui/system';
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
@@ -16,9 +15,12 @@ interface Props {
   buttonStyle?: SxProps<Theme>;
   ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
+  buttonOutlined?: boolean;
+  // If connecting a wallet, this component auto-triggers signing. Defaults to true
+  enableAutosign?: boolean;
 }
 
-export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton }: Props) {
+export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton, buttonOutlined, enableAutosign = true }: Props) {
 
   const {
     account,
@@ -42,7 +44,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && verifiableWalletDetected) {
+    if (userClickedConnect.current && !isSigning && enableAutosign && verifiableWalletDetected) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
@@ -75,6 +77,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
           userClickedConnect.current = true;
           connectWallet();
         }}
+        variant={buttonOutlined ? 'outlined' : undefined}
       >
         Connect Wallet
       </ButtonComponent>
@@ -82,7 +85,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
   }
 
   return (
-    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
+    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning} variant={buttonOutlined ? 'outlined' : undefined}>
       Verify wallet
     </ButtonComponent>
   );

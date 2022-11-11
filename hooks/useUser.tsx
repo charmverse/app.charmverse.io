@@ -76,7 +76,12 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
     // Support the initial load
     if (!isLoaded
-      || account || user?.discordUser) {
+      // Account is only ever visible if it belongs to the current user
+      || account
+      // If the user is connected with a Discord account, we can ignore changes
+      || user?.discordUser
+      // If the web3 wallet is locked, don't log out the user
+      || (!verifiableWalletDetected && user)) {
       charmClient.getUser()
         .then(_user => {
           setUser(_user);

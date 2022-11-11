@@ -25,7 +25,7 @@ type Props = {
  */
 export function WalletConnect ({ onSuccess }: Props) {
 
-  const { account } = useWeb3AuthSig();
+  const { account, connectWallet } = useWeb3AuthSig();
   const { updateUser } = useUser();
 
   async function signSuccess (signature: AuthSigWithRawAddress) {
@@ -40,13 +40,15 @@ export function WalletConnect ({ onSuccess }: Props) {
   if (!account) {
     return (
       <WalletSign
-        buttonStyle={StyledButton.__emotion_styles}
+        buttonOutlined
         signSuccess={signSuccess}
         ButtonComponent={StyledButton as any}
+        buttonSize='medium'
+        enableAutosign={false}
       />
     );
   }
 
-  return <StyledButton disabled color='secondary'>Connected</StyledButton>;
+  return <StyledButton onClick={connectWallet} variant='outlined' color='primary'>Switch</StyledButton>;
 }
 
