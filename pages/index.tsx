@@ -66,7 +66,7 @@ export default function LoginPage () {
   useEffect(() => {
     if (isDataLoaded) {
       // redirect once user is logged in unless we are verifying their wallet
-      if (isLoggedIn && !walletNeedsVerification) {
+      if (isLoggedIn && (!walletNeedsVerification || !!user?.discordUser)) {
         redirectToDefaultPage();
       }
       else {
