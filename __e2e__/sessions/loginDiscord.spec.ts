@@ -42,7 +42,7 @@ test(
   }
 );
 
-test.only(
+test(
   'login - allows user to login and see their workspace even when a wallet is connected (regression check)',
   async ({ discordServer, loginPage }) => {
 
