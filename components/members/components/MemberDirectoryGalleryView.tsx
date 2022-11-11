@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
+import type { MemberProperty, MemberPropertyType } from '@prisma/client';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -32,21 +33,19 @@ function MemberDirectoryGalleryCard ({
   member: Member;
 }) {
   const { properties = [] } = useMemberProperties();
-  const nameProperty = properties.find(property => property.type === 'name');
-  const timezoneProperty = properties.find(property => property.type === 'timezone');
-  const rolesProperty = properties.find(property => property.type === 'role');
-  const discordProperty = properties.find(property => property.type === 'discord');
-  const twitterProperty = properties.find(property => property.type === 'twitter');
+  const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+    record[prop.type] = prop;
+    return record;
+  }, {} as any);
+
   const [currentSpace] = useCurrentSpace();
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateMembers } = useMembers();
 
-  const isNameHidden = !nameProperty?.enabledViews.includes('gallery');
-  const isTimezoneHidden = !timezoneProperty?.enabledViews.includes('gallery');
-  const isRolesHidden = !rolesProperty?.enabledViews.includes('gallery');
-  const isDiscordHidden = !discordProperty?.enabledViews.includes('gallery');
-  const isTwitterHidden = !twitterProperty?.enabledViews.includes('gallery');
+  const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
+  const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
+  const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const admin = isAdmin();
 
   const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
@@ -99,7 +98,7 @@ function MemberDirectoryGalleryCard ({
           <Stack p={2} gap={1}>
             {!isNameHidden && (
               <Typography gutterBottom variant='h6' mb={0} component='div'>
-                {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
+                {member.properties.find(memberProperty => memberProperty.memberPropertyId === propertiesRecord.name?.id)?.value ?? member.username}
               </Typography>
             )}
             <SocialIcons
@@ -108,23 +107,6 @@ function MemberDirectoryGalleryCard ({
               showDiscord={!isDiscordHidden}
               showTwitter={!isTwitterHidden}
             />
-            {!isRolesHidden && (
-              <Stack gap={0.5}>
-                <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-                <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                  {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
-                </Stack>
-              </Stack>
-            )}
-
-            {!isTimezoneHidden && (
-              <Stack flexDirection='row' gap={1}>
-                <TimezoneDisplay
-                  showTimezone
-                  timezone={member.profile?.timezone}
-                />
-              </Stack>
-            )}
             {properties.map(property => {
               const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
@@ -137,6 +119,27 @@ function MemberDirectoryGalleryCard ({
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
                       <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                    </Stack>
+                  );
+                }
+
+                case 'role': {
+                  return (
+                    <Stack gap={0.5}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                      </Stack>
+                    </Stack>
+                  );
+                }
+                case 'timezone': {
+                  return (
+                    <Stack flexDirection='row' gap={1}>
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile?.timezone}
+                      />
                     </Stack>
                   );
                 }
