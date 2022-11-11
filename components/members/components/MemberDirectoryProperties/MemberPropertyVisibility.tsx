@@ -84,7 +84,7 @@ export function MemberPropertyVisibility ({
       <Typography variant='overline' alignItems='center' display='flex'>
         Views
       </Typography>
-      <Stack gap={1} flexDirection='row' mb={1}>
+      <Stack gap={1} flexDirection='row'>
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}

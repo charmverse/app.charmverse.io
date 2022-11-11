@@ -21,7 +21,9 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true
   },
   bio: {
-    label: 'Bio'
+    label: 'Bio',
+    default: true,
+    readonly: true
   },
   discord: {
     label: 'Discord',
@@ -70,7 +72,7 @@ export const READONLY_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PR
 
 export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].default);
 
-export const MEMBER_PROPERTIES_ORDER = [
+export const DEFAULT_MEMBER_PROPERTIES_ORDER = [
   'name',
   'role',
   'profile_pic',

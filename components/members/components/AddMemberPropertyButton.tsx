@@ -46,7 +46,7 @@ export function AddMemberPropertyButton () {
     }
   }
 
-  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([, propertyConfig]) => propertyConfig.default);
+  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([, propertyConfig]) => !propertyConfig.default);
 
   return (
     <>
