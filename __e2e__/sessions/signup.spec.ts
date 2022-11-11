@@ -58,7 +58,7 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
 
 });
 
-test('signup - ignores the logic to redirect user after connect', async ({ sandboxPage, signupPage }) => {
+test('signup - ignores the logic to redirect user after connect if the user has 0 spaces', async ({ sandboxPage, signupPage }) => {
 
   // mimic signup: create a user and a session
   const user = await generateUser();
