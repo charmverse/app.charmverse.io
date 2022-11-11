@@ -27,7 +27,7 @@ export default function PublishToSnapshot ({ pageId, renderContent, onPublish = 
 
   const [checkingProposal, setCheckingProposal] = useState(!!page.snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
 
   const {
     isOpen,

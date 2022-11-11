@@ -11,7 +11,7 @@ import { sortNodes } from 'lib/pages/mapPageTree';
 // Redirect users to an initial page
 export default function RedirectToMainPage () {
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages, loadingPages } = usePages();
   const defaultPageKey: string = space?.domain ? getKey(`last-page-${space.domain}`) : '';
   const defaultPage = defaultPageKey ? (typeof window !== 'undefined' && localStorage.getItem(defaultPageKey)) : null;

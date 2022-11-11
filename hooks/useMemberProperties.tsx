@@ -32,7 +32,7 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
 });
 
 export function MemberPropertiesProvider ({ children }: { children: ReactNode }) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { data: properties, mutate: mutateProperties } = useSWR(() => space ? `members/properties/${space?.id}` : null, () => {
     return charmClient.members.getMemberProperties(space!.id);

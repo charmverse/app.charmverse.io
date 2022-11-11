@@ -23,7 +23,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
   const { user } = useUser();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const isAdmin = useIsAdmin();

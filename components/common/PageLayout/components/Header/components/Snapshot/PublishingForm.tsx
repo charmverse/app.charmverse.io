@@ -48,7 +48,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   const { account, library } = useWeb3React();
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
