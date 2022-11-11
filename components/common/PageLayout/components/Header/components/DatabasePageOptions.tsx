@@ -1,8 +1,14 @@
 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import FavoritedIcon from '@mui/icons-material/Star';
+import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import { Divider, Tooltip } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -16,11 +22,17 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useToggleFavorite } from 'hooks/useToggleFavorite';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   closeMenu: () => void;
+  pageId?: string;
+  pagePermissions: IPagePermissionFlags;
 }
 
 function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
@@ -41,12 +53,14 @@ function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[],
   }
 }
 
-export default function DatabaseOptions ({ closeMenu }: Props) {
+export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }: Props) {
   const intl = useIntl();
   const router = useRouter();
-  const { pages } = usePages();
+  const { pages, deletePage } = usePages();
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
+  const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId });
+  const { showMessage } = useSnackbar();
 
   const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
   const board = boards.find(b => b.id === activeBoardId);
@@ -59,6 +73,15 @@ export default function DatabaseOptions ({ closeMenu }: Props) {
     boardId: board.id,
     viewId: view.id
   }));
+
+  async function onDeletePage () {
+    if (pageId) {
+      await deletePage({
+        pageId
+      });
+      closeMenu();
+    }
+  }
 
   const exportCsv = () => {
     const cards = _cards.map(card => {
@@ -78,8 +101,64 @@ export default function DatabaseOptions ({ closeMenu }: Props) {
     closeMenu();
   };
 
+  function onCopyLink () {
+    Utils.copyTextToClipboard(window.location.href);
+    showMessage('Copied link to clipboard', 'success');
+    closeMenu();
+  }
+
   return (
     <List dense>
+      <ListItemButton
+        onClick={() => {
+          toggleFavorite();
+          closeMenu();
+        }}
+      >
+        <Box sx={{
+          mr: 0.5,
+          position: 'relative',
+          left: -4,
+          display: 'flex',
+          alignItems: 'center'
+        }}
+        >
+          {isFavorite ? (
+            <FavoritedIcon />
+          ) : (
+            <NotFavoritedIcon />
+          )}
+        </Box>
+        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorite'} />
+      </ListItemButton>
+      <ListItemButton
+        onClick={onCopyLink}
+      >
+        <ContentCopyIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='Copy link' />
+      </ListItemButton>
+      <Divider />
+      <Tooltip title={!pagePermissions.delete ? 'You don\'t have permission to delete this page' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!pagePermissions.delete}
+            onClick={onDeletePage}
+          >
+            <DeleteIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Delete' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <ListItemButton
         onClick={exportCsv}
       >

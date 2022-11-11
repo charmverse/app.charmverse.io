@@ -5,6 +5,7 @@ import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
@@ -32,6 +33,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { humanFriendlyDate } from 'lib/utilities/dates';
@@ -41,6 +43,7 @@ import DatabasePageOptions from './components/DatabasePageOptions';
 import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
+import PublishToSnapshot from './components/Snapshot/PublishToSnapshot';
 
 export const headerHeight = 56;
 
@@ -62,7 +65,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
@@ -70,26 +73,15 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const { updatePageActionDisplay } = usePageActionDisplay();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { showMessage } = useSnackbar();
-
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
+  const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
 
   const pagePermissions = getPagePermissions(basePageId);
-
-  const isFavorite = basePage && user?.favorites.some(({ pageId }) => pageId === basePage.id);
   const pageType = basePage?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
-
-  async function toggleFavorite () {
-    if (!basePage || !user) return;
-    const pageId = basePage.id;
-    const updatedFields = isFavorite
-      ? await charmClient.unfavoritePage(pageId)
-      : await charmClient.favoritePage(pageId);
-    setUser({ ...user, ...updatedFields });
-  }
 
   async function exportMarkdown () {
     if (!basePage) {
@@ -142,8 +134,33 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
 
+  function onCopyLink () {
+    Utils.copyTextToClipboard(window.location.href);
+    showMessage('Copied link to clipboard', 'success');
+    setPageMenuOpen(false);
+  }
+
   const documentOptions = (
     <List dense>
+      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
+        <div>
+          <ListItemButton
+            disabled={!pagePermissions?.create_poll}
+            onClick={() => {
+              setPageMenuOpen(false);
+              setIsModalOpen(true);
+            }}
+          >
+            <HowToVoteOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Create a poll' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <ListItemButton
         onClick={() => {
           updatePageActionDisplay('suggestions');
@@ -182,11 +199,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorite'} />
       </ListItemButton>
       <ListItemButton
-        onClick={() => {
-          Utils.copyTextToClipboard(window.location.href);
-          showMessage('Copied link to clipboard', 'success');
-          setPageMenuOpen(false);
-        }}
+        onClick={onCopyLink}
       >
         <ContentCopyIcon
           fontSize='small'
@@ -214,7 +227,18 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         </div>
       </Tooltip>
       <Divider />
-      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
+      {basePage && (
+        <PublishToSnapshot
+          pageId={basePage.id}
+          renderContent={({ label, onClick, icon }) => (
+            <ListItemButton onClick={onClick}>
+              {icon}
+              <ListItemText primary={label} />
+            </ListItemButton>
+          )}
+        />
+      )}
+      {/* <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
         <div>
           <ListItemButton
             disabled={!pagePermissions?.create_poll}
@@ -232,7 +256,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <ListItemText primary='Convert to proposal' />
           </ListItemButton>
         </div>
-      </Tooltip>
+      </Tooltip> */}
       <Tooltip title={!isExportablePage ? 'This page can\'t be exported' : ''}>
         <div>
           <ListItemButton
@@ -301,7 +325,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     pageOptionsList = documentOptions;
   }
   else if (isBasePageDatabase) {
-    pageOptionsList = <DatabasePageOptions closeMenu={closeMenu} />;
+    pageOptionsList = <DatabasePageOptions pagePermissions={pagePermissions} pageId={basePage?.id} closeMenu={closeMenu} />;
   }
 
   return (
@@ -343,11 +367,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
               )}
-              <IconButton sx={{ display: { xs: 'none', md: 'inline-flex' } }} size='small' onClick={toggleFavorite} color='inherit'>
-                <Tooltip title={isFavorite ? 'Remove from sidebar' : 'Pin this page to your sidebar'} arrow placement='top'>
-                  {isFavorite ? <FavoritedIcon color='secondary' /> : <NotFavoritedIcon color='secondary' />}
-                </Tooltip>
-              </IconButton>
             </>
           )}
 
