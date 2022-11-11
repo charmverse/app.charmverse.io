@@ -1,16 +1,16 @@
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, ListItemText, Typography } from '@mui/material';
+import { Box, ListItemText } from '@mui/material';
 import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import type { bindTrigger } from 'material-ui-popup-state';
-import { memo, useState } from 'react';
+import { bindTrigger } from 'material-ui-popup-state';
+import type { PopupState } from 'material-ui-popup-state/core';
 import type { MouseEvent, SyntheticEvent } from 'react';
+import { memo, useState } from 'react';
 
 import Button from 'components/common/Button';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -52,15 +52,17 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = ReturnType<typeof bindTrigger>
+export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>
 
 interface InviteActionsProps {
   isAdmin: boolean;
-  openInvites: popupStateTrigger;
-  openTokenGate: popupStateTrigger;
+  invitePopupState: PopupState;
+  tokenGatePopupState: PopupState;
+  onOpenInvitesClick: (e: SyntheticEvent<any, Event>) => void;
+  onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
 }
 
-function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsProps) {
+function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -70,18 +72,14 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const { account } = useWeb3AuthSig();
 
-  const { onClick: onOpenInvitesClick, ...restInviteProps } = openInvites;
-  const { onClick: onOpenTokenGateClick, ...restTokenGateProps } = openTokenGate;
-
-  const handleInvites = (event: SyntheticEvent<any, Event>) => {
-    onOpenInvitesClick(event);
+  const handleInvites = (e: SyntheticEvent<any, Event>) => {
+    onOpenInvitesClick(e);
     handleClose();
   };
 
-  const handleTokenGate = (event: SyntheticEvent<any, Event>) => {
-    onOpenTokenGateClick(event);
+  const handleTokenGate = (e: SyntheticEvent<any, Event>) => {
+    onOpenTokenGateClick(e);
     handleClose();
   };
 
@@ -108,7 +106,7 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleInvites} disableRipple dense {...restInviteProps}>
+        <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -119,7 +117,12 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
             />
           </Box>
         </MenuItem>
-        <MenuItem disabled={!account} onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
+        <MenuItem
+          {...bindTrigger(tokenGatePopupState)}
+          onClick={handleTokenGate}
+          disableRipple
+          dense
+        >
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
