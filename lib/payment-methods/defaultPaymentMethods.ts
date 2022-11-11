@@ -13,14 +13,6 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
     tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
   },
   {
-    chainId: 4,
-    contractAddress: '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926',
-    tokenDecimals: 6,
-    tokenName: 'USD Coin',
-    tokenSymbol: 'USDC',
-    tokenLogo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
-  },
-  {
     chainId: 137,
     contractAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
     tokenDecimals: 6,
@@ -31,7 +23,7 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
 ];
 
 /**
- * Provides USDC by default for a space on ETH Mainnet, ETH Rinkeby and Polygon
+ * Provides USDC by default for a space on ETH Mainnet and Polygon
  * Executes in upsert mode to avoid duplicate payment method creation
  *
  * @createdBy Defaults to the space creator
