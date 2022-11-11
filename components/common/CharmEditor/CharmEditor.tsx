@@ -79,6 +79,8 @@ import { rejectAll } from './components/suggestions/track/rejectAll';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import { TweetComponent } from './components/tweet/components/Tweet';
+import * as tweet from './components/tweet/tweet';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
@@ -222,7 +224,8 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins()
+    disclosure.plugins(),
+    tweet.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -605,6 +608,14 @@ function CharmEditor (
             return (
               <InlineDatabase
                 containerWidth={containerWidth}
+                readOnly={readOnly}
+                {...props}
+              />
+            );
+          }
+          case 'tweet': {
+            return (
+              <TweetComponent
                 readOnly={readOnly}
                 {...props}
               />

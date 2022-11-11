@@ -10,10 +10,10 @@ import { useUser } from 'hooks/useUser';
 import type { NestedPagePluginState } from '../nestedPage';
 import useNestedPage from '../nestedPage/hooks/useNestedPage';
 
+import { items as advancedBlocks } from './editorItems/advancedBlocks';
 import { items as databaseItems } from './editorItems/database';
-import { items as listItems } from './editorItems/list';
+import { items as embedItems } from './editorItems/embed';
 import { items as mediaItems } from './editorItems/media';
-import { items as otherItems } from './editorItems/other';
 import { items as textItems } from './editorItems/text';
 import { PaletteItem } from './paletteItem';
 import type { PaletteItemTypeNoGroup } from './paletteItem';
@@ -31,11 +31,11 @@ export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
   const paletteItems = useMemo(() => {
 
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
-      ['list', listItems()],
+      ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
+      ['database', (user && space && !disableNestedPage) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []],
       ['media', mediaItems()],
-      ['other', otherItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
-      ['text', textItems()],
-      ['database', (user && space && !disableNestedPage) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []]
+      ['embed', embedItems()],
+      ['advanced blocks', advancedBlocks()]
     ];
 
     const itemList = itemGroups.map(([group, items]) => (

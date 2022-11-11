@@ -1,5 +1,5 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import Alert from '@mui/material/Alert';
+import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
@@ -58,37 +58,38 @@ function DiscussionTaskRow (
     <TableRow>
       <TableCell>
         <Box display='flex'>
-          {!marked && (
-            <VisibilityIcon
-              fontSize='small'
-              sx={{
-                position: 'absolute',
-                left: '-15px'
-              }}
-            />
-          )}
-          {createdBy && (
-            <Tooltip title={createdBy.username}>
-              <div>
-                <UserDisplay avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
-              </div>
-            </Tooltip>
-          )}
-          <Link
-            href={discussionLink}
-            variant='body1'
-            noWrap
-            color='inherit'
-            sx={{
-              maxWidth: {
-                xs: '130px',
-                sm: '200px',
-                md: '400px'
-              }
+          <Badge
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left'
             }}
+            invisible={marked}
+            color='error'
+            variant='dot'
           >
-            {text}
-          </Link>
+            {createdBy && (
+              <Tooltip title={createdBy.username}>
+                <div>
+                  <UserDisplay avatarSize='small' user={createdBy} hideName={true} marginRight='10px' />
+                </div>
+              </Tooltip>
+            )}
+            <Link
+              href={discussionLink}
+              variant='body1'
+              noWrap
+              color='inherit'
+              sx={{
+                maxWidth: {
+                  xs: '130px',
+                  sm: '200px',
+                  md: '400px'
+                }
+              }}
+            >
+              {text}
+            </Link>
+          </Badge>
         </Box>
       </TableCell>
       <TableCell>
@@ -169,23 +170,21 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
   }
 
   return (
-    <Box position='relative'>
-      <Box overflow='auto'>
-        <Table size='medium' aria-label='Nexus proposals table'>
-          <TableHead>
-            <TableRow>
-              <TableCell>Comment</TableCell>
-              <TableCell width={200}>Workspace</TableCell>
-              <TableCell width={200}>Page</TableCell>
-              <TableCell width={140} align='center'>Date</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked={false} />)}
-            {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked />)}
-          </TableBody>
-        </Table>
-      </Box>
+    <Box overflow='auto'>
+      <Table size='medium' aria-label='Nexus discussions table'>
+        <TableHead>
+          <TableRow>
+            <TableCell>Comment</TableCell>
+            <TableCell width={200}>Workspace</TableCell>
+            <TableCell width={200}>Page</TableCell>
+            <TableCell width={140} align='center'>Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked={false} />)}
+          {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked />)}
+        </TableBody>
+      </Table>
     </Box>
   );
 }
