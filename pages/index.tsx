@@ -38,15 +38,15 @@ export default function LoginPage () {
 
   function redirectToDefaultPage () {
     // send to signup for users without a workspace unless they are being redirected to an existing workspace
-    if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
+    if (returnUrl) {
+      log.info('Redirect user to given url');
+      router.push(returnUrl);
+    }
+    else if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
       // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
       // TODO: Find a way to connect the state between hooks (wallet address and loaded user)
       log.info('Redirect user to signup');
       router.push('/signup');
-    }
-    else if (returnUrl) {
-      log.info('Redirect user to given url');
-      router.push(returnUrl);
     }
     else {
       const defaultWorkspace = getDefaultWorkspaceUrl(spaces);
