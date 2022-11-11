@@ -53,7 +53,8 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
       .filter(bounty => {
         return safeData
           ? safeData.find(
-            ({ chainId: safeChainId }) => bounty.chainId === safeChainId && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
+            ({ chainId: safeChainId }) => bounty.chainId === safeChainId
+              && bounty.rewardToken === getChainById(safeChainId)?.nativeCurrency.symbol
           )
           : false;
       })
