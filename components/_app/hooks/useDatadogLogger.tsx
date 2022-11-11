@@ -1,16 +1,15 @@
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
-import type { ReactNode } from 'react';
 
 import { isProdEnv } from 'config/constants';
 
-import { useUser } from '../../hooks/useUser';
+import { useUser } from '../../../hooks/useUser';
 
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'charmverseapp';
 
-export default function DatadogLogger ({ children }: { children: ReactNode }) {
+export default function useDatadogLogger () {
   const { user } = useUser();
 
   // Load DD_LOGS
@@ -69,6 +68,4 @@ export default function DatadogLogger ({ children }: { children: ReactNode }) {
       datadogRum.clearUser();
     };
   }, [user?.id]);
-
-  return <div>{children}</div>;
 }

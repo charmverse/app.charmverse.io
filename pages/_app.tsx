@@ -18,7 +18,6 @@ import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import DatadogLogger from 'components/_app/DatadogLogger';
 import GlobalComponents from 'components/_app/GlobalComponents';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { setTheme as setFocalBoardTheme } from 'components/common/BoardEditor/focalboard/src/theme';
@@ -226,37 +225,35 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                 <Web3AccountProvider>
                   <ReactDndProvider>
                     <DataProviders>
-                      <DatadogLogger>
-                        <OnboardingProvider>
-                          <FocalBoardProvider>
-                            <IntlProvider>
-                              <SnackbarProvider>
-                                <PageMetaTags />
-                                <CssBaseline enableColorScheme={true} />
-                                <Global styles={cssVariables} />
-                                <RouteGuard>
-                                  <ErrorBoundary>
-                                    <Snackbar
-                                      isOpen={isOldBuild}
-                                      message='New CharmVerse platform update available. Please refresh.'
-                                      actions={[
-                                        <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                          <RefreshIcon fontSize='small' />
-                                        </IconButton>
-                                      ]}
-                                      origin={{ vertical: 'top', horizontal: 'center' }}
-                                      severity='warning'
-                                      handleClose={() => setIsOldBuild(false)}
-                                    />
-                                    {getLayout(<Component {...pageProps} />)}
-                                    <GlobalComponents />
-                                  </ErrorBoundary>
-                                </RouteGuard>
-                              </SnackbarProvider>
-                            </IntlProvider>
-                          </FocalBoardProvider>
-                        </OnboardingProvider>
-                      </DatadogLogger>
+                      <OnboardingProvider>
+                        <FocalBoardProvider>
+                          <IntlProvider>
+                            <SnackbarProvider>
+                              <PageMetaTags />
+                              <CssBaseline enableColorScheme={true} />
+                              <Global styles={cssVariables} />
+                              <RouteGuard>
+                                <ErrorBoundary>
+                                  <Snackbar
+                                    isOpen={isOldBuild}
+                                    message='New CharmVerse platform update available. Please refresh.'
+                                    actions={[
+                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                        <RefreshIcon fontSize='small' />
+                                      </IconButton>
+                                    ]}
+                                    origin={{ vertical: 'top', horizontal: 'center' }}
+                                    severity='warning'
+                                    handleClose={() => setIsOldBuild(false)}
+                                  />
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <GlobalComponents />
+                                </ErrorBoundary>
+                              </RouteGuard>
+                            </SnackbarProvider>
+                          </IntlProvider>
+                        </FocalBoardProvider>
+                      </OnboardingProvider>
                     </DataProviders>
                   </ReactDndProvider>
                 </Web3AccountProvider>
