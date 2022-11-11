@@ -1,5 +1,6 @@
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import React from 'react';
@@ -113,6 +114,17 @@ const GalleryCard = React.memo((props: Props) => {
 
                   Utils.copyTextToClipboard(cardLink);
                   showMessage('Copied card link to clipboard', 'success');
+                }}
+              />
+              <Menu.Text
+                icon={<LaunchIcon fontSize='small' />}
+                id='copy'
+                name='Open in new tab'
+                onClick={() => {
+                  const _cardPage = pages[card.id];
+                  if (_cardPage && space) {
+                    window.open(`${window.location.origin}/${space.domain}/${_cardPage.path}`);
+                  }
                 }}
               />
             </Menu>

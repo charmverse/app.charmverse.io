@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box } from '@mui/material';
@@ -19,7 +20,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
-import { PageContent } from 'models';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
@@ -152,7 +152,7 @@ const KanbanCard = React.memo((props: Props) => {
                     />
                   )}
                   <Menu.Text
-                    icon={<DuplicateIcon color='secondary' fontSize='small' />}
+                    icon={<DuplicateIcon fontSize='small' />}
                     id='duplicate'
                     name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
                     onClick={() => {
@@ -176,7 +176,7 @@ const KanbanCard = React.memo((props: Props) => {
                     }}
                   />
                   <Menu.Text
-                    icon={<LinkIcon />}
+                    icon={<LinkIcon fontSize='small' />}
                     id='copy'
                     name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
                     onClick={() => {
@@ -191,6 +191,17 @@ const KanbanCard = React.memo((props: Props) => {
 
                       Utils.copyTextToClipboard(cardLink);
                       showMessage('Copied card link to clipboard', 'success');
+                    }}
+                  />
+                  <Menu.Text
+                    icon={<LaunchIcon fontSize='small' />}
+                    id='copy'
+                    name='Open in new tab'
+                    onClick={() => {
+                      const _cardPage = pages[card.id];
+                      if (_cardPage && space) {
+                        window.open(`${window.location.origin}/${space.domain}/${_cardPage.path}`);
+                      }
                     }}
                   />
                 </Menu>
