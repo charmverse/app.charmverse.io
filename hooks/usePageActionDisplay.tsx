@@ -15,7 +15,7 @@ export type PageAction = 'polls' | 'comments' | 'suggestions';
 export interface IPageActionDisplayContext {
   currentPageActionDisplay: PageAction | null;
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>;
-  updatePageActionDisplay: VoidFunction;
+  updatePageActionDisplay: (defaultAction: PageAction | null) => void;
 }
 
 export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
@@ -34,7 +34,7 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
 
-  function updatePageActionDisplay () {
+  function updatePageActionDisplay (defaultAction: PageAction | null = null) {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (currentPageActionDisplay) {
       // dont redirect if sidebar is already open
@@ -54,7 +54,7 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
         return setCurrentPageActionDisplay('comments');
       }
       else {
-        return setCurrentPageActionDisplay(null);
+        return setCurrentPageActionDisplay(defaultAction);
       }
     }
   }

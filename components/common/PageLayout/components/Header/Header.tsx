@@ -26,7 +26,6 @@ import { useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import PublishToSnapshot from 'components/common/PageLayout/components/Header/components/Snapshot/PublishToSnapshot';
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
 import { useMembers } from 'hooks/useMembers';
@@ -145,21 +144,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List dense>
-      {/* {basePage && (
-        <PublishToSnapshot
-          pageId={basePage.id}
-          renderContent={({ label, onClick, icon }) => (
-            <ListItemButton onClick={onClick}>
-              {icon}
-              <ListItemText primary={label} />
-            </ListItemButton>
-          )}
-        />
-      )}
-      <Divider /> */}
       <ListItemButton
         onClick={() => {
-          updatePageActionDisplay();
+          updatePageActionDisplay('suggestions');
           setPageMenuOpen(false);
         }}
       >
@@ -171,32 +158,29 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View feedback' />
       </ListItemButton>
-      {/* <ListItemButton onClick={() => {
-        setCurrentPageActionDisplay('comments');
-        setPageMenuOpen(false);
-      }}
+      <Divider />
+      <ListItemButton
+        onClick={() => {
+          toggleFavorite();
+          setPageMenuOpen(false);
+        }}
       >
-        <MessageOutlinedIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='View comments' />
-      </ListItemButton> */}
-      {/* <ListItemButton onClick={() => {
-        setCurrentPageActionDisplay('suggestions');
-        setPageMenuOpen(false);
-      }}
-      >
-        <RateReviewOutlined
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='View suggestions' />
-      </ListItemButton> */}
+        <Box sx={{
+          mr: 0.5,
+          position: 'relative',
+          left: -4,
+          display: 'flex',
+          alignItems: 'center'
+        }}
+        >
+          {isFavorite ? (
+            <FavoritedIcon />
+          ) : (
+            <NotFavoritedIcon />
+          )}
+        </Box>
+        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorite'} />
+      </ListItemButton>
       <ListItemButton
         onClick={() => {
           Utils.copyTextToClipboard(window.location.href);
