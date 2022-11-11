@@ -70,7 +70,7 @@ function getFriendlyEthValue (value: string) {
 }
 
 function getGnosisTransactionUrl (address: string, chainId: number) {
-  return `https://app.gnosis-safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
+  return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
 }
 
 function getTaskDescription (transaction: GnosisTransaction): string {
