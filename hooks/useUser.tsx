@@ -76,8 +76,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
     // Support the initial load
     if (!isLoaded
-      || (account && !user?.wallets.some(w => lowerCaseEqual(w.address, account)) && lowerCaseEqual(signature?.address, account))
-      || user?.discordUser) {
+      || account || user?.discordUser) {
       charmClient.getUser()
         .then(_user => {
           setUser(_user);
