@@ -28,6 +28,7 @@ export function useGnosisPayment ({
   if (!network?.gnosisUrl) {
     throw new Error(`Unsupported Gnosis network: ${chainId}`);
   }
+
   async function makePayment () {
 
     if (chainId !== connectedChainId) {
@@ -37,7 +38,6 @@ export function useGnosisPayment ({
     if (!safe || !account || !network?.gnosisUrl) {
       return;
     }
-
     const safeTransaction = await safe.createTransaction(transactions.map(transaction => (
       {
         data: transaction.data,
