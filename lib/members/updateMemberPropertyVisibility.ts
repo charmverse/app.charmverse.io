@@ -2,7 +2,7 @@ import { prisma } from 'db';
 import { NotFoundError } from 'lib/middleware';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 
-import { UNHIDEABLE_MEMBER_PROPERTIES } from './constants';
+import { MEMBER_PROPERTY_CONFIG } from './constants';
 import type { UpdateMemberPropertyVisibilityPayload } from './interfaces';
 
 export async function updateMemberPropertyVisibility ({
@@ -26,7 +26,7 @@ export async function updateMemberPropertyVisibility ({
 
   const enabledViews = memberProperty?.enabledViews ?? [];
 
-  if (UNHIDEABLE_MEMBER_PROPERTIES.includes(memberProperty.type)) {
+  if (MEMBER_PROPERTY_CONFIG[memberProperty.type]?.unhideable) {
     throw new UndesirableOperationError(`${memberProperty.type} property visibility can't be updated`);
   }
 

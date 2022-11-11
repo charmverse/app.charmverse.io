@@ -57,7 +57,8 @@ import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
-import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
+import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
@@ -79,6 +80,8 @@ import { rejectAll } from './components/suggestions/track/rejectAll';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import { TweetComponent } from './components/tweet/components/Tweet';
+import * as tweet from './components/tweet/tweet';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
@@ -222,7 +225,8 @@ export function charmEditorPlugins (
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     trailingNode.plugins(),
-    disclosure.plugins()
+    disclosure.plugins(),
+    tweet.plugins()
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
     // pasteImagePlugin
@@ -610,6 +614,14 @@ function CharmEditor (
               />
             );
           }
+          case 'tweet': {
+            return (
+              <TweetComponent
+                readOnly={readOnly}
+                {...props}
+              />
+            );
+          }
           default: {
             return null;
           }
@@ -622,12 +634,14 @@ function CharmEditor (
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
+        nestedPagePluginKey={nestedPagePluginKey}
+        disableNestedPage={disableNestedPage}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
+      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>

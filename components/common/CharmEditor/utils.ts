@@ -22,7 +22,7 @@ export function insertNode (state: EditorState, dispatch: ((tr: Transaction<any>
 
 export function isAtBeginningOfLine (state: EditorState) {
   // @ts-ignore types package is missing $cursor property as of 1.2.8
-  const parentOffset = state.selection.$cursor.parentOffset;
+  const parentOffset = state.selection.$cursor?.parentOffset;
   return parentOffset === 0;
 }
 

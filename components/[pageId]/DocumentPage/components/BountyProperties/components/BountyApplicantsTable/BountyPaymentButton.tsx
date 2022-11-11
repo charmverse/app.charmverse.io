@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { Divider, Menu, MenuItem } from '@mui/material';
+import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
