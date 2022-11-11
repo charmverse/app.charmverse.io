@@ -229,6 +229,22 @@ const RPC = {
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true
+  },
+  OPTIMISM: {
+    chainId: 10,
+    chainName: 'Optimism',
+    nativeCurrency: {
+      name: 'Optimism',
+      symbol: 'OP',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI:
+        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    rpcUrls: ['https://mainnet.optimism.io'],
+    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/optimism.svg',
+    testnet: true
   }
 } as const;
 
@@ -289,6 +305,7 @@ const supportedChains: Blockchain[] = [
   'HARMONY',
   'HARMONY_DEVNET',
   'BSC',
+  'OPTIMISM',
   'GOERLI',
   'MUMBAI',
   'RINKEBY'

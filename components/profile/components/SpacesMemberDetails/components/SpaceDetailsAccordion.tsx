@@ -1,11 +1,14 @@
+import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 type Props = {
   spaceName: string;
@@ -16,9 +19,13 @@ type Props = {
   expanded?: boolean;
 };
 
+const StyledAccordionSummary = styled(AccordionSummary)`
+  ${({ theme }) => !isTouchScreen() && hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+`;
+
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
-
+  const touchScreen = isTouchScreen();
   useEffect(() => {
     setExpanded(defaultExpanded);
   }, [defaultExpanded]);
@@ -30,7 +37,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
         setExpanded(!expanded);
       }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar
           name={spaceName}
           image={spaceImage}
@@ -39,22 +46,25 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
           <Typography ml={2} variant='h6'>{spaceName}</Typography>
           {!readOnly && (
             <IconButton
-              sx={{ mx: 1 }}
+              className='icons'
+              sx={{ mx: 1, opacity: touchScreen ? (expanded ? 1 : 0) : 'inherit' }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onEdit();
               }}
-              data-testid='edit-identity'
             >
               <EditIcon fontSize='small' />
             </IconButton>
           )}
         </Box>
-      </AccordionSummary>
+      </StyledAccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
           {properties.map(property => {
+            if (!property.enabledViews.includes('profile')) {
+              return null;
+            }
             switch (property.type) {
               case 'text':
               case 'text_multiline':
