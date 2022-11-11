@@ -6,7 +6,7 @@ export function deleteMemberProperty (id: string) {
     where: {
       id,
       type: {
-        notIn: [...DEFAULT_MEMBER_PROPERTIES]
+        notIn: DEFAULT_MEMBER_PROPERTIES
       }
     }
   });
