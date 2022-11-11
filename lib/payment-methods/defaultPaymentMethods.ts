@@ -34,7 +34,7 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
 ];
 
 /**
- * Provides USDC by default for a space on ETH Mainnet, ETH Rinkeby and Polygon
+ * Provides USDC by default for a space on ETH Mainnet and Polygon
  * Executes in upsert mode to avoid duplicate payment method creation
  *
  * @createdBy Defaults to the space creator

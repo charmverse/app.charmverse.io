@@ -11,7 +11,7 @@ import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
 
@@ -46,6 +46,8 @@ export function AddMemberPropertyButton () {
     }
   }
 
+  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([, propertyConfig]) => !propertyConfig.default);
+
   return (
     <>
       <Button
@@ -72,21 +74,17 @@ export function AddMemberPropertyButton () {
           }
         }}
       >
-        {Object.keys(MEMBER_PROPERTY_LABELS).map((memberPropertyType) => (
-          !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
-            <MenuItem
-              key={memberPropertyType}
-              onClick={() => {
-                setSelectedPropertyType(memberPropertyType as MemberPropertyType);
-                propertyNamePopupState.open();
-                addMemberPropertyPopupState.close();
-              }}
-            >
-              <MemberPropertyItem
-                type={memberPropertyType as MemberPropertyType}
-              />
-            </MenuItem>
-          )
+        {configurableProperties.map(([propertyType]) => (
+          <MenuItem
+            key={propertyType}
+            onClick={() => {
+              setSelectedPropertyType(propertyType as MemberPropertyType);
+              propertyNamePopupState.open();
+              addMemberPropertyPopupState.close();
+            }}
+          >
+            <MemberPropertyItem type={propertyType as MemberPropertyType} />
+          </MenuItem>
         ))}
       </Menu>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>

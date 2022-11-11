@@ -7,7 +7,7 @@ import { prisma } from 'db';
 import log from 'lib/log';
 
 import type { GnosisTransaction } from './gnosis';
-import { gnosisUnsupportedChainIds, getTransactionsforSafes } from './gnosis';
+import { getTransactionsforSafes } from './gnosis';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
@@ -230,7 +230,7 @@ export async function getPendingGnosisTasks (myUserId: string) {
     }
   });
 
-  const transactions = await getTransactionsforSafes(safeOwner, safes.filter(safe => !gnosisUnsupportedChainIds.includes(safe.chainId)));
+  const transactions = await getTransactionsforSafes(safeOwner, safes);
 
   const userAddresses = safes.map(safe => safe.owners).flat();
   const wallets = await prisma.userWallet.findMany({
