@@ -4,7 +4,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
@@ -17,9 +17,11 @@ import { BountyStatusChip } from 'components/bounties/components/BountyStatusBad
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
@@ -79,8 +81,9 @@ const KanbanCard = React.memo((props: Props) => {
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
   const { pages, getPagePermissions } = usePages();
+  const { members } = useMembers();
   const cardPage = pages[card.id];
-
+  const pageCreator = members.find(member => member.id === cardPage?.createdBy);
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
@@ -204,6 +207,22 @@ const KanbanCard = React.memo((props: Props) => {
                       }
                     }}
                   />
+                  <Divider />
+                  {
+                    pageCreator && cardPage && (
+                      <Stack sx={{
+                        ml: 1
+                      }}
+                      >
+                        <Typography variant='subtitle2'>
+                          Last edited by {pageCreator.username}
+                        </Typography>
+                        <Typography variant='subtitle2'>
+                          Last edited at {humanFriendlyDate(cardPage.updatedAt)}
+                        </Typography>
+                      </Stack>
+                    )
+                  }
                 </Menu>
               </MenuWrapper>
             )}

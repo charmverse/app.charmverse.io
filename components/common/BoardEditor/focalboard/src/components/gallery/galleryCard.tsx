@@ -3,15 +3,18 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Divider, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
@@ -42,8 +45,9 @@ const GalleryCard = React.memo((props: Props) => {
   const [space] = useCurrentSpace();
   const intl = useIntl();
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
-
+  const { members } = useMembers();
   const cardPage = pages[card.id];
+  const pageCreator = members.find(member => member.id === cardPage?.createdBy);
 
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
 
@@ -127,6 +131,22 @@ const GalleryCard = React.memo((props: Props) => {
                   }
                 }}
               />
+              <Divider />
+              {
+                pageCreator && cardPage && (
+                  <Stack sx={{
+                    ml: 1
+                  }}
+                  >
+                    <Typography variant='subtitle2'>
+                      Last edited by {pageCreator.username}
+                    </Typography>
+                    <Typography variant='subtitle2'>
+                      Last edited at {humanFriendlyDate(cardPage.updatedAt)}
+                    </Typography>
+                  </Stack>
+                )
+              }
             </Menu>
           </MenuWrapper>
         )}
