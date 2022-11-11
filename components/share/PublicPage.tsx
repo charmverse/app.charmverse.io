@@ -136,7 +136,7 @@ export default function PublicPage () {
   }, []);
 
   useEffect(() => {
-    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.address)) {
+    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.rawAddress)) {
       charmClient.login({ address: account, walletSignature: walletAuthSignature })
         .then(loggedInUser => {
           setUser(loggedInUser);

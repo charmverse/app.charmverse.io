@@ -24,7 +24,6 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
     account,
     sign,
     isSigning,
-    getStoredSignature,
     walletAuthSignature,
     verifiableWalletDetected,
     connectWallet,

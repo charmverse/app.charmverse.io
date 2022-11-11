@@ -39,22 +39,22 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? getStoredSignature() as AuthSig;
+    let signature = authSig ?? getStoredSignature() as AuthSigWithRawAddress;
 
-    if (!signature || !lowerCaseEqual(signature?.address, signature.address)) {
+    if (!signature || !lowerCaseEqual(signature?.address, signature.address) || !signature.rawAddress) {
       signature = await sign();
     }
 
     try {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
+      const refreshedProfile = await charmClient.login({ address: signature.rawAddress, walletSignature: signature });
 
       setUser(refreshedProfile);
 
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address: signature.rawAddress, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }

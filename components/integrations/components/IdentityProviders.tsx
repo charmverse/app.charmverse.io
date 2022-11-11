@@ -51,18 +51,13 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-  const { account, connector } = useWeb3AuthSig();
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { account, connector, connectWallet } = useWeb3AuthSig();
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
   const [isLoggingOut] = useState(false);
   const [telegramError, setTelegramError] = useState('');
 
   const connectedWithTelegram = Boolean(user?.telegramUser);
-
-  const handleWalletProviderSwitch = () => {
-    openWalletSelectorModal();
-  };
 
   function connectorName (c: any) {
     switch (c) {
