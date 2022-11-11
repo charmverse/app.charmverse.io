@@ -269,7 +269,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-
     <UserProvider>
       <SpacesProvider>
         <WebSocketClientProvider>
@@ -288,9 +287,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
           </MembersProvider>
         </WebSocketClientProvider>
       </SpacesProvider>
-
     </UserProvider>
-
   );
 }
 

@@ -20,8 +20,8 @@ import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import * as bulletList from '../../bulletList';
-import type { NestedPagePluginState } from '../../nestedPage';
-import { nestedPageSuggestMarkName } from '../../nestedPage';
+import { nestedPageSuggestMarkName } from '../../nestedPage/nestedPage.constants';
+import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import * as orderedList from '../../orderedList';
 import paragraph from '../../paragraph';
 import { isList } from '../commands';
@@ -272,19 +272,22 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
 
             if (_dispatch && range) {
               const tr = _state.tr;
-              tr.wrap(range, [
-                {
-                  type: _state.schema.nodes.disclosureDetails
-                }
-              ]);
-              tr.insert(range.start + 1, _state.schema.nodes.disclosureSummary.createChecked(null, Fragment.fromArray([
-                _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
-              ])));
-              const resolvedPos = tr.doc.resolve(range.start + 1);
 
-              tr.setSelection(TextSelection.near(resolvedPos));
+              if (tr?.wrap && state.schema.nodes.disclosureDetails) {
+                tr.wrap(range, [
+                  {
+                    type: _state.schema.nodes.disclosureDetails
+                  }
+                ]);
+                tr.insert(range.start + 1, _state.schema.nodes.disclosureSummary.createChecked(null, Fragment.fromArray([
+                  _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
+                ])));
+                const resolvedPos = tr.doc.resolve(range.start + 1);
 
-              _dispatch(tr);
+                tr.setSelection(TextSelection.near(resolvedPos));
+
+                _dispatch(tr);
+              }
             }
             return true;
           });

@@ -48,14 +48,14 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
   const { members } = useMembers();
 
   useEffect(() => {
-    const applicationIds = transactions.map(transaction => transaction.applicationId);
+    const applicationIds = transactions.map(transaction => transaction().applicationId);
     setSelectedApplicationIds(applicationIds);
   }, [transactions]);
 
   // A record to keep track of application id an its corresponding transaction
-  const applicationTransactionRecord: Record<string, TransactionWithMetadata> = {};
+  const applicationTransactionRecord: Record<string, (address: string) => TransactionWithMetadata> = {};
   transactions.forEach(transaction => {
-    applicationTransactionRecord[transaction.applicationId] = transaction;
+    applicationTransactionRecord[transaction().applicationId] = transaction;
   });
 
   return (
@@ -124,7 +124,8 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
           </Box>
           <Box pb={2}>
             <List>
-              {transactions.map(({ title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId }) => {
+              {transactions.map((getTransaction) => {
+                const { title, chainId: _chainId, rewardAmount, rewardToken, userId, applicationId } = getTransaction();
                 const user = members.find(member => member.id === userId);
                 const isChecked = selectedApplicationIds.includes(applicationId);
                 if (user) {
@@ -181,7 +182,9 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
               <MultiPaymentButton
                 chainId={gnosisSafeChainId}
                 safeAddress={gnosisSafeAddress}
-                transactions={selectedApplicationIds.map(selectedApplicationId => applicationTransactionRecord[selectedApplicationId])}
+                transactions={selectedApplicationIds.map(selectedApplicationId => (
+                  applicationTransactionRecord[selectedApplicationId](gnosisSafeAddress)
+                ))}
                 onSuccess={onPaymentSuccess}
                 isLoading={isLoading}
               />

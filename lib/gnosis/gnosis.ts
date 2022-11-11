@@ -1,10 +1,10 @@
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import type { SafeMultisigTransactionResponse, SafeInfoResponse } from '@gnosis.pm/safe-service-client';
+import type { SafeInfoResponse, SafeMultisigTransactionResponse } from '@gnosis.pm/safe-service-client';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import type { UserGnosisSafe } from '@prisma/client';
-import { RPC, getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { getChainById, RPC } from 'connectors';
 import type { Signer } from 'ethers';
+import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 
 import log from 'lib/log';
@@ -50,7 +50,6 @@ interface GetSafesForAddressProps {
 export type SafeData = ({ chainId: number } & SafeInfoResponse);
 
 export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
-
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
     return [];
@@ -66,15 +65,8 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   return [];
 }
 
-export const gnosisUnsupportedChainIds = [4];
-
-export function gnosisSupportedNetworks () {
-  // ChainId 4 Rinkeby is not supported by gnosis anymore
-  return Object.values(RPC).filter(network => !gnosisUnsupportedChainIds.includes(network.chainId));
-}
-
 export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-  const safes = await Promise.all(gnosisSupportedNetworks().map(network => {
+  const safes = await Promise.all(Object.values(RPC).map(network => {
     return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
   })).then(list => list.flat().flat());
 
