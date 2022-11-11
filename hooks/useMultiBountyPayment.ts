@@ -19,7 +19,7 @@ import { useBounties } from './useBounties';
 import { useCurrentSpace } from './useCurrentSpace';
 
 const ERC20_ABI = [
-  'function transferFrom(address sender, address to, uint256 value)'
+  'function transfer(address to, uint256 value)'
 ];
 
 export interface TransactionWithMetadata extends MetaTransactionData, Pick<Bounty, 'rewardToken' | 'rewardAmount' | 'chainId'>{
@@ -74,8 +74,8 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
                 const erc20 = new ethers.utils.Interface(ERC20_ABI);
                 const parsedAmount = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount), paymentMethod?.tokenDecimals).toString();
                 data = erc20.encodeFunctionData(
-                  'transferFrom',
-                  [safeAddress, application.walletAddress, parsedAmount]
+                  'transfer',
+                  [application.walletAddress, parsedAmount]
                 );
                 // send the request to the token contract
                 to = bounty.rewardToken;
