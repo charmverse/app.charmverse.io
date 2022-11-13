@@ -20,6 +20,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
 
@@ -57,7 +58,7 @@ function MemberDirectoryGalleryCard ({
   return (
     <>
       <StyledLink
-        href={`/u/${member.path || member.id}`}
+        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
         color='primary'
         sx={{
           '&:hover': {
@@ -119,6 +120,18 @@ function MemberDirectoryGalleryCard ({
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
                       <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                    </Stack>
+                  );
+                }
+
+                case 'join_date': {
+                  return (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Join date</Typography>
+                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                        withYear: true
+                      })}
+                      </Typography>
                     </Stack>
                   );
                 }

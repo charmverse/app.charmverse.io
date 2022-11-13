@@ -5,6 +5,8 @@ import { getSpaceMemberRoles } from 'lib/members/getSpaceMemberRoles';
 import type { CommonSpacesInput, MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 import { getPropertiesWithValues, groupPropertyValuesBySpace } from 'lib/members/utils';
 
+import { getSpaceMemberJoinDates } from './getSpaceMemberJoinDates';
+
 export async function getSpacesPropertyValues ({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<MemberPropertyValuesBySpace[]> {
   const spaceIds = requestingUserId ? await getCommonSpaceIds({ spaceId, memberId, requestingUserId }) : [];
   const visibleMemberProperties = await getAccessibleMemberPropertiesBySpace({ spaceId: spaceIds, userId: requestingUserId });
@@ -24,6 +26,10 @@ export async function getSpacesPropertyValues ({ memberId, requestingUserId, spa
   if (visibleMemberProperties.find(mp => mp.type === 'role')) {
     const spaceRolesMap = await getSpaceMemberRoles({ spaceIds, memberId });
     propertyValues = propertyValues.map(pv => pv.type === 'role' ? { ...pv, value: spaceRolesMap[pv.spaceId]?.map(r => r.name) || [] } : pv);
+  }
+  if (visibleMemberProperties.find(mp => mp.type === 'join_date')) {
+    const joinDatesMap = await getSpaceMemberJoinDates({ spaceIds, memberId });
+    propertyValues = propertyValues.map(pv => pv.type === 'join_date' ? { ...pv, value: joinDatesMap[pv.spaceId] } : pv);
   }
 
   return groupPropertyValuesBySpace(propertyValues);

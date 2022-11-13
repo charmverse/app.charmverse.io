@@ -19,6 +19,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { TimezoneDisplay } from './TimezoneDisplay';
 
@@ -102,6 +103,16 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell>
                   {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
+                </TableCell>
+              );
+            }
+            case 'join_date': {
+              return (
+                <TableCell>
+                  <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                    withYear: true
+                  })}
+                  </Typography>
                 </TableCell>
               );
             }

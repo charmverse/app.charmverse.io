@@ -30,6 +30,11 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     default: true,
     readonly: true
   },
+  join_date: {
+    label: 'Join date',
+    default: true,
+    readonly: true
+  },
   twitter: {
     label: 'Twitter',
     default: true,
@@ -79,5 +84,6 @@ export const DEFAULT_MEMBER_PROPERTIES_ORDER = [
   'bio',
   'discord',
   'twitter',
-  'timezone'
+  'timezone',
+  'join_date'
 ] as const;
