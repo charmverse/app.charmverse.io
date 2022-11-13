@@ -27,7 +27,7 @@ beforeAll(async () => {
   await generateSpaceForUser(user2);
 
   // Properties for user 1 spaces
-  property1 = await generateMemberProperty({ type: 'name', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
+  property1 = await generateMemberProperty({ type: 'number', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
   property2 = await generateMemberProperty({ type: 'email', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
   property3 = await generateMemberProperty({ type: 'phone', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
 });
