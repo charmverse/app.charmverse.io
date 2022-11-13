@@ -32,7 +32,7 @@ export default function ImportNotionWorkspace () {
   const { showMessage } = useSnackbar();
   const [modalOpen, setModalOpen] = useState(false);
   const { mutate } = useSWRConfig();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const dispatch = useAppDispatch();
 

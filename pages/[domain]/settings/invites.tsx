@@ -7,7 +7,7 @@ import { setTitle } from 'hooks/usePageTitle';
 
 export default function Pageinvites () {
   setTitle('Invites');
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   if (!space) {
     return null;

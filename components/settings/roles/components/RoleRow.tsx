@@ -55,7 +55,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
   const [newMembers, setNewMembers] = useState<string[]>([]);
   const { members } = useMembers();
 
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
 
