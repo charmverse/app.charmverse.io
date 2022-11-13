@@ -31,6 +31,7 @@ export function generateMemberProperty ({ type = 'text', spaceId, userId, option
       options,
       index
     },
+    spaceId,
     userId
   });
 }

@@ -1,11 +1,9 @@
 import { prisma } from 'db';
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getCommonSpaceIds } from 'lib/members/getCommonSpaceIds';
-import { getSpaceMemberRoles } from 'lib/members/getSpaceMemberRoles';
+import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
 import type { CommonSpacesInput, MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 import { getPropertiesWithValues, groupPropertyValuesBySpace } from 'lib/members/utils';
-
-import { getSpaceMemberJoinDates } from './getSpaceMemberJoinDates';
 
 export async function getSpacesPropertyValues ({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<MemberPropertyValuesBySpace[]> {
   const spaceIds = requestingUserId ? await getCommonSpaceIds({ spaceId, memberId, requestingUserId }) : [];
@@ -23,14 +21,21 @@ export async function getSpacesPropertyValues ({ memberId, requestingUserId, spa
 
   let propertyValues = getPropertiesWithValues(visibleMemberProperties, memberPropertyValues, { withSpaceDetails: true });
 
-  if (visibleMemberProperties.find(mp => mp.type === 'role')) {
-    const spaceRolesMap = await getSpaceMemberRoles({ spaceIds, memberId });
-    propertyValues = propertyValues.map(pv => pv.type === 'role' ? { ...pv, value: spaceRolesMap[pv.spaceId]?.map(r => r.name) || [] } : pv);
-  }
-  if (visibleMemberProperties.find(mp => mp.type === 'join_date')) {
-    const joinDatesMap = await getSpaceMemberJoinDates({ spaceIds, memberId });
-    propertyValues = propertyValues.map(pv => pv.type === 'join_date' ? { ...pv, value: joinDatesMap[pv.spaceId] } : pv);
-  }
+  const isRolePropertyVisible = visibleMemberProperties.find(mp => mp.type === 'role');
+  const isJoinDatePropertyVisible = visibleMemberProperties.find(mp => mp.type === 'join_date');
 
+  if (isRolePropertyVisible || isJoinDatePropertyVisible) {
+    const spaceMetadataMap = await getSpaceMemberMetadata({ spaceIds, memberId });
+    propertyValues = propertyValues.map(pv => {
+      if (pv.type === 'role' && isRolePropertyVisible) {
+        return { ...pv, value: spaceMetadataMap[pv.spaceId]?.roles.map(r => r.name) || [] };
+      }
+      else if (pv.type === 'join_date' && isJoinDatePropertyVisible) {
+        return { ...pv, value: spaceMetadataMap[pv.spaceId]?.joinDate };
+      }
+
+      return pv;
+    });
+  }
   return groupPropertyValuesBySpace(propertyValues);
 }

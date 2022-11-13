@@ -1,7 +1,7 @@
 
 import type { Space } from '@prisma/client';
 
-import { getSpaceMemberRoles } from 'lib/members/getSpaceMemberRoles';
+import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
 import { assignRole } from 'lib/roles';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -36,33 +36,37 @@ beforeAll(async () => {
   await assignRole({ roleId: role1.id, userId: u2.id });
 });
 
-describe('getSpaceMemberRoles', () => {
+describe('getSpaceMemberMetadata', () => {
 
   it('should retrieve admin user roles for single space', async () => {
 
-    const rolesMap = await getSpaceMemberRoles({ spaceIds: u1Space1.id, memberId: user1.id });
+    const metadataMap = await getSpaceMemberMetadata({ spaceIds: u1Space1.id, memberId: user1.id });
 
-    expect(rolesMap[u1Space1.id].length).toBe(2);
-    expect(rolesMap[u1Space2.id]).toBeUndefined();
+    expect(metadataMap[u1Space1.id].roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id].joinDate).toBeTruthy();
+    expect(metadataMap[u1Space2.id]).toBeUndefined();
   });
 
   it('should retrieve admin user roles for multiple spaces', async () => {
-    const rolesMap = await getSpaceMemberRoles({ spaceIds: [u1Space1.id, u1Space2.id], memberId: user1.id });
+    const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id, u1Space2.id], memberId: user1.id });
 
-    expect(rolesMap[u1Space1.id]?.length).toBe(2);
-    expect(rolesMap[u1Space2.id]?.length).toBe(1);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
+    expect(metadataMap[u1Space2.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space2.id]?.joinDate).toBeTruthy();
   });
 
   it('should not return roles if user is not a member of space', async () => {
-    const rolesMap = await getSpaceMemberRoles({ spaceIds: [u1Space2.id], memberId: user2.id });
+    const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space2.id], memberId: user2.id });
 
-    expect(rolesMap[u1Space2.id]).toBeUndefined();
-    expect(rolesMap[u1Space1.id]).toBeUndefined();
+    expect(metadataMap[u1Space2.id]).toBeUndefined();
+    expect(metadataMap[u1Space1.id]).toBeUndefined();
   });
 
   it('should retrieve non-admin user roles for single space', async () => {
-    const rolesMap = await getSpaceMemberRoles({ spaceIds: [u1Space1.id], memberId: user2.id });
+    const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id], memberId: user2.id });
 
-    expect(rolesMap[u1Space1.id]?.length).toBe(1);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
   });
 });
