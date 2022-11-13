@@ -36,6 +36,11 @@ export function sortMembers (members: Member[], property: MemberProperty) {
         return (memberADiscordUsername ?? '') > (memberBDiscordUsername ?? '') ? 1 : -1;
       });
     }
+    case 'join_date': {
+      return members.sort((memA, memB) => {
+        return (memA.joinDate) > (memB.joinDate) ? 1 : -1;
+      });
+    }
     case 'twitter': {
       return members.sort((memA, memB) => {
         const memberATwitterURL = (memA.profile?.social as Partial<Social>)?.twitterURL;

@@ -18,7 +18,7 @@ export function MemberDirectorySort ({
 }) {
   const { properties = [] } = useMemberProperties();
   const sortableProperties = properties.filter(property => property.enabledViews.includes(view)
-    && !['profile_pic', 'role'].includes(property.type));
+    && !['profile_pic', 'role', 'select', 'multi-select'].includes(property.type));
 
   return (
     <ViewOptions label='Sort'>
