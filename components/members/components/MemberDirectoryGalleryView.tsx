@@ -127,15 +127,15 @@ function MemberDirectoryGalleryCard ({
                 case 'join_date': {
                   return (
                     <Stack key={property.id}>
-                      <Typography fontWeight='bold' variant='subtitle2'>Join date</Typography>
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                       <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                        withYear: true
+                        withYear: true,
+                        withTime: true
                       })}
                       </Typography>
                     </Stack>
                   );
                 }
-
                 case 'role': {
                   return (
                     <Stack gap={0.5}>
