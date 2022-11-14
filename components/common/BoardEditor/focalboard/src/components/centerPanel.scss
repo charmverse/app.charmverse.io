@@ -54,8 +54,11 @@
     // }
     > div {
       position: relative;
-      padding-bottom: var(--page-layout-pb);
       height: 100%;
+
+      .full-page & {
+        padding-bottom: var(--page-layout-pb);
+      }
     }
 
     &.sidebar-visible {
@@ -74,19 +77,11 @@
     transition: opacity 0.2s ease-in-out;
   }
 
-  &.embedded-board {
-    &:hover {
-      .view-actions {
-        opacity: 1;
-      }
-    }
-    .view-actions {
-      opacity: 0;
-    }
-    > .container-container {
-      > div {
-        padding-bottom: 5px;
-      }
-    }
+  &.embedded-board .view-actions {
+    opacity: 0;
+  }
+
+  &.embedded-board:hover .view-actions {
+    opacity: 1;
   }
 }
