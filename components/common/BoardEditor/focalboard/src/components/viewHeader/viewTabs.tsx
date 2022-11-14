@@ -125,10 +125,11 @@ function ViewTabs (props: ViewTabsProps) {
   }
 
   function getViewUrl (viewId: string) {
+    const { cardId, ...rest } = router.query;
     return {
       pathname: router.pathname,
       query: {
-        ...router.query,
+        ...rest,
         viewId
       }
     };
