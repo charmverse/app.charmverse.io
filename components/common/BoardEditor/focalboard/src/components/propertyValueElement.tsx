@@ -94,9 +94,8 @@ function PropertyValueElement (props:Props): JSX.Element {
         onDeleteOption={(option) => {
           mutator.deletePropertyOption(board, propertyTemplate, option);
         }}
-        onCreateOption={async (newValue) => {
-          await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue.id);
+        onCreateOption={(newValue) => {
+          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
         }}
         displayType={displayType}
       />
