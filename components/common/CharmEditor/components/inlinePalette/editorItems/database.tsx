@@ -1,11 +1,10 @@
-import type { EditorState } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import type { PageType } from '@prisma/client';
 
 import { addPage } from 'lib/pages';
 
-import { insertNode } from '../../../utils';
+import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
@@ -133,10 +132,4 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
   );
 
   return returnedItems;
-}
-
-function isAtBeginningOfLine (state: EditorState) {
-  // @ts-ignore types package is missing $cursor property as of 1.2.8
-  const parentOffset = state.selection.$cursor.parentOffset;
-  return parentOffset === 0;
 }

@@ -230,7 +230,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                           <IntlProvider>
                             <SnackbarProvider>
                               <PageMetaTags />
-                              <CssBaseline />
+                              <CssBaseline enableColorScheme={true} />
                               <Global styles={cssVariables} />
                               <RouteGuard>
                                 <ErrorBoundary>
@@ -269,7 +269,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-
     <UserProvider>
       <SpacesProvider>
         <WebSocketClientProvider>
@@ -288,9 +287,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
           </MembersProvider>
         </WebSocketClientProvider>
       </SpacesProvider>
-
     </UserProvider>
-
   );
 }
 

@@ -22,7 +22,7 @@ interface Props {
 }
 
 export default function BountiesPage ({ publicMode = false, bounties }: Props) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   useEffect(() => {
     charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });

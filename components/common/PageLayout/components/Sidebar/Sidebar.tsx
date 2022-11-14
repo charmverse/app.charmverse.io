@@ -179,7 +179,7 @@ interface SidebarProps {
 export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const { user } = useUser();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
@@ -260,7 +260,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               active={router.pathname.startsWith('/[domain]/settings/workspace')}
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
-              label='Settings & Members'
+              label='Settings'
             />
             <SidebarLink
               active={false}

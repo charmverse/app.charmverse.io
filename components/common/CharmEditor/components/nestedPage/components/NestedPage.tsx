@@ -36,7 +36,7 @@ const NestedPageContainer = styled(Link)`
 `;
 
 export default function NestedPage ({ node }: NodeViewProps) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
 

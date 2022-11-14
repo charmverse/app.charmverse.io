@@ -8,6 +8,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
+import { mergeRefs } from 'lib/utilities/react';
 import type { Page } from 'models';
 import { greyColor2 } from 'theme/colors';
 
@@ -188,20 +189,6 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
         )}
     </PageTreeItem>
   );
-}
-
-// pulled from react-merge-refs
-function mergeRefs (refs: any) {
-  return (value: any) => {
-    refs.forEach((ref: any) => {
-      if (typeof ref === 'function') {
-        ref(value);
-      }
-      else if (ref != null) {
-        ref.current = value;
-      }
-    });
-  };
 }
 
 const MemoizedTreeNode = memo(DraggableTreeNode);

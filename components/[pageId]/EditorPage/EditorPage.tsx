@@ -21,7 +21,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   const { editMode, resetPageProps, setPageProps } = usePrimaryCharmEditor();
   const [, setTitleState] = usePageTitle();
   const [pageNotFound, setPageNotFound] = useState(false);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const { user } = useUser();
   const currentPagePermissions = useMemo(() => getPagePermissions(pageId), [pageId]);

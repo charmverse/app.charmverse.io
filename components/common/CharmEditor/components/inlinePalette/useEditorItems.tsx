@@ -7,8 +7,8 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
-import type { NestedPagePluginState } from '../nestedPage';
 import useNestedPage from '../nestedPage/hooks/useNestedPage';
+import type { NestedPagePluginState } from '../nestedPage/nestedPage.interfaces';
 
 import { items as advancedBlocks } from './editorItems/advancedBlocks';
 import { items as databaseItems } from './editorItems/database';
@@ -21,7 +21,7 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
     { disableNestedPage: boolean, nestedPagePluginKey?: PluginKey<NestedPagePluginState> }) {
   const { addNestedPage } = useNestedPage();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId, pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -46,7 +46,6 @@ export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
     )).flat();
 
     return itemList;
-
   }, [addNestedPage, currentPageId, user, space]);
 
   return paletteItems;
