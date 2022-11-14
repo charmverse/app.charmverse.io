@@ -235,6 +235,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         ...(existingPages ?? {}),
         ...pagesToUpdate
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
@@ -254,6 +256,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         ...(existingPages ?? {}),
         ...newPages
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
@@ -268,6 +272,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       });
 
       return newValue;
+    }, {
+      revalidate: false
     });
   }, []);
 
