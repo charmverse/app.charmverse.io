@@ -3,26 +3,40 @@ import { Stack, Typography } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
 import { mapPropertyOptionToSelectOption, mapSelectOptionToPropertyOption } from 'components/common/BoardEditor/components/properties/SelectProperty/mappers';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
-type PreviewProps ={
-  readOnly?: boolean;
+type ContainerProps = {
+  displayType?: PropertyValueDisplayType;
 }
-const SelectPreviewContainer = styled(Stack)<PreviewProps>`
-  min-height: 32px;
-  min-width: 150px;
+const SelectPreviewContainer = styled(Stack)<ContainerProps>`
   justify-content: center;
-  padding: ${({ theme }) => theme.spacing(0.5)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
+
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   transition: background-color 0.2s ease-in-out;
 
+  padding: ${({ theme }) => theme.spacing(0.25, 0)};
+
+  ${({ displayType, theme }) => {
+    // Styles depending on a view type
+    if (displayType === 'details') {
+      return `
+        min-height: 32px;
+        min-width: 150px;
+        padding: ${theme.spacing(0.5)} ${theme.spacing(1)};
+        padding-right: ${theme.spacing(2)};
+      `;
+    }
+
+    return '';
+  }}
+
   &:hover {
     cursor: pointer;
-    background-color: ${({ theme, readOnly }) => !readOnly ? theme.palette.action.hover : 'transparent'};
+    background-color: ${({ theme, displayType }) => displayType === 'details' ? theme.palette.action.hover : 'transparent'};
   }
 
   div {
@@ -46,6 +60,7 @@ type Props = {
   options: IPropertyOption[];
   propertyValue: string | string[];
   placeholder?: string;
+  displayType?: PropertyValueDisplayType;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
   onUpdateOption?: (option: IPropertyOption) => void;
@@ -61,7 +76,8 @@ export function SelectProperty ({
   onChange,
   onUpdateOption,
   onDeleteOption,
-  onCreateOption
+  onCreateOption,
+  displayType
 }: Props) {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -101,7 +117,7 @@ export function SelectProperty ({
 
   if (!isOpened) {
     return (
-      <SelectPreviewContainer onClick={onEdit} readOnly={readOnly}>
+      <SelectPreviewContainer onClick={onEdit} displayType={displayType}>
         <SelectPreview
           value={selectValue}
           options={selectOptions}

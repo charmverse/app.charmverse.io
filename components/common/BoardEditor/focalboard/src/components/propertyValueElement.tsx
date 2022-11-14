@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 
 import type { Board, IPropertyTemplate, PropertyType } from '../blocks/board';
 import type { Card } from '../blocks/card';
@@ -27,13 +28,14 @@ type Props = {
     updatedAt: string;
     propertyTemplate: IPropertyTemplate;
     showEmptyPlaceholder: boolean;
+    displayType?: PropertyValueDisplayType;
 }
 
 function PropertyValueElement (props:Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
 
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt } = props;
+  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl);
@@ -96,6 +98,7 @@ function PropertyValueElement (props:Props): JSX.Element {
           await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
           mutator.changePropertyValue(card, propertyTemplate.id, newValue.id);
         }}
+        displayType={displayType}
       />
     );
   }
