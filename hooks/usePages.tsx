@@ -215,24 +215,26 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }
 
   const handlePagesUpdate = useCallback((value: WebsocketPayload<'pages_meta_updated'>) => {
-    const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
-
-      const existingPage = pages[updatedPageMeta.id];
-
-      if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
-        pageMap[updatedPageMeta.id] = {
-          ...existingPage,
-          ...updatedPageMeta
-        };
-      }
-
-      return pageMap;
-
-    }, {} as PagesMap);
 
     mutatePagesList(existingPages => {
+      const _existingPages = existingPages || {};
+      const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
+
+        const existingPage = _existingPages[updatedPageMeta.id];
+
+        if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
+          pageMap[updatedPageMeta.id] = {
+            ...existingPage,
+            ...updatedPageMeta
+          };
+        }
+
+        return pageMap;
+
+      }, {} as PagesMap);
+
       return {
-        ...(existingPages ?? {}),
+        ..._existingPages,
         ...pagesToUpdate
       };
     }, {
