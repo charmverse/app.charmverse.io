@@ -2,6 +2,8 @@ import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 
 export const hoverIconsStyle = ({ theme, isTouchScreen }: { theme: Theme, isTouchScreen: boolean }) => css`
+  position: relative;
+  
   &:hover .icons {
     opacity: 1;
     transition: ${theme.transitions.create('opacity', {

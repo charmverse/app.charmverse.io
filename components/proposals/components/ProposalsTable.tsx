@@ -106,6 +106,7 @@ export default function ProposalsTable ({ proposals, mutateProposals }: { propos
             </Grid>
             <Grid item xs={1} display='flex' justifyContent='flex-end'>
               <ProposalActionsMenu
+                lastUpdatedAt={proposalPage.updatedAt}
                 deleteProposal={deleteProposal}
                 editProposal={(proposalId) => openPage(proposalId)}
                 proposal={proposal}
