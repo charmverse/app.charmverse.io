@@ -12,18 +12,22 @@ import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 const filter = createFilterOptions<SelectOptionType>();
 
 type SelectProps = {
+  value: string | string[];
   multiselect?: boolean;
   options?: SelectOptionType[];
   disabled?: boolean;
+  canEditOptions?: boolean;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
   onBlur?: () => void;
   autoOpen?: boolean;
+  placeholder?: string;
+  className?: string;
 }
 
-type Props = ControlFieldProps & FieldProps & SelectProps;
+type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
 
 export const SelectField = forwardRef<HTMLDivElement, Props>((
   {
@@ -33,11 +37,14 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
     disabled,
     autoOpen = false,
     multiselect = false,
+    canEditOptions = true,
     options = [],
     onDeleteOption,
     onUpdateOption,
     onCreateOption,
     onBlur,
+    placeholder,
+    className,
     ...inputProps
   },
   ref
@@ -95,6 +102,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
   return (
     <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
       <Autocomplete
+        className={className}
         onClose={() => setIsOpened(false)}
         onOpen={() => setIsOpened(true)}
         open={isOpened || isOptionEditOpened}
@@ -107,7 +115,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
         handleHomeEndKeys
         multiple
         filterSelectedOptions
-        sx={{ minWidth: 150, width: '100%' }}
+        sx={{ minWidth: 150, width: '100%', background: 'transparent' }}
         options={options}
         autoHighlight
         clearIcon={null}
@@ -121,8 +129,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
               key={option.id || option.name}
               option={option}
               menuItemProps={selectProps}
-              onDelete={onDeleteOption || undefined}
-              onChange={onUpdateOption || undefined}
+              onDelete={canEditOptions ? onDeleteOption : undefined}
+              onChange={canEditOptions ? onUpdateOption : undefined}
               onToggleOptionEdit={toggleOptionEdit}
             />
           );
@@ -142,6 +150,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
             inputRef={inputRef}
             {...params}
             size='small'
+            placeholder={!selectedOptions.length ? placeholder : undefined}
           />
         )}
         getOptionLabel={(option: SelectOptionType) => {
@@ -154,7 +163,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>((
 
           // Suggest the creation of a new value
           const isExisting = options.some((option) => inputValue.toLowerCase() === option.name?.toLocaleLowerCase());
-          if (inputValue !== '' && !isExisting && onCreateOption) {
+          if (inputValue !== '' && !isExisting && onCreateOption && canEditOptions) {
             filtered.push({
               temp: true,
               id: v4(),
