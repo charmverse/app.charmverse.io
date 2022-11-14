@@ -137,9 +137,6 @@ CREATE INDEX "SpacePermission_spaceId_idx" ON "SpacePermission"("spaceId");
 CREATE INDEX "SpaceRole_spaceId_idx" ON "SpaceRole"("spaceId");
 
 -- CreateIndex
-CREATE INDEX "SpaceRole_tokenGateId_idx" ON "SpaceRole"("tokenGateId");
-
--- CreateIndex
 CREATE INDEX "SpaceRole_userId_idx" ON "SpaceRole"("userId");
 
 -- CreateIndex

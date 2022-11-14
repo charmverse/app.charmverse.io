@@ -24,7 +24,7 @@ cron.schedule('0 */30 * * * *', voteTask);
 cron.schedule('0 */15 * * * *', proposalTask);
 
 // Verify token gates and remove users who no longer meet the conditions
-cron.schedule('0 */10 * * * *', verifyTokenGateMembershipsTask);
+cron.schedule('0 */30 * * * *', verifyTokenGateMembershipsTask);
 
 const port = process.env.PORT || 4000;
 
