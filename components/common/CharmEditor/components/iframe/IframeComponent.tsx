@@ -254,7 +254,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   }
   else if (node.attrs.type === 'figma') {
 
-    const src = `https://www.figma.com/embed?embed_host=astra&url=${node.attrs.src}`;
+    const src = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
     return (
       <BlockAligner onDelete={onDelete}>
         <VerticalResizer
