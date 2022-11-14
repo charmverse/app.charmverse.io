@@ -5,7 +5,7 @@ import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export default function isAdmin (spaceId?: string) {
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
 
   return isSpaceAdmin(user, spaceId || space?.id);

@@ -1,13 +1,18 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import { MenuItem } from '@mui/material';
+import { ClickAwayListener } from '@mui/material';
+import Grow from '@mui/material/Grow';
+import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import type { PopupState } from 'material-ui-popup-state/core';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 
 import type { NestedPagePluginState } from '../../nestedPage';
-import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
+import { GroupLabel } from '../../PopoverMenu';
 import { palettePluginKey } from '../config';
 import {
   useInlinePaletteItems,
@@ -19,6 +24,15 @@ import {
 import { useEditorItems } from '../useEditorItems';
 
 import InlinePaletteRow from './InlinePaletteRow';
+
+export type InlinePaletteSize = 'small' | 'big';
+
+const StyledPaper = styled(Paper)`
+  max-height: '40vh';
+  width: '250px';
+  overflow-y: 'auto';
+  padding: '0 5px';
+`;
 
 function getItemsAndHints (
   view: EditorView,
@@ -32,16 +46,11 @@ function getItemsAndHints (
     throw new Error(`uid: "${invalidItem.uid}" must be an instance of PaletteItem`);
   }
 
-  let items = editorItems.filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden);
+  const items: PaletteItem[] = editorItems
+    .filter((item) => typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden)
+    .filter((item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE)
+    .map(item => ({ ...item, _isItemDisabled: isItemDisabled(item) }));
 
-  // TODO This is hacky
-  items.forEach((item) => {
-    item._isItemDisabled = isItemDisabled(item);
-  });
-  items = items
-    .filter(
-      (item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE
-    );
   return { items };
 }
 
@@ -50,8 +59,16 @@ const InlinePaletteGroup = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
+interface InlineCommentGroupProps {
+  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  disableNestedPage?: boolean;
+  externalPopupState?: PopupState;
+  size?: InlinePaletteSize;
+  handleActiveItem?: (item: string) => void;
+}
+
 export default function InlineCommandPalette (
-  { nestedPagePluginKey, disableNestedPage = false }: { nestedPagePluginKey?: PluginKey<NestedPagePluginState>, disableNestedPage?: boolean }
+  { nestedPagePluginKey, disableNestedPage = false, externalPopupState, size = 'big', handleActiveItem }: InlineCommentGroupProps
 ) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
@@ -73,6 +90,15 @@ export default function InlineCommandPalette (
       isItemDisabled
     );
   });
+
+  const closePalette = useCallback(() => {
+    if (externalPopupState && externalPopupState.isOpen) {
+      externalPopupState.close();
+    }
+  }, [externalPopupState]);
+
+  const isInlineCommandVisible = externalPopupState?.isOpen;
+  const contentDOM = externalPopupState?.anchorEl;
 
   useEffect(() => {
     const payload = getItemsAndHints(
@@ -98,61 +124,102 @@ export default function InlineCommandPalette (
     isItemDisabled
   );
 
-  const paletteGroupItemsRecord: Record<string, ReactNode[]> = {};
+  const paletteGroupItemsRecord: Record<string, ReactNode[]> = useMemo(() => {
+    return items.reduce<Record<string, ReactNode[]>>((acc, item, intex) => {
+      if ((disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage) {
+        const itemProps = { ...getItemProps(item, intex) };
+        const itemNode = (
+          <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0, px: '4px' }}>
+            <InlinePaletteRow
+              dataId={item.uid}
+              key={item.uid}
+              disabled={item._isItemDisabled}
+              title={item.title}
+              icon={item.icon}
+              description={size === 'big' ? item.description : undefined}
+              {...itemProps}
+              size={size}
+              onClick={(e) => {
+                itemProps.onClick(e);
+                closePalette();
+              }}
+            />
+          </MenuItem>
+        );
 
-  items.forEach((item, i) => {
-    if ((disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage) {
-      const itemProps = { ...getItemProps(item, i) };
-      if (!paletteGroupItemsRecord[item.group]) {
-        paletteGroupItemsRecord[item.group] = [];
+        if (acc[item.group]) {
+          return {
+            ...acc,
+            [item.group]: [...acc[item.group], itemNode]
+          };
+        }
+
+        return {
+          ...acc,
+          [item.group]: [itemNode]
+        };
       }
-      paletteGroupItemsRecord[item.group].push(
-        <MenuItem key={item.uid} disabled={item._isItemDisabled} selected={itemProps.isActive} sx={{ py: 0, px: '4px' }}>
-          <InlinePaletteRow
-            dataId={item.uid}
-            key={item.uid}
-            disabled={item._isItemDisabled}
-            title={item.title}
-            icon={item.icon}
-            description={item.description}
-            {...itemProps}
-          />
-        </MenuItem>
-      );
+      return acc;
+    }, {});
+  }, [items, disableNestedPage, size, getItemProps, closePalette]);
+
+  useEffect(() => {
+    const activeItem = items.find((item, index) => !!getItemProps(item, index).isActive);
+    if (handleActiveItem && !!activeItem) {
+      handleActiveItem(activeItem.title);
     }
-  });
+  }, [items, handleActiveItem]);
 
   function handleListKeyDown (event: React.KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
       dismissPalette();
+      closePalette();
     }
     else if (event.key === 'Escape') {
       dismissPalette();
+      closePalette();
     }
   }
 
+  const filteredPaletteGroupItemsRecord = size === 'small' && paletteGroupItemsRecord.text ? { text: paletteGroupItemsRecord.text } : paletteGroupItemsRecord;
+
   return (
-    <PopoverMenu
-      isOpen={isVisible}
-      container={tooltipContentDOM}
-      onClose={dismissPalette}
+    <Popper
+      open={isInlineCommandVisible || isVisible}
+      anchorEl={contentDOM || tooltipContentDOM}
+      placement='bottom-start'
+      sx={{ zIndex: 1301 }}
     >
-      <MenuList
-        autoFocusItem={isVisible}
-        onKeyDown={handleListKeyDown}
-        sx={{ py: 0 }}
-      >
-        {Object.entries(paletteGroupItemsRecord).map(([group, paletteItems]) => (
-          <InlinePaletteGroup key={group}>
-            <GroupLabel>
-              {group}
-            </GroupLabel>
-            {paletteItems}
-          </InlinePaletteGroup>
-        ))}
-      </MenuList>
-    </PopoverMenu>
+      <ClickAwayListener onClickAway={() => closePalette()}>
+        <Grow
+          in={true}
+          style={{
+            transformOrigin: 'left top'
+          }}
+        >
+          <StyledPaper>
+            <MenuList
+              autoFocusItem={isInlineCommandVisible || isVisible}
+              onKeyDown={(e) => {
+                handleListKeyDown(e);
+                closePalette();
+              }}
+              sx={{ py: 0 }}
+            >
+              {Object.entries(filteredPaletteGroupItemsRecord).map(([group, paletteItems]) => (
+                <InlinePaletteGroup key={group}>
+                  <GroupLabel>
+                    {size === 'small' ? 'Turn into' : group}
+                  </GroupLabel>
+                  {paletteItems}
+                </InlinePaletteGroup>
+              ))}
+            </MenuList>
+          </StyledPaper>
+        </Grow>
+      </ClickAwayListener>
+    </Popper>
   );
 }
 

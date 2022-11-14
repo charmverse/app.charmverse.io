@@ -5,11 +5,11 @@ import { useCallback, createContext, useContext, useEffect, useMemo, useState } 
 
 import charmClient from 'charmClient';
 
-import { useOnboarding } from './useOnboarding';
 import { useUser } from './useUser';
 
 type IContext = {
   spaces: Space[];
+  setSpace: (spaces: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
   createNewSpace: (data: Prisma.SpaceCreateInput) => Promise<Space | null>;
@@ -17,7 +17,12 @@ type IContext = {
 };
 
 export const SpacesContext = createContext<Readonly<IContext>>({
-  spaces: [], setSpaces: () => undefined, isLoaded: false, createNewSpace: () => Promise.resolve() as any, isCreatingSpace: false
+  spaces: [],
+  setSpace: () => undefined,
+  setSpaces: () => undefined,
+  isLoaded: false,
+  createNewSpace: () => Promise.resolve(null),
+  isCreatingSpace: false
 });
 
 export function SpacesProvider ({ children }: { children: ReactNode }) {
@@ -66,7 +71,19 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
     return null;
   }, []);
 
-  const value = useMemo(() => ({ spaces, setSpaces, isLoaded, createNewSpace, isCreatingSpace }) as IContext, [spaces, isLoaded, isCreatingSpace]);
+  const setSpace = useCallback((_space: Space) => {
+    const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
+    setSpaces(newSpaces);
+  }, [spaces, setSpaces]);
+
+  const value = useMemo(() => ({
+    spaces,
+    setSpace,
+    setSpaces,
+    isLoaded,
+    createNewSpace,
+    isCreatingSpace
+  }) as IContext, [spaces, isLoaded, isCreatingSpace]);
 
   return (
     <SpacesContext.Provider value={value}>

@@ -34,7 +34,7 @@ function InputSearchRoleBase ({
   defaultValue, disableCloseOnSelect = false, filter, showWarningOnNoRoles = false, placeholder, ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const defaultRole = typeof defaultValue === 'string' ? roles?.find(role => {
     return role.id === defaultValue;

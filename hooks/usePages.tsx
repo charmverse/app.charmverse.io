@@ -59,7 +59,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const [currentPageId, setCurrentPageId] = useState<string>('');
   const router = useRouter();
   const { user } = useUser();

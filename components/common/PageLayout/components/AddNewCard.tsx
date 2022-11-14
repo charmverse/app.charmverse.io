@@ -14,7 +14,7 @@ import { usePages } from 'hooks/usePages';
 
 function AddNewCard ({ pageId }: { pageId: string }) {
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages } = usePages();
   const dispatch = useAppDispatch();
 

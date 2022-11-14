@@ -34,7 +34,7 @@ const ArchivedPageItem = memo<
   onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
   onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
-      const [space] = useCurrentSpace();
+      const space = useCurrentSpace();
 
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
@@ -72,7 +72,7 @@ export default function TrashModal ({ onClose, isOpen }: { onClose: () => void, 
   const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages, getPagePermissions, mutatePagesRemove, currentPageId } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();

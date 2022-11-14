@@ -8,7 +8,7 @@ import { setTitle } from 'hooks/usePageTitle';
 
 export default function MemberSettings () {
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   setTitle('Members');

@@ -16,7 +16,7 @@ import { ListItemIcon, ListItemText } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
-import { MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
@@ -58,7 +58,7 @@ export function MemberPropertyItem ({
           }
         }}
       >
-        {name ?? MEMBER_PROPERTY_LABELS[type]}
+        {name ?? MEMBER_PROPERTY_CONFIG[type]?.label}
       </ListItemText>
     </>
   );
