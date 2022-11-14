@@ -67,7 +67,7 @@ export const lightModeColors: BrandColorScheme = {
 
 export const brandColorNames = Object.keys(darkModeColors) as BrandColor[];
 
-export const propertyColorsMap: { [key: string]: SupportedColor } = {
+export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',
   propColorGray: 'gray',
   propColorTurquoise: 'turquoise',
