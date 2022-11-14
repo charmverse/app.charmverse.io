@@ -23,7 +23,6 @@ import Legend from 'components/settings/Legend';
 import ImportNotionWorkspace from 'components/settings/workspace/ImportNotionWorkspace';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useOnboarding } from 'hooks/useOnboarding';
 import { setTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
@@ -32,8 +31,8 @@ import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export default function WorkspaceSettings () {
   const router = useRouter();
-  const [space, setSpace] = useCurrentSpace();
-  const { spaces, setSpaces } = useSpaces();
+  const space = useCurrentSpace();
+  const { spaces, setSpace, setSpaces } = useSpaces();
   const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
   const isAdmin = isSpaceAdmin(user, space?.id);

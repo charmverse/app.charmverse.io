@@ -96,7 +96,7 @@ interface Props {
 export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, pageType, proposalParentId }: Props) {
 
   const { pages, getPagePermissions } = usePages();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
   const spaceLevelPermission = pagePermissions.find(permission => space && permission.spaceId === space?.id);

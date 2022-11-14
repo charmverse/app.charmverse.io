@@ -21,7 +21,7 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
     { disableNestedPage: boolean, nestedPagePluginKey?: PluginKey<NestedPagePluginState> }) {
   const { addNestedPage } = useNestedPage();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId, pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();

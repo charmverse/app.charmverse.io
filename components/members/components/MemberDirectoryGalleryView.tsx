@@ -38,7 +38,7 @@ function MemberDirectoryGalleryCard ({
     return record;
   }, {} as any);
 
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutateMembers } = useMembers();
