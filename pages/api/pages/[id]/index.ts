@@ -117,11 +117,6 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   const pageWithPermission = await updatePage(page, userId, req.body);
 
-  if (hasNewParentPage) {
-    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
-    return res.status(200).json(updatedPage);
-  }
-
   const { content, contentText, ...updatedPageMeta } = req.body as Page;
 
   // Update page track profile and meta data state, unless it was content update
@@ -131,6 +126,11 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
       type: 'pages_meta_updated',
       payload: [{ ...updatedPageMeta, id: pageId }]
     }, page.spaceId);
+  }
+
+  if (hasNewParentPage) {
+    const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
+    return res.status(200).json(updatedPage);
   }
 
   return res.status(200).json(pageWithPermission);
