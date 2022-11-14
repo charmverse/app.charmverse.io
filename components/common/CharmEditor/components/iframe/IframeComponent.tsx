@@ -10,6 +10,7 @@ import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
+import { FiFigma } from 'react-icons/fi';
 
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
@@ -126,7 +127,7 @@ const StyledEmptyIframeContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: 'video' | 'embed' }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: 'video' | 'embed' | 'figma' }) {
   const theme = useTheme();
   const { type, readOnly, ...rest } = props;
   return (
@@ -144,9 +145,34 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnl
       {...rest}
     >
       <StyledEmptyIframeContainer>
-        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' />}
+        {(() => {
+          switch (type) {
+            case 'embed':
+              return <PreviewIcon fontSize='small' />;
+            case 'video':
+              return <VideoLibraryIcon fontSize='small' />;
+            case 'figma':
+              return <FiFigma style={{ fontSize: 'small' }} />;
+
+            default:
+              return null;
+          }
+        })()}
         <Typography>
-          {type === 'video' ? 'Insert a video' : 'Insert an embed'}
+          {(() => {
+            switch (type) {
+              case 'embed':
+                return 'Insert an embed';
+              case 'video':
+                return 'Insert a video';
+              case 'figma':
+                return 'Insert a Figma';
+
+              default:
+                return null;
+            }
+          })()}
+
         </Typography>
       </StyledEmptyIframeContainer>
     </ListItem>
@@ -221,6 +247,34 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
         >
           <StyledIFrame>
             <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
+        </VerticalResizer>
+      </BlockAligner>
+    );
+  }
+  else if (node.attrs.type === 'figma') {
+    return (
+
+      <BlockAligner onDelete={onDelete}>
+        <VerticalResizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              height: data.size.height
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={node.attrs.width}
+          height={height}
+          onResize={(_, data) => {
+            setHeight(data.size.height);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        >
+          <StyledIFrame>
+            <iframe allowFullScreen title='iframe' src={`https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>

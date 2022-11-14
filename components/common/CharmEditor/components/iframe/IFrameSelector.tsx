@@ -10,7 +10,7 @@ interface IFrameSelectorProps {
   onIFrameSelect: (videoSrc: string) => void;
   children: ReactNode;
   tabs?: [string, ReactNode][];
-  type: 'embed' | 'video';
+  type: 'embed' | 'video' | 'figma';
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {
@@ -54,7 +54,21 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
                     setEmbedLink('');
                   }}
                 >
-                  {type === 'embed' ? 'Embed link' : 'Insert Video'}
+
+                  {(() => {
+                    switch (type) {
+                      case 'embed':
+                        return 'Embed Link';
+                      case 'video':
+                        return 'Insert Video';
+                      case 'figma':
+                        return 'Insert Figma';
+
+                      default:
+                        return null;
+                    }
+                  })()}
+
                 </Button>
               </Box>
             ]
