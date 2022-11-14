@@ -1,13 +1,11 @@
-import type { MemberPropertyType } from '@prisma/client';
-
-import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
+import { DEFAULT_MEMBER_PROPERTIES_ORDER, MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
 export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: string, spaceId: string }) {
-  const defaultPropertiesInput = [...DEFAULT_MEMBER_PROPERTIES].sort().map((memberProperty, memberPropertyIndex) => ({
+  const defaultPropertiesInput = DEFAULT_MEMBER_PROPERTIES_ORDER.map((memberProperty, memberPropertyIndex) => ({
     createdBy: userId,
-    name: MEMBER_PROPERTY_LABELS[memberProperty],
+    name: MEMBER_PROPERTY_CONFIG[memberProperty].label,
     index: memberPropertyIndex,
-    type: (memberProperty as MemberPropertyType),
+    type: memberProperty,
     updatedBy: userId,
     spaceId
   }));

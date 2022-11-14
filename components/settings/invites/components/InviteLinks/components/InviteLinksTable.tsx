@@ -28,7 +28,7 @@ interface Props {
 
 export default function InvitesTable (props: Props) {
   const { isAdmin, invites, onDelete, refetchInvites } = props;
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
 
@@ -54,6 +54,8 @@ export default function InvitesTable (props: Props) {
     }
   }
 
+  const padding = 32;
+
   return (
     <Box overflow='auto'>
       <Table size='small' aria-label='Invite links table'>
@@ -62,9 +64,9 @@ export default function InvitesTable (props: Props) {
             <TableCell sx={{ padding: '10px 16px' }}>Description</TableCell>
             <TableCell>Uses</TableCell>
             <TableCell>Expires</TableCell>
-            <TableCell>Assigned Role</TableCell>
-            <TableCell align='center'>Link</TableCell>
-            <TableCell>{/** Delete */}</TableCell>
+            <TableCell sx={{ width: 150 }}>Assigned Role</TableCell>
+            <TableCell sx={{ width: 90 + padding }} align='center'>Link</TableCell>
+            <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -76,7 +78,7 @@ export default function InvitesTable (props: Props) {
           {invites.map((invite) => (
             <TableRow key={invite.id}>
               <TableCell sx={{ padding: '20px 16px' }}>
-                Private Invite Link
+                Private Link
               </TableCell>
               <TableCell>
                 <Typography>

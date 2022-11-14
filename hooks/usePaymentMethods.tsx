@@ -21,7 +21,7 @@ export const PaymentMethodsContext = createContext<Readonly<IContext>>([
 export function PaymentMethodsProvider ({ children }: { children: ReactNode }) {
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   useEffect(() => {
     refreshPaymentMethods();

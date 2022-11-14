@@ -42,7 +42,7 @@ export function VotesProvider ({ children }: { children: ReactNode }) {
     revalidateOnFocus: false
   });
 
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { mutate: mutateTasks } = useTasks();
 
   function removeVoteFromTask (voteId: string) {

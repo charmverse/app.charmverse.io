@@ -1,4 +1,4 @@
-import type { MemberProperty, Prisma } from '@prisma/client';
+import type { MemberProperty } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,14 +14,15 @@ handler
   .put(updateMemberPropertyHandler)
   .delete(deleteMemberPropertyHandler);
 
-async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
+async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<{ success: 'ok' }>) {
   const userId = req.session.user.id;
   const propertyId = req.query.propertyId as string;
-  const data = req.body as Prisma.MemberPropertyUpdateInput;
+  const data = req.body as Partial<MemberProperty>;
+  const spaceId = req.query.id as string;
 
-  const updatedProperty = await updateMemberProperty({ userId, id: propertyId, data });
+  await updateMemberProperty({ userId, id: propertyId, data, spaceId });
 
-  return res.status(200).json(updatedProperty);
+  return res.status(200).json({ success: 'ok' });
 }
 
 async function deleteMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse) {

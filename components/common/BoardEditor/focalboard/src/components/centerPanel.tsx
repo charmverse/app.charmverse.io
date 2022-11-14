@@ -87,7 +87,7 @@ function CenterPanel (props: Props) {
   });
 
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);

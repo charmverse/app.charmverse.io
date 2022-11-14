@@ -38,7 +38,7 @@ export default function RoleSettings () {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { isValidating } = useImportDiscordRoles();
