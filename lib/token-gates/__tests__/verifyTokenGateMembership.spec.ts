@@ -70,7 +70,7 @@ describe('verifyTokenGateMembership', () => {
 
     const spaceUser = await getSpaceUser();
 
-    expect(res).toBe(true);
+    expect(res).toEqual({ removedRoles: 0, verified: true });
     expect(spaceUser).not.toBeNull();
   });
 
@@ -108,7 +108,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(1);
     expect(verifyUser.user.userTokenGates[0].tokenGate).toBeNull();
-    expect(res).toBe(false);
+    expect(res).toEqual({ removedRoles: 0, verified: false });
     expect(spaceUser).toBeNull();
   });
 
@@ -164,7 +164,7 @@ describe('verifyTokenGateMembership', () => {
 
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
-    expect(res).toBe(false);
+    expect(res).toEqual({ removedRoles: 0, verified: false });
     expect(spaceUser).toBeNull();
   });
 
@@ -231,7 +231,7 @@ describe('verifyTokenGateMembership', () => {
 
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
-    expect(res).toBe(true);
+    expect(res).toEqual({ removedRoles: 0, verified: true });
     expect(spaceUser).not.toBeNull();
   });
 
@@ -294,7 +294,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
-    expect(res).toBe(true);
+    expect(res).toEqual({ removedRoles: 2, verified: true });
     expect(spaceUser).not.toBeNull();
     expect(spaceUser?.spaceRoleToRole.length).toBe(0);
   });
@@ -365,7 +365,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
     expect(verifyUser.spaceRoleToRole.length).toBe(2);
-    expect(res).toBe(true);
+    expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
     expect(spaceUser?.spaceRoleToRole.length).toBe(1);
     expect(spaceUser?.spaceRoleToRole[0].roleId).toBe(role2.id);
@@ -445,7 +445,7 @@ describe('verifyTokenGateMembership', () => {
     const spaceUser = await getSpaceUser();
     expect(verifyUser.user.userTokenGates.length).toBe(2);
     expect(verifyUser.spaceRoleToRole.length).toBe(3);
-    expect(res).toBe(true);
+    expect(res).toEqual({ removedRoles: 1, verified: true });
     expect(spaceUser).not.toBeNull();
     expect(spaceUser?.spaceRoleToRole.length).toBe(2);
     expect(spaceUser?.spaceRoleToRole).toEqual(
