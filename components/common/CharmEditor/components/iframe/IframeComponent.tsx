@@ -253,8 +253,9 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
     );
   }
   else if (node.attrs.type === 'figma') {
-    return (
 
+    const src = `https://www.figma.com/embed?embed_host=astra&url=${node.attrs.src}`;
+    return (
       <BlockAligner onDelete={onDelete}>
         <VerticalResizer
           onResizeStop={(_, data) => {
@@ -274,7 +275,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
           minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
           <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={`https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+            <iframe allowFullScreen title='iframe' src={src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
