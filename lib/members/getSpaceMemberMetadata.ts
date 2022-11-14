@@ -22,7 +22,7 @@ export async function getSpaceMemberMetadata ({ spaceIds, memberId }:{ spaceIds:
     }
   });
 
-  const metadataBySpaceMap = spaceRoles.reduce(
+  const metadataBySpaceMap = spaceRoles.reduce<Record<string, { roles: Role[], joinDate: Date }>>(
     (acc, spaceRole) => {
       const roles = spaceRole.spaceRoleToRole?.map(spaceRoleToRole => spaceRoleToRole.role);
       acc[spaceRole.spaceId] = {
@@ -31,7 +31,7 @@ export async function getSpaceMemberMetadata ({ spaceIds, memberId }:{ spaceIds:
       };
       return acc;
     },
-   {} as Record<string, { roles: Role[], joinDate: Date }>
+    {}
   );
 
   return metadataBySpaceMap;

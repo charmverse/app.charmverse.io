@@ -1,5 +1,6 @@
 import type { MemberProperty, Space } from '@prisma/client';
 
+import { prisma } from 'db';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -26,8 +27,16 @@ beforeAll(async () => {
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
   await generateSpaceForUser(user2);
 
-  // Properties for user 1 spaces
-  property1 = await generateMemberProperty({ type: 'number', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
+  // Create name property manually as generateMemberProperty don't allow creating default properties
+  property1 = await prisma.memberProperty.create({
+    data: {
+      name: 'Name',
+      type: 'name',
+      space: { connect: { id: u1Space1.id } },
+      createdBy: u1.id,
+      updatedBy: u1.id
+    }
+  });
   property2 = await generateMemberProperty({ type: 'email', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
   property3 = await generateMemberProperty({ type: 'phone', userId: u1.id, spaceId: u1Space1.id, name: 'test text1' });
 });
