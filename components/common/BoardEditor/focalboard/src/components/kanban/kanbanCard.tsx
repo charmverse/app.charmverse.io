@@ -1,36 +1,31 @@
 import styled from '@emotion/styled';
 import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import LaunchIcon from '@mui/icons-material/Launch';
-import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, IconButton, ListItemText, MenuItem } from '@mui/material';
 import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
 import { useRouter } from 'next/router';
+import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import { PageActions } from 'components/common/PageActions';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
-import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { Card } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
-import IconButton from '../../widgets/buttons/iconButton';
-import Menu from '../../widgets/menu';
-import MenuWrapper from '../../widgets/menuWrapper';
 import Tooltip from '../../widgets/tooltip';
 import type { ConfirmationDialogBoxProps } from '../confirmationDialogBox';
 import ConfirmationDialogBox from '../confirmationDialogBox';
@@ -66,6 +61,10 @@ const CurrencyIcon = styled.span`
   justify-content: center;
 `;
 
+const StyledBox = styled(Box)`
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+`;
+
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
@@ -81,13 +80,20 @@ const KanbanCard = React.memo((props: Props) => {
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
   const { pages, getPagePermissions } = usePages();
-  const { members } = useMembers();
   const cardPage = pages[card.id];
-  const pageCreator = members.find(member => member.id === cardPage?.createdBy);
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
-
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
@@ -120,12 +126,10 @@ const KanbanCard = React.memo((props: Props) => {
     setShowConfirmationDialogBox(true);
   };
 
-  const { showMessage } = useSnackbar();
-
   return (
     <>
       <Link href={fullPageUrl} draggable={false}>
-        <div
+        <StyledBox
           ref={props.readOnly ? () => null : cardRef}
           className={className}
           draggable={!props.readOnly}
@@ -138,34 +142,50 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly
+          {!props.readOnly && cardPage
             && (
-              <MenuWrapper
-                className='optionsMenu'
-                stopPropagationOnToggle={true}
-              >
-                <IconButton icon={<MoreHorizIcon />} />
-                <Menu position='bottom-start'>
-                  {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
-                    <Menu.Text
-                      icon={<DeleteOutlineIcon />}
-                      id='delete'
-                      name={intl.formatMessage({ id: 'KanbanCard.delete', defaultMessage: 'Delete' })}
+              <>
+                <IconButton
+                  size='small'
+                  className='icons'
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    p: 1,
+                    m: 1
+                  }}
+                  onClick={handleClick}
+                >
+                  <MoreHorizIcon color='secondary' fontSize='small' />
+                </IconButton>
+                <PageActions
+                  anchorEl={anchorEl}
+                  onClick={handleClose}
+                  open={open}
+                  pageType='card'
+                  pageCreatedBy={cardPage.createdBy}
+                  pageUpdatedAt={cardPage.updatedAt}
+                  pageId={cardPage.id}
+                >
+                  {pagePermissions.delete && cardPage.deletedAt === null && (
+                    <MenuItem
+                      dense
                       onClick={handleDeleteButtonOnClick}
-                    />
+                    >
+                      <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+                      <ListItemText>Delete card</ListItemText>
+                    </MenuItem>
                   )}
-                  <Menu.Text
-                    icon={<DuplicateIcon fontSize='small' />}
-                    id='duplicate'
-                    name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
+                  <MenuItem
+                    dense
                     onClick={() => {
-                      const _cardPage = pages[card.id];
-                      if (_cardPage && space) {
+                      if (space) {
                         mutator.duplicateCard(
                           {
                             cardId: card.id,
                             board,
-                            cardPage: _cardPage,
+                            cardPage,
                             afterRedo: async (newCardId) => {
                               props.showCard(newCardId);
                               mutate(`pages/${space.id}`);
@@ -177,54 +197,12 @@ const KanbanCard = React.memo((props: Props) => {
                         );
                       }
                     }}
-                  />
-                  <Menu.Text
-                    icon={<LinkIcon fontSize='small' />}
-                    id='copy'
-                    name={intl.formatMessage({ id: 'KanbanCard.copyLink', defaultMessage: 'Copy link' })}
-                    onClick={() => {
-                      let cardLink = window.location.href;
-
-                      const queryString = new URLSearchParams(window.location.search);
-                      if (queryString.get('cardId') !== card.id) {
-                        const newUrl = new URL(window.location.toString());
-                        newUrl.searchParams.set('cardId', card.id);
-                        cardLink = newUrl.toString();
-                      }
-
-                      Utils.copyTextToClipboard(cardLink);
-                      showMessage('Copied card link to clipboard', 'success');
-                    }}
-                  />
-                  <Menu.Text
-                    icon={<LaunchIcon fontSize='small' />}
-                    id='copy'
-                    name='Open in new tab'
-                    onClick={() => {
-                      const _cardPage = pages[card.id];
-                      if (_cardPage && space) {
-                        window.open(`${window.location.origin}/${space.domain}/${_cardPage.path}`);
-                      }
-                    }}
-                  />
-                  <Divider />
-                  {
-                    pageCreator && cardPage && (
-                      <Stack sx={{
-                        ml: 1
-                      }}
-                      >
-                        <Typography variant='subtitle2'>
-                          Last edited by {pageCreator.username}
-                        </Typography>
-                        <Typography variant='subtitle2'>
-                          Last edited at {humanFriendlyDate(cardPage.updatedAt)}
-                        </Typography>
-                      </Stack>
-                    )
-                  }
-                </Menu>
-              </MenuWrapper>
+                  >
+                    <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
+                    <ListItemText>Duplicate</ListItemText>
+                  </MenuItem>
+                </PageActions>
+              </>
             )}
 
           <div className='octo-icontitle'>
@@ -283,7 +261,7 @@ const KanbanCard = React.memo((props: Props) => {
               <BountyStatusChip status={linkedBounty.status} />
             </BountyFooter>
           )}
-        </div>
+        </StyledBox>
       </Link>
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>
