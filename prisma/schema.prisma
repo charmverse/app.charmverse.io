@@ -523,7 +523,6 @@ model SpaceRole {
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])
-  @@index([tokenGateId])
   @@index([userId])
 }
 
