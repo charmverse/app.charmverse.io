@@ -56,20 +56,26 @@ export async function verifyTokenGateMemberships () {
     }
   });
 
-  const promises = usersWithTokenGates.map(async spaceRole => verifyTokenGateMembership({
-    userTokenGates: spaceRole.user.userTokenGates,
-    userId: spaceRole.user.id,
-    spaceId: spaceRole.spaceId,
-    userSpaceRoles: spaceRole.spaceRoleToRole,
-    canBeRemovedFromSpace: !spaceRole.joinedViaLink
-  }));
+  let removedMembers = 0;
+  let removedRoles = 0;
 
-  const res = await Promise.all(promises);
-  const verifiedUsers = res.filter(Boolean).length;
-  const deletedUsers = usersWithTokenGates.length - verifiedUsers;
+  for (const spaceRole of usersWithTokenGates) {
+    const res = await verifyTokenGateMembership({
+      userTokenGates: spaceRole.user.userTokenGates,
+      userId: spaceRole.user.id,
+      spaceId: spaceRole.spaceId,
+      userSpaceRoles: spaceRole.spaceRoleToRole,
+      canBeRemovedFromSpace: !spaceRole.joinedViaLink
+    });
+
+    removedRoles += res.removedRoles;
+    if (!res.verified) {
+      removedMembers += 1;
+    }
+  }
 
   return {
-    verifiedUsers,
-    deletedUsers
+    removedRoles,
+    removedMembers
   };
 }

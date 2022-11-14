@@ -9,9 +9,11 @@ export async function task () {
 
   try {
     const results = await verifyTokenGateMemberships();
-    log.debug('Number of members removed due to invalid token gate conditions', results.deletedUsers);
+    log.debug('Number of members removed due to invalid token gate conditions', results.removedMembers);
+    log.debug('Number of user roles removed due to invalid token gate conditions', results.removedRoles);
 
-    count('cron.token-gate-verification.removed-members', results.deletedUsers);
+    count('cron.token-gate-verification.removed-members', results.removedMembers);
+    count('cron.token-gate-verification.removed-member-roles', results.removedRoles);
   }
   catch (error: any) {
     log.error(`Error expiring proposals: ${error.stack || error.message || error}`, { error });

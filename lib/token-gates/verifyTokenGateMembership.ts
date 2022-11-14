@@ -25,10 +25,10 @@ type VerifyTokenGateMembershipProps = {
 
 export async function verifyTokenGateMembership (
   { userTokenGates, userSpaceRoles, userId, spaceId, canBeRemovedFromSpace }: VerifyTokenGateMembershipProps
-): Promise<boolean> {
+): Promise<{ verified: boolean, removedRoles: number }> {
 
   if (!userTokenGates.length) {
-    return true;
+    return { verified: true, removedRoles: 0 };
   }
 
   // We want to update only invalid token gates
@@ -80,10 +80,10 @@ export async function verifyTokenGateMembership (
       }
     });
 
-    return false;
+    return { verified: false, removedRoles: 0 };
   }
 
-  return true;
+  return { verified: true, removedRoles: invalidSpaceRoleToRoleIds.length || 0 };
 }
 
 async function removeUserRoles (spaceRoleToRoleIds: string[]) {
