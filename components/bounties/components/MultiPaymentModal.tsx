@@ -10,7 +10,6 @@ import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { TransactionWithMetadata } from 'hooks/useMultiBountyPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -29,9 +28,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     isDisabled,
     onPaymentSuccess,
     transactions,
-    gnosisSafeAddress,
-    gnosisSafeChainId,
-    safeData,
+    gnosisSafes,
     gnosisSafeData,
     isLoading,
     setGnosisSafeData
@@ -43,6 +40,10 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     }
   });
 
+  const firstGnosisSafe = gnosisSafes?.[0];
+  const gnosisSafeAddress = firstGnosisSafe?.address;
+  const gnosisSafeChainId = firstGnosisSafe?.chainId;
+
   const userGnosisSafeRecord = userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
     record[userGnosisSafe.address] = userGnosisSafe;
     return record;
@@ -51,7 +52,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
   const { members } = useMembers();
 
   useEffect(() => {
-    const applicationIds = transactions.map(transaction => transaction().applicationId);
+    const applicationIds = transactions.map(trans => trans(gnosisSafeAddress).applicationId);
     setSelectedApplicationIds(applicationIds);
   }, [transactions]);
 
@@ -86,7 +87,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
           <Box
             mt={2}
           >
-            {safeData && (
+            {gnosisSafes && (
               <Box justifyContent='space-between' gap={2} alignItems='center' display='flex'>
                 <Typography
                   variant='subtitle1'
@@ -97,7 +98,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
                 </Typography>
                 <Select
                   onChange={(e) => {
-                    setGnosisSafeData(safeData.find(safeInfo => safeInfo.address === e.target.value) ?? null);
+                    setGnosisSafeData(gnosisSafes.find(safeInfo => safeInfo.address === e.target.value) ?? null);
                   }}
                   sx={{ flexGrow: 1 }}
                   value={gnosisSafeData?.address ?? ''}
@@ -115,7 +116,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
                     return userGnosisSafeRecord[safeAddress]?.name ?? safeAddress;
                   }}
                 >
-                  {safeData.map(safeInfo => (
+                  {gnosisSafes.map(safeInfo => (
                     <MenuItem key={safeInfo.address} value={safeInfo.address}>
                       {userGnosisSafeRecord[safeInfo.address]?.name ?? safeInfo.address}
                     </MenuItem>
