@@ -1,18 +1,20 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import type { PageMeta } from 'lib/pages';
+
 interface PageDialogContext {
   bountyId?: string;
   pageId?: string | null;
   readOnly?: boolean;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
-  onClose?: () => void;
+  onClose?: (page: PageMeta | null) => void;
 }
 
 interface Context {
   props: PageDialogContext;
-  hidePage: () => void;
+  hidePage: (page: PageMeta | null) => void;
   showPage: (context: PageDialogContext) => void;
 }
 
@@ -28,8 +30,8 @@ export function PageDialogProvider ({ children }: { children: ReactNode }) {
 
   const [props, setProps] = useState<PageDialogContext>({});
 
-  function hidePage () {
-    props?.onClose?.();
+  function hidePage (page: PageMeta | null) {
+    props?.onClose?.(page);
     setProps({});
   }
 

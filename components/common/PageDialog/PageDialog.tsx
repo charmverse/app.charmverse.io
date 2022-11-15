@@ -31,10 +31,14 @@ interface Props {
   bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
+  setGlobalPage: (pageMeta: {
+    title: string;
+    hasContent: boolean;
+  }) => void;
 }
 
 export default function PageDialog (props: Props) {
-  const { hideToolsMenu = false, page, bounty, toolbar, readOnly } = props;
+  const { hideToolsMenu = false, page, bounty, toolbar, setGlobalPage, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -97,6 +101,12 @@ export default function PageDialog (props: Props) {
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     await updatePage(updates);
+    if (page) {
+      setGlobalPage({
+        hasContent: updates.hasContent ?? page.hasContent,
+        title: updates.title ?? page.title
+      });
+    }
   }, 500);
 
   const setPage = useCallback(async (updates: Partial<Page>) => {

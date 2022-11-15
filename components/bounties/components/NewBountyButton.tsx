@@ -18,7 +18,7 @@ export default function NewBountyButton () {
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
-  const { mutatePage } = usePages();
+  const { mutatePage, setPages } = usePages();
   const { showPage } = usePageDialog();
 
   async function onClickCreate () {
@@ -62,7 +62,17 @@ export default function NewBountyButton () {
       showPage({
         pageId: createdBounty.page.id,
         hideToolsMenu: suggestBounties,
-        onClose () {
+        async onClose (page) {
+          if (page && !page.hasContent && page.title.length === 0) {
+            const { pageIds } = await charmClient.deletePage(page.id);
+            setPages((_pages) => {
+              pageIds.forEach((_pageId) => {
+                delete _pages[_pageId];
+              });
+              return _pages;
+            });
+            setBounties((bounties) => bounties.filter(bounty => bounty.id !== page.id));
+          }
           setUrlWithoutRerender(router.pathname, { bountyId: null });
         }
       });

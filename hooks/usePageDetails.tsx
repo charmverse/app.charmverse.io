@@ -4,7 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
-import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
+import type { IPageWithPermissions, PageDetails, PageDetailsUpdates } from 'lib/pages';
 import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { PageContent } from 'models';
@@ -45,6 +45,11 @@ export function usePageDetails (pageIdOrPath: string, spaceId?: string) {
     }, { revalidate: false });
 
     mutatePageDetails(updatedDetails);
+
+    return {
+      ...updatedPage,
+      ...updatedDetails
+    } as IPageWithPermissions;
   }, [mutatePageDetails]);
 
   const debouncedUpdatePageDetails = useMemo(

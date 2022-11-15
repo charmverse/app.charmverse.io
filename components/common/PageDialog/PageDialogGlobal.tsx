@@ -20,7 +20,7 @@ export default function PageDialogGlobal () {
   const pageIdToFetch = bounty?.page.id || (pageId as string);
 
   function closeDialog () {
-    hidePage();
+    hidePage(page);
   }
 
   useEffect(() => {
@@ -40,6 +40,11 @@ export default function PageDialogGlobal () {
 
   return (
     <PageDialog
+      setGlobalPage={(pageMeta) => {
+        if (pageMeta && page) {
+          setPage({ ...page, title: pageMeta.title, hasContent: pageMeta.hasContent });
+        }
+      }}
       bounty={bounty}
       hideToolsMenu={hideToolsMenu}
       readOnly={readOnly}
