@@ -124,8 +124,9 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   }
 
   const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText });
-    // setPage({ content: content.doc, contentText: content.rawText });
+    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText })?.then(() => {
+      setPage({ content: content.doc, contentText: content.rawText });
+    });
   }, [setPage]);
 
   const card = cards.find(_card => _card.id === page.id);

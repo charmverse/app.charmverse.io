@@ -9,6 +9,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function NewBountyButton () {
@@ -63,15 +64,15 @@ export default function NewBountyButton () {
         pageId: createdBounty.page.id,
         hideToolsMenu: suggestBounties,
         async onClose (page) {
-          if (page && !page.hasContent && page.title.length === 0) {
-            const { pageIds } = await charmClient.deletePage(page.id);
+          if (page && checkIsContentEmpty(page.content) && page.title.length === 0) {
+            const { pageIds } = await charmClient.deletePage(createdBounty.page.id);
             setPages((_pages) => {
               pageIds.forEach((_pageId) => {
                 delete _pages[_pageId];
               });
               return _pages;
             });
-            setBounties((bounties) => bounties.filter(bounty => bounty.id !== page.id));
+            setBounties((bounties) => bounties.filter(bounty => bounty.id !== createdBounty.page.id));
           }
           setUrlWithoutRerender(router.pathname, { bountyId: null });
         }

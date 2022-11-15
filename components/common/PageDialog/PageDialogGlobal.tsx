@@ -4,6 +4,7 @@ import charmClient from 'charmClient';
 import { useBounties } from 'hooks/useBounties';
 import log from 'lib/log';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
+import type { PageContent } from 'models';
 
 import { usePageDialog } from './hooks/usePageDialog';
 import PageDialog from './PageDialog';
@@ -20,7 +21,10 @@ export default function PageDialogGlobal () {
   const pageIdToFetch = bounty?.page.id || (pageId as string);
 
   function closeDialog () {
-    hidePage(page);
+    hidePage(page ? {
+      content: page.content as PageContent,
+      title: page.title
+    } : null);
   }
 
   useEffect(() => {
@@ -40,9 +44,9 @@ export default function PageDialogGlobal () {
 
   return (
     <PageDialog
-      setGlobalPage={(pageMeta) => {
-        if (pageMeta && page) {
-          setPage({ ...page, title: pageMeta.title, hasContent: pageMeta.hasContent });
+      setPageContentData={(pageContentData) => {
+        if (pageContentData && page) {
+          setPage({ ...page, title: pageContentData.title, content: pageContentData.content });
         }
       }}
       bounty={bounty}

@@ -23,6 +23,7 @@ import log from 'lib/log';
 import type { PageMeta, PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import type { PageContent } from 'models';
 
 interface Props {
   page?: PageMeta | null;
@@ -31,14 +32,14 @@ interface Props {
   bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
-  setGlobalPage: (pageMeta: {
+  setPageContentData: (pageContentData: {
     title: string;
-    hasContent: boolean;
+    content: PageContent;
   }) => void;
 }
 
 export default function PageDialog (props: Props) {
-  const { hideToolsMenu = false, page, bounty, toolbar, setGlobalPage, readOnly } = props;
+  const { hideToolsMenu = false, page, bounty, toolbar, setPageContentData, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -102,8 +103,8 @@ export default function PageDialog (props: Props) {
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     await updatePage(updates);
     if (page) {
-      setGlobalPage({
-        hasContent: updates.hasContent ?? page.hasContent,
+      setPageContentData({
+        content: updates.content as PageContent,
         title: updates.title ?? page.title
       });
     }
