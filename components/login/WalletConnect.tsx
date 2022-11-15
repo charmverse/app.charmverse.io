@@ -29,9 +29,7 @@ export function WalletConnect ({ onSuccess }: Props) {
   const { updateUser } = useUser();
 
   async function signSuccess (signature: AuthSigWithRawAddress) {
-    const updatedUser = await charmClient.updateUser({
-      addressesToAdd: [signature]
-    });
+    const updatedUser = await charmClient.addUserWallets([signature]);
 
     updateUser(updatedUser);
     onSuccess();

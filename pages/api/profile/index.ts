@@ -66,7 +66,7 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
   res.status(200).json(user);
 }
 
-async function handleNoProfile (req: NextApiRequest, res: NextApiResponse) {
+export async function handleNoProfile (req: NextApiRequest, res: NextApiResponse) {
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = v4();
     await req.session.save();
@@ -99,46 +99,15 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
 
 async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
-  let user: LoggedInUser & { addressesToAdd?: AuthSigWithRawAddress[] };
-
-  const addressesToAdd = req.body.addressesToAdd as AuthSigWithRawAddress[];
-
-  if (addressesToAdd) {
-    for (const addressToVerify of addressesToAdd) {
-      if (!isValidWalletSignature({ address: addressToVerify.rawAddress, signature: addressToVerify, host: req.headers.origin as string })) {
-        throw new InsecureOperationError('Could not verify wallet');
-      }
+  const user = await prisma.user.update({
+    where: {
+      id: req.session.user.id
+    },
+    include: sessionUserRelations,
+    data: {
+      ...req.body
     }
-
-    await prisma.userWallet.createMany({
-      data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.rawAddress }))
-    });
-
-    const updatedProfile = await prisma.user.findUnique({
-      where: {
-        id: req.session.user.id
-      },
-      include: sessionUserRelations
-    }) as LoggedInUser;
-
-    if (!updatedProfile) {
-      return handleNoProfile(req, res);
-    }
-    else {
-      user = updatedProfile;
-    }
-  }
-  else {
-    user = await prisma.user.update({
-      where: {
-        id: req.session.user.id
-      },
-      include: sessionUserRelations,
-      data: {
-        ...req.body
-      }
-    });
-  }
+  });
 
   updateTrackUserProfile(user);
 

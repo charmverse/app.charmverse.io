@@ -126,6 +126,10 @@ class CharmClient {
     return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
+  addUserWallets (data: AuthSigWithRawAddress[]) {
+    return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
+  }
+
   async createSpace (spaceOpts: Prisma.SpaceCreateInput) {
     const space = await http.POST<Space>('/api/spaces', spaceOpts);
     return space;
