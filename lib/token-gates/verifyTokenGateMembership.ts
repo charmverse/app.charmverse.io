@@ -71,14 +71,15 @@ export async function verifyTokenGateMembership (
 
   // All token gates are invalid and user did not join via invite link soo he should be removed from space
   if (invalidTokenGates.length === userTokenGates.length && canBeRemovedFromSpace) {
-    await prisma.spaceRole.delete({
-      where: {
-        spaceUser: {
-          userId,
-          spaceId
-        }
-      }
-    });
+    // TEMP - run in test mode
+    // await prisma.spaceRole.delete({
+    //   where: {
+    //     spaceUser: {
+    //       userId,
+    //       spaceId
+    //     }
+    //   }
+    // });
 
     return { verified: false, removedRoles: 0 };
   }
@@ -87,11 +88,12 @@ export async function verifyTokenGateMembership (
 }
 
 async function removeUserRoles (spaceRoleToRoleIds: string[]) {
-  return prisma.spaceRoleToRole.deleteMany({
-    where: {
-      id: {
-        in: spaceRoleToRoleIds
-      }
-    }
-  });
+  // TEMP - run in test mode
+  // return prisma.spaceRoleToRole.deleteMany({
+  //   where: {
+  //     id: {
+  //       in: spaceRoleToRoleIds
+  //     }
+  //   }
+  // });
 }
