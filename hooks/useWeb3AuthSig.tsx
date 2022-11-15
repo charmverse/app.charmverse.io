@@ -206,8 +206,6 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     openWalletSelectorModal();
   }
 
-  // console.log('Detected account', account, '\r\nWallet detected', verifiableWalletDetected, '\r\nExposed account', storedAccount, '\r\nConnector:', connector);
-
   const value = useMemo<IContext>(() => ({
     account: storedAccount,
     walletAuthSignature,

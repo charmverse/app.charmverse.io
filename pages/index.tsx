@@ -63,7 +63,6 @@ export default function LoginPage () {
   useEffect(() => {
     setTitleState('Welcome');
     if (discordCookie) {
-      // console.log('Logged in with Discord');
       deleteCookie(AUTH_CODE_COOKIE);
     }
   }, []);
