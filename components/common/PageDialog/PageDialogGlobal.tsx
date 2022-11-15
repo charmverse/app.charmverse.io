@@ -45,7 +45,7 @@ export default function PageDialogGlobal () {
   return (
     <PageDialog
       setPageContentData={(pageContentData) => {
-        if (pageContentData && page) {
+        if (page) {
           setPage({ ...page, title: pageContentData.title, content: pageContentData.content });
         }
       }}

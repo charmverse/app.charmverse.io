@@ -23,7 +23,7 @@ import log from 'lib/log';
 import type { PageMeta, PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
-import type { PageContent } from 'models';
+import type { PageContent, PageContentData } from 'models';
 
 interface Props {
   page?: PageMeta | null;
@@ -32,10 +32,7 @@ interface Props {
   bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
-  setPageContentData: (pageContentData: {
-    title: string;
-    content: PageContent;
-  }) => void;
+  setPageContentData: (pageContentData: PageContentData) => void;
 }
 
 export default function PageDialog (props: Props) {

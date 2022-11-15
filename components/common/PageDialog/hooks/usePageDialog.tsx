@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import type { PageContent } from 'models';
+import type { PageContentData } from 'models';
 
 interface PageDialogContext {
   bountyId?: string;
@@ -9,18 +9,12 @@ interface PageDialogContext {
   readOnly?: boolean;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
-  onClose?: (pageContentData: {
-    title: string;
-    content: PageContent;
-  } | null) => void;
+  onClose?: (pageContentData: PageContentData | null) => void;
 }
 
 interface Context {
   props: PageDialogContext;
-  hidePage: (pageContentData: {
-    title: string;
-    content: PageContent;
-  } | null) => void;
+  hidePage: (pageContentData: PageContentData | null) => void;
   showPage: (context: PageDialogContext) => void;
 }
 
@@ -36,10 +30,7 @@ export function PageDialogProvider ({ children }: { children: ReactNode }) {
 
   const [props, setProps] = useState<PageDialogContext>({});
 
-  function hidePage (pageContentData: {
-    title: string;
-    content: PageContent;
-  } | null) {
+  function hidePage (pageContentData: PageContentData | null) {
     props?.onClose?.(pageContentData);
     setProps({});
   }

@@ -133,3 +133,8 @@ export interface CodeNode {
     language: string;
   };
 }
+
+export interface PageContentData {
+  title: string;
+  content: PageContent;
+}
