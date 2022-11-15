@@ -14,6 +14,7 @@ import type { TransactionWithMetadata } from 'hooks/useMultiBountyPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import type { BountyWithDetails } from 'lib/bounties';
+import { isTruthy } from 'lib/utilities/types';
 
 import { BountyAmount } from './BountyStatusBadge';
 import MultiPaymentButton from './MultiPaymentButton';
@@ -34,11 +35,13 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     gnosisSafeData,
     isLoading,
     setGnosisSafeData
-  } = useMultiBountyPayment({ bounties,
+  } = useMultiBountyPayment({
+    bounties,
     postPaymentSuccess () {
       setSelectedApplicationIds([]);
       popupState.close();
-    } });
+    }
+  });
 
   const userGnosisSafeRecord = userGnosisSafes?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
     record[userGnosisSafe.address] = userGnosisSafe;
@@ -52,11 +55,10 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
     setSelectedApplicationIds(applicationIds);
   }, [transactions]);
 
-  // A record to keep track of application id an its corresponding transaction
-  const applicationTransactionRecord: Record<string, (address: string) => TransactionWithMetadata> = {};
-  transactions.forEach(transaction => {
-    applicationTransactionRecord[transaction().applicationId] = transaction;
-  });
+  const selectedTransactions = selectedApplicationIds.map(applicationId => {
+    const transaction = transactions.find(trans => trans(gnosisSafeAddress).applicationId === applicationId);
+    return transaction?.(gnosisSafeAddress);
+  }).filter(isTruthy);
 
   return (
     <>
@@ -182,9 +184,7 @@ export default function MultiPaymentModal ({ bounties }: { bounties: BountyWithD
               <MultiPaymentButton
                 chainId={gnosisSafeChainId}
                 safeAddress={gnosisSafeAddress}
-                transactions={selectedApplicationIds.map(selectedApplicationId => (
-                  applicationTransactionRecord[selectedApplicationId](gnosisSafeAddress)
-                ))}
+                transactions={selectedTransactions}
                 onSuccess={onPaymentSuccess}
                 isLoading={isLoading}
               />
