@@ -126,8 +126,7 @@ export default function BountyProperties (props: {
   }
 
   const updateBountyAmount = useCallback((e) => {
-    const isEmpty = !!e.target.value;
-    setIsAmountInputEmpty(isEmpty);
+    setIsAmountInputEmpty(e.target.value === '');
 
     applyBountyUpdatesDebounced({
       rewardAmount: Number(e.target.value)

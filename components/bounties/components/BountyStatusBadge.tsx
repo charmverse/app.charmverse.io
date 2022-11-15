@@ -201,7 +201,15 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
 
   const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
 
-  const truncatedAmount = millify(bounty.rewardAmount, { precision: 4 });
+  const truncatedAmount = () => {
+    try {
+      return millify(bounty.rewardAmount, { precision: 4 });
+    }
+    catch (error) {
+      return 'Invalid number';
+    }
+
+  };
 
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
@@ -244,7 +252,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                   variant='h6'
                   fontSize={18}
                 >
-                  {truncate ? truncatedAmount : bounty.rewardAmount}
+                  {truncate ? truncatedAmount() : bounty.rewardAmount}
                 </Typography>
               </>
             )
