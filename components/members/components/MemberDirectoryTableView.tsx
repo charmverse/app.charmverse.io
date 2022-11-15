@@ -93,7 +93,7 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                    {member.roles.length === 0 ? '-' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                   </Stack>
                 </TableCell>
               );
@@ -101,14 +101,14 @@ function MemberDirectoryTableRow ({
             case 'discord': {
               return (
                 <TableCell>
-                  {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
+                  {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : '-'}
                 </TableCell>
               );
             }
             case 'twitter': {
               return (
                 <TableCell>
-                  {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : 'N/A'}
+                  {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : '-'}
                 </TableCell>
               );
             }
@@ -121,10 +121,12 @@ function MemberDirectoryTableRow ({
                     flexDirection: 'row'
                   }}
                   >
-                    <TimezoneDisplay
-                      showTimezone
-                      timezone={member.profile?.timezone}
-                    />
+                    {member.profile?.timezone ? (
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile.timezone}
+                      />
+                    ) : '-'}
                   </Box>
                 </TableCell>
               );
@@ -144,7 +146,7 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell>
                   <Typography>
-                    {member.profile?.description ?? 'N/A'}
+                    {member.profile?.description ?? '-'}
                   </Typography>
                 </TableCell>
               );
@@ -156,7 +158,7 @@ function MemberDirectoryTableRow ({
             case 'number': {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
@@ -178,14 +180,14 @@ function MemberDirectoryTableRow ({
                         value={memberProperty.value as (string | string[])}
                       />
                     )
-                    : 'N/A'}
+                    : '-'}
                 </TableCell>
               );
             }
             default: {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
