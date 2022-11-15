@@ -15,7 +15,16 @@ const getBountyWithUserId = async ({id}: { id: string}) => {
  * Script for taking all unmarked bounties for all the users and creating user notifications.
  */
 (async () => {
-  const users = await prisma.user.findMany({ select: { id: true}});
+  const users = await prisma.user.findMany({
+    where: {
+      AND: [
+        { email: { not: null } },
+        { email: { not: '' } }
+      ]
+    },
+    select: { id: true}
+  });
+  
   const unmarkedBounties = await Promise.all(users.map(getBountyWithUserId))
   const bounties = unmarkedBounties.flat();
  
