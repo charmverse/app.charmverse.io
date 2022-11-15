@@ -194,6 +194,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
+  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -220,7 +221,11 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   if (readOnly) {
     return (
       <StyledIFrame>
-        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+        {node.attrs.type === 'figma' ? (
+          <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+        ) : (
+          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+        )}
       </StyledIFrame>
     );
   }
@@ -253,8 +258,6 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
     );
   }
   else if (node.attrs.type === 'figma') {
-
-    const src = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
     return (
       <BlockAligner onDelete={onDelete}>
         <VerticalResizer
@@ -275,7 +278,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
           minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
           <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+            <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
