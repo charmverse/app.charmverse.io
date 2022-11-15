@@ -32,7 +32,7 @@ interface Props {
   bounty?: BountyWithDetails | null;
   toolbar?: ReactNode;
   hideToolsMenu?: boolean;
-  setPageContentData: (pageContentData: PageContentData) => void;
+  setPageContentData?: (pageContentData: PageContentData) => void;
 }
 
 export default function PageDialog (props: Props) {
@@ -99,7 +99,7 @@ export default function PageDialog (props: Props) {
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     await updatePage(updates);
-    if (page) {
+    if (page && setPageContentData) {
       setPageContentData({
         content: updates.content as PageContent,
         title: updates.title ?? page.title
