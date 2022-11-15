@@ -68,7 +68,7 @@ import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';
-import ResizableImage from './components/ResizableImage';
+import ResizableImage, { pasteImagePlugin } from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
@@ -226,10 +226,10 @@ export function charmEditorPlugins (
     table.TableFiltersMenu(),
     trailingNode.plugins(),
     disclosure.plugins(),
-    tweet.plugins()
+    tweet.plugins(),
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
-    // pasteImagePlugin
+    pasteImagePlugin
   ];
 
   if (!readOnly) {

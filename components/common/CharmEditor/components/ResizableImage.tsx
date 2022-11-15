@@ -29,7 +29,7 @@ export const pasteImagePlugin = new Plugin({
   props: {
     handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
       // @ts-ignore
-      const contentRow = slice.content.content?.[0].content.content?.[0];
+      const contentRow = slice.content.content?.[0]?.content.content?.[0];
 
       if ((contentRow?.text as string)?.startsWith('http')) {
         const embedUrl = contentRow.text.split('.');
