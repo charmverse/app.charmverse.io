@@ -136,7 +136,10 @@ export default function BoardPage ({ page, setPage, readOnly = false, pagePermis
               <CardDialog
                 key={shownCardId}
                 cardId={shownCardId}
-                onClose={() => showCard(null)}
+                onClose={() => {
+                  showCard(null);
+                  setShownCardId(null);
+                }}
                 readOnly={readOnly}
               />
             </RootPortal>

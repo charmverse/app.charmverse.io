@@ -322,10 +322,11 @@ function CenterPanel (props: Props) {
 
   const showView = useCallback((viewId) => {
     if (!props.disableUpdatingUrl) {
+      const { cardId, ...rest } = router.query;
       router.push({
         pathname: router.pathname,
         query: {
-          ...router.query,
+          ...rest,
           viewId: viewId || ''
         }
       }, undefined, { shallow: true });

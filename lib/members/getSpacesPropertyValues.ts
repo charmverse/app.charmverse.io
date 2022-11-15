@@ -7,7 +7,7 @@ import { getPropertiesWithValues, groupPropertyValuesBySpace } from 'lib/members
 
 export async function getSpacesPropertyValues ({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<MemberPropertyValuesBySpace[]> {
   const spaceIds = requestingUserId ? await getCommonSpaceIds({ spaceId, memberId, requestingUserId }) : [];
-  const visibleMemberProperties = await getAccessibleMemberPropertiesBySpace({ spaceId: spaceIds, userId: requestingUserId });
+  const visibleMemberProperties = await getAccessibleMemberPropertiesBySpace({ requestedUserId: memberId, spaceId: spaceIds, requestingUserId });
   const memberPropertyIds = visibleMemberProperties.map(mp => mp.id);
 
   const memberPropertyValues = await prisma.memberPropertyValue.findMany({
