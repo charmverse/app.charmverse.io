@@ -306,16 +306,6 @@ function ViewTabs (props: ViewTabsProps) {
         </Box>
         <Divider />
         {addViewButton}
-        {/* <AddViewMenu
-          sx={{
-            width: '100%'
-          }}
-          showLabel={true}
-          board={board}
-          activeView={activeView}
-          showView={showView}
-          views={views}
-        /> */}
       </Menu>
 
       {/* Form to rename views */}
