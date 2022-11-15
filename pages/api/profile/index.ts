@@ -81,12 +81,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
     return handleNoProfile(req, res);
   }
 
-  const profile = await prisma.user.findUnique({
-    where: {
-      id: req.session.user.id
-    },
-    include: sessionUserRelations
-  });
+  const profile = await getUserProfile('id', req.session.user.id);
 
   if (!profile) {
     return handleNoProfile(req, res);
