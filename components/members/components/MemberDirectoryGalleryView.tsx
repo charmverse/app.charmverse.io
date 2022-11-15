@@ -60,6 +60,8 @@ function MemberDirectoryGalleryCard ({
         href={`/u/${member.path || member.id}`}
         color='primary'
         sx={{
+          height: '100%',
+          display: 'flex',
           '&:hover': {
             opacity: 0.8
           },
@@ -118,14 +120,20 @@ function MemberDirectoryGalleryCard ({
                   return (
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
-                      <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                      <Typography
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                        variant='body2'
+                      >{member.profile?.description ?? 'N/A'}
+                      </Typography>
                     </Stack>
                   );
                 }
 
                 case 'role': {
                   return (
-                    <Stack gap={0.5}>
+                    <Stack>
                       <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
                       <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                         {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
@@ -150,7 +158,12 @@ function MemberDirectoryGalleryCard ({
                 case 'url':
                 case 'number': {
                   return (
-                    <Stack key={property.id}>
+                    <Stack
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                      key={property.id}
+                    >
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                       <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
                     </Stack>
