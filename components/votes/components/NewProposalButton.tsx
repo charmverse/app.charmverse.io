@@ -17,6 +17,7 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { PageMeta } from 'lib/pages';
 import { addPage } from 'lib/pages/addPage';
+import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -27,7 +28,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const isAdmin = useIsAdmin();
-  const { mutatePagesRemove, mutatePage, pages } = usePages();
+  const { mutatePagesRemove, mutatePage, pages, setPages } = usePages();
   const { mutate } = useTasks();
 
   // MUI Menu specific content
@@ -88,24 +89,32 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
 
   async function onClickCreate () {
     if (currentSpace && user) {
-      const { page: newPage } = await addPage({
+      const { page: proposalPage } = await addPage({
         spaceId: currentSpace.id,
         createdBy: user.id,
         type: 'proposal'
       });
 
-      mutatePage(newPage);
-
+      mutatePage(proposalPage);
       mutateProposals();
       mutate();
       showPage({
-        pageId: newPage.id,
-        onClose () {
+        pageId: proposalPage.id,
+        async onClose (page) {
+          if (page && checkIsContentEmpty(page.content) && page.title.length === 0) {
+            const { pageIds } = await charmClient.deletePage(proposalPage.id);
+            setPages((_pages) => {
+              pageIds.forEach((_pageId) => {
+                delete _pages[_pageId];
+              });
+              return _pages;
+            });
+            mutateProposals();
+          }
           setUrlWithoutRerender(router.pathname, { id: null });
-          mutateProposals();
         }
       });
-      setUrlWithoutRerender(router.pathname, { id: newPage.id });
+      setUrlWithoutRerender(router.pathname, { id: proposalPage.id });
     }
   }
 
