@@ -205,21 +205,6 @@ export async function generateDiscordUser () {
   return user;
 }
 
-export async function generateTokenGate ({ userId, spaceId }: { spaceId: string, userId: string }) {
-  return prisma.tokenGate.create({
-    data: {
-      conditions: {},
-      createdBy: userId,
-      resourceId: {},
-      space: {
-        connect: {
-          id: spaceId
-        }
-      }
-    }
-  });
-}
-
 export async function generateSpaceRole ({
   spaceId,
   userId
