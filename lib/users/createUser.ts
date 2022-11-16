@@ -7,6 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
+import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -43,6 +44,7 @@ export async function createUserFromWallet (
         identityType: IDENTITY_TYPES[0],
         username,
         path: isUserPathAvailable ? userPath : null,
+        email: `${randomName()}@charmversetest.io`,
         wallets: {
           create: {
             address
