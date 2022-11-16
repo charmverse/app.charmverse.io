@@ -3,6 +3,7 @@ import type { MemberProperty, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import type { ExistingSelectOption } from 'lib/forms/Interfaces';
 import { NotFoundError } from 'lib/middleware';
+import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type UpdatePropertyInput = {
@@ -27,7 +28,7 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
   });
 
   if (!spaceRole) {
-    throw new InvalidInputError('Invalid workspace data.');
+    throw new UserIsNotSpaceMemberError();
   }
 
   let updateData = data;
