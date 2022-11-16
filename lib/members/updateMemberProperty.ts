@@ -20,14 +20,20 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
     }
   });
 
+  const memberProperty = await prisma.memberProperty.findUnique({
+    where: {
+      id
+    }
+  });
+
   if (!spaceRole) {
     throw new InvalidInputError('Invalid workspace data.');
   }
 
   let updateData = data;
   if (!spaceRole.isAdmin) {
-    // non-admin users can only update property options
-    if (!updateData.options) {
+    // non-admin users can only update select / multiselect property options
+    if ((memberProperty?.type !== 'select' && memberProperty?.type !== 'multiselect') || !updateData.options) {
       throw new InvalidInputError('Invalid property data.');
     }
 
@@ -45,15 +51,6 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
   }
 
   if (newIndex !== null && newIndex !== undefined) {
-    const memberProperty = await prisma.memberProperty.findUnique({
-      where: {
-        id
-      },
-      select: {
-        index: true
-      }
-    });
-
     if (!memberProperty) {
       throw new NotFoundError('member property not found');
     }
