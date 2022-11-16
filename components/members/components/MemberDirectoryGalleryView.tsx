@@ -116,7 +116,7 @@ function MemberDirectoryGalleryCard ({
               }
               switch (property.type) {
                 case 'bio': {
-                  return (
+                  return member.profile?.description && (
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
                       <Typography
@@ -124,28 +124,28 @@ function MemberDirectoryGalleryCard ({
                           wordBreak: 'break-word'
                         }}
                         variant='body2'
-                      >{member.profile?.description ?? 'N/A'}
+                      >{member.profile?.description}
                       </Typography>
                     </Stack>
                   );
                 }
 
                 case 'role': {
-                  return (
-                    <Stack>
+                  return member.roles.length !== 0 && (
+                    <Stack gap={0.5} key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
                       <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                        {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                       </Stack>
                     </Stack>
                   );
                 }
                 case 'timezone': {
-                  return (
-                    <Stack flexDirection='row' gap={1}>
+                  return member.profile?.timezone && (
+                    <Stack flexDirection='row' gap={1} key={property.id}>
                       <TimezoneDisplay
                         showTimezone
-                        timezone={member.profile?.timezone}
+                        timezone={member.profile.timezone}
                       />
                     </Stack>
                   );
@@ -156,15 +156,15 @@ function MemberDirectoryGalleryCard ({
                 case 'email':
                 case 'url':
                 case 'number': {
-                  return (
+                  return memberPropertyValue?.value && (
                     <Stack
+                      key={property.id}
                       sx={{
                         wordBreak: 'break-word'
                       }}
-                      key={property.id}
                     >
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
+                      <Typography variant='body2'>{memberPropertyValue.value}</Typography>
                     </Stack>
                   );
                 }
@@ -177,6 +177,7 @@ function MemberDirectoryGalleryCard ({
                         options={property.options as SelectOptionType[]}
                         value={memberPropertyValue.value as (string | string[])}
                         name={property.name}
+                        key={property.id}
                       />
                     )
                     : null;

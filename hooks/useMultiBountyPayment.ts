@@ -3,7 +3,7 @@ import type { Bounty } from '@prisma/client';
 import { useWeb3React } from '@web3-react/core';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -37,26 +37,26 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const [paymentMethods] = usePaymentMethods();
   const { account, chainId } = useWeb3React();
   const signer = useGnosisSigner();
-  const { data: safeData } = useSWR(
+  const { data: gnosisSafes } = useSWR(
     (signer && account && chainId) ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
 
-  useEffect(() => {
-    if (safeData) {
-      setGnosisSafeData(safeData[0]);
-    }
-  }, [safeData]);
+  // useEffect(() => {
+  //   if (gnosisSafes) {
+  //     setGnosisSafeData(safeData[0]);
+  //   }
+  // }, [safeData]);
 
-  const gnosisSafeAddress = gnosisSafeData?.address;
-  const gnosisSafeChainId = gnosisSafeData?.chainId;
+  // const gnosisSafeAddress = gnosisSafeData?.address;
+  // const gnosisSafeChainId = gnosisSafeData?.chainId;
 
   // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
   const transactions: ((safeAddress?: string) => TransactionWithMetadata)[] = useMemo(
     () => bounties
       .filter(bounty => {
-        return safeData ? safeData.some(safe => bounty.chainId === safe.chainId) : false;
+        return gnosisSafes?.some(safe => bounty.chainId === safe.chainId);
       })
       .map(bounty => {
         return bounty.applications
@@ -98,18 +98,19 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
           });
       })
       .flat(),
-    [bounties, safeData]
+    [bounties, gnosisSafes]
   );
 
   async function onPaymentSuccess (result: MultiPaymentResult) {
-    if (gnosisSafeAddress && gnosisSafeChainId) {
+    const safeData = gnosisSafes?.find(safe => safe.address === result.safeAddress);
+    if (safeData) {
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
           await charmClient.bounties.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
-            chainId: gnosisSafeChainId.toString()
+            chainId: safeData.chainId.toString()
           });
           await charmClient.bounties.markSubmissionAsPaid(transaction.applicationId);
         })
@@ -137,9 +138,7 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
     isDisabled,
     transactions,
     onPaymentSuccess,
-    gnosisSafeChainId,
-    gnosisSafeAddress,
-    safeData,
+    gnosisSafes,
     gnosisSafeData,
     setGnosisSafeData
   };

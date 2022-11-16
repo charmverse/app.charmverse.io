@@ -61,7 +61,7 @@ export function useGnosisPayment ({
       senderAddress: account,
       origin
     });
-    onSuccess({ transactions, txHash });
+    onSuccess({ safeAddress, transactions, txHash });
   }
 
   return {

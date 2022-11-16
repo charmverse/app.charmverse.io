@@ -73,18 +73,28 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               case 'url':
               case 'email':
               case 'number': {
-                return (
+                return property.value && (
                   <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}>{property.value ?? 'N/A'}</Typography>
+                    <Typography
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                      whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}
+                    >{property.value}
+                    </Typography>
                   </Stack>
                 );
               }
               case 'multiselect':
               case 'select': {
+                const propertyValue = property.value as string | string[];
+                if (propertyValue.length === 0) {
+                  return null;
+                }
                 return (
                   <SelectPreview
-                    value={property.value as (string | string[])}
+                    value={propertyValue}
                     name={property.name}
                     options={property.options}
                   />
@@ -93,11 +103,11 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
 
               case 'role': {
                 const roles = property.value as string[];
-                return (
-                  <Stack gap={0.5} key={property.memberPropertyId}>
+                return roles.length !== 0 && (
+                  <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
                     <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {roles.length === 0 ? 'N/A' : roles.map(role => <Chip label={role} key={role} size='small' variant='outlined' />)}
+                      {roles.map(role => <Chip label={role} key={role} size='small' variant='outlined' />)}
                     </Stack>
                   </Stack>
                 );

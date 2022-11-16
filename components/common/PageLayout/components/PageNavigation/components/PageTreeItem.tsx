@@ -17,6 +17,7 @@ import type { Page, PageType } from '@prisma/client';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -382,9 +383,10 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
 function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void, pageId: string, pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
-  const { deletePage, getPagePermissions, pages } = usePages();
+  const { deletePage, currentPageId, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
   const permissions = getPagePermissions(pageId);
+  const router = useRouter();
 
   const deletePageDisabled = !permissions.delete;
 
@@ -394,11 +396,16 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
     }
     const page = pages[pageId];
     const board = boards.find(b => b.id === page?.id);
-
-    await deletePage({
+    const currentPage = pages[currentPageId];
+    const newPage = await deletePage({
       board,
       pageId
     });
+
+    if (!currentPage && newPage) {
+      // If we are in a page that doesn't exist, redirect user to the created page
+      router.push(`/${router.query.domain}/${newPage.id}`);
+    }
   }
 
   function onCopy () {
