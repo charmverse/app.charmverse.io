@@ -507,8 +507,6 @@ model FavoritePage {
   @@index([pageId])
 }
 
-<<<<<<< HEAD
-=======
 model UserTokenGate {
   id                     String     @id @default(uuid()) @db.Uuid
   spaceId                String     @db.Uuid
@@ -527,7 +525,6 @@ model UserTokenGate {
   @@index([tokenGateId])
 }
 
->>>>>>> email-notice
 model SpaceRole {
   spaceId         String            @db.Uuid
   userId          String            @db.Uuid
@@ -536,14 +533,10 @@ model SpaceRole {
   createdAt       DateTime          @default(now())
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-<<<<<<< HEAD
   spaceRoleToRole SpaceRoleToRole[]
   TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateId     String?           @db.Uuid
-=======
   joinedViaLink   Boolean?
-  spaceRoleToRole SpaceRoleToRole[]
->>>>>>> email-notice
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])
@@ -662,6 +655,7 @@ model TokenGate {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   tokenGateToRoles TokenGateToRole[]
   userTokenGates   UserTokenGate[]
+  SpaceRole        SpaceRole[]
 
   @@index([spaceId])
 }

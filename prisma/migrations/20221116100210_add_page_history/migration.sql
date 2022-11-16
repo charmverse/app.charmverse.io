@@ -1,14 +1,8 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `tokenGateConnectedDate` on the `SpaceRole` table. All the data in the column will be lost.
-
-*/
 -- AlterTable
 ALTER TABLE "Page" ADD COLUMN     "version" INTEGER NOT NULL DEFAULT 0;
 
 -- AlterTable
-ALTER TABLE "SpaceRole" DROP COLUMN "tokenGateConnectedDate";
+ALTER TABLE "SpaceRole" ADD COLUMN     "tokenGateId" UUID;
 
 -- CreateTable
 CREATE TABLE "PageDiff" (
@@ -27,3 +21,6 @@ CREATE UNIQUE INDEX "PageDiff_pageId_version_key" ON "PageDiff"("pageId", "versi
 
 -- AddForeignKey
 ALTER TABLE "PageDiff" ADD CONSTRAINT "PageDiff_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SpaceRole" ADD CONSTRAINT "SpaceRole_tokenGateId_fkey" FOREIGN KEY ("tokenGateId") REFERENCES "TokenGate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
