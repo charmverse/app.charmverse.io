@@ -11,7 +11,7 @@ import {
   updateCollaboratorSelection
 } from '../state_plugins';
 
-import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/documentEvents/interfaces';
+import { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage, ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 
 export class ModCollabDoc {
@@ -161,6 +161,7 @@ export class ModCollabDoc {
         const unconfirmedDiff: ClientDiffMessage = {
           type: 'diff',
           v: this.mod.editor.docInfo.version,
+          ds: [],
           rid
         };
 
@@ -168,37 +169,8 @@ export class ModCollabDoc {
 
         if (stepsToSend) {
           unconfirmedDiff.ds = stepsToSend.steps.map(
-            s => s.toJSON()
+            s => s.toJSON() as any
           );
-          // In case the title changed, we also add a title field to
-          // update the title field instantly - important for the
-          // document overview page.
-          // let newTitle = '';
-          // this.mod.editor.view.state.doc.firstChild?.firstChild?.forEach(
-          //   child => {
-          //     if (!child.marks.find(mark => mark.type.name === 'deletion')) {
-          //       newTitle += child.textContent;
-          //     }
-          //   }
-          // );
-          // newTitle = newTitle.slice(0, 255);
-          // let oldTitle = '';
-          // const confirmedDoc = this.mod.editor.docInfo.confirmedDoc;
-          // if (confirmedDoc) {
-          //   confirmedDoc.firstChild?.firstChild?.forEach(
-          //     (child: Node) => {
-          //       if (!child.marks.find(mark => mark.type.name === 'deletion')) {
-          //         oldTitle += child.textContent;
-          //       }
-          //     }
-          //   );
-          // }
-          // oldTitle = oldTitle.slice(0, 255);
-          // if (
-          //   newTitle !== oldTitle
-          // ) {
-          //   unconfirmedDiff.ti = newTitle;
-          // }
         }
 
         this.unconfirmedDiffs[rid] = {
@@ -298,6 +270,7 @@ export class ModCollabDoc {
       );
       const tr = receiveTransaction(
         this.mod.editor.view.state,
+        // @ts-ignore because `Step` is roughly the same as `ProsemirrorJSONStep`
         sentSteps,
         ourIds
       );

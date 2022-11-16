@@ -217,7 +217,7 @@ export class DocumentEventHandler {
       });
 
       if (permissions.edit_content !== true) {
-        this.sendError('You do not have permission to view this page');
+        this.sendError('You do not have permission to edit this page');
         return;
       }
 

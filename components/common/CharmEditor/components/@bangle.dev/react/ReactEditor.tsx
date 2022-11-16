@@ -4,6 +4,7 @@ import type {
 import {
   BangleEditor as CoreBangleEditor
 } from '@bangle.dev/core';
+import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
@@ -12,6 +13,7 @@ import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
+import charmClient from 'charmClient';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -33,6 +35,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   editorRef?: RefObject<HTMLDivElement>;
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
+  readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
 
@@ -53,7 +56,8 @@ export const BangleEditor = React.forwardRef<
       editorRef,
       enableSuggestions = false,
       trackChanges = false,
-      onParticipantUpdate = () => {}
+      onParticipantUpdate = () => {},
+      readOnly = false
     },
     ref
   ) => {
@@ -102,7 +106,7 @@ export const BangleEditor = React.forwardRef<
       );
       let fEditor: FidusEditor;
 
-      if (user && pageId && trackChanges) {
+      if (user && pageId && trackChanges && !readOnly) {
         // eslint-disable-next-line no-new
         fEditor = new FidusEditor({
           user,
@@ -116,6 +120,26 @@ export const BangleEditor = React.forwardRef<
           onParticipantUpdate
         });
         fEditor.init(_editor.view, onError);
+      }
+      else if (pageId && readOnly) {
+        charmClient.pages.getPageDetails(pageId)
+          .then((page) => {
+            if (_editor) {
+              setIsLoading(false);
+              isLoadingRef.current = false;
+              const schema = _editor.view.state.schema;
+              const doc = schema.nodeFromJSON(page.content);
+
+              const stateConfig = {
+                schema,
+                doc,
+                plugins: _editor.view.state.plugins
+              };
+              // Set document in prosemirror
+              _editor.view.setProps({ state: EditorState.create(stateConfig) });
+            }
+          });
+
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       setEditor(_editor);

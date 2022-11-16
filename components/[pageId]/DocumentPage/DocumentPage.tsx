@@ -11,6 +11,7 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -21,7 +22,6 @@ import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import type { Participant } from 'lib/websockets/documentEvents/interfaces';
 import type { Page } from 'models';
 
 import BountyProperties from './components/BountyProperties';
@@ -141,7 +141,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   // editMode is null to start, but we dont want to re-render charmeditor in editing mode when it starts
   const charmKey = page.id + (editMode || 'editing');
 
-  function onParticipantUpdate (participants: Participant[]) {
+  function onParticipantUpdate (participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
 

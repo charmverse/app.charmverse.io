@@ -500,6 +500,7 @@ function CharmEditor (
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges={true}
+      readOnly={readOnly}
       style={{
         ...(style ?? {}),
         width: '100%',
