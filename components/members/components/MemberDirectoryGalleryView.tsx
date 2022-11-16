@@ -20,6 +20,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -131,6 +132,18 @@ function MemberDirectoryGalleryCard ({
                   );
                 }
 
+                case 'join_date': {
+                  return (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                        withYear: true,
+                        withTime: true
+                      })}
+                      </Typography>
+                    </Stack>
+                  );
+                }
                 case 'role': {
                   return member.roles.length !== 0 && (
                     <Stack gap={0.5} key={property.id}>

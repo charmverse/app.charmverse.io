@@ -179,6 +179,7 @@ enum MemberPropertyType {
   discord
   twitter
   bio
+  join_date
 }
 
 enum MemberPropertyPermissionLevel {
