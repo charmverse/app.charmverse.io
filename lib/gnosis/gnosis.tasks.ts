@@ -81,6 +81,24 @@ function getTaskDescription (transaction: GnosisTransaction): string {
         const actions = data.parameters[0].valueDecoded as { to: string, value: string }[];
         return `MultiSend: ${actions.length} actions`;
       }
+      case 'addOwnerWithThreshold': {
+        // this is the JSON type in case we want it for something
+        // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];
+        /* example
+          {
+            method: 'addOwnerWithThreshold',
+            parameters: [
+              {
+                name: 'owner',
+                type: 'address',
+                value: '0x78d32460D0a53Ac2678e869Eb6b4f6bA9d2Ef360'
+              },
+              { name: '_threshold', type: 'uint256', value: '3' }
+            ]
+          }
+        */
+        return 'Add a new owner';
+      }
 
       default:
         log.warn('Unknown transaction method', data.method);
