@@ -24,10 +24,9 @@ const getBountyWithUserId = async ({id}: { id: string}) => {
     },
     select: { id: true}
   });
-  
+
   const unmarkedBounties = await Promise.all(users.map(getBountyWithUserId))
   const bounties = unmarkedBounties.flat();
- 
   await prisma.userNotification.createMany({
     data: bounties.map(bounty => ({
       userId: bounty.userId,
