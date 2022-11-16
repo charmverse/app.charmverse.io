@@ -6,8 +6,10 @@ const integrationConfig = {
   ...jestConfig,
   testMatch: [
     '**/__integration-tests__/**/*.spec.ts',
-    '**/lib/**/*.spec.ts'
+    '**/lib/**/*.spec.ts',
+    '**/background/**/*.spec.ts'
   ]
 };
 
 export default createJestConfig(integrationConfig);
+
