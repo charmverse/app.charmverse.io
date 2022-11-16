@@ -125,7 +125,7 @@ export function wrappingInputRuleForTodo (
 ) {
   return new InputRule(regexp, ((state, match, start, end) => {
     const nodeType = state.schema.nodes.listItem;
-    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
+    const attrs = getAttrs instanceof Function ? getAttrs(match as RegExpMatchArray) : getAttrs;
     const tr = state.tr.delete(start, end);
     const $start = tr.doc.resolve(start);
     const range = $start.blockRange();

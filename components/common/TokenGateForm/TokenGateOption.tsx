@@ -6,11 +6,11 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { SxProps, Theme } from '@mui/system';
-import { useWeb3React } from '@web3-react/core';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
 
 export default function TokenGateOption ({ tokenGate, validGate, isVerifying }: Props) {
 
-  const { account } = useWeb3React();
+  const { account } = useWeb3AuthSig();
   const [description, setDescription] = useState<string>('');
 
   useEffect(() => {

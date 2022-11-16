@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
-import { Alert, Box, Card, Divider, Grid, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Alert, Card, Stack, SvgIcon, Tooltip, Typography } from '@mui/material';
 import type { User } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import { injected, walletConnect, walletLink } from 'connectors';
 import type { ReactNode } from 'react';
 import { useContext, useState } from 'react';
@@ -9,7 +8,9 @@ import { useContext, useState } from 'react';
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Button from 'components/common/Button';
+import { WalletConnect } from 'components/login/WalletConnect';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -50,18 +51,13 @@ function ProviderRow ({ children }: { children: ReactNode }) {
 }
 
 export default function IdentityProviders () {
-  const { account, connector } = useWeb3React();
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { account, connector, connectWallet } = useWeb3AuthSig();
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
   const [isLoggingOut] = useState(false);
   const [telegramError, setTelegramError] = useState('');
 
   const connectedWithTelegram = Boolean(user?.telegramUser);
-
-  const handleWalletProviderSwitch = () => {
-    openWalletSelectorModal();
-  };
 
   function connectorName (c: any) {
     switch (c) {
@@ -117,9 +113,7 @@ export default function IdentityProviders () {
         <Typography color='secondary' variant='button'>
           {account ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
         </Typography>
-        <StyledButton variant='outlined' onClick={handleWalletProviderSwitch}>
-          {account ? 'Switch' : 'Connect'}
-        </StyledButton>
+        <WalletConnect onSuccess={() => null} />
       </ProviderRow>
 
       <DiscordProvider>

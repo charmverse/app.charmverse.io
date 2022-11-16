@@ -1,6 +1,5 @@
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import type { Bounty } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
 import { useMemo, useState } from 'react';
@@ -9,6 +8,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { SafeData } from 'lib/gnosis';
@@ -33,9 +33,9 @@ export function useMultiBountyPayment ({ bounties, postPaymentSuccess }:
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
   const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
+  const { account, chainId } = useWeb3AuthSig();
   const currentSpace = useCurrentSpace();
   const [paymentMethods] = usePaymentMethods();
-  const { account, chainId } = useWeb3React();
   const signer = useGnosisSigner();
   const { data: gnosisSafes } = useSWR(
     (signer && account && chainId) ? `/connected-gnosis-safes/${account}` : null,
