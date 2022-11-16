@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import type { Space } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useContext, useRef } from 'react';
@@ -56,19 +56,13 @@ function Invites ({ space }: InvitesProps) {
       <InviteIntro />
       <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} display='flex' justifyContent='space-between'>
         <Typography variant='h2' fontSize='inherit' fontWeight={700}>Invite Links</Typography>
-        {!account ? (
-          <Button data-test='connect-wallet-button' onClick={openWalletSelectorModal}>
-            Connect Wallet
-          </Button>
-        ) : (
-          <InviteActions
-            onOpenInvitesClick={popupInvitesState.open}
-            onOpenTokenGateClick={handleTokenGate}
-            invitePopupState={popupInvitesState}
-            tokenGatePopupState={popupTokenGateState}
-            isAdmin={isAdmin}
-          />
-        )}
+        <InviteActions
+          onOpenInvitesClick={popupInvitesState.open}
+          onOpenTokenGateClick={handleTokenGate}
+          invitePopupState={popupInvitesState}
+          tokenGatePopupState={popupTokenGateState}
+          isAdmin={isAdmin}
+        />
       </Legend>
       <InviteLinkList isAdmin={isAdmin} spaceId={spaceId} popupState={popupInvitesState} />
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />

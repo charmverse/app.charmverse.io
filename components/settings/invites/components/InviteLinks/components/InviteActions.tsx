@@ -85,39 +85,24 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 
   return (
     <>
-      {isAdmin ? (
-        <Button
-          id='add-invites-menu'
-          aria-controls={open ? 'demo-customized-menu' : undefined}
-          aria-haspopup='true'
-          aria-expanded={open ? 'true' : undefined}
-          disableElevation
-          onClick={handleAddClick}
-          endIcon={<KeyboardArrowDownIcon />}
-          disabled={!isAdmin}
-        >
-          Add
-        </Button>
-      ) : (
-        <Tooltip title='Only workspace admins can create invite links' arrow>
-          {/* Tooltip on disabled button requires one block element below wrapper */}
-          <span>
-            <Button
-              id='add-invites-menu'
-              aria-controls={open ? 'demo-customized-menu' : undefined}
-              aria-haspopup='true'
-              aria-expanded={open ? 'true' : undefined}
-              disableElevation
-              onClick={handleAddClick}
-              endIcon={<KeyboardArrowDownIcon />}
-              disabled={!isAdmin}
-            >
-              Add
-            </Button>
-          </span>
-        </Tooltip>
-      )}
 
+      <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
+        {/* Tooltip on disabled button requires one block element below wrapper */}
+        <span>
+          <Button
+            id='add-invites-menu'
+            aria-controls={open ? 'demo-customized-menu' : undefined}
+            aria-haspopup='true'
+            aria-expanded={open ? 'true' : undefined}
+            disableElevation
+            onClick={handleAddClick}
+            endIcon={<KeyboardArrowDownIcon />}
+            disabled={!isAdmin}
+          >
+            Add
+          </Button>
+        </span>
+      </Tooltip>
       <StyledMenu
         id='demo-customized-menu'
         MenuListProps={{
