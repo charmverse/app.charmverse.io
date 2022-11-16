@@ -64,7 +64,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
   });
 
   const [,, refreshPaymentMethods] = usePaymentMethods();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
   const [formError, setFormError] = useState<ISystemError | null>(null);

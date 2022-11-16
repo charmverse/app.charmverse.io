@@ -31,7 +31,7 @@ export default function Mention ({ node }: NodeViewProps) {
   const { members } = useMembers();
   const { pages } = usePages();
   const member = members.find(_member => _member.id === attrs.value);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {
     const page = pages[attrs.value];

@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
 export default function useNestedPage () {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId } = usePages();
   const view = useEditorViewContext();

@@ -87,7 +87,7 @@ function PageNavigation ({
 }: PageNavigationProps) {
   const router = useRouter();
   const { pages, currentPageId, setPages, mutatePage } = usePages();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();

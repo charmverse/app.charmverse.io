@@ -26,7 +26,7 @@ export function BountySignupButton ({ bountyPage }: Props) {
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const router = useRouter();
   const { members } = useMembers();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const { openWalletSelectorModal } = useContext(Web3Connection);
   const [loggingIn, setLoggingIn] = useState(false);

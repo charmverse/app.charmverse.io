@@ -1,38 +1,83 @@
 import type { MemberPropertyType } from '@prisma/client';
 
-export const READONLY_MEMBER_PROPERTIES: MemberPropertyType[] = [
-  'profile_pic',
-  'role',
-  'discord',
-  'twitter',
-  'timezone',
-  'bio'
-];
+type MemberPropertyConfig = { label: string, readonly?: boolean, default?: boolean, unhideable?: boolean };
 
-export const DEFAULT_MEMBER_PROPERTIES = [
-  ...READONLY_MEMBER_PROPERTIES,
-  'name'
-] as const;
-
-export const MEMBER_PROPERTY_LABELS: Record<MemberPropertyType, string> = {
-  discord: 'Discord',
-  name: 'Name',
-  profile_pic: 'Profile pic',
-  role: 'Role',
-  timezone: 'Timezone',
-  twitter: 'Twitter',
-  email: 'Email',
-  multiselect: 'Multi-select',
-  number: 'Number',
-  phone: 'Phone',
-  select: 'Select',
-  text: 'Text',
-  text_multiline: 'Multiline text',
-  url: 'URL',
-  bio: 'Bio'
+// the following properties are listed in the order they should appear in the UI. Chronological sort is guaranteed since es2015
+export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyConfig> = {
+  profile_pic: {
+    label: 'Avatar',
+    default: true,
+    readonly: true,
+    unhideable: true
+  },
+  name: {
+    label: 'Name',
+    default: true,
+    unhideable: true
+  },
+  role: {
+    label: 'Roles',
+    default: true,
+    readonly: true
+  },
+  bio: {
+    label: 'Bio',
+    default: true,
+    readonly: true
+  },
+  discord: {
+    label: 'Discord',
+    default: true,
+    readonly: true
+  },
+  twitter: {
+    label: 'Twitter',
+    default: true,
+    readonly: true
+  },
+  timezone: {
+    label: 'Timezone',
+    default: true,
+    readonly: true
+  },
+  email: {
+    label: 'Email'
+  },
+  multiselect: {
+    label: 'Multi-select'
+  },
+  number: {
+    label: 'Number'
+  },
+  phone: {
+    label: 'Phone'
+  },
+  select: {
+    label: 'Select'
+  },
+  text: {
+    label: 'Text'
+  },
+  text_multiline: {
+    label: 'Multiline text'
+  },
+  url: {
+    label: 'URL'
+  }
 };
 
-export const UNHIDEABLE_MEMBER_PROPERTIES = [
+const propertyTypes = Object.keys(MEMBER_PROPERTY_CONFIG) as MemberPropertyType[];
+
+export const READONLY_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].readonly);
+
+export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].default);
+
+export const DEFAULT_MEMBER_PROPERTIES_ORDER = [
   'name',
-  'profile_pic'
-];
+  'role',
+  'profile_pic',
+  'bio',
+  'discord',
+  'twitter',
+  'timezone'
+] as const;

@@ -1,9 +1,10 @@
-import type { ExistingSelectOption, NewSelectOptionType } from 'lib/forms/Interfaces';
-import type { BrandColor } from 'theme/colors';
+import type { SupportedColor } from 'theme/colors';
 
-export type TempSelectOption = NewSelectOptionType & {
-  inputValue: string;
-}
-
-export type SelectOptionType = (ExistingSelectOption | TempSelectOption) & { color: BrandColor };
+export type SelectOptionType = {
+  id: string;
+  name: string;
+  color: SupportedColor;
+  index?: number;
+  temp?: boolean;
+};
 

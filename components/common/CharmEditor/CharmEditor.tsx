@@ -57,7 +57,8 @@ import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
-import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
+import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
@@ -67,7 +68,7 @@ import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import Placeholder from './components/Placeholder';
 import Quote from './components/quote';
-import ResizableImage from './components/ResizableImage';
+import ResizableImage, { pasteImagePlugin } from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
@@ -225,10 +226,10 @@ export function charmEditorPlugins (
     table.TableFiltersMenu(),
     trailingNode.plugins(),
     disclosure.plugins(),
-    tweet.plugins()
+    tweet.plugins(),
     // TODO: Pasting iframe or image link shouldn't create those blocks for now
     // iframePlugin,
-    // pasteImagePlugin
+    pasteImagePlugin
   ];
 
   if (!readOnly) {
@@ -378,7 +379,7 @@ function CharmEditor (
 ) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   // check empty state of page on first load
   const _isEmpty = checkIsContentEmpty(content);
@@ -633,12 +634,14 @@ function CharmEditor (
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
+        nestedPagePluginKey={nestedPagePluginKey}
+        disableNestedPage={disableNestedPage}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
+      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>

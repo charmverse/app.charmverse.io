@@ -11,6 +11,7 @@ export function getPropertiesWithValues (
   propertyValues: Pick<MemberPropertyValue, 'value' | 'memberPropertyId'>[],
   { withSpaceDetails }: Options = {}
 ): PropertyValueWithDetails[] {
+
   return properties.map(({ enabledViews, id, spaceId, type, name, options, space: { name: spaceName, spaceImage } }) => {
     const propertyValue: PropertyValueWithDetails = {
       memberPropertyId: id,

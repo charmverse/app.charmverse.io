@@ -10,7 +10,13 @@ type Props = {
   type: FieldType;
 } & FieldProps & ControlFieldProps;
 
-export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...fieldProps }: Props, ref) => {
+export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({
+  type,
+  options,
+  onCreateOption,
+  onDeleteOption,
+  onUpdateOption,
+  ...fieldProps }: Props, ref) => {
   switch (type) {
     case 'text':
     case 'phone':
@@ -27,11 +33,33 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({ type, ...f
     }
 
     case 'select': {
-      return <SelectField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+      return (
+        <SelectField
+          {...fieldProps}
+          ref={ref}
+          iconLabel={MemberPropertyIcons[type]}
+          options={options}
+          onCreateOption={onCreateOption}
+          onDeleteOption={onDeleteOption}
+          onUpdateOption={onUpdateOption}
+        />
+      );
+
     }
 
     case 'multiselect': {
-      return <SelectField {...fieldProps} ref={ref} multiselect iconLabel={MemberPropertyIcons[type]} />;
+      return (
+        <SelectField
+          {...fieldProps}
+          ref={ref}
+          multiselect
+          iconLabel={MemberPropertyIcons[type]}
+          options={options}
+          onCreateOption={onCreateOption}
+          onDeleteOption={onDeleteOption}
+          onUpdateOption={onUpdateOption}
+        />
+      );
     }
 
     default: {

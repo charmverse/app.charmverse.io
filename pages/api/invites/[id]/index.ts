@@ -50,7 +50,8 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
           connect: {
             id: userId
           }
-        }
+        },
+        joinedViaLink: true
       }
     });
 

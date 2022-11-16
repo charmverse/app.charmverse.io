@@ -5,7 +5,7 @@ import { useUser } from 'hooks/useUser';
 import { MemberOnboardingForm } from './components/MemberOnboardingForm';
 
 export function MemberOnboardingModal ({ userId }: { userId?: string }) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { hideOnboarding } = useOnboarding();
   const { onboarding } = useOnboarding();

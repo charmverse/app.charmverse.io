@@ -73,7 +73,7 @@ const KanbanCard = React.memo((props: Props) => {
   if (props.isManualSort && isOver) {
     className += ' dragover';
   }
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { bounties } = useBounties();
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);

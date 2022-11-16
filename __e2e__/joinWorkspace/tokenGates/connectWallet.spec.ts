@@ -3,8 +3,9 @@ import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
+import { generateTokenGate } from 'testing/utils/tokenGates';
 
-import { generateDiscordUser, generateTokenGate, generateUserAndSpace } from '../../utils/mocks';
+import { generateDiscordUser, generateUserAndSpace } from '../../utils/mocks';
 
 type Fixtures = {
   tokenGatePage: TokenGatePage;

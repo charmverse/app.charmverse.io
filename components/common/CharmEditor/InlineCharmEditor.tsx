@@ -146,7 +146,7 @@ export default function CharmEditor (
   { focusOnInit, content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
   CharmEditorProps
 ) {
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
 
   const _isEmpty = !content || checkIsContentEmpty(content);

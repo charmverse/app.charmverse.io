@@ -40,7 +40,7 @@ export const BountiesContext = createContext<Readonly<IContext>>({
 });
 
 export function BountiesProvider ({ children }: { children: ReactNode }) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { user } = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);

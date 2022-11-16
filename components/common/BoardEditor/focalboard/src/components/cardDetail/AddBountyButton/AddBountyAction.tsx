@@ -25,7 +25,7 @@ export default function AddBountyAction ({ readOnly, cardId }: Props) {
     return !!bounties.find(bounty => bounty.page?.id === cardId) ?? null;
   }, [cardId, bounties]);
   const { user } = useUser();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { createDraftBounty } = useBounties();
 
   // clear draft bounty on close, just in case

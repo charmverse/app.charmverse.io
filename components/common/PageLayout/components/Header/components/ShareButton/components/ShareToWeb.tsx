@@ -61,7 +61,7 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
   const router = useRouter();
   const { pages, getPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const publicPermission = pagePermissions.find(publicPerm => publicPerm.public === true) ?? null;
 
   const currentPagePermissions = getPagePermissions(pageId);
