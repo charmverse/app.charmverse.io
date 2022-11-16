@@ -7,8 +7,8 @@ import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useState } from 'react';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
-import { FormattedMessage, injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -225,10 +225,6 @@ function Kanban (props: Props) {
     setShowCalculationsMenu(newShowOptions);
   };
 
-  const ScrollingComponent = withScrolling('div');
-  const hStrength = createHorizontalStrength(isTouchScreen() ? 60 : 250);
-  const vStrength = createVerticalStrength(isTouchScreen() ? 60 : 250);
-
   const menuTriggerProps = !props.readOnly ? bindTrigger(popupState) : {};
   return (
     <Box
@@ -298,10 +294,7 @@ function Kanban (props: Props) {
 
       {/* Main content */}
 
-      <ScrollingComponent
-        horizontalStrength={hStrength}
-        verticalStrength={vStrength}
-      >
+      <Box>
         <div
           className='octo-board-body'
           id='mainBoardBody'
@@ -375,7 +368,7 @@ function Kanban (props: Props) {
               </div>
             )}
         </div>
-      </ScrollingComponent>
+      </Box>
     </Box>
   );
 }
