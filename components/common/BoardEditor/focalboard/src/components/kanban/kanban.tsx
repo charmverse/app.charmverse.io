@@ -6,11 +6,8 @@ import { Box } from '@mui/system';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useState } from 'react';
-import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrolling';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
-
-import { isTouchScreen } from 'lib/utilities/browser';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
