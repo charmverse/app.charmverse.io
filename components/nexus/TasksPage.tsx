@@ -1,15 +1,17 @@
 
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Close, EmailOutlined } from '@mui/icons-material';
 import ForumIcon from '@mui/icons-material/Forum';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import KeyIcon from '@mui/icons-material/Key';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Badge, Box, Divider, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Badge, Box, Divider, Grid, IconButton, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
+import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
@@ -45,6 +47,15 @@ export const tabStyles = {
     }
   }
 };
+
+const StyledEmailAlert = styled(Alert)`
+  .MuiAlert-icon {
+    align-items: center;
+  }
+  .MuiAlert-message {
+    width: 100%;
+  }
+`;
 
 const StyledTypography = styled(Typography)`
   font-size: 24px;
@@ -87,7 +98,29 @@ export default function TasksPage () {
     <>
       <NexusPageTitle />
       <TasksPageHeader />
-      <Grid container spacing={{ xs: 1, sm: 3 }} sx={{ pt: 6, pb: 2 }}>
+
+      <Box mt={4}>
+        <StyledEmailAlert icon={<EmailOutlined />} severity='info'>
+          <Box width='100%' display='flex' alignItems='center' justifyContent='space-between'>
+            <Typography variant='body2'>
+              <strong>Email notifications</strong> &mdash; Enter your email to receive task notifications
+            </Typography>
+            <Box display='flex' gap={1}>
+              <Grid container sx={{ width: 'auto' }}>
+                <TextField
+                  color='info'
+                  placeholder='jarvis@mail.com'
+                />
+                <Button sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>Save</Button>
+              </Grid>
+              <IconButton size='small'>
+                <Close />
+              </IconButton>
+            </Box>
+          </Box>
+        </StyledEmailAlert>
+      </Box>
+      <Grid container spacing={{ xs: 1, sm: 3 }} sx={{ pt: 2, pb: 2 }}>
         <Grid item xs={12} sm={6}>
           <Box>
             <StyledTypography>
