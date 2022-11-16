@@ -81,9 +81,11 @@ function MemberDirectoryTableRow ({
           switch (property.type) {
             case 'profile_pic': {
               return (
-                <TableCell sx={{
-                  p: 1
-                }}
+                <TableCell
+                  key={property.id}
+                  sx={{
+                    p: 1
+                  }}
                 >
                   <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
                 </TableCell>
@@ -91,7 +93,7 @@ function MemberDirectoryTableRow ({
             }
             case 'role': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                     {member.roles.length === 0 ? '-' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                   </Stack>
@@ -100,21 +102,21 @@ function MemberDirectoryTableRow ({
             }
             case 'discord': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : '-'}
                 </TableCell>
               );
             }
             case 'twitter': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : '-'}
                 </TableCell>
               );
             }
             case 'timezone': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Box sx={{
                     gap: 1,
                     display: 'flex',
@@ -133,7 +135,7 @@ function MemberDirectoryTableRow ({
             }
             case 'name': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Link color='inherit' href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}>
                     <Typography fontWeight='bold'>
                       {memberProperty.value ?? member.username}
@@ -144,7 +146,7 @@ function MemberDirectoryTableRow ({
             }
             case 'bio': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Typography>
                     {member.profile?.description ?? '-'}
                   </Typography>

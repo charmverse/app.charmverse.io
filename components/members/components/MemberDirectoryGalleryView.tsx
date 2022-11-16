@@ -125,7 +125,7 @@ function MemberDirectoryGalleryCard ({
 
                 case 'role': {
                   return member.roles.length !== 0 && (
-                    <Stack gap={0.5}>
+                    <Stack gap={0.5} key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
                       <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                         {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
@@ -135,7 +135,7 @@ function MemberDirectoryGalleryCard ({
                 }
                 case 'timezone': {
                   return member.profile?.timezone && (
-                    <Stack flexDirection='row' gap={1}>
+                    <Stack flexDirection='row' gap={1} key={property.id}>
                       <TimezoneDisplay
                         showTimezone
                         timezone={member.profile.timezone}
@@ -165,6 +165,7 @@ function MemberDirectoryGalleryCard ({
                         options={property.options as SelectOptionType[]}
                         value={memberPropertyValue.value as (string | string[])}
                         name={property.name}
+                        key={property.id}
                       />
                     )
                     : null;
