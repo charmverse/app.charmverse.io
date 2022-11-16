@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
-import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import splashImage from 'public/images/artwork/world.png';
 
 import { WalletSign } from './WalletSign';
@@ -17,7 +17,7 @@ export const Container = styled(Box)`
 `;
 
 interface Props {
-  walletSigned: (authSig: AuthSigWithRawAddress) => void;
+  walletSigned: (authSig: AuthSig) => void;
 }
 
 export function LoginPageContent ({ walletSigned }: Props) {

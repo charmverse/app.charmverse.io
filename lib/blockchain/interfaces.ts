@@ -35,7 +35,3 @@ export interface AuthSig {
   address: string;
 }
 
-export type AuthSigWithRawAddress = AuthSig & {
-  rawAddress: string;
-}
-

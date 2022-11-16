@@ -10,7 +10,7 @@ import { PagesApi } from 'charmClient/apis/pagesApi';
 import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
-import type { AuthSigWithRawAddress, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
@@ -106,7 +106,7 @@ class CharmClient {
     });
   }
 
-  updateUser (data: Partial<User> & { addressesToAdd?: AuthSigWithRawAddress[] }) {
+  updateUser (data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
@@ -126,7 +126,7 @@ class CharmClient {
     return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
-  addUserWallets (data: AuthSigWithRawAddress[]) {
+  addUserWallets (data: AuthSig[]) {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
   }
 
