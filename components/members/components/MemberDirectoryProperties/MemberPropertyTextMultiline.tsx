@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
-const MAX_CHAR = 250;
+const MAX_CHAR = 150;
 
 const ReadMoreTypography = styled(Typography)`
   cursor: pointer;
@@ -27,9 +27,7 @@ export function MemberPropertyTextMultiline ({
     <Stack>
       {label && <Typography fontWeight='bold' variant='subtitle2'>{label}</Typography>}
       <Typography
-        sx={{
-          whiteSpace: 'normal'
-        }}
+        whiteSpace='normal'
         variant='body2'
       >{(!showingFullValue && isOverflowing) ? `${textContent.slice(0, MAX_CHAR)}...` : textContent}
         {isOverflowing && (
