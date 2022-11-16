@@ -38,7 +38,7 @@ export default function NotifyMeButton () {
           sx={{ display: 'flex', fontSize: { xs: '12px', sm: '14px' } }}
           {...bindTrigger(popupState)}
         >
-          Email notifications
+          {user?.email ? 'Notification Settings' : 'Notify Me'}
         </Button>
       </Tooltip>
       <NotifyMeModal
