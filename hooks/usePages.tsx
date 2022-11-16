@@ -35,7 +35,7 @@ export type PagesContext = {
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
@@ -177,6 +177,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         }
         return { ..._pages };
       });
+
+      return newPage;
     }
   }
 
