@@ -14,7 +14,7 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     await generateMemberProperty({ type: 'text', userId: adminUser.id, spaceId: space.id, name: 'test text1' });
     await generateMemberProperty({ type: 'text', userId: adminUser.id, spaceId: space.id, name: 'test text2' });
 
-    const properties = await getAccessibleMemberPropertiesBySpace({ userId: adminUser.id, spaceId: space.id });
+    const properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: adminUser.id, spaceId: space.id });
 
     expect(properties.length).toBe(2);
 
@@ -27,7 +27,7 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space.id, name: 'test text1' });
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space.id, name: 'test text2' });
 
-    const properties = await getAccessibleMemberPropertiesBySpace({ userId: nonAdminUser.id, spaceId: space.id });
+    const properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: nonAdminUser.id, spaceId: space.id });
 
     expect(properties.length).toBe(2);
   });
@@ -39,7 +39,7 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space.id, name: 'test text1' });
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space.id, name: 'test text2' });
 
-    const properties = await getAccessibleMemberPropertiesBySpace({ userId: undefined, spaceId: space.id });
+    const properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: undefined, spaceId: space.id });
 
     expect(properties.length).toBe(0);
   });
@@ -52,7 +52,7 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space2.id, name: 'test text1' });
     await generateMemberProperty({ type: 'text', userId: nonAdminUser.id, spaceId: space2.id, name: 'test text2' });
 
-    const properties = await getAccessibleMemberPropertiesBySpace({ userId: adminUser.id, spaceId: space2.id });
+    const properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: adminUser.id, spaceId: space2.id });
 
     expect(properties.length).toBe(0);
 
@@ -70,21 +70,21 @@ describe('getAccessibleMemberPropertiesBySpace', () => {
     await createMemberPropertyPermission({ memberPropertyId: prop1.id, roleId: role.id });
     await createMemberPropertyPermission({ memberPropertyId: prop2.id, roleId: role2.id });
 
-    let properties = await getAccessibleMemberPropertiesBySpace({ userId: nonAdminUser.id, spaceId: space.id });
+    let properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: nonAdminUser.id, spaceId: space.id });
     expect(properties.length).toBe(0);
 
     await assignRole({
       roleId: role.id,
       userId: nonAdminUser.id
     });
-    properties = await getAccessibleMemberPropertiesBySpace({ userId: nonAdminUser.id, spaceId: space.id });
+    properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: nonAdminUser.id, spaceId: space.id });
     expect(properties.length).toBe(1);
 
     await assignRole({
       roleId: role2.id,
       userId: nonAdminUser.id
     });
-    properties = await getAccessibleMemberPropertiesBySpace({ userId: nonAdminUser.id, spaceId: space.id });
+    properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: nonAdminUser.id, spaceId: space.id });
     expect(properties.length).toBe(2);
   });
 });

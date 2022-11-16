@@ -25,7 +25,14 @@ import { humanFriendlyDate } from 'lib/utilities/dates';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })};
+
+  height: 100%;
+  display: flex;
+  &:hover {
+    opacity: 0.8;
+  }
+  position: relative;
 `;
 
 function MemberDirectoryGalleryCard ({
@@ -60,12 +67,6 @@ function MemberDirectoryGalleryCard ({
       <StyledLink
         href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
         color='primary'
-        sx={{
-          '&:hover': {
-            opacity: 0.8
-          },
-          position: 'relative'
-        }}
       >
         <Card sx={{ width: '100%' }}>
           {((user?.id === member.id && currentSpace) || admin) && (
@@ -116,10 +117,16 @@ function MemberDirectoryGalleryCard ({
               }
               switch (property.type) {
                 case 'bio': {
-                  return (
+                  return member.profile?.description && (
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
-                      <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                      <Typography
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                        variant='body2'
+                      >{member.profile?.description}
+                      </Typography>
                     </Stack>
                   );
                 }
@@ -137,21 +144,21 @@ function MemberDirectoryGalleryCard ({
                   );
                 }
                 case 'role': {
-                  return (
-                    <Stack gap={0.5}>
+                  return member.roles.length !== 0 && (
+                    <Stack gap={0.5} key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
                       <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                        {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                       </Stack>
                     </Stack>
                   );
                 }
                 case 'timezone': {
-                  return (
-                    <Stack flexDirection='row' gap={1}>
+                  return member.profile?.timezone && (
+                    <Stack flexDirection='row' gap={1} key={property.id}>
                       <TimezoneDisplay
                         showTimezone
-                        timezone={member.profile?.timezone}
+                        timezone={member.profile.timezone}
                       />
                     </Stack>
                   );
@@ -162,10 +169,15 @@ function MemberDirectoryGalleryCard ({
                 case 'email':
                 case 'url':
                 case 'number': {
-                  return (
-                    <Stack key={property.id}>
+                  return memberPropertyValue?.value && (
+                    <Stack
+                      key={property.id}
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                    >
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
+                      <Typography variant='body2'>{memberPropertyValue.value}</Typography>
                     </Stack>
                   );
                 }
@@ -178,6 +190,7 @@ function MemberDirectoryGalleryCard ({
                         options={property.options as SelectOptionType[]}
                         value={memberPropertyValue.value as (string | string[])}
                         name={property.name}
+                        key={property.id}
                       />
                     )
                     : null;

@@ -4,60 +4,63 @@ import { prisma } from 'db';
 
 type GetVisiblePropertiesProps = {
   spaceId: string | string[];
-  userId: string | undefined;
+  requestingUserId: string | undefined;
+  requestedUserId?: string;
 }
 
-export function getAccessibleMemberPropertiesBySpace ({ userId, spaceId }: GetVisiblePropertiesProps) {
-  if (!userId) {
+export function getAccessibleMemberPropertiesBySpace ({ requestedUserId, requestingUserId, spaceId }: GetVisiblePropertiesProps) {
+  if (!requestingUserId) {
     return [];
   }
 
   const spaceIdQuery = typeof spaceId === 'string' ? [spaceId] : spaceId;
 
-  return prisma.memberProperty.findMany({
-    where: {
-      AND: [
-        // User must be a member of space
+  const memberPropertyWhereAndQuery: Prisma.Enumerable<Prisma.MemberPropertyWhereInput> = [{
+    space: {
+      id: { in: spaceIdQuery },
+      spaceRoles: {
+        some: {
+          userId: requestingUserId
+        }
+      }
+    }
+  }];
+
+  if (requestingUserId !== requestedUserId) {
+    memberPropertyWhereAndQuery.push({
+      OR: [
+        // User has permission to view property
+        {
+          spaceId: { in: spaceIdQuery },
+          permissions: accessiblePropertiesByPermissionsQuery({
+            spaceIds: spaceIdQuery,
+            userId: requestingUserId
+          })
+        },
+        // No permissions are set, permission visible for everyone
+        {
+          spaceId: { in: spaceIdQuery },
+          permissions: { none: {} }
+        },
+        // Admin override to always return all pages
         {
           space: {
             id: { in: spaceIdQuery },
             spaceRoles: {
               some: {
-                userId
+                userId: requestingUserId,
+                isAdmin: true
               }
             }
           }
-        },
-        {
-          OR: [
-            // User has permission to view property
-            {
-              spaceId: { in: spaceIdQuery },
-              permissions: accessiblePropertiesByPermissionsQuery({
-                spaceIds: spaceIdQuery,
-                userId
-              })
-            },
-            // No permissions are set, permission visible for everyone
-            {
-              spaceId: { in: spaceIdQuery },
-              permissions: { none: {} }
-            },
-            // Admin override to always return all pages
-            {
-              space: {
-                id: { in: spaceIdQuery },
-                spaceRoles: {
-                  some: {
-                    userId,
-                    isAdmin: true
-                  }
-                }
-              }
-            }
-          ]
         }
       ]
+    });
+  }
+
+  return prisma.memberProperty.findMany({
+    where: {
+      AND: memberPropertyWhereAndQuery
     },
     orderBy: {
       index: 'asc'

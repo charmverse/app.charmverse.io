@@ -169,6 +169,13 @@ async function sendNotification (notification: PendingTasksProps & {
           channel: 'email',
           type: 'mention'
         }
+      })), ...notification.bountyTasks.map(bountyTask => prisma.userNotification.create({
+        data: {
+          userId: notification.user.id,
+          taskId: bountyTask.id,
+          channel: 'email',
+          type: 'bounty'
+        }
       }))]
     );
   }

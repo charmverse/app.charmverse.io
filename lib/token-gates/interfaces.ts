@@ -24,6 +24,8 @@ export interface TokenGateWithRoles extends TokenGate {
   tokenGateToRoles: (TokenGateToRole & { role: Role })[];
 }
 
+export type TokenGateJwtResult = { jwt?: string, id: string, verified: boolean, grantedRoles: string[] };
+
 export interface TokenGateJwt {
   signedToken: string;
   tokenGate: TokenGateWithRoles;

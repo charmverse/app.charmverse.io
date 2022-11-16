@@ -35,7 +35,7 @@ export type PagesContext = {
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
@@ -177,6 +177,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         }
         return { ..._pages };
       });
+
+      return newPage;
     }
   }
 
@@ -215,26 +217,30 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }
 
   const handlePagesUpdate = useCallback((value: WebsocketPayload<'pages_meta_updated'>) => {
-    const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
-
-      const existingPage = pages[updatedPageMeta.id];
-
-      if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
-        pageMap[updatedPageMeta.id] = {
-          ...existingPage,
-          ...updatedPageMeta
-        };
-      }
-
-      return pageMap;
-
-    }, {} as PagesMap);
 
     mutatePagesList(existingPages => {
+      const _existingPages = existingPages || {};
+      const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
+
+        const existingPage = _existingPages[updatedPageMeta.id];
+
+        if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
+          pageMap[updatedPageMeta.id] = {
+            ...existingPage,
+            ...updatedPageMeta
+          };
+        }
+
+        return pageMap;
+
+      }, {} as PagesMap);
+
       return {
-        ...(existingPages ?? {}),
+        ..._existingPages,
         ...pagesToUpdate
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
@@ -254,6 +260,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         ...(existingPages ?? {}),
         ...newPages
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
@@ -268,6 +276,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       });
 
       return newValue;
+    }, {
+      revalidate: false
     });
   }, []);
 

@@ -5,7 +5,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
-import { Options } from 'components/common/BoardEditor/focalboard/src/components/calculations/options';
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
@@ -16,9 +15,10 @@ type Props = {
   option: SelectOptionType;
   onChange?: (option: SelectOptionType) => void;
   onDelete?: (option: SelectOptionType) => void;
+  onToggleOptionEdit?: (isOpened: boolean) => void;
 };
 
-export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
+export function SelectOptionEdit ({ option, onChange, onDelete, onToggleOptionEdit }: Props) {
   const theme = useTheme();
   const [tempName, setTempName] = useState(option.name || '');
 
@@ -27,6 +27,8 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
   }, [option.name]);
 
   function onSave () {
+    onToggleOptionEdit?.(false);
+
     if (tempName !== option.name) {
       onChange?.({ ...option, name: tempName });
       setTempName(option.name || '');
@@ -55,7 +57,11 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           />
         </Stack>
         {!!onDelete && (
-          <MenuItem onClick={() => onDelete(option)}>
+          <MenuItem onClick={() => {
+            onDelete(option);
+            onToggleOptionEdit?.(false);
+          }}
+          >
             <ListItemIcon>
               <DeleteIcon fontSize='small' />
             </ListItemIcon>
@@ -67,7 +73,14 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
           <FieldLabel variant='subtitle2'>Color</FieldLabel>
         </Stack>
         {brandColorNames.map(color => (
-          <MenuItem key={color} sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }} onClick={() => onColorChange(color)}>
+          <MenuItem
+            key={color}
+            sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onColorChange(color);
+            }}
+          >
             <Stack flexDirection='row' gap={1} alignContent='center'>
               <div style={{
                 width: 20,
@@ -90,7 +103,7 @@ export function SelectOptionEdit ({ option, onChange, onDelete }: Props) {
   ), [option, onColorChange, tempName]);
 
   return (
-    <PopperPopup popupContent={popupContent} onClose={onSave}>
+    <PopperPopup popupContent={popupContent} onClose={onSave} onOpen={() => onToggleOptionEdit?.(true)}>
       <IconButton size='small'>
         <MoreHorizIcon fontSize='small' />
       </IconButton>
