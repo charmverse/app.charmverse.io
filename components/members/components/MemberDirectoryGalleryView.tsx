@@ -24,7 +24,14 @@ import { isTouchScreen } from 'lib/utilities/browser';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })};
+
+  height: 100%;
+  display: flex;
+  &:hover {
+    opacity: 0.8;
+  }
+  position: relative;
 `;
 
 function MemberDirectoryGalleryCard ({
@@ -59,14 +66,6 @@ function MemberDirectoryGalleryCard ({
       <StyledLink
         href={`/u/${member.path || member.id}`}
         color='primary'
-        sx={{
-          height: '100%',
-          display: 'flex',
-          '&:hover': {
-            opacity: 0.8
-          },
-          position: 'relative'
-        }}
       >
         <Card sx={{ width: '100%' }}>
           {((user?.id === member.id && currentSpace) || admin) && (
