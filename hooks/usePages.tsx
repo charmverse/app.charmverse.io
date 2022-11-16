@@ -35,7 +35,7 @@ export type PagesContext = {
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null>;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
@@ -135,7 +135,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     return computedPermissions;
   }
-  // eslint-disable-next-line react/no-unused-prop-types
+
   async function deletePage ({ pageId, board }: { pageId: string, board?: Block }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
@@ -180,8 +180,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
       return newPage;
     }
-
-    return null;
   }
 
   const mutatePage = useCallback((page: PageUpdates, revalidate = false) => {
