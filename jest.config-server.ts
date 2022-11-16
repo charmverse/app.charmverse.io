@@ -5,8 +5,8 @@ import { jestConfig } from './jest.config';
 const integrationConfig = {
   ...jestConfig,
   testMatch: [
-    '**/__integration-tests__/**/*.spec.ts',
-    '**/lib/**/*.spec.ts'
+    '**/__integration-tests__/**/*.spec.ts'
+    // '**/lib/**/*.spec.ts'
   ]
 };
 

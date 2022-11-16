@@ -13,6 +13,27 @@ type UpdatePropertyInput = {
 }
 
 export async function updateMemberProperty ({ data, id, userId, spaceId }: UpdatePropertyInput): Promise<MemberProperty> {
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId,
+      userId
+    }
+  });
+
+  if (!spaceRole) {
+    throw new InvalidInputError('Invalid workspace data.');
+  }
+
+  let updateData = data;
+  if (!spaceRole.isAdmin) {
+    // non-admin users can only update property options
+    if (!updateData.options) {
+      throw new InvalidInputError('Invalid property data.');
+    }
+
+    updateData = { options: data.options };
+  }
+
   const transactions: PrismaPromise<any>[] = [];
   const newIndex = data.index;
   const updateOptions = data.options as ExistingSelectOption[] || [];
