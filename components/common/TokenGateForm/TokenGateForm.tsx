@@ -12,9 +12,8 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
-
-import type { AuthSig } from '../../../lib/blockchain/interfaces';
 
 import TokenGateOption from './TokenGateOption';
 
@@ -29,7 +28,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { user, loginFromWeb3Account, refreshUserWithWeb3Account } = useUser();
+  const { refreshUserWithWeb3Account } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -64,10 +63,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
-
-    if (!user) {
-      await loginFromWeb3Account();
-    }
 
     try {
       const verifyResult = await charmClient.evalueTokenGateEligibility({

@@ -1,11 +1,11 @@
 import type { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
 import SafeServiceClient from '@gnosis.pm/safe-service-client';
-import { useWeb3React } from '@web3-react/core';
 import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
 
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 
 import useGnosisSafes from './useGnosisSafes';
@@ -21,7 +21,7 @@ export function useGnosisPayment ({
   chainId, safeAddress, transactions, onSuccess
 }: GnosisPaymentProps) {
 
-  const { account, chainId: connectedChainId, library } = useWeb3React();
+  const { account, chainId: connectedChainId, library } = useWeb3AuthSig();
 
   const [safe] = useGnosisSafes([safeAddress]);
   const network = getChainById(chainId);

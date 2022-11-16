@@ -5,7 +5,6 @@ import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
-import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -20,6 +19,7 @@ import { useUpdateProfileAvatar } from 'components/profile/components/UserDetail
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
 import useENSName from 'hooks/useENSName';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -74,7 +74,7 @@ function EditIconContainer ({ children, readOnly, onClick, ...props }: { childre
 }
 
 function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
-  const { account } = useWeb3React();
+  const { account } = useWeb3AuthSig();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
     return isPublic ? user.profile : charmClient.getUserDetails();

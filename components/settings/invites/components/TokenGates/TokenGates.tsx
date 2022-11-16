@@ -1,11 +1,10 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { TokenGate } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3-react-17';
 import type { PopupState } from 'material-ui-popup-state/hooks';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
@@ -63,7 +62,7 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
 
   const theme = useTheme();
   const litClient = useLitProtocol();
-  const { chainId } = useWeb3React();
+  const { chainId } = useWeb3AuthSig();
   const { walletAuthSignature } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');

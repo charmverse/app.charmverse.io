@@ -5,7 +5,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import type { Space } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -49,7 +48,7 @@ const LayoutContainer = styled.div`
 
 export default function PublicPage () {
 
-  const { account } = useWeb3React();
+  const { account } = useWeb3AuthSig();
   const { setUser } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
 
@@ -146,7 +145,7 @@ export default function PublicPage () {
   }, []);
 
   useEffect(() => {
-    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.address)) {
+    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.rawAddress)) {
       charmClient.login({ address: account, walletSignature: walletAuthSignature })
         .then(loggedInUser => {
           setUser(loggedInUser);
