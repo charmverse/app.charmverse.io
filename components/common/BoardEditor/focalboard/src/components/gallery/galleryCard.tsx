@@ -38,7 +38,7 @@ type Props = {
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
   const { pages, getPagePermissions } = usePages();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const intl = useIntl();
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
 

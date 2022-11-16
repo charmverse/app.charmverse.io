@@ -40,7 +40,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
 
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { current: eventFeed } = useRef(
     new PubSub<ServerMessage['type'], ServerMessage['payload']>()

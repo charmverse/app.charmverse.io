@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import type { Space } from '@prisma/client';
 
-import { generateTokenGate } from './mocks';
+import { generateTokenGate } from 'testing/utils/tokenGates';
 
 export async function generateAndMockTokenGateRequests ({
   space,

@@ -10,6 +10,7 @@ type GenerateMemberPropertyProps = {
   spaceId: string;
   userId: string;
   options?: any;
+  index?: number;
 }
 
 type GenerateMemberPropertyValueProps = {
@@ -19,7 +20,7 @@ type GenerateMemberPropertyValueProps = {
   value?: MemberPropertyValueType;
 }
 
-export function generateMemberProperty ({ type = 'text', spaceId, userId, options, name }: GenerateMemberPropertyProps): Promise<MemberProperty> {
+export function generateMemberProperty ({ type = 'text', spaceId, userId, options, name, index }: GenerateMemberPropertyProps): Promise<MemberProperty> {
   return createMemberProperty({
     data: {
       name,
@@ -27,7 +28,8 @@ export function generateMemberProperty ({ type = 'text', spaceId, userId, option
       space: { connect: { id: spaceId } },
       createdBy: '',
       updatedBy: '',
-      options
+      options,
+      index
     },
     userId
   });

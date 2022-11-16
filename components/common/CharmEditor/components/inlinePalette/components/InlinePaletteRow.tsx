@@ -9,6 +9,8 @@ import {
   safeScrollIntoViewIfNeeded
 } from 'lib/utilities/browser';
 
+import type { InlinePaletteSize } from './InlineCommandPalette';
+
 interface InlinePaletteRowProps {
   dataId: string;
   title?: string;
@@ -22,11 +24,12 @@ interface InlinePaletteRowProps {
   disabled?: boolean;
   // on touch devices having :hover forces you to click twice
   allowHover?: boolean;
+  size: InlinePaletteSize;
 }
 
-const StyledPaper = styled(Paper)`
-  width: 46px;
-  height: 46px;
+const StyledPaper = styled(Paper)<{ size: InlinePaletteSize }>`
+  width: ${({ size }) => (size === 'small') ? '22px' : '46px'};
+  height: ${({ size }) => (size === 'small') ? '22px' : '46px'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,14 +37,23 @@ const StyledPaper = styled(Paper)`
   margin-left: 10px;
 `;
 
-const StyledInlinePaletteRow = styled.div<{ disabled: boolean }>`
+const StyledInlinePaletteRow = styled.div<{ disabled: boolean, size: InlinePaletteSize }>`
   padding: 0.3rem 0;
-  min-height: 55px;
   cursor: pointer;
   display: flex;
   align-items: center;
   font-weight: bold;
   font-size: 14px;
+  ${({ size }) => size === 'big' && `
+      min-height: 55px;
+  `}
+
+  ${({ size }) => size === 'small' && `
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+  `}
 `;
 
 export default function InlinePaletteRow ({
@@ -55,6 +67,7 @@ export default function InlinePaletteRow ({
   scrollIntoViewIfNeeded = true,
   style = {},
   disabled,
+  size,
   // on touch devices having :hover forces you to click twice
   allowHover = !isTouchDevice()
 }: InlinePaletteRowProps) {
@@ -91,10 +104,12 @@ export default function InlinePaletteRow ({
       disabled={Boolean(disabled)}
       className={className}
       style={style}
+      size={size}
     >
       <StyledPaper
         elevation={0}
         variant='outlined'
+        size={size}
       >
         {icon}
       </StyledPaper>

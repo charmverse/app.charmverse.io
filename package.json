@@ -67,6 +67,8 @@
     "@bangle.dev/tooltip": "^0.28.4-alpha.2",
     "@bangle.dev/utils": "^0.28.8",
     "@beam-australia/react-env": "^3.1.1",
+    "@datadog/browser-logs": "^4.24.0",
+    "@datadog/browser-rum": "^4.24.0",
     "@date-io/luxon": "^2.13.1",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.7.1",

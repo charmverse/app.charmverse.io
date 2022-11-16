@@ -35,6 +35,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { PublicPageResponse } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 
 import { lowerCaseEqual } from '../../lib/utilities/strings';
@@ -59,7 +60,7 @@ export default function PublicPage () {
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId, getPagePermissions } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { setSpaces } = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
@@ -73,15 +74,25 @@ export default function PublicPage () {
   const editString = router.asPath.replace('/share', '');
 
   async function onLoad () {
-
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
+    let foundPage: PublicPageResponse | null = null;
 
     try {
-      foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
-      if (foundSpace) {
-        setSpaces([foundSpace]);
+      if (validate(router.query.pageId?.[0] || '')) {
+        foundPage = await charmClient.getPublicPage(pageIdOrPath);
+        foundSpace = foundPage.space;
+        router.replace(`/share/${foundSpace?.domain}/${foundPage.page.path}`);
+      }
+      if (!foundPage) {
+        foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
+        if (foundSpace) {
+          setSpaces([foundSpace]);
+        }
+        else {
+          setPageNotFound(true);
+        }
       }
     }
     catch (err) {
@@ -90,12 +101,10 @@ export default function PublicPage () {
 
     if (!isBountiesPage && foundSpace) {
       try {
-
-        const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
-
-        if (validate(router.query.pageId?.[0] || '')) {
-          router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
+        if (!foundPage) {
+          foundPage = await charmClient.getPublicPage(pageIdOrPath);
         }
+        const { page: rootPage, cards, boards, space, views } = foundPage;
 
         charmClient.track.trackAction('page_view', {
           type: rootPage.type,

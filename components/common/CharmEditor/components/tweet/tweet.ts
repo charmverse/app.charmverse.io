@@ -13,6 +13,11 @@ export interface TweetNodeAttrs {
 
 // a function to extract user screen name and tweet id from a tweet url
 export function extractTweetId (url: string): TweetNodeAttrs | null {
+
+  if (!url) {
+    return null;
+  }
+
   const match = url.match(/twitter\.com\/([^/]+)\/status\/(\d+)/);
   if (!match) {
     return null;
@@ -34,8 +39,8 @@ export function plugins () {
     new Plugin({
       props: {
         handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-        // @ts-ignore
-          const contentRow = slice.content.content?.[0].content.content;
+          // @ts-ignore
+          const contentRow = slice.content.content?.[0]?.content.content;
           const tweetParams = extractTweetId(contentRow?.[0]?.text);
           if (tweetParams) {
             insertNode(name, view.state, view.dispatch, view, tweetParams);

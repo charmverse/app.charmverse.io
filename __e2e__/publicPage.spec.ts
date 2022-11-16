@@ -105,6 +105,34 @@ test.describe.serial('Make a page public and visit it', async () => {
 
   });
 
+  test('open a page with id in url', async () => {
+
+    const publicContext = await browser.newContext({});
+
+    const page = await publicContext.newPage();
+
+    await page.goto(`share/${boardPage?.id}`);
+
+    const boardTitle = page.locator('data-test=board-title').locator('input');
+
+    await expect(boardTitle).toBeVisible();
+
+  });
+
+  test('open a page with incorrect in url', async () => {
+
+    const publicContext = await browser.newContext({});
+
+    const page = await publicContext.newPage();
+
+    await page.goto('share/not-existing-page-id');
+
+    const errorTitle = page.locator('data-test=error-title');
+
+    await expect(errorTitle).toBeVisible();
+
+  });
+
   test('visit the public page', async () => {
 
     // Part B - Visit this page as a non logged in user
@@ -154,4 +182,3 @@ test.describe.serial('Make a page public and visit it', async () => {
   });
 
 });
-

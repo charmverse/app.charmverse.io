@@ -2,7 +2,7 @@
 import styled from '@emotion/styled';
 import KeyIcon from '@mui/icons-material/Key';
 import { Box, Card, CircularProgress, OutlinedInput, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { getChainById } from 'connectors';
+import { getChainById, getChainShortname } from 'connectors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ const StyledTableCell = styled(TableCell)`
   border-bottom: 1px solid #000;
 `;
 
-const gnosisUrl = (address: string) => `https://gnosis-safe.io/app/eth:${address}/home`;
+const gnosisUrl = (address: string, chainId: number) => `https://app.safe.global/${getChainShortname(chainId)}:${address}/home`;
 
 export default function GnosisSafesList () {
 
@@ -193,7 +193,7 @@ function SafeRow ({ safe, updateWallets }: { safe: Safe, updateWallets: () => vo
       <TableCell>
         <Tooltip placement='top' title={safe.address}>
           <span>
-            <Link external href={gnosisUrl(safe.address)} target='_blank'>
+            <Link external href={gnosisUrl(safe.address, safe.chainId)} target='_blank'>
               {shortenHex(safe.address)}
             </Link>
           </span>

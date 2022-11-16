@@ -103,7 +103,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const router = useRouter();
   const { pages } = usePages();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const [isSearching, setIsSearching] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [options, setOptions] = useState<SearchResultItem[]>([]);

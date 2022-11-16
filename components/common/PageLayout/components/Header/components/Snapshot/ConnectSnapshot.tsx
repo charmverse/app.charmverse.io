@@ -13,6 +13,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -38,7 +39,8 @@ const DEFAULT_VOTING_DURATION = 7;
 
 export default function ConnectSnapshot () {
 
-  const [space, setSpace] = useCurrentSpace();
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
   const [formError, setFormError] = useState<SystemError | null>(null);
   const [touched, setTouched] = useState<boolean>(false);
   const isAdmin = useIsAdmin();
@@ -58,6 +60,8 @@ export default function ConnectSnapshot () {
   });
 
   const values = watch();
+
+  const snapshotDomainUnchanged = space?.snapshotDomain === values.snapshotDomain;
 
   async function onSubmit (formValues: FormValues) {
 
@@ -129,7 +133,7 @@ export default function ConnectSnapshot () {
         {
           isAdmin && (
             <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton disabled={!isValid} type='submit'>
+              <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type='submit'>
                 Save
               </PrimaryButton>
             </Grid>

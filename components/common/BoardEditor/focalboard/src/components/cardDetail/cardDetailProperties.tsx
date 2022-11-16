@@ -166,6 +166,7 @@ const CardDetailProperties = React.memo((props: Props) => {
               updatedBy={pageUpdatedBy}
               propertyTemplate={propertyTemplate}
               showEmptyPlaceholder={true}
+              displayType='details'
             />
           </div>
         );

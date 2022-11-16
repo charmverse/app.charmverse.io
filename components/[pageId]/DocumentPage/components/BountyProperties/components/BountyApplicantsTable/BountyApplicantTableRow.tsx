@@ -23,7 +23,6 @@ import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfac
 import type { AssignedBountyPermissions, BountyWithDetails } from 'lib/bounties';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 import type { SystemError } from 'lib/utilities/errors';
-import { shortenHex } from 'lib/utilities/strings';
 
 import ApplicationInput from '../BountyApplicantForm/components/ApplicationInput';
 import SubmissionInput from '../BountyApplicantForm/components/SubmissionInput';
@@ -207,6 +206,7 @@ export default function BountyApplicantTableRow ({
                       setIsExpandedRow(false);
                     }}
                     permissions={permissions}
+                    expandedOnLoad={submission.status === 'review'}
                     alwaysExpanded={false}
                   />
                   {/* disabled - maybe we dont need to show address here? <Box mb={3}>

@@ -119,7 +119,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
       <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
         <Stack gap={0.5}>
 
-          <InputLabel>Roles</InputLabel>
+          <InputLabel>Role</InputLabel>
           <InputSearchRoleMultiple
             onChange={setSelectedRoleIds}
             filter={{

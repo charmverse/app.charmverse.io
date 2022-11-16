@@ -14,6 +14,7 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
 
 interface Props {
@@ -21,7 +22,8 @@ interface Props {
 }
 
 export default function PermissionConfigurationMode ({ permissionModeSelected = () => null }: Props) {
-  const [space, setSpace] = useCurrentSpace();
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
 
   const isAdmin = useIsAdmin();
 

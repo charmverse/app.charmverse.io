@@ -145,7 +145,7 @@ export default function CharmEditor (
   { focusOnInit, content, children, onContentChange, style, noPadding, placeholderText, readOnly = false }:
   CharmEditorProps
 ) {
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
 
   const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
