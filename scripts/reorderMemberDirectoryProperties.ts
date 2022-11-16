@@ -1,6 +1,6 @@
 import { MemberProperty } from '@prisma/client';
 import { prisma } from 'db';
-import { DEFAULT_MEMBER_PROPERTIES, DEFAULT_MEMBER_PROPERTIES_ORDER } from 'lib/members/constants';
+import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 
 async function updateBioProperty () {
   const spaces = await prisma.space.findMany({
@@ -33,25 +33,25 @@ async function updateBioProperty () {
       }
     })
 
-    await prisma.$transaction(
-      [...DEFAULT_MEMBER_PROPERTIES_ORDER.map((mp, index) => prisma.memberProperty.update({
-        where: {
-          id: defaultMemberPropertiesRecord[mp].id
-        },
-        data: {
-          index
-        }
-      })),
-      ...nonDefaultMemberProperties.map((mp, index) => prisma.memberProperty.update({
-        where: {
-          id: mp.id
-        },
-        data: {
-          index: DEFAULT_MEMBER_PROPERTIES_ORDER.length + index
-        }
-      }))
-    ],
-    )
+    // await prisma.$transaction(
+    //   [...DEFAULT_MEMBER_PROPERTIES_ORDER.map((mp, index) => prisma.memberProperty.update({
+    //     where: {
+    //       id: defaultMemberPropertiesRecord[mp].id
+    //     },
+    //     data: {
+    //       index
+    //     }
+    //   })),
+    //   ...nonDefaultMemberProperties.map((mp, index) => prisma.memberProperty.update({
+    //     where: {
+    //       id: mp.id
+    //     },
+    //     data: {
+    //       index: DEFAULT_MEMBER_PROPERTIES_ORDER.length + index
+    //     }
+    //   }))
+    // ],
+    // )
 
     completedSpaces+=1;
     console.log(`Complete space ${completedSpaces}`);
