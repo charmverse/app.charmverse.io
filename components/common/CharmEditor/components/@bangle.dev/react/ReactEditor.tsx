@@ -12,6 +12,7 @@ import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
 
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -32,6 +33,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   editorRef?: RefObject<HTMLDivElement>;
   enableSuggestions?: boolean; // requires trackChanges to be true
   trackChanges?: boolean;
+  onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
 
 export const BangleEditor = React.forwardRef<
@@ -50,7 +52,8 @@ export const BangleEditor = React.forwardRef<
       style,
       editorRef,
       enableSuggestions = false,
-      trackChanges = false
+      trackChanges = false,
+      onParticipantUpdate = () => {}
     },
     ref
   ) => {
@@ -109,7 +112,8 @@ export const BangleEditor = React.forwardRef<
             setIsLoading(false);
             isLoadingRef.current = false;
             // console.log('set is loading false');
-          }
+          },
+          onParticipantUpdate
         });
         fEditor.init(_editor.view, onError);
       }

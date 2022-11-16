@@ -6,10 +6,12 @@ import type { Socket } from 'socket.io';
 import { prisma } from 'db';
 import { ironOptions } from 'lib/session/config';
 
-export type SocketUser = { id: string, name: string };
-export type AuthenticatedSocket = { user: SocketUser };
+export type SocketUser = { id: string, avatar: string | null, name: string };
+export type AuthenticatedSocketData = { user: SocketUser };
 
-export async function authOnConnect (socket: Socket, next: (err?: Error) => void) {
+type AuthenticatedSocket = Socket<any, any, any, AuthenticatedSocketData>;
+
+export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: Error) => void) {
 
   try {
     const session = await getSessionFromCookies(socket);
@@ -22,7 +24,11 @@ export async function authOnConnect (socket: Socket, next: (err?: Error) => void
     });
 
     // add data to the individual client socket
-    socket.data.user = user;
+    socket.data.user = {
+      id: user.id,
+      avatar: user.avatar,
+      name: user.username
+    };
 
     next();
   }

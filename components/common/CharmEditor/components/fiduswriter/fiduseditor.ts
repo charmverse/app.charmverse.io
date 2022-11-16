@@ -7,8 +7,9 @@ import {
   sendableSteps
 } from 'prosemirror-collab';
 
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import log from 'lib/log';
-import type { ClientSubscribeMessage, ServerErrorMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
+import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { ModCollab } from './collab';
 import {
@@ -41,6 +42,7 @@ type EditorProps = {
   docId: string;
   enableSuggestionMode: boolean;
   onDocLoaded?: () => void;
+  onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -80,12 +82,17 @@ export class FidusEditor {
   // dealt with.
   waitingForDocument = true;
 
-  onDocLoaded: () => void = () => {};
+  onDocLoaded: NonNullable<EditorProps['onDocLoaded']> = () => {};
 
-  constructor ({ user, docId, enableSuggestionMode, onDocLoaded }: EditorProps) {
+  onParticipantUpdate: NonNullable<EditorProps['onParticipantUpdate']> = () => {};
+
+  constructor ({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate }: EditorProps) {
     this.user = user;
     if (onDocLoaded) {
       this.onDocLoaded = onDocLoaded;
+    }
+    if (onParticipantUpdate) {
+      this.onParticipantUpdate = onParticipantUpdate;
     }
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -134,13 +141,16 @@ export class FidusEditor {
         //   return; // user navigated away.
         // }
         switch (data.type) {
-          case 'connections':
-            this.mod.collab.updateParticipantList(data.participant_list);
+          case 'connections': {
+            // define .sessionIds on each participant
+            const participants = this.mod.collab.updateParticipantList(data.participant_list);
             if (resubscribed) { // check version if only reconnected after being offline
               this.mod.collab.doc.checkVersion(); // check version to sync the doc
               resubscribed = false;
             }
+            this.onParticipantUpdate(participants);
             break;
+          }
           case 'doc_data':
             this.onDocLoaded(); // call this first so that the loading state is up-to-date before transactions occur
             this.mod.collab.doc.receiveDocument(data);

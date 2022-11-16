@@ -35,6 +35,7 @@ import { generateMarkdown } from 'lib/pages/generateMarkdown';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
+import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ShareButton from './components/ShareButton';
@@ -283,6 +284,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
+              {isBasePageDocument && <DocumentParticipants />}
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />

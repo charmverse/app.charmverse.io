@@ -4,9 +4,7 @@ import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
-import { ActionNotPermittedError } from 'lib/middleware';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 
 import type { ServerMessage } from './interfaces';
 

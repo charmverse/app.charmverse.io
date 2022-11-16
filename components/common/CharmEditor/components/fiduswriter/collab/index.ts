@@ -6,6 +6,10 @@ import { removeCollaboratorSelection } from '../state_plugins';
 import { ModCollabColors } from './colors';
 import { ModCollabDoc } from './doc';
 
+export type FrontendParticipant = Participant & {
+  sessionIds: string[];
+};
+
 export class ModCollab {
 
   // @ts-ignore set inside constructor of ModCollabColors
@@ -16,7 +20,7 @@ export class ModCollab {
 
   editor: FidusEditor;
 
-  participants: Participant[] = [];
+  participants: FrontendParticipant[] = [];
 
   pastParticipants: Participant[] = []; // Participants who have left comments or tracked changes.
 
@@ -34,9 +38,9 @@ export class ModCollab {
     new ModCollabColors(this);
   }
 
-  updateParticipantList (participantArray: Participant[]) {
+  updateParticipantList (participantArray: (Participant & { sessionIds?: string[] })[]): FrontendParticipant[] {
     const allSessionIds: string[] = [];
-    const participantObj: Record<string, Participant> = {};
+    const participantObj: Record<string, FrontendParticipant> = {};
 
     participantArray.forEach(participant => {
       if (participant.session_id) {
@@ -48,7 +52,7 @@ export class ModCollab {
         else {
           participant.sessionIds = [participant.session_id];
           delete participant.session_id;
-          participantObj[participant.id] = participant;
+          participantObj[participant.id] = participant as FrontendParticipant;
         }
       }
     });
@@ -80,5 +84,7 @@ export class ModCollab {
     this.participants.forEach(participant => {
       this.colors.ensureUserColor(participant.id);
     });
+
+    return this.participants;
   }
 }

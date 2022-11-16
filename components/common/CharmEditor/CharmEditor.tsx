@@ -30,6 +30,7 @@ import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/Vot
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -332,6 +333,7 @@ interface CharmEditorProps {
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
+  onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
 
 export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
@@ -368,7 +370,8 @@ function CharmEditor (
     pageId,
     containerWidth,
     pageType,
-    pagePermissions
+    pagePermissions,
+    onParticipantUpdate
   }:
   CharmEditorProps
 ) {
@@ -495,6 +498,7 @@ function CharmEditor (
       pageId={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       enableSuggestions={enableSuggestingMode}
+      onParticipantUpdate={onParticipantUpdate}
       trackChanges={true}
       style={{
         ...(style ?? {}),

@@ -9,13 +9,13 @@ import { computeUserPagePermissions } from 'lib/permissions/pages/page-permissio
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
-import type { AuthenticatedSocket } from '../authentication';
+import type { AuthenticatedSocketData } from '../authentication';
 
 import type { Participant, ProsemirrorJSONStep, WrappedSocketMessage, ClientMessage, ServerDocDataMessage, ClientCheckVersionMessage, ClientDiffMessage, ClientSelectionMessage, ServerMessage } from './interfaces';
 
 const log = getLogger('ws-docs');
 
-type SocketSessionData = AuthenticatedSocket & {
+type SocketSessionData = AuthenticatedSocketData & {
   documentId?: string;
   isOwner?: boolean;
   permissions: Partial<IPagePermissionFlags>;
@@ -43,6 +43,8 @@ export class DocumentEventHandler {
   docSaveInterval = 1; // how often to save document to database
 
   historyLength = 1000; // Only keep the last 1000 diffs
+
+  socket: Socket;
 
   socketEvent = 'message';
 
@@ -74,27 +76,26 @@ export class DocumentEventHandler {
     return room;
   }
 
-  constructor (private socket: Socket) {
+  constructor (socket: Socket) {
 
     this.id = socket.id;
+    this.socket = socket;
 
+    // set up socket data
+    // this.socket.data.user is set by the authentication middleware
+    this.socket.data.permissions = {}; // set empty permissions
   }
 
   init () {
 
-    const user = this.socket.data.user;
-
-    this.setSession({
-      user: { id: user.id, name: user.username },
-      permissions: {}
-    });
+    const session = this.getSession();
 
     this.socket.on(this.socketEvent, async message => {
       try {
         await this.onMessage(message);
       }
       catch (error) {
-        log.error('Error handling document event', { userId: user.id, error });
+        log.error('Error handling document event', { userId: session.user.id, error });
       }
     });
 
@@ -104,7 +105,7 @@ export class DocumentEventHandler {
         this.onClose();
       }
       catch (error) {
-        log.error('Error handling web socket disconnect', { userId: user.id, error });
+        log.error('Error handling web socket disconnect', { userId: session.user.id, error });
       }
     });
 
@@ -280,18 +281,17 @@ export class DocumentEventHandler {
         participantList.push({
           id: session.user.id,
           name: session.user.name,
-          sessionIds: [],
           session_id: participant.id
         });
       }
-      this.sendUpdates({ type: 'connections', participant_list: participantList });
+      this.sendUpdates({ message: { type: 'connections', participant_list: participantList } });
     }
   }
 
   handleSelectionChange (message: ClientSelectionMessage) {
     const room = this.getDocumentRoom();
     if (message.v === room?.doc.version) {
-      this.sendUpdates(message);
+      this.sendUpdatesToOthers(message);
     }
   }
 
@@ -339,7 +339,7 @@ export class DocumentEventHandler {
       }
       await this.saveDiff(message);
       this.confirmDiff(message.rid);
-      this.sendUpdates(message);
+      this.sendUpdatesToOthers(message);
     }
     else if (clientV < serverV) {
       if (clientV + room.doc.diffs.length >= serverV) {
@@ -467,12 +467,16 @@ export class DocumentEventHandler {
     }
   }
 
-  sendUpdates (message: ClientMessage | ServerMessage) {
+  sendUpdatesToOthers (message: ClientMessage | ServerMessage) {
+    this.sendUpdates({ message, senderId: this.id });
+  }
+
+  sendUpdates ({ message, senderId }: { message: ClientMessage | ServerMessage, senderId?: string }) {
     const pageId = this.getSession().documentId;
-    log.debug(`Broadcasting ${message.type} to room`, { pageId });
+    log.debug(`Broadcasting message "${message.type}" to room`, { pageId });
     const room = this.getDocumentRoomOrThrow();
     for (const participant of Object.values(room.participants)) {
-      if (participant.id !== this.id) {
+      if (participant.id !== senderId) {
         participant.sendMessage(message);
       }
     }

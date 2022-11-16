@@ -21,6 +21,7 @@ import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
+import type { Participant } from 'lib/websockets/documentEvents/interfaces';
 import type { Page } from 'models';
 
 import BountyProperties from './components/BountyProperties';
@@ -71,7 +72,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
 
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
-  const { editMode } = usePrimaryCharmEditor();
+  const { editMode, setPageProps } = usePrimaryCharmEditor();
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
@@ -140,6 +141,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   // editMode is null to start, but we dont want to re-render charmeditor in editing mode when it starts
   const charmKey = page.id + (editMode || 'editing');
 
+  function onParticipantUpdate (participants: Participant[]) {
+    setPageProps({ participants });
+  }
+
   return (
     <ScrollableWindow
       sx={{
@@ -171,6 +176,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
+              onParticipantUpdate={onParticipantUpdate}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader

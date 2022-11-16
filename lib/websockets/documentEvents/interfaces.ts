@@ -2,9 +2,9 @@ import type { Node } from '@bangle.dev/pm';
 
 export type Participant = {
   id: string;
+  avatar?: string | null;
   name: string;
   session_id?: string | undefined;
-  sessionIds: string[];
 };
 
 export type WrappedSocketMessage<T> = T & {
