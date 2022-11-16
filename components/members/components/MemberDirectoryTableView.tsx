@@ -20,6 +20,7 @@ import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -150,6 +151,17 @@ function MemberDirectoryTableRow ({
                   <Typography>
                     {member.profile?.description ?? '-'}
                   </Typography>
+                </TableCell>
+              );
+            }
+            case 'text_multiline': {
+              return (
+                <TableCell key={property.id}>
+                  {memberProperty?.value ? (
+                    <MemberPropertyTextMultiline
+                      value={memberProperty.value as string}
+                    />
+                  ) : '-'}
                 </TableCell>
               );
             }
