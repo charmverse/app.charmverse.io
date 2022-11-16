@@ -4,6 +4,7 @@ import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -27,13 +28,7 @@ async function deleteImage (req: NextApiRequest, res: NextApiResponse) {
     Key: key
   };
 
-  const client = new S3Client({
-    credentials: {
-      accessKeyId: process.env.S3_UPLOAD_KEY as string,
-      secretAccessKey: process.env.S3_UPLOAD_SECRET as string
-    },
-    region: process.env.S3_UPLOAD_REGION
-  });
+  const client = new S3Client(getS3ClientConfig());
 
   const command = new DeleteObjectCommand(input);
   await client.send(command);
