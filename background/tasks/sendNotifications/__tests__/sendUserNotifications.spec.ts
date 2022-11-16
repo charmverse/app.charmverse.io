@@ -44,7 +44,7 @@ describe('sendNotification()', () => {
     });
 
     const notificationsNo = await sendUserNotifications();
-    expect(notificationsNo).toBe(1);
+    expect(notificationsNo).toBeGreaterThan(0);
     const secondNotificationsNo = await sendUserNotifications();
     expect(secondNotificationsNo).toBe(0);
   });
