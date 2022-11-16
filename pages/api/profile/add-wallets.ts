@@ -31,7 +31,7 @@ async function addWalletsController (req: NextApiRequest, res: NextApiResponse<L
   }
 
   await prisma.userWallet.createMany({
-    data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.address }))
+    data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
   });
 
   const updatedProfile = await prisma.user.findUnique({
