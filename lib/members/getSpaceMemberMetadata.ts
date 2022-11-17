@@ -3,7 +3,7 @@ import type { Role } from '@prisma/client';
 
 import { prisma } from 'db';
 
-export async function getSpaceMemberRoles ({ spaceIds, memberId }:{ spaceIds: string | string[], memberId: string }) {
+export async function getSpaceMemberMetadata ({ spaceIds, memberId }:{ spaceIds: string | string[], memberId: string }) {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId: {
@@ -11,7 +11,9 @@ export async function getSpaceMemberRoles ({ spaceIds, memberId }:{ spaceIds: st
       },
       userId: memberId
     },
-    include: {
+    select: {
+      createdAt: true,
+      spaceId: true,
       spaceRoleToRole: {
         include: {
           role: true
@@ -20,14 +22,17 @@ export async function getSpaceMemberRoles ({ spaceIds, memberId }:{ spaceIds: st
     }
   });
 
-  const rolesBySpaceMap = spaceRoles.reduce(
+  const metadataBySpaceMap = spaceRoles.reduce<Record<string, { roles: Role[], joinDate: Date }>>(
     (acc, spaceRole) => {
       const roles = spaceRole.spaceRoleToRole?.map(spaceRoleToRole => spaceRoleToRole.role);
-      acc[spaceRole.spaceId] = roles;
+      acc[spaceRole.spaceId] = {
+        roles,
+        joinDate: spaceRole.createdAt
+      };
       return acc;
     },
-   {} as Record<string, Role[]>
+    {}
   );
 
-  return rolesBySpaceMap;
+  return metadataBySpaceMap;
 }

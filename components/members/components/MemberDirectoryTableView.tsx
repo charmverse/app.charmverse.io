@@ -19,7 +19,9 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -107,6 +109,17 @@ function MemberDirectoryTableRow ({
                 </TableCell>
               );
             }
+            case 'join_date': {
+              return (
+                <TableCell>
+                  <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                    withYear: true,
+                    withTime: true
+                  })}
+                  </Typography>
+                </TableCell>
+              );
+            }
             case 'twitter': {
               return (
                 <TableCell key={property.id}>
@@ -150,6 +163,17 @@ function MemberDirectoryTableRow ({
                   <Typography>
                     {member.profile?.description ?? '-'}
                   </Typography>
+                </TableCell>
+              );
+            }
+            case 'text_multiline': {
+              return (
+                <TableCell key={property.id}>
+                  {memberProperty?.value ? (
+                    <MemberPropertyTextMultiline
+                      value={memberProperty.value as string}
+                    />
+                  ) : '-'}
                 </TableCell>
               );
             }

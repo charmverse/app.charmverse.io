@@ -8,8 +8,9 @@ export async function seedMemberProp() {
    space: { connect: { id: '8cee49eb-68bb-444c-8dbf-bdfa776b172a'}},
    createdBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b',
    updatedBy: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b',
-   updatedAt: new Date()
+   updatedAt: new Date(),
   },
+  spaceId: '8cee49eb-68bb-444c-8dbf-bdfa776b172a',
   userId: 'e8f5e4e9-4099-4b7d-aab8-42747cd1fe1b'
 })
 

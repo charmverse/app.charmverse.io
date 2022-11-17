@@ -29,7 +29,7 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
     { revalidateOnMount: true }
   );
 
-  const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate, spaceId);
+  const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
   const { showMessage } = useSnackbar();
 
   const defaultValues = useMemo(() => {
@@ -83,9 +83,9 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
                       error: errors[property.memberPropertyId],
                       inline: true,
                       options: property.options,
-                      onCreateOption: createOption ? (option) => createOption(property, option) : undefined,
-                      onUpdateOption: createOption ? (option) => updateOption(property, option) : undefined,
-                      onDeleteOption: createOption ? (option) => deleteOption(property, option) : undefined
+                      onCreateOption: (option) => createOption(property, option),
+                      onUpdateOption: (option) => updateOption(property, option),
+                      onDeleteOption: (option) => deleteOption(property, option)
                     });
 
                     return fieldRendererConfig.renderer

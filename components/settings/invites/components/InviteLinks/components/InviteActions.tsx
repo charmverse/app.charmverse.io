@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, ListItemText } from '@mui/material';
+import { Box, ListItemText, Tooltip } from '@mui/material';
 import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -85,18 +85,24 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 
   return (
     <>
-      <Button
-        id='add-invites-menu'
-        aria-controls={open ? 'demo-customized-menu' : undefined}
-        aria-haspopup='true'
-        aria-expanded={open ? 'true' : undefined}
-        disableElevation
-        onClick={handleAddClick}
-        endIcon={<KeyboardArrowDownIcon />}
-        disabled={!isAdmin}
-      >
-        Add
-      </Button>
+
+      <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
+        {/* Tooltip on disabled button requires one block element below wrapper */}
+        <span>
+          <Button
+            id='add-invites-menu'
+            aria-controls={open ? 'demo-customized-menu' : undefined}
+            aria-haspopup='true'
+            aria-expanded={open ? 'true' : undefined}
+            disableElevation
+            onClick={handleAddClick}
+            endIcon={<KeyboardArrowDownIcon />}
+            disabled={!isAdmin}
+          >
+            Add
+          </Button>
+        </span>
+      </Tooltip>
       <StyledMenu
         id='demo-customized-menu'
         MenuListProps={{
@@ -139,3 +145,4 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 }
 
 export default memo(InviteActions);
+

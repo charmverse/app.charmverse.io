@@ -2,20 +2,12 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import useIsAdmin from 'hooks/useIsAdmin';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
 export function useMutateMemberPropertyValues (
-  mutatePropertyValue: KeyedMutator<PropertyValueWithDetails[]>,
-  spaceId: string | null
+  mutatePropertyValue: KeyedMutator<PropertyValueWithDetails[]>
+
 ) {
-
-  const isAdmin = useIsAdmin(spaceId || undefined);
-
-  if (!isAdmin) {
-    return { createOption: undefined, deleteOption: undefined, updateOption: undefined, canEditOptions: false };
-  }
-
   async function updateAndMutatePropertyOptions (propUpdate: { id: string, options: SelectOptionType[], spaceId: string }) {
     const updatedProperty = await charmClient.members.updateMemberProperty(propUpdate.spaceId, propUpdate);
 

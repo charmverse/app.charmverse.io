@@ -23,8 +23,8 @@ export function AddMemberPropertyButton () {
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
   const { properties, addProperty } = useMemberProperties();
-  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>([]);
 
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>([]);
   useEffect(() => {
     if (!propertyNamePopupState.isOpen) {
       setPropertyName('');
@@ -46,7 +46,17 @@ export function AddMemberPropertyButton () {
     }
   }
 
-  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([, propertyConfig]) => !propertyConfig.default);
+  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([propertyType, propertyConfig]) => {
+    if (propertyConfig.default) {
+      return false;
+    }
+    // Read-only properties can only have one instance, join_date is an example
+    if (propertyConfig.readonly && properties?.find(property => property.type === propertyType)) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <>

@@ -20,7 +20,9 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
@@ -64,7 +66,7 @@ function MemberDirectoryGalleryCard ({
   return (
     <>
       <StyledLink
-        href={`/u/${member.path || member.id}`}
+        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
         color='primary'
       >
         <Card sx={{ width: '100%' }}>
@@ -109,7 +111,7 @@ function MemberDirectoryGalleryCard ({
               showTwitter={!isTwitterHidden}
             />
             {properties.map(property => {
-              const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
+              const memberProperty = member.properties.find(mp => mp.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
               if (hiddenInGallery) {
                 return null;
@@ -130,6 +132,18 @@ function MemberDirectoryGalleryCard ({
                   );
                 }
 
+                case 'join_date': {
+                  return (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                        withYear: true,
+                        withTime: true
+                      })}
+                      </Typography>
+                    </Stack>
+                  );
+                }
                 case 'role': {
                   return member.roles.length !== 0 && (
                     <Stack gap={0.5} key={property.id}>
@@ -150,13 +164,21 @@ function MemberDirectoryGalleryCard ({
                     </Stack>
                   );
                 }
+                case 'text_multiline': {
+                  return memberProperty?.value && (
+                    <MemberPropertyTextMultiline
+                      key={property.id}
+                      label={property.name}
+                      value={memberProperty.value as string}
+                    />
+                  );
+                }
                 case 'text':
-                case 'text_multiline':
                 case 'phone':
                 case 'email':
                 case 'url':
                 case 'number': {
-                  return memberPropertyValue?.value && (
+                  return memberProperty?.value && (
                     <Stack
                       key={property.id}
                       sx={{
@@ -164,18 +186,18 @@ function MemberDirectoryGalleryCard ({
                       }}
                     >
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{memberPropertyValue.value}</Typography>
+                      <Typography variant='body2'>{memberProperty.value}</Typography>
                     </Stack>
                   );
                 }
                 case 'select':
                 case 'multiselect': {
-                  return memberPropertyValue
+                  return memberProperty
                     ? (
                       <SelectPreview
                         size='small'
                         options={property.options as SelectOptionType[]}
-                        value={memberPropertyValue.value as (string | string[])}
+                        value={memberProperty.value as (string | string[])}
                         name={property.name}
                         key={property.id}
                       />

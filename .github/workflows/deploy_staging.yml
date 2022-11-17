@@ -31,6 +31,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
 
+      - name: Replace env_var with staging settings
+        run: |
+          sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
+          sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:

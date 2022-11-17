@@ -9,6 +9,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/WorkspaceAvatar';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
 type Props = {
   spaceName: string;
@@ -29,7 +30,6 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
   useEffect(() => {
     setExpanded(defaultExpanded);
   }, [defaultExpanded]);
-
   return (
     <Accordion
       expanded={expanded}
@@ -100,7 +100,17 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
                   />
                 );
               }
-
+              case 'join_date': {
+                return (
+                  <Stack key={property.memberPropertyId}>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
+                    <Typography>{humanFriendlyDate(property.value as string, {
+                      withYear: true
+                    })}
+                    </Typography>
+                  </Stack>
+                );
+              }
               case 'role': {
                 const roles = property.value as string[];
                 return roles.length !== 0 && (
