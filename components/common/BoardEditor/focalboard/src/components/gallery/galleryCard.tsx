@@ -23,7 +23,7 @@ import Tooltip from '../../widgets/tooltip';
 import PropertyValueElement from '../propertyValueElement';
 
 const StyledBox = styled(Box)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle}
 `;
 
 type Props = {

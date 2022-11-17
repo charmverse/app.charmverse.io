@@ -62,7 +62,7 @@ const CurrencyIcon = styled.span`
 `;
 
 const StyledBox = styled(Box)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle}
 `;
 
 const KanbanCard = React.memo((props: Props) => {

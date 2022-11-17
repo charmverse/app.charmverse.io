@@ -10,7 +10,6 @@ import { usePageDetails } from 'hooks/usePageDetails';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -22,7 +21,7 @@ interface Props {
 }
 
 const StyledBox = styled(Box)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle}
 `;
 
 function BountyCard ({ bounty, page, onClick }: Props) {

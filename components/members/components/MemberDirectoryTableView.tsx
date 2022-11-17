@@ -18,7 +18,6 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
@@ -29,7 +28,7 @@ const StyledTableCell = styled(TableCell)`
 `;
 
 const StyledTableRow = styled(TableRow)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle}
 `;
 
 function MemberDirectoryTableRow ({
