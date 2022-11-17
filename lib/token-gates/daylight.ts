@@ -1,40 +1,62 @@
 import type { TokenGate } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
+import { flatten } from 'lodash';
 
-import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
 import { getAccessType } from './utils';
 
-export async function addToDaylight (spaceId: string, tokenGate: TokenGate, conditions: AccessControlCondition[]) {
+export async function addToDaylight (spaceId: string, tokenGate: TokenGate) {
   const space = await prisma.space.findUnique({ where: { id: spaceId } });
   if (!space) {
     return;
   }
-  const filteredConditions = conditions.filter(condition => getAccessType(condition) === 'individual_wallet' || 'individual_nft' || 'group_token_or_nft');
+
+  const conditions: AccessControlCondition[] = flatten((tokenGate.conditions as any)?.unifiedAccessControlConditions);
+
+  const supportedTypes = ['individual_wallet', 'individual_nft', 'group_token_or_nft'];
+  const filteredConditions = conditions.filter(condition => supportedTypes.includes(getAccessType(condition)));
   if (filteredConditions.length !== conditions.length) {
     return;
   }
-  let chain = '';
-  let address = '';
 
+  const createdRequirements = [];
   for (let i = 0; i < filteredConditions.length; i++) {
     const element = filteredConditions[i];
-    chain = element.chain;
-    address = element.contractAddress;
+    const { method, parameters } = element;
+
+    if (!method && parameters.includes(':userAddress')) {
+      createdRequirements.push({ chain: element.chain, type: 'onAllowlist', addresses: [element.returnValueTest.value] });
+    }
+
+    switch (method) {
+      case 'balanceOf': createdRequirements.push({ chain: element.chain,
+        type: 'hasTokenBalance',
+        address: element.contractAddress,
+        minAmount: element.returnValueTest.value });
+        break;
+      case 'ownerOf': createdRequirements.push({
+        chain: element.chain,
+        type: 'hasNftWithSpecificId',
+        address: element.contractAddress,
+        id: element.parameters
+      });
+        break;
+      default:
+          // do nothing
+    }
   }
 
   const options = {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${process.env.DAYLIGHT_API_KEY}` },
     body: JSON.stringify({
-      // eslint-disable-next-line object-shorthand
-      requirements: [{ chain: chain, type: 'hasTokenBalance', address: address }],
-      action: { completedBy: [{ chain: 'ethereum' }], linkUrl: `${baseUrl}/join?domain=${space.domain}` },
-      title: `Join CharmVerse's workspace ${space.domain}`,
-      sourceId: tokenGate.id,
+      requirements: createdRequirements,
+      action: { linkUrl: `https//:charmverse.io/join?domain=${space.domain}` },
+      title: 'workspace',
       type: 'access',
-      isActive: true
+      isActive: true,
+      sourceId: tokenGate.id
     })
   };
 

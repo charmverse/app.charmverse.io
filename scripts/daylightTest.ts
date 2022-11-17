@@ -11,11 +11,10 @@ export async function addToDaylightTest() {
     spaceId: space.id
   });
 
-  const conditions: AccessControlCondition[] = []
 
 const spaceId = space.id
 
-  addToDaylight(spaceId, tokenGate, conditions)
+  addToDaylight(spaceId, tokenGate)
   
   console.log('test fired');
 }
