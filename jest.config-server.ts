@@ -11,3 +11,4 @@ const integrationConfig = {
 };
 
 export default createJestConfig(integrationConfig);
+
