@@ -20,7 +20,7 @@ function DocumentHistory ({ page }: { page: PageMeta }) {
   const { members } = useMembers();
 
   const createdBy = members.find(member => member.id === page.createdBy)?.username ?? 'unknown';
-  const updatedBy = members.find(member => member.id === page.updatedBy)?.username ?? createdBy ?? 'unknown';
+  const updatedBy = members.find(member => member.id === page.updatedBy)?.username ?? createdBy;
 
   useEffect(() => {
     setTime((prevState) => ({ ...prevState, updatedAt: updatedAtMemo }));
