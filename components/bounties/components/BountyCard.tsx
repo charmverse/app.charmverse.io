@@ -5,7 +5,6 @@ import { memo } from 'react';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
-import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -16,20 +15,15 @@ interface Props {
   bounty: BountyWithDetails;
   page: PageMeta;
   onClick?: () => void;
+  onDelete?: (bountyId: string) => void;
 }
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyCard ({ bounty, page, onClick }: Props) {
+function BountyCard ({ onDelete, bounty, page, onClick }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
-  const { deletePage } = usePages();
-
-  function onClickDelete () {
-    deletePage({ pageId: page.id });
-  }
-
   return (
     <StyledBox
       onClick={onClick}
@@ -57,10 +51,13 @@ function BountyCard ({ bounty, page, onClick }: Props) {
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      <PageActions
-        page={page}
-        onClickDelete={onClickDelete}
-      />
+      {onDelete
+        && (
+          <PageActions
+            page={page}
+            onClickDelete={() => onDelete(bounty.id)}
+          />
+        )}
     </StyledBox>
   );
 }

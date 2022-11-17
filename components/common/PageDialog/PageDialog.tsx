@@ -36,7 +36,7 @@ export default function PageDialog (props: Props) {
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { refreshBounty } = useBounties();
+  const { refreshBounty, setBounties } = useBounties();
   const { currentPageId, setCurrentPageId, updatePage, getPagePermissions, deletePage, pages } = usePages();
   const pagePermission = page ? getPagePermissions(page.id) : null;
   // extract domain from shared pages: /share/<domain>/<page_path>
@@ -72,6 +72,12 @@ export default function PageDialog (props: Props) {
 
   async function onClickDelete () {
     if (page) {
+      if (page.type === 'card') {
+        await charmClient.deleteBlock(page.id, () => {});
+      }
+      else if (page.type === 'bounty') {
+        setBounties((bounties) => bounties.filter(_bounty => _bounty.id !== page.id));
+      }
       await deletePage({ pageId: page.id });
       onClose();
     }
