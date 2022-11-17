@@ -7,6 +7,7 @@ import { PageActions } from 'components/common/PageActions';
 import { usePageDetails } from 'hooks/usePageDetails';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import BountyStatusBadge from './BountyStatusBadge';
@@ -16,14 +17,16 @@ interface Props {
   page: PageMeta;
   onClick?: () => void;
   onDelete?: (bountyId: string) => void;
+  getPagePermissions: (pageId: string, page?: PageMeta | undefined) => IPagePermissionFlags;
 }
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyCard ({ onDelete, bounty, page, onClick }: Props) {
+function BountyCard ({ onDelete, bounty, getPagePermissions, page, onClick }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
+  const pagePermission = getPagePermissions(page.id);
   return (
     <StyledBox
       onClick={onClick}
@@ -55,7 +58,7 @@ function BountyCard ({ onDelete, bounty, page, onClick }: Props) {
         && (
           <PageActions
             page={page}
-            onClickDelete={() => onDelete(bounty.id)}
+            onClickDelete={pagePermission?.delete ? () => onDelete(bounty.id) : undefined}
           />
         )}
     </StyledBox>

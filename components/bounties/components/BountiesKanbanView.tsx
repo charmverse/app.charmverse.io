@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
-  const { deletePage, pages } = usePages();
+  const { deletePage, pages, getPagePermissions } = usePages();
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
@@ -85,6 +85,7 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
             {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])
               && pages[bounty.page.id]?.deletedAt === null).map(bounty => (
                 <BountyCard
+                  getPagePermissions={getPagePermissions}
                   onDelete={publicMode ? undefined : onClickDelete}
                   key={bounty.id}
                   bounty={bounty}

@@ -104,12 +104,10 @@ export function PageActions ({
             <ListItemText>Edit</ListItemText>
           </MenuItem>
         )}
-        {onClickDelete && (
-          <MenuItem dense onClick={onClickDelete}>
-            <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        )}
+        <MenuItem dense onClick={onClickDelete} disabled={!onClickDelete}>
+          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
         {onClickDuplicate && (
           <MenuItem dense onClick={onClickDuplicate}>
             <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />

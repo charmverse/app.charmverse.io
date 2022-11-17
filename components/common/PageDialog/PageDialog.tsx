@@ -127,10 +127,10 @@ export default function PageDialog (props: Props) {
           toolsMenu={!hideToolsMenu && !readOnly && page && (
             <PageActions
               page={page}
-              onClickDelete={() => {
+              onClickDelete={pagePermission?.delete ? () => {
                 onClickDelete();
                 onClose();
-              }}
+              } : undefined}
             >
               {bounty && (
                 <MenuItem dense onClick={() => closeBounty(bounty.id)} disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}>
