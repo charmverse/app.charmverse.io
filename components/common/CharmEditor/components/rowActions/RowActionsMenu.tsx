@@ -80,7 +80,6 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   function deleteRow () {
     const node = _getNode();
-
     if (node) {
       let start = node.nodeStart;
       let end = node.nodeEnd;

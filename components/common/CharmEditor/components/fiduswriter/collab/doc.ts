@@ -186,6 +186,9 @@ export class ModCollabDoc {
           return false;
         }
 
+        console.log('last update', this.lastSelectionUpdateState, getSelectionUpdate(currentView.state))
+        console.log('')
+
         if (this.lastSelectionUpdateState === currentView.state) {
           // Selection update has been sent for this state already. Skip
           return false;

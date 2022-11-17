@@ -196,7 +196,6 @@ export default function CharmEditor (
         width: '100%',
         height: '100%'
       }}
-      className='czi-editor-frame-body'
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,
