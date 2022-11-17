@@ -5,7 +5,7 @@ import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 async function updateBioProperty () {
   const spaces = await prisma.space.findMany({
     select: {
-      memberProperty: {
+      memberProperties: {
         select: {
           id: true,
           type: true,
@@ -22,12 +22,12 @@ async function updateBioProperty () {
 
   console.log('Total Spaces', spaces.length);
   let completedSpaces = 0;
-  
+
   for (const space of spaces) {
-    const { memberProperty } = space;
-    const nonDefaultMemberProperties: Pick<MemberProperty, "id" | "type">[] = memberProperty.filter(mp => !DEFAULT_MEMBER_PROPERTIES.includes(mp.type));
+    const { memberProperties } = space;
+    const nonDefaultMemberProperties: Pick<MemberProperty, "id" | "type">[] = memberProperties.filter(mp => !DEFAULT_MEMBER_PROPERTIES.includes(mp.type));
     const defaultMemberPropertiesRecord: Record<string, Pick<MemberProperty, "id" | "type">> = {};
-    memberProperty.forEach(mp => {
+    memberProperties.forEach(mp => {
       if (DEFAULT_MEMBER_PROPERTIES.includes(mp.type)) {
         defaultMemberPropertiesRecord[mp.type] = mp;
       }
