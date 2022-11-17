@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useRef, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -64,9 +64,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
+  const ref = useRef<{ empty?: boolean }>();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
-
+    ref.current = {
+      empty: false
+    };
     if (!currentSpace) {
       return {};
     }
@@ -77,10 +80,22 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       pagesDict[page.id] = page;
     }, {});
 
+    if (pagesRes.length === 0) {
+      ref.current = {
+        empty: true
+      };
+    }
+
     return pagesDict;
   }, { refreshInterval });
 
   const pages = data || {};
+
+  useEffect(() => {
+    if (ref.current?.empty && currentSpace) {
+      router.push(`/${currentSpace.domain}/members`);
+    }
+  }, [ref.current, currentSpace]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
