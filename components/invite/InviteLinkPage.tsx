@@ -23,7 +23,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
 
   async function joinSpace () {
     if (!user && verifiableWalletDetected && walletAuthSignature) {
-      await charmClient.createUser({ address: walletAuthSignature.rawAddress, walletSignature: walletAuthSignature });
+      await charmClient.createUser({ address: walletAuthSignature.address, walletSignature: walletAuthSignature });
     }
     await charmClient.acceptInvite({ id: invite.id });
     window.location.href = `/${invite.space.domain}`;

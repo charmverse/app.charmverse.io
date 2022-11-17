@@ -6,7 +6,7 @@ import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import { ExternalServiceError, MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
@@ -19,12 +19,12 @@ import { PREFIX, useLocalStorage } from './useLocalStorage';
 type IContext = {
   // Web3 account belonging to the current logged in user
   account?: string | null;
-  walletAuthSignature?: AuthSigWithRawAddress | null;
+  walletAuthSignature?: AuthSig | null;
   library: any;
   chainId: any;
-  sign: () => Promise<AuthSigWithRawAddress>;
+  sign: () => Promise<AuthSig>;
   triedEager: boolean;
-  getStoredSignature: () => AuthSigWithRawAddress | null;
+  getStoredSignature: () => AuthSig | null;
   disconnectWallet: () => void;
   // Used by useUser to pass the user to the Web3 context
   setLoggedInUser: (user: LoggedInUser | null) => void;
@@ -41,7 +41,7 @@ type IContext = {
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
-  sign: () => Promise.resolve({} as AuthSigWithRawAddress),
+  sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
   getStoredSignature: (address?: string) => null,
   disconnectWallet: () => null,
@@ -69,13 +69,13 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
 
-  const [, setLitAuthSignature] = useLocalStorage<AuthSigWithRawAddress | null>('lit-auth-signature', null, true);
+  const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
   const [user, setLoggedInUser] = useState<LoggedInUser | null>(null);
 
-  const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSigWithRawAddress | null>(null);
+  const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
-  function getStoredSignature (): AuthSigWithRawAddress | null {
+  function getStoredSignature (): AuthSig | null {
 
     if (!account) {
       return null;
@@ -87,10 +87,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(stored) as AuthSig;
 
-        return {
-          ...parsed,
-          rawAddress: account
-        };
+        return parsed;
 
       }
       catch (e) {
@@ -107,7 +104,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     setLoggedInUser(updatedUser);
   }, []);
 
-  function setSignature (signature: AuthSigWithRawAddress | null, writeToLocalStorage?: boolean) {
+  function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
 
     if (writeToLocalStorage) {
       window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
@@ -124,7 +121,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
 
     if (account && user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
-      setStoredAccount(account);
+      setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature();
       setSignature(storedWalletSignature);
@@ -136,7 +133,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     }
   }, [account, user]);
 
-  async function sign (): Promise<AuthSigWithRawAddress> {
+  async function sign (): Promise<AuthSig> {
 
     if (!account) {
       throw new MissingWeb3AccountError();
@@ -174,18 +171,17 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
         throw new Error('Signature address does not match account');
       }
 
-      const generated: AuthSigWithRawAddress = {
+      const generated: AuthSig = {
         sig: newSignature,
         derivedVia: 'charmverse.sign',
         signedMessage: body,
-        address: signatureAddress,
-        rawAddress: account
+        address: signatureAddress
       };
 
       setSignature(generated, true);
       setIsSigning(false);
 
-      return { ...generated, rawAddress: account };
+      return generated;
     }
     catch (err) {
       setIsSigning(false);

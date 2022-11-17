@@ -8,7 +8,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 export async function createMemberPropertyPermission (data: CreateMemberPropertyPermissionInput) {
   const space = await prisma.space.findFirst({
     where: {
-      memberProperty: {
+      memberProperties: {
         some: {
           id: data.memberPropertyId
         }

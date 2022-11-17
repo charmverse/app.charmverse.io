@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -20,18 +20,18 @@ handler
 
 async function addWalletsController (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
 
-  let user: LoggedInUser & { addressesToAdd?: AuthSigWithRawAddress[] };
+  let user: LoggedInUser & { addressesToAdd?: AuthSig[] };
 
-  const addressesToAdd = req.body.addressesToAdd as AuthSigWithRawAddress[];
+  const addressesToAdd = req.body.addressesToAdd as AuthSig[];
 
   for (const addressToVerify of addressesToAdd) {
-    if (!isValidWalletSignature({ address: addressToVerify.rawAddress, signature: addressToVerify, host: req.headers.origin as string })) {
+    if (!isValidWalletSignature({ address: addressToVerify.address, signature: addressToVerify, host: req.headers.origin as string })) {
       throw new InsecureOperationError('Could not verify wallet');
     }
   }
 
   await prisma.userWallet.createMany({
-    data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.rawAddress }))
+    data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
   });
 
   const updatedProfile = await prisma.user.findUnique({

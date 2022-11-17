@@ -36,11 +36,11 @@ async function updateBioProperty () {
   console.log('Renamed', r2.count, 'bio properties');
   const spaces = await prisma.space.findMany({
     include: {
-      memberProperty: true
+      memberProperties: true
     }
   });
 
-  const spacesWithoutBio = spaces.filter(s => s.memberProperty.every(p => p.type !== 'bio'));
+  const spacesWithoutBio = spaces.filter(s => s.memberProperties.every(p => p.type !== 'bio'));
 
   const r3 = await prisma.memberProperty.createMany({
     data: spacesWithoutBio.map(({id: spaceId, createdBy}) => ({
