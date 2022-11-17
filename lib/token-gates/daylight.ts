@@ -2,115 +2,187 @@ import type { TokenGate } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
 import { getAccessType } from './utils';
 
-export async function addToDaylight (spaceId: string, tokenGate: TokenGate) {
-  const space = await prisma.space.findUnique({ where: { id: spaceId } });
+const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
+const HEADERS = { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${DAYLIGHT_API_KEY}` };
+
+type ConditionOperator = { operator: 'AND' | 'OR' }
+type Condition = AccessControlCondition | ConditionOperator;
+type TokenGateAccessConditions = (Condition | Condition[])[];
+
+export async function addDaylightAbility (tokenGate: TokenGate) {
+  const space = await prisma.space.findUnique({ where: { id: tokenGate.spaceId } });
   if (!space) {
     return;
   }
 
-  type ConditionOperator = { operator: 'and' | 'or' }
-  type Condition = AccessControlCondition | ConditionOperator;
-  type TokenGateAccessConditions = (Condition | Condition[])[];
+  const requirementsData = getDaylightRequirements((tokenGate.conditions as any)?.unifiedAccessControlConditions as any);
 
-  function getRequirement (condition: AccessControlCondition) {
-    const accessType = getAccessType(condition);
-
-    switch (accessType) {
-      case 'individual_wallet': {
-        if (!condition.contractAddress) {
-          return null;
-        }
-
-        return {
-          chain: condition.chain,
-          type: 'onAllowlist',
-          addresses: [condition.returnValueTest.value]
-        };
-      }
-
-      case 'individual_nft': {
-        if (!condition.contractAddress) {
-          return null;
-        }
-
-        return {
-          chain: condition.chain,
-          type: 'hasNftWithSpecificId',
-          address: condition.contractAddress,
-          id: condition.parameters
-        };
-      }
-
-      case 'group_token_or_nft': {
-        if (!condition.contractAddress) {
-          return null;
-        }
-
-        return {
-          chain: condition.chain,
-          type: 'hasTokenBalance',
-          address: condition.contractAddress,
-          minAmount: condition.returnValueTest.value
-        };
-      }
-
-      default: {
-        return null;
-      }
-    }
+  if (!requirementsData.requirements.length || !DAYLIGHT_API_KEY) {
+    return;
   }
 
-  function getDaylightRequirements (conditionsData: TokenGateAccessConditions) {
-    const conditionsFlatArr = flatten(conditionsData);
-
-    const operators = conditionsFlatArr.filter(condition => {
-      return 'operator' in condition;
-    }) as ConditionOperator[];
-
-    const conditions = conditionsFlatArr.filter(condition => {
-      return 'chain' in condition;
-    }) as AccessControlCondition[];
-
-    const conditionsOperator: 'or' | 'and' = operators[0]?.operator || 'or';
-
-    if (conditions.length > 1 && operators.some(o => o.operator !== operators[0].operator)) {
-      // Daylight does not support multiple operators, do not proceed
-      return { requirements: [], operator: conditionsOperator };
-    }
-
-    const requirements = conditions.map(condition => getRequirement(condition));
-    const hasInvalidRequirements = requirements.some(r => r === null);
-
-    return {
-      requirements: hasInvalidRequirements ? [] : requirements,
-      operator: conditionsOperator
-    };
-  }
-
-  const requirements = getDaylightRequirements((tokenGate.conditions as any)?.unifiedAccessControlConditions as any);
-
-  const options = {
+  const params = {
     method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${process.env.DAYLIGHT_API_KEY}` },
+    headers: HEADERS,
     body: JSON.stringify({
-      // eslint-disable-next-line object-shorthand
-      requirements: requirements,
-      action: { linkUrl: `https//:charmverse.io/join?domain=${space.domain}` },
-      title: 'workspace',
+      requirements: requirementsData.requirements,
+      requirementsLogic: requirementsData.operator,
+      action: { linkUrl: getActionUrl(space.domain) },
+      title: `Join CharmVerse's ${space.name} workspace`,
       type: 'access',
       isActive: true,
+      // Daylight's sourceId will be the same as tokenGate id
       sourceId: tokenGate.id
     })
   };
 
-  await fetch('https://api.daylight.xyz/v1/abilities', options)
-    .then(response => response.json())
-  // eslint-disable-next-line no-console
-    .then(response => console.log(response))
-  // eslint-disable-next-line no-console
-    .catch(err => console.error(err));
+  try {
+    const res = await fetch('https://api.daylight.xyz/v1/abilities', params);
+    const data = await res.json();
+
+    return data;
+  }
+  // eslint-disable-next-line no-empty
+  catch (e) {}
+}
+
+export async function deleteDaylightAbility (tokenGateId: string) {
+  if (!tokenGateId || !DAYLIGHT_API_KEY) {
+    return;
+  }
+
+  const params = {
+    method: 'PUT',
+    headers: HEADERS,
+    body: JSON.stringify({
+      isActive: false
+    })
+  };
+
+  try {
+    const res = await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
+    return await res.json();
+  }
+  // eslint-disable-next-line no-empty
+  catch (e) {
+
+  }
+}
+
+export async function getAllAbilities () {
+  const params = {
+    method: 'GET',
+    headers: HEADERS
+  };
+
+  try {
+    const res = await fetch('https://api.daylight.xyz/v1/abilities/mine', params);
+    const data = await res.json();
+    return data.abilities as { sourceId: string, uid: string }[];
+  }
+  // eslint-disable-next-line no-empty
+  catch (e) {}
+}
+
+export async function getAbility (tokenGateId: string) {
+  const params = {
+    method: 'GET',
+    headers: HEADERS
+  };
+
+  try {
+    const res = await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
+    return res.json();
+  }
+  // eslint-disable-next-line no-empty
+  catch (e) {}
+}
+
+function getRequirement (condition: AccessControlCondition) {
+  const accessType = getAccessType(condition);
+
+  switch (accessType) {
+    case 'individual_wallet': {
+      const addressValue = condition.returnValueTest?.value;
+      if (!addressValue) {
+        return null;
+      }
+
+      return {
+        chain: condition.chain,
+        type: 'onAllowlist',
+        addresses: Array.isArray(addressValue) ? addressValue : [addressValue]
+      };
+    }
+
+    case 'individual_nft': {
+      if (!condition.contractAddress) {
+        return null;
+      }
+
+      return {
+        chain: condition.chain,
+        type: 'hasNftWithSpecificId',
+        address: condition.contractAddress,
+        id: condition.parameters
+      };
+    }
+
+    case 'group_token_or_nft': {
+      if (!condition.contractAddress || !condition.returnValueTest?.value) {
+        return null;
+      }
+
+      return {
+        chain: condition.chain,
+        type: 'hasTokenBalance',
+        address: condition.contractAddress,
+        minAmount: condition.returnValueTest.value
+      };
+    }
+
+    default: {
+      return null;
+    }
+  }
+}
+
+function getDaylightRequirements (conditionsData: TokenGateAccessConditions) {
+  const conditionsFlatArr = flatten(conditionsData);
+
+  const operators = conditionsFlatArr.filter(condition => {
+    return 'operator' in condition;
+  }) as ConditionOperator[];
+
+  const conditions = conditionsFlatArr.filter(condition => {
+    return 'chain' in condition;
+  }) as AccessControlCondition[];
+
+  const conditionsOperator: 'OR' | 'AND' = operators[0]?.operator || 'AND';
+
+  if (conditions.length > 1 && operators.some(o => o.operator !== operators[0].operator)) {
+    // Daylight does not support multiple operators, do not proceed
+    return { requirements: [], operator: conditionsOperator };
+  }
+
+  const requirements = conditions.map(condition => getRequirement(condition));
+  const hasInvalidRequirements = requirements.some(r => r === null);
+
+  return {
+    requirements: hasInvalidRequirements ? [] : requirements,
+    operator: conditionsOperator
+  };
+}
+
+function getActionUrl (spaceDomain: string) {
+  // Daylight will not allow to create ability with action url pointing to localhost
+  // for testing we can sue our main domain
+  const base = baseUrl.includes('localhost') ? 'https://charmverse.io' : baseUrl;
+
+  return `${base}/join?domain=${spaceDomain}`;
 }
