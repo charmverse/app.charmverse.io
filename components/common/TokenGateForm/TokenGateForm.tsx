@@ -12,6 +12,7 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
 
@@ -28,6 +29,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
+  const { walletAuthSignature } = useWeb3AuthSig();
   const { refreshUserWithWeb3Account, loginFromWeb3Account, user } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
@@ -47,6 +49,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
     else {
       setIsLoading(true);
+
       charmClient.getTokenGatesForSpace({ spaceDomain })
         .then(gates => {
           setTokenGates(gates);
@@ -59,12 +62,21 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
   }, [spaceDomain]);
 
+  useEffect(() => {
+    if (user && walletAuthSignature && !verifyingGates) {
+      evaluateEligibility(walletAuthSignature);
+    }
+  }, []);
+
   async function evaluateEligibility (authSig: AuthSig) {
+
+    if (!user) {
+      return loginFromWeb3Account(authSig);
+    }
+
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
-
-    // const _user = user ?? await loginFromWeb3Account(authSig);
 
     try {
       const verifyResult = await charmClient.evalueTokenGateEligibility({
@@ -72,6 +84,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
         spaceIdOrDomain: spaceDomain
       });
       setTokenGateResult(verifyResult);
+
       if (verifyResult.canJoinSpace) {
         showMessage('Verification succeeded.', 'success');
       }
