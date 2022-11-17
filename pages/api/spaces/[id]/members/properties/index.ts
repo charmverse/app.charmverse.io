@@ -39,7 +39,8 @@ async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiRes
       updatedBy: userId,
       options: propertyData.options ?? Prisma.DbNull,
       space: { connect: { id: spaceId } }
-    }
+    },
+    spaceId
   });
 
   return res.status(201).json(property);

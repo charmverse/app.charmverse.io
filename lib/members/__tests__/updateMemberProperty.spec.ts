@@ -22,7 +22,7 @@ describe('updateMemberProperty', () => {
 
   it('Should update index of affected properties when moving a property upward', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const property1 = await generateMemberProperty({ index: 0, type: 'name', userId: user.id, spaceId: space.id, name: 'test text1' });
+    const property1 = await generateMemberProperty({ index: 0, type: 'number', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property2 = await generateMemberProperty({ index: 1, type: 'email', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property3 = await generateMemberProperty({ index: 2, type: 'phone', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property4 = await generateMemberProperty({ index: 3, type: 'select', userId: user.id, spaceId: space.id, name: 'Select', options: [{ name: 'option 1' }] });
@@ -67,7 +67,7 @@ describe('updateMemberProperty', () => {
 
   it('Should update index of affected properties when moving a property downward', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const property1 = await generateMemberProperty({ index: 0, type: 'name', userId: user.id, spaceId: space.id, name: 'test text1' });
+    const property1 = await generateMemberProperty({ index: 0, type: 'number', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property2 = await generateMemberProperty({ index: 1, type: 'email', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property3 = await generateMemberProperty({ index: 2, type: 'phone', userId: user.id, spaceId: space.id, name: 'test text1' });
     const property4 = await generateMemberProperty({ index: 3, type: 'select', userId: user.id, spaceId: space.id, name: 'Select', options: [{ name: 'option 1' }] });

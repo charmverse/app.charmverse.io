@@ -6,15 +6,11 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { v4 as uuid } from 'uuid';
 
+import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
+
 const bucket = process.env.S3_UPLOAD_BUCKET;
 
-const client = new S3Client({
-  credentials: {
-    accessKeyId: process.env.S3_UPLOAD_KEY as string,
-    secretAccessKey: process.env.S3_UPLOAD_SECRET as string
-  },
-  region: process.env.S3_UPLOAD_REGION
-});
+const client = new S3Client(getS3ClientConfig());
 
 export async function uploadFileToS3 (file: { pathInS3: string, content: Buffer }) {
 

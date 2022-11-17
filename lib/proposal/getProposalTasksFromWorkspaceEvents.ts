@@ -15,12 +15,12 @@ export interface ProposalTask {
   pageId: string;
 }
 
-type PopulatedPage = Pick<Page, 'id' | 'path' | 'title'> & {
+type PopulatedPage = Pick<Page, 'id' | 'path' | 'title' | 'deletedAt'> & {
   space: Pick<Space, 'domain' | 'name'>;
   proposal: ProposalWithUsers | null;
 };
 
-type ProposalRecord = Record<string, PopulatedPage | undefined>;
+type ProposalPageMap = Record<string, PopulatedPage | undefined>;
 
 type ProposalStatusChangeMetaData = {
   newStatus: ProposalStatus;
@@ -95,8 +95,8 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     ? spaceRole.spaceRoleToRole[0].role.id
     : null).filter(roleId => roleId);
 
-  const proposalsRecord: ProposalRecord = proposalPages.reduce<ProposalRecord>((record, proposal) => {
-    record[proposal.id] = proposal;
+  const proposalsRecord: ProposalPageMap = proposalPages.reduce<ProposalPageMap>((record, page) => {
+    record[page.id] = page;
     return record;
   }, {});
 
@@ -112,7 +112,11 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
     const page = proposalsRecord[workspaceEvent.pageId];
     const { meta: { newStatus } } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
 
-    if (page?.proposal && !newStatus.match(/draft/)) {
+    // ignore draft events
+    if (newStatus.match(/draft/) || page?.deletedAt) {
+      unmarkedWorkspaceEvents.push(workspaceEvent.id);
+    }
+    else if (page?.proposal) {
       // If an event for this proposal was already handled no need to process further
       if (!visitedProposals.has(page.id)) {
         const isAuthor = Boolean(page.proposal.authors.find(author => author.userId === userId));
