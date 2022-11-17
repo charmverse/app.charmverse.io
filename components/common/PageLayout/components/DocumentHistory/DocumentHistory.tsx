@@ -42,7 +42,7 @@ function DocumentHistory ({ page }: { page: PageMeta }) {
         </>
       )}
     >
-      <Typography color='secondary' fontSize={12.8} variant='caption' fontWeight={500} marginRight='15px'>Edited {updatedAt}</Typography>
+      <Typography display={{ xs: 'none', sm: 'block' }} color='secondary' fontSize={12.8} variant='caption' fontWeight={500} marginRight='15px'>Edited {updatedAt}</Typography>
     </Tooltip>
   );
 }

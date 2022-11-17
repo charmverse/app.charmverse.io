@@ -11,16 +11,18 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import type { Theme } from '@mui/material';
-import { Divider, FormControlLabel, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Popover from '@mui/material/Popover';
+import Switch from '@mui/material/Switch';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -80,7 +82,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
-  const isSmall = useMediaQuery((_theme: Theme) => _theme.breakpoints.down('sm'));
 
   async function toggleFavorite () {
     if (!basePage || !user) return;
@@ -287,7 +288,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
-              {!isSmall && <DocumentHistory page={basePage} />}
+              <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
