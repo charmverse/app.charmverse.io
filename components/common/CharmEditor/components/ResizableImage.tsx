@@ -15,6 +15,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
 
+import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyImageContainer = styled(Box)`
@@ -101,7 +102,7 @@ const StyledImage = styled.img`
   }
 `;
 
-export function imageSpec (): RawSpecs {
+function imageSpec (): RawSpecs {
   return {
     type: 'node',
     name: 'image',
@@ -163,6 +164,7 @@ interface ResizableImageProps extends NodeViewProps {
 function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {
 
   const imageSource = node.attrs.src;
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
 
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -183,7 +185,7 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
     else {
       return (
         <ImageSelector
-          autoOpen={true}
+          autoOpen={autoOpen}
           onImageSelect={async (imageSrc) => {
             // const image = await imagePromise(imageSrc);
             updateAttrs({
@@ -268,6 +270,13 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
       </Resizable>
     );
   }
+}
+
+export function spec () {
+  // this is a dummy marker to let us know to show the image selector
+  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image' });
+  tooltipSpec.schema.inclusive = false;
+  return [tooltipSpec, imageSpec()];
 }
 
 export default memo(ResizableImage);

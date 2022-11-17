@@ -169,10 +169,13 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
 
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return readOnly ? <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} /> : (
       <IFrameSelector
+        autoOpen={autoOpen}
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
           updateAttrs({

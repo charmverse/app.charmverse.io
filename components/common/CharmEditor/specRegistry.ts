@@ -17,6 +17,7 @@ import * as callout from './components/callout';
 import * as columnLayout from './components/columnLayout';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
+import * as doc from './components/doc';
 import * as emoji from './components/emojiSuggest';
 import {
   deletion,
@@ -36,7 +37,7 @@ import { nestedPageSpec } from './components/nestedPage';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as quote from './components/quote';
-import { imageSpec } from './components/ResizableImage';
+import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
@@ -53,6 +54,7 @@ export const specRegistry = new SpecRegistry([
   // ?? => Could not test component or identify it
   // NO => Not supported
   //
+  doc.spec(), // OK
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
   paragraph.spec(), // OK
   mentionSpecs(), // NO
@@ -78,7 +80,7 @@ export const specRegistry = new SpecRegistry([
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
   pdfSpec(), // NO
-  imageSpec(), // OK
+  image.spec(), // OK
   columnLayout.rowSpec(), // NO
   columnLayout.columnSpec(), // NO
   nestedPageSpec(), // NO

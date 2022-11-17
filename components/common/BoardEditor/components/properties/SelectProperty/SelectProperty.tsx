@@ -13,7 +13,7 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 }
-const SelectPreviewContainer = styled(Stack)<ContainerProps>`
+const SelectPreviewContainer = styled(Stack, { shouldForwardProp: (prop: string) => prop !== 'displayType' })<ContainerProps>`
   justify-content: center;
 
   border-radius: ${({ theme }) => theme.spacing(0.5)};

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import PopperPopup from 'components/common/PopperPopup';
 
 interface TweetInputProps {
+  autoOpen?: boolean;
   onSubmit: (url: string) => void;
   readOnly?: boolean;
   isValid?: (url: string) => boolean;
@@ -16,7 +17,7 @@ export function TweetInput (props: TweetInputProps) {
 
   return (
     <PopperPopup
-      autoOpen
+      autoOpen={props.autoOpen}
       popupContent={(
         <Box width={750}>
           <Box
