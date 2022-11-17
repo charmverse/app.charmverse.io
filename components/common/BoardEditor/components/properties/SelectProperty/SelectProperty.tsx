@@ -7,6 +7,7 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { SelectField } from 'components/common/form/fields/SelectField';
+import { isEmptyValue } from 'components/common/form/fields/utils';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
 type ContainerProps = {
@@ -115,6 +116,10 @@ export function SelectProperty ({
     onCreateOption?.(option);
   }, [onCreateOption]);
 
+  if (displayType === 'kanban' && isEmptyValue(selectValue)) {
+    return null;
+  }
+
   if (!isOpened) {
     return (
       <SelectPreviewContainer onClick={onEdit} displayType={displayType}>
@@ -129,7 +134,6 @@ export function SelectProperty ({
   }
 
   return (
-
     <StyledSelect
       placeholder={placeholder}
       autoOpen
