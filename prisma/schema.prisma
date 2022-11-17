@@ -229,8 +229,8 @@ model Space {
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
   proposalCategory            ProposalCategory[]
-  memberProperty              MemberProperty[]
-  memberPropertyValue         MemberPropertyValue[]
+  memberProperties            MemberProperty[]
+  memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
 
   @@index([createdBy])

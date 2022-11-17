@@ -4,14 +4,14 @@ import { useContext, useEffect, useRef } from 'react';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { Web3Connection } from '../_app/Web3ConnectionManager';
 
 interface Props {
-  signSuccess: (authSig: AuthSigWithRawAddress) => void;
+  signSuccess: (authSig: AuthSig) => void;
   buttonStyle?: SxProps<Theme>;
   ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
@@ -54,7 +54,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
 
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
 
-      signSuccess({ ...walletAuthSignature, rawAddress: account });
+      signSuccess(walletAuthSignature);
     }
     else {
       sign()

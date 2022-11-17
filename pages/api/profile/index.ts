@@ -4,8 +4,6 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
-import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -18,7 +16,6 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
-import { InsecureOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

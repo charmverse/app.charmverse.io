@@ -134,7 +134,7 @@ function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
     const commentIds = row.nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
-    const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
+    const newIds = Array.from(new Set(commentIds.filter(commentId => !uniqueCommentIds.has(commentId))));
     commentIds.forEach(commentId => uniqueCommentIds.add(commentId));
 
     if (newIds.length !== 0) {
