@@ -18,11 +18,14 @@ export async function createUserFromWallet (
   // An ID set by analytics tools to have pre signup user journey
   preExistingId: string = v4()
 ): Promise<LoggedInUser> {
+
+  const lowercaseAddress = address.toLowerCase();
+
   const user = await prisma.user.findFirst({
     where: {
       wallets: {
         some: {
-          address
+          address: lowercaseAddress
         }
       }
     },
@@ -47,7 +50,7 @@ export async function createUserFromWallet (
         email: `${randomName()}@charmversetest.io`,
         wallets: {
           create: {
-            address
+            address: lowercaseAddress
           }
         }
       },
