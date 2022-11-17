@@ -26,5 +26,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "Mainnets"
-  ]
+  ],
+  "WillLuke.nextjs.addTypesOnSave": true,
+  "WillLuke.nextjs.hasPrompted": true
 }

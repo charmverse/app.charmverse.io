@@ -54,6 +54,8 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  // daylight(spaceId, result, conditions, () => console.log('delete'));
+
   const chainTypeParam = chains.length === 1 ? chains[0] : chains;
   const accessTypesParam = accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map(at => accessTypeDict[at]);
   trackUserAction('add_a_gate', { userId, spaceId, accesType: accessTypesParam, chainType: chainTypeParam, numberOfConditions });
