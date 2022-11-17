@@ -11,7 +11,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
-import { Divider, FormControlLabel, Switch, Typography } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Divider, FormControlLabel, Switch, Typography, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -32,6 +33,8 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
+
+import DocumentHistory from '../DocumentHistory';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
@@ -77,6 +80,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
+  const isSmall = useMediaQuery((_theme: Theme) => _theme.breakpoints.down('sm'));
 
   async function toggleFavorite () {
     if (!basePage || !user) return;
@@ -283,6 +287,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
+              {!isSmall && <DocumentHistory page={basePage} />}
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
