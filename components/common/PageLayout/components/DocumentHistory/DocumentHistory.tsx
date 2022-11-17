@@ -12,20 +12,20 @@ const StyledTypography = styled(Typography)`
 `;
 
 function DocumentHistory ({ page }: { page: PageMeta }) {
-  const updatedAtCb = useCallback(() => ({
+  const updateRelativeDatesCb = useCallback(() => ({
     createdAt: getRelativeTimeInThePast(new Date(page.createdAt)),
     updatedAt: getRelativeTimeInThePast(new Date(page.updatedAt))
   }), [page.updatedAt, page.updatedAt]);
-  const [{ updatedAt, createdAt }, setTime] = useState(updatedAtCb());
 
+  const [{ updatedAt, createdAt }, setTime] = useState(updateRelativeDatesCb());
   const { members } = useMembers();
 
   const createdBy = members.find(member => member.id === page.createdBy)?.username ?? 'Unknown user';
   const updatedBy = members.find(member => member.id === page.updatedBy)?.username ?? createdBy;
 
   useEffect(() => {
-    setTime(updatedAtCb());
-  }, [updatedAtCb]);
+    setTime(updateRelativeDatesCb());
+  }, [updateRelativeDatesCb]);
 
   return (
     <Tooltip
@@ -33,7 +33,7 @@ function DocumentHistory ({ page }: { page: PageMeta }) {
       enterDelay={0}
       arrow={false}
       placement='bottom-start'
-      onOpen={() => setTime(updatedAtCb())}
+      onOpen={() => setTime(updateRelativeDatesCb())}
       title={(
         <>
           <StyledTypography variant='caption'>Edited by</StyledTypography> {updatedBy} <StyledTypography variant='caption'>{updatedAt}</StyledTypography>
