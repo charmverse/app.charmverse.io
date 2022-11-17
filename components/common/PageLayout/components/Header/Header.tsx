@@ -76,7 +76,8 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
 
-  const pagePermissions = getPagePermissions(basePageId);
+  const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
+
   const pageType = basePage?.type;
   const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
 
@@ -209,10 +210,10 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
-      <Tooltip title={!pagePermissions.delete ? 'You don\'t have permission to delete this page' : ''}>
+      <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
         <div>
           <ListItemButton
-            disabled={!pagePermissions.delete}
+            disabled={!pagePermissions?.delete}
             onClick={onDeletePage}
           >
             <DeleteOutlineOutlinedIcon
@@ -324,7 +325,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     pageOptionsList = documentOptions;
   }
   else if (isBasePageDatabase) {
-    pageOptionsList = <DatabasePageOptions pagePermissions={pagePermissions} pageId={basePage?.id} closeMenu={closeMenu} />;
+    pageOptionsList = <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage?.id} closeMenu={closeMenu} />;
   }
 
   return (

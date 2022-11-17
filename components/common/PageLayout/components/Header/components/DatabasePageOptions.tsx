@@ -32,7 +32,7 @@ import { isTruthy } from 'lib/utilities/types';
 interface Props {
   closeMenu: () => void;
   pageId?: string;
-  pagePermissions: IPagePermissionFlags;
+  pagePermissions?: IPagePermissionFlags;
 }
 
 function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
@@ -143,10 +143,10 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
         <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
-      <Tooltip title={!pagePermissions.delete ? 'You don\'t have permission to delete this page' : ''}>
+      <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
         <div>
           <ListItemButton
-            disabled={!pagePermissions.delete}
+            disabled={!pagePermissions?.delete}
             onClick={onDeletePage}
           >
             <DeleteIcon
