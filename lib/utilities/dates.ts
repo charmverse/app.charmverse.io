@@ -110,7 +110,6 @@ export const getRelativeTimeInThePast = (date: Date): string => {
   const toSec = Math.round(diff / 1000);
   const toMin = Math.round(toSec / 60);
   const toHour = Math.round(toMin / 60);
-  const toDays = Math.round(toHour / 24);
 
   switch (true) {
     case (toSec < 60):
@@ -119,10 +118,10 @@ export const getRelativeTimeInThePast = (date: Date): string => {
       return `${toMin}m ago`;
     case (toHour < 24):
       return `${toHour}h ago`;
-    case (toDays >= 24 && ((now.getFullYear() - date.getFullYear()) === 0)):
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    case (toHour >= 24 && ((now.getFullYear() - date.getFullYear()) === 0)):
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     default:
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 };
 
