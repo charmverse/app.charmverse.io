@@ -41,7 +41,7 @@ export function UserProvider ({ children }: { children: ReactNode }) {
 
     let signature = authSig ?? getStoredSignature() as AuthSig;
 
-    if (!signature || !lowerCaseEqual(signature?.address, signature.address) || !signature.address) {
+    if (!signature) {
       signature = await sign();
     }
 
