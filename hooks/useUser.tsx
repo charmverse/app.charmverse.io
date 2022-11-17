@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import charmClient from 'charmClient';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSig, AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -14,7 +14,7 @@ type IContext = {
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
-  loginFromWeb3Account: (authSig?: AuthSigWithRawAddress) => Promise<LoggedInUser>;
+  loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
   refreshUserWithWeb3Account: () => Promise<void>;
 };
 
@@ -33,28 +33,28 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  async function loginFromWeb3Account (authSig?: AuthSigWithRawAddress) {
+  async function loginFromWeb3Account (authSig?: AuthSig) {
 
     if (!verifiableWalletDetected && !authSig) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? getStoredSignature() as AuthSigWithRawAddress;
+    let signature = authSig ?? getStoredSignature() as AuthSig;
 
-    if (!signature || !lowerCaseEqual(signature?.address, signature.address) || !signature.rawAddress) {
+    if (!signature || !lowerCaseEqual(signature?.address, signature.address) || !signature.address) {
       signature = await sign();
     }
 
     try {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: signature.rawAddress, walletSignature: signature });
+      const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
 
       setUser(refreshedProfile);
 
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.createUser({ address: signature.rawAddress, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }

@@ -48,7 +48,7 @@ const LayoutContainer = styled.div`
 
 export default function PublicPage () {
 
-  const { account } = useWeb3AuthSig();
+  const { account, verifiableWalletDetected } = useWeb3AuthSig();
   const { setUser } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
 
@@ -143,25 +143,6 @@ export default function PublicPage () {
     };
 
   }, []);
-
-  useEffect(() => {
-    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.rawAddress)) {
-      charmClient.login({ address: account, walletSignature: walletAuthSignature })
-        .then(loggedInUser => {
-          setUser(loggedInUser);
-        })
-        .catch(() => {
-          charmClient.createUser({ address: account, walletSignature: walletAuthSignature })
-            .then(loggedInUser => {
-              setUser(loggedInUser);
-            }).catch(() => {
-              charmClient.logout();
-              setUser(null);
-            });
-        });
-
-    }
-  }, [account]);
 
   if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;

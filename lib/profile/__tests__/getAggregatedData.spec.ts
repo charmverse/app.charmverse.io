@@ -1,20 +1,17 @@
 import type { Space, SpaceRole } from '@prisma/client';
 import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
-import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
-import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
 
-const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address];
+const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address].map(a => a.toLowerCase());
 
 beforeAll(async () => {
 
