@@ -78,12 +78,14 @@ type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   rootPageIds?: string[];
+  onClick?: () => void;
 };
 
 function PageNavigation ({
   deletePage,
   isFavorites,
-  rootPageIds
+  rootPageIds,
+  onClick
 }: PageNavigationProps) {
   const router = useRouter();
   const { pages, currentPageId, setPages, mutatePage } = usePages();
@@ -282,6 +284,7 @@ function PageNavigation ({
           selectedNodeId={selectedNodeId}
           addPage={addPage}
           deletePage={deletePage}
+          onClick={onClick}
         />
       ))}
     </StyledTreeRoot>

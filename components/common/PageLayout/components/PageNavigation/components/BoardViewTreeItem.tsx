@@ -11,6 +11,7 @@ interface BoardViewTreeItemProps {
   label: string;
   nodeId: string;
   viewType: IViewType;
+  onClick?: () => void;
 }
 
 const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
@@ -18,7 +19,8 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
     href,
     label,
     viewType,
-    nodeId
+    nodeId,
+    onClick
   } = props;
 
   const labelIcon = iconForViewType(viewType);
@@ -31,6 +33,7 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
           label={label}
           labelIcon={labelIcon}
           showPicker={false}
+          onClick={onClick}
         />
       )}
       nodeId={nodeId}
