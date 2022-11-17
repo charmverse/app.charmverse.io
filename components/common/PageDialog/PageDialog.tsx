@@ -1,4 +1,4 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, ListItemText, MenuItem } from '@mui/material';
 import type { Page } from '@prisma/client';
@@ -134,7 +134,7 @@ export default function PageDialog (props: Props) {
             >
               {bounty && (
                 <MenuItem dense onClick={() => closeBounty(bounty.id)} disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}>
-                  <CheckCircleIcon
+                  <CheckCircleOutlinedIcon
                     sx={{
                       mr: 1
                     }}
