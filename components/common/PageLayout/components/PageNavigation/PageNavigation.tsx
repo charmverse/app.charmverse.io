@@ -230,7 +230,7 @@ function PageNavigation ({
     const currentPage = pages[currentPageId];
     // expand the parent of the active page
     if (currentPage?.parentId && !isFavorites) {
-      if (!expanded.includes(currentPage.parentId)) {
+      if (!expanded.includes(currentPage.parentId) && currentPage.type !== 'card') {
         setExpanded(expanded.concat(currentPage.parentId));
       }
     }
