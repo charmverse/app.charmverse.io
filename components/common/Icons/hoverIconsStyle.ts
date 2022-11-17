@@ -24,7 +24,6 @@ export const hoverIconsStyle = ({ absolutePositioning = false }: { absolutePosit
     position: absolute;
     top: 0;
     right: 0;
-    padding: ${theme.spacing(1)};
     margin: ${theme.spacing(1)};
     z-index: 1;
   `}

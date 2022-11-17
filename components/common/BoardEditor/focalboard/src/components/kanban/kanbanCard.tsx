@@ -1,11 +1,9 @@
 import styled from '@emotion/styled';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton } from '@mui/material';
+import { Box } from '@mui/material';
 import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
 import { useRouter } from 'next/router';
-import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
@@ -82,16 +80,7 @@ const KanbanCard = React.memo((props: Props) => {
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
@@ -161,23 +150,11 @@ const KanbanCard = React.memo((props: Props) => {
         >
           {!props.readOnly && cardPage
             && (
-              <>
-                <IconButton
-                  size='small'
-                  className='icons'
-                  onClick={handleClick}
-                >
-                  <MoreHorizIcon color='secondary' fontSize='small' />
-                </IconButton>
-                <PageActions
-                  anchorEl={anchorEl}
-                  onClick={handleClose}
-                  open={open}
-                  page={cardPage}
-                  onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-                  onClickDuplicate={duplicateCard}
-                />
-              </>
+              <PageActions
+                page={cardPage}
+                onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+                onClickDuplicate={duplicateCard}
+              />
             )}
 
           <div className='octo-icontitle'>

@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton } from '@mui/material';
-import type { MouseEvent } from 'react';
-import React, { useState } from 'react';
+import { Box } from '@mui/material';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -42,16 +40,6 @@ const GalleryCard = React.memo((props: Props) => {
   const space = useCurrentSpace();
   const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
   const cardPage = pages[card.id];
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
 
@@ -91,23 +79,11 @@ const GalleryCard = React.memo((props: Props) => {
       >
         {!props.readOnly
         && (
-          <>
-            <IconButton
-              size='small'
-              className='icons'
-              onClick={handleClick}
-            >
-              <MoreHorizIcon color='secondary' fontSize='small' />
-            </IconButton>
-            <PageActions
-              anchorEl={anchorEl}
-              onClick={handleClose}
-              open={open}
-              page={cardPage}
-              onClickDuplicate={duplicateCard}
-              onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-            />
-          </>
+          <PageActions
+            page={cardPage}
+            onClickDuplicate={duplicateCard}
+            onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+          />
         )}
         {galleryImageUrl
         && (

@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, CardHeader, IconButton, Typography } from '@mui/material';
-import type { MouseEvent } from 'react';
-import { memo, useState } from 'react';
+import { Box, CardHeader, Typography } from '@mui/material';
+import { memo } from 'react';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
@@ -27,17 +25,6 @@ const StyledBox = styled(Box)`
 function BountyCard ({ bounty, page, onClick }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
   const { deletePage } = usePages();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   function onClickDelete () {
     deletePage({ pageId: page.id });
@@ -70,18 +57,8 @@ function BountyCard ({ bounty, page, onClick }: Props) {
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      <IconButton
-        size='small'
-        className='icons'
-        onClick={handleClick}
-      >
-        <MoreHorizIcon color='secondary' fontSize='small' />
-      </IconButton>
       <PageActions
         page={page}
-        anchorEl={anchorEl}
-        onClick={handleClose}
-        open={open}
         onClickDelete={onClickDelete}
       />
     </StyledBox>
