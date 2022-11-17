@@ -8,6 +8,7 @@ import * as React from 'react';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { PageActionDisplayProvider } from 'hooks/usePageActionDisplay';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -95,7 +96,7 @@ interface PageLayoutProps {
 function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
 
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
-  const [open, setOpen] = React.useState(!smallScreen);
+  const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
 
   const handleDrawerOpen = React.useCallback(() => {

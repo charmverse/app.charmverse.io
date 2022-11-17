@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: ['**']
 
 jobs:
   test:
@@ -79,11 +79,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
-
-      - name: Configure env_var to prod settings
-        run: |
-          sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
-          sed -i 's/stg/prd/g' .ebextensions/00_env_vars.config
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master

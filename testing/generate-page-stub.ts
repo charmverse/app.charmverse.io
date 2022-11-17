@@ -803,7 +803,7 @@ export function pageContentStub (): Pick<Prisma.PageCreateInput, 'content' |'con
           type: 'image',
           attrs: {
             alt: null,
-            src: 'https://s3.amazonaws.com/charm.public.test/user-content/2e086f83-e519-4563-aba8-a521b0e1d84b/3aff036c-0958-4c06-afff-9e0438abb4f4/Bitcoin_Block_Data.png',
+            src: 'https://s3.amazonaws.com/charm.public.dev/user-content/2e086f83-e519-4563-aba8-a521b0e1d84b/3aff036c-0958-4c06-afff-9e0438abb4f4/Bitcoin_Block_Data.png',
             size: 425,
             caption: null
           }

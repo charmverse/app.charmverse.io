@@ -5,7 +5,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import type { Space } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -35,6 +34,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { PublicPageResponse } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 
 import { lowerCaseEqual } from '../../lib/utilities/strings';
@@ -48,7 +48,7 @@ const LayoutContainer = styled.div`
 
 export default function PublicPage () {
 
-  const { account } = useWeb3React();
+  const { account } = useWeb3AuthSig();
   const { setUser } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
 
@@ -73,15 +73,25 @@ export default function PublicPage () {
   const editString = router.asPath.replace('/share', '');
 
   async function onLoad () {
-
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
+    let foundPage: PublicPageResponse | null = null;
 
     try {
-      foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
-      if (foundSpace) {
-        setSpaces([foundSpace]);
+      if (validate(router.query.pageId?.[0] || '')) {
+        foundPage = await charmClient.getPublicPage(pageIdOrPath);
+        foundSpace = foundPage.space;
+        router.replace(`/share/${foundSpace?.domain}/${foundPage.page.path}`);
+      }
+      if (!foundPage) {
+        foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
+        if (foundSpace) {
+          setSpaces([foundSpace]);
+        }
+        else {
+          setPageNotFound(true);
+        }
       }
     }
     catch (err) {
@@ -90,12 +100,10 @@ export default function PublicPage () {
 
     if (!isBountiesPage && foundSpace) {
       try {
-
-        const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
-
-        if (validate(router.query.pageId?.[0] || '')) {
-          router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
+        if (!foundPage) {
+          foundPage = await charmClient.getPublicPage(pageIdOrPath);
         }
+        const { page: rootPage, cards, boards, space, views } = foundPage;
 
         charmClient.track.trackAction('page_view', {
           type: rootPage.type,
@@ -137,7 +145,7 @@ export default function PublicPage () {
   }, []);
 
   useEffect(() => {
-    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.address)) {
+    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.rawAddress)) {
       charmClient.login({ address: account, walletSignature: walletAuthSignature })
         .then(loggedInUser => {
           setUser(loggedInUser);

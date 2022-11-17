@@ -229,6 +229,7 @@ const KanbanCard = React.memo((props: Props) => {
                 updatedBy={cardPage?.updatedBy || ''}
                 propertyTemplate={template}
                 showEmptyPlaceholder={false}
+                displayType='kanban'
               />
             </Tooltip>
           ))}

@@ -125,10 +125,11 @@ function ViewTabs (props: ViewTabsProps) {
   }
 
   function getViewUrl (viewId: string) {
+    const { cardId, ...rest } = router.query;
     return {
       pathname: router.pathname,
       query: {
-        ...router.query,
+        ...rest,
         viewId
       }
     };
@@ -305,16 +306,6 @@ function ViewTabs (props: ViewTabsProps) {
         </Box>
         <Divider />
         {addViewButton}
-        {/* <AddViewMenu
-          sx={{
-            width: '100%'
-          }}
-          showLabel={true}
-          board={board}
-          activeView={activeView}
-          showView={showView}
-          views={views}
-        /> */}
       </Menu>
 
       {/* Form to rename views */}

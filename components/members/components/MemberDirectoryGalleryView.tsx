@@ -20,11 +20,20 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })};
+
+  height: 100%;
+  display: flex;
+  &:hover {
+    opacity: 0.8;
+  }
+  position: relative;
 `;
 
 function MemberDirectoryGalleryCard ({
@@ -57,14 +66,8 @@ function MemberDirectoryGalleryCard ({
   return (
     <>
       <StyledLink
-        href={`/u/${member.path || member.id}`}
+        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
         color='primary'
-        sx={{
-          '&:hover': {
-            opacity: 0.8
-          },
-          position: 'relative'
-        }}
       >
         <Card sx={{ width: '100%' }}>
           {((user?.id === member.id && currentSpace) || admin) && (
@@ -108,63 +111,95 @@ function MemberDirectoryGalleryCard ({
               showTwitter={!isTwitterHidden}
             />
             {properties.map(property => {
-              const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
+              const memberProperty = member.properties.find(mp => mp.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
               if (hiddenInGallery) {
                 return null;
               }
               switch (property.type) {
                 case 'bio': {
-                  return (
+                  return member.profile?.description && (
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
-                      <Typography variant='body2'>{member.profile?.description ?? 'N/A'}</Typography>
+                      <Typography
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                        variant='body2'
+                      >{member.profile?.description}
+                      </Typography>
                     </Stack>
                   );
                 }
 
-                case 'role': {
+                case 'join_date': {
                   return (
-                    <Stack gap={0.5}>
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                        withYear: true,
+                        withTime: true
+                      })}
+                      </Typography>
+                    </Stack>
+                  );
+                }
+                case 'role': {
+                  return member.roles.length !== 0 && (
+                    <Stack gap={0.5} key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
                       <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                        {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                        {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                       </Stack>
                     </Stack>
                   );
                 }
                 case 'timezone': {
-                  return (
-                    <Stack flexDirection='row' gap={1}>
+                  return member.profile?.timezone && (
+                    <Stack flexDirection='row' gap={1} key={property.id}>
                       <TimezoneDisplay
                         showTimezone
-                        timezone={member.profile?.timezone}
+                        timezone={member.profile.timezone}
                       />
                     </Stack>
                   );
                 }
+                case 'text_multiline': {
+                  return memberProperty?.value && (
+                    <MemberPropertyTextMultiline
+                      key={property.id}
+                      label={property.name}
+                      value={memberProperty.value as string}
+                    />
+                  );
+                }
                 case 'text':
-                case 'text_multiline':
                 case 'phone':
                 case 'email':
                 case 'url':
                 case 'number': {
-                  return (
-                    <Stack key={property.id}>
+                  return memberProperty?.value && (
+                    <Stack
+                      key={property.id}
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                    >
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
+                      <Typography variant='body2'>{memberProperty.value}</Typography>
                     </Stack>
                   );
                 }
                 case 'select':
                 case 'multiselect': {
-                  return memberPropertyValue
+                  return memberProperty
                     ? (
                       <SelectPreview
                         size='small'
                         options={property.options as SelectOptionType[]}
-                        value={memberPropertyValue.value as (string | string[])}
+                        value={memberProperty.value as (string | string[])}
                         name={property.name}
+                        key={property.id}
                       />
                     )
                     : null;

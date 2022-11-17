@@ -3,6 +3,7 @@ import type { MemberProperty, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import type { ExistingSelectOption } from 'lib/forms/Interfaces';
 import { NotFoundError } from 'lib/middleware';
+import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type UpdatePropertyInput = {
@@ -12,7 +13,34 @@ type UpdatePropertyInput = {
   spaceId: string;
 }
 
-export async function updateMemberProperty ({ data, id, userId, spaceId }: UpdatePropertyInput) {
+export async function updateMemberProperty ({ data, id, userId, spaceId }: UpdatePropertyInput): Promise<MemberProperty> {
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId,
+      userId
+    }
+  });
+
+  const memberProperty = await prisma.memberProperty.findUnique({
+    where: {
+      id
+    }
+  });
+
+  if (!spaceRole) {
+    throw new UserIsNotSpaceMemberError();
+  }
+
+  let updateData = data;
+  if (!spaceRole.isAdmin) {
+    // non-admin users can only update select / multiselect property options
+    if ((memberProperty?.type !== 'select' && memberProperty?.type !== 'multiselect') || !updateData.options) {
+      throw new InvalidInputError('Invalid property data.');
+    }
+
+    updateData = { options: data.options };
+  }
+
   const transactions: PrismaPromise<any>[] = [];
   const newIndex = data.index;
   const updateOptions = data.options as ExistingSelectOption[] || [];
@@ -24,15 +52,6 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
   }
 
   if (newIndex !== null && newIndex !== undefined) {
-    const memberProperty = await prisma.memberProperty.findUnique({
-      where: {
-        id
-      },
-      select: {
-        index: true
-      }
-    });
-
     if (!memberProperty) {
       throw new NotFoundError('member property not found');
     }
@@ -67,5 +86,7 @@ export async function updateMemberProperty ({ data, id, userId, spaceId }: Updat
     data: { ...data, options: data.options ?? undefined, updatedBy: userId, id }
   }));
 
-  return prisma.$transaction(transactions);
+  const result = await prisma.$transaction(transactions);
+
+  return result[result.length - 1] as MemberProperty;
 }

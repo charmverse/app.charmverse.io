@@ -1,6 +1,7 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import LinkIcon from '@mui/icons-material/Link';
@@ -34,7 +35,8 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   discord: <DiscordIcon width={18.5} height={18.5} />,
   twitter: <TwitterIcon fontSize='small' />,
   name: <DriveFileRenameOutlineIcon fontSize='small' />,
-  bio: <PersonIcon fontSize='small' />
+  bio: <PersonIcon fontSize='small' />,
+  join_date: <CalendarMonthIcon fontSize='small' />
 };
 
 export function MemberPropertyItem ({

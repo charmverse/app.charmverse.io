@@ -10,19 +10,19 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .put(updateMemberPropertyHandler)
   .delete(deleteMemberPropertyHandler);
 
-async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<{ success: 'ok' }>) {
+async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
   const userId = req.session.user.id;
   const propertyId = req.query.propertyId as string;
   const data = req.body as Partial<MemberProperty>;
   const spaceId = req.query.id as string;
 
-  await updateMemberProperty({ userId, id: propertyId, data, spaceId });
+  const updatedProperty = await updateMemberProperty({ userId, id: propertyId, data, spaceId });
 
-  return res.status(200).json({ success: 'ok' });
+  return res.status(200).json(updatedProperty);
 }
 
 async function deleteMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse) {

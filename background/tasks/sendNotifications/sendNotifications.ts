@@ -88,30 +88,30 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
 
     const voteTasksNotSent = voteTasks.filter(voteTask => !sentTaskIds.has(voteTask.id));
     const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
-    const myGnosisTasks = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
+    const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
     const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(workspaceEvent.id));
     const { proposalTasks = [], unmarkedWorkspaceEvents = [] } = workspaceEventsNotSent.length !== 0
       ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent) : {};
 
-    const totalTasks = myGnosisTasks.length
+    const totalTasks = myGnosisTasksNotSent.length
       + discussionTasks.unmarked.length
       + voteTasksNotSent.length
       + proposalTasks.length
       + bountyTasks.unmarked.length;
 
     log.debug('Found tasks for notification', {
-      notSent: gnosisSafeTasksNotSent.length
+      notSent: myGnosisTasksNotSent.length
        + voteTasksNotSent.length
        + discussionTasks.unmarked.length
        + proposalTasks.length
        + bountyTasks.unmarked.length,
       gnosisSafeTasks: gnosisSafeTasks.length,
-      myGnosisTasks: myGnosisTasks.length
+      myGnosisTasks: myGnosisTasksNotSent.length
     });
 
     return {
       user: user as PendingTasksProps['user'],
-      gnosisSafeTasks: myGnosisTasks,
+      gnosisSafeTasks: myGnosisTasksNotSent,
       totalTasks,
       // Get only the unmarked discussion tasks
       discussionTasks: discussionTasks.unmarked,
@@ -168,6 +168,13 @@ async function sendNotification (notification: PendingTasksProps & {
           taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
           channel: 'email',
           type: 'mention'
+        }
+      })), ...notification.bountyTasks.map(bountyTask => prisma.userNotification.create({
+        data: {
+          userId: notification.user.id,
+          taskId: bountyTask.id,
+          channel: 'email',
+          type: 'bounty'
         }
       }))]
     );

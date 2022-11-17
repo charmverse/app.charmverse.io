@@ -114,7 +114,7 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
     }
   });
 
-  const visibleProperties = await getAccessibleMemberPropertiesBySpace({ userId, spaceId });
+  const visibleProperties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: userId, spaceId });
 
   const members = spaceRoles.map((spaceRole): Member => {
     const { memberPropertyValues = [], id, ...userData } = spaceRole.user;

@@ -19,7 +19,9 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -81,9 +83,11 @@ function MemberDirectoryTableRow ({
           switch (property.type) {
             case 'profile_pic': {
               return (
-                <TableCell sx={{
-                  p: 1
-                }}
+                <TableCell
+                  key={property.id}
+                  sx={{
+                    p: 1
+                  }}
                 >
                   <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
                 </TableCell>
@@ -91,47 +95,60 @@ function MemberDirectoryTableRow ({
             }
             case 'role': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                    {member.roles.length === 0 ? '-' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
                   </Stack>
                 </TableCell>
               );
             }
             case 'discord': {
               return (
+                <TableCell key={property.id}>
+                  {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : '-'}
+                </TableCell>
+              );
+            }
+            case 'join_date': {
+              return (
                 <TableCell>
-                  {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : 'N/A'}
+                  <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                    withYear: true,
+                    withTime: true
+                  })}
+                  </Typography>
                 </TableCell>
               );
             }
             case 'twitter': {
               return (
-                <TableCell>
-                  {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : 'N/A'}
+                <TableCell key={property.id}>
+                  {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : '-'}
                 </TableCell>
               );
             }
             case 'timezone': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Box sx={{
                     gap: 1,
                     display: 'flex',
                     flexDirection: 'row'
                   }}
                   >
-                    <TimezoneDisplay
-                      showTimezone
-                      timezone={member.profile?.timezone}
-                    />
+                    {member.profile?.timezone ? (
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile.timezone}
+                      />
+                    ) : '-'}
                   </Box>
                 </TableCell>
               );
             }
             case 'name': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Link color='inherit' href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}>
                     <Typography fontWeight='bold'>
                       {memberProperty.value ?? member.username}
@@ -142,10 +159,21 @@ function MemberDirectoryTableRow ({
             }
             case 'bio': {
               return (
-                <TableCell>
+                <TableCell key={property.id}>
                   <Typography>
-                    {member.profile?.description ?? 'N/A'}
+                    {member.profile?.description ?? '-'}
                   </Typography>
+                </TableCell>
+              );
+            }
+            case 'text_multiline': {
+              return (
+                <TableCell key={property.id}>
+                  {memberProperty?.value ? (
+                    <MemberPropertyTextMultiline
+                      value={memberProperty.value as string}
+                    />
+                  ) : '-'}
                 </TableCell>
               );
             }
@@ -156,7 +184,7 @@ function MemberDirectoryTableRow ({
             case 'number': {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
@@ -178,14 +206,14 @@ function MemberDirectoryTableRow ({
                         value={memberProperty.value as (string | string[])}
                       />
                     )
-                    : 'N/A'}
+                    : '-'}
                 </TableCell>
               );
             }
             default: {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>{memberProperty.value ?? 'N/A'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
