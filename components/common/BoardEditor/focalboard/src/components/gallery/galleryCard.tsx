@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton, ListItemText, MenuItem } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -66,6 +64,23 @@ const GalleryCard = React.memo((props: Props) => {
 
   const pagePermissions = getPagePermissions(card.id);
 
+  const deleteCard = () => {
+    mutator.deleteBlock(card, 'delete card');
+  };
+
+  const duplicateCard = () => {
+    if (space && cardPage) {
+      mutator.duplicateCard({
+        cardId: card.id,
+        board,
+        cardPage,
+        afterRedo: async () => {
+          mutate(`pages/${space.id}`);
+        }
+      });
+    }
+  };
+
   return (
     cardPage ? (
       <StyledBox
@@ -89,35 +104,9 @@ const GalleryCard = React.memo((props: Props) => {
               onClick={handleClose}
               open={open}
               page={cardPage}
-            >
-              {pagePermissions.delete && cardPage.deletedAt === null && (
-                <MenuItem
-                  dense
-                  onClick={() => mutator.deleteBlock(card, 'delete card')}
-                >
-                  <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-                  <ListItemText>Delete card</ListItemText>
-                </MenuItem>
-              )}
-              <MenuItem
-                dense
-                onClick={() => {
-                  if (space) {
-                    mutator.duplicateCard({
-                      cardId: card.id,
-                      board,
-                      cardPage,
-                      afterRedo: async () => {
-                        mutate(`pages/${space.id}`);
-                      }
-                    });
-                  }
-                }}
-              >
-                <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
-                <ListItemText>Duplicate</ListItemText>
-              </MenuItem>
-            </PageActions>
+              onClickDuplicate={duplicateCard}
+              onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+            />
           </>
         )}
         {galleryImageUrl

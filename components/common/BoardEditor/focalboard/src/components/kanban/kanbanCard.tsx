@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
-import DuplicateIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, IconButton, ListItemText, MenuItem } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
@@ -115,7 +113,7 @@ const KanbanCard = React.memo((props: Props) => {
       setShowConfirmationDialogBox(false);
     }
   };
-  const handleDeleteButtonOnClick = () => {
+  const deleteCard = () => {
     // user trying to delete a card with blank name
     // but content present cannot be deleted without
     // confirmation dialog
@@ -124,6 +122,25 @@ const KanbanCard = React.memo((props: Props) => {
       return;
     }
     setShowConfirmationDialogBox(true);
+  };
+
+  const duplicateCard = () => {
+    if (space && cardPage) {
+      mutator.duplicateCard(
+        {
+          cardId: card.id,
+          board,
+          cardPage,
+          afterRedo: async (newCardId) => {
+            props.showCard(newCardId);
+            mutate(`pages/${space.id}`);
+          },
+          beforeUndo: async () => {
+            props.showCard(null);
+          }
+        }
+      );
+    }
   };
 
   return (
@@ -157,41 +174,9 @@ const KanbanCard = React.memo((props: Props) => {
                   onClick={handleClose}
                   open={open}
                   page={cardPage}
-                >
-                  {pagePermissions.delete && cardPage.deletedAt === null && (
-                    <MenuItem
-                      dense
-                      onClick={handleDeleteButtonOnClick}
-                    >
-                      <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-                      <ListItemText>Delete card</ListItemText>
-                    </MenuItem>
-                  )}
-                  <MenuItem
-                    dense
-                    onClick={() => {
-                      if (space) {
-                        mutator.duplicateCard(
-                          {
-                            cardId: card.id,
-                            board,
-                            cardPage,
-                            afterRedo: async (newCardId) => {
-                              props.showCard(newCardId);
-                              mutate(`pages/${space.id}`);
-                            },
-                            beforeUndo: async () => {
-                              props.showCard(null);
-                            }
-                          }
-                        );
-                      }
-                    }}
-                  >
-                    <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
-                    <ListItemText>Duplicate</ListItemText>
-                  </MenuItem>
-                </PageActions>
+                  onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+                  onClickDuplicate={duplicateCard}
+                />
               </>
             )}
 

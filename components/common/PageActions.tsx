@@ -1,8 +1,9 @@
+import { EditOutlined } from '@mui/icons-material';
+import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LinkIcon from '@mui/icons-material/Link';
 import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
 
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -25,14 +26,16 @@ export function PageActions ({
   onClickDelete,
   anchorEl,
   onClick,
-  children
+  onClickEdit,
+  onClickDuplicate
 }: {
   page: PageMeta;
   onClick: VoidFunction;
   onClickDelete?: VoidFunction;
+  onClickEdit?: VoidFunction;
+  onClickDuplicate?: VoidFunction;
   open: boolean;
   anchorEl: HTMLElement | null | undefined;
-  children?: ReactNode;
 }) {
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
@@ -76,14 +79,25 @@ export function PageActions ({
         onClick?.();
       }}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       open={open}
     >
-      {children}
+      {onClickEdit && (
+        <MenuItem dense onClick={onClickEdit}>
+          <EditOutlined fontSize='small' sx={{ mr: 1 }} />
+          <ListItemText>Edit</ListItemText>
+        </MenuItem>
+      )}
       {onClickDelete && (
         <MenuItem dense onClick={onClickDelete}>
           <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Delete</ListItemText>
+        </MenuItem>
+      )}
+      {onClickDuplicate && (
+        <MenuItem dense onClick={onClickDuplicate}>
+          <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
+          <ListItemText>Duplicate</ListItemText>
         </MenuItem>
       )}
       <MenuItem dense onClick={onClickCopyLink}>
@@ -98,13 +112,13 @@ export function PageActions ({
       {
       pageCreator && (
         <Stack sx={{
-          px: 1
+          px: 2
         }}
         >
-          <Typography variant='subtitle2'>
+          <Typography variant='caption' color='secondary'>
             Last edited by {pageCreator.username}
           </Typography>
-          <Typography variant='subtitle2'>
+          <Typography variant='caption' color='secondary'>
             Last edited at {humanFriendlyDate(page.updatedAt)}
           </Typography>
         </Stack>

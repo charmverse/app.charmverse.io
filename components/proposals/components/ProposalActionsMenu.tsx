@@ -1,7 +1,5 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { IconButton, ListItemText, MenuItem } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { PageActions } from 'components/common/PageActions';
@@ -36,31 +34,12 @@ export default function ProposalActionsMenu ({ page, deleteProposal, editProposa
         {...bindMenu(actionsPopup)}
         page={page}
         onClick={actionsPopup.close}
-      >
-        {editProposal && (
-          <MenuItem
-            dense
-            onClick={() => {
-              editProposal(proposal.id);
-            }}
-          >
-            <EditIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Edit proposal</ListItemText>
-          </MenuItem>
-        )}
-        {deleteProposal && (
-          <MenuItem
-            dense
-            onClick={async () => {
-              deleteProposal(proposal.id);
-              refetchTasks();
-            }}
-          >
-            <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
-            <ListItemText>Delete proposal</ListItemText>
-          </MenuItem>
-        )}
-      </PageActions>
+        onClickDelete={() => {
+          deleteProposal(proposal.id);
+          refetchTasks();
+        }}
+        onClickEdit={() => editProposal(proposal.id)}
+      />
     </>
   );
 }
