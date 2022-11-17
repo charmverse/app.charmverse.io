@@ -25,7 +25,7 @@ import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberP
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
-  ${hoverIconsStyle};
+  ${hoverIconsStyle({ absolutePositioning: true })};
 
   height: 100%;
   display: flex;
@@ -73,12 +73,6 @@ function MemberDirectoryGalleryCard ({
             <IconButton
               size='small'
               className={!admin ? '' : 'icons'}
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                zIndex: 1
-              }}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

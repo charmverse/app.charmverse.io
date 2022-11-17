@@ -21,7 +21,7 @@ type Props = {
 };
 
 const StyledAccordionSummary = styled(AccordionSummary)`
-  ${!isTouchScreen() && hoverIconsStyle}
+  ${!isTouchScreen() && hoverIconsStyle()}
 `;
 
 export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {

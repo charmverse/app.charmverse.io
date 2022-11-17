@@ -62,7 +62,7 @@ const CurrencyIcon = styled.span`
 `;
 
 const StyledBox = styled(Box)`
-  ${hoverIconsStyle}
+  ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
 const KanbanCard = React.memo((props: Props) => {
@@ -148,13 +148,6 @@ const KanbanCard = React.memo((props: Props) => {
                 <IconButton
                   size='small'
                   className='icons'
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    p: 1,
-                    m: 1
-                  }}
                   onClick={handleClick}
                 >
                   <MoreHorizIcon color='secondary' fontSize='small' />

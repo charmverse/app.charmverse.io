@@ -52,7 +52,7 @@ export interface UserDetailsProps {
 }
 
 const StyledStack = styled(Stack)`
-  ${hoverIconsStyle}
+  ${hoverIconsStyle()}
 `;
 
 function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {

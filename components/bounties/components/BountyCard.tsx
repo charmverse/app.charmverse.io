@@ -21,7 +21,7 @@ interface Props {
 }
 
 const StyledBox = styled(Box)`
-  ${hoverIconsStyle}
+  ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
 function BountyCard ({ bounty, page, onClick }: Props) {
@@ -73,13 +73,6 @@ function BountyCard ({ bounty, page, onClick }: Props) {
       <IconButton
         size='small'
         className='icons'
-        sx={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          p: 1,
-          m: 1
-        }}
         onClick={handleClick}
       >
         <MoreHorizIcon color='secondary' fontSize='small' />

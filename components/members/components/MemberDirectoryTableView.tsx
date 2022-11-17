@@ -28,7 +28,7 @@ const StyledTableCell = styled(TableCell)`
 `;
 
 const StyledTableRow = styled(TableRow)`
-  ${hoverIconsStyle}
+  ${hoverIconsStyle()}
 `;
 
 function MemberDirectoryTableRow ({
