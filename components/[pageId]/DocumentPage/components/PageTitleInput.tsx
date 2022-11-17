@@ -52,11 +52,8 @@ export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps
   const [title, setTitle] = useState(value);
   const titleInput = useRef(null);
 
-  // sync value with updates if input is not focused
   useEffect(() => {
-    if (document.activeElement !== titleInput.current) {
-      setTitle(value);
-    }
+    setTitle(value);
   }, [value]);
 
   function _onChange (event: ChangeEvent<HTMLInputElement>) {
