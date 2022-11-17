@@ -266,7 +266,9 @@ export class WebSocketConnector {
       this.setRecentlySentTimer(timer);
     }
     else {
-      log.debug('queue socket message', { connected: this.socket.connected, recentlySent: this.recentlySent });
+      if (getData()) {
+        log.debug('queue socket message', { data: getData(), connected: this.socket.connected, recentlySent: this.recentlySent });
+      }
       this.messagesToSend.push(getData);
     }
   }

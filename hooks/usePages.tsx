@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -61,6 +61,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   const currentSpace = useCurrentSpace();
   const [currentPageId, setCurrentPageId] = useState<string>('');
+  const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
@@ -94,7 +95,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
-
   /**
    * Will return permissions for the currently connected user
    * @param pageId
@@ -220,11 +220,11 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     mutatePagesList(existingPages => {
       const _existingPages = existingPages || {};
-      const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
+      const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
 
         const existingPage = _existingPages[updatedPageMeta.id];
 
-        if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
+        if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
           pageMap[updatedPageMeta.id] = {
             ...existingPage,
             ...updatedPageMeta
@@ -233,7 +233,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
         return pageMap;
 
-      }, {} as PagesMap);
+      }, {});
 
       return {
         ..._existingPages,
@@ -246,14 +246,12 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
   const handleNewPages = useCallback((value: WebSocketPayload<'pages_created'>) => {
 
-    const newPages = value.reduce((pageMap, page) => {
-      if (page.spaceId === currentSpace?.id) {
+    const newPages = value.reduce<PagesMap>((pageMap, page) => {
+      if (page.spaceId === currentSpaceId.current) {
         pageMap[page.id] = page;
       }
-
       return pageMap;
-
-    }, {} as PagesMap);
+    }, {});
 
     mutatePagesList(existingPages => {
       return {
@@ -292,6 +290,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       unsubscribeFromPageDeletes();
     };
   }, []);
+
+  useEffect(() => {
+    currentSpaceId.current = currentSpace?.id;
+  }, [currentSpace]);
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,

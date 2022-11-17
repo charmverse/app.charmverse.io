@@ -113,7 +113,6 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
 
     const { content, contentText, ...newPageToNotify } = pageWithPermissions;
-
     relay.broadcast({
       type: 'pages_created',
       payload: [newPageToNotify]
