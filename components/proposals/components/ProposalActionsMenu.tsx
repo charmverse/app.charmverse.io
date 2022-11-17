@@ -8,16 +8,17 @@ import { PageActions } from 'components/common/PageActions';
 import useTasks from 'components/nexus/hooks/useTasks';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import type { PageMeta } from 'lib/pages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 interface ProposalActionsProps {
   deleteProposal: (voteId: string) => Promise<void>;
   editProposal: (voteId: string) => void;
   proposal: ProposalWithUsers;
-  lastUpdatedAt: Date;
+  page: PageMeta;
 }
 
-export default function ProposalActionsMenu ({ lastUpdatedAt, deleteProposal, editProposal, proposal }: ProposalActionsProps) {
+export default function ProposalActionsMenu ({ page, deleteProposal, editProposal, proposal }: ProposalActionsProps) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
   const actionsPopup = usePopupState({ variant: 'popover', popupId: 'proposal-action' });
@@ -33,10 +34,7 @@ export default function ProposalActionsMenu ({ lastUpdatedAt, deleteProposal, ed
       )}
       <PageActions
         {...bindMenu(actionsPopup)}
-        pageType='proposal'
-        pageCreatedBy={proposal.createdBy}
-        pageId={proposal.id}
-        pageUpdatedAt={lastUpdatedAt}
+        page={page}
         onClick={actionsPopup.close}
       >
         {editProposal && (

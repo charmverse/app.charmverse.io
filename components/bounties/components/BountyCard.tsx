@@ -78,14 +78,11 @@ function BountyCard ({ bounty, page, onClick }: Props) {
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       <PageActions
-        pageType='bounty'
+        page={page}
         anchorEl={anchorEl}
         onClick={handleClose}
         open={open}
         onClickDelete={onClickDelete}
-        pageCreatedBy={page.createdBy}
-        pageId={page.id}
-        pageUpdatedAt={page.updatedAt}
       />
     </StyledBox>
   );

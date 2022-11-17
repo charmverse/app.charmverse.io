@@ -88,10 +88,7 @@ const GalleryCard = React.memo((props: Props) => {
               anchorEl={anchorEl}
               onClick={handleClose}
               open={open}
-              pageType='card'
-              pageCreatedBy={cardPage.createdBy}
-              pageUpdatedAt={cardPage.updatedAt}
-              pageId={cardPage.id}
+              page={cardPage}
             >
               {pagePermissions.delete && cardPage.deletedAt === null && (
                 <MenuItem

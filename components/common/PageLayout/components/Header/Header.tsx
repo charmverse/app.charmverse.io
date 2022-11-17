@@ -2,15 +2,14 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import GetAppIcon from '@mui/icons-material/GetApp';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -167,7 +166,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           setPageMenuOpen(false);
         }}
       >
-        <FeedbackIcon
+        <FeedbackOutlinedIcon
           fontSize='small'
           sx={{
             mr: 1
@@ -216,7 +215,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             disabled={!pagePermissions.delete}
             onClick={onDeletePage}
           >
-            <DeleteIcon
+            <DeleteOutlineOutlinedIcon
               fontSize='small'
               sx={{
                 mr: 1
@@ -266,7 +265,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
               setPageMenuOpen(false);
             }}
           >
-            <GetAppIcon
+            <GetAppOutlinedIcon
               fontSize='small'
               sx={{
                 mr: 1

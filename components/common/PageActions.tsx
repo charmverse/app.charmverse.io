@@ -6,11 +6,14 @@ import type { ReactNode } from 'react';
 
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PageMeta } from 'lib/pages';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { Utils } from './BoardEditor/focalboard/src/utils';
 
-const PageTypeQueryParamRecord: Record<'bounty' | 'card' | 'proposal', string> = {
+type SupportedPageType = 'bounty' | 'card' | 'proposal';
+
+const PageTypeQueryParamRecord: Record<SupportedPageType, string> = {
   card: 'cardId',
   bounty: 'bountyId',
   proposal: 'id'
@@ -18,50 +21,46 @@ const PageTypeQueryParamRecord: Record<'bounty' | 'card' | 'proposal', string> =
 
 export function PageActions ({
   open,
-  pageId,
+  page,
   onClickDelete,
-  pageUpdatedAt,
-  pageCreatedBy,
   anchorEl,
   onClick,
-  children,
-  pageType
+  children
 }: {
-  pageType: 'bounty' | 'card' | 'proposal';
+  page: PageMeta;
   onClick: VoidFunction;
-  pageId: string;
   onClickDelete?: VoidFunction;
   open: boolean;
-  pageCreatedBy: string;
-  pageUpdatedAt: Date | string;
   anchorEl: HTMLElement | null | undefined;
   children?: ReactNode;
 }) {
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const pageCreator = members.find(member => member.id === pageCreatedBy);
+  const pageCreator = members.find(member => member.id === page.createdBy);
+
+  const pageType = page.type as SupportedPageType;
 
   function onClickCopyLink () {
     let link = window.location.href;
 
     const queryString = new URLSearchParams(window.location.search);
-    if (queryString.get(PageTypeQueryParamRecord[pageType]) !== pageId) {
+    if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
       const newUrl = new URL(window.location.toString());
-      newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], pageId);
+      newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
       link = newUrl.toString();
     }
 
     Utils.copyTextToClipboard(link);
-    showMessage(`Copied ${pageType} link to clipboard`, 'success');
+    showMessage(`Copied ${page.type} link to clipboard`, 'success');
   }
 
   function onClickOpenInNewTab () {
     let link = window.location.href;
 
     const queryString = new URLSearchParams(window.location.search);
-    if (queryString.get(PageTypeQueryParamRecord[pageType]) !== pageId) {
+    if (queryString.get(PageTypeQueryParamRecord[pageType]) !== page.id) {
       const newUrl = new URL(window.location.toString());
-      newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], pageId);
+      newUrl.searchParams.set(PageTypeQueryParamRecord[pageType], page.id);
       link = newUrl.toString();
     }
 
@@ -106,7 +105,7 @@ export function PageActions ({
             Last edited by {pageCreator.username}
           </Typography>
           <Typography variant='subtitle2'>
-            Last edited at {humanFriendlyDate(pageUpdatedAt)}
+            Last edited at {humanFriendlyDate(page.updatedAt)}
           </Typography>
         </Stack>
       )
