@@ -72,12 +72,15 @@ function MemberDirectoryGalleryCard ({
           {((user?.id === member.id && currentSpace) || admin) && (
             <IconButton
               size='small'
-              className={!admin ? '' : 'icons'}
+              className='icons'
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setIsModalOpen(true);
               }}
+              style={!admin ? {
+                opacity: 1
+              } : {}}
             >
               <EditIcon fontSize='small' />
             </IconButton>

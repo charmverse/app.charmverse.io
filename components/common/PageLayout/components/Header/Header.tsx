@@ -298,7 +298,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       {
         pageCreator && basePage && (
           <Stack sx={{
-            ml: 1,
+            mx: 2,
             my: 1
           }}
           >
