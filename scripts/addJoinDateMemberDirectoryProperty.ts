@@ -6,7 +6,11 @@ async function addJoinDateMemberDirectoryProperty () {
       createdAt: "asc"
     },
     select: {
-      memberProperties: true,
+      memberProperties: {
+        orderBy: {
+          index: "asc"
+        }
+      },
       id: true,
       createdBy: true
     }
@@ -16,12 +20,11 @@ async function addJoinDateMemberDirectoryProperty () {
     const { memberProperties } = space;
     const profilePicMemberProperty = memberProperties.find(mp => mp.type === "profile_pic");
     if (profilePicMemberProperty) {
-      memberProperties.sort((a, b) => a.index - b.index);
       const firstProperty = memberProperties[0]; // most likely "Name"
       await prisma.$transaction([
         prisma.memberProperty.create({
           data: {
-            index: memberProperties.length - 1,
+            index: memberProperties.length,
             createdBy: space.createdBy,
             name: 'Join date',
             spaceId: space.id,
@@ -29,7 +32,7 @@ async function addJoinDateMemberDirectoryProperty () {
             updatedBy: space.createdBy,
           }
         }),
-        // Interchange profile pic and 0th index property
+        // Interchange profile pic and first property index
         prisma.memberProperty.update({
           where: {
             id: profilePicMemberProperty.id,
