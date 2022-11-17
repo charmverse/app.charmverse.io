@@ -1,4 +1,7 @@
 
+import type { PageMeta } from 'lib/pages';
+import type { IPagePermissionFlags } from 'lib/permissions/pages';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 
@@ -12,6 +15,8 @@ type CardFields = {
 type Card = Block & {
     fields: CardFields;
 }
+
+type CardAndPage = { card: Card, page: PageMeta, permissions: IPagePermissionFlags };
 
 /**
  * Returns a focalboard-ready card data stub
@@ -44,5 +49,5 @@ function createCard (block?: Partial<Block>): Card {
 }
 
 export { createCard };
-export type { Card };
+export type { Card, CardAndPage };
 

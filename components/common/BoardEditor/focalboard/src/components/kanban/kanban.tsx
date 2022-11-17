@@ -11,7 +11,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Card, CardAndPage } from '../../blocks/card';
 import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
@@ -60,7 +60,7 @@ function NewGroupTextField (props: NewGroupTextFieldProps) {
 type Props = {
   board: Board;
   activeView: BoardView;
-  cards: Card[];
+  cardPages: CardAndPage[];
   groupByProperty?: IPropertyTemplate;
   visibleGroups: BoardGroup[];
   hiddenGroups: BoardGroup[];
@@ -73,7 +73,8 @@ type Props = {
 }
 
 function Kanban (props: Props) {
-  const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
+  const { board, activeView, cardPages, groupByProperty, visibleGroups, hiddenGroups } = props;
+  const cards = cardPages.map(c => c.card);
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
@@ -82,7 +83,6 @@ function Kanban (props: Props) {
     (id) => board.fields.cardProperties.find((t) => t.id === id)
   ).filter((i) => i) as IPropertyTemplate[];
   const isManualSort = activeView.fields.sortOptions.length === 0;
-  const visibleBadges = activeView.fields.visiblePropertyIds.includes(Constants.badgesColumnId);
 
   const propertyNameChanged = useCallback(async (option: IPropertyOption, text: string): Promise<void> => {
     if (groupByProperty) {
@@ -128,8 +128,8 @@ function Kanban (props: Props) {
 
     if (draggedCardIds.length > 0) {
       await mutator.performAsUndoGroup(async () => {
-        const cardsById: { [key: string]: Card } = cards.reduce((acc: { [key: string]: Card }, c: Card): { [key: string]: Card } => {
-          acc[c.id] = c;
+        const cardsById: { [key: string]: Card } = cards.reduce<{ [key: string]: Card }>((acc, _card) => {
+          acc[_card.id] = _card;
           return acc;
         }, {});
         const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]).filter((c) => c);
@@ -185,8 +185,8 @@ function Kanban (props: Props) {
     const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
 
     // Update dstCard order
-    const cardsById: { [key: string]: Card } = cards.reduce((acc: { [key: string]: Card }, card: Card): { [key: string]: Card } => {
-      acc[card.id] = card;
+    const cardsById: { [key: string]: Card } = cards.reduce<{ [key: string]: Card }>((acc, _card) => {
+      acc[_card.id] = _card;
       return acc;
     }, {});
     const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]).filter((c) => c);
@@ -303,7 +303,7 @@ function Kanban (props: Props) {
               key={group.option.id || 'empty'}
               onDrop={(card: Card) => onDropToColumn(group.option, card)}
             >
-              {group.cards.map((card) => (
+              {group.cardPages.map((card) => (
                 <KanbanCard
                   card={card}
                   board={board}

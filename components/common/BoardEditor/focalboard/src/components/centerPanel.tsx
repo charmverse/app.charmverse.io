@@ -25,12 +25,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
+import { isTruthy } from 'lib/utilities/types';
 
 import { BlockIcons } from '../blockIcons';
 import type { Block } from '../blocks/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board';
 import type { BoardView } from '../blocks/boardView';
-import type { Card } from '../blocks/card';
+import type { Card, CardAndPage } from '../blocks/card';
 import { createCard } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
@@ -88,7 +89,7 @@ function CenterPanel (props: Props) {
 
   const router = useRouter();
   const space = useCurrentSpace();
-  const { pages, updatePage } = usePages();
+  const { pages, updatePage, getPagePermissions } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
 
@@ -105,7 +106,10 @@ function CenterPanel (props: Props) {
     viewId: activeView?.id || ''
   }));
   // filter cards by whats accessible
-  const cards = _cards.filter(card => pages[card.id]);
+  const cardPages = _cards.map(card => ({ card, page: pages[card.id], permissions: getPagePermissions(card.id) }))
+    // make sure a page exists and is not deleted
+    .filter((item): item is CardAndPage => isTruthy(item.page));
+  const cards = cardPages.map(cardPage => cardPage.card);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
@@ -118,7 +122,7 @@ function CenterPanel (props: Props) {
   }
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
-    ? getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
+    ? getVisibleAndHiddenGroups(cardPages, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
     : { visible: [], hidden: [] };
 
   const backgroundRef = React.createRef<HTMLDivElement>();
@@ -300,8 +304,13 @@ function CenterPanel (props: Props) {
     setState({ ...state, selectedCardIds: [] });
   }
 
-  function getVisibleAndHiddenGroups (__cards: Card[], visibleOptionIds: string[], hiddenOptionIds: string[], groupByProperty?: IPropertyTemplate):
-    { visible: BoardGroup[], hidden: BoardGroup[] } {
+  function getVisibleAndHiddenGroups (
+    cardPages: CardAndPage[],
+    visibleOptionIds: string[],
+    hiddenOptionIds: string[],
+    groupByProperty?: IPropertyTemplate
+  ): { visible: BoardGroup[], hidden: BoardGroup[] } {
+
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
       unassignedOptionIds = groupByProperty.options
@@ -315,8 +324,8 @@ function CenterPanel (props: Props) {
       allVisibleOptionIds.unshift('');
     }
 
-    const _visibleGroups = groupCardsByOptions(__cards, allVisibleOptionIds, groupByProperty);
-    const _hiddenGroups = groupCardsByOptions(__cards, hiddenOptionIds, groupByProperty);
+    const _visibleGroups = groupCardsByOptions(cardPages, allVisibleOptionIds, groupByProperty);
+    const _hiddenGroups = groupCardsByOptions(cardPages, hiddenOptionIds, groupByProperty);
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
@@ -480,7 +489,7 @@ function CenterPanel (props: Props) {
               <Kanban
                 board={activeBoard}
                 activeView={activeView}
-                cards={cards}
+                cardPages={cardPages}
                 groupByProperty={groupByProperty}
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
@@ -543,30 +552,32 @@ function CenterPanel (props: Props) {
 
 }
 
-export function groupCardsByOptions (cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
+export function groupCardsByOptions (cardPages: CardAndPage[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
   const groups = [];
 
   for (const optionId of optionIds) {
     if (optionId) {
       const option = groupByProperty?.options.find((o) => o.id === optionId);
       if (option) {
-        const c = cards.filter((o) => optionId === o.fields.properties[groupByProperty!.id]);
+        const c = cardPages.filter((o) => optionId === o.card.fields.properties[groupByProperty!.id]);
         const group: BoardGroup = {
           option,
-          cards: c
+          cardPages: c,
+          cards: c.map((o) => o.card)
         };
         groups.push(group);
       }
     }
     else {
       // Empty group
-      const emptyGroupCards = cards.filter((card) => {
+      const emptyGroupCards = cardPages.filter(({ card }) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
         return !groupByOptionId || !groupByProperty?.options.find((option) => option.id === groupByOptionId);
       });
       const group: BoardGroup = {
         option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
-        cards: emptyGroupCards
+        cardPages: emptyGroupCards,
+        cards: emptyGroupCards.map((o) => o.card)
       };
       groups.push(group);
     }

@@ -8,7 +8,8 @@ import Link from '@mui/material/Link';
 import type { CryptoCurrency } from 'connectors';
 import { TokenLogoPaths } from 'connectors';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import type { MouseEvent } from 'react';
+import { memo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -16,13 +17,11 @@ import { BountyStatusChip } from 'components/bounties/components/BountyStatusBad
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isTouchScreen } from 'lib/utilities/browser';
-import { PageContent } from 'models';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { Card } from '../../blocks/card';
+import type { Card, CardAndPage } from '../../blocks/card';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -35,11 +34,11 @@ import ConfirmationDialogBox from '../confirmationDialogBox';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
-  card: Card;
+  card: CardAndPage;
   board: Board;
   visiblePropertyTemplates: IPropertyTemplate[];
   isSelected: boolean;
-  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   showCard: (cardId: string | null) => void;
@@ -64,8 +63,9 @@ const CurrencyIcon = styled.span`
   justify-content: center;
 `;
 
-const KanbanCard = React.memo((props: Props) => {
-  const { card, board } = props;
+function KanbanCard (props: Props) {
+  const { card: cardPage, board } = props;
+  const { card, page, permissions } = cardPage;
   const intl = useIntl();
   const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
@@ -78,22 +78,17 @@ const KanbanCard = React.memo((props: Props) => {
   const { bounties } = useBounties();
   const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
 
-  const { pages, getPagePermissions } = usePages();
-  const cardPage = pages[card.id];
-
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
-  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
+  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page.path}` : `/${domain}/${page.path}`;
 
-  // Check if the current user is an admin, admin means implicit full access
-  const pagePermissions = getPagePermissions(card.id);
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
   const handleDeleteCard = async () => {
     if (!card) {
       Utils.assertFailure();
       return;
     }
-    if (pagePermissions.delete) {
+    if (permissions.delete) {
       await mutator.deleteBlock(card, 'delete card');
       mutate(`pages/${space?.id}`);
     }
@@ -143,7 +138,7 @@ const KanbanCard = React.memo((props: Props) => {
               >
                 <IconButton icon={<MoreHorizIcon />} />
                 <Menu position='bottom-start'>
-                  {pagePermissions.delete && pages[card.id]?.deletedAt === null && (
+                  {permissions.delete && page.deletedAt === null && (
                     <Menu.Text
                       icon={<DeleteOutlineIcon />}
                       id='delete'
@@ -156,13 +151,12 @@ const KanbanCard = React.memo((props: Props) => {
                     id='duplicate'
                     name={intl.formatMessage({ id: 'KanbanCard.duplicate', defaultMessage: 'Duplicate' })}
                     onClick={() => {
-                      const _cardPage = pages[card.id];
-                      if (_cardPage && space) {
+                      if (space) {
                         mutator.duplicateCard(
                           {
                             cardId: card.id,
                             board,
-                            cardPage: _cardPage,
+                            cardPage: page,
                             afterRedo: async (newCardId) => {
                               props.showCard(newCardId);
                               mutate(`pages/${space.id}`);
@@ -199,13 +193,13 @@ const KanbanCard = React.memo((props: Props) => {
 
           <div className='octo-icontitle'>
             <div>
-              {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage.hasContent} pageType='page' icon={cardPage.icon} /> : undefined}
+              {page.icon ? <PageIcon isEditorEmpty={!page.hasContent} pageType='page' icon={page.icon} /> : undefined}
             </div>
             <div
               key='__title'
               className='octo-titletext'
             >
-              {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
+              {page.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
           {visiblePropertyTemplates.map((template) => (
@@ -217,8 +211,8 @@ const KanbanCard = React.memo((props: Props) => {
                 board={board}
                 readOnly={true}
                 card={card}
-                updatedAt={cardPage?.updatedAt.toString() || ''}
-                updatedBy={cardPage?.updatedBy || ''}
+                updatedAt={page.updatedAt.toString() || ''}
+                updatedBy={page.updatedBy || ''}
                 propertyTemplate={template}
                 showEmptyPlaceholder={false}
                 displayType='kanban'
@@ -259,6 +253,6 @@ const KanbanCard = React.memo((props: Props) => {
       {showConfirmationDialogBox && <ConfirmationDialogBox dialogBox={confirmDialogProps} />}
     </>
   );
-});
+}
 
-export default KanbanCard;
+export default memo(KanbanCard);

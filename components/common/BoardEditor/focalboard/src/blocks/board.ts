@@ -4,7 +4,7 @@ import { IDType, Utils } from '../utils';
 
 import type { Block } from './block';
 import { createBlock } from './block';
-import type { Card } from './card';
+import type { Card, CardAndPage } from './card';
 
 type PropertyType = 'text' | 'number' | 'select' | 'multiSelect' | 'date' | 'person' | 'file' | 'checkbox' | 'url' | 'email' | 'phone' | 'createdTime' | 'createdBy' | 'updatedTime' | 'updatedBy'
 
@@ -88,6 +88,7 @@ function createBoard ({ block, addDefaultProperty }: { block?: Block, addDefault
 type BoardGroup = {
     option: IPropertyOption;
     cards: Card[];
+    cardPages: CardAndPage[];
 }
 
 export { createBoard };
