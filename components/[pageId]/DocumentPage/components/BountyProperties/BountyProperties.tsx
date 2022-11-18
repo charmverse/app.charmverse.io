@@ -52,6 +52,7 @@ export default function BountyProperties (props: {
   const [space] = useCurrentSpace();
   const { user } = useUser();
   const { mutatePage, pages } = usePages();
+  const isRewardAmountInvalid = useMemo(() => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0, [isAmountInputEmpty, currentBounty]);
 
   const router = useRouter();
 
@@ -247,6 +248,8 @@ export default function BountyProperties (props: {
           inputProps={{
             step: 0.01
           }}
+          error={isRewardAmountInvalid}
+          helperText={isRewardAmountInvalid && 'Bounty amount should be a number greater than 0'}
         />
       </div>
       <Stack
