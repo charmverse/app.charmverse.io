@@ -2,6 +2,7 @@ import type { TokenGate } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
 
+import fetch from 'adapters/http/fetch.server';
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 
@@ -42,10 +43,7 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
   };
 
   try {
-    const res = await fetch('https://api.daylight.xyz/v1/abilities', params);
-    const data = await res.json();
-
-    return data;
+    return await fetch('https://api.daylight.xyz/v1/abilities', params);
   }
   // eslint-disable-next-line no-empty
   catch (e) {}
@@ -65,8 +63,7 @@ export async function deleteDaylightAbility (tokenGateId: string) {
   };
 
   try {
-    const res = await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
-    return await res.json();
+    return await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
   }
   // eslint-disable-next-line no-empty
   catch (e) {
@@ -80,13 +77,7 @@ export async function getAllAbilities () {
     headers: HEADERS
   };
 
-  try {
-    const res = await fetch('https://api.daylight.xyz/v1/abilities/mine', params);
-    const data = await res.json();
-    return data.abilities as { sourceId: string, uid: string }[];
-  }
-  // eslint-disable-next-line no-empty
-  catch (e) {}
+  fetch<{ abilities: { sourceId: string, uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
 }
 
 export async function getAbility (tokenGateId: string) {
@@ -95,12 +86,7 @@ export async function getAbility (tokenGateId: string) {
     headers: HEADERS
   };
 
-  try {
-    const res = await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
-    return res.json();
-  }
-  // eslint-disable-next-line no-empty
-  catch (e) {}
+  return fetch<{ sourceId: string, uid: string }>(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
 }
 
 function getRequirement (condition: AccessControlCondition) {
@@ -182,7 +168,7 @@ function getDaylightRequirements (conditionsData: TokenGateAccessConditions) {
 function getActionUrl (spaceDomain: string) {
   // Daylight will not allow to create ability with action url pointing to localhost
   // for testing we can sue our main domain
-  const base = baseUrl.includes('localhost') ? 'https://charmverse.io' : baseUrl;
+  const base = baseUrl.includes('localhost') ? 'https://app.charmverse.io' : baseUrl;
 
   return `${base}/join?domain=${spaceDomain}`;
 }
