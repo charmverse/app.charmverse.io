@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
@@ -28,6 +28,7 @@ import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
+import { isSmallScreen } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
 import { headerHeight } from '../Header/Header';
@@ -153,9 +154,10 @@ const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
 `;
 
-function SidebarLink ({ active, href, icon, label, target }: { active: boolean, href: string, icon: any, label: string, target?: string }) {
+function SidebarLink ({ active, href, icon, label, target, onClick }:
+  { active: boolean, href: string, icon: any, label: string, target?: string, onClick?: () => void }) {
   return (
-    <StyledSidebarLink href={href} active={active} target={target}>
+    <StyledSidebarLink href={href} active={active} target={target} onClick={onClick}>
       {icon}
       {label}
     </StyledSidebarLink>
@@ -189,6 +191,8 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
   const favoritePageIds = favorites.map(f => f.pageId);
 
+  const isMobile = isSmallScreen();
+
   function onScroll (e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
@@ -204,6 +208,12 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         .then();
     }
   }, []);
+
+  function closeSidebarIfIsMobile () {
+    if (isMobile) {
+      closeSidebar();
+    }
+  }
 
   return (
     <SidebarContainer>
@@ -223,18 +233,21 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               active={router.pathname.startsWith('/[domain]/members')}
               icon={<AccountCircleIcon fontSize='small' />}
               label='Member Directory'
+              onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
               icon={<TaskOutlinedIcon fontSize='small' />}
               label='Proposals'
+              onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               href={`/${space.domain}/bounties`}
               active={router.pathname.startsWith('/[domain]/bounties')}
               icon={<BountyIcon fontSize='small' />}
               label='Bounties'
+              onClick={closeSidebarIfIsMobile}
             />
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
@@ -251,6 +264,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/invites`}
               icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
               label='Invite Members'
+              onClick={closeSidebarIfIsMobile}
             />
             <SearchInWorkspaceModal
               isOpen={searchInWorkspaceModalState.isOpen}
@@ -261,6 +275,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               href={`/${space.domain}/settings/workspace`}
               icon={<SettingsIcon color='secondary' fontSize='small' />}
               label='Settings'
+              onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               active={false}
@@ -268,6 +283,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'
+              onClick={closeSidebarIfIsMobile}
             />
           </Box>
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
@@ -296,14 +312,14 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
 
             </WorkspaceLabel>
             <Box mb={6}>
-              <PageNavigation />
+              <PageNavigation onClick={closeSidebarIfIsMobile} />
             </Box>
             <Box mb={2}>
               <SidebarBox
                 onClick={() => {
                   setShowingTrash(true);
                 }}
-                icon={<DeleteIcon fontSize='small' />}
+                icon={<DeleteOutlinedIcon fontSize='small' />}
                 label='Trash'
               />
             </Box>

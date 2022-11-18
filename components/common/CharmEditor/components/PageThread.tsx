@@ -1,6 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
@@ -434,7 +434,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
             <ListItemText>Edit comment</ListItemText>
           </MenuItem>
           <MenuItem onClick={onClickDeleteComment}>
-            <ListItemIcon><DeleteIcon /></ListItemIcon>
+            <ListItemIcon><DeleteOutlinedIcon /></ListItemIcon>
             <ListItemText>Delete comment</ListItemText>
           </MenuItem>
         </Menu>

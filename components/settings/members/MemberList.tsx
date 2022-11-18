@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -65,17 +65,17 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
   return (
     <>
       <Legend>Current Members</Legend>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Join date</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {members.map(member => (
-            member.isBot === true ? null : (
+      <Box overflow='auto'>
+        <Table size='small' aria-label='Current members table'>
+          <TableHead>
+            <TableRow>
+              <TableCell>Username</TableCell>
+              <TableCell>Join date</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {members.filter(member => !member.isBot).map(member => (
               <MemberListItem
                 isAdmin={isAdmin}
                 key={member.id}
@@ -83,10 +83,10 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
                 member={member}
                 onChange={updateMember}
               />
-            )
-          ))}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
       {removedMember && (
         <ConfirmDeleteModal
           title='Remove member'

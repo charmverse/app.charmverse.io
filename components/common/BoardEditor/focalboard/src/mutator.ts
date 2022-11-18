@@ -1,11 +1,10 @@
 /* eslint-disable default-param-last */
 import charmClient from 'charmClient';
 import type { PageMeta } from 'lib/pages';
-import type { Page, PageContent } from 'models';
+import type { PageContent } from 'models';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import { BlockIcons } from './blockIcons';
 import type { Block, BlockPatch } from './blocks/block';
 import { createPatchesFromBlocks } from './blocks/block';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
@@ -17,9 +16,7 @@ import { createCard } from './blocks/card';
 import type { FilterGroup } from './blocks/filterGroup';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
-import store from './store';
 import undoManager from './undomanager';
-import { UserSettings } from './userSettings';
 import { IDType, Utils } from './utils';
 
 export interface BlockChange {

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/Close';
+import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import type { TokenGate } from '@prisma/client';
 import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useRouter } from 'next/router';
-import type { MouseEvent } from 'react';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
@@ -224,7 +223,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                     <Tooltip arrow placement='top' title='Delete'>
                       <ButtonChip
                         className='row-actions'
-                        icon={<DeleteIcon />}
+                        icon={<DeleteOutlinedIcon />}
                         clickable
                         color='secondary'
                         size='small'

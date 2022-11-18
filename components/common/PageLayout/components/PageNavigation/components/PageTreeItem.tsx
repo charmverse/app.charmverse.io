@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -52,6 +52,7 @@ interface PageTreeItemProps {
   pageId: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
+  onClick?: () => void;
 }
 
 export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean }>(({ isActive, theme }) => ({
@@ -177,9 +178,10 @@ interface PageLinkProps {
   pageType?: Page['type']; // optional since we use this for views as well
   pageId?: string;
   showPicker?: boolean;
+  onClick?: () => void;
 }
 
-export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId }: PageLinkProps) {
+export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId, onClick }: PageLinkProps) {
 
   const popupState = usePopupState({
     popupId: 'page-emoji',
@@ -211,7 +213,7 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
             <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
           </span>
         )}
-        <PageTitle hasContent={isempty}>
+        <PageTitle hasContent={isempty} onClick={onClick}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
         {children}
@@ -278,7 +280,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     label,
     pageType,
     pageId,
-    hasSelectedChildView
+    hasSelectedChildView,
+    onClick
   } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -331,6 +334,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
       labelIcon={icon}
       pageId={pageId}
       pageType={pageType}
+      onClick={onClick}
     >
       <div className='page-actions'>
         <MemoizedIconButton size='small' onClick={showMenu}>
@@ -425,7 +429,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
           <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
-            <ListItemIcon><DeleteIcon /></ListItemIcon>
+            <ListItemIcon><DeleteOutlinedIcon /></ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </PageMenuItem>
         </div>
