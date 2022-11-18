@@ -415,7 +415,7 @@ export class DocumentEventHandler {
         content,
         v: page.version
       },
-      doc_info: {
+      docInfo: {
         id: page.id,
         session_id: this.id,
         updated: page.updatedAt,
