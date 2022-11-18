@@ -1,6 +1,6 @@
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
@@ -149,7 +149,7 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
             disabled={!pagePermissions?.delete}
             onClick={onDeletePage}
           >
-            <DeleteIcon
+            <DeleteOutlinedIcon
               fontSize='small'
               sx={{
                 mr: 1

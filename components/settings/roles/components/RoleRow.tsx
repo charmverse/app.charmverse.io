@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DoneIcon from '@mui/icons-material/Done';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -22,7 +22,6 @@ import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMem
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import useIsAdmin from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { spaceOperationLabels } from 'lib/permissions/spaces/client';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
@@ -56,8 +55,6 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
   const { members } = useMembers();
 
   const currentSpace = useCurrentSpace();
-
-  const isAdmin = useIsAdmin();
 
   const roleSpacePermissions = role.spacePermissions?.find(p => p.forSpaceId === currentSpace?.id)?.operations ?? [];
 
@@ -211,7 +208,7 @@ export default function RoleRow ({ isEditable, role, assignRoles, unassignRole, 
             menuState.close();
           }}
         >
-          <ListItemIcon><DeleteIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon><DeleteOutlinedIcon fontSize='small' /></ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
         </MenuItem>
       </Menu>

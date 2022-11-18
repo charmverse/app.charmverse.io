@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -425,7 +425,7 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
       <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
           <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
-            <ListItemIcon><DeleteIcon /></ListItemIcon>
+            <ListItemIcon><DeleteOutlinedIcon /></ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </PageMenuItem>
         </div>

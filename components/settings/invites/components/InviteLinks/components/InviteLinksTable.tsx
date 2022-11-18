@@ -1,5 +1,5 @@
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
-import DeleteIcon from '@mui/icons-material/Close';
+import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
@@ -118,7 +118,7 @@ export default function InvitesTable (props: Props) {
                   <Tooltip arrow placement='top' title='Delete'>
                     <ButtonChip
                       className='row-actions'
-                      icon={<DeleteIcon />}
+                      icon={<CloseIcon />}
                       clickable
                       color='secondary'
                       size='small'

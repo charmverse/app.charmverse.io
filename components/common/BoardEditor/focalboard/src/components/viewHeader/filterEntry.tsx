@@ -1,4 +1,4 @@
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -100,7 +100,7 @@ function FilterEntry (props: Props): JSX.Element {
           mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
         }}
       >
-        <DeleteIcon fontSize='small' />
+        <DeleteOutlinedIcon fontSize='small' />
       </Button>
     </div>
   );

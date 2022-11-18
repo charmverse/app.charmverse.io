@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
@@ -24,7 +24,6 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
-import { useWebSocketClient } from 'hooks/useSocketClient';
 import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
@@ -303,7 +302,7 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
                 onClick={() => {
                   setShowingTrash(true);
                 }}
-                icon={<DeleteIcon fontSize='small' />}
+                icon={<DeleteOutlinedIcon fontSize='small' />}
                 label='Trash'
               />
             </Box>
