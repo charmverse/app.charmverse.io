@@ -4,9 +4,12 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
 import SunIcon from '@mui/icons-material/WbSunny';
@@ -130,6 +133,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   }
 
   const { members } = useMembers();
+  const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
   const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
 
@@ -141,19 +145,45 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List dense>
-      <ListItemButton
-        onClick={() => {
-          updatePageActionDisplay('suggestions');
-          setPageMenuOpen(false);
-        }}
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('comments');
+        setPageMenuOpen(false);
+      }}
       >
-        <FeedbackOutlinedIcon
+        <MessageOutlinedIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='View feedback' />
+        <ListItemText primary='View comments' />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('suggestions');
+        setPageMenuOpen(false);
+      }}
+      >
+        <RateReviewOutlinedIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View suggestions' />
+      </ListItemButton>
+      <ListItemButton onClick={() => {
+        setCurrentPageActionDisplay('polls');
+        setPageMenuOpen(false);
+      }}
+      >
+        <FormatListBulletedOutlinedIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='View polls' />
       </ListItemButton>
       <Divider />
       <ListItemButton
