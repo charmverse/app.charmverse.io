@@ -137,8 +137,7 @@ function MemberDirectoryGalleryCard ({
                     <Stack key={property.id}>
                       <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
                       <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                        withYear: true,
-                        withTime: true
+                        withYear: true
                       })}
                       </Typography>
                     </Stack>
