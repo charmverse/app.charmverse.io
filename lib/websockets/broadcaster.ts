@@ -10,6 +10,8 @@ import type { ServerMessage } from './interfaces';
 
 export class WebsocketBroadcaster {
 
+  sockets: Record<string, Socket> = {};
+
   // Server will be set after the first request
   private io: Server = new Server();
 
@@ -36,6 +38,7 @@ export class WebsocketBroadcaster {
     //     // eslint-disable-next-line no-console
     //     console.log('Connected socket amount', sockets.size);
     //   });
+    // });
 
     // }, 1000);
 
@@ -47,6 +50,13 @@ export class WebsocketBroadcaster {
 
   broadcast (message: ServerMessage, roomId: string): void {
     this.io.to(roomId).emit('message', message);
+  }
+
+  broadcastToOthers (message: ServerMessage, roomId: string, userId: string): void {
+    const socket = this.sockets[userId];
+    if (socket) {
+      socket.broadcast.to(roomId).emit('message', message);
+    }
   }
 
   leaveRoom (socket: Socket, roomId: string): void {
@@ -76,6 +86,8 @@ export class WebsocketBroadcaster {
     });
 
     socket.join([roomId]);
+
+    this.sockets[userId] = socket;
   }
 
 }

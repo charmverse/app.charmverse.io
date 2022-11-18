@@ -122,10 +122,10 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   // Update page track profile and meta data state, unless it was content update
   if (!('content' in updateContent)) {
     updateTrackPageProfile(pageWithPermission.id);
-    relay.broadcast({
+    relay.broadcastToOthers({
       type: 'pages_meta_updated',
       payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
-    }, page.spaceId);
+    }, page.spaceId, req.session.user.id);
   }
 
   if (hasNewParentPage) {
@@ -170,10 +170,10 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
   updateTrackPageProfile(pageId);
 
   if (pageToDelete) {
-    relay.broadcast({
+    relay.broadcastToOthers({
       type: 'pages_deleted',
       payload: modifiedChildPageIds.map(id => ({ id }))
-    }, pageToDelete?.spaceId as string);
+    }, pageToDelete.spaceId, req.session.user.id);
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
