@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { useRef, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -10,11 +10,11 @@ import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
+import { untitledPage } from 'lib/pages/untitledPage';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import type { WebsocketPayload } from 'lib/websockets/interfaces';
-import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
@@ -64,12 +64,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
-  const ref = useRef<{ empty?: boolean }>();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
-    ref.current = {
-      empty: false
-    };
     if (!currentSpace) {
       return {};
     }
@@ -80,22 +76,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       pagesDict[page.id] = page;
     }, {});
 
-    if (pagesRes.length === 0) {
-      ref.current = {
-        empty: true
-      };
-    }
-
     return pagesDict;
   }, { refreshInterval });
 
   const pages = data || {};
-
-  useEffect(() => {
-    if (ref.current?.empty && currentSpace) {
-      router.push(`/${currentSpace.domain}/members`);
-    }
-  }, [ref.current, currentSpace]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
