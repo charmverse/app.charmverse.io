@@ -289,18 +289,21 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       </ListItemButton>
       {
         pageCreator && basePage && (
-          <Stack sx={{
-            mx: 2,
-            my: 1
-          }}
-          >
-            <Typography variant='subtitle2'>
-              Last edited by {pageCreator.username}
-            </Typography>
-            <Typography variant='subtitle2'>
-              Last edited at {humanFriendlyDate(basePage.updatedAt)}
-            </Typography>
-          </Stack>
+          <>
+            <Divider />
+            <Stack sx={{
+              mx: 2,
+              my: 1
+            }}
+            >
+              <Typography variant='subtitle2'>
+                Last edited by {pageCreator.username}
+              </Typography>
+              <Typography variant='subtitle2'>
+                Last edited at {humanFriendlyDate(basePage.updatedAt)}
+              </Typography>
+            </Stack>
+          </>
         )
       }
     </List>
