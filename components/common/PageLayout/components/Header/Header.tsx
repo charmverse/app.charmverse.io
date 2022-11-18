@@ -5,7 +5,6 @@ import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoritedIcon from '@mui/icons-material/Star';
@@ -26,7 +25,6 @@ import { useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useColorMode } from 'context/darkMode';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -70,7 +68,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
   const { updatePageActionDisplay } = usePageActionDisplay();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { showMessage } = useSnackbar();
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
@@ -79,7 +76,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
   const pageType = basePage?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal';
+  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
 
@@ -91,7 +88,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     // getPage to get content
     const page = await charmClient.pages.getPage(basePage.id);
     const markdownContent = await generateMarkdown(page);
-
     if (markdownContent) {
       const data = new Blob([markdownContent], { type: 'text/plain' });
 
@@ -127,6 +123,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       await deletePage({
         pageId: basePage.id
       });
+      if (basePage.type === 'board') {
+        await charmClient.deleteBlock(basePage.id, () => {});
+      }
     }
   }
 
@@ -142,25 +141,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const documentOptions = (
     <List dense>
-      <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
-        <div>
-          <ListItemButton
-            disabled={!pagePermissions?.create_poll}
-            onClick={() => {
-              setPageMenuOpen(false);
-              setIsModalOpen(true);
-            }}
-          >
-            <HowToVoteOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Create a poll' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
       <ListItemButton
         onClick={() => {
           updatePageActionDisplay('suggestions');
@@ -196,7 +176,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <NotFavoritedIcon />
           )}
         </Box>
-        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorite'} />
+        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorites'} />
       </ListItemButton>
       <ListItemButton
         onClick={onCopyLink}
@@ -213,7 +193,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
         <div>
           <ListItemButton
-            disabled={!pagePermissions?.delete}
+            disabled={!pagePermissions?.delete || basePage?.deletedAt !== null}
             onClick={onDeletePage}
           >
             <DeleteOutlineOutlinedIcon
@@ -238,25 +218,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           )}
         />
       )}
-      {/* <Tooltip title={!pagePermissions?.create_poll ? 'You don\'t have permission to create poll' : ''}>
-        <div>
-          <ListItemButton
-            disabled={!pagePermissions?.create_poll}
-            onClick={() => {
-              setPageMenuOpen(false);
-              setIsModalOpen(true);
-            }}
-          >
-            <TaskOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Convert to proposal' />
-          </ListItemButton>
-        </div>
-      </Tooltip> */}
       <Tooltip title={!isExportablePage ? 'This page can\'t be exported' : ''}>
         <div>
           <ListItemButton
@@ -413,18 +374,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           {/* <Account /> */}
         </Box>
       </Box>
-      {/** inject the modal based on open status so it resets the form each time */}
-      {isModalOpen && (
-        <CreateVoteModal
-          open={isModalOpen}
-          onCreateVote={() => {
-            setIsModalOpen(false);
-          }}
-          onClose={() => {
-            setIsModalOpen(false);
-          }}
-        />
-      )}
     </StyledToolbar>
   );
 }
