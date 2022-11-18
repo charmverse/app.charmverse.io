@@ -22,7 +22,6 @@ import useENSName from 'hooks/useENSName';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { shortenHex } from 'lib/utilities/strings';
 import type { IdentityType, LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -53,7 +52,7 @@ export interface UserDetailsProps {
 }
 
 const StyledStack = styled(Stack)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle()}
 `;
 
 function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {

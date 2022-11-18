@@ -7,6 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
+import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
@@ -17,11 +18,14 @@ export async function createUserFromWallet (
   // An ID set by analytics tools to have pre signup user journey
   preExistingId: string = v4()
 ): Promise<LoggedInUser> {
+
+  const lowercaseAddress = address.toLowerCase();
+
   const user = await prisma.user.findFirst({
     where: {
       wallets: {
         some: {
-          address
+          address: lowercaseAddress
         }
       }
     },
@@ -43,9 +47,10 @@ export async function createUserFromWallet (
         identityType: IDENTITY_TYPES[0],
         username,
         path: isUserPathAvailable ? userPath : null,
+        email: `${randomName()}@charmversetest.io`,
         wallets: {
           create: {
-            address
+            address: lowercaseAddress
           }
         }
       },

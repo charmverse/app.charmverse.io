@@ -93,7 +93,8 @@ function CenterPanel (props: Props) {
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPageType = pages[board.id]?.type;
+  const boardPage = pages[board.id];
+  const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
@@ -392,7 +393,7 @@ function CenterPanel (props: Props) {
         keyName='ctrl+d,del,esc,backspace'
         onKeyDown={keydownHandler}
       />
-      {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={board.id} />}
       {!props.hideBanner && board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner

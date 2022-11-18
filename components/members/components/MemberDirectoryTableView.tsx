@@ -18,7 +18,6 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
@@ -29,7 +28,7 @@ const StyledTableCell = styled(TableCell)`
 `;
 
 const StyledTableRow = styled(TableRow)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })}
+  ${hoverIconsStyle()}
 `;
 
 function MemberDirectoryTableRow ({
@@ -66,12 +65,15 @@ function MemberDirectoryTableRow ({
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
             size='small'
-            className={!admin ? '' : 'icons'}
+            className='icons'
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setIsModalOpen(true);
             }}
+            style={!admin ? {
+              opacity: 1
+            } : {}}
           >
             <EditIcon fontSize='small' />
           </IconButton>
@@ -113,8 +115,7 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell>
                   <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                    withYear: true,
-                    withTime: true
+                    withYear: true
                   })}
                   </Typography>
                 </TableCell>

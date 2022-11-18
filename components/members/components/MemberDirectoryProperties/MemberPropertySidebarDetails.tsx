@@ -1,5 +1,5 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberPropertyPermission } from '@prisma/client';
@@ -78,7 +78,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
                       {!readOnly && (
                         <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
                           <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                            <DeleteIcon fontSize='small' onClick={() => removePermission(permission)} />
+                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
                           </Tooltip>
                         </IconButton>
                       )}

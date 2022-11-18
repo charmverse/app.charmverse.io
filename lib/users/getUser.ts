@@ -17,7 +17,7 @@ export async function getUserProfile (key: 'id' | 'addresses', value: string): P
   if (key === 'addresses') {
     query.wallets = {
       some: {
-        address: value
+        address: value.toLowerCase()
       }
     };
   }

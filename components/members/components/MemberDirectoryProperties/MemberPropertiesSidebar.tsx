@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
@@ -224,7 +224,7 @@ export function MemberPropertySidebarItem ({
             </Tooltip>
             {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
               <Tooltip title={`Delete ${property.name} property.`}>
-                <DeleteIcon
+                <DeleteOutlinedIcon
                   cursor='pointer'
                   fontSize='small'
                   color='secondary'

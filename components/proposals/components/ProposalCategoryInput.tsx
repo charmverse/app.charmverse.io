@@ -1,4 +1,4 @@
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Chip, IconButton, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import type { HTMLAttributes } from 'react';
@@ -48,7 +48,7 @@ function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategory
               onDelete(category.id);
             }}
           >
-            <DeleteIcon />
+            <DeleteOutlinedIcon />
           </IconButton>
         )}
       </Box>

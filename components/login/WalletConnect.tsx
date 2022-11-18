@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { AuthSigWithRawAddress } from 'lib/blockchain/interfaces';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 
 import { WalletSign } from './WalletSign';
 
@@ -28,7 +28,7 @@ export function WalletConnect ({ onSuccess }: Props) {
   const { account, connectWallet } = useWeb3AuthSig();
   const { updateUser } = useUser();
 
-  async function signSuccess (signature: AuthSigWithRawAddress) {
+  async function signSuccess (signature: AuthSig) {
     const updatedUser = await charmClient.addUserWallets([signature]);
 
     updateUser(updatedUser);
