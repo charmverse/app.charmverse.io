@@ -21,7 +21,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
-import { nanofy } from 'lib/utilities/numbers';
 import type { BrandColor } from 'theme/colors';
 
 export const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
@@ -203,7 +202,15 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
 
   const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
 
-  const truncatedAmount = bounty.rewardAmount < 1 ? nanofy({ number: bounty.rewardAmount, spaceUnit: false }) : millify(bounty.rewardAmount);
+  const truncatedAmount = () => {
+    try {
+      return millify(bounty.rewardAmount, { precision: 4 });
+    }
+    catch (error) {
+      return 'Invalid number';
+    }
+
+  };
 
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
@@ -246,7 +253,7 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
                   variant='h6'
                   fontSize={18}
                 >
-                  {truncate ? truncatedAmount : bounty.rewardAmount}
+                  {truncate ? truncatedAmount() : bounty.rewardAmount}
                 </Typography>
               </>
             )
