@@ -1,6 +1,5 @@
 import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import type { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -19,43 +18,10 @@ import BlockAligner from '../BlockAligner';
 import Resizable from '../Resizable';
 import VerticalResizer from '../Resizable/VerticalResizer';
 
+import type { IFrameSelectorProps } from './IFrameSelector';
 import IFrameSelector from './IFrameSelector';
 
 const name = 'iframe';
-
-interface DispatchFn {
-  (tr: Transaction): void;
-}
-
-// inject a real iframe node when pasting embed codes
-
-export const iframePlugin = new Plugin({
-  props: {
-    handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-      // @ts-ignore
-      const contentRow = slice.content.content?.[0].content.content;
-      const embedUrl = extractEmbedLink(contentRow?.[0]?.text);
-      if (embedUrl) {
-        insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
-        return true;
-      }
-      return false;
-    }
-  }
-});
-
-const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
-
-function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
-  const type = getTypeFromSchema(state.schema);
-  const newTr = type.create(attrs);
-  const { tr } = view.state;
-  const cursorPosition = state.selection.$head.pos;
-  tr.insert(cursorPosition, newTr);
-  if (dispatch) {
-    dispatch(state.tr.replaceSelectionWith(newTr));
-  }
-}
 
 export function iframeSpec (): RawSpecs {
   return {
@@ -127,7 +93,7 @@ const StyledEmptyIframeContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: 'video' | 'embed' | 'figma' }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: IFrameSelectorProps['type'] }) {
   const theme = useTheme();
   const { type, readOnly, ...rest } = props;
   return (
@@ -202,8 +168,10 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
       <IFrameSelector
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
+          const attrs = extractEmbedLink(videoLink);
           updateAttrs({
-            src: extractEmbedLink(videoLink)
+            src: attrs.url,
+            type: attrs.type
           });
         }}
       >

@@ -1,10 +1,18 @@
-export function extractEmbedLink (url: string) {
-  const isIframeEmbed = url.startsWith('<iframe ');
-  let embedUrl = url;
+export type LinkType = 'embed' | 'video' | 'figma';
 
+export function extractEmbedLink (url: string): { type: LinkType, url: string } {
+
+  let embedUrl = url;
+  let type: LinkType = 'embed';
+
+  const isIframeEmbed = url.startsWith('<iframe ');
   const isRegularYTLink = url.includes('youtube');
   const isSharedYTLink = url.includes('youtu.be');
+  const isFigma = url.includes('www.figma.com');
   if (isRegularYTLink || isSharedYTLink) {
+
+    type = 'video';
+
     const { pathname, search } = new URL(url);
     const urlSearchParams = new URLSearchParams(search);
     if (isRegularYTLink) {
@@ -23,6 +31,9 @@ export function extractEmbedLink (url: string) {
     const indexOfLastQuote = url.indexOf('"', indexOfFirstQuote + 1);
     embedUrl = url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
   }
+  else if (isFigma) {
+    type = 'figma';
+  }
 
-  return embedUrl;
+  return { type, url: embedUrl };
 }
