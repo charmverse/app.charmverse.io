@@ -10,6 +10,7 @@ import { getAccessType } from './utils';
 
 const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
 const HEADERS = { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${DAYLIGHT_API_KEY}` };
+const SOURCE_PREFIX = 'charm_verse_ability_';
 
 type ConditionOperator = { operator: 'AND' | 'OR' }
 type Condition = AccessControlCondition | ConditionOperator;
@@ -37,8 +38,7 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
       title: `Join CharmVerse's ${space.name} workspace`,
       type: 'access',
       isActive: true,
-      // Daylight's sourceId will be the same as tokenGate id
-      sourceId: tokenGate.id
+      sourceId: getAbilitySourceId(tokenGate.id)
     })
   };
 
@@ -63,7 +63,7 @@ export async function deleteDaylightAbility (tokenGateId: string) {
   };
 
   try {
-    return await fetch(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
+    return await fetch(`https://api.daylight.xyz/v1/abilities/${getAbilitySourceId(tokenGateId)}`, params);
   }
   // eslint-disable-next-line no-empty
   catch (e) {
@@ -86,7 +86,7 @@ export async function getAbility (tokenGateId: string) {
     headers: HEADERS
   };
 
-  return fetch<{ sourceId: string, uid: string }>(`https://api.daylight.xyz/v1/abilities/${tokenGateId}`, params);
+  return fetch<{ sourceId: string, uid: string }>(`https://api.daylight.xyz/v1/abilities/${getAbilitySourceId(tokenGateId)}`, params);
 }
 
 function getRequirement (condition: AccessControlCondition) {
@@ -171,4 +171,8 @@ function getActionUrl (spaceDomain: string) {
   const base = baseUrl.includes('localhost') ? 'https://app.charmverse.io' : baseUrl;
 
   return `${base}/join?domain=${spaceDomain}`;
+}
+
+function getAbilitySourceId (tokenGateId: string) {
+  return `${SOURCE_PREFIX}${tokenGateId}`;
 }
