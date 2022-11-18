@@ -113,8 +113,7 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell>
                   <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                    withYear: true,
-                    withTime: true
+                    withYear: true
                   })}
                   </Typography>
                 </TableCell>
