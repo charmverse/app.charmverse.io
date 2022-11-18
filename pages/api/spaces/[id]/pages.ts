@@ -1,13 +1,14 @@
 
+import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { onError, onNoMatch } from 'lib/middleware';
-import { getPagePath } from 'lib/pages';
 import type { IPageWithPermissions } from 'lib/pages/server';
-import { includePagePermissionsMeta, getAccessiblePages } from 'lib/pages/server';
+import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
+import { untitledPage } from 'lib/pages/untitledPage';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -32,7 +33,6 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPerm
   });
 
   const createdPages: IPageWithPermissions[] = [];
-  // const redirectUrl: null | string = null;
 
   if (accessiblePages.length === 0 && !search) {
     const totalPages = await prisma.page.count({
@@ -43,15 +43,10 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPerm
 
     if (totalPages === 0) {
       const createdPage = await createPage({
-        data: {
-          type: 'page',
-          title: '',
-          createdBy: userId,
-          updatedBy: userId,
-          contentText: '',
-          spaceId,
-          path: getPagePath()
-        },
+        data: untitledPage({
+          userId,
+          spaceId
+        }) as Prisma.PageUncheckedCreateInput,
         include: {
           ...includePagePermissionsMeta()
         }
@@ -60,26 +55,7 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPerm
       await setupPermissionsAfterPageCreated(createdPage.id);
       createdPages.push(createdPage);
     }
-    // else {
-    //   const space = await prisma.space.findUnique({
-    //     where: {
-    //       id: spaceId
-    //     },
-    //     select: {
-    //       domain: true
-    //     }
-    //   });
-    //   if (space) {
-    //     redirectUrl = `${req.headers.host}/${space.domain}/members`;
-    //   }
-    // }
   }
-
-  // if (redirectUrl) {
-  //   return res.writeHead(302, {
-  //     Location: redirectUrl
-  //   });
-  // }
   return res.status(200).json([...accessiblePages, ...createdPages]);
 }
 
