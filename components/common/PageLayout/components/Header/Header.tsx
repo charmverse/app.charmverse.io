@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -38,6 +37,8 @@ import { useUser } from 'hooks/useUser';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
+import DocumentHistory from '../DocumentHistory';
+
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import DatabasePageOptions from './components/DatabasePageOptions';
 import EditingModeToggle from './components/EditingModeToggle';
@@ -70,7 +71,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
   const pageMenuAnchor = useRef();
-  const { updatePageActionDisplay } = usePageActionDisplay();
   const { showMessage } = useSnackbar();
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
@@ -357,6 +357,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {basePage && (
             <>
+              <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
               {basePage?.deletedAt === null && (
                 <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
