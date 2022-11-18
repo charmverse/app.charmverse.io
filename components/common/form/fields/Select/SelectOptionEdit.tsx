@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import CheckIcon from '@mui/icons-material/Check';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
@@ -63,7 +63,7 @@ export function SelectOptionEdit ({ option, onChange, onDelete, onToggleOptionEd
           }}
           >
             <ListItemIcon>
-              <DeleteIcon fontSize='small' />
+              <DeleteOutlinedIcon fontSize='small' />
             </ListItemIcon>
             <Typography variant='subtitle1'>Delete</Typography>
           </MenuItem>

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -124,7 +124,7 @@ export default function LargeAvatar (props: LargeAvatarProps) {
       />
     </StyledIconButton>,
     <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
-      <DeleteIcon
+      <DeleteOutlinedIcon
         fontSize='small'
       />
     </StyledIconButton>,

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -20,11 +21,15 @@ interface Props {
 }
 
 export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
-  const { pages } = usePages();
+  const { deletePage, pages, getPagePermissions } = usePages();
   const { showPage } = usePageDialog();
-
+  const { setBounties } = useBounties();
   const router = useRouter();
   const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
+  function onClickDelete (bountyId: string) {
+    setBounties((_bounties) => _bounties.filter(_bounty => _bounty.id !== bountyId));
+    deletePage({ pageId: bountyId });
+  }
 
   const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
     record[bounty.status].push(bounty);
@@ -80,6 +85,8 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
             {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])
               && pages[bounty.page.id]?.deletedAt === null).map(bounty => (
                 <BountyCard
+                  getPagePermissions={getPagePermissions}
+                  onDelete={publicMode ? undefined : onClickDelete}
                   key={bounty.id}
                   bounty={bounty}
                   page={pages[bounty.page.id] as PageMeta}

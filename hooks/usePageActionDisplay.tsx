@@ -15,11 +15,13 @@ export type PageAction = 'polls' | 'comments' | 'suggestions';
 export interface IPageActionDisplayContext {
   currentPageActionDisplay: PageAction | null;
   setCurrentPageActionDisplay: React.Dispatch<React.SetStateAction<IPageActionDisplayContext['currentPageActionDisplay']>>;
+  updatePageActionDisplay: (defaultAction: PageAction | null) => void;
 }
 
 export const PageActionDisplayContext = createContext<IPageActionDisplayContext>({
   currentPageActionDisplay: null,
-  setCurrentPageActionDisplay: () => undefined
+  setCurrentPageActionDisplay: () => undefined,
+  updatePageActionDisplay: () => null
 });
 
 export function PageActionDisplayProvider ({ children }: { children: ReactNode }) {
@@ -32,12 +34,11 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
   const { cache } = useSWRConfig();
   const [currentPageActionDisplay, setCurrentPageActionDisplay] = useState<IPageActionDisplayContext['currentPageActionDisplay']>(null);
 
-  // show page sidebar by default if there are comments or votes
-  useEffect(() => {
+  function updatePageActionDisplay (defaultAction: PageAction | null = null) {
     const highlightedCommentId = (new URLSearchParams(window.location.search)).get('commentId');
     if (currentPageActionDisplay) {
       // dont redirect if sidebar is already open
-      return;
+      return setCurrentPageActionDisplay(null);
     }
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
       const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
@@ -46,20 +47,26 @@ export function PageActionDisplayProvider ({ children }: { children: ReactNode }
       if (!highlightedCommentId && cachedInlineVotesData && cachedInlineVotesData.find(inlineVote => inlineVote.status === 'InProgress'
       // We don't want to open the sidebar for a proposal-type vote
       && inlineVote.context !== 'proposal')) {
-        setCurrentPageActionDisplay('polls');
+        return setCurrentPageActionDisplay('polls');
       }
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       else if (highlightedCommentId || (cachedInlineCommentData && cachedInlineCommentData.find(thread => thread && !thread.resolved))) {
-        setCurrentPageActionDisplay('comments');
+        return setCurrentPageActionDisplay('comments');
       }
       else {
-        setCurrentPageActionDisplay(null);
+        return setCurrentPageActionDisplay(defaultAction);
       }
     }
+  }
+
+  // show page sidebar by default if there are comments or votes
+  useEffect(() => {
+    updatePageActionDisplay();
   }, [isValidatingInlineComments, isValidatingInlineVotes, currentPageId]);
 
   const value = useMemo<IPageActionDisplayContext>(() => ({
     currentPageActionDisplay,
+    updatePageActionDisplay,
     setCurrentPageActionDisplay
   }), [currentPageActionDisplay]);
 

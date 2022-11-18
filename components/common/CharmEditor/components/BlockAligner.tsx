@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItem } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo, forwardRef } from 'react';
@@ -49,7 +49,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
             backgroundColor: 'inherit'
           }}
         >
-          <DeleteIcon sx={{ fontSize: 14 }} />
+          <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
         </ListItem>
       </Controls>
     </StyledBlockAligner>

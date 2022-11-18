@@ -19,14 +19,13 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { humanFriendlyDate } from 'lib/utilities/dates';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => hoverIconsStyle({ theme, isTouchScreen: isTouchScreen() })};
+  ${hoverIconsStyle({ absolutePositioning: true })};
 
   height: 100%;
   display: flex;
@@ -73,18 +72,15 @@ function MemberDirectoryGalleryCard ({
           {((user?.id === member.id && currentSpace) || admin) && (
             <IconButton
               size='small'
-              className={!admin ? '' : 'icons'}
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                zIndex: 1
-              }}
+              className='icons'
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setIsModalOpen(true);
               }}
+              style={!admin ? {
+                opacity: 1
+              } : {}}
             >
               <EditIcon fontSize='small' />
             </IconButton>
