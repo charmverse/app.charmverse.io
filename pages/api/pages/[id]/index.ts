@@ -60,7 +60,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     userId
   });
 
-  const updateContent = req.body as Page ?? {};
+  const updateContent = req.body as Partial<Page> ?? {};
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
@@ -124,7 +124,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     updateTrackPageProfile(pageWithPermission.id);
     relay.broadcast({
       type: 'pages_meta_updated',
-      payload: [{ ...updatedPageMeta, id: pageId }]
+      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
     }, page.spaceId);
   }
 
