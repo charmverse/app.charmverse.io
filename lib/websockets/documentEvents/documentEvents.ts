@@ -7,6 +7,7 @@ import { getLogger } from 'lib/log/prefix';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocketData } from '../authentication';
@@ -236,7 +237,7 @@ export class DocumentEventHandler {
             diffs: true
           }
         });
-        const content = page.content || { type: 'doc', content: [] };
+        const content = page.content || emptyDocument;
         const room: DocumentRoom = {
           doc: {
             id: page.id,
@@ -408,7 +409,7 @@ export class DocumentEventHandler {
       where: { id: session.documentId },
       select: { content: true, updatedAt: true, id: true, version: true }
     });
-    const content = page.content as any || { type: 'doc', content: [] };
+    const content = page.content as any || emptyDocument;
     const message: ServerDocDataMessage = {
       type: 'doc_data',
       doc: {

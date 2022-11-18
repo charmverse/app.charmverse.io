@@ -268,7 +268,6 @@ export class WebSocketConnector {
       const data = getData();
       if (!data) {
         // message is empty
-        log.debug('Ignore empty message');
         return;
       }
       this.messages.client += 1;
