@@ -101,7 +101,7 @@ export class FidusEditor {
       id: docId,
       confirmedDoc: false, // The latest doc as confirmed by the server.
       updated: false, // Latest update time stamp
-      version: 0
+      version: 1
     };
 
     this.statePlugins = [

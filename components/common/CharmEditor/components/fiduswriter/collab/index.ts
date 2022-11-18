@@ -82,7 +82,7 @@ export class ModCollab {
       this.collaborativeMode = false;
     }
     this.participants.forEach(participant => {
-      this.colors.ensureUserColor(participant.id);
+      this.colors.ensureUserColor(participant.id, participant.name);
     });
 
     return this.participants;

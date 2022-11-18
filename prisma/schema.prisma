@@ -273,7 +273,7 @@ model Page {
   proposalId         String?          @unique @db.Uuid
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
-  version            Int              @default(0)
+  version            Int              @default(1)
   //diffs: Json @default('[]')
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author             User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)

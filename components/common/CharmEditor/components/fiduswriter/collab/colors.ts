@@ -1,4 +1,6 @@
 
+import { stringToHue } from 'lib/utilities/strings';
+
 import { noSpaceTmp } from '../common/basic';
 
 import type { ModCollab } from './index';
@@ -34,7 +36,7 @@ export class ModCollabColors {
 
   userColorStyle: null | HTMLElement = null;
 
-  colorIds: string[] = [];
+  colorIds: { id: string, username: string }[] = [];
 
   constructor (mod: ModCollab) {
     mod.colors = this;
@@ -51,12 +53,12 @@ export class ModCollabColors {
     this.userColorStyle = document.getElementById('user-colors');
   }
 
-  ensureUserColor (userId: string) {
+  ensureUserColor (id: string, username: string) {
     /* We assign a color to each user. This color stays even if the user
         * disconnects or the participant list is being updated.
         */
-    if (!(this.colorIds.includes(userId))) {
-      this.colorIds.push(userId);
+    if (!(this.colorIds.some(user => user.id === id))) {
+      this.colorIds.push({ id, username });
       this.provideUserColorStyles();
     }
   }
@@ -64,19 +66,21 @@ export class ModCollabColors {
   // Ensure that there are at least the given number of user color styles.
   provideUserColorStyles () {
     if (this.userColorStyle) {
-      this.userColorStyle.innerHTML = this.colorIds.map((id, index) => {
-        const color = index < CSS_COLORS.length ? CSS_COLORS[index]
-          : `${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)}`;
+      this.userColorStyle.innerHTML = this.colorIds.map(({ id, username }) => {
+        // const color = index < CSS_COLORS.length ? CSS_COLORS[index]
+        //   : `${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)},${Math.round(Math.random() * 255)}`;
+        const hue = stringToHue(username);
+        const hslValues = `${hue}, 50%, 50%`;
         return noSpaceTmp`
           .user-${id} {
-            border-color: var(${color});
-            text-decoration-color: var(${color});
+            border-color: hsl(${hslValues});
+            text-decoration-color: hsl(${hslValues});
           }
           .user-${id}.insertion {
-            color: var(${color});
+            color: hsl(${hslValues});
           }
           .user-bg-${id} {
-            background-color: rgba(var(${color}-rgb), 0.2);
+            background-color: hsla(${hslValues}, 0.2);
           }`;
       }).join('\n');
     }
