@@ -5,7 +5,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import type { ClientSelectionMessage } from 'lib/websockets/documentEvents/interfaces';
 
-export const key = new PluginKey('collabCarets');
+const key = new PluginKey('collabCarets');
 
 type CaretPosition = {
   anchor: number;

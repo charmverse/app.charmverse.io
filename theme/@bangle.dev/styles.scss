@@ -559,8 +559,6 @@ details {
   color: var(--prop-gray);
   content: attr(data-placeholder);
   pointer-events: none;
-}
-
-.ProseMirror:focus[data-placeholder]::before {
-  display: none;
+  position: relative;
+  top: 3px;
 }
