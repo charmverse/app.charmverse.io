@@ -53,6 +53,7 @@ import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
+import fiduswriterStyles from './components/fiduswriter/styles';
 import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import * as floatingMenu from './components/floatingMenu';
 import * as heading from './components/heading';
@@ -71,11 +72,10 @@ import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import { placeholderPlugin } from './components/placeholder/index';
 import Quote from './components/quote';
-import ResizableImage, { pasteImagePlugin } from './components/ResizableImage';
+import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
-import trackStyles from './components/suggestions/styles';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -225,12 +225,9 @@ export function charmEditorPlugins (
     table.selectionShadowPlugin(),
     // @ts-ignore missing type
     table.TableFiltersMenu(),
-    trailingNode.plugins(),
     disclosure.plugins(),
     tweet.plugins(),
-    // TODO: Pasting iframe or image link shouldn't create those blocks for now
-    // iframePlugin,
-    pasteImagePlugin
+    trailingNode.plugins()
   ];
 
   if (!readOnly) {
@@ -309,7 +306,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     }
   `}
 
-  ${trackStyles}
+  ${fiduswriterStyles}
 `;
 
 const defaultContent: PageContent = {
@@ -419,8 +416,7 @@ function CharmEditor (
   }, 100) : undefined;
 
   function _onContentChange (view: EditorView, prevDoc: Node<any>) {
-    // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkIsContentEmpty(view.state.doc.textContent.trim() === ''));
+    setIsEmpty(view.state.doc.textContent.trim() === '');
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view, prevDoc);
     }

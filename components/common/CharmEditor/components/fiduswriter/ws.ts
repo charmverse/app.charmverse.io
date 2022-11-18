@@ -127,21 +127,20 @@ export class WebSocketConnector {
       const expectedServer = this.messages.server + 1;
       // console.log('[charm ws] socket message', data, expectedServer);
       if (data.type === 'request_resend') {
-        this.resend_messages(data.from);
+        this.resendMessages(data.from);
       }
       else if (data.s < expectedServer) {
         log.debug('[charm ws] ignore old message');
         // Receive a message already received at least once. Ignore.
-
       }
       else if (data.s > expectedServer) {
         // console.log('[charm ws] resend messages');
         // Messages from the server have been lost.
         // Request resend.
-        this.socket.emit(socketEvent, {
+        this.waitForWS().then(() => this.socket.emit(socketEvent, {
           type: 'request_resend',
           from: this.messages.server
-        });
+        }));
       }
       else {
         this.messages.server = expectedServer;
@@ -156,23 +155,25 @@ export class WebSocketConnector {
           // to have missed some of the client's messages. They could
           // have been sent simultaneously.
           // The server wins over the client in this case.
-          const clientDifference = this.messages.client - data.c;
-          this.messages.client = data.c;
-          if (clientDifference > this.messages.lastTen.length) {
-            // We cannot fix the situation
-            this.send(this.restartMessage);
-            return;
-          }
-          this.messages.lastTen.slice(0 - clientDifference).forEach(__data => {
-            this.messages.client += 1;
-            const wrappedMessage = {
-              ...__data,
-              c: this.messages.client,
-              s: this.messages.server
-            };
-            this.socket.emit(socketEvent, wrappedMessage);
+          this.waitForWS().then(() => {
+            const clientDifference = this.messages.client - data.c;
+            this.messages.client = data.c;
+            if (clientDifference > this.messages.lastTen.length) {
+              // We cannot fix the situation
+              this.send(this.restartMessage);
+              return;
+            }
+            this.messages.lastTen.slice(0 - clientDifference).forEach(__data => {
+              this.messages.client += 1;
+              const wrappedMessage = {
+                ...__data,
+                c: this.messages.client,
+                s: this.messages.server
+              };
+              this.socket.emit(socketEvent, wrappedMessage);
+            });
+            this.receive(data);
           });
-          this.receive(data);
         }
       }
     });
@@ -209,6 +210,23 @@ export class WebSocketConnector {
 
       // }
 
+    });
+  }
+
+  waitForWS () {
+    return new Promise<void>(resolve => {
+      if (this.socket.connected) {
+        resolve();
+      }
+      else {
+        new Promise<void>(resolveTimer => {
+          setTimeout(resolveTimer, 100);
+        }).then(
+          () => this.waitForWS()
+        ).then(
+          () => resolve()
+        );
+      }
     });
   }
 
@@ -261,14 +279,13 @@ export class WebSocketConnector {
       };
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
-      this.socket.emit(socketEvent, wrappedMessage);
-      log.debug('Sent socket message', wrappedMessage);
-      this.setRecentlySentTimer(timer);
+      this.waitForWS().then(() => {
+        log.debug('Sent socket message', wrappedMessage);
+        this.socket.emit(socketEvent, wrappedMessage);
+        this.setRecentlySentTimer(timer);
+      });
     }
     else {
-      if (getData()) {
-        log.debug('queue socket message', { data: getData(), connected: this.socket.connected, recentlySent: this.recentlySent });
-      }
       this.messagesToSend.push(getData);
     }
   }
@@ -288,7 +305,7 @@ export class WebSocketConnector {
     }, timer);
   }
 
-  resend_messages (from: number) {
+  resendMessages (from: number) {
     const toSend = this.messages.client - from;
     this.messages.client = from;
     if (toSend > this.messages.lastTen.length) {

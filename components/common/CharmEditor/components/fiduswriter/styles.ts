@@ -4,7 +4,7 @@ const caretCSS = `
     display: inline;
     border-style: solid;
     border-width: 1px;
-    margin: 0 -1px 0 -1px;
+    margin: 0 -1px;
     position: relative;
   }
 

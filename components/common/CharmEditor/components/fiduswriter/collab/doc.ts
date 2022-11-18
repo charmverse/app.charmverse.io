@@ -148,9 +148,9 @@ export class ModCollabDoc {
       else if (
         sendableSteps(this.mod.editor.view.state)
       ) {
+        console.log('sendToCollaborators - disableDiffSending()')
         this.disableDiffSending();
-        const stepsToSend = sendableSteps(this.mod.editor.view
-          .state);
+        const stepsToSend = sendableSteps(this.mod.editor.view.state);
 
         if (!stepsToSend) {
           // no diff. abandon operation
@@ -185,9 +185,6 @@ export class ModCollabDoc {
         if (!currentView) {
           return false;
         }
-
-        console.log('last update', this.lastSelectionUpdateState, getSelectionUpdate(currentView.state))
-        console.log('')
 
         if (this.lastSelectionUpdateState === currentView.state) {
           // Selection update has been sent for this state already. Skip
@@ -262,6 +259,7 @@ export class ModCollabDoc {
   confirmDiff (request_id: number) {
     const unconfirmedDiffs = this.unconfirmedDiffs[request_id];
     if (!unconfirmedDiffs) {
+      console.log('confirmDiff - dont confirm diff')
       return;
     }
     this.mod.editor.docInfo.version++;
@@ -278,13 +276,12 @@ export class ModCollabDoc {
         ourIds
       );
       this.mod.editor.view.dispatch(tr);
-      if (unconfirmedDiffs.doc) {
-        this.mod.editor.docInfo.confirmedDoc = unconfirmedDiffs.doc;
-      }
+      this.mod.editor.docInfo.confirmedDoc = unconfirmedDiffs.doc;
     }
 
     delete this.unconfirmedDiffs[request_id];
     this.enableDiffSending();
+    console.log('confirmDiff - enableDiffSending()');
   }
 
   rejectDiff (request_id: number) {

@@ -63,7 +63,7 @@ export type ClientDiffMessage = {
   type: 'diff';
   rid: number;
   cid?: number; // client id
-  ds: ProsemirrorJSONStep[]; // steps to send
+  ds: ProsemirrorJSONStep[]; // document steps to send
   // ti?: string; // new title
   doc?: Node;
   v: number;
