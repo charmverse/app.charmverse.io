@@ -22,6 +22,7 @@ import VoteIcon from 'components/votes/components/VoteIcon';
 import type { VoteTask } from 'lib/votes/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
 interface VoteTasksListProps {
@@ -137,12 +138,7 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
 
   if (totalVotes === 0) {
     return (
-      <Card variant='outlined'>
-        <Box p={3} textAlign='center'>
-          <HowToVote />
-          <Typography color='secondary'>You don't have any polls right now</Typography>
-        </Box>
-      </Card>
+      <EmptyTaskState taskType='votes' />
     );
   }
 
