@@ -227,8 +227,6 @@ export function charmEditorPlugins (
     trailingNode.plugins(),
     disclosure.plugins(),
     tweet.plugins(),
-    // TODO: Pasting iframe or image link shouldn't create those blocks for now
-    // iframePlugin,
     pasteImagePlugin
   ];
 

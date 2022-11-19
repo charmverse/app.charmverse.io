@@ -5,12 +5,13 @@ import { useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
+import type { LinkType } from 'lib/embed/extractEmbedLink';
 
-interface IFrameSelectorProps {
+export interface IFrameSelectorProps {
   onIFrameSelect: (videoSrc: string) => void;
   children: ReactNode;
   tabs?: [string, ReactNode][];
-  type: 'embed' | 'video' | 'figma';
+  type: LinkType;
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {
