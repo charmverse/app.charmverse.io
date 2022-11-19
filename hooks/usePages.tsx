@@ -15,7 +15,6 @@ import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pa
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
-import { untitledPage } from 'seedData';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
