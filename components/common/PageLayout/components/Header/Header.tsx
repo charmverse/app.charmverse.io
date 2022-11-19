@@ -11,6 +11,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -28,6 +29,8 @@ import { useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useColorMode } from 'context/darkMode';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -65,7 +68,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
+  const { pages, updatePage, getPagePermissions, deletePage, mutatePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -75,6 +78,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
+  const currentSpace = useCurrentSpace();
 
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
@@ -134,13 +138,28 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+  const canCreateProposal = !!userSpacePermissions?.createVote;
   const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
 
   function onCopyLink () {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
     setPageMenuOpen(false);
+  }
+
+  async function convertToProposal () {
+    if (currentSpace && user && basePage) {
+      await charmClient.pages.updatePage({
+        type: 'proposal',
+        id: basePage.id
+      });
+
+      mutatePage({
+        id: basePage.id,
+        type: 'proposal'
+      });
+    }
   }
 
   const documentOptions = (
@@ -185,6 +204,26 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         />
         <ListItemText primary='View polls' />
       </ListItemButton>
+      <Divider />
+      <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : basePage?.type === 'proposal' ? 'Proposal page can\'t be converted' : ''}>
+        <div>
+          <ListItemButton
+            onClick={() => {
+              convertToProposal();
+              setPageMenuOpen(false);
+            }}
+            disabled={!canCreateProposal || basePage?.type === 'proposal'}
+          >
+            <TaskOutlinedIcon
+              fontSize='small'
+              sx={{
+                mr: 1
+              }}
+            />
+            <ListItemText primary='Convert to proposal' />
+          </ListItemButton>
+        </div>
+      </Tooltip>
       <Divider />
       <ListItemButton
         onClick={() => {

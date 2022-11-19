@@ -13,8 +13,11 @@ import { resolvePageTree } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server/getPage';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { createProposal } from 'lib/proposal/createProposal';
+import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UndesirableOperationError } from 'lib/utilities/errors';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -78,7 +81,9 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
       id: true,
       parentId: true,
       type: true,
-      spaceId: true
+      spaceId: true,
+      content: true,
+      title: true
     }
   });
 
@@ -96,6 +101,36 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
     if (error) {
       throw error;
+    }
+  }
+
+  if (updateContent.type === 'proposal') {
+    const spacePermissions = await computeSpacePermissions({
+      allowAdminBypass: true,
+      resourceId: page.spaceId,
+      userId
+    });
+
+    if (!spacePermissions.createVote) {
+      throw new UnauthorisedActionError('You do not have permission to create a page in this space');
+    }
+    else {
+      await createProposal({
+        createdBy: userId,
+        spaceId: page.spaceId,
+        content: page.content ?? undefined,
+        title: page.title
+      });
+
+      const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
+        pageId: page.id
+        // includeDeletedPages: true
+      })).parents.find(p => p.type === 'proposal')?.id : undefined;
+
+      // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
+      if (proposalIdForPermissions) {
+        await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
+      }
     }
   }
 

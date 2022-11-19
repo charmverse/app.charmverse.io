@@ -1,11 +1,9 @@
-import type { ProposalStatus, Prisma } from '@prisma/client';
+import type { Page, Prisma, Proposal, ProposalStatus, WorkspaceEvent } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
-import type { PageContent } from 'models';
 
 import { getPagePath } from '../pages';
 
@@ -18,7 +16,7 @@ type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
   & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
 type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
 
-export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
+export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput, createProposalPage: boolean = true) {
 
   const { createdBy, spaceId } = pageProps;
 
@@ -26,31 +24,45 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
 
-  // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, page, workspaceEvent] = await prisma.$transaction([
-    prisma.proposal.create({
-      data: {
-        // Add page creator as the proposal's first author
-        createdBy,
-        id: proposalId,
-        spaceId,
-        status: proposalStatus,
-        categoryId: proposalProps?.categoryId || null,
-        authors: {
-          create: {
-            userId: createdBy
-          }
-        },
-        ...proposalProps?.reviewers && {
-          reviewers: {
-            createMany: {
-              data: proposalProps.reviewers
-            }
+  const transactionPipeline = [prisma.proposal.create({
+    data: {
+      // Add page creator as the proposal's first author
+      createdBy,
+      id: proposalId,
+      spaceId,
+      status: proposalStatus,
+      categoryId: proposalProps?.categoryId || null,
+      authors: {
+        create: {
+          userId: createdBy
+        }
+      },
+      ...proposalProps?.reviewers && {
+        reviewers: {
+          createMany: {
+            data: proposalProps.reviewers
           }
         }
       }
-    }),
-    createPage({
+    }
+  }), prisma.workspaceEvent.create({
+    data: {
+      type: 'proposal_status_change',
+      meta: {
+        newStatus: proposalStatus
+      },
+      actorId: createdBy,
+      pageId: proposalId,
+      spaceId
+    }
+  })];
+
+  transactionPipeline.push();
+
+  // Using a transaction to ensure both the proposal and page gets created together
+  const result = (createProposalPage
+    ? await prisma.$transaction(transactionPipeline)
+    : await prisma.$transaction([...transactionPipeline, createPage({
       data: {
         proposalId,
         contentText: '',
@@ -62,19 +74,9 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         type: 'proposal'
       },
       include: null
-    }),
-    prisma.workspaceEvent.create({
-      data: {
-        type: 'proposal_status_change',
-        meta: {
-          newStatus: proposalStatus
-        },
-        actorId: createdBy,
-        pageId: proposalId,
-        spaceId
-      }
-    })
-  ]);
+    })])) as [Proposal, WorkspaceEvent] | [Proposal, WorkspaceEvent, Page];
+
+  const [proposal, workspaceEvent, page] = result;
 
   const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, isNewProposal: true });
 
@@ -85,7 +87,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
     ))
   ]);
 
-  trackUserAction('new_proposal_created', { userId: createdBy, pageId: page.id, resourceId: proposal.id, spaceId });
+  trackUserAction('new_proposal_created', { userId: createdBy, pageId: proposal.id, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }
