@@ -88,8 +88,8 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               }
               case 'multiselect':
               case 'select': {
-                const propertyValue = property.value as string | string[];
-                if (propertyValue.length === 0) {
+                const propertyValue = property.value as string | undefined | string[];
+                if (!propertyValue || propertyValue?.length === 0) {
                   return null;
                 }
                 return (
