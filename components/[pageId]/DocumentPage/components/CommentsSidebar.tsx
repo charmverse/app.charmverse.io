@@ -11,7 +11,7 @@ import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
+import { findTotalInlineComments } from 'lib/prosemirror/plugins/inline-comments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';

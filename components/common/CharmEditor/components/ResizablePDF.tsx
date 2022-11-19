@@ -13,7 +13,7 @@ import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
 import PdfSelector from 'components/common/PdfSelector';
-import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
+import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import Resizable from './Resizable/Resizable';
 

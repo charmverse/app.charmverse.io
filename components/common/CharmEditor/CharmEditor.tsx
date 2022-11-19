@@ -36,10 +36,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inline-comments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
@@ -376,16 +375,12 @@ function CharmEditor (
   const { mutate } = useSWRConfig();
   const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  // check empty state of page on first load
-  const _isEmpty = checkIsContentEmpty(content);
-  const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
 
-  // eslint-disable-next-line
-  const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+  const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(
       specRegistry.schema,
       doc,
@@ -394,33 +389,29 @@ function CharmEditor (
     if (deletedThreadIds.length) {
       charmClient.resolveMultipleThreads({
         threadIds: deletedThreadIds,
-        pageId
+        pageId: _pageId
       }).then(() => {
-        charmClient.getPageThreads(pageId).then((threads) => {
-          mutate(`pages/${pageId}/threads`, threads);
+        charmClient.getPageThreads(_pageId).then((threads) => {
+          mutate(`pages/${_pageId}/threads`, threads);
         }).catch((err) => {
-          log.warn(`Failed to fetch threads for page ${pageId}`, err);
+          log.warn(`Failed to fetch threads for page ${_pageId}`, err);
         });
       }).catch((err) => {
         log.warn('Failed to auto resolve threads', err);
       });
     }
   }, 1000);
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
+
+  const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
-    onContentChange({ doc, rawText });
-  }, 100) : undefined;
-
-  function _onContentChange (view: EditorView, prevDoc: Node<any>) {
-    setIsEmpty(view.state.doc.textContent.trim() === '');
-    if (onContentChangeDebounced) {
-      onContentChangeDebounced(view, prevDoc);
+    if (onContentChange) {
+      onContentChange({ doc, rawText });
     }
-  }
+  }, 100);
 
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -442,10 +433,11 @@ function CharmEditor (
     });
   }
 
-  const state = useEditorState({
-    specRegistry,
-    plugins: charmEditorPlugins({
-      onContentChange: _onContentChange,
+  function getPlugins () {
+    return charmEditorPlugins({
+      onContentChange: (view: EditorView, prevDoc: Node<any>) => {
+        debouncedUpdate(view, prevDoc);
+      },
       onSelectionSet,
       readOnly,
       disablePageSpecificFeatures,
@@ -453,7 +445,12 @@ function CharmEditor (
       pageId,
       spaceId: currentSpace?.id,
       userId: user?.id
-    }),
+    });
+  }
+
+  const state = useEditorState({
+    specRegistry,
+    plugins: getPlugins(),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
@@ -461,11 +458,9 @@ function CharmEditor (
   });
 
   const onResizeStop = useCallback((view: EditorView) => {
-    if (onContentChangeDebounced) {
-      // Save the current embed size on the backend after we are done resizing
-      onContentChangeDebounced(view);
-    }
-  }, [onContentChangeDebounced]);
+    // Save the current embed size on the backend after we are done resizing
+    debouncedUpdate(view);
+  }, [debouncedUpdate]);
 
   useEffect(() => {
     if (editorRef.current) {
@@ -488,6 +483,12 @@ function CharmEditor (
       // console.log('destroy charmeditor');
     };
   }, [editorRef.current]);
+
+  useEffect(() => {
+
+    const plugins = getPlugins();
+
+  }, [readOnly, enableVoting, pageId, currentSpace?.id, user?.id]);
 
   return (
     <StyledReactBangleEditor

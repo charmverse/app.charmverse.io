@@ -1,9 +1,9 @@
 import type { Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 
-import { extractTextFromSelection } from 'lib/inline-comments/extractTextFromSelection';
-import { findTotalInlineComments } from 'lib/inline-comments/findTotalInlineComments';
-import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
+import { extractTextFromSelection } from 'lib/prosemirror/plugins/inline-comments/extractTextFromSelection';
+import { findTotalInlineComments } from 'lib/prosemirror/plugins/inline-comments/findTotalInlineComments';
+import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inline-comments/removeInlineCommentMark';
 
 import { useMembers } from './useMembers';
 import { usePages } from './usePages';

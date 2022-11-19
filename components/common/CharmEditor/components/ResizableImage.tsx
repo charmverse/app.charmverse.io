@@ -13,7 +13,7 @@ import { v4 } from 'uuid';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import Resizable from './Resizable/Resizable';

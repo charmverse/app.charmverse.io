@@ -137,10 +137,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
 
-  // re-render when the page or edit mode changes
-  // editMode is null to start, but we dont want to re-render charmeditor in editing mode when it starts
-  const charmKey = page.id + (editMode || 'editing');
-
   function onParticipantUpdate (participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
@@ -164,7 +160,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={charmKey}
+              key={page.id}
               // content={pageDetails?.content as PageContent}
               // onContentChange={updatePageContent}
               readOnly={readOnly}
