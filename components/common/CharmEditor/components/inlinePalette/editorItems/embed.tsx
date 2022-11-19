@@ -2,6 +2,7 @@ import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import PreviewIcon from '@mui/icons-material/Preview';
 import TwitterIcon from '@mui/icons-material/Twitter';
+import { FiFigma } from 'react-icons/fi';
 
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 
@@ -36,6 +37,40 @@ export function items (): PaletteItemTypeNoGroup[] {
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node, false));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+            return replaceSuggestionMarkWith(palettePluginKey, '')(
+              state,
+              dispatch,
+              view
+            );
+          }
+          return false;
+        };
+      }
+    },
+    {
+      uid: 'figma',
+      title: 'Figma',
+      icon: <FiFigma style={{ fontSize: iconSize }} />,
+      keywords: ['iframe'],
+      description: 'Embed Figma',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
+
+              const node = _state.schema.nodes.iframe.create({
+                src: null,
+                type: 'figma',
+                width: MAX_EMBED_WIDTH,
+                height: MIN_EMBED_HEIGHT
+              });
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node));
                 return true;
               }
               return insertNode(_state, _dispatch, node);
