@@ -8,7 +8,7 @@ export function EmptyTaskState ({ taskType }: { taskType: string }) {
     <Card variant='outlined'>
       <Box p={3} textAlign='center'>
         <TaskOutlinedIcon />
-        <Typography color='secondary'>You don't have any {taskType} right now</Typography>
+        <Typography color='secondary'>You don't have any {taskType} to review right now</Typography>
       </Box>
     </Card>
   );
