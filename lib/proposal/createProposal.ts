@@ -1,4 +1,4 @@
-import type { Page, Prisma, Proposal, ProposalStatus, WorkspaceEvent } from '@prisma/client';
+import type { Page, Prisma, ProposalStatus, WorkspaceEvent } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
@@ -16,7 +16,7 @@ type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
   & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
 type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
 
-export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput, createProposalPage: boolean = true) {
+export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput, pageId?: string) {
 
   const { createdBy, spaceId } = pageProps;
 
@@ -24,7 +24,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
 
-  const transactionPipeline = [prisma.proposal.create({
+  const proposalCreateQuery = prisma.proposal.create({
     data: {
       // Add page creator as the proposal's first author
       createdBy,
@@ -45,7 +45,9 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         }
       }
     }
-  }), prisma.workspaceEvent.create({
+  });
+
+  const workspaceEventCreateQuery = prisma.workspaceEvent.create({
     data: {
       type: 'proposal_status_change',
       meta: {
@@ -55,14 +57,12 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
       pageId: proposalId,
       spaceId
     }
-  })];
-
-  transactionPipeline.push();
+  });
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const result = (createProposalPage
-    ? await prisma.$transaction(transactionPipeline)
-    : await prisma.$transaction([...transactionPipeline, createPage({
+  const result = (!pageId
+    ? await prisma.$transaction([proposalCreateQuery, workspaceEventCreateQuery])
+    : await prisma.$transaction([proposalCreateQuery, createPage({
       data: {
         proposalId,
         contentText: '',
@@ -74,9 +74,11 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         type: 'proposal'
       },
       include: null
-    })])) as [Proposal, WorkspaceEvent] | [Proposal, WorkspaceEvent, Page];
+    }), workspaceEventCreateQuery]));
 
-  const [proposal, workspaceEvent, page] = result;
+  const proposal = result[0];
+  const workspaceEvent = (pageId ? result[1] : result[2]) as WorkspaceEvent;
+  const page = pageId ? result[1] as Page : null;
 
   const [deleteArgs, createArgs] = await generateSyncProposalPermissions({ proposalId, isNewProposal: true });
 
@@ -87,7 +89,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
     ))
   ]);
 
-  trackUserAction('new_proposal_created', { userId: createdBy, pageId: proposal.id, resourceId: proposal.id, spaceId });
+  trackUserAction('new_proposal_created', { userId: createdBy, pageId: (pageId ?? page?.id) as string, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }

@@ -120,7 +120,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
         spaceId: page.spaceId,
         content: page.content ?? undefined,
         title: page.title
-      });
+      }, undefined, page.id);
 
       const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
         pageId: page.id
