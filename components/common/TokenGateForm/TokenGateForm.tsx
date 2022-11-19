@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
@@ -27,9 +27,11 @@ interface Props {
 
 export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
 
+  const renders = useRef(0);
+  renders.current += 1;
+  //  console.log('Renders', renders.current);
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { walletAuthSignature } = useWeb3AuthSig();
   const { refreshUserWithWeb3Account, loginFromWeb3Account, user } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
@@ -61,12 +63,6 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
         });
     }
   }, [spaceDomain]);
-
-  useEffect(() => {
-    if (user && walletAuthSignature && !verifyingGates) {
-      evaluateEligibility(walletAuthSignature);
-    }
-  }, []);
 
   async function evaluateEligibility (authSig: AuthSig) {
 
