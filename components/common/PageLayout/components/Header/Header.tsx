@@ -68,7 +68,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage, mutatePage } = usePages();
+  const { pages, updatePage, getPagePermissions, deletePage, mutatePage, refreshPage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -159,6 +159,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         id: basePage.id,
         type: 'proposal'
       });
+
+      refreshPage(basePage.id);
+      setPageMenuOpen(false);
     }
   }
 
@@ -208,10 +211,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : basePage?.type === 'proposal' ? 'Proposal page can\'t be converted' : ''}>
         <div>
           <ListItemButton
-            onClick={() => {
-              convertToProposal();
-              setPageMenuOpen(false);
-            }}
+            onClick={convertToProposal}
             disabled={!canCreateProposal || basePage?.type === 'proposal'}
           >
             <TaskOutlinedIcon
