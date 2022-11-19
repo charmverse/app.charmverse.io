@@ -1,7 +1,6 @@
 import Alert from '@mui/material/Alert';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -19,6 +18,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
 function DiscussionTaskRow (
@@ -161,11 +161,7 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
 
   if (totalMentions === 0) {
     return (
-      <Card variant='outlined'>
-        <Box p={3} textAlign='center'>
-          <Typography color='secondary'>You don't have any mentions right now</Typography>
-        </Box>
-      </Card>
+      <EmptyTaskState taskType='discussions' />
     );
   }
 
