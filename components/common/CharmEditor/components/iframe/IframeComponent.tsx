@@ -167,14 +167,14 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
       <IFrameSelector
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
-          const attrs = extractEmbedLink(videoLink);
           const tweetAttrs = extractTweetAttrs(videoLink);
           if (tweetAttrs) {
-            const tweetNode = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
             const pos = getPos();
+            const tweetNode = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, tweetNode));
           }
           else {
+            const attrs = extractEmbedLink(videoLink);
             updateAttrs({
               src: attrs.url,
               type: attrs.type
