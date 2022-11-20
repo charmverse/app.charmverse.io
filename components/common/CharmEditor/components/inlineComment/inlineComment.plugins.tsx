@@ -5,7 +5,7 @@ import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import reactDOM from 'react-dom';
 
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
-import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inline-comments/findTotalInlineComments';
+import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';

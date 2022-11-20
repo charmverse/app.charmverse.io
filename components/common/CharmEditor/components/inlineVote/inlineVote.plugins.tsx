@@ -4,8 +4,8 @@ import type { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.d
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import reactDOM from 'react-dom';
 
-import { extractInlineVoteRows } from 'lib/inline-votes/findTotalInlineVotes';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+import { extractInlineVoteRows } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';

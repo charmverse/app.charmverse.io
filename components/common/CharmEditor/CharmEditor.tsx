@@ -38,7 +38,7 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
-import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inline-comments/extractDeletedThreadIds';
+import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
