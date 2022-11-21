@@ -138,7 +138,7 @@ function getRequirement (condition: AccessControlCondition) {
   }
 }
 
-function getDaylightRequirements (conditionsData: TokenGateAccessConditions) {
+export function getDaylightRequirements (conditionsData: TokenGateAccessConditions) {
   const conditionsFlatArr = flatten(conditionsData);
 
   const operators = conditionsFlatArr.filter(condition => {
