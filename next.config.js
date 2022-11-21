@@ -56,7 +56,7 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            hermes: './background/hermes.ts'
+            websockets: './background/websockets.ts'
           };
         });
       };

@@ -1,13 +1,13 @@
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
-import { hermesHost } from 'config/constants';
+import { websocketsHost } from 'config/constants';
 import log from 'lib/log';
 import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, ServerMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 const gettext = (text: string) => text;
 
-const socketHost = `${hermesHost}/ceditor`;
+const socketHost = `${websocketsHost}/ceditor`;
 const socketEvent = 'message';
 
 type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;

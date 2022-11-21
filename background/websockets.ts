@@ -18,4 +18,4 @@ relay.bindServer(io);
 
 io.listen(parseInt(port));
 
-log.info('Hermes socket server listening to port: ', port);
+log.info('Web socket server listening to port: ', port);

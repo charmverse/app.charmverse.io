@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { hermesHost } from 'config/constants';
+import { websocketsHost } from 'config/constants';
 import log from 'lib/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
@@ -14,7 +14,7 @@ import { PubSub } from 'lib/websockets/pubSub';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
-const socketHost = `${hermesHost || ''}/`;
+const socketHost = `${websocketsHost || ''}/`;
 
 type LoggedMessage = { type: string, payload: any }
 
