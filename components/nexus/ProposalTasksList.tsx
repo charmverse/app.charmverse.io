@@ -1,6 +1,5 @@
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import Alert from '@mui/material/Alert';
-import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -18,6 +17,7 @@ import { ProposalStatusChip } from 'components/proposals/components/ProposalStat
 import type { ProposalTask, ProposalTaskAction } from 'lib/proposal/getProposalTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
 const ProposalActionRecord: Record<ProposalTaskAction, string> = {
@@ -150,12 +150,7 @@ export default function ProposalTasksList ({
 
   if (totalProposals === 0) {
     return (
-      <Card variant='outlined'>
-        <Box p={3} textAlign='center'>
-          <TaskOutlinedIcon />
-          <Typography color='secondary'>You don't have any proposals right now</Typography>
-        </Box>
-      </Card>
+      <EmptyTaskState taskType='proposals' />
     );
   }
 

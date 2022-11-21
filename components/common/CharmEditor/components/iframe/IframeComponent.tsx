@@ -1,6 +1,5 @@
 import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node, Schema, Slice, Transaction } from '@bangle.dev/pm';
+import type { EditorView, Node } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -10,6 +9,7 @@ import { ListItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
+import { FiFigma } from 'react-icons/fi';
 
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
@@ -18,43 +18,10 @@ import BlockAligner from '../BlockAligner';
 import Resizable from '../Resizable';
 import VerticalResizer from '../Resizable/VerticalResizer';
 
+import type { IFrameSelectorProps } from './IFrameSelector';
 import IFrameSelector from './IFrameSelector';
 
 const name = 'iframe';
-
-interface DispatchFn {
-  (tr: Transaction): void;
-}
-
-// inject a real iframe node when pasting embed codes
-
-export const iframePlugin = new Plugin({
-  props: {
-    handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-      // @ts-ignore
-      const contentRow = slice.content.content?.[0].content.content;
-      const embedUrl = extractEmbedLink(contentRow?.[0]?.text);
-      if (embedUrl) {
-        insertIframeNode(view.state, view.dispatch, view, { src: embedUrl });
-        return true;
-      }
-      return false;
-    }
-  }
-});
-
-const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
-
-function insertIframeNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
-  const type = getTypeFromSchema(state.schema);
-  const newTr = type.create(attrs);
-  const { tr } = view.state;
-  const cursorPosition = state.selection.$head.pos;
-  tr.insert(cursorPosition, newTr);
-  if (dispatch) {
-    dispatch(state.tr.replaceSelectionWith(newTr));
-  }
-}
 
 export function iframeSpec (): RawSpecs {
   return {
@@ -126,7 +93,7 @@ const StyledEmptyIframeContainer = styled(Box)`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: 'video' | 'embed' }) {
+function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: IFrameSelectorProps['type'] }) {
   const theme = useTheme();
   const { type, readOnly, ...rest } = props;
   return (
@@ -144,9 +111,34 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnl
       {...rest}
     >
       <StyledEmptyIframeContainer>
-        {type === 'embed' ? <PreviewIcon fontSize='small' /> : <VideoLibraryIcon fontSize='small' />}
+        {(() => {
+          switch (type) {
+            case 'embed':
+              return <PreviewIcon fontSize='small' />;
+            case 'video':
+              return <VideoLibraryIcon fontSize='small' />;
+            case 'figma':
+              return <FiFigma style={{ fontSize: 'small' }} />;
+
+            default:
+              return null;
+          }
+        })()}
         <Typography>
-          {type === 'video' ? 'Insert a video' : 'Insert an embed'}
+          {(() => {
+            switch (type) {
+              case 'embed':
+                return 'Insert an embed';
+              case 'video':
+                return 'Insert a video';
+              case 'figma':
+                return 'Insert a Figma';
+
+              default:
+                return null;
+            }
+          })()}
+
         </Typography>
       </StyledEmptyIframeContainer>
     </ListItem>
@@ -168,6 +160,7 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
   const [height, setHeight] = useState(node.attrs.height);
   const view = useEditorViewContext();
+  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -175,8 +168,10 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
       <IFrameSelector
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
+          const attrs = extractEmbedLink(videoLink);
           updateAttrs({
-            src: extractEmbedLink(videoLink)
+            src: attrs.url,
+            type: attrs.type
           });
         }}
       >
@@ -194,7 +189,11 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
   if (readOnly) {
     return (
       <StyledIFrame>
-        <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+        {node.attrs.type === 'figma' ? (
+          <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+        ) : (
+          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+        )}
       </StyledIFrame>
     );
   }
@@ -221,6 +220,33 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
         >
           <StyledIFrame>
             <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          </StyledIFrame>
+        </VerticalResizer>
+      </BlockAligner>
+    );
+  }
+  else if (node.attrs.type === 'figma') {
+    return (
+      <BlockAligner onDelete={onDelete}>
+        <VerticalResizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              height: data.size.height
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={node.attrs.width}
+          height={height}
+          onResize={(_, data) => {
+            setHeight(data.size.height);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        >
+          <StyledIFrame>
+            <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
