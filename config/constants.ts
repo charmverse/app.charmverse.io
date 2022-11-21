@@ -7,3 +7,4 @@ export const baseUrl = process.env.DOMAIN as string | undefined;
 export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
 export const socketsHost = process.env.NEXT_PUBLIC_SOCKETS_HOST;
 export const socketsPort = process.env.NEXT_PUBLIC_SOCKETS_PORT;
+export const authSecret = process.env.AUTH_SECRET as string | undefined;

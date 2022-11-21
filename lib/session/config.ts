@@ -1,5 +1,5 @@
 
-import { baseUrl, cookieDomain } from 'config/constants';
+import { authSecret as _maybeAuthSecret, baseUrl, cookieDomain } from 'config/constants';
 
 declare module 'iron-session' {
   interface IronSessionData {
@@ -10,9 +10,15 @@ declare module 'iron-session' {
   }
 }
 
+if (!_maybeAuthSecret) {
+  throw new Error('The AUTH_SECRET env var is required to start server');
+}
+
+export const authSecret = _maybeAuthSecret;
+
 export const ironOptions = {
   cookieName: 'charm.sessionId',
-  password: process.env.AUTH_SECRET as string,
+  password: authSecret,
   // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
   cookieOptions: {
     sameSite: 'strict' as const,

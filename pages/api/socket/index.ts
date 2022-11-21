@@ -5,6 +5,7 @@ import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { authOnConnect } from 'lib/websockets/authentication';
 import { DocumentEventHandler } from 'lib/websockets/documentEvents';
@@ -26,7 +27,6 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
   };
 }
 
-const authSecret = process.env.AUTH_SECRET as string;
 const safeUserIdTtl = 15;
 
 // Subscribe user to messages
