@@ -7,7 +7,7 @@ import { useRef } from 'react';
 import log from 'lib/log';
 
 import type { TweetNodeAttrs } from '../tweet';
-import { extractTweetId } from '../tweet';
+import { extractTweetAttrs } from '../tweet';
 import { twitterWidgetJs } from '../twitterJSUrl';
 
 import { TweetInput } from './TweetInput';
@@ -75,11 +75,11 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
     else {
       return (
         <TweetInput
-          isValid={(url) => extractTweetId(url) !== null}
+          isValid={(url) => extractTweetAttrs(url) !== null}
           onSubmit={(urlInput) => {
-            const props = extractTweetId(urlInput);
-            if (props) {
-              updateAttrs(props);
+            const _attrs = extractTweetAttrs(urlInput);
+            if (_attrs) {
+              updateAttrs(_attrs);
             }
           }}
         />

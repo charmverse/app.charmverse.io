@@ -1,6 +1,5 @@
 import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
 import type { EditorView, Node } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
@@ -17,6 +16,7 @@ import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import BlockAligner from '../BlockAligner';
 import Resizable from '../Resizable';
 import VerticalResizer from '../Resizable/VerticalResizer';
+import { extractTweetAttrs } from '../tweet/tweet';
 
 import type { IFrameSelectorProps } from './IFrameSelector';
 import IFrameSelector from './IFrameSelector';
@@ -156,10 +156,9 @@ const StyledIFrame = styled(Box)`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
+function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeStop }:
   NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
   const [height, setHeight] = useState(node.attrs.height);
-  const view = useEditorViewContext();
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
   // If there are no source for the node, return the image select component
@@ -168,11 +167,19 @@ function ResizableIframe ({ readOnly, node, updateAttrs, onResizeStop }:
       <IFrameSelector
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
-          const attrs = extractEmbedLink(videoLink);
-          updateAttrs({
-            src: attrs.url,
-            type: attrs.type
-          });
+          const tweetAttrs = extractTweetAttrs(videoLink);
+          if (tweetAttrs) {
+            const pos = getPos();
+            const tweetNode = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
+            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, tweetNode));
+          }
+          else {
+            const attrs = extractEmbedLink(videoLink);
+            updateAttrs({
+              src: attrs.url,
+              type: attrs.type
+            });
+          }
         }}
       >
         <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} />
