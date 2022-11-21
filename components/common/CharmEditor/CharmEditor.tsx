@@ -139,7 +139,7 @@ export function charmEditorPlugins (
           update: (view, prevState) => {
             if (
               // Update only if page is in editing mode or in viewing mode
-              (!readOnly || (enableComments && enableVoting))
+              (!readOnly || enableComments || enableVoting)
               && onContentChange
               && !view.state.doc.eq(prevState.doc)
             ) {
