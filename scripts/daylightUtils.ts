@@ -2,7 +2,7 @@ import {  deleteDaylightAbility, getAllAbilities } from "lib/token-gates/dayligh
 
 
 export async function listAbilities() {
-  const abilities = await getAllAbilities();
+  const { abilities } = await getAllAbilities();
 
 
   console.log('Abilities created by CharmVerse:', abilities);
@@ -10,7 +10,7 @@ export async function listAbilities() {
 }
 
 export async function deleteAllAbilities() {
-  const abilities = await getAllAbilities();
+  const { abilities } = await getAllAbilities();
 
   if (abilities) {
     for (const ability of abilities) {
@@ -23,4 +23,4 @@ export async function deleteAllAbilities() {
 
 
 // listAbilities()
-// deleteAllAbilities();
+deleteAllAbilities();

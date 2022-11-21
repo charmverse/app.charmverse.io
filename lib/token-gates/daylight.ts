@@ -35,7 +35,8 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
       requirements: requirementsData.requirements,
       requirementsLogic: requirementsData.operator,
       action: { linkUrl: getActionUrl(space.domain) },
-      title: `Join CharmVerse's ${space.name} workspace`,
+      title: ` Join the ${space.name} Workspace on CharmVerse`,
+      description: 'We are using CharmVerse to coordinate tasks, host discussion, share documents and facilitate decisions. Join us.',
       type: 'access',
       isActive: true,
       sourceId: getAbilitySourceId(tokenGate.id)
@@ -77,7 +78,7 @@ export async function getAllAbilities () {
     headers: HEADERS
   };
 
-  fetch<{ abilities: { sourceId: string, uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
+  return fetch<{ abilities: { sourceId: string, uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
 }
 
 export async function getAbility (tokenGateId: string) {
