@@ -23,17 +23,17 @@ export class WebsocketBroadcaster {
 
     this.io = io;
 
-    // if (redisClient) {
-    //   const pubClient = redisClient;
-    //   const subClient = pubClient.duplicate();
+    if (redisClient) {
+      const pubClient = redisClient;
+      const subClient = pubClient.duplicate();
 
-    //   await Promise.all([
-    //     pubClient.connect(),
-    //     subClient.connect()
-    //   ]);
+      await Promise.all([
+        pubClient.connect(),
+        subClient.connect()
+      ]);
 
-    //   io.adapter(createAdapter(pubClient, subClient));
-    // }
+      io.adapter(createAdapter(pubClient, subClient));
+    }
 
     // Function for debugging amount of connections
     // setInterval(() => {
