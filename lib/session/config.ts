@@ -1,5 +1,5 @@
 
-import { authSecret as _maybeAuthSecret, baseUrl, cookieDomain } from 'config/constants';
+import { authSecret as _maybeAuthSecret, baseUrl, cookieDomain, cookieName } from 'config/constants';
 
 declare module 'iron-session' {
   interface IronSessionData {
@@ -17,11 +17,11 @@ if (!_maybeAuthSecret) {
 export const authSecret = _maybeAuthSecret;
 
 export const ironOptions = {
-  cookieName: 'charm.sessionId',
+  cookieName,
   password: authSecret,
-  // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
   cookieOptions: {
     sameSite: 'strict' as const,
+    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
     secure: typeof baseUrl === 'string' && baseUrl.includes('https'),
     domain: cookieDomain
   }

@@ -1,18 +1,20 @@
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
+import { hermesHost } from 'config/constants';
 import log from 'lib/log';
 import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, ServerMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 const gettext = (text: string) => text;
 
-const namespace = '/ceditor';
+const socketHost = `${hermesHost}/ceditor`;
 const socketEvent = 'message';
 
 type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
 type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 
 type WebSocketConnectorProps = {
+  sessionCookie: string;
   anythingToSend: () => boolean;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
@@ -65,7 +67,8 @@ export class WebSocketConnector {
     initialMessage,
     resubscribed,
     restartMessage,
-    receiveData
+    receiveData,
+    sessionCookie
   }: WebSocketConnectorProps) {
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
@@ -73,8 +76,9 @@ export class WebSocketConnector {
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
-    log.debug('Request page socket');
-    this.socket = io(namespace, {
+    this.sessionCookie = sessionCookie;
+    log.debug('Request page socket', sessionCookie);
+    this.socket = io(socketHost, {
       withCredentials: true
       // path: '/api/socket'
     }).connect();

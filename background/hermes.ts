@@ -1,15 +1,21 @@
 import { Server } from 'socket.io';
 
-import { socketsPort } from 'config/constants';
+import { baseUrl } from 'config/constants';
 import log from 'lib/log';
 import { relay } from 'lib/websockets/relay';
 
-const port = socketsPort || process.env.PORT as string;
+const port = process.env.PORT as string;
 
-const io = new Server();
+const io = new Server({
+  cors: {
+    allowedHeaders: ['authorization'],
+    credentials: true,
+    origin: baseUrl || '*.charmverse.co' // use wildcard for staging
+  }
+});
 
 relay.bindServer(io);
 
 io.listen(parseInt(port));
 
-log.info('Socket server listening to port: ', port);
+log.info('Hermes socket server listening to port: ', port);

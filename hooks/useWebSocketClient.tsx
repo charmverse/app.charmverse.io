@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { socketsHost, socketsPort } from 'config/constants';
+import { hermesHost } from 'config/constants';
 import log from 'lib/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
@@ -14,12 +14,13 @@ import { PubSub } from 'lib/websockets/pubSub';
 import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
+const socketHost = `${hermesHost || ''}/`;
+
 type LoggedMessage = { type: string, payload: any }
 
 export type SocketConnection = Socket<{ message: (message: WebSocketMessage) => void }>;
 
 type IContext = {
-  authToken?: string;
   sendMessage: (message: ClientMessage) => void;
   // Testing purposes
   messageLog: LoggedMessage[];
@@ -72,8 +73,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     if (socket?.connected) {
       socket.disconnect();
     }
-
-    socket = io(`${socketsHost}${socketsPort ? `:${socketsPort}` : ''}/`, {
+    socket = io(socketHost, {
       withCredentials: true
       // path: '/api/socket'
     }).connect();
@@ -119,7 +119,6 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
   }
 
   const value: IContext = useMemo(() => ({
-    authToken: authResponse?.authToken,
     sendMessage,
     messageLog,
     clearLog,

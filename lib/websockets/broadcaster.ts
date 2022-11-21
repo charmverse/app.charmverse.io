@@ -5,6 +5,9 @@ import { Server } from 'socket.io';
 import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
+import { authOnConnect } from 'lib/websockets/authentication';
+import { DocumentEventHandler } from 'lib/websockets/documentEvents';
+import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
 
 import type { ServerMessage } from './interfaces';
 
@@ -20,17 +23,17 @@ export class WebsocketBroadcaster {
 
     this.io = io;
 
-    if (redisClient) {
-      const pubClient = redisClient;
-      const subClient = pubClient.duplicate();
+    // if (redisClient) {
+    //   const pubClient = redisClient;
+    //   const subClient = pubClient.duplicate();
 
-      await Promise.all([
-        pubClient.connect(),
-        subClient.connect()
-      ]);
+    //   await Promise.all([
+    //     pubClient.connect(),
+    //     subClient.connect()
+    //   ]);
 
-      io.adapter(createAdapter(pubClient, subClient));
-    }
+    //   io.adapter(createAdapter(pubClient, subClient));
+    // }
 
     // Function for debugging amount of connections
     // setInterval(() => {
@@ -41,6 +44,31 @@ export class WebsocketBroadcaster {
     // });
 
     // }, 1000);
+
+    // Define listeners
+    io
+      .on('connect', (socket) => {
+        new SpaceEventHandler(socket).init();
+
+        // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
+        // so we only need to keep track of the number of clients connected to the root namespace
+        log.debug('[ws] Web socket connected', {
+          // clientCount: io.engine.clientsCount,
+          clientCount: io.of('/').sockets.size
+        });
+
+        socket.on('disconnect', () => {
+          log.debug('[ws] Web socket disconnected', {
+            clientCount: io.of('/').sockets.size
+          });
+        });
+      });
+
+    io.of('/ceditor')
+      .use(authOnConnect)
+      .on('connect', (socket) => {
+        new DocumentEventHandler(socket).init();
+      });
 
   }
 

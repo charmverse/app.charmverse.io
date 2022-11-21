@@ -4,14 +4,12 @@ import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
+import { hermesHost } from 'config/constants';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { authOnConnect } from 'lib/websockets/authentication';
-import { DocumentEventHandler } from 'lib/websockets/documentEvents';
 import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
-import { SpaceEventHandler } from 'lib/websockets/spaceEvents';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -49,36 +47,15 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
     return;
   }
 
-  const io = new Server(res.socket.server);
-
-  // Define listeners
-  io
-    .on('connect', (socket) => {
-      new SpaceEventHandler(socket).init();
-
-      // Socket-io clientsCount includes namespaces, but these are actually sent under the same web socket
-      // so we only need to keep track of the number of clients connected to the root namespace
-      log.debug('[ws] Web socket connected', {
-        // clientCount: io.engine.clientsCount,
-        clientCount: io.of('/').sockets.size
-      });
-
-      socket.on('disconnect', () => {
-        log.debug('[ws] Web socket disconnected', {
-          clientCount: io.of('/').sockets.size
-        });
-      });
-    });
-
-  io.of('/ceditor')
-    .use(authOnConnect)
-    .on('connect', (socket) => {
-      new DocumentEventHandler(socket).init();
-    });
-
-  res.socket.server.io = io;
-
-  relay.bindServer(io);
+  if (!hermesHost) {
+    const io = new Server(res.socket.server);
+    res.socket.server.io = io;
+    relay.bindServer(io);
+    log.info('Hermes socket connected');
+  }
+  else {
+    log.info('Hermes socket server is running on a different host');
+  }
 
   res.send({ authToken: sealedUserId });
 }

@@ -95,8 +95,10 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_cron/00_env_vars.config
 
-            cat .ebextensions/00_env_vars.config
-            cat .ebextensions_cron/00_env_vars.config
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_hermes/00_env_vars.config
 
       - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
@@ -105,6 +107,11 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+
+      - name: Update and Package hermes
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_hermes .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_hermes.zip
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
@@ -129,5 +136,18 @@ jobs:
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deploy_cron.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Deploy Hermes to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: charmverse-hermes
+          environment_name: prd-charmverse-hermes
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_hermes.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes

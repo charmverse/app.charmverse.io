@@ -1,4 +1,4 @@
-import { Node } from '@bangle.dev/pm';
+import { Node } from 'prosemirror-model';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 

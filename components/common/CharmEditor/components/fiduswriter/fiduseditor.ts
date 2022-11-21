@@ -8,7 +8,9 @@ import {
 } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { cookieName } from 'config/constants';
 import log from 'lib/log';
+import { getCookie } from 'lib/utilities/browser';
 import type { ClientSubscribeMessage, SocketMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { ModCollab } from './collab';
@@ -116,6 +118,8 @@ export class FidusEditor {
 
     let resubscribed = false;
 
+    const sessionCookie = getCookie(cookieName);
+
     this.ws = new WebSocketConnector({
       anythingToSend: () => Boolean(sendableSteps(view.state)),
       initialMessage: () => {
@@ -200,7 +204,8 @@ export class FidusEditor {
           default:
             break;
         }
-      }
+      },
+      sessionCookie
       // failedAuth: () => {
       //   if (this.view.state.plugins.length && sendableSteps(this.view.state) && this.ws.connectionCount > 0) {
       //     this.ws.online = false; // To avoid Websocket trying to reconnect.

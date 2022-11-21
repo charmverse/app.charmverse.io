@@ -35,6 +35,8 @@ jobs:
         run: |
           sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
           sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
+          sed -i 's/production/staging/g' .ebextensions_hermes/00_env_vars.config
+          sed -i 's/prd/stg/g' .ebextensions_hermes/00_env_vars.config
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -42,9 +44,19 @@ jobs:
           cmd: |
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .NODE_ENV = "production" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_cron/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_hermes/00_env_vars.config
 
       - name: Set STAGE variable in environment for build and deploy steps
         run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
@@ -85,3 +97,23 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ steps.cdk_deploy.outputs.env_url }}
+
+      # update Hermes in staging
+
+      - name: Update and Package hermes
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_hermes .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_hermes.zip
+
+      - name: Deploy Hermes to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: charmverse-hermes
+          environment_name: stg-charmverse-hermes
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_hermes.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
