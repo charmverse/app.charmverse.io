@@ -1,5 +1,5 @@
 
-import { authSecret as _maybeAuthSecret, baseUrl, cookieDomain, cookieName } from 'config/constants';
+import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieDomain, cookieName } from 'config/constants';
 
 declare module 'iron-session' {
   interface IronSessionData {
@@ -10,7 +10,7 @@ declare module 'iron-session' {
   }
 }
 
-if (!_maybeAuthSecret) {
+if (!_maybeAuthSecret && !isTestEnv) {
   throw new Error('The AUTH_SECRET env var is required to start server');
 }
 
