@@ -171,6 +171,22 @@ SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at"
 
 ```
 
+### Web Sockets - Hermes
+Real-time features including the content editor for pages relies on a web socket service known as Hermes.
+
+#### Hermes Development
+```
+# Running the standard dev command will serve Hermes as part of the Next.js process:
+npm start
+
+# Run Hermes as a separate process along with the Next.js app:
+npm run hermes
+
+# Run Hermes process on its own:
+npm run hermes:dev
+```
+
+
 ### Testing
 Testing for client-side and server-side code happens separately.
 

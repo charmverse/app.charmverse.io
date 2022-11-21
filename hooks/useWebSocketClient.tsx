@@ -6,6 +6,7 @@ import io from 'socket.io-client';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { socketsHost, socketsPort } from 'config/constants';
 import log from 'lib/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
@@ -72,7 +73,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket.disconnect();
     }
 
-    socket = io('/', {
+    socket = io(`${socketsHost}${socketsPort ? `:${socketsPort}` : ''}/`, {
       withCredentials: true
       // path: '/api/socket'
     }).connect();

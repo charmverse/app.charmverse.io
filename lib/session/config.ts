@@ -1,4 +1,6 @@
 
+import { baseUrl } from 'config/constants';
+
 declare module 'iron-session' {
   interface IronSessionData {
     // this data is only useful for authentication - it is not kept up-to-date!
@@ -14,7 +16,8 @@ export const ironOptions = {
   // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
   cookieOptions: {
     sameSite: 'strict' as const,
-    secure: typeof process.env.DOMAIN === 'string' && process.env.DOMAIN.includes('https')
+    secure: typeof process.env.DOMAIN === 'string' && process.env.DOMAIN.includes('https'),
+    domain: process.env.COOKIE_DOMAIN
   }
 };
 

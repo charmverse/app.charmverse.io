@@ -13,7 +13,7 @@
     "cron:staging": "npx react-env --path .env.staging -- node ./.next/server/cron.js",
     "cron:prod": "node ./.next/server/cron.js",
     "cron:dev": "dotenv -e .env.local -- ts-node ./background/cron.ts",
-    "hermes": "npm run hermes:dev",
+    "hermes": "concurrently --names \"hermes,next\" -c \"yellow,green\" \"npm run hermes:dev\" \"USE_HERMES=true npm run server:dev\"",
     "hermes:dev": "dotenv -e .env -e .env.local -- ts-node ./background/hermes.ts --watch",
     "hermes:prod": "node ./.next/server/hermes.js",
     "hermes:staging": "npx react-env --path .env.staging -- node ./.next/server/hermes.js",
