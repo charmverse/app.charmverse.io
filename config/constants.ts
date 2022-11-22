@@ -10,8 +10,8 @@ export const authSecret = process.env.AUTH_SECRET as string | undefined;
 export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
 export const cookieName = 'charm.sessionId';
 // web sockets
-export const websocketsHost = isProdEnv
-  ? 'https://sockets.charmverse.io'
-  : isStagingEnv
-    ? 'https://sockets.charmverse.co'
+export const websocketsHost = isStagingEnv
+  ? 'https://sockets.charmverse.co'
+  : isProdEnv
+    ? 'https://sockets.charmverse.io'
     : process.env.WEBSOCKETS_HOST || '' as string;
