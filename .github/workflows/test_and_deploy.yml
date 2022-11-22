@@ -72,6 +72,14 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        env:
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
+          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
+
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
