@@ -10,11 +10,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSudoApiKey)
-  .use(requireKeys(['spaceId'], 'body'))
-  .post(provisionToken)
-  .delete(invalidateToken);
+  .use(requireKeys(['name'], 'body'))
+  .post(provisionSuperApiToken)
+  .delete(invalidateSuperToken);
 
-async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
+async function provisionSuperApiToken (req: NextApiRequest, res: NextApiResponse) {
 
   const { spaceId } = req.body;
 
@@ -24,7 +24,7 @@ async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
 
 }
 
-async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {
+async function invalidateSuperToken (req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.body;
   await prisma.spaceApiToken.delete({
     where: {

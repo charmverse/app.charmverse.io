@@ -251,7 +251,7 @@ model SpaceApiToken {
 
 model SuperApiToken {
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   token     String   @unique
   name      String?
   spaces     Space[]
