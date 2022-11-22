@@ -219,7 +219,13 @@ export class WebSocketConnector {
 
     this.socket.on('connect_error', error => {
       log.warn('Socket connection error', error);
-      this.onError(error);
+      const errorType = (error as any).type as string;
+      if (errorType === 'TransportError') {
+        // server is probably restarting
+      }
+      else {
+        this.onError(error);
+      }
     });
   }
 

@@ -124,9 +124,9 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       pushToMessageLog({ type: 'connect', payload: 'disconnected from websocket' });
     });
 
-    socket.on('connect_error', (err) => {
-      log.error('Socket error', err.message); // prints the message associated with the error
-      pushToMessageLog({ type: 'error', payload: err.message });
+    socket.on('connect_error', (error) => {
+      log.warn('Socket error - maybe restarting?', { error });
+      pushToMessageLog({ type: 'error', payload: error.message });
     });
 
   }

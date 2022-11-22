@@ -4,6 +4,7 @@ import { getIronSession } from 'iron-session';
 import type { Socket } from 'socket.io';
 
 import { prisma } from 'db';
+import { ActionNotPermittedError } from 'lib/middleware';
 import { ironOptions } from 'lib/session/config';
 
 export type SocketUser = { id: string, avatar: string | null, name: string };
@@ -16,7 +17,7 @@ export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: E
   try {
     const session = await getSessionFromCookies(socket);
     if (!session.user) {
-      throw new Error('User not logged in');
+      throw new ActionNotPermittedError('User not logged in');
     }
 
     const user = await prisma.user.findUniqueOrThrow({
@@ -33,6 +34,7 @@ export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: E
     next();
   }
   catch (error) {
+    log.warn('User is not authorized to connect to socket', error);
     next(error as Error);
   }
 }
