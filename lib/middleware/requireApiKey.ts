@@ -35,19 +35,6 @@ export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> 
   return spaceToken;
 }
 
-export async function provisionSuperApiKey (name: string): Promise<SuperApiToken> {
-  const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
-
-  const superToken = await prisma.superApiToken.create({
-    data: {
-      token: newApiKey,
-      name
-    }
-  });
-
-  return superToken;
-}
-
 /**
  * Returns bot user for the space, and creates one if they do not exist
  */

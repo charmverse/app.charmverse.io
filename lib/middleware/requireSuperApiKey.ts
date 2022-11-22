@@ -1,13 +1,11 @@
 import crypto from 'node:crypto';
 
-import type { Space, SuperApiToken, User } from '@prisma/client';
+import type { SuperApiToken } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
 import { prisma } from 'db';
-import log from 'lib/log';
 import { ApiError } from 'lib/middleware/errors';
-import { IDENTITY_TYPES } from 'models';
 
 export async function provisionSuperApiKey (name: string): Promise<SuperApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
@@ -23,9 +21,9 @@ export async function provisionSuperApiKey (name: string): Promise<SuperApiToken
 }
 
 /**
- * Check for a valid space level API token, and ensure the operation is taking place only in the target space
+ * Check for a valid SUPER API token
  *
- * assigns authorizedSpaceId so follow-on endpoints can use it
+ * assigns superApiToken so follow-on endpoints can use it
  */
 export async function requireSuperApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
@@ -61,3 +59,4 @@ export function getVerifiedSuperApiToken (token: string): Promise<SuperApiToken 
     }
   });
 }
+

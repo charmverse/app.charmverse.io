@@ -220,8 +220,8 @@ model Space {
   paymentMethods              PaymentMethod[]
   roles                       Role[]
   apiToken                    SpaceApiToken?
-  superApiTokenId             String?
-  superApiToken               SuperApiToken?                    @relation(fields: [superApiTokenId], references: [token], onDelete: SetNull)
+  superApiTokenId             String?                           @unique @db.Uuid
+  superApiToken               SuperApiToken?                    @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
   permittedGroups             SpacePermission[]                 @relation("permittedGroups")
   spacePermissions            SpacePermission[]                 @relation("spacePermissions")
   spaceRoles                  SpaceRole[]
@@ -250,11 +250,12 @@ model SpaceApiToken {
 }
 
 model SuperApiToken {
+  id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     String   @unique
   name      String?
-  spaces     Space[]
+  spaces    Space[]
 
   @@index([token])
 }
