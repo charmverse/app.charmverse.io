@@ -17,7 +17,6 @@ const io = new Server(server, {
     allowedHeaders: ['authorization'],
     credentials: true,
     origin: (requestOrigin, callback) => {
-      log.info(`baseUrl ${baseUrl} requestOrigin`, requestOrigin);
       if (baseUrl) {
         callback(null, baseUrl);
       }

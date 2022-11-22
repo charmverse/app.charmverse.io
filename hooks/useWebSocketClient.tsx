@@ -78,6 +78,28 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       // path: '/api/socket'
     }).connect();
 
+    // add headers for AWS. see: https://socket.io/how-to/deal-with-cookies#nodejs-client-and-cookies
+    // also https://stackoverflow.com/questions/72909155/socket-io-and-load-balancer-alb-aws
+    socket.io.on('open', () => {
+      socket.io.engine.transport.on('pollComplete', () => {
+        const request = socket.io.engine.transport.pollXhr.xhr;
+        const cookieHeader = request.getResponseHeader('set-cookie') as string[] | undefined;
+        log.debug('open socket', { cookieHeader });
+        if (!cookieHeader) {
+          return;
+        }
+        cookieHeader.forEach(cookieString => {
+          log.debug({ cookieString });
+          if (cookieString.includes('AWSALB')) {
+            const name = cookieString.split('=')[0];
+            const value = cookieString.split('=')[1];
+            socket.io.opts.extraHeaders ||= {};
+            socket.io.opts.extraHeaders.cookie = `${name}=${value}`;
+          }
+        });
+      });
+    });
+
     socket.on('connect', () => {
       log.info('Socket client connected');
       pushToMessageLog({ type: 'connect', payload: 'Client connected' });
