@@ -14,7 +14,7 @@ type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
 type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 
 type WebSocketConnectorProps = {
-  sessionCookie: string;
+  authToken: string;
   anythingToSend: () => boolean;
   onError: (error: Error) => void;
   sendMessage?: (message: string) => void;
@@ -63,12 +63,12 @@ export class WebSocketConnector {
 
   constructor ({
     anythingToSend,
+    authToken,
     sendMessage,
     initialMessage,
     resubscribed,
     restartMessage,
     receiveData,
-    sessionCookie,
     onError
   }: WebSocketConnectorProps) {
     this.anythingToSend = anythingToSend;
@@ -78,10 +78,12 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onError = onError;
-    this.sessionCookie = sessionCookie;
-    log.debug('Request page socket', sessionCookie);
+    log.debug('Request page socket', authToken);
     this.socket = io(socketHost, {
-      withCredentials: true
+      withCredentials: true,
+      auth: {
+        authToken
+      }
       // path: '/api/socket'
     }).connect();
     this.createWSConnection();
@@ -218,12 +220,12 @@ export class WebSocketConnector {
     });
 
     this.socket.on('connect_error', error => {
-      log.warn('Socket connection error', error);
       const errorType = (error as any).type as string;
       if (errorType === 'TransportError') {
         // server is probably restarting
       }
       else {
+        log.warn('Error connecting to /ceditor socket namespace', error);
         this.onError(error);
       }
     });

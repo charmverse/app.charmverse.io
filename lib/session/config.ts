@@ -1,5 +1,5 @@
 
-import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieDomain, cookieName } from 'config/constants';
+import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
 
 declare module 'iron-session' {
   interface IronSessionData {
@@ -22,8 +22,8 @@ export const ironOptions = {
   cookieOptions: {
     sameSite: 'strict' as const,
     // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
-    secure: typeof baseUrl === 'string' && baseUrl.includes('https'),
-    domain: cookieDomain
+    secure: typeof baseUrl === 'string' && baseUrl.includes('https')
+    // domain: cookieDomain TODO: change domain to subdomain without logging people out, so we can use them across subdomains
   }
 };
 

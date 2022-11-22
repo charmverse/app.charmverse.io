@@ -125,7 +125,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     });
 
     socket.on('connect_error', (error) => {
-      log.warn('Socket error - maybe restarting?', { error });
+      log.warn('Error connecting to workspace socket - maybe restarting?', { error });
       pushToMessageLog({ type: 'error', payload: error.message });
     });
 

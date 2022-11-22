@@ -26,7 +26,8 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
   };
 }
 
-const safeUserIdTtl = 15;
+// set a ttl that allows sockets to reuse in the same session
+const sevenDaysInSeconds = 7 * 24 * 60 * 60;
 
 // Subscribe user to messages
 async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
@@ -38,7 +39,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
     userId
   } as SealedUserId, {
     password: authSecret,
-    ttl: safeUserIdTtl
+    ttl: sevenDaysInSeconds
   });
 
   // It means that socket server was already initialised

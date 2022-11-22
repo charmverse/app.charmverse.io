@@ -1,11 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import { getIronSession } from 'iron-session';
+import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
 import { prisma } from 'db';
+import log from 'lib/log';
 import { ActionNotPermittedError } from 'lib/middleware';
-import { ironOptions } from 'lib/session/config';
+import { authSecret, ironOptions } from 'lib/session/config';
+import type { SealedUserId } from 'lib/websockets/interfaces';
 
 export type SocketUser = { id: string, avatar: string | null, name: string };
 export type AuthenticatedSocketData = { user: SocketUser };
@@ -15,13 +17,21 @@ type AuthenticatedSocket = Socket<any, any, any, AuthenticatedSocketData>;
 export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: Error) => void) {
 
   try {
-    const session = await getSessionFromCookies(socket);
-    if (!session.user) {
-      throw new ActionNotPermittedError('User not logged in');
+    let userId: string;
+    if (socket.handshake.auth.authToken) {
+      ({ userId } = await getUserIdFromToken(socket.handshake.auth.authToken));
+    }
+    else {
+      // use cookie session locally /// TODO: maybe delete this?
+      const session = await getSessionFromSocket(socket);
+      if (!session.user) {
+        throw new ActionNotPermittedError('Please log in');
+      }
+      userId = session.user.id;
     }
 
     const user = await prisma.user.findUniqueOrThrow({
-      where: { id: session.user.id }
+      where: { id: userId }
     });
 
     // add data to the individual client socket
@@ -34,12 +44,18 @@ export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: E
     next();
   }
   catch (error) {
-    log.warn('User is not authorized to connect to socket', error);
+    log.warn('Unable to authorize socket', error);
     next(error as Error);
   }
 }
 
-function getSessionFromCookies (socket: Socket) {
+async function getUserIdFromToken (authToken: string) {
+  return unsealData<SealedUserId>(authToken, {
+    password: authSecret
+  });
+}
+
+function getSessionFromSocket (socket: Socket) {
   // @ts-ignore IncomingMessage doesn't require an argument
   const req = new IncomingMessage();
   req.headers = socket.handshake.headers;

@@ -12,6 +12,7 @@ import { objectUid } from '@bangle.dev/utils';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
@@ -67,6 +68,10 @@ export const BangleEditor = React.forwardRef<
     const [isLoading, setIsLoading] = useState(enableFidusEditor);
     const isLoadingRef = useRef(enableFidusEditor);
 
+    const useSockets = user && pageId && trackChanges && !readOnly;
+
+    const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
+
     pmViewOpts ||= {};
     pmViewOpts.editable = () => !isLoadingRef.current;
 
@@ -106,20 +111,22 @@ export const BangleEditor = React.forwardRef<
       );
       let fEditor: FidusEditor;
 
-      if (user && pageId && trackChanges && !readOnly) {
-        log.info('Init FidusEditor');
-        fEditor = new FidusEditor({
-          user,
-          docId: pageId,
-          enableSuggestionMode: enableSuggestions,
-          onDocLoaded: () => {
-            setIsLoading(false);
-            isLoadingRef.current = false;
+      if (useSockets) {
+        if (authResponse) {
+          log.info('Init FidusEditor');
+          fEditor = new FidusEditor({
+            user,
+            docId: pageId,
+            enableSuggestionMode: enableSuggestions,
+            onDocLoaded: () => {
+              setIsLoading(false);
+              isLoadingRef.current = false;
             // console.log('set is loading false');
-          },
-          onParticipantUpdate
-        });
-        fEditor.init(_editor.view, onError);
+            },
+            onParticipantUpdate
+          });
+          fEditor.init(_editor.view, authResponse.authToken, onError);
+        }
       }
       else if (pageId && readOnly) {
         charmClient.pages.getPageDetails(pageId)
@@ -147,7 +154,7 @@ export const BangleEditor = React.forwardRef<
         fEditor?.close();
         _editor.destroy();
       };
-    }, [user, pageId, trackChanges, ref]);
+    }, [user, pageId, useSockets, authResponse, authResponse, ref]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
       throw new Error(
