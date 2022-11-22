@@ -25,23 +25,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSuperApiKey)
-  // .get(getSpaces)
   .post(createSpace);
-
-// async function getSpaces (req: NextApiRequest, res: NextApiResponse<Space[]>) {
-//   const userId = req.session.user.id;
-
-//   const spaceRoles = await prisma.spaceRole.findMany({
-//     where: {
-//       userId
-//     },
-//     include: {
-//       space: true
-//     }
-//   });
-//   const spaces = spaceRoles.map(sr => sr.space);
-//   return res.status(200).json(spaces);
-// }
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const { name, discordServerId, domain, avatar } = req.body as CreateSpaceInputData;
