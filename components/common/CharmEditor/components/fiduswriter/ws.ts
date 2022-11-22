@@ -78,7 +78,6 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onError = onError;
-    log.debug('Request page socket', authToken);
     this.socket = io(socketHost, {
       withCredentials: true,
       auth: {
