@@ -19,16 +19,12 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
-import { DOMAIN_BLACKLIST } from 'lib/spaces';
+import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({
   id: yup.string(),
-  domain: yup.string().ensure().trim().lowercase()
-    .min(3, 'Domain must be at least 3 characters')
-    .matches(/^[0-9a-z-]*$/, 'Domain must be only lowercase hyphens, letters, and numbers')
-    .notOneOf(DOMAIN_BLACKLIST, 'Domain is not allowed')
-    .required('Domain is required')
+  domain: domainSchema
     .test('domain-exists', 'Domain already exists', async function checkDomain (domain) {
       const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
       return !ok;
