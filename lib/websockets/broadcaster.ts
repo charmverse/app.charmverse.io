@@ -33,6 +33,7 @@ export class WebsocketBroadcaster {
         subClient.connect()
       ]);
 
+      log.debug('Connecting to Redis for socket.io');
       io.adapter(createAdapter(pubClient, subClient));
     }
 
@@ -84,10 +85,13 @@ export class WebsocketBroadcaster {
   }
 
   broadcastToOthers (message: ServerMessage, roomId: string, userId: string): void {
-    const socket = this.sockets[userId];
-    if (socket) {
-      socket.broadcast.to(roomId).emit('message', message);
-    }
+    // @ts-ignore
+    message.userId = userId;
+    this.broadcast(message, roomId);
+    // const socket = this.sockets[userId];
+    // if (socket) {
+    //   socket.broadcast.to(roomId).emit('message', message);
+    // }
   }
 
   leaveRoom (socket: Socket, roomId: string): void {
