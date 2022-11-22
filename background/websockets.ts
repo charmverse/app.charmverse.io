@@ -1,12 +1,18 @@
+import { createServer } from 'http';
+
 import { Server } from 'socket.io';
 
 import { baseUrl } from 'config/constants';
 import log from 'lib/log';
 import { relay } from 'lib/websockets/relay';
 
-const port = process.env.PORT as string;
+import app from './server/app';
 
-const io = new Server({
+const port = process.env.PORT || 3001;
+
+const server = createServer(app.callback());
+
+const io = new Server(server, {
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
@@ -16,6 +22,6 @@ const io = new Server({
 
 relay.bindServer(io);
 
-io.listen(parseInt(port));
+server.listen(port);
 
 log.info('Web socket server listening to port: ', port);

@@ -9,4 +9,4 @@ export const authSecret = process.env.AUTH_SECRET as string | undefined;
 export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
 export const cookieName = 'charm.sessionId';
 // web sockets
-export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST as string | undefined;
+export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST || '' as string;
