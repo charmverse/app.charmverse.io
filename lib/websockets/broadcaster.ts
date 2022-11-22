@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 
 import { redisClient } from 'adapters/redis/redisClient';
 import { prisma } from 'db';
+import log from 'lib/log';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 import { authOnConnect } from 'lib/websockets/authentication';
 import { DocumentEventHandler } from 'lib/websockets/documentEvents';
@@ -42,7 +43,6 @@ export class WebsocketBroadcaster {
     //     console.log('Connected socket amount', sockets.size);
     //   });
     // });
-
     // }, 1000);
 
     // Define listeners
