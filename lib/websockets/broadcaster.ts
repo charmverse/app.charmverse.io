@@ -67,7 +67,10 @@ export class WebsocketBroadcaster {
     io.of('/ceditor')
       .use(authOnConnect)
       .on('connect', (socket) => {
+
+        log.debug('[ws] Web socket namepsace /editor connected');
         new DocumentEventHandler(socket).init();
+
       });
 
   }

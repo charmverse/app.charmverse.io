@@ -16,6 +16,7 @@ type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 type WebSocketConnectorProps = {
   sessionCookie: string;
   anythingToSend: () => boolean;
+  onError: (error: Error) => void;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
   restartMessage: () => ClientRestartMessage; // Too many messages have been lost and we need to restart
@@ -54,8 +55,7 @@ export class WebSocketConnector {
 
   recentlySent = false;
 
-  // @ts-ignore set up during init()
-  listeners: { onOffline: () => any };
+  // listeners: { onOffline?: () => any } = {};
 
   warningNotAllSent = gettext('Warning! Not all your changes have been saved! You could suffer data loss. Attempting to reconnect...'); // Info to show while disconnected WITH unsaved data
 
@@ -68,7 +68,8 @@ export class WebSocketConnector {
     resubscribed,
     restartMessage,
     receiveData,
-    sessionCookie
+    sessionCookie,
+    onError
   }: WebSocketConnectorProps) {
     this.anythingToSend = anythingToSend;
     this.sendMessage = sendMessage;
@@ -76,6 +77,7 @@ export class WebSocketConnector {
     this.resubscribed = resubscribed;
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
+    this.onError = onError;
     this.sessionCookie = sessionCookie;
     log.debug('Request page socket', sessionCookie);
     this.socket = io(socketHost, {
@@ -124,7 +126,6 @@ export class WebSocketConnector {
     // this.open()//;
 
     this.socket.on('message', _data => {
-
       const data = _data as WrappedServerMessage;
 
       // console.log('ws - on socket events', data);
@@ -214,6 +215,11 @@ export class WebSocketConnector {
 
       // }
 
+    });
+
+    this.socket.on('connect_error', error => {
+      log.warn('Socket connection error', error);
+      this.onError(error);
     });
   }
 

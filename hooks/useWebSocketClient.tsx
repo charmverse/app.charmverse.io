@@ -84,7 +84,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       socket.io.engine.transport.on('pollComplete', () => {
         const request = socket.io.engine.transport.pollXhr.xhr;
         const cookieHeader = request.getResponseHeader('set-cookie') as string[] | undefined;
-        log.debug('open socket', { cookieHeader });
+        log.debug('open socket', { cookieHeader, xhr: socket.io.engine.transport.pollXhr.xhr });
         if (!cookieHeader) {
           return;
         }

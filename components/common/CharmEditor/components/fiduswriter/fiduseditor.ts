@@ -114,7 +114,7 @@ export class FidusEditor {
     ];
   }
 
-  init (view: EditorView, onError: (error: string) => void) {
+  init (view: EditorView, onError: (error: Error) => void) {
 
     let resubscribed = false;
 
@@ -133,6 +133,7 @@ export class FidusEditor {
         }
         return message;
       },
+      onError,
       resubscribed: () => {
         resubscribed = true;
         if (this.mod.collab) {
@@ -195,11 +196,11 @@ export class FidusEditor {
             this.mod.collab.doc.rejectDiff(data.rid);
             break;
           case 'patch_error':
-            onError('Your document was out of sync and has been reset.');
+            onError(new Error('Your document was out of sync and has been reset.'));
             break;
           case 'error':
             log.error('Error talking to socket server', data.message);
-            onError(data.message);
+            onError(new Error(data.message));
             break;
           default:
             break;

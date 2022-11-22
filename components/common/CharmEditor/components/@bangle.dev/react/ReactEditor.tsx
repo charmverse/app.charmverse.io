@@ -95,8 +95,8 @@ export const BangleEditor = React.forwardRef<
       [editor]
     );
 
-    function onError (message: string) {
-      showMessage(message, 'error');
+    function onError (error: Error) {
+      showMessage(error.message, 'error');
     }
 
     useEffect(() => {

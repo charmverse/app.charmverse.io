@@ -14,7 +14,7 @@
     "cron:prod": "node ./.next/server/cron.js",
     "cron:dev": "dotenv -e .env.local -- ts-node ./background/cron.ts",
     "sockets": "concurrently --names \"sockets,next\" -c \"yellow,green\" \"npm run sockets:dev\" \"npm run server:dev\"",
-    "sockets:dev": "PORT=3001 npx dotenv -e .env -e .env.local -- node ./.next/server/websockets.js",
+    "sockets:dev": "PORT=3001 npx dotenv -e .env -e .env.local -- node --watch ./.next/server/websockets.js",
     "sockets:prod": "node ./.next/server/websockets.js",
     "sockets:staging": "npx react-env --path .env.staging -- node ./.next/server/websockets.js",
     "migrate:test": "dotenv -e .env.test.local -- npx prisma migrate deploy",
