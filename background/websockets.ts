@@ -16,7 +16,7 @@ const io = new Server(server, {
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
-    origin: baseUrl || '*.charmverse.co' // use wildcard for staging
+    origin: baseUrl || 'https://*.charmverse.co' // use wildcard for staging
   }
 });
 
