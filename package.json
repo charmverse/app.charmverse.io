@@ -25,7 +25,7 @@
     "postinstall": "patch-package",
     "server:prod": "node --require dd-trace/init node_modules/.bin/next start",
     "server:prod:win": "node --require dd-trace/init node_modules/next/dist/bin/next start",
-    "server:sockets": "NEXT_PUBLIC_WEBSOCKETS_HOST=http://localhost:3001 next dev",
+    "server:sockets": "WEBSOCKETS_HOST=http://localhost:3001 next dev",
     "server:staging": "npx react-env --path .env.staging -- node --require dd-trace/init node_modules/.bin/next start",
     "start": "next dev",
     "start:debug": "NODE_OPTIONS='--inspect' next",
