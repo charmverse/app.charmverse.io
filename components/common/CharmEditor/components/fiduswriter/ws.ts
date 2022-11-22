@@ -7,7 +7,7 @@ import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, Serve
 
 const gettext = (text: string) => text;
 
-const socketHost = `${websocketsHost}/ceditor`;
+const socketHost = `${websocketsHost || ''}/ceditor`;
 const socketEvent = 'message';
 
 type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
