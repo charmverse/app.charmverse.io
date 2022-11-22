@@ -18,7 +18,7 @@ export function validateDomainName (domain: string) {
     if (err.errors?.length) {
       errorMessage += `. ${err.errors?.join('. ').trim()}`;
     }
-    return { isValid: true, error: errorMessage };
+    return { isValid: false, error: errorMessage };
   }
 }
 

@@ -13,7 +13,8 @@ const ErrorCodes = {
   'Access denied': 401,
   'Insecure operation': 401,
   'External service': 500,
-  'Unexpected result': 500
+  'Unexpected result': 500,
+  Conflict: 409
 };
 
 type ErrorType = keyof typeof ErrorCodes
@@ -145,6 +146,16 @@ export class MissingWeb3SignatureError extends SystemError {
     super({
       message: 'This operation requires a signature from your connected wallet.',
       errorType: 'Insecure operation',
+      severity: 'warning'
+    });
+  }
+}
+
+export class DataConflictError extends SystemError {
+  constructor (message = 'Data conflict') {
+    super({
+      message,
+      errorType: 'Conflict',
       severity: 'warning'
     });
   }

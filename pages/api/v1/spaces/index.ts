@@ -8,8 +8,9 @@ import { onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { validateDomainName } from 'lib/spaces/validateDomainName';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { DataConflictError, InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 import { IDENTITY_TYPES } from 'models';
 
@@ -45,7 +46,7 @@ handler
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const { name, discordServerId, domain, avatar } = req.body as CreateSpaceInputData;
 
-  if (!name || name.length < 3) {
+  if (!name) {
     throw new InvalidInputError('Missing space name');
   }
 
@@ -58,11 +59,17 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   }
 
   let spaceDomain = domain;
+
   if (spaceDomain) {
     // Validate domain name if user provided one
     const { isValid, error } = validateDomainName(spaceDomain);
     if (!isValid) {
       throw new InvalidInputError(error);
+    }
+
+    const existingSpace = await getSpaceByDomain(spaceDomain);
+    if (existingSpace) {
+      throw new DataConflictError('Domain name is already taken');
     }
   }
   else {
@@ -82,7 +89,6 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   // Create workspace
   const spaceData = {
     name,
-    createdBy: botUser.id,
     updatedBy: botUser.id,
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
@@ -109,7 +115,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     }
   });
 
-  return res.status(200).json(space);
+  return res.status(201).json(space);
 }
 
 export default withSessionRoute(handler);
