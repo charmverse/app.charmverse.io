@@ -16,7 +16,16 @@ const io = new Server(server, {
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
-    origin: baseUrl || 'https://*.charmverse.co' // use wildcard for staging
+    origin: (requestOrigin, callback) => {
+      log.info(`baseUrl ${baseUrl} requestOrigin`, requestOrigin);
+      if (baseUrl) {
+        callback(null, baseUrl);
+      }
+      // support any subdomain for staging
+      else if (requestOrigin?.endsWith('.charmverse.co')) {
+        callback(null, requestOrigin);
+      }
+    }
   }
 });
 
