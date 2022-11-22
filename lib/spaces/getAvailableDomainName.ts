@@ -3,9 +3,11 @@ import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import randomName from 'lib/utilities/randomName';
 
 export async function getAvailableDomainName (name?: string, randomize = false): Promise<string> {
-  let spaceDomain = name ? getSpaceDomainFromName(name) : randomName();
+  const domainName = getSpaceDomainFromName(name || '');
+
+  let spaceDomain = domainName || randomName();
   if (randomize && name) {
-    spaceDomain = `${name}-${randomName()}`;
+    spaceDomain = `${domainName}-${randomName()}`;
   }
 
   const existingSpace = await getSpaceByDomain(spaceDomain);
