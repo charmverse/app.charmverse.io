@@ -8,9 +8,7 @@ import { onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
-import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
-import { validateDomainName } from 'lib/spaces/validateDomainName';
-import { DataConflictError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 import { IDENTITY_TYPES } from 'models';
 
@@ -28,7 +26,7 @@ handler
   .post(createSpace);
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
-  const { name, discordServerId, domain, avatar } = req.body as CreateSpaceInputData;
+  const { name, discordServerId, avatar } = req.body as CreateSpaceInputData;
 
   if (!name) {
     throw new InvalidInputError('Missing space name');
@@ -42,24 +40,8 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     throw new InvalidInputError('Missing discord server id');
   }
 
-  let spaceDomain = domain;
-
-  if (spaceDomain) {
-    // Validate domain name if user provided one
-    const { isValid, error } = validateDomainName(spaceDomain);
-    if (!isValid) {
-      throw new InvalidInputError(error);
-    }
-
-    const existingSpace = await getSpaceByDomain(spaceDomain);
-    if (existingSpace) {
-      throw new DataConflictError('Domain name is already taken');
-    }
-  }
-  else {
-    // generate a domain name if user didn't provide one
-    spaceDomain = await getAvailableDomainName(name);
-  }
+  // generate a domain name if user didn't provide one
+  const spaceDomain = await getAvailableDomainName(name);
 
   // create new bot user as space creator
   const botUser = await prisma.user.create({

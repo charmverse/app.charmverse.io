@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import type { Space, SpaceApiToken, SuperApiToken, User } from '@prisma/client';
+import type { Space, SpaceApiToken, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
@@ -8,6 +8,13 @@ import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError } from 'lib/middleware/errors';
 import { IDENTITY_TYPES } from 'models';
+
+declare module 'http' {
+  interface IncomingMessage {
+    authorizedSpaceId: string;
+    botUser: User;
+  }
+}
 
 export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');

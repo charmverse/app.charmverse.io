@@ -19,6 +19,7 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
+import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { domainSchema } from 'lib/spaces/validateDomainName';
 import randomName from 'lib/utilities/randomName';
 
@@ -101,7 +102,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
   function onChangeName (event: ChangeEvent<HTMLInputElement>) {
     const name = event.target.value;
     if (!touchedFields.domain) {
-      setValue('domain', getDomainFromName(name));
+      setValue('domain', getSpaceDomainFromName(name));
     }
 
   }
@@ -179,10 +180,6 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
     </form>
   );
 
-}
-
-export function getDomainFromName (name: string) {
-  return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
 }
 
 function getDefaultName (): { name: string, domain: string } {

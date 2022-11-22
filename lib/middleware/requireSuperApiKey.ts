@@ -7,6 +7,12 @@ import type { NextHandler } from 'next-connect';
 import { prisma } from 'db';
 import { ApiError } from 'lib/middleware/errors';
 
+declare module 'http' {
+  interface IncomingMessage {
+    superApiToken: SuperApiToken | null;
+  }
+}
+
 export async function provisionSuperApiKey (name: string): Promise<SuperApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
 

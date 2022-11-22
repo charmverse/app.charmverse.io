@@ -1,6 +1,6 @@
 import { string } from 'yup';
 
-import { DOMAIN_BLACKLIST } from 'lib/spaces';
+import { DOMAIN_BLACKLIST } from 'lib/spaces/utils';
 
 export const domainSchema = string().ensure().trim().lowercase()
   .min(3, 'Domain must be at least 3 characters')

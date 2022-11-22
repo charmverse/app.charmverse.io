@@ -9,7 +9,7 @@ import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
-import { isSpaceDomain } from 'lib/spaces';
+import { isSpaceDomain } from 'lib/spaces/utils';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'share', 'api-docs', 'u'];
