@@ -193,7 +193,7 @@
     "reselect": "^4.0.0",
     "scroll-into-view-if-needed": "^2.2.29",
     "sharp": "^0.30.5",
-    "socket.io": "^4.5.2",
+    "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.2",
     "swagger-ui-react": "^4.14.1",
     "swr": "^1.2.1",
