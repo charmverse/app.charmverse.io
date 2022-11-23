@@ -34,16 +34,7 @@ export async function provisionSuperApiKey (name: string): Promise<SuperApiToken
 export async function requireSuperApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
 
-  let superApiToken: SuperApiToken | null = null;
-
-  try {
-    if (apiKey) {
-      superApiToken = await getVerifiedSuperApiToken(apiKey);
-    }
-  }
-  catch (error) {
-    superApiToken = null;
-  }
+  const superApiToken: SuperApiToken | null = apiKey ? await getVerifiedSuperApiToken(apiKey) : null;
 
   if (superApiToken) {
     req.superApiToken = superApiToken;
