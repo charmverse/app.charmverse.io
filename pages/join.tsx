@@ -4,15 +4,17 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useMemo, useEffect, memo } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
+import { MountTracker } from 'components/common/Debug/MountTracker';
 import { DialogTitle } from 'components/common/Modal';
 import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
 import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useSpaces } from 'hooks/useSpaces';
+import log from 'lib/log';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const { spaces } = useSpaces();
@@ -33,7 +35,7 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
 
 export default function JoinWorkspace () {
   const router = useRouter();
-  const domain = router.query.domain;
+  const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const { showOnboarding } = useOnboarding();
 
@@ -45,17 +47,27 @@ export default function JoinWorkspace () {
     }
   }, [spaces]);
 
+  const JoinForm = memo(domain ? JoinPredefinedSpaceDomain.bind(null, { spaceDomain: domain }) : JoinDynamicSpaceForm);
+
+  const DynamicJoinForm = memo(JoinDynamicSpaceForm);
+
+  log.debug('mount debug Domain', domain);
+
   return (
-    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
-      <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle>Join a workspace</DialogTitle>
-        <Divider />
-        {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain as string} /> : <JoinDynamicSpaceForm />}
-      </Card>
-      <AlternateRouteButton href='/createWorkspace'>
-        Create a workspace
-      </AlternateRouteButton>
-    </Box>
+    <MountTracker name='Join page'>
+      <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
+        <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
+          <DialogTitle>Join a workspace</DialogTitle>
+          <Divider />
+          <MountTracker name='Join form enclosure'>
+            <JoinForm />
+          </MountTracker>
+        </Card>
+        <AlternateRouteButton href='/createWorkspace'>
+          Create a workspace
+        </AlternateRouteButton>
+      </Box>
+    </MountTracker>
   );
 }
 
