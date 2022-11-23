@@ -1,4 +1,5 @@
 {
+  "name": "charmverse.io",
   "scripts": {
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" next build",
     "build:win": "npx next build",
@@ -175,6 +176,7 @@
     "react-hook-form": "^7.25.0",
     "react-hot-keys": "^2.7.1",
     "react-hotkeys-hook": "^3.4.4",
+    "react-icons": "^4.6.0",
     "react-intl": "^5.24.4",
     "react-pdf": "^5.7.2",
     "react-redux": "^7.2.6",

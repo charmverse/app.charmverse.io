@@ -70,7 +70,7 @@ export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: 
         </Box>
       </TableCell>
       <TableCell>
-        <Typography variant='body2'>{humanFriendlyDate(member.createdAt)}</Typography>
+        <Typography minWidth={80} variant='body2'>{humanFriendlyDate(member.createdAt)}</Typography>
       </TableCell>
       <TableCell>
         {actions.length > 0 ? (

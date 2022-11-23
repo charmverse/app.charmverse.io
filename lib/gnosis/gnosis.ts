@@ -5,6 +5,7 @@ import type { UserGnosisSafe } from '@prisma/client';
 import { getChainById, RPC } from 'connectors';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
 
 import log from 'lib/log';
@@ -56,7 +57,8 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   }
   const service = getGnosisService({ signer, serviceUrl });
   if (service) {
-    return service.getSafesByOwner(address)
+    const checksumAddress = getAddress(address); // convert to checksum address
+    return service.getSafesByOwner(checksumAddress)
       .then(r => Promise.all(r.safes.map(safeAddr => {
         return service.getSafeInfo(safeAddr)
           .then(info => ({ ...info, chainId }));

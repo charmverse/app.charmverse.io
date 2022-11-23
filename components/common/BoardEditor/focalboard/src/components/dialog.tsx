@@ -1,13 +1,9 @@
 
 import CloseIcon from '@mui/icons-material/Close';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import MuiIconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useIntl } from 'react-intl';
-
-import PopperPopup from 'components/common/PopperPopup';
 
 import IconButton from '../widgets/buttons/iconButton';
 
@@ -60,13 +56,7 @@ const Dialog = React.memo((props: Props) => {
                 )
               }
               {toolbar && <div className='cardToolbar'>{toolbar}</div>}
-              {toolsMenu && (
-                <PopperPopup closeOnClick popupContent={toolsMenu}>
-                  <MuiIconButton size='small'>
-                    <MoreHorizIcon fontSize='small' />
-                  </MuiIconButton>
-                </PopperPopup>
-              )}
+              {toolsMenu}
             </div>
             {props.children}
           </div>

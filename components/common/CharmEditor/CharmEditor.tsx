@@ -137,7 +137,12 @@ export function charmEditorPlugins (
         }
         return {
           update: (view, prevState) => {
-            if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
+            if (
+              // Update only if page is in editing mode or in viewing mode
+              (!readOnly || enableComments || enableVoting)
+              && onContentChange
+              && !view.state.doc.eq(prevState.doc)
+            ) {
               onContentChange(view, prevState.doc);
             }
           }
@@ -227,8 +232,6 @@ export function charmEditorPlugins (
     trailingNode.plugins(),
     disclosure.plugins(),
     tweet.plugins(),
-    // TODO: Pasting iframe or image link shouldn't create those blocks for now
-    // iframePlugin,
     pasteImagePlugin
   ];
 

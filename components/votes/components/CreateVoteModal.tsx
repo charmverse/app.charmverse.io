@@ -1,5 +1,5 @@
 import AddCircle from '@mui/icons-material/AddCircle';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -60,7 +60,7 @@ function InlineVoteOptions (
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
                   }}
                 >
-                  <DeleteIcon fontSize='small' />
+                  <DeleteOutlinedIcon fontSize='small' />
                 </IconButton>
               </div>
             </Tooltip>
