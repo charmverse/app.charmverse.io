@@ -7,7 +7,9 @@ import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, Serve
 
 const gettext = (text: string) => text;
 
-const socketHost = `${websocketsHost || ''}/ceditor`;
+const namespace = '/ceditor';
+
+const socketHost = `${websocketsHost || ''}${namespace}`;
 const socketEvent = 'message';
 
 type WrappedServerMessage = WrappedSocketMessage<ServerMessage>;
@@ -190,7 +192,7 @@ export class WebSocketConnector {
 
     this.socket.on('connect', () => {
       // // console.log('connected');
-      log.info('Page socket client connected', this.connectionCount);
+      log.info(`[ws${namespace}]: Client connected`, this.connectionCount);
       this.open();
       // try {
       //   const sendable = this.anythingToSend();
@@ -224,7 +226,7 @@ export class WebSocketConnector {
         // server is probably restarting
       }
       else {
-        log.warn('Error connecting to /ceditor socket namespace', error);
+        log.warn(`[ws${namespace}]: Connection error`, error);
         this.onError(error);
       }
     });
@@ -256,7 +258,6 @@ export class WebSocketConnector {
       client: 0,
       lastTen: []
     };
-    log.info('Subscribe to page');
 
     this.send(() => message);
   }
@@ -296,7 +297,7 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        log.debug('Sent socket message', wrappedMessage);
+        log.debug(`[ws${namespace}]: Sent message`, wrappedMessage);
         this.socket.emit(socketEvent, wrappedMessage);
         this.setRecentlySentTimer(timer);
       });
@@ -338,7 +339,7 @@ export class WebSocketConnector {
   }
 
   receive (data: WrappedServerMessage) {
-    log.debug('receive event', data);
+    log.debug(`[ws${namespace}]: Received event`, data);
     switch (data.type) {
 
       case 'welcome':

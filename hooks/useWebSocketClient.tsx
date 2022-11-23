@@ -79,7 +79,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     }).connect();
 
     socket.on('connect', () => {
-      log.info('Socket client connected');
+      log.info('[ws] Client connected');
       pushToMessageLog({ type: 'connect', payload: 'Client connected' });
       socket.emit('message', {
         type: 'subscribe',
@@ -94,6 +94,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       if (isServerMessage(message)) {
         // Key part when we relay messages from the server to consumers
         eventFeed.publish(message.type, message.payload);
+        log.debug('[ws]: Received event', message);
         pushToMessageLog(message);
       }
     });
@@ -103,7 +104,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     });
 
     socket.on('connect_error', (error) => {
-      log.warn('Error connecting to workspace socket - maybe restarting?', { error });
+      log.warn('[ws] Connection error - maybe restarting?', { error });
       pushToMessageLog({ type: 'error', payload: error.message });
     });
 

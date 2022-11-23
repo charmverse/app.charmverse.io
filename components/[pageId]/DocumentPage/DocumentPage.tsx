@@ -181,6 +181,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                 // key={page.title}
                 icon={page.icon}
                 title={page.title}
+                updatedAt={page.updatedAt.toString()}
                 readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />

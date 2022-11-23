@@ -84,16 +84,6 @@ export class WebsocketBroadcaster {
     this.io.to(roomId).emit('message', message);
   }
 
-  broadcastToOthers (message: ServerMessage, roomId: string, userId: string): void {
-    // @ts-ignore
-    message.userId = userId;
-    this.broadcast(message, roomId);
-    // const socket = this.sockets[userId];
-    // if (socket) {
-    //   socket.broadcast.to(roomId).emit('message', message);
-    // }
-  }
-
   leaveRoom (socket: Socket, roomId: string): void {
     socket.leave(roomId);
   }

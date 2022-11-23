@@ -13,8 +13,8 @@ type CurrentPageData = {
 
 export async function updatePage (page: CurrentPageData, userId: string, updates: Prisma.PageUpdateInput): Promise<IPageWithPermissions> {
   const data: Prisma.PageUpdateInput = {
-    ...updates,
     updatedAt: new Date(),
+    ...updates,
     updatedBy: userId
   };
 

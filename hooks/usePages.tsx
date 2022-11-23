@@ -201,9 +201,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }, { revalidate });
   }, [mutate]);
 
-  const updatePage = useCallback(async (updates: PageUpdates, revalidateCache = false) => {
+  const updatePage = useCallback(async (updates: PageUpdates) => {
+
     const updatedPage = await charmClient.pages.updatePage(updates);
-    mutatePage(updatedPage, revalidateCache);
 
     return updatedPage;
   }, [mutatePage]);
@@ -215,7 +215,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
-  const handlePagesUpdate = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
+  const handleUpdateEvent = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
 
     mutatePagesList(existingPages => {
       const _existingPages = existingPages || {};
@@ -243,7 +243,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const handleNewPages = useCallback((value: WebSocketPayload<'pages_created'>) => {
+  const handleNewPageEvent = useCallback((value: WebSocketPayload<'pages_created'>) => {
 
     const newPages = value.reduce<PagesMap>((pageMap, page) => {
       if (page.spaceId === currentSpaceId.current) {
@@ -262,7 +262,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const handlePageDeletes = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
+  const handleDeleteEvent = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
 
     mutatePagesList(existingPages => {
 
@@ -279,9 +279,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handlePagesUpdate);
-    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPages);
-    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handlePageDeletes);
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();

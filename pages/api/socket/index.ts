@@ -4,7 +4,6 @@ import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { websocketsHost } from 'config/constants';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { authSecret } from 'lib/session/config';
@@ -53,15 +52,6 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   res.socket.server.io = io;
   relay.bindServer(io);
   log.info('Web socket server instantiated');
-  // if (!websocketsHost) {
-  //   const io = new Server(res.socket.server);
-  //   res.socket.server.io = io;
-  //   relay.bindServer(io);
-  //   log.info('Web socket server instantiated');
-  // }
-  // else {
-  //   log.info('Web socket server is running on a different host');
-  // }
 
   res.send({ authToken: sealedUserId });
 }
