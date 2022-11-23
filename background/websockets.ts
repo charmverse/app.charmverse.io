@@ -2,7 +2,7 @@ import { createServer } from 'http';
 
 import { Server } from 'socket.io';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl, appEnv } from 'config/constants';
 import log from 'lib/log';
 import { relay } from 'lib/websockets/relay';
 
@@ -32,4 +32,4 @@ relay.bindServer(io);
 
 server.listen(port);
 
-log.info('Web socket server listening to port: ', port);
+log.info(`Web socket server running in ${appEnv} listening to port: `, port);

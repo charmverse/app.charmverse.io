@@ -4,6 +4,7 @@ export const isStagingEnv = process.env.NEXT_PUBLIC_APP_ENV === 'staging';
 export const isDevEnv = process.env.NODE_ENV === 'development' && !isTestEnv && !isStagingEnv;
 export const isProdEnv = process.env.NODE_ENV === 'production' && !isTestEnv && !isStagingEnv;
 export const isNodeEnv = typeof window === 'undefined';
+export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTestEnv ? 'test' : 'development';
 export const baseUrl = process.env.DOMAIN as string | undefined;
 // for cookies
 export const authSecret = process.env.AUTH_SECRET as string | undefined;
