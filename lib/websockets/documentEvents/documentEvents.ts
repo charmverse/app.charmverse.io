@@ -301,7 +301,7 @@ export class DocumentEventHandler {
   removeTooltipMarks (diff: ProsemirrorJSONStep) {
     if (diff.slice?.content?.[0]?.marks?.length) {
       diff.slice.content[0].marks = diff.slice.content[0].marks.filter(mark => (
-        !mark.attrs.trigger
+        !mark.attrs?.trigger
       ));
     }
     return diff;
