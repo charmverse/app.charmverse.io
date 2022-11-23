@@ -18,9 +18,18 @@ interface Props {
   buttonOutlined?: boolean;
   // If connecting a wallet, this component auto-triggers signing. Defaults to true
   enableAutosign?: boolean;
+  loading?: boolean;
 }
 
-export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton, buttonOutlined, enableAutosign = true }: Props) {
+export function WalletSign ({
+  signSuccess,
+  buttonStyle,
+  buttonSize,
+  ButtonComponent = PrimaryButton,
+  buttonOutlined,
+  enableAutosign = true,
+  loading
+}: Props) {
 
   const {
     account,
@@ -36,6 +45,8 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
 
   // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
   const userClickedConnect = useRef<boolean>(false);
+
+  const showLoadingState = loading || isSigning;
 
   useEffect(() => {
     if (isWalletSelectorModalOpen && !userClickedConnect.current) {
@@ -85,7 +96,7 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonCompon
   }
 
   return (
-    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning} variant={buttonOutlined ? 'outlined' : undefined}>
+    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} disabled={showLoadingState} loading={showLoadingState} variant={buttonOutlined ? 'outlined' : undefined}>
       Verify wallet
     </ButtonComponent>
   );
