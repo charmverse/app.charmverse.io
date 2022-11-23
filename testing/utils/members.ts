@@ -49,3 +49,17 @@ export function generateMemberPropertyValue ({
     }
   });
 }
+
+export function addDiscordUser ({ userId, discordId }: { userId: string, discordId: string }) {
+  return prisma.discordUser.create({
+    data: {
+      account: {},
+      discordId,
+      user: {
+        connect: {
+          id: userId
+        }
+      }
+    }
+  });
+}
