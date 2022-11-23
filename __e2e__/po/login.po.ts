@@ -30,7 +30,9 @@ export class LoginPage {
 
   async goto () {
     // assume that the base page will redirect to /signup
-    await this.page.goto(baseUrl);
+    if (baseUrl) {
+      await this.page.goto(baseUrl);
+    }
   }
 
   async waitForURL () {

@@ -26,7 +26,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
       id: validUuid ? spaceIdOrDomain : undefined
     },
     include: {
-      TokenGate: {
+      tokenGates: {
         include: {
           tokenGateToRoles: {
             include: {
@@ -42,7 +42,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
   }
 
-  if (space.TokenGate.length === 0) {
+  if (space.tokenGates.length === 0) {
     throw new MissingDataError('There are no token gates available in this space.');
   }
 
@@ -51,7 +51,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
   }
 
   const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
-    space.TokenGate.map(tokenGate => {
+    space.tokenGates.map(tokenGate => {
       return litClient.getSignedToken({
         authSig,
         // note that we used to store 'chain' but now it is an array

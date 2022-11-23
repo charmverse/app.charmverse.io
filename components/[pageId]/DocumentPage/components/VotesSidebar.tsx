@@ -9,7 +9,7 @@ import { ViewOptions } from 'components/common/ViewOptions';
 import NoVotesMessage from 'components/votes/components/NoVotesMessage';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
-import { findTotalInlineVotes } from 'lib/inline-votes/findTotalInlineVotes';
+import { findTotalInlineVotes } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 import type { ExtendedVote } from 'lib/votes/interfaces';

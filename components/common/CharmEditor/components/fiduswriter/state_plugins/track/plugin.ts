@@ -1,6 +1,7 @@
 import type { NodeSelection } from '@bangle.dev/pm';
 import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
 
+import type { FidusEditor } from '../../fiduseditor';
 import type { TrackAttribute } from '../../track/interfaces';
 
 import { findSelectedChanges } from './findSelectedChanges';
@@ -13,8 +14,7 @@ export const selectedChangeFormatSpec = {};
 export const selectedChangeBlockSpec = {};
 
 interface Options {
-  userId: string;
-  username: string;
+  editor: FidusEditor;
 }
 
 export function trackPlugin (options: Options) {
@@ -26,7 +26,7 @@ export function trackPlugin (options: Options) {
         // in the document and that they are registered as past
         // participants for the marginbox filter.
         const users: Record<string, string> = {};
-        users[options.userId] = options.username;
+        users[options.editor.user.id] = options.editor.user.username;
         state.doc.descendants(node => {
           if (node.attrs.track) {
             node.attrs.track.forEach((track: TrackAttribute) => {
@@ -49,16 +49,15 @@ export function trackPlugin (options: Options) {
           }
         });
 
-        // if (options.editor.mod.collab) {
-        //   Object.entries(users).forEach(([id, username]) => {
-        //     const userId = parseInt(id);
-        //     options.editor.mod.collab.colors.ensureUserColor(userId);
-        //     if (!options.editor.mod.collab.pastParticipants.find(participant => participant.id === userId)) {
-        //       options.editor.mod.collab.pastParticipants.push({ id: userId, name: username });
-        //     }
-        //   });
+        if (options.editor.mod.collab) {
+          Object.entries(users).forEach(([userId, username]) => {
+            options.editor.mod.collab.colors.ensureUserColor(userId, username);
+            if (!options.editor.mod.collab.pastParticipants.some(participant => participant.id === userId)) {
+              options.editor.mod.collab.pastParticipants.push({ id: userId, name: username });
+            }
+          });
 
-        // }
+        }
 
         return {
           decos: DecorationSet.empty

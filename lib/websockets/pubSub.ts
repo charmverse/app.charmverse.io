@@ -4,6 +4,12 @@ type CallbackType<T> = (value: T) => void;
 export class PubSub<T, V> {
   subscribers = new Map<T, CallbackType<V>[]>();
 
+  constructor () {
+    this.subscribe = this.subscribe.bind(this);
+    this.unsubscribe = this.unsubscribe.bind(this);
+    this.publish = this.publish.bind(this);
+  }
+
   subscribe<E extends T = T, S extends V = V> (type: E, callback: CallbackType<S>) {
     if (!this.subscribers.has(type)) {
       this.subscribers.set(type, []);

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
@@ -11,20 +11,18 @@ import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/c
 import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import VoteDetail from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import LoadingComponent from 'components/common/LoadingComponent';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
-import { usePageDetails } from 'hooks/usePageDetails';
 import { usePages } from 'hooks/usePages';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import type { Page, PageContent } from 'models';
+import type { Page } from 'models';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
@@ -50,6 +48,15 @@ export const Container = styled(Box)<{ top: number, fullWidth?: boolean }>`
   }
 `;
 
+const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(({ showPageActionSidebar, theme }) => `
+  transition: width ease-in 0.25s;
+  ${theme.breakpoints.up('md')} {
+    width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
+    height: ${showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'};
+    overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
+  }
+`);
+
 export interface DocumentPageProps {
   page: PageMeta;
   setPage: (p: Partial<Page>) => void;
@@ -62,11 +69,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
   const pagePermissions = getPagePermissions(page.id);
-  const { pageDetails, debouncedUpdatePageDetails } = usePageDetails(page.id);
 
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
-  const { editMode } = usePrimaryCharmEditor();
+  const { editMode, setPageProps } = usePrimaryCharmEditor();
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
@@ -123,11 +129,6 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
     pageTop = 200;
   }
 
-  const updatePageContent = useCallback((content: ICharmEditorOutput) => {
-    debouncedUpdatePageDetails({ id: page.id, content: content.doc, contentText: content.rawText });
-    // setPage({ content: content.doc, contentText: content.rawText });
-  }, [setPage]);
-
   const card = cards.find(_card => _card.id === page.id);
 
   const comments = useAppSelector(getCardComments(card?.id ?? page.id));
@@ -135,6 +136,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
   const showPageActionSidebar = (currentPageActionDisplay !== null) && !insideModal;
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+
+  function onParticipantUpdate (participants: FrontendParticipant[]) {
+    setPageProps({ participants });
+  }
 
   return (
     <ScrollableWindow
@@ -144,21 +149,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
         }
       }}
     >
-      <Box
-        id='document-scroll-container'
-        sx={{
-          transition: 'width ease-in 0.25s',
-          width: {
-            md: showPageActionSidebar ? 'calc(100% - 430px)' : '100%'
-          },
-          height: {
-            md: showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'
-          },
-          overflow: {
-            md: showPageActionSidebar ? 'auto' : 'inherit'
-          }
-        }}
-      >
+      <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
@@ -169,10 +160,10 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id + editMode + !!pageDetails}
-              content={pageDetails?.content as PageContent}
-              onContentChange={updatePageContent}
-              readOnly={readOnly || !pageDetails}
+              key={page.id + editMode}
+              // content={pageDetails?.content as PageContent}
+              // onContentChange={updatePageContent}
+              readOnly={readOnly}
               pageActionDisplay={!insideModal ? currentPageActionDisplay : null}
               pageId={page.id}
               disablePageSpecificFeatures={isSharedPage}
@@ -181,7 +172,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
               containerWidth={containerWidth}
               pageType={page.type}
               pagePermissions={pagePermissions}
-              placeholder={!pageDetails ? <LoadingComponent isLoading /> : null}
+              onParticipantUpdate={onParticipantUpdate}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
@@ -190,6 +181,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
                 // key={page.title}
                 icon={page.icon}
                 title={page.title}
+                updatedAt={page.updatedAt.toString()}
                 readOnly={readOnly || enableSuggestingMode}
                 setPage={setPage}
               />
@@ -259,7 +251,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
 
           </Container>
         </div>
-      </Box>
+      </ScrollContainer>
     </ScrollableWindow>
   );
 }

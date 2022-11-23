@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { PageContent } from 'models';
 

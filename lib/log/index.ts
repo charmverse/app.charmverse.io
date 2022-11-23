@@ -1,5 +1,3 @@
-import log from 'loglevel';
+import { log } from './log';
 
-import { apply } from './logLevel.plugin';
-
-export default apply(log);
+export default log;

@@ -161,10 +161,13 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
   const [height, setHeight] = useState(node.attrs.height);
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
+
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
     return readOnly ? <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} /> : (
       <IFrameSelector
+        autoOpen={autoOpen}
         type={node.attrs.type}
         onIFrameSelect={(videoLink) => {
           const tweetAttrs = extractTweetAttrs(videoLink);

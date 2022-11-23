@@ -14,8 +14,7 @@
     background-color: var(--editorCore-selectionChange-bgColor);
   }
 
-  to {
-  }
+  to {}
 }
 
 :root {
@@ -31,8 +30,7 @@
   text-decoration: underline;
 }
 
-.bangle-editor p > code {
-}
+.bangle-editor p > code {}
 
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
@@ -477,7 +475,7 @@ details {
   position: absolute;
   top: -2px;
   width: 20px;
-  border-top: 2px solid black;
+  border-top: 2px solid var(--primary-text);
   animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
 }
 
@@ -526,7 +524,7 @@ details {
   }
 }
 
-.czi-editor-frame-body {
+.bangle-editor-core {
   &:hover {
     .row-handle {
       opacity: 1;
@@ -552,4 +550,15 @@ details {
     color: rgba(var(--center-channel-color-rgb), 0.8);
     font-size: 0.8rem;
   }
+}
+
+/** placeholder **/
+.ProseMirror[data-placeholder]::before {
+  display: block;
+  height: 0;
+  color: var(--prop-gray);
+  content: attr(data-placeholder);
+  pointer-events: none;
+  position: relative;
+  top: 3px;
 }
