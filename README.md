@@ -63,7 +63,6 @@ S3_UPLOAD_SECRET=???
 S3_UPLOAD_BUCKET=charm.public.dev
 S3_UPLOAD_REGION=us-east-1
 
-
 ### Access your local server via https
 You may want to access your local development server using https from another device (such as in the case of mobile testing).
 
