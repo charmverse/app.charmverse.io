@@ -1,5 +1,6 @@
 -- AlterTable
-ALTER TABLE "Space" ADD COLUMN     "superApiTokenId" UUID;
+ALTER TABLE "Space" ADD COLUMN     "adminDiscordUserId" TEXT,
+ADD COLUMN     "superApiTokenId" UUID;
 
 -- CreateTable
 CREATE TABLE "SuperApiToken" (

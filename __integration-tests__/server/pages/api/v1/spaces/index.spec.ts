@@ -11,6 +11,7 @@ let apiToken: SuperApiToken;
 const defaultSpaceData = {
   name: 'Test Space',
   discordServerId: '1234',
+  adminDiscordUserId: '1337',
   avatar: ''
 };
 
@@ -64,6 +65,16 @@ describe('GET /api/v1/spaces', () => {
     expect(response.body.message).toBe('Missing discord server id');
   });
 
+  it('should respond 400 when discord admin id is missing', async () => {
+    const response = await request(baseUrl)
+      .post('/api/v1/spaces')
+      .set('Authorization', apiToken.token)
+      .send({ ...defaultSpaceData, adminDiscordUserId: '' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe('Missing discord admin id');
+  });
+
   it('should respond 400 when discord server id is missing', async () => {
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
@@ -85,6 +96,7 @@ describe('GET /api/v1/spaces', () => {
     expect(response.body.domain).toBe('test-space');
     expect(response.body.name).toBe('Test Space');
     expect(response.body.superApiTokenId).toBe(apiToken.id);
+    expect(response.body.adminDiscordUserId).toBe('1337');
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: { spaceId: response.body.id },

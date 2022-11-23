@@ -15,7 +15,7 @@ import { IDENTITY_TYPES } from 'models';
 type CreateSpaceInputData = {
   name: string;
   discordServerId: string;
-  domain?: string;
+  adminDiscordUserId: string;
   avatar?: string;
 }
 
@@ -26,7 +26,7 @@ handler
   .post(createSpace);
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
-  const { name, discordServerId, avatar } = req.body as CreateSpaceInputData;
+  const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceInputData;
 
   if (!name) {
     throw new InvalidInputError('Missing space name');
@@ -38,6 +38,10 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
 
   if (!discordServerId) {
     throw new InvalidInputError('Missing discord server id');
+  }
+
+  if (!adminDiscordUserId) {
+    throw new InvalidInputError('Missing discord admin id');
   }
 
   // generate a domain name if user didn't provide one
@@ -58,6 +62,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     updatedBy: botUser.id,
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
+    adminDiscordUserId,
     author: {
       connect: {
         id: botUser.id

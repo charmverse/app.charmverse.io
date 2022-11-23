@@ -234,6 +234,7 @@ model Space {
   memberProperties            MemberProperty[]
   memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
+  adminDiscordUserId          String?
 
   @@index([createdBy])
 }
