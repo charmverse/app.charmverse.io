@@ -16,6 +16,8 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
 
+import { MountTracker } from '../Debug/MountTracker';
+
 import TokenGateOption from './TokenGateOption';
 
 interface Props {
@@ -66,30 +68,33 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   async function evaluateEligibility (authSig: AuthSig) {
 
-    if (!user) {
-      await loginFromWeb3Account(authSig);
-    }
-
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
 
-    try {
-      const verifyResult = await charmClient.evalueTokenGateEligibility({
-        authSig,
-        spaceIdOrDomain: spaceDomain
-      });
-      setTokenGateResult(verifyResult);
+    if (!user) {
+      try {
+        await loginFromWeb3Account(authSig);
+      }
+      catch {
+        setIsVerifyingGates(false);
+        return;
+      }
+    }
 
+    charmClient.evalueTokenGateEligibility({
+      authSig,
+      spaceIdOrDomain: spaceDomain
+    }).then(verifyResult => {
+      setTokenGateResult(verifyResult);
       if (verifyResult.canJoinSpace) {
         showMessage('Verification succeeded.', 'success');
       }
-
-      setIsVerifyingGates(false);
-    }
-    catch (err) {
-      setIsVerifyingGates(false);
-    }
+      else {
+        showMessage('Verification failed.', 'warning');
+      }
+    })
+      .finally(() => setIsVerifyingGates(false));
   }
 
   async function onSubmit () {
@@ -186,7 +191,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid item>
         {
           !tokenGateResult?.canJoinSpace ? (
-            <WalletSign signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
+            <WalletSign loading={verifyingGates} signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
           ) : (
             <PrimaryButton
               size='large'
