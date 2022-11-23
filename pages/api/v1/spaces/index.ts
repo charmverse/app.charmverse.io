@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { addUserToSpace } from 'lib/spaces/addUserToSpace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -44,7 +45,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     throw new InvalidInputError('Missing discord admin id');
   }
 
-  // generate a domain name based on space name
+  // generate a domain name based on space
   const spaceDomain = await getAvailableDomainName(name);
 
   // create new bot user as space creator
@@ -78,10 +79,13 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const space = await createWorkspace({ spaceData, userId: botUser.id });
 
   // Add bot user to space
-  await prisma.spaceRole.create({
-    data: {
-      spaceId: space.id,
-      userId: botUser.id,
+  await addUserToSpace({
+    spaceRole: {
+      space: {
+        connect: { id: space.id }
+      },
+      user: {
+        connect: { id: botUser.id } },
       isAdmin: true
     }
   });

@@ -1,0 +1,26 @@
+import type { Prisma } from '@prisma/client';
+
+import { prisma } from 'db';
+import { isSpaceDiscordAdmin } from 'lib/discord/isSpaceDiscordAdmin';
+
+type AddUserToSpaceProps = {
+  spaceRole: Prisma.SpaceRoleCreateInput;
+  spaceId?:string;
+  userId?: string;
+}
+
+export async function addUserToSpace ({ spaceRole, spaceId, userId }: AddUserToSpaceProps) {
+  let isAdmin = spaceRole.isAdmin;
+
+  if (!isAdmin && spaceId && userId) {
+    // try to grant admin for discord admin user
+    isAdmin = await isSpaceDiscordAdmin({ userId, spaceId });
+  }
+
+  return prisma.spaceRole.create({
+    data: {
+      ...spaceRole,
+      isAdmin
+    }
+  });
+}

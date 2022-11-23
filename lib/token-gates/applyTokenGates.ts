@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
+import { addUserToSpace } from 'lib/spaces/addUserToSpace';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 
@@ -149,8 +150,8 @@ export async function applyTokenGates ({
   }
   else {
     const spaceRoleId = v4();
-    await prisma.spaceRole.create({
-      data: {
+    await addUserToSpace({
+      spaceRole: {
         id: spaceRoleId,
         spaceRoleToRole: {
           createMany: {
@@ -171,7 +172,9 @@ export async function applyTokenGates ({
             id: userId
           }
         }
-      }
+      },
+      spaceId,
+      userId
     });
 
     updateTrackUserProfileById(userId);
