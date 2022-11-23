@@ -35,7 +35,6 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user && router.route !== '/share/[...pageId]') {
-      setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);

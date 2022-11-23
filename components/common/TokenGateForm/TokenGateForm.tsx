@@ -67,7 +67,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   async function evaluateEligibility (authSig: AuthSig) {
 
     if (!user) {
-      return loginFromWeb3Account(authSig);
+      await loginFromWeb3Account(authSig);
     }
 
     // Reset the current state
