@@ -225,8 +225,11 @@ export class WebSocketConnector {
       if (errorType === 'TransportError') {
         // server is probably restarting
       }
+      else if ((error as any).code === 'parser error') {
+        // ignore error - seems to happen on deploy
+      }
       else {
-        log.warn(`[ws${namespace}] Connection error`, error);
+        log.warn(`[ws${namespace}] Connection error`, { error });
         this.onError(error);
       }
     });
