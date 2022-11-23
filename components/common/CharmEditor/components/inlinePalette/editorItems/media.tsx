@@ -23,18 +23,21 @@ export function items (): PaletteItemTypeNoGroup[] {
       description: 'Insert a image block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-          rafCommandExec(view!, (_state, _dispatch) => {
-            const node = _state.schema.nodes.image.create({
-              src: null
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.image.create({
+                src: null
+              }, null, [tooltipMark]);
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
+                return true;
+              }
+
+              return insertNode(_state, _dispatch, node);
             });
-
-            if (_dispatch && isAtBeginningOfLine(_state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
-              return true;
-            }
-
-            return insertNode(_state, _dispatch, node);
-          });
+          }
           return replaceSuggestionMarkWith(palettePluginKey, '')(
             state,
             dispatch,
@@ -55,15 +58,17 @@ export function items (): PaletteItemTypeNoGroup[] {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
 
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
               const node = _state.schema.nodes.iframe.create({
                 src: null,
                 type: 'video',
                 width: MAX_EMBED_WIDTH,
                 height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
-              });
+              }, undefined, [tooltipMark]);
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
 
@@ -90,13 +95,14 @@ export function items (): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
+            // let the node view know to show the tooltip by default
+            const tooltipMark = _state.schema.mark('tooltip-marker');
             const node = _state.schema.nodes.pdf.create({
               src: null
-
-            });
+            }, undefined, [tooltipMark]);
 
             if (_dispatch && isAtBeginningOfLine(_state)) {
-              _dispatch(_state.tr.replaceSelectionWith(node));
+              _dispatch(_state.tr.replaceSelectionWith(node, false));
               return true;
             }
             return insertNode(_state, _dispatch, node);

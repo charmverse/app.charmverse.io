@@ -1,12 +1,14 @@
-import { sealData, unsealData } from 'iron-session';
+import { sealData } from 'iron-session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
+import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { authSecret } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { SocketAuthReponse, WebsocketMessage } from 'lib/websockets/interfaces';
+import type { SealedUserId, SocketAuthReponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -23,12 +25,8 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
   };
 }
 
-type SealedUserId = {
-  userId: string;
-}
-
-const authSecret = process.env.AUTH_SECRET as string;
-const safeUserIdTtl = 15;
+// set a ttl that allows sockets to reuse in the same session
+const sevenDaysInSeconds = 7 * 24 * 60 * 60;
 
 // Subscribe user to messages
 async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
@@ -40,7 +38,7 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
     userId
   } as SealedUserId, {
     password: authSecret,
-    ttl: safeUserIdTtl
+    ttl: sevenDaysInSeconds
   });
 
   // It means that socket server was already initialised
@@ -51,38 +49,9 @@ async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocket
   }
 
   const io = new Server(res.socket.server);
-
-  // Define actions inside
-  io.on('connect', (socket) => {
-
-    socket.emit('message', 'Connection established');
-
-    socket.on('message', async (message: WebsocketMessage<'subscribe'>) => {
-
-      try {
-        const decryptedUserId = (await unsealData<SealedUserId>(message.payload.authToken, {
-          password: authSecret,
-          ttl: safeUserIdTtl
-        }))?.userId;
-
-        if (message.type === 'subscribe' && typeof decryptedUserId === 'string') {
-          relay.registerSubscriber({
-            userId: decryptedUserId,
-            socket,
-            roomId: (message).payload.spaceId
-          });
-        }
-
-      }
-      catch (err) {
-        socket.emit('error', 'Unable to register user');
-      }
-    });
-  });
-
   res.socket.server.io = io;
-
   relay.bindServer(io);
+  log.info('Web socket server instantiated');
 
   res.send({ authToken: sealedUserId });
 }

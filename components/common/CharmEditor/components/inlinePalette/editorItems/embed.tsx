@@ -26,15 +26,17 @@ export function items (): PaletteItemTypeNoGroup[] {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
 
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
               const node = _state.schema.nodes.iframe.create({
                 src: null,
                 type: 'embed',
                 width: MAX_EMBED_WIDTH,
                 height: MIN_EMBED_HEIGHT
-              });
+              }, undefined, [tooltipMark]);
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);
@@ -123,10 +125,12 @@ export function items (): PaletteItemTypeNoGroup[] {
             // Execute the animation
             rafCommandExec(view!, (_state, _dispatch) => {
 
-              const node = _state.schema.nodes.tweet.create();
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.tweet.create(undefined, undefined, [tooltipMark]);
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);

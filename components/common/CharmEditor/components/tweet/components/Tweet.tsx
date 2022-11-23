@@ -59,6 +59,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
 
   function onLoadScript () {
     if (ref.current && attrs.id) {
@@ -75,6 +76,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
     else {
       return (
         <TweetInput
+          autoOpen={autoOpen}
           isValid={(url) => extractTweetAttrs(url) !== null}
           onSubmit={(urlInput) => {
             const _attrs = extractTweetAttrs(urlInput);

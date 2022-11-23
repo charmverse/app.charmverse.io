@@ -1,6 +1,8 @@
-/* eslint-disable */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-mixed-operators */
+/* eslint-disable eqeqeq */
 
-import { isTruthy } from "./types";
+import { isTruthy } from './types';
 
 // source: https://stackoverflow.com/questions/1685680/how-to-avoid-scientific-notation-for-large-numbers-in-javascript
 
@@ -36,91 +38,94 @@ export function eToNumber (num: number | string): string {
   }
 }
 
-export type  PropertyValueCountSummary<K extends string> = Record<K, number> & {
-  total: number
+export type PropertyValueCountSummary<K extends string> = Record<K, number> & {
+  total: number;
 }
 
 /**
  * Return amount of times a key has a specific value, for each given set of values
  */
-export function countValueOccurrences<V extends string, T = any>(objectList: T [], key: keyof T): PropertyValueCountSummary<V> {
+export function countValueOccurrences<V extends string, T = any> (objectList: T [], key: keyof T): PropertyValueCountSummary<V> {
   const reduced: PropertyValueCountSummary<V> = objectList.reduce((summary: any, obj, index) => {
     const valueAsString = String(obj[key]) as keyof V;
 
-    summary[valueAsString] = typeof summary[valueAsString] === 'number' ? summary[valueAsString] + 1 : 1
+    summary[valueAsString] = typeof summary[valueAsString] === 'number' ? summary[valueAsString] + 1 : 1;
 
-    return summary
+    return summary;
 
-  },{})
-  reduced.total = objectList.length
+  }, {});
+  reduced.total = objectList.length;
 
-  return reduced
+  return reduced;
 }
 
 /**
  * Use this for converting numbers between 0 and 1 to a prefixed number
  * @abstract Only works up to atto (10^-18)
- * @param number 
+ * @param number
  * @param spaceUnit Whether to add spacing for the target unit. Defaults to false
  */
-export function nanofy({number, spaceUnit = false}: {number: string | number, spaceUnit?: boolean}): string {
+export function nanofy ({ number, spaceUnit = false }: { number: string | number, spaceUnit?: boolean }): string {
 
-  let parsedAsNum = parseFloat(number.toString());
+  const parsedAsNum = parseFloat(number.toString());
 
   if (parsedAsNum >= 1 || parsedAsNum <= -1) {
-    return parsedAsNum.toString()
-  } else if (!isTruthy(parsedAsNum)) {
-    return "0";
+    return parsedAsNum.toString();
+  }
+  else if (!isTruthy(parsedAsNum)) {
+    return '0';
   }
 
   // This prevents scientific notation being used
   // See https://stackoverflow.com/a/1685917 for more information
-  let numberAsString = parsedAsNum.toFixed(20)
+  const numberAsString = parsedAsNum.toFixed(20);
 
   // milli (3), micro (6), nano (9), pico (12), femto (15), atto (18)
   const units = ['m', 'µ', 'n', 'p', 'f', 'a'];
 
-
-  let splitted = numberAsString.split("")
+  const splitted = numberAsString.split('')
     // Remove the decimal dot
     .slice(2);
 
   let rebuiltString = '';
-  let currentUnit = ''
+  let currentUnit = '';
 
   for (let i = 0; i < splitted.length; i++) {
 
     if (i % 3 === 0 && rebuiltString === '') {
-      currentUnit = units[units.indexOf(currentUnit) + 1]
-    } else if (i % 3 === 0 && rebuiltString !== '') {
-      rebuiltString += '.'
+      currentUnit = units[units.indexOf(currentUnit) + 1];
+    }
+    else if (i % 3 === 0 && rebuiltString !== '') {
+      rebuiltString += '.';
     }
 
     const currentCharacter = splitted[i];
 
     // Ensure the leading character is not 0
     if (currentCharacter !== '0' || rebuiltString.length >= 1) {
-      rebuiltString += currentCharacter
+      rebuiltString += currentCharacter;
     }
 
-    if ((rebuiltString.length === 3 && !rebuiltString.match(".")) || rebuiltString.length >= 4) {
+    if ((rebuiltString.length === 3 && !rebuiltString.match('.')) || rebuiltString.length >= 4) {
       break;
     }
 
   }
 
   // Prevent last character being a dot or a bunch of zeros
-  if (rebuiltString[rebuiltString.length - 1] === ".") {
-    rebuiltString = rebuiltString.slice(0, rebuiltString.length -1)
+  if (rebuiltString[rebuiltString.length - 1] === '.') {
+    rebuiltString = rebuiltString.slice(0, rebuiltString.length - 1);
   // Drop decimals if there are only zeros
-  } else if (parseInt(rebuiltString.split(".")[1] ?? "0") === 0) {
-    rebuiltString = rebuiltString.split(".")[0]
+  }
+  else if (parseInt(rebuiltString.split('.')[1] ?? '0') === 0) {
+    rebuiltString = rebuiltString.split('.')[0];
   // If there are 3 significant digits before the decimal, drop the decimal
-  } else if (rebuiltString.match(".") !== null && rebuiltString.split(".")[0].length === 3) {
-    rebuiltString = rebuiltString.split(".")[0]
+  }
+  else if (rebuiltString.match('.') !== null && rebuiltString.split('.')[0].length === 3) {
+    rebuiltString = rebuiltString.split('.')[0];
   }
 
-  return `${rebuiltString}${spaceUnit? ' ' : ''}${currentUnit}`
+  return `${rebuiltString}${spaceUnit ? ' ' : ''}${currentUnit}`;
 
 }
 
@@ -133,11 +138,11 @@ interface PercentCalculation {
 /**
  * Returns a string representation of a percentage
  */
-export function percent({total, value, significantDigits}: PercentCalculation): string {
+export function percent ({ total, value, significantDigits }: PercentCalculation): string {
 
-  significantDigits = Math.abs(significantDigits ?? 0)
+  significantDigits = Math.abs(significantDigits ?? 0);
 
   const percentage = value === 0 ? 0 : ((value / total) * 100);
 
-  return `${percentage.toFixed(significantDigits)}%`
+  return `${percentage.toFixed(significantDigits)}%`;
 }

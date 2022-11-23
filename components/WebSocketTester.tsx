@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
 
 import { PimpedButton as Button } from 'components/common/Button';
-import { useWebSocketClient } from 'hooks/useSocketClient';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export function WebSocketTester () {
 
