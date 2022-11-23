@@ -60,7 +60,7 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    #if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: test
     steps:
       - uses: actions/checkout@v2
@@ -108,44 +108,44 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      # - name: Package Webapp
-      #   run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+      - name: Package Webapp
+        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
-      # - name: Update and Package background worker
-      #   run: |
-      #     rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
-      #     cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+      - name: Update and Package background worker
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       - name: Update and Package websockets
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-      # - name: Deploy to Beanstalk
-      #   uses: einaregilsson/beanstalk-deploy@v18
-      #   with:
-      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     application_name: web3-workspace
-      #     environment_name: prd-charmverse-webapp
-      #     version_label: ${{ github.sha }}
-      #     region: us-east-1
-      #     deployment_package: deploy.zip
-      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
-      #     wait_for_deployment: false # set to false to save sweet Github minutes
+      - name: Deploy to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: web3-workspace
+          environment_name: prd-charmverse-webapp
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
 
-      # - name: Deploy Background to Beanstalk
-      #   uses: einaregilsson/beanstalk-deploy@v18
-      #   with:
-      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     application_name: charmverse-worker
-      #     environment_name: prd-charmverse-worker
-      #     version_label: ${{ github.sha }}
-      #     region: us-east-1
-      #     deployment_package: deploy_cron.zip
-      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
-      #     wait_for_deployment: false # set to false to save sweet Github minutes
+      - name: Deploy Background to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: charmverse-worker
+          environment_name: prd-charmverse-worker
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_cron.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Deploy Websockets to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
