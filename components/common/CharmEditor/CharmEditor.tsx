@@ -293,8 +293,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
       background: rgba(255,212,0,0.14);
       border-bottom: 2px solid rgb(255, 212, 0);
       padding-bottom: 2px;
-      &:hover {
-        background: rgba(255,212,0,0.56) !important;
+
+      // disable hover UX on ios which converts first click to a hover event
+      @media (pointer: fine) {
+        &:hover {
+          background: rgba(255,212,0,0.56) !important;
+        }
       }
       cursor: pointer;
     }
@@ -303,8 +307,11 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
       background: rgba(0,171,255,0.14);
       border-bottom: 2px solid rgb(0,171,255);
       padding-bottom: 2px;
-      &:hover {
-        background: rgba(0,171,255,0.56) !important;
+      // disable hover UX on ios which converts first click to a hover event
+      @media (pointer: fine) {
+        &:hover {
+          background: rgba(0,171,255,0.56) !important;
+        }
       }
       cursor: pointer;
     }

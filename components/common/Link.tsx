@@ -17,10 +17,13 @@ const StyledMuiLink = styled(MuiLink)`
   ${props => props.color
     // @ts-ignore
     ? `color: ${props.theme.palette[props.color]?.main};` : ''}
-  &:hover {
-    color: ${props => typeof props.color === 'string'
-    // @ts-ignore
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      color: ${props => typeof props.color === 'string'
+  // @ts-ignore
     ? (hoverStyle[props.color] || props.theme.palette[props.color]?.main) : props.theme.palette[props.color]?.main};
+    }
   }
 `;
 
