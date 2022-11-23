@@ -224,7 +224,7 @@ model Space {
   spacePermissions            SpacePermission[]                 @relation("spacePermissions")
   spaceRoles                  SpaceRole[]
   threads                     Thread[]
-  TokenGate                   TokenGate[]
+  tokenGates                  TokenGate[]
   votes                       Vote[]
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
@@ -274,7 +274,6 @@ model Page {
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
   version            Int              @default(1)
-  //diffs: Json @default('[]')
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author             User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   space              Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -413,7 +412,7 @@ model User {
   threads              Thread[]
   profile              UserDetails?
   gnosisSafes          UserGnosisSafe[]
-  UserNotification     UserNotification[]
+  userNotifications    UserNotification[]
   notificationState    UserNotificationState?
   userVotes            UserVote[]
   initiatedVotes       Vote[]
@@ -535,7 +534,7 @@ model SpaceRole {
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   spaceRoleToRole SpaceRoleToRole[]
-  TokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateId     String?           @db.Uuid
   joinedViaLink   Boolean?
 
@@ -656,7 +655,7 @@ model TokenGate {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   tokenGateToRoles TokenGateToRole[]
   userTokenGates   UserTokenGate[]
-  SpaceRole        SpaceRole[]
+  spaceRoles       SpaceRole[]
 
   @@index([spaceId])
 }
@@ -707,9 +706,9 @@ model Role {
   permissions               PagePermission[]
   spacePermissions          SpacePermission[]
   spaceRolesToRole          SpaceRoleToRole[]
-  TokenGateToRole           TokenGateToRole[]
+  tokenGateToRoles          TokenGateToRole[]
   proposalReviewer          ProposalReviewer[]
-  InviteLinkToRole          InviteLinkToRole[]
+  inviteLinkToRoles         InviteLinkToRole[]
   memberPropertyPermissions MemberPropertyPermission[]
 
   @@unique([spaceId, name])

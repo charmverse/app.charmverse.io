@@ -47,7 +47,7 @@ jobs:
           cmd: |
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .NODE_ENV = "production" |
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
 

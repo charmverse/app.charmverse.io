@@ -8,7 +8,8 @@ export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTe
 export const baseUrl = process.env.DOMAIN as string | undefined;
 // for cookies
 export const authSecret = process.env.AUTH_SECRET as string | undefined;
-export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
+// export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
+export const cookieDomain = undefined; // TODO: set cookie domain so that we can have cross-subdomain sessions
 export const cookieName = 'charm.sessionId';
 // web sockets
 export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
