@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { isSpaceDiscordAdmin } from 'lib/discord/isSpaceDiscordAdmin';
+import { isSpaceDiscordAdmin } from 'lib/discord/discordSpaceAdmin';
 
 type AddUserToSpaceProps = {
   spaceRole: Prisma.XOR<Prisma.SpaceRoleCreateInput, Prisma.SpaceRoleUncheckedCreateInput>;
