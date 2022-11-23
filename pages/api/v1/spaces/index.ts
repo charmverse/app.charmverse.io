@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { grantRoleToSpaceDiscordAdmin } from 'lib/discord/discordSpaceAdmin';
 import { onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/spaces/addUserToSpace';
@@ -89,6 +90,9 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       isAdmin: true
     }
   });
+
+  // If discord admin user has an account, add him to space as admin
+  grantRoleToSpaceDiscordAdmin(space);
 
   return res.status(201).json(space);
 }
