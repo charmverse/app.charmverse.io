@@ -44,7 +44,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     throw new InvalidInputError('Missing discord admin id');
   }
 
-  // generate a domain name if user didn't provide one
+  // generate a domain name based on space name
   const spaceDomain = await getAvailableDomainName(name);
 
   // create new bot user as space creator

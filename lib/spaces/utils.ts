@@ -26,5 +26,5 @@ export function isSpaceDomain (path?: string) {
 }
 
 export function getSpaceDomainFromName (name: string) {
-  return name.replace(/[\p{P}\p{S}]/gu, '').replace(/\s/g, '-').toLowerCase();
+  return name.replace(/[^\w\s-]/gu, '').replace(/\s/g, '-').toLowerCase();
 }

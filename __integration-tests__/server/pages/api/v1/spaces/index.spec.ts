@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import { prisma } from 'db';
 import { baseUrl } from 'testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateSuperApiToken } from 'testing/utils/middleware';
 
 let apiToken: SuperApiToken;
@@ -108,6 +109,19 @@ describe('GET /api/v1/spaces', () => {
     expect(spaceRoles[0].isAdmin).toBe(true);
     expect(spaceRoles[0].user.id).toBe(response.body.createdBy);
     expect(spaceRoles[0].user.isBot).toBe(true);
+  });
+
+  it('should respond 201 and generate unique domain', async () => {
+    const { space: { domain: existingDomain } } = await generateUserAndSpaceWithApiToken();
+
+    const response = await request(baseUrl)
+      .post('/api/v1/spaces')
+      .set('Authorization', apiToken.token)
+      .send({ ...defaultSpaceData, name: existingDomain });
+
+    expect(response.statusCode).toBe(201);
+    expect(response.body.domain).not.toBe(existingDomain);
+    expect((response.body.domain as string).startsWith(existingDomain)).toBe(true);
   });
 });
 
