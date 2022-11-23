@@ -6,10 +6,9 @@ on:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
-    # if: |
-    #   (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
-    #   (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
+    if: |
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -104,20 +103,20 @@ jobs:
 
       # update websockets in staging
 
-      - name: Update and Package websockets
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+      # - name: Update and Package websockets
+      #   run: |
+      #     rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+      #     cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
-      - name: Deploy websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v18
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: stg-charmverse-websockets
-          environment_name: stg-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+      # - name: Deploy websockets to Beanstalk
+      #   uses: einaregilsson/beanstalk-deploy@v18
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     application_name: stg-charmverse-websockets
+      #     environment_name: stg-charmverse-websockets
+      #     version_label: ${{ github.sha }}
+      #     region: us-east-1
+      #     deployment_package: deploy_websockets.zip
+      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
+      #     wait_for_deployment: false # set to false to save sweet Github minutes
