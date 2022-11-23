@@ -35,9 +35,12 @@ const SelectPreviewContainer = styled(Stack)<ContainerProps>`
     return '';
   }}
 
-  &:hover {
-    cursor: pointer;
-    background-color: ${({ theme, displayType }) => displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      cursor: pointer;
+      background-color: ${({ theme, displayType }) => displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+    }
   }
 
   div {
