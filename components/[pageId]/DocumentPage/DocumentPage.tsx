@@ -160,7 +160,7 @@ function DocumentPage ({ page, setPage, insideModal, readOnly = false, parentPro
             fullWidth={page.fullWidth ?? false}
           >
             <CharmEditor
-              key={page.id}
+              key={page.id + editMode}
               // content={pageDetails?.content as PageContent}
               // onContentChange={updatePageContent}
               readOnly={readOnly}
