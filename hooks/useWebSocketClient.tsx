@@ -94,7 +94,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       if (isServerMessage(message)) {
         // Key part when we relay messages from the server to consumers
         eventFeed.publish(message.type, message.payload);
-        log.debug('[ws]: Received event', message);
+        log.debug('[ws] Received event', message);
         pushToMessageLog(message);
       }
     });

@@ -192,7 +192,7 @@ export class WebSocketConnector {
 
     this.socket.on('connect', () => {
       // // console.log('connected');
-      log.info(`[ws${namespace}]: Client connected`, this.connectionCount);
+      log.info(`[ws${namespace}] Client connected`, this.connectionCount);
       this.open();
       // try {
       //   const sendable = this.anythingToSend();
@@ -226,7 +226,7 @@ export class WebSocketConnector {
         // server is probably restarting
       }
       else {
-        log.warn(`[ws${namespace}]: Connection error`, error);
+        log.warn(`[ws${namespace}] Connection error`, error);
         this.onError(error);
       }
     });
@@ -297,7 +297,7 @@ export class WebSocketConnector {
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
-        log.debug(`[ws${namespace}]: Sent message`, wrappedMessage);
+        log.debug(`[ws${namespace}] Sent message`, wrappedMessage);
         this.socket.emit(socketEvent, wrappedMessage);
         this.setRecentlySentTimer(timer);
       });
@@ -339,7 +339,7 @@ export class WebSocketConnector {
   }
 
   receive (data: WrappedServerMessage) {
-    log.debug(`[ws${namespace}]: Received event`, data);
+    log.debug(`[ws${namespace}] Received event`, data);
     switch (data.type) {
 
       case 'welcome':
