@@ -231,7 +231,6 @@ export class FidusEditor {
       //   }
       // }
     });
-    log.debug('enabled ws');
 
     this.initEditor(view);
 
