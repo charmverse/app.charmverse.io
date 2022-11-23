@@ -368,7 +368,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           )}
 
           {pageOptionsList && (
-            <Box ml={1} ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
+            <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
               <div>
                 <IconButton
                   size='small'
