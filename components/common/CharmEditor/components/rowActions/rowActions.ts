@@ -54,7 +54,7 @@ export function plugins ({ key }: { key: PluginKey }) {
     }
   }
 
-  const throttled = throttle(onMouseOver, 100);
+  const throttledMouseOver = throttle(onMouseOver, 100);
 
   const brokenClipboardAPI = false;
 
@@ -65,7 +65,7 @@ export function plugins ({ key }: { key: PluginKey }) {
     const coords = { left: e.clientX + 100, top: e.clientY };
     const pos = blockPosAtCoords(view, coords);
     if (pos != null) {
-      view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)));
+      view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)).setMeta('row-handle-drag', true));
 
       const slice = view.state.selection.content();
       const { dom, text } = serializeForClipboard(view, slice);
@@ -103,7 +103,7 @@ export function plugins ({ key }: { key: PluginKey }) {
       props: {
         handleDOMEvents: {
           mousemove: (view: EditorView, event: MouseEvent) => {
-            throttled(view, event);
+            throttledMouseOver(view, event);
             return false;
           }
         }
@@ -113,7 +113,6 @@ export function plugins ({ key }: { key: PluginKey }) {
         function onDragStart (e: DragEvent) {
           return dragStart(view, e);
         }
-
         view.dom.parentNode?.appendChild(tooltipDOM);
         tooltipDOM.addEventListener('dragstart', onDragStart);
 

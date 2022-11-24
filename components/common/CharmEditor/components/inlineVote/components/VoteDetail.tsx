@@ -15,7 +15,7 @@ import useTasks from 'components/nexus/hooks/useTasks';
 import VoteActionsMenu from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useUser } from 'hooks/useUser';
-import { removeInlineVoteMark } from 'lib/inline-votes/removeInlineVoteMark';
+import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 

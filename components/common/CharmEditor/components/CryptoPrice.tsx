@@ -56,24 +56,20 @@ export function cryptoPriceSpec () {
   return spec;
 }
 
-export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChange }: {
-  preset?: Partial<{
-    base: CryptoCurrency | null;
-    quote: FiatCurrency | null;
-  }>;
-  onQuoteCurrencyChange?: ((currency: FiatCurrency) => void);
-  onBaseCurrencyChange?: ((currency: CryptoCurrency) => void);
+export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrencyChange }: {
+  base: CryptoCurrency | null;
+  quote: FiatCurrency | null;
+  onQuoteCurrencyChange: ((currency: FiatCurrency) => void);
+  onBaseCurrencyChange: ((currency: CryptoCurrency) => void);
 }) {
 
   const [loading, setLoadingState] = useState(false);
-  const [baseCurrency, setBaseCurrency] = useState(preset?.base ?? null as any as CryptoCurrency);
-  const [quoteCurrency, setQuoteCurrency] = useState(preset?.quote ?? 'USD' as FiatCurrency);
-  const [lastQuote, setPrice] = useState({
+  const [baseCurrency, setBaseCurrency] = useState<CryptoCurrency | null>(base);
+  const [quoteCurrency, setQuoteCurrency] = useState<FiatCurrency>(quote ?? 'USD');
+  const [lastQuote, setPrice] = useState<{ amount: number, receivedOn: number }>({
     amount: 0,
-    receivedOn: 0,
-    base: baseCurrency,
-    quote: quoteCurrency
-  } as IPairQuote);
+    receivedOn: 0
+  });
   // Defines which list to show a search field for
   const [selectionList, setSelectionList] = useState<null | OptionListName>(null);
   const [error, setError] = useState<null | string>(null);
@@ -91,6 +87,11 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   const cryptoList = (CryptoCurrencies as string []).concat(customCryptoContractAddresses);
 
   useEffect(() => {
+    setBaseCurrency(base);
+    setQuoteCurrency(quote ?? 'USD');
+  }, [base, quote]);
+
+  useEffect(() => {
     // Load the price automatically on the initial render, or if a currency was changed
     if (error === null && baseCurrency && quoteCurrency) {
       refreshPrice();
@@ -98,15 +99,20 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   }, [baseCurrency, quoteCurrency]);
 
   function refreshPrice () {
+
+    if (!baseCurrency || !quoteCurrency) {
+      return;
+    }
+
     setLoadingState(true);
 
     const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
 
     charmClient.getPricing(symbol, quoteCurrency)
-      .then((quote) => {
+      .then((_quote) => {
 
         setError(null);
-        setPrice({ ...quote, receivedOn: quote.receivedOn ?? Date.now() });
+        setPrice({ ..._quote, receivedOn: typeof _quote.receivedOn === 'number' ? _quote.receivedOn : Date.now() });
         setLoadingState(false);
       })
       .catch(() => {
@@ -118,19 +124,13 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
   function changeBaseCurrency (newBase: CryptoCurrency): void {
     setSelectionList(null);
     setBaseCurrency(newBase);
-
-    if (onBaseCurrencyChange) {
-      onBaseCurrencyChange(newBase);
-    }
+    onBaseCurrencyChange(newBase);
   }
 
   function changeQuoteCurrency (newQuote: FiatCurrency): void {
     setSelectionList(null);
     setQuoteCurrency(newQuote);
-
-    if (onQuoteCurrencyChange) {
-      onQuoteCurrencyChange(newQuote);
-    }
+    onQuoteCurrencyChange(newQuote);
   }
 
   function toggleSelectionList (option: OptionListName): void {
@@ -194,7 +194,7 @@ export function CryptoPrice ({ preset, onQuoteCurrencyChange, onBaseCurrencyChan
           )}
 
           <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
-            {loading === false && !error && formatMoney(lastQuote.amount, quoteCurrency, window.navigator.language)}
+            {loading === false && !error && formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
             {loading === true && !error && '- -'}
             {error && 'No price found'}
           </Typography>

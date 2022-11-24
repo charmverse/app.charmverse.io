@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { PageContent } from 'models';
 
 async function updatePageHasContent () {

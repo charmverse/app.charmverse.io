@@ -226,7 +226,7 @@ model Space {
   spacePermissions            SpacePermission[]                 @relation("spacePermissions")
   spaceRoles                  SpaceRole[]
   threads                     Thread[]
-  TokenGate                   TokenGate[]
+  tokenGates                  TokenGate[]
   votes                       Vote[]
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
@@ -287,6 +287,7 @@ model Page {
   proposalId         String?          @unique @db.Uuid
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
+  version            Int              @default(1)
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author             User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   space              Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -299,6 +300,7 @@ model Page {
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
+  diffs              PageDiff[]
 
   @@index([bountyId])
   @@index([cardId])
@@ -307,6 +309,18 @@ model Page {
   @@index([proposalId])
   @@index([spaceId])
   @@index([title])
+}
+
+model PageDiff {
+  data      Json
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  pageId    String   @db.Uuid
+  page      Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  version   Int
+
+  @@unique([pageId, version])
+  @@index([pageId])
 }
 
 model Block {
@@ -412,7 +426,7 @@ model User {
   threads              Thread[]
   profile              UserDetails?
   gnosisSafes          UserGnosisSafe[]
-  UserNotification     UserNotification[]
+  userNotifications    UserNotification[]
   notificationState    UserNotificationState?
   userVotes            UserVote[]
   initiatedVotes       Vote[]
@@ -533,8 +547,10 @@ model SpaceRole {
   createdAt       DateTime          @default(now())
   space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  joinedViaLink   Boolean?
   spaceRoleToRole SpaceRoleToRole[]
+  tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
+  joinedViaLink   Boolean?
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])
@@ -653,6 +669,7 @@ model TokenGate {
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   tokenGateToRoles TokenGateToRole[]
   userTokenGates   UserTokenGate[]
+  spaceRoles       SpaceRole[]
 
   @@index([spaceId])
 }
@@ -703,9 +720,9 @@ model Role {
   permissions               PagePermission[]
   spacePermissions          SpacePermission[]
   spaceRolesToRole          SpaceRoleToRole[]
-  TokenGateToRole           TokenGateToRole[]
+  tokenGateToRoles          TokenGateToRole[]
   proposalReviewer          ProposalReviewer[]
-  InviteLinkToRole          InviteLinkToRole[]
+  inviteLinkToRoles         InviteLinkToRole[]
   memberPropertyPermissions MemberPropertyPermission[]
 
   @@unique([spaceId, name])

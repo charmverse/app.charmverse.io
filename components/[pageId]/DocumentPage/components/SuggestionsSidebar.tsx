@@ -5,12 +5,12 @@ import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import Button from 'components/common/Button';
+import { activateTrack } from 'components/common/CharmEditor/components/fiduswriter/state_plugins/track/helpers';
+import { acceptAll } from 'components/common/CharmEditor/components/fiduswriter/track/acceptAll';
+import { rejectAll } from 'components/common/CharmEditor/components/fiduswriter/track/rejectAll';
 import type { TrackedEvent } from 'components/common/CharmEditor/components/suggestions/getEvents';
 import { getEventsFromDoc } from 'components/common/CharmEditor/components/suggestions/getEvents';
-import { activateTrack } from 'components/common/CharmEditor/components/suggestions/statePlugins/track/helpers';
 import { SuggestionCard } from 'components/common/CharmEditor/components/suggestions/SuggestionCard';
-import { acceptAll } from 'components/common/CharmEditor/components/suggestions/track/acceptAll';
-import { rejectAll } from 'components/common/CharmEditor/components/suggestions/track/rejectAll';
 import { useUser } from 'hooks/useUser';
 
 import { NoCommentsMessage } from './CommentsSidebar';

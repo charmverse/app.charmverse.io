@@ -204,10 +204,12 @@ async function createBlocks (req: NextApiRequest, res: NextApiResponse<Block[]>)
 
       const createdPages = await getPageMetaList(newBlocks.map(b => b.id));
 
-      relay.broadcast({
-        type: 'pages_created',
-        payload: createdPages
-      }, space.id);
+      if (createdPages.length) {
+        relay.broadcast({
+          type: 'pages_created',
+          payload: createdPages
+        }, space.id);
+      }
 
       return res.status(200).json(newBlocks);
     }

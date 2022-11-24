@@ -81,6 +81,17 @@ function getTaskDescription (transaction: GnosisTransaction): string {
         const actions = data.parameters[0].valueDecoded as { to: string, value: string }[];
         return `MultiSend: ${actions.length} actions`;
       }
+      case 'transfer': {
+        try {
+          const recipient = data.parameters[0].value;
+          const amount = data.parameters[1].value;
+          return `Transfer: ${amount} to ${recipient}`;
+        }
+        catch (error) {
+          log.error('Error parsing gnosis transfer', { error, data });
+        }
+        break;
+      }
       case 'addOwnerWithThreshold': {
         // this is the JSON type in case we want it for something
         // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];

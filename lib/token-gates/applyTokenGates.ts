@@ -25,7 +25,7 @@ export async function applyTokenGates ({
     },
     include: {
       roles: true,
-      TokenGate: {
+      tokenGates: {
         include: {
           tokenGateToRoles: {
             include: {
@@ -42,7 +42,7 @@ export async function applyTokenGates ({
     throw new DataNotFoundError(`Could not find space with id ${spaceId}.`);
   }
 
-  const { TokenGate: tokenGates } = space;
+  const { tokenGates } = space;
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {

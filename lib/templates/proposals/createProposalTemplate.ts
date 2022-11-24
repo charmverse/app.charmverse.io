@@ -1,9 +1,9 @@
 import { v4 } from 'uuid';
 
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import type { ProposalReviewerInput } from '../../proposal/interface';
 

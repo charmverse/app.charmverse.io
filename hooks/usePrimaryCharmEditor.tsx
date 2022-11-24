@@ -2,6 +2,7 @@ import { EditOutlined, RateReviewOutlined, VisibilityOutlined } from '@mui/icons
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 const EDIT_MODES = ['editing', 'suggesting', 'viewing'] as const;
@@ -28,6 +29,7 @@ interface PrimaryCharmEditorContext {
   availableEditModes: EditMode[];
   editMode: EditMode | null;
   permissions: IPagePermissionFlags | null;
+  participants: FrontendParticipant[];
 }
 
 interface PrimaryCharmEditorContextWithSetter extends PrimaryCharmEditorContext {
@@ -40,7 +42,8 @@ const defaultProps = {
   isSaving: false,
   availableEditModes: [],
   editMode: null,
-  permissions: null
+  permissions: null,
+  participants: []
 };
 
 const CharmEditorContext = createContext<Readonly<PrimaryCharmEditorContextWithSetter>>({

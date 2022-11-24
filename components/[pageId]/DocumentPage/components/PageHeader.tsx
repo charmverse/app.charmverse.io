@@ -17,7 +17,7 @@ import { randomIntFromInterval } from 'lib/utilities/random';
 import type { Page } from 'models';
 
 import { randomBannerImage } from './PageBanner';
-import PageTitleInput from './PageTitleInput';
+import { PageTitleInput } from './PageTitleInput';
 
 const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -61,9 +61,10 @@ interface PageHeaderProps {
   readOnly: boolean;
   title: string;
   setPage: (p: Partial<Page>) => void;
+  updatedAt: string;
 }
 
-function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeaderProps) {
+function PageHeader ({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
 
   function addPageIcon () {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
@@ -74,8 +75,8 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
     setPage({ icon: _icon });
   }
 
-  function updateTitle (event: ChangeEvent<HTMLInputElement>) {
-    setPage({ title: event.target.value });
+  function updateTitle (page: { title: string, updatedAt: any }) {
+    setPage(page);
   }
 
   function addPageHeader () {
@@ -143,6 +144,7 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title }: PageHeader
         readOnly={readOnly}
         value={title}
         onChange={updateTitle}
+        updatedAt={updatedAt}
       />
     </>
   );
