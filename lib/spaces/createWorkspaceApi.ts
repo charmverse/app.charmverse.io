@@ -39,7 +39,7 @@ export async function createWorkspaceApi (
     discordServerId,
     author: {
       connect: {
-        id: botUser.id
+        id: adminUserId
       }
     },
     superApiToken: {
