@@ -81,11 +81,3 @@ export async function generateSpaceForUser (user: LoggedInUser, isAdmin = true, 
   return space;
 }
 
-export async function addDiscordAdminToSpace ({ spaceId, adminDiscordUserId }: { spaceId: string, adminDiscordUserId: string }) {
-  return prisma.space.update({
-    where: { id: spaceId },
-    data: {
-      adminDiscordUserId
-    }
-  });
-}
