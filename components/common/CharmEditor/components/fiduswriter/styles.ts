@@ -1,5 +1,26 @@
 
-export default `
+const caretCSS = `
+  div.caret {
+    display: inline;
+    border-style: solid;
+    border-width: 1px;
+    margin: 0 -1px;
+    position: relative;
+  }
+
+  div.caret-head {
+    position: absolute;
+    top: -2px;
+    left: -3px;
+    width: 2px;
+    height: 2px;
+    border-width: 2px;
+    border-style: solid;
+  }
+
+`;
+
+const trackingCSS = `
 
   span.deletion {
     text-decoration: line-through;
@@ -78,3 +99,5 @@ export default `
   }
 
 `;
+
+export default `${trackingCSS}${caretCSS}`;

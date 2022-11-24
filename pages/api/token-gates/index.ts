@@ -10,6 +10,7 @@ import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { addDaylightAbility } from 'lib/token-gates/daylight';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { getAccessTypes } from 'lib/token-gates/utils';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -53,6 +54,8 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
       accessTypes
     }
   });
+
+  addDaylightAbility(result);
 
   const chainTypeParam = chains.length === 1 ? chains[0] : chains;
   const accessTypesParam = accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map(at => accessTypeDict[at]);

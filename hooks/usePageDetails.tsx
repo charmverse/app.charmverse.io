@@ -5,8 +5,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 export function usePageDetails (pageIdOrPath: string, spaceId?: string) {

@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-const TELEGRAM_BOT_ID = '5238575648'; // TODO: figure out env vars in github actions process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID;
+const TELEGRAM_BOT_ID = process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID;
 
 export function loginWithTelegram (callback: (user: TelegramAccount) => void) {
   // @ts-ignore - defined by the script: https://telegram.org/js/telegram-widget.js

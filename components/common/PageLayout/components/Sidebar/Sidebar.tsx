@@ -25,6 +25,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { isSmallScreen } from 'lib/utilities/browser';

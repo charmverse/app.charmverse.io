@@ -3,6 +3,8 @@ import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Map
 import { CellSelection } from '@skiff-org/prosemirror-tables';
 import { Selection, TextSelection } from 'prosemirror-state';
 
+import type { FidusEditor } from '../fiduseditor';
+
 import type { TrackAttribute } from './interfaces';
 
 const SUPPORTED_MARKS = ['italic', 'bold', 'code', 'underline'];
@@ -184,7 +186,7 @@ function markWrapping (
   }
 }
 
-export function amendTransaction (tr: Transaction, state: EditorState, user: { id: string, username: string }, trackingEnabled: boolean) {
+export function amendTransaction (tr: Transaction, state: EditorState, editor: FidusEditor, trackingEnabled: boolean) {
 
   if (
     !tr.docChanged
@@ -205,9 +207,9 @@ export function amendTransaction (tr: Transaction, state: EditorState, user: { i
     return trackedTransaction(
       tr,
       state,
-      user,
+      editor.user,
       !trackingEnabled,
-      new Date()
+      new Date(Date.now() - editor.clientTimeAdjustment)
     );
   }
 }

@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
+import { Box } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { memo, useCallback, useEffect, useState } from 'react';
 
+import Button from 'components/common/Button';
 import { useMembers } from 'hooks/useMembers';
 import type { PageMeta } from 'lib/pages';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -29,10 +31,16 @@ function DocumentHistory ({ page }: { page: PageMeta }) {
 
   return (
     <Tooltip
-      enterTouchDelay={0}
-      enterDelay={0}
       arrow={false}
       placement='bottom-start'
+      componentsProps={{
+        tooltip: {
+          sx: {
+            bgcolor: 'rgba(97, 97, 97, 1)',
+            top: '-20px'
+          }
+        }
+      }}
       onOpen={() => setTime(updateRelativeDatesCb())}
       title={(
         <>
@@ -42,7 +50,10 @@ function DocumentHistory ({ page }: { page: PageMeta }) {
         </>
       )}
     >
-      <Typography display={{ xs: 'none', sm: 'block' }} color='secondary' fontSize={12.8} variant='caption' fontWeight={500} marginRight='15px'>Edited {updatedAt}</Typography>
+      <Box display={{ xs: 'none', lg: 'block' }} mr={2}>
+        <Button color='secondary' size='small' variant='text' disabled>Edited {updatedAt}</Button>
+        {/* <Typography color='secondary' fontSize={12.8} variant='caption' fontWeight={500}>Edited {updatedAt}</Typography> */}
+      </Box>
     </Tooltip>
   );
 }

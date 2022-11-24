@@ -90,10 +90,10 @@ export class CdkDeployStack extends Stack {
     ];
 
     const resourceTags: CfnTag[] = [
-      { 
+      {
         key: 'env',
         value: 'stg'
-      } 
+      }
     ];
 
     // Create an Elastic Beanstalk environment to run the application

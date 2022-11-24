@@ -9,7 +9,7 @@ import { Fragment, keymap,
   Selection
 } from '@bangle.dev/pm';
 import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
+import { tooltipPlacement } from '@bangle.dev/tooltip';
 import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
 import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
@@ -121,6 +121,10 @@ function pluginsFactory ({
     return [
       new Plugin<SuggestTooltipPluginState, Schema>({
         key,
+        // filterTransaction: (tr, state) => {
+
+        //   return true;
+        // },
         state: {
           init (_, _state) {
             return {
@@ -134,6 +138,10 @@ function pluginsFactory ({
           apply (tr, pluginState, _oldState, newState) {
             const meta = tr.getMeta(key);
             if (meta === undefined) {
+              return pluginState;
+            }
+            // ignore remote changes
+            if (tr.getMeta('remote')) {
               return pluginState;
             }
             if (meta.type === 'RENDER_TOOLTIP') {
@@ -223,28 +231,23 @@ export function referenceElement (
         if (emojiSuggestState.ref) {
           return (emojiSuggestState.ref as HTMLDivElement).getBoundingClientRect();
         }
+
         const state = view.state;
         const markPos = getActiveMarkPos(state);
         // add by + so that we get the position right after trigger
         const startPos = markPos.start > -1 ? markPos.start + 1 : 0;
+        const start = view.coordsAtPos(startPos);
         // if the suggestMark text spanned two lines, we want to show the tooltip based on the end pos
         // so that it doesn't hide the text
         const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);
 
-        const { left, top, bottom } = end;
-        let { right } = end;
-        right = left;
-        return {
-          width: right - left,
-          height: bottom - top,
-          top,
-          right,
-          bottom,
-          left,
-          x: left,
-          y: top,
-          toJSON: () => {}
-        };
+        const { left, right } = start;
+        const { top, bottom } = end;
+        const x = left;
+        const y = top;
+        const width = right - left;
+        const height = bottom - top;
+        return new DOMRect(x, y, width, height);
       }
     };
   };
