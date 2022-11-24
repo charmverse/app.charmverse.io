@@ -9,7 +9,6 @@ import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUser
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { addUserToSpace } from 'lib/spaces/addUserToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,8 +39,8 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
   // Only proceed if they are not a member of the workspace
   if (spaceRole.length === 0) {
     log.info('User joined workspace via invite', { spaceId: invite.spaceId, userId });
-    const createdSpaceRole = await addUserToSpace({
-      spaceRole: {
+    const createdSpaceRole = await prisma.spaceRole.create({
+      data: {
         space: {
           connect: {
             id: invite.spaceId
@@ -53,9 +52,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
           }
         },
         joinedViaLink: true
-      },
-      spaceId: invite.spaceId,
-      userId
+      }
     });
 
     logInviteAccepted({ spaceId: createdSpaceRole.spaceId });

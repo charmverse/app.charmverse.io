@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { grantRoleToSpaceDiscordAdmin } from 'lib/discord/discordSpaceAdmin';
-import { onError, onNoMatch, requireSuperApiKey } from 'lib/middleware';
+import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/spaces/addUserToSpace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
@@ -24,26 +24,15 @@ type CreateSpaceInputData = {
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .use(requireKeys(['name', 'discordServerId', 'adminDiscordUserId'], 'body'))
   .use(requireSuperApiKey)
   .post(createSpace);
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceInputData;
 
-  if (!name) {
-    throw new InvalidInputError('Missing space name');
-  }
-
   if (name.length < 3) {
     throw new InvalidInputError('Space name must be at least 3 characters');
-  }
-
-  if (!discordServerId) {
-    throw new InvalidInputError('Missing discord server id');
-  }
-
-  if (!adminDiscordUserId) {
-    throw new InvalidInputError('Missing discord admin id');
   }
 
   // generate a domain name based on space
@@ -65,6 +54,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
     adminDiscordUserId,
+    discordServerId,
     author: {
       connect: {
         id: botUser.id
@@ -74,22 +64,20 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       connect: {
         id: req.superApiToken?.id
       }
+    },
+    spaceRoles: {
+      create: [{
+        isAdmin: true,
+        user: {
+          connect: {
+            id: botUser.id
+          }
+        }
+      }]
     }
   };
 
   const space = await createWorkspace({ spaceData, userId: botUser.id });
-
-  // Add bot user to space
-  await addUserToSpace({
-    spaceRole: {
-      space: {
-        connect: { id: space.id }
-      },
-      user: {
-        connect: { id: botUser.id } },
-      isAdmin: true
-    }
-  });
 
   // If discord admin user has an account, add him to space as admin
   grantRoleToSpaceDiscordAdmin(space);
