@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { deleteDaylightAbility } from 'lib/token-gates/daylight';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -36,6 +37,8 @@ async function deleteTokenGate (req: NextApiRequest, res: NextApiResponse) {
       id: gate.id
     }
   });
+
+  deleteDaylightAbility(gate.id);
 
   res.status(200).json({ ok: true });
 }
