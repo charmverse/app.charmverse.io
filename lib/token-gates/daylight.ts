@@ -12,7 +12,8 @@ const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
 const HEADERS = { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${DAYLIGHT_API_KEY}` };
 const SOURCE_PREFIX = 'charm_verse_ability_';
 
-type ConditionOperator = { operator: 'AND' | 'OR' }
+type Operator = 'AND' | 'OR';
+type ConditionOperator = { operator: Operator }
 type Condition = AccessControlCondition | ConditionOperator;
 type TokenGateAccessConditions = (Condition | Condition[])[];
 
@@ -24,7 +25,8 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
 
   const requirementsData = getDaylightRequirements((tokenGate.conditions as any)?.unifiedAccessControlConditions as any);
 
-  if (!requirementsData.requirements.length || !DAYLIGHT_API_KEY) {
+  // "AND" operator is not yet supported by daylight
+  if (!requirementsData.requirements.length || !DAYLIGHT_API_KEY || requirementsData.operator !== 'OR') {
     return;
   }
 
@@ -47,7 +49,9 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
     return await fetch('https://api.daylight.xyz/v1/abilities', params);
   }
   // eslint-disable-next-line no-empty
-  catch (e) {}
+  catch (e) {
+
+  }
 }
 
 export async function deleteDaylightAbility (tokenGateId: string) {
@@ -93,6 +97,11 @@ export async function getAbility (tokenGateId: string) {
 function getRequirement (condition: AccessControlCondition) {
   const accessType = getAccessType(condition);
 
+  // Daylight currently supports only ethereum
+  if (condition.chain !== 'ethereum') {
+    return null;
+  }
+
   switch (accessType) {
     case 'individual_wallet': {
       const addressValue = condition.returnValueTest?.value;
@@ -121,7 +130,8 @@ function getRequirement (condition: AccessControlCondition) {
     }
 
     case 'group_token_or_nft': {
-      if (!condition.contractAddress || !condition.returnValueTest?.value) {
+      const minAmount = Number(condition.returnValueTest.value);
+      if (!condition.contractAddress || !condition.returnValueTest?.value || !minAmount) {
         return null;
       }
 
@@ -129,7 +139,7 @@ function getRequirement (condition: AccessControlCondition) {
         chain: condition.chain,
         type: 'hasTokenBalance',
         address: condition.contractAddress,
-        minAmount: condition.returnValueTest.value
+        minAmount
       };
     }
 
@@ -150,7 +160,7 @@ export function getDaylightRequirements (conditionsData: TokenGateAccessConditio
     return 'chain' in condition;
   }) as AccessControlCondition[];
 
-  const conditionsOperator: 'OR' | 'AND' = operators[0]?.operator || 'AND';
+  const conditionsOperator: Operator = operators[0]?.operator.toLocaleUpperCase() as Operator || 'OR';
 
   if (conditions.length > 1 && operators.some(o => o.operator !== operators[0].operator)) {
     // Daylight does not support multiple operators, do not proceed
