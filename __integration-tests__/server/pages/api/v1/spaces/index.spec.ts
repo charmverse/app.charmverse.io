@@ -97,18 +97,30 @@ describe('GET /api/v1/spaces', () => {
     expect(response.body.domain).toBe('test-space');
     expect(response.body.name).toBe('Test Space');
     expect(response.body.superApiTokenId).toBe(apiToken.id);
-    expect(response.body.adminDiscordUserId).toBe('1337');
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: { spaceId: response.body.id },
-      include: { user: true }
+      include: {
+        user: {
+          include: { discordUser: true }
+        }
+      }
     });
 
+    const botUser = spaceRoles.find((role) => role.user.isBot);
+    const adminUser = spaceRoles.find((role) => !role.user.isBot);
+
+    expect(spaceRoles.length).toBe(2);
+
     // Verify that bot user has been created for space
-    expect(spaceRoles.length).toBe(1);
-    expect(spaceRoles[0].isAdmin).toBe(true);
-    expect(spaceRoles[0].user.id).toBe(response.body.createdBy);
-    expect(spaceRoles[0].user.isBot).toBe(true);
+    expect(botUser).toBeDefined();
+    expect(botUser?.user.id).toBe(response.body.createdBy);
+    expect(botUser?.user.isBot).toBe(true);
+
+    // Verify that admin user has been created for space
+    expect(adminUser).toBeDefined();
+    expect(adminUser?.user?.discordUser?.discordId).toBe(defaultSpaceData.adminDiscordUserId);
+
   });
 
   it('should respond 201 and generate unique domain', async () => {
