@@ -169,7 +169,7 @@ export function getDaylightRequirements (conditionsData: TokenGateAccessConditio
 function getActionUrl (spaceDomain: string) {
   // Daylight will not allow to create ability with action url pointing to localhost
   // for testing we can sue our main domain
-  const base = baseUrl.includes('localhost') ? 'https://app.charmverse.io' : baseUrl;
+  const base = baseUrl?.includes('localhost') || !baseUrl ? 'https://app.charmverse.io' : baseUrl;
 
   return `${base}/join?domain=${spaceDomain}`;
 }
