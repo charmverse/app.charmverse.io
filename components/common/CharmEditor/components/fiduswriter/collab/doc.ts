@@ -94,8 +94,8 @@ export class ModCollabDoc {
   receiveDocument (data: ServerDocDataMessage) {
     this.cancelCurrentlyCheckingVersion();
     if (this.mod.editor.docInfo.confirmedDoc) {
+      log.debug('merge document updates');
       this.merge.adjustDocument(data);
-      log.error('TODO: merge document updates');
     }
     else {
       this.loadDocument(data);
