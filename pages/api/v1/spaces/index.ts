@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
@@ -44,6 +45,7 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       identityType: IDENTITY_TYPES[3]
     }
   });
+  const adminUserId = await upsertUserForDiscordId(adminDiscordUserId);
 
   // Create workspace
   const spaceData = {
@@ -51,7 +53,6 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
     updatedBy: botUser.id,
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
-    adminDiscordUserId,
     discordServerId,
     author: {
       connect: {
@@ -64,14 +65,26 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
       }
     },
     spaceRoles: {
-      create: [{
-        isAdmin: true,
-        user: {
-          connect: {
-            id: botUser.id
+      create: [
+        // add bot user to space
+        {
+          isAdmin: true,
+          user: {
+            connect: {
+              id: botUser.id
+            }
+          }
+        },
+        // add discord admin user to space
+        {
+          isAdmin: true,
+          user: {
+            connect: {
+              id: adminUserId
+            }
           }
         }
-      }]
+      ]
     }
   };
 
