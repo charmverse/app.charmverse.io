@@ -35,12 +35,13 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user && router.route !== '/share/[...pageId]') {
+      setIsLoaded(false);
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);
-          setIsLoaded(true);
         })
-        .catch(err => {});
+        .catch(err => {})
+        .finally(() => setIsLoaded(true));
     }
     else if (isUserLoaded) {
       setIsLoaded(true);

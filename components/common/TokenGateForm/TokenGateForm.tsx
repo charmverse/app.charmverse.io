@@ -15,6 +15,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { MountTracker } from '../Debug/MountTracker';
 
@@ -25,15 +26,18 @@ interface Props {
   spaceDomain: string;
   joinButtonLabel?: string;
   joinType?: TokenGateJoinType;
+  // Allow the Token Gate Form to auto trigger verification when a user is detected
+  autoVerify?: boolean;
 }
 
-export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
+export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate', autoVerify }: Props) {
 
   const renders = useRef(0);
   renders.current += 1;
   //  console.log('Renders', renders.current);
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
+  const { getStoredSignature } = useWeb3AuthSig();
   const { refreshUserWithWeb3Account, loginFromWeb3Account, user } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
@@ -44,6 +48,17 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
   const [tokenGateResult, setTokenGateResult] = useState<TokenGateEvaluationResult | null>(null);
   // Token gates with those that succeedeed first
+
+  useEffect(() => {
+    if (autoVerify) {
+      const signature = getStoredSignature();
+
+      if (user && !!signature && user.wallets.some(wallet => lowerCaseEqual(wallet.address, signature.address))) {
+        evaluateEligibility(signature);
+      }
+    }
+
+  }, [user]);
 
   useEffect(() => {
     if (!spaceDomain || spaceDomain.length < 3) {

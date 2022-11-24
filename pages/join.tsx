@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useMemo, useEffect, memo } from 'react';
+import { memo, useEffect } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
