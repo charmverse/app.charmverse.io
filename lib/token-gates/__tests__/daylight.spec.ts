@@ -38,7 +38,7 @@ describe('getDaylightRequirements', () => {
     const tokenGateConditions = [walletCondition];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
-      operator: 'AND',
+      operator: 'OR',
       requirements: [{
         addresses: ['0x123'],
         type: 'onAllowlist',
@@ -51,11 +51,11 @@ describe('getDaylightRequirements', () => {
     const tokenGateConditions = [tokenCondition];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
-      operator: 'AND',
+      operator: 'OR',
       requirements: [{
         address: '0x00001',
         type: 'hasTokenBalance',
-        minAmount: '1337',
+        minAmount: 1337,
         chain: 'ethereum'
       }]
     });
@@ -65,7 +65,7 @@ describe('getDaylightRequirements', () => {
     const tokenGateConditions = [nftCondition];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
-      operator: 'AND',
+      operator: 'OR',
       requirements: [{
         address: '0x00002',
         type: 'hasNftWithSpecificId',
@@ -89,7 +89,7 @@ describe('getDaylightRequirements', () => {
       {
         address: '0x00001',
         type: 'hasTokenBalance',
-        minAmount: '1337',
+        minAmount: 1337,
         chain: 'ethereum'
       }]
     });
@@ -109,17 +109,17 @@ describe('getDaylightRequirements', () => {
       {
         address: '0x00001',
         type: 'hasTokenBalance',
-        minAmount: '1337',
+        minAmount: 1337,
         chain: 'ethereum'
       }]
     });
   });
 
-  it('should return requirements with default AND operator', () => {
+  it('should return requirements with default OR operator', () => {
     const tokenGateConditions = [nftCondition, tokenCondition, walletCondition];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
-      operator: 'AND',
+      operator: 'OR',
       requirements: [{
         address: '0x00002',
         type: 'hasNftWithSpecificId',
@@ -129,7 +129,7 @@ describe('getDaylightRequirements', () => {
       {
         address: '0x00001',
         type: 'hasTokenBalance',
-        minAmount: '1337',
+        minAmount: 1337,
         chain: 'ethereum'
       },
       {
@@ -168,7 +168,7 @@ describe('getDaylightRequirements', () => {
       {
         address: '0x00001',
         type: 'hasTokenBalance',
-        minAmount: '1337',
+        minAmount: 1337,
         chain: 'ethereum'
       }]
     });
