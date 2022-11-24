@@ -104,20 +104,22 @@ export function relativeTime (dateInput: DateInput) {
  * @param date Date
  * @returns string
  */
-export const getRelativeTimeInThePast = (date: Date): string => {
+export const getRelativeTimeInThePast = (date: Date, options: ({ ago: boolean } | undefined) = { ago: true }): string => {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const toSec = Math.round(diff / 1000);
   const toMin = Math.round(toSec / 60);
   const toHour = Math.round(toMin / 60);
 
+  const agoText = options.ago ? ' ago' : '';
+
   switch (true) {
     case (toSec < 60):
       return 'just now';
     case (toMin < 60):
-      return `${toMin}m ago`;
+      return `${toMin}m${agoText}`;
     case (toHour < 24):
-      return `${toHour}h ago`;
+      return `${toHour}h${agoText}`;
     case (toHour >= 24 && ((now.getFullYear() - date.getFullYear()) === 0)):
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     default:
