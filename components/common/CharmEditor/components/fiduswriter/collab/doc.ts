@@ -11,6 +11,8 @@ import {
   updateCollaboratorSelection
 } from '../state_plugins';
 
+import { Merge } from './merge';
+
 import type { ModCollab } from './index';
 
 export class ModCollabDoc {
@@ -35,9 +37,12 @@ export class ModCollabDoc {
 
   confirmedJson: any;
 
+  merge: Merge;
+
   constructor (mod: ModCollab) {
     mod.doc = this;
     this.mod = mod;
+    this.merge = new Merge(mod);
   }
 
   cancelCurrentlyCheckingVersion () {
@@ -89,8 +94,8 @@ export class ModCollabDoc {
   receiveDocument (data: ServerDocDataMessage) {
     this.cancelCurrentlyCheckingVersion();
     if (this.mod.editor.docInfo.confirmedDoc) {
-      // this.merge.adjustDocument(data);
-      log.error('TODO: merge document updates');
+      log.debug('merge document updates');
+      this.merge.adjustDocument(data);
     }
     else {
       this.loadDocument(data);
