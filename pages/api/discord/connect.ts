@@ -5,7 +5,6 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import { addDiscordUserAdminToSpaces } from 'lib/discord/discordSpaceAdmin';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
@@ -135,9 +134,6 @@ async function connectDiscord (req: NextApiRequest, res: NextApiResponse<Connect
       log.warn('Could not add Discord roles to user on connect', error);
     }
   }
-
-  // Check if the user is discord admin in any of spaces
-  addDiscordUserAdminToSpaces({ discordId: discordUser.discordId, userId: discordUser.userId });
 
   res.status(200).json({ discordUser });
 }

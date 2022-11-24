@@ -4,10 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { grantRoleToSpaceDiscordAdmin } from 'lib/discord/discordSpaceAdmin';
 import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { addUserToSpace } from 'lib/spaces/addUserToSpace';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -78,9 +76,6 @@ async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   };
 
   const space = await createWorkspace({ spaceData, userId: botUser.id });
-
-  // If discord admin user has an account, add him to space as admin
-  grantRoleToSpaceDiscordAdmin(space);
 
   return res.status(201).json(space);
 }
