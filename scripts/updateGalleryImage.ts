@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { PageContent } from 'models';
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';

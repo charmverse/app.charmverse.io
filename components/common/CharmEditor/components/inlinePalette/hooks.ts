@@ -1,7 +1,8 @@
 import type { EditorState, EditorView, PluginKey, Transaction } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { suggestTooltip } from '@bangle.dev/tooltip';
 import { useCallback, useEffect } from 'react';
+
+import { suggestTooltip } from '../@bangle.dev/tooltip';
 
 import { getSuggestTooltipKey } from './inlinePalette';
 import type { PromisedCommand } from './paletteItem';

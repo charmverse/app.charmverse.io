@@ -13,7 +13,7 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 }
-const SelectPreviewContainer = styled(Stack)<ContainerProps>`
+const SelectPreviewContainer = styled(Stack, { shouldForwardProp: (prop: string) => prop !== 'displayType' })<ContainerProps>`
   justify-content: center;
 
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -35,9 +35,12 @@ const SelectPreviewContainer = styled(Stack)<ContainerProps>`
     return '';
   }}
 
-  &:hover {
-    cursor: pointer;
-    background-color: ${({ theme, displayType }) => displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      cursor: pointer;
+      background-color: ${({ theme, displayType }) => displayType === 'details' ? theme.palette.action.hover : 'transparent'};
+    }
   }
 
   div {

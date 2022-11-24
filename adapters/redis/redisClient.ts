@@ -14,10 +14,10 @@ let redisClientInstance: RedisClientType | null = null;
 if (process.env.REDIS_URI) {
   try {
     redisClientInstance = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
-    redisClientInstance.on('error', (err) => log.debug(`Redis Client Error ${err}`));
+    redisClientInstance.on('error', (error) => log.error('Redis Client Error', error));
   }
-  catch (err) {
-    log.debug(`Could not instantiate Redis. Error occurred: ${err}`);
+  catch (error) {
+    log.error('Could not instantiate Redis. Error occurred', error);
   }
 }
 

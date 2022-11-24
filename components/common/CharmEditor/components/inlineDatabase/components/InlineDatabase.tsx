@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
@@ -142,6 +142,12 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   if (!displayProperty && currentView?.fields.viewType === 'calendar') {
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
+
+  useEffect(() => {
+    if (views.length > 0 && !currentViewId) {
+      setCurrentViewId(views[0].id);
+    }
+  }, [currentViewId, views]);
 
   return (
     <>
