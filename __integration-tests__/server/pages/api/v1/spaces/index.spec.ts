@@ -45,7 +45,7 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, name: '' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Missing space name');
+    expect(response.body.message).toBe('Key name is required in request body and must not be an empty value.');
 
     const response2 = await request(baseUrl)
       .post('/api/v1/spaces')
@@ -63,7 +63,7 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, discordServerId: '' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Missing discord server id');
+    expect(response.body.message).toBe('Key discordServerId is required in request body and must not be an empty value.');
   });
 
   it('should respond 400 when discord admin id is missing', async () => {
@@ -73,7 +73,7 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, adminDiscordUserId: '' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Missing discord admin id');
+    expect(response.body.message).toBe('Key adminDiscordUserId is required in request body and must not be an empty value.');
   });
 
   it('should respond 400 when discord server id is missing', async () => {
@@ -83,7 +83,7 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, discordServerId: '' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Missing discord server id');
+    expect(response.body.message).toBe('Key discordServerId is required in request body and must not be an empty value.');
   });
 
   it('should respond 201 with created space data', async () => {

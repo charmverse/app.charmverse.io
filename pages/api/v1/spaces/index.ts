@@ -13,6 +13,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSuperApiKey)
+  .use(requireKeys(
+    [
+      { key: 'name', truthy: true },
+      { key: 'discordServerId', truthy: true },
+      { key: 'adminDiscordUserId', truthy: true }
+    ],
+    'body'
+  ))
   .post(createSpace);
 
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
