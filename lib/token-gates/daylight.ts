@@ -10,7 +10,7 @@ import { getAccessType } from './utils';
 
 const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
 const HEADERS = { accept: 'application/json', 'content-type': 'application/json', authorization: `Bearer ${DAYLIGHT_API_KEY}` };
-const SOURCE_PREFIX = 'charm_verse_ability_';
+const SOURCE_PREFIX = 'charmverse-';
 
 type Operator = 'AND' | 'OR';
 type ConditionOperator = { operator: Operator }
@@ -54,8 +54,8 @@ export async function addDaylightAbility (tokenGate: TokenGate) {
   }
 }
 
-export async function deleteDaylightAbility (tokenGateId: string) {
-  if (!tokenGateId || !DAYLIGHT_API_KEY) {
+export async function deleteDaylightAbility (sourceId: string) {
+  if (!sourceId || !DAYLIGHT_API_KEY) {
     return;
   }
 
@@ -68,7 +68,8 @@ export async function deleteDaylightAbility (tokenGateId: string) {
   };
 
   try {
-    return await fetch(`https://api.daylight.xyz/v1/abilities/${getAbilitySourceId(tokenGateId)}`, params);
+    const id = sourceId.startsWith(SOURCE_PREFIX) ? sourceId : getAbilitySourceId(sourceId);
+    return await fetch(`https://api.daylight.xyz/v1/abilities/${id}`, params);
   }
   // eslint-disable-next-line no-empty
   catch (e) {
@@ -83,15 +84,6 @@ export async function getAllAbilities () {
   };
 
   return fetch<{ abilities: { sourceId: string, uid: string }[] }>('https://api.daylight.xyz/v1/abilities/mine', params);
-}
-
-export async function getAbility (tokenGateId: string) {
-  const params = {
-    method: 'GET',
-    headers: HEADERS
-  };
-
-  return fetch<{ sourceId: string, uid: string }>(`https://api.daylight.xyz/v1/abilities/${getAbilitySourceId(tokenGateId)}`, params);
 }
 
 function getRequirement (condition: AccessControlCondition) {
