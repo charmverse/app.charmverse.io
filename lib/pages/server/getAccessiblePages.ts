@@ -7,7 +7,7 @@ import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { IPageWithPermissions } from '../interfaces';
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>
-type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version'>, true>;
+type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version' | 'postId'>, true>;
 
 type PagesRequest = {
   spaceId: string;
