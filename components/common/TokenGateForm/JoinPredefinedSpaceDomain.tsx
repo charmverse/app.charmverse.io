@@ -7,7 +7,6 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 
-import { MountTracker } from '../Debug';
 import LoadingComponent from '../LoadingComponent';
 
 import TokenGateForm from './TokenGateForm';
@@ -36,18 +35,16 @@ export function JoinPredefinedSpaceDomain ({ spaceDomain }: { spaceDomain: strin
   }
 
   return (
-    <MountTracker name='JoinSpaceForm'>
-      <>
-        <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Box mb={3}>
-            <WorkspaceAvatar image={spaceInfo.spaceImage} name={spaceInfo.name} variant='rounded' />
-          </Box>
-          <Box display='flex' flexDirection='column' alignItems='center'>
-            <Typography variant='h5'>{spaceInfo.name}</Typography>
-          </Box>
-        </Card>
-        <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
-      </>
-    </MountTracker>
+    <>
+      <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <Box mb={3}>
+          <WorkspaceAvatar image={spaceInfo.spaceImage} name={spaceInfo.name} variant='rounded' />
+        </Box>
+        <Box display='flex' flexDirection='column' alignItems='center'>
+          <Typography variant='h5'>{spaceInfo.name}</Typography>
+        </Box>
+      </Card>
+      <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
+    </>
   );
 }

@@ -8,13 +8,11 @@ import { memo, useEffect } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
-import { MountTracker } from 'components/common/Debug/MountTracker';
 import { DialogTitle } from 'components/common/Modal';
 import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
 import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useSpaces } from 'hooks/useSpaces';
-import log from 'lib/log';
 
 export function AlternateRouteButton ({ href, children }: { href: string, children: ReactNode }) {
   const { spaces } = useSpaces();
@@ -47,27 +45,17 @@ export default function JoinWorkspace () {
     }
   }, [spaces]);
 
-  const JoinForm = memo(domain ? JoinPredefinedSpaceDomain.bind(null, { spaceDomain: domain }) : JoinDynamicSpaceForm);
-
-  const DynamicJoinForm = memo(JoinDynamicSpaceForm);
-
-  log.debug('mount debug Domain', domain);
-
   return (
-    <MountTracker name='Join page'>
-      <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
-        <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-          <DialogTitle>Join a workspace</DialogTitle>
-          <Divider />
-          <MountTracker name='Join form enclosure'>
-            <JoinForm />
-          </MountTracker>
-        </Card>
-        <AlternateRouteButton href='/createWorkspace'>
-          Create a workspace
-        </AlternateRouteButton>
-      </Box>
-    </MountTracker>
+    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
+      <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
+        <DialogTitle>Join a workspace</DialogTitle>
+        <Divider />
+        {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain} /> : <JoinDynamicSpaceForm />}
+      </Card>
+      <AlternateRouteButton href='/createWorkspace'>
+        Create a workspace
+      </AlternateRouteButton>
+    </Box>
   );
 }
 
