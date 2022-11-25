@@ -34,6 +34,7 @@ const createDiscussionTask = (
     type: 'page',
     createdBy: {
       id: v4(),
+      addresses: [],
       createdAt: new Date(),
       updatedAt: new Date(),
       email: '',
