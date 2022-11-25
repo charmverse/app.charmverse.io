@@ -32,7 +32,9 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         },
         data: {
           proposalId,
-          type: 'proposal'
+          type: 'proposal',
+          updatedAt: new Date(),
+          updatedBy: createdBy
         }
       });
     }
