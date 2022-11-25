@@ -331,7 +331,7 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
           safeUrl={safe.safeUrl}
         />
       ))}
-      {safeData?.length && tasks.length === 0 && (
+      {(safeData?.length !== undefined && safeData.length >= 1) && tasks.length === 0 && (
         <EmptyTaskState taskType='transactions' />
       )}
       {gnosisSigner && user && safeData?.length === 0 ? (
