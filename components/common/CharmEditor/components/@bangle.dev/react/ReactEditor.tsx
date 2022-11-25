@@ -38,6 +38,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   trackChanges?: boolean;
   readOnly?: boolean;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  isContentControlled?: boolean;
 }
 
 export const BangleEditor = React.forwardRef<
@@ -49,6 +50,7 @@ export const BangleEditor = React.forwardRef<
       pageId,
       state,
       children,
+      isContentControlled,
       focusOnInit = !isTouchScreen(),
       pmViewOpts,
       renderNodeViews,
@@ -64,11 +66,11 @@ export const BangleEditor = React.forwardRef<
   ) => {
     const renderRef = useRef<HTMLDivElement>(null);
     const { user } = useUser();
-    const enableFidusEditor = Boolean(user && pageId && trackChanges);
+    const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
     const [isLoading, setIsLoading] = useState(enableFidusEditor);
     const isLoadingRef = useRef(enableFidusEditor);
 
-    const useSockets = user && pageId && trackChanges && !readOnly;
+    const useSockets = user && pageId && trackChanges && !readOnly && !isContentControlled;
 
     const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
 
@@ -111,7 +113,10 @@ export const BangleEditor = React.forwardRef<
       );
       let fEditor: FidusEditor;
 
-      if (useSockets) {
+      if (isContentControlled) {
+        setIsLoading(false);
+      }
+      else if (useSockets) {
         if (authResponse) {
           log.info('Init FidusEditor');
           fEditor = new FidusEditor({

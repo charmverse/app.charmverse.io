@@ -336,6 +336,7 @@ interface CharmEditorProps {
   style?: CSSProperties;
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
+  isContentControlled?: boolean;
   enableVoting?: boolean;
   pageId: string;
   containerWidth?: number;
@@ -374,6 +375,7 @@ function CharmEditor (
     style,
     readOnly = false,
     disablePageSpecificFeatures = false,
+    isContentControlled = false,
     enableVoting,
     pageId,
     containerWidth,
@@ -496,16 +498,11 @@ function CharmEditor (
     };
   }, [editorRef.current]);
 
-  useEffect(() => {
-
-    const plugins = getPlugins();
-
-  }, [readOnly, enableVoting, pageId, currentSpace?.id, user?.id]);
-
   return (
     <StyledReactBangleEditor
       pageId={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges={true}
