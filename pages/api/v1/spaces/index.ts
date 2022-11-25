@@ -23,23 +23,30 @@ handler
   ))
   .post(createSpace);
 
+/**
+ * @swagger
+ * /api/v1/spaces:
+ *   post:
+ *     summary: Create a new workspace
+ *     description: Create a new workspace with discord server and discord admin user. Requires a valid super API key.
+ *     requestBody:
+ *       content:
+ *          application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/CreateWorkspaceRequestBody'
+ *     responses:
+ *       200:
+ *         description: Summary of created workspace
+ *         content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Workspace'
+ */
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceApiInputData;
 
-  if (!name) {
-    throw new InvalidInputError('Missing space name');
-  }
-
-  if (name.length < 3) {
-    throw new InvalidInputError('Space name must be at least 3 characters');
-  }
-
   if (!discordServerId) {
     throw new InvalidInputError('Missing discord server id');
-  }
-
-  if (!adminDiscordUserId) {
-    throw new InvalidInputError('Missing discord admin id');
   }
 
   const space = await createWorkspaceApi({ name, discordServerId, adminDiscordUserId, avatar, superApiToken: req.superApiToken });

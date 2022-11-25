@@ -114,10 +114,10 @@ describe('GET /api/v1/spaces', () => {
 
     // Verify that bot user has been created for space
     expect(botUser).toBeDefined();
-    expect(botUser?.user.id).toBe(response.body.createdBy);
     expect(botUser?.user.isBot).toBe(true);
 
     // Verify that admin user has been created for space
+    expect(adminUser?.user.id).toBe(response.body.createdBy);
     expect(adminUser).toBeDefined();
     expect(adminUser?.user?.discordUser?.discordId).toBe(defaultSpaceData.adminDiscordUserId);
 
