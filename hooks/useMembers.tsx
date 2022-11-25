@@ -22,21 +22,7 @@ export function MembersProvider ({ children }: { children: ReactNode }) {
   const space = useCurrentSpace();
 
   const { data: members, mutate: mutateMembers } = useSWR(() => space ? `members/${space?.id}` : null, () => {
-    return charmClient.members.getMembers(space!.id).then(_members => _members.sort((a, b) => {
-
-      const first = a.username?.toLowerCase() || '';
-      const second = b.username?.toLowerCase() || '';
-
-      if (first < second) {
-        return -1;
-      }
-      else if (second > first) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    }));
+    return charmClient.members.getMembers(space!.id);
   });
 
   const value = useMemo(() => ({ members: members || [], mutateMembers }) as Context, [members]);
