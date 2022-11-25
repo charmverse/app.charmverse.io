@@ -46,7 +46,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     userId
   });
 
-  if (permissions.edit_content !== true && permissions.comment !== true) {
+  if (permissions.edit_content !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
