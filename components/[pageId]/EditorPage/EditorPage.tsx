@@ -13,7 +13,7 @@ import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import BoardPage from '../BoardPage';
+import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {
@@ -143,7 +143,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
   else if (currentPagePermissions.read === true) {
     if (currentPage?.type === 'board' || currentPage?.type === 'inline_board' || currentPage?.type === 'inline_linked_board') {
       return (
-        <BoardPage
+        <DatabasePage
           page={memoizedCurrentPage}
           setPage={setPage}
           pagePermissions={currentPagePermissions}
