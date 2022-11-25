@@ -129,7 +129,7 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
             <NotFavoritedIcon />
           )}
         </Box>
-        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorites'} />
+        <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
       <ListItemButton
         onClick={onCopyLink}
