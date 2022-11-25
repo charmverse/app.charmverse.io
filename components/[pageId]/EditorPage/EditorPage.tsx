@@ -122,7 +122,7 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       currentPage?.deletedAt,
       currentPage?.fullWidth,
       currentPagePermissions,
-      currentPage?.proposalId
+      currentPage?.type
     ]
   );
 

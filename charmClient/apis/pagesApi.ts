@@ -31,5 +31,9 @@ export class PagesApi {
     const query = spaceId ? `?spaceId=${spaceId}` : '';
     return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details${query}`);
   }
+
+  convertToProposal (pageId: string) {
+    return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`);
+  }
 }
 

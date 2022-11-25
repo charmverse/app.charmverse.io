@@ -151,17 +151,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   async function convertToProposal () {
     if (currentSpace && user && basePage) {
-      await charmClient.pages.updatePage({
-        type: 'proposal',
-        id: basePage.id
-      });
-
-      mutatePage({
-        id: basePage.id,
-        type: 'proposal'
-      });
-
-      refreshPage(basePage.id);
+      await charmClient.pages.convertToProposal(basePage.id);
       setPageMenuOpen(false);
     }
   }
@@ -209,23 +199,27 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       <Divider />
-      <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : basePage?.type === 'proposal' ? 'Proposal page can\'t be converted' : ''}>
-        <div>
-          <ListItemButton
-            onClick={convertToProposal}
-            disabled={!canCreateProposal || basePage?.type === 'proposal'}
-          >
-            <TaskOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
-            <ListItemText primary='Convert to proposal' />
-          </ListItemButton>
-        </div>
-      </Tooltip>
-      <Divider />
+      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+        <>
+          <Tooltip title={!canCreateProposal && 'You do not have the permission to convert to proposal'}>
+            <div>
+              <ListItemButton
+                onClick={convertToProposal}
+                disabled={!canCreateProposal}
+              >
+                <TaskOutlinedIcon
+                  fontSize='small'
+                  sx={{
+                    mr: 1
+                  }}
+                />
+                <ListItemText primary='Convert to proposal' />
+              </ListItemButton>
+            </div>
+          </Tooltip>
+          <Divider />
+        </>
+      )}
       <ListItemButton
         onClick={() => {
           toggleFavorite();
