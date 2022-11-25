@@ -30,7 +30,7 @@ interface Props {
   pagePermissions?: IPagePermissionFlags;
 }
 
-export default function BoardPage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
+export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const activeView = useAppSelector(getView(router.query.viewId as string));

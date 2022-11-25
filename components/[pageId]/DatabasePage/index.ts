@@ -1,3 +1,1 @@
-import BoardPage from './DatabasePage';
-
-export default BoardPage;
+export { DatabasePage } from './DatabasePage';
