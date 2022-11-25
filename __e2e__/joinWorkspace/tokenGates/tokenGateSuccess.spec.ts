@@ -51,6 +51,8 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
 
   // wait for token gate page to open for the workspace
   await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
+  await expect(tokenGatePage.tokenGateForm).toBeVisible();
+
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
   await tokenGatePage.joinWorkspaceButton.click();
   // Joining a workspace creates a spaceRole
