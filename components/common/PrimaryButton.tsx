@@ -25,10 +25,13 @@ const StyledButton = styled(Button)`
     font-size: .85em;
   }
 
-  &:hover {
-    background: ${darken(blueColor, 0.1)};
-    color: white;
-    border: 0 none;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      background: ${darken(blueColor, 0.1)};
+      color: white;
+      border: 0 none;
+    }
   }
 `;
 

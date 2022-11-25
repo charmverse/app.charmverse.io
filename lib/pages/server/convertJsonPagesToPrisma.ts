@@ -4,8 +4,8 @@ import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 interface AWSAssetUrl {

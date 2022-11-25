@@ -7,7 +7,7 @@ import { useRef } from 'react';
 import log from 'lib/log';
 
 import type { TweetNodeAttrs } from '../tweet';
-import { extractTweetId } from '../tweet';
+import { extractTweetAttrs } from '../tweet';
 import { twitterWidgetJs } from '../twitterJSUrl';
 
 import { TweetInput } from './TweetInput';
@@ -59,6 +59,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
 
   function onLoadScript () {
     if (ref.current && attrs.id) {
@@ -75,11 +76,12 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
     else {
       return (
         <TweetInput
-          isValid={(url) => extractTweetId(url) !== null}
+          autoOpen={autoOpen}
+          isValid={(url) => extractTweetAttrs(url) !== null}
           onSubmit={(urlInput) => {
-            const props = extractTweetId(urlInput);
-            if (props) {
-              updateAttrs(props);
+            const _attrs = extractTweetAttrs(urlInput);
+            if (_attrs) {
+              updateAttrs(_attrs);
             }
           }}
         />

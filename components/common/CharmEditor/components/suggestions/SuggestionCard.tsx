@@ -7,12 +7,12 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
+import { accept } from '../fiduswriter/track/accept';
+import type { TrackType } from '../fiduswriter/track/interfaces';
+import { reject } from '../fiduswriter/track/reject';
 import { RelativeDate } from '../PageThread';
 
 import type { TrackedEvent } from './getEvents';
-import { accept } from './track/accept';
-import type { TrackType } from './track/interfaces';
-import { reject } from './track/reject';
 
 const FORMAT_MARK_NAMES: Record<string, string> = {
   italic: 'italic',

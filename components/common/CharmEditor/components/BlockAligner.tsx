@@ -13,9 +13,12 @@ const StyledBlockAligner = styled.div`
   position: relative;
   max-width: 100%;
   text-align: center;
-  &:hover .controls {
-    opacity: 1;
-    transition: opacity 250ms ease-in-out;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover .controls {
+      opacity: 1;
+      transition: opacity 250ms ease-in-out;
+    }
   }
 `;
 

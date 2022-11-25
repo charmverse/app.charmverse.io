@@ -171,6 +171,22 @@ SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at"
 
 ```
 
+### Web Sockets
+Real-time features including the content editor for pages relies on a web socket service. It depends on socket.io.
+
+#### Development
+```
+# Running the standard dev command will serve web sockets as part of the Next.js process:
+npm start
+
+# Run as a separate process along with the Next.js app:
+npm run sockets
+
+# Run process on its own:
+npm run sockets:dev
+```
+
+
 ### Testing
 Testing for client-side and server-side code happens separately.
 

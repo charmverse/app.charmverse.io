@@ -8,6 +8,7 @@ import PopperPopup from 'components/common/PopperPopup';
 import type { LinkType } from 'lib/embed/extractEmbedLink';
 
 export interface IFrameSelectorProps {
+  autoOpen?: boolean;
   onIFrameSelect: (videoSrc: string) => void;
   children: ReactNode;
   tabs?: [string, ReactNode][];
@@ -20,7 +21,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
 
   return (
     <PopperPopup
-      autoOpen
+      autoOpen={props.autoOpen}
       popupContent={(
         <Box sx={{
           width: 750

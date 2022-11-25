@@ -27,8 +27,11 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
   ${({ onClick, theme }) => {
     if (onClick) {
       return `
-        &:hover {
-          background-color: ${theme.palette.background.light};
+        // disable hover UX on ios which converts first click to a hover event
+        @media (pointer: fine) {
+          &:hover {
+            background-color: ${theme.palette.background.light};
+          }
         }
       `;
     }

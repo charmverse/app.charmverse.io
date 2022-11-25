@@ -32,6 +32,7 @@ import { shortenHex } from 'lib/utilities/strings';
 
 import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
 
+import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 import useTasksState from './hooks/useTasksState';
 
@@ -330,6 +331,9 @@ export default function GnosisTasksSection ({ error, mutateTasks, tasks }: Gnosi
           safeUrl={safe.safeUrl}
         />
       ))}
+      {safeData?.length && tasks.length === 0 && (
+        <EmptyTaskState taskType='transactions' />
+      )}
       {gnosisSigner && user && safeData?.length === 0 ? (
         <GnosisConnectCard loading={isLoadingSafes} onClick={importSafes} />
       ) : (!gnosisSigner || !user) ? (

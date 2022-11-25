@@ -185,6 +185,7 @@
       "error",
       "always"
     ],
+    "prefer-spread": "off",
     "no-bitwise": "warn",
     "no-undef": "off",
     "jsx-a11y/alt-text": "off",

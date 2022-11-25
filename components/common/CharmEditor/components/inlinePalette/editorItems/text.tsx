@@ -76,7 +76,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
     uid: 'insert-page',
     title: 'Insert page',
     requiredSpacePermission: 'createPage' as SpaceOperation,
-    keywords: ['page'],
+    keywords: ['page', 'nested'],
     icon: <DescriptionOutlinedIcon sx={{
       fontSize: iconSize
     }}

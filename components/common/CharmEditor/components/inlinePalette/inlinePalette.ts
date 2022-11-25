@@ -2,11 +2,11 @@ import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { PluginKey } from '@bangle.dev/core';
 import { keymap } from '@bangle.dev/pm';
 import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
-import { createTooltipDOM } from '@bangle.dev/tooltip';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
+import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { paletteMarkName, palettePluginKey, trigger } from './config';
