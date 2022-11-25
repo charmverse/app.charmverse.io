@@ -116,11 +116,12 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     }
     else {
       await createProposal({
+        id: page.id,
         createdBy: userId,
         spaceId: page.spaceId,
         content: page.content ?? undefined,
         title: page.title
-      }, undefined, page.id);
+      });
 
       const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
         pageId: page.id
