@@ -24,7 +24,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
   const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
 
-  const existingPage = await prisma.page.findUnique({
+  const existingPage = pageId && await prisma.page.findUnique({
     where: {
       id: pageId
     }
