@@ -2,7 +2,7 @@ import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
 import { Typography, Divider, MenuItem } from '@mui/material';
 import { Box } from '@mui/system';
 import type { PluginKey } from 'prosemirror-state';
-import { useCallback, useEffect, memo } from 'react';
+import { useCallback, useEffect, memo, useMemo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -43,10 +43,12 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
-  const filteredMembers = triggerText.length !== 0 ? members.filter(
-    member => (
-      member.username?.toLowerCase()?.startsWith(triggerText.toLowerCase()))
-  ) : members;
+  const filteredMembers = useMemo(() => {
+    return triggerText.length !== 0 ? members.filter(
+      member => (
+        member.username?.toLowerCase()?.match(triggerText.toLowerCase()))
+    ) : members;
+  }, [triggerText, members]);
 
   const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
   const totalItems = (filteredMembers.length + filteredPages.length);
