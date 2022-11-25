@@ -6,11 +6,13 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -82,6 +84,18 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
 
   if (vote.context === 'proposal') {
     trackUserAction('new_vote_created', { userId, pageId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+  }
+
+  const [pageMeta, space] = await Promise.all([
+    getPageMeta(vote.pageId),
+    prisma.space.findUnique({ where: { id: vote.spaceId } })
+  ]);
+
+  if (pageMeta && space) {
+    relay.broadcast({
+      type: 'votes_created',
+      payload: [{ ...vote, page: pageMeta, space }]
+    }, vote.spaceId);
   }
 
   return res.status(201).json(vote);
