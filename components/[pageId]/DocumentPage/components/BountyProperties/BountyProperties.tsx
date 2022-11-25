@@ -47,11 +47,12 @@ export default function BountyProperties (props: {
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
   const bountyFromContext = bounties.find(b => b.id === bountyId);
   const [currentBounty, setCurrentBounty] = useState<(BountyCreationData & BountyWithDetails) | null>(null);
-
+  const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(currentBounty?.maxSubmissions !== null);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { mutatePage, pages } = usePages();
+  const isRewardAmountInvalid = useMemo(() => isAmountInputEmpty || Number(currentBounty?.rewardAmount) <= 0, [isAmountInputEmpty, currentBounty]);
 
   const router = useRouter();
 
@@ -126,6 +127,8 @@ export default function BountyProperties (props: {
   }
 
   const updateBountyAmount = useCallback((e) => {
+    setIsAmountInputEmpty(e.target.value === '');
+
     applyBountyUpdatesDebounced({
       rewardAmount: Number(e.target.value)
     });
@@ -238,13 +241,15 @@ export default function BountyProperties (props: {
             width: '100%'
           }}
           disabled={readOnly}
-          value={currentBounty?.rewardAmount}
+          value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount}
           type='number'
           size='small'
           onChange={updateBountyAmount}
           inputProps={{
-            step: 0.000000001
+            step: 0.01
           }}
+          error={isRewardAmountInvalid}
+          helperText={isRewardAmountInvalid && 'Bounty amount should be a number greater than 0'}
         />
       </div>
       <Stack

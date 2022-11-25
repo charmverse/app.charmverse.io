@@ -1,14 +1,39 @@
-import { Card, Chip, Grid, Stack, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import EditIcon from '@mui/icons-material/Edit';
+import { Card, Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
+import type { MemberProperty, MemberPropertyType } from '@prisma/client';
+import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
+import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import type { Member } from 'lib/members/interfaces';
+import { useMembers } from 'hooks/useMembers';
+import { useUser } from 'hooks/useUser';
+import type { Member, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 
-import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
+import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
+
+const StyledLink = styled(Link)`
+  ${hoverIconsStyle({ absolutePositioning: true })};
+
+  height: 100%;
+  display: flex;
+  &:hover {
+    opacity: 0.8;
+  }
+  position: relative;
+`;
 
 function MemberDirectoryGalleryCard ({
   member
@@ -16,93 +41,184 @@ function MemberDirectoryGalleryCard ({
   member: Member;
 }) {
   const { properties = [] } = useMemberProperties();
-  const nameProperty = properties.find(property => property.type === 'name');
+  const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+    record[prop.type] = prop;
+    return record;
+  }, {} as any);
 
+  const currentSpace = useCurrentSpace();
+  const { user } = useUser();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { mutateMembers } = useMembers();
+
+  const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
+  const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
+  const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
+  const admin = isAdmin();
+
+  const updateMemberPropertyValues = async (spaceId: string, values: UpdateMemberPropertyValuePayload[]) => {
+    await charmClient.members.updateSpacePropertyValues(member.id, spaceId, values);
+    mutateMembers();
+  };
+
+  const social = member.profile?.social as Social ?? {};
   return (
-    <Link
-      href={`/u/${member.path || member.id}`}
-      color='primary'
-      sx={{
-        '&:hover': {
-          opacity: 0.8
-        }
-      }}
-    >
-      <Card sx={{ width: '100%' }}>
-        <Avatar
-          sx={{
-            width: '100%'
-          }}
-          avatar={member.avatar}
-          name={member.username}
-          size='2xLarge'
-          variant='square'
-        />
-        <Stack p={2} gap={1}>
-          <Typography gutterBottom variant='h6' mb={0} component='div'>
-            {member.properties.find(memberProperty => memberProperty.memberPropertyId === nameProperty?.id)?.value ?? member.username}
-          </Typography>
-          {member.profile?.social && <SocialIcons gap={1} social={member.profile.social as Social} />}
-          <Stack gap={0.5}>
-            <Typography fontWeight='bold' variant='subtitle2'>Roles</Typography>
-            <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-              {member.roles.length === 0 ? 'N/A' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
-            </Stack>
-          </Stack>
-          <Stack flexDirection='row' gap={1}>
-            <TimezoneDisplay
-              showTimezone
-              timezone={member.profile?.timezone}
+    <>
+      <StyledLink
+        href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+        color='primary'
+      >
+        <Card sx={{ width: '100%' }}>
+          {((user?.id === member.id && currentSpace) || admin) && (
+            <IconButton
+              size='small'
+              className='icons'
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsModalOpen(true);
+              }}
+              style={!admin ? {
+                opacity: 1
+              } : {}}
+            >
+              <EditIcon fontSize='small' />
+            </IconButton>
+          )}
+          <Avatar
+            sx={{
+              width: '100%'
+            }}
+            avatar={member.avatar}
+            name={member.username}
+            size='2xLarge'
+            variant='square'
+          />
+          <Stack p={2} gap={1}>
+            {!isNameHidden && (
+              <Typography gutterBottom variant='h6' mb={0} component='div'>
+                {member.properties.find(memberProperty => memberProperty.memberPropertyId === propertiesRecord.name?.id)?.value ?? member.username}
+              </Typography>
+            )}
+            <SocialIcons
+              gap={1}
+              social={social}
+              showDiscord={!isDiscordHidden}
+              showTwitter={!isTwitterHidden}
             />
-          </Stack>
-          {properties.map(property => {
-            const memberPropertyValue = member.properties.find(memberProperty => memberProperty.memberPropertyId === property.id);
-            switch (property.type) {
-              case 'text':
-              case 'text_multiline':
-              case 'phone':
-              case 'email':
-              case 'url':
-              case 'number': {
-                return (
-                  <Stack key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                    <Typography variant='body2'>{memberPropertyValue?.value ?? 'N/A'}</Typography>
-                  </Stack>
-                );
-              }
-              case 'multiselect': {
-                const values = (memberPropertyValue?.value ?? []) as PropertyOption[];
-                return (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {values.length !== 0 ? values.map(propertyValue => <Chip label={propertyValue.name} color={propertyValue.color} key={propertyValue.name} size='small' variant='outlined' />) : 'N/A'}
-                    </Stack>
-                  </Stack>
-                );
-              }
-              case 'select': {
-                const propertyValue = memberPropertyValue?.value as PropertyOption;
-                return (
-                  <Stack gap={0.5} key={property.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                    {propertyValue ? (
-                      <Stack gap={1} flexDirection='row'>
-                        <Chip label={propertyValue.name} key={propertyValue.name?.toString() ?? ''} color={propertyValue.color} size='small' variant='outlined' />
-                      </Stack>
-                    ) : <Typography variant='body2'>N/A</Typography>}
-                  </Stack>
-                );
-              }
-              default: {
+            {properties.map(property => {
+              const memberProperty = member.properties.find(mp => mp.memberPropertyId === property.id);
+              const hiddenInGallery = !property.enabledViews.includes('gallery');
+              if (hiddenInGallery) {
                 return null;
               }
-            }
-          })}
-        </Stack>
-      </Card>
-    </Link>
+              switch (property.type) {
+                case 'bio': {
+                  return member.profile?.description && (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
+                      <Typography
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                        variant='body2'
+                      >{member.profile?.description}
+                      </Typography>
+                    </Stack>
+                  );
+                }
+
+                case 'join_date': {
+                  return (
+                    <Stack key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
+                        withYear: true
+                      })}
+                      </Typography>
+                    </Stack>
+                  );
+                }
+                case 'role': {
+                  return member.roles.length !== 0 && (
+                    <Stack gap={0.5} key={property.id}>
+                      <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                        {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                      </Stack>
+                    </Stack>
+                  );
+                }
+                case 'timezone': {
+                  return member.profile?.timezone && (
+                    <Stack flexDirection='row' gap={1} key={property.id}>
+                      <TimezoneDisplay
+                        showTimezone
+                        timezone={member.profile.timezone}
+                      />
+                    </Stack>
+                  );
+                }
+                case 'text_multiline': {
+                  return memberProperty?.value && (
+                    <MemberPropertyTextMultiline
+                      key={property.id}
+                      label={property.name}
+                      value={memberProperty.value as string}
+                    />
+                  );
+                }
+                case 'text':
+                case 'phone':
+                case 'email':
+                case 'url':
+                case 'number': {
+                  return memberProperty?.value && (
+                    <Stack
+                      key={property.id}
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
+                      <Typography variant='body2'>{memberProperty.value}</Typography>
+                    </Stack>
+                  );
+                }
+                case 'select':
+                case 'multiselect': {
+                  return memberProperty
+                    ? (
+                      <SelectPreview
+                        size='small'
+                        options={property.options as SelectOptionType[]}
+                        value={memberProperty.value as (string | string[])}
+                        name={property.name}
+                        key={property.id}
+                      />
+                    )
+                    : null;
+                }
+
+                default: {
+                  return null;
+                }
+              }
+            })}
+          </Stack>
+        </Card>
+      </StyledLink>
+      {isModalOpen && user && currentSpace && (
+        <MemberPropertiesPopupForm
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          memberId={member.id}
+          spaceId={currentSpace.id}
+          updateMemberPropertyValues={updateMemberPropertyValues}
+        />
+      )}
+    </>
   );
 }
 

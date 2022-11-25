@@ -1,4 +1,5 @@
 import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
+import { getChainShortname } from 'connectors';
 import { ethers } from 'ethers';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
@@ -38,6 +39,7 @@ export interface GnosisTransactionPopulated {
   nonce: number;
   safeAddress: string;
   safeName: string | null;
+  safeChainId: number;
   threshold: number;
   snoozedUsers: UserWithGnosisSafeState[];
 }
@@ -67,8 +69,8 @@ function getFriendlyEthValue (value: string) {
   }
 }
 
-function getGnosisTransactionUrl (address: string) {
-  return `https://gnosis-safe.io/app/rin:${address}/transactions/queue`;
+function getGnosisTransactionUrl (address: string, chainId: number) {
+  return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
 }
 
 function getTaskDescription (transaction: GnosisTransaction): string {
@@ -78,6 +80,35 @@ function getTaskDescription (transaction: GnosisTransaction): string {
       case 'multiSend': {
         const actions = data.parameters[0].valueDecoded as { to: string, value: string }[];
         return `MultiSend: ${actions.length} actions`;
+      }
+      case 'transfer': {
+        try {
+          const recipient = data.parameters[0].value;
+          const amount = data.parameters[1].value;
+          return `Transfer: ${amount} to ${recipient}`;
+        }
+        catch (error) {
+          log.error('Error parsing gnosis transfer', { error, data });
+        }
+        break;
+      }
+      case 'addOwnerWithThreshold': {
+        // this is the JSON type in case we want it for something
+        // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];
+        /* example
+          {
+            method: 'addOwnerWithThreshold',
+            parameters: [
+              {
+                name: 'owner',
+                type: 'address',
+                value: '0x78d32460D0a53Ac2678e869Eb6b4f6bA9d2Ef360'
+              },
+              { name: '_threshold', type: 'uint256', value: '3' }
+            ]
+          }
+        */
+        return 'Add a new owner';
       }
 
       default:
@@ -129,7 +160,7 @@ interface TransactionToTaskProps {
 
 function transactionToTask ({ myAddresses, transaction, safe, wallets }: TransactionToTaskProps): GnosisTransactionPopulated {
   const actions = getTaskActions(transaction, getRecipient);
-  const gnosisUrl = getGnosisTransactionUrl(transaction.safe);
+  const gnosisUrl = getGnosisTransactionUrl(transaction.safe, safe.chainId);
   const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
   const myOwnedAddresses = intersection(myAddresses, safe.owners).length; // handle owner of multiple addresses in one safe
   // console.log('transaction', transaction);
@@ -171,6 +202,7 @@ function transactionToTask ({ myAddresses, transaction, safe, wallets }: Transac
     nonce: transaction.nonce,
     safeAddress: transaction.safe,
     safeName: safe.name,
+    safeChainId: safe.chainId,
     confirmations,
     threshold: safe.threshold,
     myAction: actionLabel,
@@ -207,7 +239,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, wallets }: Transa
         taskId,
         safeAddress: _transactions[0].safeAddress,
         safeName: _transactions[0].safeName,
-        safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress),
+        safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
         tasks
       };
     })

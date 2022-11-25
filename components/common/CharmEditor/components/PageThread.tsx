@@ -1,6 +1,6 @@
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Collapse, Menu, MenuItem, ListItemText, ListItemIcon, Paper, Typography, ListItem, IconButton, Tooltip } from '@mui/material';
@@ -18,9 +18,9 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { CommentWithUser } from 'lib/comments/interfaces';
-import { removeInlineCommentMark } from 'lib/inline-comments/removeInlineCommentMark';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type { PageContent } from 'models';
 
@@ -434,7 +434,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(({ showFindButton
             <ListItemText>Edit comment</ListItemText>
           </MenuItem>
           <MenuItem onClick={onClickDeleteComment}>
-            <ListItemIcon><DeleteIcon /></ListItemIcon>
+            <ListItemIcon><DeleteOutlinedIcon /></ListItemIcon>
             <ListItemText>Delete comment</ListItemText>
           </MenuItem>
         </Menu>

@@ -5,9 +5,8 @@ import Typography from '@mui/material/Typography';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import splashImage from 'public/images/artwork/world.png';
-
-import type { AuthSig } from '../../lib/blockchain/interfaces';
 
 import { WalletSign } from './WalletSign';
 

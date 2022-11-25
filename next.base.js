@@ -16,7 +16,6 @@ const esmModules = [
   '@fullcalendar/interaction',
   '@fullcalendar/react',
   'react-dnd',
-  // 'react-dnd-scrolling',
   'react-pdf',
   '@hookform/resolvers',
   'lit-share-modal-v3-react-17',

@@ -1,8 +1,7 @@
 import Grid from '@mui/material/Grid';
-import { useState } from 'react';
 
 import { PimpedButton as Button } from 'components/common/Button';
-import { useWebSocketClient } from 'hooks/useSocketClient';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export function WebSocketTester () {
 
@@ -20,11 +19,14 @@ export function WebSocketTester () {
         <Button css={{ backgroundColor: 'red' }} onClick={clearLog}>Clear</Button>
       </Grid>
       {
-      messageLog.map((message, index) => (
-        <Grid item xs={12}>
-          <p>{typeof message === 'object' ? JSON.stringify(message) : message}</p>
-        </Grid>
-      ))
+      messageLog.map((message) => {
+        const msgString = typeof message === 'object' ? JSON.stringify(message) : message;
+        return (
+          <Grid key={msgString} item xs={12}>
+            <p>{msgString}</p>
+          </Grid>
+        );
+      })
     }
     </Grid>
   );

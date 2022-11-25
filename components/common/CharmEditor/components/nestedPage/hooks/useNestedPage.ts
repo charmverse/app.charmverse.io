@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
 export default function useNestedPage () {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const { currentPageId } = usePages();
   const view = useEditorViewContext();
@@ -31,15 +31,10 @@ export default function useNestedPage () {
         });
         if (dispatch) {
           dispatch(state.tr.replaceSelectionWith(nestedPageNode));
-          if (isInsideCard) {
-            // A small delay to let the inserted page be saved in the editor
-            setTimeout(() => {
-              router.push(`/${router.query.domain}/${page.path}`);
-            }, 100);
-          }
-          else {
+          // A small delay to let the inserted page be saved in the editor
+          setTimeout(() => {
             router.push(`/${router.query.domain}/${page.path}`);
-          }
+          }, 500);
         }
         return true;
       });

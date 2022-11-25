@@ -25,9 +25,13 @@ export interface ExtendedPoap {
   name: string;
 }
 
+/**
+ * @param rawAddress - Account as detected, without any lowercasing
+ */
 export interface AuthSig {
   sig: string;
   derivedVia: string;
   signedMessage: string;
   address: string;
 }
+

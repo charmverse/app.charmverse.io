@@ -1,6 +1,7 @@
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import * as emails from 'lib/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -80,6 +81,20 @@ const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<Prop
   };
 };
 
+const createBountyTask = ({ action, pageTitle, spaceName, status }: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+  return {
+    id: v4(),
+    action,
+    pagePath: randomName(),
+    pageTitle,
+    status,
+    spaceDomain: randomName(),
+    spaceName,
+    pageId: v4(),
+    eventDate: new Date()
+  };
+};
+
 const templates = {
   'Notify the user about tasks': () => {
     return emails.getPendingTasksEmail({
@@ -89,6 +104,14 @@ const templates = {
         username: 'ghostpepper'
       },
       totalTasks: 6,
+      bountyTasks: [
+        createBountyTask({
+          action: 'application_pending',
+          pageTitle: 'Create a new protocol',
+          spaceName: 'Uniswap',
+          status: 'open'
+        })
+      ],
       proposalTasks: [
         createProposalTasks({
           action: 'discuss',
@@ -174,7 +197,8 @@ const templates = {
               safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
               safeName: 'My Personal Safe',
               threshold: 2,
-              snoozedUsers: []
+              snoozedUsers: [],
+              safeChainId: 1
             }]
           }],
           safeAddress: '0x123',
@@ -199,7 +223,8 @@ const templates = {
               safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
               safeName: 'Work Safe',
               threshold: 2,
-              snoozedUsers: []
+              snoozedUsers: [],
+              safeChainId: 1
             }]
           }],
           safeAddress: '0x456',

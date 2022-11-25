@@ -79,15 +79,17 @@ export type InitialAvatarProps = {
   size?: AvatarSize;
   isNft?: boolean;
   sx?: SxProps;
+  onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft, sx = {} }: InitialAvatarProps) {
+export default function InitialAvatar ({ avatar, className, name, variant, size = 'medium', isNft, onMouseEnter, sx = {} }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   const muiVariant = isNft ? 'square' : variant;
   const AvatarComponent = isNft ? HexagonAvatar : StyledAvatar;
 
   return (
     <AvatarComponent
+      onMouseEnter={onMouseEnter}
       className={className}
       sx={{ backgroundColor: avatar ? 'initial' : stringToColor(nameStr), ...getAvatarCustomStyles(variant, size), ...sx }}
       variant={muiVariant}

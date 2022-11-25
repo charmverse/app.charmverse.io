@@ -1,4 +1,4 @@
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { IconButton, List, MenuItem, ListItemText, ListItemIcon, Tooltip, Typography, TextField, Box } from '@mui/material';
 import { DateTime } from 'luxon';
@@ -34,7 +34,7 @@ const ArchivedPageItem = memo<
   onRestore:(e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
   onDelete: (e: MouseEvent<HTMLButtonElement, MouseEvent>, pageId: string) => void;
     }>(({ onRestore, onDelete, disabled, archivedPage }) => {
-      const [space] = useCurrentSpace();
+      const space = useCurrentSpace();
 
       return (
         <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
@@ -59,7 +59,7 @@ const ArchivedPageItem = memo<
                 onClick={(e) => onDelete(e as any, archivedPage.id)}
               >
                 <Tooltip arrow placement='top' title='Delete page permanently'>
-                  <DeleteIcon color='error' fontSize='small' />
+                  <DeleteOutlinedIcon color='error' fontSize='small' />
                 </Tooltip>
               </IconButton>
             </div>
@@ -72,7 +72,7 @@ export default function TrashModal ({ onClose, isOpen }: { onClose: () => void, 
   const [archivedPages, setArchivedPages] = useState<Record<string, Page>>({});
   const [isMutating, setIsMutating] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages, getPagePermissions, mutatePagesRemove, currentPageId } = usePages();
   const dispatch = useAppDispatch();
   const router = useRouter();

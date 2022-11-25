@@ -2,12 +2,12 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import reactDOM from 'react-dom';
 
-import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
@@ -134,7 +134,7 @@ function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
     const commentIds = row.nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
-    const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
+    const newIds = Array.from(new Set(commentIds.filter(commentId => !uniqueCommentIds.has(commentId))));
     commentIds.forEach(commentId => uniqueCommentIds.add(commentId));
 
     if (newIds.length !== 0) {

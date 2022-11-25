@@ -2,17 +2,18 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button, Menu, MenuItem, Stack, TextField } from '@mui/material';
 import type { MemberPropertyType } from '@prisma/client';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
+import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
-import type { PropertyOption } from './MemberDirectoryProperties/MemberPropertySelectInput';
-import { MemberPropertySelectInput } from './MemberDirectoryProperties/MemberPropertySelectInput';
 
 export function AddMemberPropertyButton () {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
@@ -22,7 +23,14 @@ export function AddMemberPropertyButton () {
   const [selectedPropertyType, setSelectedPropertyType] = useState<null | MemberPropertyType>(null);
   const [propertyName, setPropertyName] = useState('');
   const { properties, addProperty } = useMemberProperties();
-  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>([]);
+
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>([]);
+  useEffect(() => {
+    if (!propertyNamePopupState.isOpen) {
+      setPropertyName('');
+      setPropertyOptions([]);
+    }
+  }, [propertyNamePopupState.isOpen]);
 
   async function onSubmit () {
     if (propertyName && selectedPropertyType) {
@@ -32,11 +40,23 @@ export function AddMemberPropertyButton () {
         options: propertyOptions,
         type: selectedPropertyType
       });
-      setPropertyName('');
+
       mutateMembers();
       propertyNamePopupState.close();
     }
   }
+
+  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([propertyType, propertyConfig]) => {
+    if (propertyConfig.default) {
+      return false;
+    }
+    // Read-only properties can only have one instance, join_date is an example
+    if (propertyConfig.readonly && properties?.find(property => property.type === propertyType)) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -64,21 +84,17 @@ export function AddMemberPropertyButton () {
           }
         }}
       >
-        {Object.keys(MEMBER_PROPERTY_LABELS).map((memberPropertyType) => (
-          !memberPropertyType.match(/select/) && !DEFAULT_MEMBER_PROPERTIES.includes(memberPropertyType as any) && (
-            <MenuItem
-              key={memberPropertyType}
-              onClick={() => {
-                setSelectedPropertyType(memberPropertyType as MemberPropertyType);
-                propertyNamePopupState.open();
-                addMemberPropertyPopupState.close();
-              }}
-            >
-              <MemberPropertyItem
-                type={memberPropertyType as MemberPropertyType}
-              />
-            </MenuItem>
-          )
+        {configurableProperties.map(([propertyType]) => (
+          <MenuItem
+            key={propertyType}
+            onClick={() => {
+              setSelectedPropertyType(propertyType as MemberPropertyType);
+              propertyNamePopupState.open();
+              addMemberPropertyPopupState.close();
+            }}
+          >
+            <MemberPropertyItem type={propertyType as MemberPropertyType} />
+          </MenuItem>
         ))}
       </Menu>
       <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
@@ -99,19 +115,17 @@ export function AddMemberPropertyButton () {
               }
             }}
           />
-          {selectedPropertyType?.match(/select/) && (
-            <MemberPropertySelectInput
-              onChange={setPropertyOptions}
-              options={propertyOptions}
-            />
+          {isSelectType(selectedPropertyType) && (
+            <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
           )}
           <Button
+            onMouseDown={e => e.preventDefault()}
             disabled={!propertyName || !selectedPropertyType}
             sx={{
               width: 'fit-content'
             }}
             onClick={onSubmit}
-          >Add
+          >Add property
           </Button>
         </Stack>
       </Modal>

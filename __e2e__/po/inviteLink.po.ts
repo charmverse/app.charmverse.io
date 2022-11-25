@@ -20,6 +20,8 @@ export class AcceptInvitePage {
   }
 
   async goto () {
-    await this.page.goto(baseUrl);
+    if (baseUrl) {
+      await this.page.goto(baseUrl);
+    }
   }
 }

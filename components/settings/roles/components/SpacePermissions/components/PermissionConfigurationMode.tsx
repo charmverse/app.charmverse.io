@@ -14,6 +14,7 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
 
 interface Props {
@@ -21,7 +22,8 @@ interface Props {
 }
 
 export default function PermissionConfigurationMode ({ permissionModeSelected = () => null }: Props) {
-  const [space, setSpace] = useCurrentSpace();
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
 
   const isAdmin = useIsAdmin();
 
@@ -98,6 +100,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
               return (
                 <MenuItem
+                  key={mode}
                   selected={isSelected}
                   onClick={() => {
                     setSelectedConfigurationMode(mode);
@@ -140,7 +143,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
 
               {
               templateExplanation[0].map(canDo => (
-                <Grid item xs={12} display='flex'>
+                <Grid key={canDo} item xs={12} display='flex'>
                   <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{canDo}</Typography>
                 </Grid>
@@ -151,7 +154,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
             <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
               {
               templateExplanation[1].map(cannotDo => (
-                <Grid item xs={12} display='flex'>
+                <Grid key={cannotDo} item xs={12} display='flex'>
                   <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
                   <Typography variant='caption'>{cannotDo}</Typography>
                 </Grid>

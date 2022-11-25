@@ -39,10 +39,11 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
+import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
@@ -200,6 +201,15 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // wait for router to be ready, as we rely on the URL to know what space to load
 
+  const { refreshSignupData } = useUserAcquisition();
+
+  useEffect(() => {
+    if (router.isReady) {
+      refreshSignupData();
+    }
+
+  }, [router.isReady]);
+
   if (!router.isReady) {
     return null;
   }
@@ -259,7 +269,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 function DataProviders ({ children }: { children: ReactNode }) {
 
   return (
-
     <UserProvider>
       <SpacesProvider>
         <WebSocketClientProvider>
@@ -278,9 +287,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
           </MembersProvider>
         </WebSocketClientProvider>
       </SpacesProvider>
-
     </UserProvider>
-
   );
 }
 

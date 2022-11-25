@@ -1,7 +1,7 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
-import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
+import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
 import type { Page } from '@prisma/client';
@@ -35,7 +35,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
   const view = useEditorViewContext();
   const { deletePage, currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();
   const boards = useAppSelector(getSortedBoards);
 
@@ -80,7 +80,6 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   function deleteRow () {
     const node = _getNode();
-
     if (node) {
       let start = node.nodeStart;
       let end = node.nodeEnd;
@@ -142,7 +141,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
         {...menuPosition}
       >
         <ListItemButton onClick={deleteRow} dense>
-          <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
+          <ListItemIcon><DeleteOutlined color='secondary' /></ListItemIcon>
           <ListItemText primary='Delete' />
         </ListItemButton>
         <ListItemButton onClick={duplicateRow} dense>

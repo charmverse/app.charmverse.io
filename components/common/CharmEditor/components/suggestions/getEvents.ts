@@ -1,7 +1,7 @@
 import type { EditorState, Node } from '@bangle.dev/pm';
 
-import { getSelectedChanges } from './statePlugins/track';
-import type { TrackAttribute, TrackType } from './track/interfaces';
+import { getSelectedChanges } from '../fiduswriter/state_plugins/track';
+import type { TrackAttribute, TrackType } from '../fiduswriter/track/interfaces';
 
 type TrackAttribute2 = {
   type: TrackAttribute['type'];

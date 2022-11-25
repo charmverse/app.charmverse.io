@@ -143,6 +143,55 @@ enum WorkspaceEventType {
   proposal_status_change
 }
 
+enum PageType {
+  board
+  board_template
+  bounty
+  bounty_template
+  page
+  page_template
+  card
+  card_template
+  proposal
+  proposal_template
+  inline_board
+  inline_linked_board
+}
+
+enum VoteContext {
+  inline
+  proposal
+}
+
+enum MemberPropertyType {
+  text
+  text_multiline
+  number
+  email
+  phone
+  url
+  select
+  multiselect
+  role
+  profile_pic
+  timezone
+  name
+  discord
+  twitter
+  bio
+  join_date
+}
+
+enum MemberPropertyPermissionLevel {
+  view
+}
+
+enum VisibilityView {
+  gallery
+  table
+  profile
+}
+
 model Space {
   id                          String                            @id @default(uuid()) @db.Uuid
   deletedAt                   DateTime?
@@ -175,13 +224,16 @@ model Space {
   spacePermissions            SpacePermission[]                 @relation("spacePermissions")
   spaceRoles                  SpaceRole[]
   threads                     Thread[]
-  TokenGate                   TokenGate[]
+  tokenGates                  TokenGate[]
   votes                       Vote[]
   proposals                   Proposal[]
   workspaceEvents             WorkspaceEvent[]
   proposalCategory            ProposalCategory[]
-  memberProperty              MemberProperty[]
-  memberPropertyValue         MemberPropertyValue[]
+  memberProperties            MemberProperty[]
+  memberPropertyValues        MemberPropertyValue[]
+  userTokenGates              UserTokenGate[]
+
+  @@index([createdBy])
 }
 
 model SpaceApiToken {
@@ -192,21 +244,7 @@ model SpaceApiToken {
   space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
   @@unique([token, spaceId])
-}
-
-enum PageType {
-  board
-  board_template
-  bounty
-  bounty_template
-  page
-  page_template
-  card
-  card_template
-  proposal
-  proposal_template
-  inline_board
-  inline_linked_board
+  @@index([spaceId])
 }
 
 model Page {
@@ -235,6 +273,7 @@ model Page {
   proposalId         String?          @unique @db.Uuid
   snapshotProposalId String?
   fullWidth          Boolean?         @default(false)
+  version            Int              @default(1)
   card               Block?           @relation(fields: [cardId], references: [id], onDelete: Cascade)
   author             User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   space              Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -247,6 +286,27 @@ model Page {
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
+  diffs              PageDiff[]
+
+  @@index([bountyId])
+  @@index([cardId])
+  @@index([createdBy])
+  @@index([parentId])
+  @@index([proposalId])
+  @@index([spaceId])
+  @@index([title])
+}
+
+model PageDiff {
+  data      Json
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  pageId    String   @db.Uuid
+  page      Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  version   Int
+
+  @@unique([pageId, version])
+  @@index([pageId])
 }
 
 model Block {
@@ -266,6 +326,10 @@ model Block {
   user      User      @relation(fields: [createdBy], references: [id])
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   page      Page?
+
+  @@index([rootId])
+  @@index([spaceId])
+  @@index([createdBy])
 }
 
 model UserVote {
@@ -278,6 +342,8 @@ model UserVote {
   vote      Vote     @relation(fields: [voteId], references: [id], onDelete: Cascade)
 
   @@unique([voteId, userId])
+  @@index([voteId])
+  @@index([userId])
 }
 
 model VoteOptions {
@@ -286,11 +352,7 @@ model VoteOptions {
   vote   Vote   @relation(fields: [voteId], references: [id], onDelete: Cascade)
 
   @@unique([voteId, name])
-}
-
-enum VoteContext {
-  inline
-  proposal
+  @@index([voteId])
 }
 
 model Vote {
@@ -311,12 +373,20 @@ model Vote {
   space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   userVotes   UserVote[]
   voteOptions VoteOptions[]
+
+  @@index([createdBy])
+  @@index([pageId])
+  @@index([spaceId])
 }
 
 model User {
   id                   String                 @id @default(uuid()) @db.Uuid
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @default(now())
+  <<<<<<< HEAD
+  =======
+  addresses            String[]
+  >>>>>>> main
   deletedAt            DateTime?
   avatar               String?
   avatarContract       String?
@@ -345,7 +415,7 @@ model User {
   threads              Thread[]
   profile              UserDetails?
   gnosisSafes          UserGnosisSafe[]
-  UserNotification     UserNotification[]
+  userNotifications    UserNotification[]
   notificationState    UserNotificationState?
   userVotes            UserVote[]
   initiatedVotes       Vote[]
@@ -356,12 +426,15 @@ model User {
   workspaceEvents      WorkspaceEvent[]
   wallets              UserWallet[]
   memberPropertyValues MemberPropertyValue[]
+  userTokenGates       UserTokenGate[]
 }
 
 model UserWallet {
   address String @unique
   userId  String @db.Uuid
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model UserNotificationState {
@@ -369,6 +442,8 @@ model UserNotificationState {
   snoozeMessage String?
   userId        String    @unique @db.Uuid
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model UserNotification {
@@ -380,6 +455,7 @@ model UserNotification {
   user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
+  @@index([userId])
 }
 
 model UserDetails {
@@ -397,6 +473,8 @@ model TelegramUser {
   telegramId Int      @id
   account    Json
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model DiscordUser {
@@ -406,6 +484,8 @@ model DiscordUser {
   discordId String   @id
   account   Json
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Poap {
@@ -415,6 +495,8 @@ model Poap {
   walletAddress String
   isHidden      Boolean?
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model FavoritePage {
@@ -424,22 +506,44 @@ model FavoritePage {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([pageId, userId])
+  @@index([userId])
+  @@index([pageId])
+}
+
+model UserTokenGate {
+  id                     String     @id @default(uuid()) @db.Uuid
+  spaceId                String     @db.Uuid
+  userId                 String     @db.Uuid
+  tokenGateConnectedDate DateTime?
+  jwt                    String?
+  tokenGateId            String?    @db.Uuid
+  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id], onDelete: SetNull)
+  space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedRoles           String[]   @default([])
+
+  @@unique([tokenGateId, userId, spaceId], name: "tokenGateUserSpace")
+  @@index([spaceId])
+  @@index([userId])
+  @@index([tokenGateId])
 }
 
 model SpaceRole {
-  spaceId                String            @db.Uuid
-  userId                 String            @db.Uuid
-  tokenGateConnectedDate DateTime?
-  tokenGateId            String?           @db.Uuid
-  id                     String            @id @default(uuid()) @db.Uuid
-  isAdmin                Boolean           @default(false)
-  createdAt              DateTime          @default(now())
-  space                  Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  tokenGate              TokenGate?        @relation(fields: [tokenGateId], references: [id])
-  user                   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceRoleToRole        SpaceRoleToRole[]
+  spaceId         String            @db.Uuid
+  userId          String            @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  isAdmin         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceRoleToRole SpaceRoleToRole[]
+  tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
+  joinedViaLink   Boolean?
 
   @@unique([spaceId, userId], name: "spaceUser")
+  @@index([spaceId])
+  @@index([userId])
 }
 
 model InviteLink {
@@ -454,6 +558,9 @@ model InviteLink {
   author            User               @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   inviteLinkToRoles InviteLinkToRole[]
+
+  @@index([createdBy])
+  @@index([spaceId])
 }
 
 model Bounty {
@@ -475,6 +582,9 @@ model Bounty {
   applications      Application[]
   permissions       BountyPermission[]
   page              Page?
+
+  @@index([createdBy])
+  @@index([spaceId])
 }
 
 model BountyPermission {
@@ -495,6 +605,10 @@ model BountyPermission {
   @@unique([roleId, bountyId, permissionLevel], name: "roleId_bountyId_permissionLevel")
   @@unique([spaceId, bountyId, permissionLevel], name: "spaceId_bountyId_permissionLevel")
   @@unique([public, bountyId, permissionLevel], name: "public_bountyId_permissionLevel")
+  @@index([bountyId])
+  @@index([spaceId])
+  @@index([roleId])
+  @@index([userId])
 }
 
 model Application {
@@ -516,6 +630,8 @@ model Application {
   transactions    Transaction[]
 
   @@unique([bountyId, createdBy])
+  @@index([createdBy])
+  @@index([bountyId])
 }
 
 model Transaction {
@@ -526,6 +642,8 @@ model Transaction {
   chainId       String
   applicationId String      @db.Uuid
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
 }
 
 model TokenGate {
@@ -538,8 +656,11 @@ model TokenGate {
   userRole         String?
   accessTypes      String[]          @default([])
   space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  spaceRoles       SpaceRole[]
   tokenGateToRoles TokenGateToRole[]
+  userTokenGates   UserTokenGate[]
+  spaceRoles       SpaceRole[]
+
+  @@index([spaceId])
 }
 
 model PaymentMethod {
@@ -559,6 +680,7 @@ model PaymentMethod {
 
   @@unique([spaceId, chainId, contractAddress])
   @@unique([spaceId, chainId, gnosisSafeAddress])
+  @@index([spaceId])
 }
 
 model UserGnosisSafe {
@@ -570,6 +692,8 @@ model UserGnosisSafe {
   threshold Int
   owners    String[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Role {
@@ -585,12 +709,13 @@ model Role {
   permissions               PagePermission[]
   spacePermissions          SpacePermission[]
   spaceRolesToRole          SpaceRoleToRole[]
-  TokenGateToRole           TokenGateToRole[]
+  tokenGateToRoles          TokenGateToRole[]
   proposalReviewer          ProposalReviewer[]
-  InviteLinkToRole          InviteLinkToRole[]
+  inviteLinkToRoles         InviteLinkToRole[]
   memberPropertyPermissions MemberPropertyPermission[]
 
   @@unique([spaceId, name])
+  @@index([spaceId])
 }
 
 model TokenGateToRole {
@@ -602,6 +727,8 @@ model TokenGateToRole {
   tokenGate   TokenGate @relation(fields: [tokenGateId], references: [id], onDelete: Cascade)
 
   @@unique([tokenGateId, roleId])
+  @@index([tokenGateId])
+  @@index([roleId])
 }
 
 model InviteLinkToRole {
@@ -613,6 +740,8 @@ model InviteLinkToRole {
   inviteLink   InviteLink @relation(fields: [inviteLinkId], references: [id], onDelete: Cascade)
 
   @@unique([inviteLinkId, roleId])
+  @@index([roleId])
+  @@index([inviteLinkId])
 }
 
 model SpaceRoleToRole {
@@ -624,6 +753,8 @@ model SpaceRoleToRole {
   spaceRole   SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
 
   @@unique([spaceRoleId, roleId])
+  @@index([spaceRoleId])
+  @@index([roleId])
 }
 
 model PagePermission {
@@ -647,6 +778,10 @@ model PagePermission {
   @@unique([roleId, pageId], name: "roleId_pageId")
   @@unique([spaceId, pageId], name: "spaceId_pageId")
   @@unique([public, pageId], name: "public_pageId")
+  @@index([pageId])
+  @@index([roleId])
+  @@index([userId])
+  @@index([spaceId])
 }
 
 model SpacePermission {
@@ -665,6 +800,10 @@ model SpacePermission {
   @@unique([userId, forSpaceId], name: "userId_forSpaceId")
   @@unique([roleId, forSpaceId], name: "roleId_forSpaceId")
   @@unique([spaceId, forSpaceId], name: "spaceId_forSpaceId")
+  @@index([roleId])
+  @@index([userId])
+  @@index([forSpaceId])
+  @@index([spaceId])
 }
 
 model Thread {
@@ -680,6 +819,10 @@ model Thread {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
   comments  Comment[]
+
+  @@index([pageId])
+  @@index([spaceId])
+  @@index([userId])
 }
 
 model Comment {
@@ -695,6 +838,11 @@ model Comment {
   space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   thread    Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id])
+
+  @@index([pageId])
+  @@index([spaceId])
+  @@index([threadId])
+  @@index([userId])
 }
 
 model Proposal {
@@ -712,6 +860,10 @@ model Proposal {
   categoryId             String?            @db.Uuid
   category               ProposalCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   snapshotProposalExpiry DateTime?
+
+  @@index([spaceId])
+  @@index([reviewedBy])
+  @@index([categoryId])
 }
 
 model ProposalAuthor {
@@ -721,6 +873,8 @@ model ProposalAuthor {
   author     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([proposalId, userId])
+  @@index([proposalId])
+  @@index([userId])
 }
 
 model ProposalReviewer {
@@ -734,6 +888,9 @@ model ProposalReviewer {
 
   @@unique([userId, proposalId], name: "userId_proposalId")
   @@unique([roleId, proposalId], name: "roleId_proposalId")
+  @@index([proposalId])
+  @@index([roleId])
+  @@index([userId])
 }
 
 model ProfileItem {
@@ -743,6 +900,8 @@ model ProfileItem {
   isHidden Boolean?
   metadata Json?
   type     ProfileItemType
+
+  @@index([userId])
 }
 
 model WorkspaceEvent {
@@ -756,6 +915,10 @@ model WorkspaceEvent {
   pageId    String             @db.Uuid
   page      Page               @relation(fields: [pageId], references: [id], onDelete: Cascade)
   createdAt DateTime           @default(now())
+
+  @@index([actorId])
+  @@index([spaceId])
+  @@index([pageId])
 }
 
 model ProposalCategory {
@@ -765,27 +928,8 @@ model ProposalCategory {
   title    String
   color    String
   proposal Proposal[]
-}
 
-enum MemberPropertyType {
-  text
-  text_multiline
-  number
-  email
-  phone
-  url
-  select
-  multiselect
-  role
-  profile_pic
-  timezone
-  name
-  discord
-  twitter
-}
-
-enum MemberPropertyPermissionLevel {
-  view
+  @@index([spaceId])
 }
 
 model MemberProperty {
@@ -802,6 +946,9 @@ model MemberProperty {
   index                Int                        @default(-1)
   memberPropertyValues MemberPropertyValue[]
   permissions          MemberPropertyPermission[]
+  enabledViews         VisibilityView[]           @default([gallery, table, profile])
+
+  @@index([spaceId])
 }
 
 model MemberPropertyValue {
@@ -817,6 +964,9 @@ model MemberPropertyValue {
   value            Json?
 
   @@unique([memberPropertyId, spaceId, userId])
+  @@index([memberPropertyId])
+  @@index([spaceId])
+  @@index([userId])
 }
 
 model MemberPropertyPermission {
@@ -828,4 +978,6 @@ model MemberPropertyPermission {
   role                          Role?                         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, memberPropertyId])
+  @@index([memberPropertyId])
+  @@index([roleId])
 }

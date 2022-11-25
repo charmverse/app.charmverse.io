@@ -803,7 +803,7 @@ export function pageContentStub (): Pick<Prisma.PageCreateInput, 'content' |'con
           type: 'image',
           attrs: {
             alt: null,
-            src: 'https://s3.amazonaws.com/charm.public.test/user-content/2e086f83-e519-4563-aba8-a521b0e1d84b/3aff036c-0958-4c06-afff-9e0438abb4f4/Bitcoin_Block_Data.png',
+            src: 'https://s3.amazonaws.com/charm.public.dev/user-content/2e086f83-e519-4563-aba8-a521b0e1d84b/3aff036c-0958-4c06-afff-9e0438abb4f4/Bitcoin_Block_Data.png',
             size: 425,
             caption: null
           }
@@ -1571,7 +1571,7 @@ export function pageContentStub (): Pick<Prisma.PageCreateInput, 'content' |'con
  * A page stub with a significant amount of content
  */
 export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt, title }:
-  { id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string }): Prisma.PageCreateInput {
+  { id?: string, createdBy: string, spaceId: string, parentId?: string, deletedAt?: Date, title?: string }): Prisma.PageCreateManyInput {
 
   const pageContent = pageContentStub();
 
@@ -1580,17 +1580,9 @@ export function pageStubToCreate ({ id, parentId, createdBy, spaceId, deletedAt,
   return {
     id: pageId ?? v4(),
     deletedAt,
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
+    createdBy,
     updatedBy: createdBy,
-    space: {
-      connect: {
-        id: spaceId
-      }
-    },
+    spaceId,
     updatedAt: '2022-09-14T14:13:05.326Z',
     title: title ?? `Page ${pageId}`,
     headerImage: null,

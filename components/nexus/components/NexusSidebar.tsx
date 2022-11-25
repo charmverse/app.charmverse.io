@@ -12,6 +12,14 @@ const SidebarContainer = styled.div`
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   height: 100%;
 
+  // hide scrollbar but allow scrolling
+  overflow: auto;
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  ::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
   &:hover {
     .sidebar-header {
       .MuiTypography-root {

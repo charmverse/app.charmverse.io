@@ -13,7 +13,7 @@ import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
 import PdfSelector from 'components/common/PdfSelector';
-import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
+import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import Resizable from './Resizable/Resizable';
 
@@ -173,6 +173,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
   const size: number = useMemo(() => node.attrs.size, [node.attrs.size]);
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
 
   // If there are no source for the node, return the pdf select component
   if (!url) {
@@ -182,7 +183,7 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
     else {
       return (
         <PdfSelector
-          autoOpen={true}
+          autoOpen={autoOpen}
           onPdfSelect={async (pdfSrc) => {
             updateAttrs({
               src: pdfSrc

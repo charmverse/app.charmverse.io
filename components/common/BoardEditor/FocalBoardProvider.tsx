@@ -3,9 +3,9 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { publishDeletes, publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWebSocketClient } from 'hooks/useSocketClient';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import log from 'lib/log';
-import type { WebsocketPayload } from 'lib/websockets/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import store from './focalboard/src/store';
 import { useAppDispatch } from './focalboard/src/store/hooks';
@@ -14,22 +14,22 @@ import { initialLoad } from './focalboard/src/store/initialLoad';
 // load focalboard data when a workspace is selected
 function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { subscribe } = useWebSocketClient();
 
   useEffect(() => {
-    log.debug('Load focalboard data');
     if (space) {
+      log.debug('Load focalboard blocks');
       dispatch(initialLoad({ spaceId: space.id }));
     }
   }, [space?.id]);
 
-  const handleBlockUpdates = useCallback((value: WebsocketPayload<'blocks_updated' | 'blocks_created'>) => {
+  const handleBlockUpdates = useCallback((value: WebSocketPayload<'blocks_updated' | 'blocks_created'>) => {
     publishIncrementalUpdate(value instanceof Array ? value : [value] as any);
   }, []);
 
-  const handleBlockDeletes = useCallback((value: WebsocketPayload<'blocks_deleted'>) => {
+  const handleBlockDeletes = useCallback((value: WebSocketPayload<'blocks_deleted'>) => {
     publishDeletes(value);
   }, []);
 

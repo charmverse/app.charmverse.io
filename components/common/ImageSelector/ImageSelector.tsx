@@ -27,6 +27,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
     tabs.push([
       'Gallery',
       <ImageSelectorGallery
+        key='gallery'
         onImageClick={onImageSelect}
         items={galleryImages}
       />
@@ -47,11 +48,13 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
               ...tabs,
               [
                 'Upload',
-                <Box sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  width: '100%'
-                }}
+                <Box
+                  key='upload'
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%'
+                  }}
                 >
                   <PimpedButton loading={isUploading} loadingMessage='Uploading image' disabled={isUploading} component='label' variant='contained'>
                     Choose an image
@@ -74,12 +77,14 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
               ],
               [
                 'Link',
-                <Box sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                  alignItems: 'center'
-                }}
+                <Box
+                  key='link'
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    alignItems: 'center'
+                  }}
                 >
                   <TextField autoFocus placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
                   <Button

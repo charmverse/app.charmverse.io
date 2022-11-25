@@ -19,7 +19,7 @@ const MembersContext = createContext<Readonly<Context>>({
 });
 
 export function MembersProvider ({ children }: { children: ReactNode }) {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const { data: members, mutate: mutateMembers } = useSWR(() => space ? `members/${space?.id}` : null, () => {
     return charmClient.members.getMembers(space!.id);

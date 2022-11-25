@@ -1,9 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import type { UserGnosisSafe } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import ERC20ABI from 'abis/ERC20ABI.json';
 import { getChainById } from 'connectors';
 import type { Signer } from 'ethers';
@@ -17,6 +17,7 @@ import { useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
@@ -82,26 +83,28 @@ function SafeMenuItem ({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions
+    transactions: transactions.map(getTransaction => getTransaction(safeInfo.address))
   });
 
   return (
-    <MenuItem onClick={async () => {
-      onClick();
-      try {
-        await makePayment();
-      }
-      catch (error: any) {
-        const errorMessage = extractWalletErrorMessage(error);
+    <MenuItem
+      dense
+      onClick={async () => {
+        onClick();
+        try {
+          await makePayment();
+        }
+        catch (error: any) {
+          const errorMessage = extractWalletErrorMessage(error);
 
-        if (errorMessage === 'underlying network changed') {
-          onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+          if (errorMessage === 'underlying network changed') {
+            onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
+          }
+          else {
+            onError(errorMessage);
+          }
         }
-        else {
-          onError(errorMessage);
-        }
-      }
-    }}
+      }}
     >{label}
     </MenuItem>
   );
@@ -119,7 +122,7 @@ export default function BountyPaymentButton ({
 }: Props) {
   const { data: safesData } = useMultiWalletSigs();
   const signer = useGnosisSigner();
-  const { account, library, chainId } = useWeb3React();
+  const { account, library, chainId } = useWeb3AuthSig();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -234,13 +237,16 @@ export default function BountyPaymentButton ({
     }
   };
 
+  const hasSafes = Boolean(safeInfos?.length);
+
   return (
     <>
       <Button
         color='primary'
+        endIcon={hasSafes ? <KeyboardArrowDownIcon /> : null}
         size='small'
         onClick={(e) => {
-          if (safeInfos?.length === 0) {
+          if (!hasSafes) {
             onClick();
             makePayment();
           }
@@ -251,25 +257,26 @@ export default function BountyPaymentButton ({
       >
         Send Payment
       </Button>
-      {safeInfos?.length !== 0 && (
+      {hasSafes && (
         <Menu
           id='bounty-payment'
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => {
-            onClick();
-            makePayment();
-            handleClose();
-          }}
-          >Metamask Wallet
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>Connected wallet</MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              onClick();
+              makePayment();
+              handleClose();
+            }}
+          >
+            {shortenHex(account ?? '')}
           </MenuItem>
-          {
-          safeInfos && (
-            <Divider />
-          )
-        }
+          <Divider />
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>Gnosis wallets</MenuItem>
           {
           safeInfos?.map(safeInfo => (
             <SafeMenuItem

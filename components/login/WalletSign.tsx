@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/system';
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -13,15 +13,26 @@ import { Web3Connection } from '../_app/Web3ConnectionManager';
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
   buttonStyle?: SxProps<Theme>;
+  ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
+  buttonOutlined?: boolean;
+  // If connecting a wallet, this component auto-triggers signing. Defaults to true
+  enableAutosign?: boolean;
 }
 
-export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
+export function WalletSign ({ signSuccess, buttonStyle, buttonSize, ButtonComponent = PrimaryButton, buttonOutlined, enableAutosign = true }: Props) {
 
-  const { account, sign, getStoredSignature, walletAuthSignature } = useWeb3AuthSig();
-  const { openWalletSelectorModal, triedEager, isWalletSelectorModalOpen } = useContext(Web3Connection);
+  const {
+    account,
+    sign,
+    isSigning,
+    walletAuthSignature,
+    verifiableWalletDetected,
+    connectWallet,
+    connectWalletModalIsOpen
+  } = useWeb3AuthSig();
+  const { isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
-  const [isSigning, setIsSigning] = useState(false);
 
   // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
   const userClickedConnect = useRef<boolean>(false);
@@ -33,47 +44,49 @@ export function WalletSign ({ signSuccess, buttonStyle, buttonSize }: Props) {
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && account && !lowerCaseEqual(getStoredSignature(account)?.address as string, account)) {
+    if (userClickedConnect.current && !isSigning && enableAutosign && verifiableWalletDetected) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
-  }, [account]);
+  }, [verifiableWalletDetected]);
 
   async function generateWalletAuth () {
-    if (isSigning) {
-      return;
-    }
-
-    setIsSigning(true);
 
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
 
       signSuccess(walletAuthSignature);
-      setIsSigning(false);
     }
     else {
-
       sign()
         .then(signSuccess)
         .catch(error => {
-          log.error('Error requesting wallet signature', error);
+          log.error('Error requesting wallet signature in login page', error);
           showMessage('Wallet signature failed', 'warning');
-        })
-        .finally(() => setIsSigning(false));
+        });
     }
   }
 
-  if (!account) {
+  if (!verifiableWalletDetected) {
     return (
-      <PrimaryButton data-test='connect-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} loading={!triedEager} onClick={openWalletSelectorModal}>
+      <ButtonComponent
+        data-test='connect-wallet-button'
+        sx={buttonStyle}
+        size={buttonSize ?? 'large'}
+        loading={connectWalletModalIsOpen}
+        onClick={() => {
+          userClickedConnect.current = true;
+          connectWallet();
+        }}
+        variant={buttonOutlined ? 'outlined' : undefined}
+      >
         Connect Wallet
-      </PrimaryButton>
+      </ButtonComponent>
     );
   }
 
   return (
-    <PrimaryButton data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning}>
+    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} loading={isSigning} variant={buttonOutlined ? 'outlined' : undefined}>
       Verify wallet
-    </PrimaryButton>
+    </ButtonComponent>
   );
 }

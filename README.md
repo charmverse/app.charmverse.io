@@ -60,8 +60,57 @@ For further information about environment variables in Next.js, see the [docs](h
 Until we have a decentralized solution, we currently use s3 to store images. You will need to add the following to your `.env.local` file:
 S3_UPLOAD_KEY=???
 S3_UPLOAD_SECRET=???
-S3_UPLOAD_BUCKET=charm.public.test
+S3_UPLOAD_BUCKET=charm.public.dev
 S3_UPLOAD_REGION=us-east-1
+
+
+### Access your local server via https
+You may want to access your local development server using https from another device (such as in the case of mobile testing).
+
+**Steps**
+
+1. Run the following command in your terminal to generate the certificate
+
+openssl req -x509 -out localhost.crt -keyout localhost.key \
+  -days 365 \
+  -newkey rsa:2048 -nodes -sha256 \
+  -subj '/CN=localhost' -extensions EXT -config <( \
+   printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+
+2. Create the extra certificates directory
+
+sudo mkdir /usr/local/share/ca-certificates/extra # see https://askubuntu.com/questions/73287/how-do-i-install-a-root-certificate for additional information
+
+> MacOS: You will need to manually create the share and ca-certificate directories first
+
+3. Copy the certificate to the directory
+
+sudo cp localhost.crt /usr/local/share/ca-certificates/extra/localhost.crt
+
+4. Update system certificates
+
+sudo update-ca-certificates
+
+> MacOS: You will need to use the Keychain app to manually add the certificate you created from the ca-certificates folder.
+
+5. Allow unsigned certificates
+
+NODETLSREJECT_UNAUTHORIZED=0 # this needs to be added to the .env file to ignore unsigned certificates on localhost (only include this on the development .env file, not production)
+
+6. Run the startup script
+
+```bash
+  # Starts NextJs server on port 8080, and makes it accessible via port 3000
+  $  npm run start:ssl
+```
+
+7. Access your device
+
+Find your local IP address on the network, and add the port and https prefix. For example
+
+https://192.168.1.2:3000
+
+You can now access your local dev server from another device on your network over HTTPS
 
 ### Third Party Dependencies
 
@@ -121,6 +170,22 @@ psql -h <host> -p 5432 -U <user> -d <database>
 SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at" DESC LIMIT 20;
 
 ```
+
+### Web Sockets
+Real-time features including the content editor for pages relies on a web socket service. It depends on socket.io.
+
+#### Development
+```
+# Running the standard dev command will serve web sockets as part of the Next.js process:
+npm start
+
+# Run as a separate process along with the Next.js app:
+npm run sockets
+
+# Run process on its own:
+npm run sockets:dev
+```
+
 
 ### Testing
 Testing for client-side and server-side code happens separately.

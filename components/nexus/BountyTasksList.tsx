@@ -1,7 +1,5 @@
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -18,6 +16,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 
+import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
 function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
@@ -113,12 +112,7 @@ function BountiesTasksList ({
 
   if (totalBounties === 0) {
     return (
-      <Card variant='outlined'>
-        <Box p={3} textAlign='center'>
-          <TaskOutlinedIcon />
-          <Typography color='secondary'>You don't have any bounties to review right now</Typography>
-        </Box>
-      </Card>
+      <EmptyTaskState taskType='bounties' />
     );
   }
 

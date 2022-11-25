@@ -91,7 +91,7 @@ export default function TasksPage () {
         <Grid item xs={12} sm={6}>
           <Box>
             <StyledTypography>
-              My tasks
+              My Tasks
             </StyledTypography>
           </Box>
         </Grid>

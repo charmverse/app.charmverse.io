@@ -14,17 +14,19 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
-import { getCookie, deleteCookie } from 'lib/utilities/browser';
+import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage () {
-  const { account, walletAuthSignature } = useWeb3AuthSig();
+  const { account, walletAuthSignature, verifiableWalletDetected, getStoredSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
   const { user, isLoaded, loginFromWeb3Account } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
+
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = Boolean(discordCookie);
@@ -35,12 +37,17 @@ export default function LoginPage () {
   const returnUrl = router.query.returnUrl as string | undefined;
 
   function redirectToDefaultPage () {
-    // send to signup for users without a workspace unless they are being redirected to an existing workspace
-    if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
+
+    // Send the user in priority to the invites page if they logged in looking to join a space
+    if (returnUrl?.match('join') || returnUrl?.match('invite')) {
+      log.info('Redirect user to given url');
+      router.push(returnUrl);
+    }
+    else if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
       // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
-      // TODO: Find a way to connect the state between hooks (wallet address and loaded user)
       log.info('Redirect user to signup');
       router.push('/signup');
+    // send to signup for users without a workspace unless they are being redirected to an existing workspace
     }
     else if (returnUrl) {
       log.info('Redirect user to given url');
@@ -53,11 +60,6 @@ export default function LoginPage () {
     }
   }
 
-  async function loginFromWeb3 () {
-    await loginFromWeb3Account();
-    redirectToDefaultPage();
-  }
-
   useEffect(() => {
     setTitleState('Welcome');
     if (discordCookie) {
@@ -68,26 +70,37 @@ export default function LoginPage () {
   useEffect(() => {
     if (isDataLoaded) {
       // redirect once user is logged in unless we are verifying their wallet
-      if (isLoggedIn && !walletNeedsVerification) {
+      if (isLoggedIn && (!walletNeedsVerification || !!user?.discordUser)) {
         redirectToDefaultPage();
-      }
-      else if (!isLoggedIn && walletIsVerified) {
-        loginFromWeb3();
       }
       else {
         setShowLogin(true);
       }
     }
-  }, [isDataLoaded, isLoggedIn, walletNeedsVerification]);
+  }, [isDataLoaded, isLoggedIn, walletNeedsVerification, user]);
 
-  if (!showLogin) {
+  const signature = getStoredSignature();
+
+  useEffect(() => {
+    if (verifiableWalletDetected && signature && !user) {
+      setLoggingIn(true);
+      loginFromWeb3Account(signature)
+        .finally(() => setLoggingIn(false));
+    }
+  }, [verifiableWalletDetected]);
+
+  if (!showLogin || loggingIn) {
     return null;
   }
 
   return (
     isLogInWithDiscord ? null : getLayout(
       <>
-        <LoginPageContent walletSigned={loginFromWeb3} />
+        <LoginPageContent walletSigned={(authSig) => {
+          // console.log('Received authSig', authSig);
+          loginFromWeb3Account(authSig);
+        }}
+        />
         <Footer />
       </>
     )

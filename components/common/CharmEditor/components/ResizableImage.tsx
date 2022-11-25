@@ -13,8 +13,9 @@ import { v4 } from 'uuid';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/image/constants';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
+import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyImageContainer = styled(Box)`
@@ -24,40 +25,6 @@ const StyledEmptyImageContainer = styled(Box)`
   align-items: center;
   opacity: 0.5;
 `;
-
-export const pasteImagePlugin = new Plugin({
-  props: {
-    handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-      // @ts-ignore
-      const contentRow = slice.content.content?.[0].content.content?.[0];
-
-      if ((contentRow?.text as string)?.startsWith('http')) {
-        const embedUrl = contentRow.text.split('.');
-        if (embedUrl[embedUrl.length - 1].match(/(jpeg|jpg|png|webp|gif)/)) {
-          insertImageNode(view.state, view.dispatch, view, { src: contentRow.text });
-          return true;
-        }
-        return false;
-      }
-      return false;
-    }
-  }
-});
-
-interface DispatchFn {
-  (tr: Transaction): void;
-}
-
-function insertImageNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
-  const type = state.schema.nodes.image;
-  const newTr = type.create(attrs);
-  const { tr } = view.state;
-  const cursorPosition = state.selection.$head.pos;
-  tr.insert(cursorPosition, newTr);
-  if (dispatch) {
-    dispatch(state.tr.replaceSelectionWith(newTr));
-  }
-}
 
 function EmptyImageContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
   const theme = useTheme();
@@ -101,7 +68,7 @@ const StyledImage = styled.img`
   }
 `;
 
-export function imageSpec (): RawSpecs {
+function imageSpec (): RawSpecs {
   return {
     type: 'node',
     name: 'image',
@@ -163,6 +130,7 @@ interface ResizableImageProps extends NodeViewProps {
 function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {
 
   const imageSource = node.attrs.src;
+  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
 
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -183,7 +151,7 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
     else {
       return (
         <ImageSelector
-          autoOpen={true}
+          autoOpen={autoOpen}
           onImageSelect={async (imageSrc) => {
             // const image = await imagePromise(imageSrc);
             updateAttrs({
@@ -268,6 +236,13 @@ function ResizableImage ({ readOnly = false, onResizeStop, node, updateAttrs, se
       </Resizable>
     );
   }
+}
+
+export function spec () {
+  // this is a dummy marker to let us know to show the image selector
+  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image' });
+  tooltipSpec.schema.inclusive = false;
+  return [tooltipSpec, imageSpec()];
 }
 
 export default memo(ResizableImage);

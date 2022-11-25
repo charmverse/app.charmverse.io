@@ -43,7 +43,7 @@ export default function SpacePermissions ({ targetGroup, id, callback = () => nu
 
   const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
   // custom onChange is used for switches so isDirty from useForm doesn't change it value

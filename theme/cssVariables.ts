@@ -2,9 +2,16 @@ import { css } from '@emotion/react';
 
 import * as colors from './colors';
 
+function rgbFromHex (hex: string) {
+  return hex.replace('#', '').split(/(..)/).filter(c => c).map(c => parseInt(c, 16));
+}
+
 const globalCSS = css`
+
   :root {
-    ${Object.entries(colors.lightModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
+    ${Object.entries(colors.lightModeColors).map(([key, value]) => `
+      --bg-${key}: ${value};
+      --bg-${key}-rgb: ${rgbFromHex(value)};`)}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
     --input-border-hover: #37352f;

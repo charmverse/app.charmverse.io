@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: ['**']
 
 jobs:
   test:
@@ -29,7 +29,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install dependencies and build app
         uses: ./.github/actions/install
@@ -72,6 +72,14 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        env:
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
+          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
+
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -79,11 +87,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
-
-      - name: Configure env_var to prod settings
-        run: |
-          sed -i 's/staging/prod/g' .ebextensions/00_env_vars.config
-          sed -i 's/stg/prd/g' .ebextensions/00_env_vars.config
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -100,8 +103,10 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_cron/00_env_vars.config
 
-            cat .ebextensions/00_env_vars.config
-            cat .ebextensions_cron/00_env_vars.config
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_websockets/00_env_vars.config
 
       - name: Package Webapp
         run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
@@ -110,6 +115,11 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+
+      - name: Update and Package websockets
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
@@ -134,5 +144,18 @@ jobs:
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deploy_cron.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Deploy Websockets to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: prd-charmverse-websockets
+          environment_name: prd-charmverse-websockets
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes

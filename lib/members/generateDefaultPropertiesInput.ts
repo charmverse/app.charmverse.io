@@ -1,31 +1,15 @@
-import type { MemberPropertyType } from '@prisma/client';
-
-import { DEFAULT_MEMBER_PROPERTIES, MEMBER_PROPERTY_LABELS } from 'lib/members/constants';
-
-const DEFAULT_CUSTOM_PROPERTIES: { name: string, type: MemberPropertyType }[] = [
-  { name: 'Bio', type: 'text_multiline' }
-];
+import { DEFAULT_MEMBER_PROPERTIES, HIDDEN_MEMBER_PROPERTIES, MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
 export function generateDefaultPropertiesInput ({ userId, spaceId }: { userId: string, spaceId: string }) {
-  const defaultPropertiesInput = [...DEFAULT_MEMBER_PROPERTIES].sort().map((memberProperty, memberPropertyIndex) => ({
+  const defaultPropertiesInput = DEFAULT_MEMBER_PROPERTIES.map((memberProperty, memberPropertyIndex) => ({
     createdBy: userId,
-    name: MEMBER_PROPERTY_LABELS[memberProperty],
+    name: MEMBER_PROPERTY_CONFIG[memberProperty].label,
     index: memberPropertyIndex,
-    type: (memberProperty as MemberPropertyType),
+    type: memberProperty,
     updatedBy: userId,
-    spaceId
+    spaceId,
+    enabledViews: HIDDEN_MEMBER_PROPERTIES.includes(memberProperty) ? [] : undefined
   }));
-
-  DEFAULT_CUSTOM_PROPERTIES.forEach((customMemberProperty, customMemberPropertyIndex) => {
-    defaultPropertiesInput.push({
-      createdBy: userId,
-      name: customMemberProperty.name,
-      type: customMemberProperty.type,
-      index: customMemberPropertyIndex,
-      updatedBy: userId,
-      spaceId
-    });
-  });
 
   return defaultPropertiesInput;
 }

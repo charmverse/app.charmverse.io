@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItem } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo, forwardRef } from 'react';
@@ -13,9 +13,12 @@ const StyledBlockAligner = styled.div`
   position: relative;
   max-width: 100%;
   text-align: center;
-  &:hover .controls {
-    opacity: 1;
-    transition: opacity 250ms ease-in-out;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover .controls {
+      opacity: 1;
+      transition: opacity 250ms ease-in-out;
+    }
   }
 `;
 
@@ -49,7 +52,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
             backgroundColor: 'inherit'
           }}
         >
-          <DeleteIcon sx={{ fontSize: 14 }} />
+          <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
         </ListItem>
       </Controls>
     </StyledBlockAligner>

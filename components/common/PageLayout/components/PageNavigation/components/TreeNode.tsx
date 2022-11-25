@@ -1,5 +1,6 @@
 
 import { useTreeItem } from '@mui/lab/TreeItem';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useCallback, useRef, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
@@ -8,6 +9,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
+import { mergeRefs } from 'lib/utilities/react';
 import type { Page } from 'models';
 import { greyColor2 } from 'theme/colors';
 
@@ -28,9 +30,10 @@ type NodeProps = {
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   selectedNodeId: string | null;
+  onClick?: () => void;
 }
 
-function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
+function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, onClick, pathPrefix, addPage, deletePage, selectedNodeId }: NodeProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isAdjacent, isAdjacentRef, setIsAdjacent] = useRefState(false);
   const [{ handlerId }, drag, dragPreview] = useDrag(() => ({
@@ -148,6 +151,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
       isEmptyContent={item.isEmptyContent}
       labelIcon={item.icon || undefined}
       pageType={item.type as 'page'}
+      onClick={onClick}
     >
       {hideChildren
         ? <div>{/* empty div to trick TreeView into showing expand icon */}</div>
@@ -161,13 +165,14 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
                   label={view.title}
                   nodeId={view.id}
                   viewType={view.fields.viewType}
+                  onClick={onClick}
                 />
               )
             ))
           ) : (
             item.children.length > 0
               ? item.children.map((childItem) => (
-              // eslint-disable-next-line no-use-before-define
+                // eslint-disable-next-line no-use-before-define
                 <MemoizedTreeNode
                   onDropAdjacent={onDropAdjacent}
                   onDropChild={onDropChild}
@@ -177,6 +182,7 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
                   addPage={addPage}
                   selectedNodeId={selectedNodeId}
                   deletePage={deletePage}
+                  onClick={onClick}
                 />
               ))
               : (
@@ -188,20 +194,6 @@ function DraggableTreeNode ({ item, onDropAdjacent, onDropChild, pathPrefix, add
         )}
     </PageTreeItem>
   );
-}
-
-// pulled from react-merge-refs
-function mergeRefs (refs: any) {
-  return (value: any) => {
-    refs.forEach((ref: any) => {
-      if (typeof ref === 'function') {
-        ref(value);
-      }
-      else if (ref != null) {
-        ref.current = value;
-      }
-    });
-  };
 }
 
 const MemoizedTreeNode = memo(DraggableTreeNode);

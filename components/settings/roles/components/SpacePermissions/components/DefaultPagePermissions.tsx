@@ -13,6 +13,7 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import type { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 
@@ -26,7 +27,8 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, strin
 
 export default function DefaultSpacePagePermissions () {
 
-  const [space, setSpace] = useCurrentSpace();
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
@@ -113,6 +115,7 @@ export default function DefaultSpacePagePermissions () {
 
               return (
                 <MenuItem
+                  key={permissionLevel}
                   selected={isSelected}
                   onClick={() => {
                     setSelectedPagePermission(permissionLevel);

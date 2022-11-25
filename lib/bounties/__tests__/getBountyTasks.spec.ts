@@ -6,7 +6,7 @@ import { generateUserAndSpaceWithApiToken, generateBounty } from 'testing/setupD
 import { getBountyTasks } from '../getBountyTasks';
 
 describe('getBountyTasks', () => {
-  it('Should only return one bounty with no action', async () => {
+  it('Should not return any task when there is no action', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const inProgressBounty = await generateBounty({
@@ -36,13 +36,7 @@ describe('getBountyTasks', () => {
 
     const bountyTasks = await getBountyTasks(user.id);
 
-    expect(bountyTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: inProgressBounty.status,
-        action: null,
-        id: `${inProgressBounty.id}.${application.id}.null`
-      })
-    ]));
+    expect(bountyTasks.unmarked).toEqual([]);
 
   });
 

@@ -2,12 +2,12 @@ import styled from '@emotion/styled';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import KeyIcon from '@mui/icons-material/Key';
 import { Box, Divider, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
 import Link from 'next/link';
 
 import Avatar from 'components/common/Avatar';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 const TasksPageHeaderContainer = styled.div`
   display: flex;
@@ -27,8 +27,8 @@ const TasksPageHeaderContainer = styled.div`
 
 export default function TasksPageHeader () {
   const { user } = useUser();
-  const { account, active } = useWeb3React();
-  const metamaskConnected = account && active;
+  const { account } = useWeb3AuthSig();
+  const metamaskConnected = !!account;
   const discordConnected = user?.discordUser;
   const telegramConnected = user?.telegramUser;
   const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);
@@ -141,7 +141,7 @@ export default function TasksPageHeader () {
                       }
                     }}
                   >
-                    Multisig accounts
+                    Multisig Accounts
                   </Typography>
                 </Box>
               </Box>

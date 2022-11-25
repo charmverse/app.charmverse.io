@@ -107,25 +107,27 @@ export async function getBountyTasks (userId: string): Promise<{
           isReviewer
         });
 
-        const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
+        if (action) {
+          const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
 
-        const bountyTask = {
-          id: bountyTaskId,
-          eventDate: application.updatedAt,
-          pageId: page.id,
-          pagePath: page.path,
-          pageTitle: page.title,
-          spaceDomain: page.space.domain,
-          spaceName: page.space.name,
-          status: bounty.status,
-          action
-        };
+          const bountyTask = {
+            id: bountyTaskId,
+            eventDate: application.updatedAt,
+            pageId: page.id,
+            pagePath: page.path,
+            pageTitle: page.title,
+            spaceDomain: page.space.domain,
+            spaceName: page.space.name,
+            status: bounty.status,
+            action
+          };
 
-        if (!userNotificationIds.has(bountyTaskId)) {
-          bountyRecord.unmarked.push(bountyTask);
-        }
-        else {
-          bountyRecord.marked.push(bountyTask);
+          if (!userNotificationIds.has(bountyTaskId)) {
+            bountyRecord.unmarked.push(bountyTask);
+          }
+          else {
+            bountyRecord.marked.push(bountyTask);
+          }
         }
       });
     }

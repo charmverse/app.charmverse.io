@@ -1,5 +1,5 @@
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { IconButton } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
@@ -93,7 +93,7 @@ export default function InputGeneratorText ({ onChange, title = 'Options', minim
             {
               keys.length > 1 && (
                 <IconButton size='small' onClick={() => removeRow(key)}>
-                  <DeleteIcon />
+                  <DeleteOutlinedIcon />
                 </IconButton>
               )
             }

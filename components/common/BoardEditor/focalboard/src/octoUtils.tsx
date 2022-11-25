@@ -27,9 +27,7 @@ class OctoUtils {
         // The property value is the id of the template
         if (propertyValue) {
           const option = propertyTemplate.options.find((o) => o.id === propertyValue);
-          if (!option) {
-            Utils.assertFailure(`Invalid select option ID ${propertyValue}, block.title: ${block.title}`);
-          }
+
           displayValue = option?.value || '(Unknown)';
         }
         break;
@@ -37,9 +35,6 @@ class OctoUtils {
       case 'multiSelect': {
         if (propertyValue?.length) {
           const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
-          if (!options.length) {
-            Utils.assertFailure(`Invalid multiSelect option IDs ${propertyValue}, block.title: ${block.title}`);
-          }
           displayValue = options.map((o) => o.value);
         }
         break;

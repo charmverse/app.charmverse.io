@@ -6,6 +6,7 @@ import type { GnosisPaymentProps } from 'hooks/useGnosisPayment';
 import { useGnosisPayment } from 'hooks/useGnosisPayment';
 
 export interface MultiPaymentResult {
+  safeAddress: string;
   transactions: (MetaTransactionData & { applicationId: string })[];
   txHash: string;
 }

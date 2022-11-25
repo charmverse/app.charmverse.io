@@ -8,10 +8,8 @@ import { useEffect, useState } from 'react';
 import { getKey } from 'hooks/useLocalStorage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 
 // Pages shared to the public that don't require user login
 const publicPages = ['/', 'share', 'api-docs', 'u'];
@@ -20,12 +18,10 @@ const accountPages = ['profile'];
 export default function RouteGuard ({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
-  const { account, walletAuthSignature, triedEager } = useWeb3AuthSig();
   const { user, setUser, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isWalletLoading = (!triedEager && !account);
   const isRouterLoading = !router.isReady;
-  const isLoading = !isLoaded || isWalletLoading || isRouterLoading || !isSpacesLoaded;
+  const isLoading = !isLoaded || isRouterLoading || !isSpacesLoaded;
 
   if (typeof window !== 'undefined') {
     const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
@@ -83,7 +79,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       router.events.off('routeChangeStart', hideContent);
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, account, walletAuthSignature, user, spaces]);
+  }, [isLoading, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
   async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
@@ -111,18 +107,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           query: { returnUrl: router.asPath }
         }
       };
-    }
-    // condition: account but no valid wallet signature
-    else if (account && !lowerCaseEqual(walletAuthSignature?.address as string, account)) {
-      log.info('[RouteGuard]: redirect to verify wallet');
-      return {
-        authorized: true,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
-
     }
     // condition: user accesses account pages (profile, tasks)
     else if (accountPages.some(basePath => firstPathSegment === basePath)) {

@@ -1,7 +1,7 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import type { MemberPropertyPermission } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +10,8 @@ import Button from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
+
+import { MemberPropertyVisibility } from './MemberPropertyVisibility';
 
 type Props = {
   property: MemberPropertyWithPermissions;
@@ -43,49 +45,57 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
     <>
       <Collapse in={isExpanded}>
         <Stack mb={1}>
-          {property?.permissions.length ? (
-            <Stack>
-              <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                <Typography variant='overline' pl={4}>Restricted to roles:</Typography>
+          <Stack>
+            <Box pl={4}>
+              <MemberPropertyVisibility
+                property={property}
+              />
+            </Box>
+            {property?.permissions.length ? (
+              <Stack>
+                <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
+                  <Typography pl={4} variant='overline'>Restricted to roles:</Typography>
+                </Tooltip>
+                {property?.permissions.map(permission => (
+                  <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+                    <MenuItem
+                      dense
+                      sx={{
+                        pl: 4,
+                        alignItems: 'center',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        '&:hover .icons': {
+                          opacity: 1
+                        },
+                        flex: 1,
+                        '& .MuiListItemIcon-root': {
+                          minWidth: 30
+                        }
+                      }}
+                    >
+                      <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                      {!readOnly && (
+                        <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
+                          <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
+                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
+                          </Tooltip>
+                        </IconButton>
+                      )}
+                    </MenuItem>
+                  </Stack>
+                ))}
+              </Stack>
+            ) : (
+              <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
+                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                  Everyone in workspace
+                  <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
+                </Typography>
               </Tooltip>
-              {property?.permissions.map(permission => (
-                <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
-                  <MenuItem
-                    dense
-                    sx={{
-                      pl: 4,
-                      alignItems: 'center',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      '&:hover .icons': {
-                        opacity: 1
-                      },
-                      flex: 1,
-                      '& .MuiListItemIcon-root': {
-                        minWidth: 30
-                      }
-                    }}
-                  >
-                    <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                    {!readOnly && (
-                      <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
-                        <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                          <DeleteIcon fontSize='small' onClick={() => removePermission(permission)} />
-                        </Tooltip>
-                      </IconButton>
-                    )}
-                  </MenuItem>
-                </Stack>
-              ))}
-            </Stack>
-          ) : (
-            <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
-              <Typography variant='overline' alignItems='center' display='flex' pl={4}>
-                Everyone in workspace
-                <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
-              </Typography>
-            </Tooltip>
-          )}
+            )}
+          </Stack>
+
           {!readOnly && (
             <Button
               variant='text'
@@ -109,7 +119,7 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
       <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
         <Stack gap={0.5}>
 
-          <InputLabel>Roles</InputLabel>
+          <InputLabel>Role</InputLabel>
           <InputSearchRoleMultiple
             onChange={setSelectedRoleIds}
             filter={{

@@ -60,7 +60,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     userId
   });
 
-  const updateContent = req.body as Page ?? {};
+  const updateContent = req.body as Partial<Page> ?? {};
   if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
@@ -117,22 +117,21 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   const pageWithPermission = await updatePage(page, userId, req.body);
 
+  const { content, contentText, ...updatedPageMeta } = updateContent;
+
+  // Update page track profile and meta data state, unless it was content update
+  if (!('content' in updateContent)) {
+    updateTrackPageProfile(pageWithPermission.id);
+    relay.broadcast({
+      type: 'pages_meta_updated',
+      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+    }, page.spaceId);
+  }
+
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
     return res.status(200).json(updatedPage);
   }
-
-  // Update page track profile, unless it was content update
-  if (!('content' in updateContent)) {
-    updateTrackPageProfile(pageWithPermission.id);
-  }
-
-  const { content, contentText, ...updatedPageMeta } = req.body as Page;
-
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: [{ ...updatedPageMeta, id: pageId }]
-  }, page.spaceId);
 
   return res.status(200).json(pageWithPermission);
 }
@@ -174,7 +173,7 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
     relay.broadcast({
       type: 'pages_deleted',
       payload: modifiedChildPageIds.map(id => ({ id }))
-    }, pageToDelete?.spaceId as string);
+    }, pageToDelete.spaceId);
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });

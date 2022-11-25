@@ -39,7 +39,7 @@ const WorkspacesContainer = styled.div`
 `;
 
 export default function Workspaces () {
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { spaces, createNewSpace, isCreatingSpace } = useSpaces();
   const [spaceFormOpen, setSpaceFormOpen] = useState(false);
   const { user } = useUser();

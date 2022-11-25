@@ -1,14 +1,13 @@
 import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { RateReviewOutlined } from '@mui/icons-material';
 import reactDOM from 'react-dom';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';
-import { trackPlugin } from './statePlugins/track';
 
 export interface SuggestionPluginState {
   tooltipContentDOM: HTMLElement;
@@ -17,13 +16,12 @@ export interface SuggestionPluginState {
   rowPos?: number;
 }
 
-export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
-    { onSelectionSet?: (state: EditorState) => void, readOnly: boolean, key: PluginKey, userId: string, username: string }) {
+export function plugins ({ onSelectionSet, key }:
+    { onSelectionSet?: (state: EditorState) => void, key: PluginKey }) {
 
   const tooltipDOMSpec = createTooltipDOM();
 
   return [
-    trackPlugin({ userId, username }),
     // this plugin emits the changes/new state from the origianl trackPlugin, which allows the sidebar to update
     new Plugin({
       state: {

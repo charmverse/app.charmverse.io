@@ -1,4 +1,5 @@
-import type { Page, Prisma } from '@prisma/client';
+
+import type { Page, Prisma, SpaceRoleToRole } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
@@ -6,7 +7,7 @@ import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { IPageWithPermissions } from '../interfaces';
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>
-type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText'>, true>;
+type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version'>, true>;
 
 type PagesRequest = {
   spaceId: string;
@@ -209,7 +210,78 @@ export function generateAccessiblePagesQuery (input: PagesRequest): Prisma.PageF
 
 export async function getAccessiblePages (input: PagesRequest): Promise<IPageWithPermissions[]> {
 
-  return prisma.page.findMany(
-    generateAccessiblePagesQuery(input)
-  ) as any as Promise<IPageWithPermissions[]>;
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      userId: input.userId,
+      spaceId: input.spaceId
+    }
+  });
+
+  // Not a space member, make userId undefined
+  if (!spaceRole) {
+    input.userId = undefined;
+  }
+
+  const availableRoles: { id: string, spaceRolesToRole: SpaceRoleToRole[] }[] = input.userId && spaceRole ? await prisma.role.findMany({
+    where: {
+      spaceId: input.spaceId,
+      spaceRolesToRole: {
+        some: {
+          spaceRole: {
+            userId: input.userId
+          }
+        }
+      }
+    },
+    select: {
+      id: true,
+      spaceRolesToRole: true
+    }
+  }) : [];
+
+  const formattedSearch = input.search ? `${input.search.split(/\s/).filter(s => s).join(' & ')}:*` : undefined;
+
+  const searchQuery = input.search ? {
+    title: { search: formattedSearch },
+    contentText: { search: formattedSearch }
+  } : {};
+
+  const pages = await prisma.page.findMany({
+    where: {
+      spaceId: input.spaceId,
+      deletedAt: input.archived ? { not: null } : null,
+      ...searchQuery
+    },
+    ...selectPageFields(input.meta || false)
+  } as any) as IPageWithPermissions[];
+
+  if (spaceRole?.isAdmin) {
+    return pages as IPageWithPermissions[];
+  }
+
+  const filteredPages = pages.filter(page => {
+
+    if (spaceRole && page.type === 'proposal_template') {
+      return true;
+    }
+
+    return page.permissions.some(permission => {
+
+      if (permission.public) {
+        return true;
+      }
+      else if (input.userId) {
+        return (permission.userId === input.userId)
+      || (permission.roleId
+        && spaceRole
+        && availableRoles.some(r => r.spaceRolesToRole.some(s => s.spaceRoleId === spaceRole.id && r.id === permission.roleId)))
+      || (permission.spaceId === input.spaceId);
+      }
+      else {
+        return false;
+      }
+    });
+  });
+
+  return filteredPages as IPageWithPermissions[];
 }

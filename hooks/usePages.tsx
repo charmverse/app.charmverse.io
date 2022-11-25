@@ -2,7 +2,7 @@ import type { Page, Role } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWR, { mutate } from 'swr';
 
@@ -10,16 +10,16 @@ import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import type { Block } from 'lib/focalboard/block';
 import type { PageMeta, PagesMap, PageUpdates } from 'lib/pages';
+import { untitledPage } from 'lib/pages/untitledPage';
 import type { IPagePermissionFlags, PageOperationType } from 'lib/permissions/pages';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { permissionTemplates } from 'lib/permissions/pages/page-permission-mapping';
-import type { WebsocketPayload } from 'lib/websockets/interfaces';
-import { untitledPage } from 'seedData';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import useIsAdmin from './useIsAdmin';
-import { useWebSocketClient } from './useSocketClient';
 import { useUser } from './useUser';
+import { useWebSocketClient } from './useWebSocketClient';
 
 export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
 
@@ -35,7 +35,7 @@ export type PagesContext = {
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string, board?: Block }) => Promise<void>;
+  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
@@ -59,14 +59,14 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 
 export function PagesProvider ({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const [currentPageId, setCurrentPageId] = useState<string>('');
+  const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
 
   const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
-
     if (!currentSpace) {
       return {};
     }
@@ -94,7 +94,6 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
-
   /**
    * Will return permissions for the currently connected user
    * @param pageId
@@ -177,6 +176,8 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
         }
         return { ..._pages };
       });
+
+      return newPage;
     }
   }
 
@@ -200,9 +201,9 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }, { revalidate });
   }, [mutate]);
 
-  const updatePage = useCallback(async (updates: PageUpdates, revalidateCache = false) => {
+  const updatePage = useCallback(async (updates: PageUpdates) => {
+
     const updatedPage = await charmClient.pages.updatePage(updates);
-    mutatePage(updatedPage, revalidateCache);
 
     return updatedPage;
   }, [mutatePage]);
@@ -214,50 +215,54 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
-  const handlePagesUpdate = useCallback((value: WebsocketPayload<'pages_meta_updated'>) => {
-    const pagesToUpdate = value.reduce((pageMap, updatedPageMeta) => {
-
-      const existingPage = pages[updatedPageMeta.id];
-
-      if (existingPage && updatedPageMeta.spaceId === currentSpace?.id) {
-        pageMap[updatedPageMeta.id] = {
-          ...existingPage,
-          ...updatedPageMeta
-        };
-      }
-
-      return pageMap;
-
-    }, {} as PagesMap);
+  const handleUpdateEvent = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
 
     mutatePagesList(existingPages => {
+      const _existingPages = existingPages || {};
+      const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
+
+        const existingPage = _existingPages[updatedPageMeta.id];
+
+        if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
+          pageMap[updatedPageMeta.id] = {
+            ...existingPage,
+            ...updatedPageMeta
+          };
+        }
+
+        return pageMap;
+
+      }, {});
+
       return {
-        ...(existingPages ?? {}),
+        ..._existingPages,
         ...pagesToUpdate
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
-  const handleNewPages = useCallback((value: WebsocketPayload<'pages_created'>) => {
+  const handleNewPageEvent = useCallback((value: WebSocketPayload<'pages_created'>) => {
 
-    const newPages = value.reduce((pageMap, page) => {
-      if (page.spaceId === currentSpace?.id) {
+    const newPages = value.reduce<PagesMap>((pageMap, page) => {
+      if (page.spaceId === currentSpaceId.current) {
         pageMap[page.id] = page;
       }
-
       return pageMap;
-
-    }, {} as PagesMap);
+    }, {});
 
     mutatePagesList(existingPages => {
       return {
         ...(existingPages ?? {}),
         ...newPages
       };
+    }, {
+      revalidate: false
     });
   }, []);
 
-  const handlePageDeletes = useCallback((value: WebsocketPayload<'pages_deleted'>) => {
+  const handleDeleteEvent = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
 
     mutatePagesList(existingPages => {
 
@@ -268,13 +273,15 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       });
 
       return newValue;
+    }, {
+      revalidate: false
     });
   }, []);
 
   useEffect(() => {
-    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handlePagesUpdate);
-    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPages);
-    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handlePageDeletes);
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromNewPages = subscribe('pages_created', handleNewPageEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
@@ -282,6 +289,10 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       unsubscribeFromPageDeletes();
     };
   }, []);
+
+  useEffect(() => {
+    currentSpaceId.current = currentSpace?.id;
+  }, [currentSpace]);
 
   const value: PagesContext = useMemo(() => ({
     currentPageId,

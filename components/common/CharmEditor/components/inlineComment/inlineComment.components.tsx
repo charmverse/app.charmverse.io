@@ -13,7 +13,7 @@ import { useInlineComment } from 'hooks/useInlineComment';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 import type { PageContent } from 'models';
 
@@ -70,7 +70,7 @@ export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginK
           <Box display='flex' flexDirection='column' gap={1}>
 
             {unResolvedThreads.map(resolvedThread => (
-              <ThreadContainer elevation={4}>
+              <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
               </ThreadContainer>
             ))}

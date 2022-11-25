@@ -1,11 +1,10 @@
 /* eslint-disable default-param-last */
 import charmClient from 'charmClient';
 import type { PageMeta } from 'lib/pages';
-import type { Page, PageContent } from 'models';
+import type { PageContent } from 'models';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import { BlockIcons } from './blockIcons';
 import type { Block, BlockPatch } from './blocks/block';
 import { createPatchesFromBlocks } from './blocks/block';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
@@ -17,9 +16,7 @@ import { createCard } from './blocks/card';
 import type { FilterGroup } from './blocks/filterGroup';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
-import store from './store';
 import undoManager from './undomanager';
-import { UserSettings } from './userSettings';
 import { IDType, Utils } from './utils';
 
 export interface BlockChange {
@@ -445,6 +442,15 @@ class Mutator {
     const newOption = newTemplate.options.find((o) => o.id === option.id)!;
     newOption.color = color;
     await this.updateBlock(newBoard, board, 'change option color');
+  }
+
+  async changePropertyOption (board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
+    const newBoard = createBoard({ block: board });
+    const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!;
+    const newOption = newTemplate.options.find((o) => o.id === updatedOption.id)!;
+    newOption.color = updatedOption.color;
+    newOption.value = updatedOption.value;
+    await this.updateBlock(newBoard, board, 'change property option');
   }
 
   changePropertyValue (card: Card, propertyId: string, value?: string | string[], description = 'change property', mutate = true) {

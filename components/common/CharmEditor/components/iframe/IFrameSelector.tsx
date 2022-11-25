@@ -5,12 +5,14 @@ import { useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
+import type { LinkType } from 'lib/embed/extractEmbedLink';
 
-interface IFrameSelectorProps {
+export interface IFrameSelectorProps {
+  autoOpen?: boolean;
   onIFrameSelect: (videoSrc: string) => void;
   children: ReactNode;
   tabs?: [string, ReactNode][];
-  type: 'embed' | 'video';
+  type: LinkType;
 }
 
 export default function IFrameSelector (props: IFrameSelectorProps) {
@@ -19,7 +21,7 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
 
   return (
     <PopperPopup
-      autoOpen
+      autoOpen={props.autoOpen}
       popupContent={(
         <Box sx={{
           width: 750
@@ -29,12 +31,14 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
             ...tabs,
             [
               'Link',
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                alignItems: 'center'
-              }}
+              <Box
+                key='link'
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  alignItems: 'center'
+                }}
               >
                 <TextField
                   autoFocus
@@ -52,7 +56,21 @@ export default function IFrameSelector (props: IFrameSelectorProps) {
                     setEmbedLink('');
                   }}
                 >
-                  {type === 'embed' ? 'Embed link' : 'Insert Video'}
+
+                  {(() => {
+                    switch (type) {
+                      case 'embed':
+                        return 'Embed Link';
+                      case 'video':
+                        return 'Insert Video';
+                      case 'figma':
+                        return 'Insert Figma';
+
+                      default:
+                        return null;
+                    }
+                  })()}
+
                 </Button>
               </Box>
             ]

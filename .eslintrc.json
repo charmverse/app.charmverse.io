@@ -27,6 +27,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/jsx-key": "error",
     "react/forbid-prop-types": 0,
     "@next/next/no-img-element": "off",
     "@typescript-eslint/array-type": "error",
@@ -184,6 +185,7 @@
       "error",
       "always"
     ],
+    "prefer-spread": "off",
     "no-bitwise": "warn",
     "no-undef": "off",
     "jsx-a11y/alt-text": "off",

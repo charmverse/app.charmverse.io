@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { useWeb3React } from '@web3-react/core';
 import { getChainById } from 'connectors';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
@@ -17,7 +16,9 @@ import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PageMeta } from 'lib/pages';
 import { generateMarkdown } from 'lib/pages/generateMarkdown';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingModeType, SnapshotVotingStrategy } from 'lib/snapshot';
@@ -45,9 +46,9 @@ const MIN_VOTING_OPTIONS = 2;
 
 export default function PublishingForm ({ onSubmit, page }: Props) {
 
-  const { account, library } = useWeb3React();
+  const { account, library } = useWeb3AuthSig();
 
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
@@ -68,6 +69,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   const [publishing, setPublishing] = useState(false);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     if (!snapshotBlockNumber) {
@@ -125,7 +127,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         new SystemError({
           errorType: 'Data not found',
           severity: 'warning',
-          message: 'This space must be connected to Snapshot.org before you can export proposals there.'
+          message: 'This space must be connected to Snapshot.org before you can export proposals to it. Only workspace admins can connect Snapshot to this Workspace.'
         })
       );
     }
@@ -252,10 +254,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
               <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
             </Box>
             {
-          !snapshotSpace && (
-            <ConnectSnapshot />
-          )
-        }
+              !snapshotSpace && isAdmin && (
+                <ConnectSnapshot />
+              )
+            }
           </>
         )
 

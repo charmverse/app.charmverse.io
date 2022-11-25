@@ -14,7 +14,7 @@ type IContext = {
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   setIsLoaded: (isLoaded: boolean) => void;
-  loginFromWeb3Account: () => Promise<LoggedInUser>;
+  loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
   refreshUserWithWeb3Account: () => Promise<void>;
 };
 
@@ -29,47 +29,40 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature } = useWeb3AuthSig();
+  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook, verifiableWalletDetected } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
-  const [isLoaded, setIsLoaded] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  async function loginFromWeb3Account () {
+  async function loginFromWeb3Account (authSig?: AuthSig) {
 
-    if (!account) {
+    if (!verifiableWalletDetected && !authSig) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = getStoredSignature(account) as AuthSig;
+    let signature = authSig ?? getStoredSignature() as AuthSig;
 
-    if (!signature || !lowerCaseEqual(signature?.address, account)) {
+    if (!signature || !lowerCaseEqual(signature?.address, signature.address) || !signature.address) {
       signature = await sign();
     }
 
     try {
       // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-      const refreshedProfile = await charmClient.login({ address: account, walletSignature: signature });
+      const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
 
       setUser(refreshedProfile);
 
       return refreshedProfile;
     }
     catch (err) {
-      const newProfile = await charmClient.createUser({ address: account as string, walletSignature: signature });
+      const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }
   }
 
-  function getCharmUser () {
-    setIsLoaded(false);
-    // try retrieving the user from session
-    charmClient.getUser()
-      .then(_user => {
-        setUser(_user);
-      })
-      .finally(() => {
-        setIsLoaded(true);
-      });
+  async function logoutUser () {
+    await charmClient.logout();
+    setUser(null);
   }
 
   /**
@@ -77,38 +70,61 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    *
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
-  async function refreshUserWithWeb3Account (address: string) {
-    // a hack for now to support users that are trying to log in thru discord
-    if (user && !user?.wallets.some(w => lowerCaseEqual(w.address, address))) {
-      await charmClient.logout();
-      setUser(null);
+  async function refreshUserWithWeb3Account () {
+
+    const signature = getStoredSignature();
+
+    // Support the initial load
+    if (!isLoaded
+      // Account is only ever visible if it belongs to the current user
+      || account
+      // If the user is connected with a Discord account, we can ignore changes
+      || user?.discordUser
+      // If the web3 wallet is locked, don't log out the user
+      || (!verifiableWalletDetected && user)) {
+      charmClient.getUser()
+        .then(_user => {
+          setUser(_user);
+        })
+        .finally(() => {
+          setIsLoaded(true);
+        });
+      // a hack for now to support users that are trying to log in thru discord
+    }
+    else if (verifiableWalletDetected && signature) {
+      loginFromWeb3Account(signature)
+        .then(loggedInUser => setUser(loggedInUser))
+        .catch(logoutUser);
     }
     else {
-      getCharmUser();
+      logoutUser();
     }
   }
 
   useEffect(() => {
-    if (account) {
-      refreshUserWithWeb3Account(account);
-    }
-    else {
-      getCharmUser();
-    }
+    refreshUserWithWeb3Account();
+
   }, [account]);
 
   const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {
     setUser(u => u ? { ...u, ...updatedUser } : null);
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    setUser,
-    isLoaded,
-    setIsLoaded,
-    updateUser,
-    loginFromWeb3Account,
-    refreshUserWithWeb3Account }) as IContext, [user, isLoaded]);
+  useEffect(() => {
+    setLoggedInUserForWeb3Hook(user);
+  }, [user]);
+
+  const value = useMemo<IContext>(() => {
+
+    return {
+      user,
+      setUser,
+      isLoaded,
+      setIsLoaded,
+      updateUser,
+      loginFromWeb3Account,
+      refreshUserWithWeb3Account };
+  }, [user, isLoaded]);
 
   return (
     <UserContext.Provider value={value}>

@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -10,7 +11,9 @@ import charmClient from 'charmClient';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -36,9 +39,11 @@ const DEFAULT_VOTING_DURATION = 7;
 
 export default function ConnectSnapshot () {
 
-  const [space, setSpace] = useCurrentSpace();
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
   const [formError, setFormError] = useState<SystemError | null>(null);
   const [touched, setTouched] = useState<boolean>(false);
+  const isAdmin = useIsAdmin();
 
   const {
     register,
@@ -55,6 +60,8 @@ export default function ConnectSnapshot () {
   });
 
   const values = watch();
+
+  const snapshotDomainUnchanged = space?.snapshotDomain === values.snapshotDomain;
 
   async function onSubmit (formValues: FormValues) {
 
@@ -73,19 +80,28 @@ export default function ConnectSnapshot () {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+
       <Grid container direction='column' spacing={3}>
         <Grid item>
           <FieldLabel>Snapshot domain</FieldLabel>
-          <TextField
-            {...register('snapshotDomain', {
-              onChange: () => {
-                setTouched(true);
-              }
-            })}
-            fullWidth
-            error={!!errors.snapshotDomain}
-            helperText={errors.snapshotDomain?.message}
-          />
+
+          {
+            !space?.snapshotDomain && !isAdmin ? (
+              <Typography>No Snapshot domain connected yet. Only workspace admins can configure this.</Typography>
+            ) : (
+              <TextField
+                {...register('snapshotDomain', {
+                  onChange: () => {
+                    setTouched(true);
+                  }
+                })}
+                disabled={!isAdmin}
+                fullWidth
+                error={!!errors.snapshotDomain}
+                helperText={errors.snapshotDomain?.message}
+              />
+            )
+          }
         </Grid>
         {
           values.snapshotDomain && !errors.snapshotDomain && (
@@ -97,6 +113,7 @@ export default function ConnectSnapshot () {
                     setTouched(true);
                   }
                 })}
+                disabled={!isAdmin}
                 fullWidth
                 error={!!errors.defaultVotingDuration}
                 helperText={errors.defaultVotingDuration?.message}
@@ -113,11 +130,15 @@ export default function ConnectSnapshot () {
           )
         }
 
-        <Grid item display='flex' justifyContent='space-between'>
-          <PrimaryButton disabled={!isValid} type='submit'>
-            Save
-          </PrimaryButton>
-        </Grid>
+        {
+          isAdmin && (
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type='submit'>
+                Save
+              </PrimaryButton>
+            </Grid>
+          )
+        }
       </Grid>
     </form>
   );

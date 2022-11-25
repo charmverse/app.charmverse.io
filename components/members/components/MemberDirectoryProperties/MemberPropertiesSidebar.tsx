@@ -1,28 +1,31 @@
 import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, ClickAwayListener, Collapse, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
 import type { MemberProperty } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 
 import { SidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import Button from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
+import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
 import isAdmin from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
-import type { PropertyOption } from './MemberPropertySelectInput';
-import { MemberPropertySelectInput } from './MemberPropertySelectInput';
 
 const StyledSidebar = styled.div`
   background-color: ${({ theme }) => theme.palette.background.paper};
@@ -46,17 +49,17 @@ function MemberPropertyItemForm ({
 }) {
   const { updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
-  const [propertyOptions, setPropertyOptions] = useState<PropertyOption[]>((property?.options as PropertyOption[]) ?? []);
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>((property?.options as SelectOptionType[]) ?? []);
 
   useEffect(() => {
     setPropertyName(property.name);
   }, []);
 
-  const isSelectPropertyType = (property.type.match(/select/));
+  const isSelectPropertyType = isSelectType(property.type);
 
   const isDisabled = propertyName.length === 0
     || (isSelectPropertyType
-      && (property.options as PropertyOption[])?.find(po => po.name.length === 0));
+      && (property.options as SelectOptionType[])?.find(po => po.name.length === 0));
 
   async function onSubmit () {
     if (!isDisabled) {
@@ -89,18 +92,17 @@ function MemberPropertyItemForm ({
       </Stack>
 
       {isSelectPropertyType && (
-        <MemberPropertySelectInput
-          onChange={setPropertyOptions}
-          options={propertyOptions}
-        />
+        <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
       )}
+
       <Button
         disabled={isDisabled}
         onClick={onSubmit}
         sx={{
           width: 'fit-content'
         }}
-      >Update
+      >
+        Update property
       </Button>
     </Stack>
   );
@@ -111,15 +113,57 @@ export function MemberPropertySidebarItem ({
 }: {
   property: MemberPropertyWithPermissions;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+
   const [toggled, setToggled] = useState(false);
-  const { deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
+  const { updateProperty, deleteProperty, addPropertyPermissions, removePropertyPermission } = useMemberProperties();
   const propertyRenamePopupState = usePopupState({ variant: 'popover', popupId: 'property-rename-modal' });
   const admin = isAdmin();
 
+  const [{ offset }, drag, dragPreview] = useDrag(() => ({
+    type: 'item',
+    item: property,
+    collect (monitor) {
+      return {
+        offset: monitor.getDifferenceFromInitialOffset()
+      };
+    }
+  }));
+
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<MemberPropertyWithPermissions, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
+    accept: 'item',
+    drop: async (droppedProperty, monitor) => {
+      const didDrop = monitor.didDrop();
+      if (didDrop) {
+        return;
+      }
+      await updateProperty({
+        id: droppedProperty.id,
+        index: property.index
+      });
+    },
+    collect: monitor => {
+      let canDropItem: boolean = true;
+      // We use this to bypass the thrown error: Invariant Violation: Expected to find a valid target.
+      // If there is an error thrown, set canDrop to false.
+      try {
+        canDropItem = monitor.canDrop();
+      }
+      catch {
+        canDropItem = false;
+      }
+      return {
+        isOverCurrent: monitor.isOver({ shallow: true }),
+        canDrop: canDropItem
+      };
+    }
+  }), [property]);
+
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
+  const isAdjacentActive = admin && canDrop && isOverCurrent;
 
   return (
-    <Stack height='fit-content'>
+    <Stack height='fit-content' ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
       <MenuItem
         dense
         sx={{
@@ -132,8 +176,17 @@ export function MemberPropertySidebarItem ({
           width: '100%',
           '& .MuiListItemIcon-root': {
             minWidth: 30
-          }
-          // pl: 1
+          },
+          pl: 1,
+          ...((offset?.y ?? 0) < 0 ? {
+            borderTopColor: isAdjacentActive ? 'action.focus' : 'background.paper',
+            borderTopWidth: 2,
+            borderTopStyle: 'solid'
+          } : {
+            borderBottomColor: isAdjacentActive ? 'action.focus' : 'background.paper',
+            borderBottomWidth: 2,
+            borderBottomStyle: 'solid'
+          })
         }}
         onClick={() => setToggled(!toggled)}
       >
@@ -154,7 +207,8 @@ export function MemberPropertySidebarItem ({
             gap={0.5}
             className='icons'
             sx={{
-              opacity: 0
+              opacity: 0,
+              alignItems: 'center'
             }}
           >
             <Tooltip title={`Edit ${property.name} property.`}>
@@ -168,9 +222,9 @@ export function MemberPropertySidebarItem ({
                 }}
               />
             </Tooltip>
-            {!DEFAULT_MEMBER_PROPERTIES.includes(property.type as any) && (
+            {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
               <Tooltip title={`Delete ${property.name} property.`}>
-                <DeleteIcon
+                <DeleteOutlinedIcon
                   cursor='pointer'
                   fontSize='small'
                   color='secondary'

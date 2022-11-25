@@ -43,24 +43,6 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
         }
       }
     });
-
-    const userFields: Partial<User> = {
-      username: telegramAccount.username,
-      identityType: IDENTITY_TYPES[2]
-    };
-
-    if (telegramAccount.photo_url) {
-      const pathInS3 = getUserS3FilePath({ userId, url: telegramAccount.photo_url });
-      const { url } = await uploadUrlToS3({ pathInS3, url: telegramAccount.photo_url });
-      userFields.avatar = url;
-    }
-
-    await prisma.user.update({
-      where: {
-        id: userId
-      },
-      data: userFields
-    });
   }
   catch (error) {
     log.warn('Error while connecting to Telegram', error);

@@ -1,16 +1,16 @@
 import Safe from '@gnosis.pm/safe-core-sdk';
 import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import log from 'lib/log';
 import { isTruthy } from 'lib/utilities/types';
 
 export default function useSafes (safeAddresses: string[]) {
 
   const [safes, setSafes] = useState<Safe[]>([]);
-  const { account, library } = useWeb3React();
+  const { account, library } = useWeb3AuthSig();
 
   async function loadSafes () {
     const signer = library.getSigner(account);

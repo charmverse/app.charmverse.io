@@ -25,7 +25,7 @@ async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[
 
   const computed = await computeUserPagePermissions({
     pageId: publicPage?.id as string,
-    userId: req.session?.user?.id
+    userId: req.session.user?.id
   });
 
   if (computed.read !== true) {
