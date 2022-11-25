@@ -12,7 +12,7 @@ import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces';
 
 // Pages shared to the public that don't require user login
-const publicPages = ['/', 'share', 'api-docs', 'u', 'invite', 'join'];
+const publicPages = ['/', 'share', 'api-docs', 'u'];
 const accountPages = ['profile'];
 
 export default function RouteGuard ({ children }: { children: ReactNode }) {
@@ -128,11 +128,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
   }
 
+  if (!authorized || !router.isReady) {
+    return null;
+  }
   return (
-    <span style={isLoading ? { display: 'none' } : undefined}>
-      {authorized
-        ? children
-        : null}
+    <span style={{ display: isLoading ? 'none' : 'initial' }}>
+      { children }
     </span>
   );
 }
