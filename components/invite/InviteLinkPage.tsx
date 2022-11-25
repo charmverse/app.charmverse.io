@@ -1,11 +1,13 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
 import { useContext } from 'react';
 
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { WalletSign } from 'components/login/WalletSign';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
@@ -17,9 +19,10 @@ import { CenteredBox } from './components/CenteredBox';
 export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
 
   const { user } = useUser();
-  const { openWalletSelectorModal, triedEager } = useContext(Web3Connection);
-  const { account, walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
+  const { connectWallet, walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
+  const { loginFromWeb3Account } = useUser();
   const { showOnboarding } = useOnboarding();
+  const router = useRouter();
 
   async function joinSpace () {
     if (!user && verifiableWalletDetected && walletAuthSignature) {
@@ -40,16 +43,14 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
           <Typography gutterBottom>You've been invited to join</Typography>
           <Typography variant='h5'>{invite.space.name}</Typography>
         </Box>
-        {(account || user) ? (
+        {user ? (
           <PrimaryButton data-test='accept-invite-button' fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
         ) : (
           <Box display='flex' gap={2}>
-            <PrimaryButton size='large' loading={!triedEager} onClick={openWalletSelectorModal}>
-              Connect Wallet
-            </PrimaryButton>
-            <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            <WalletSign signSuccess={loginFromWeb3Account} />
+            <PrimaryButton size='large' variant='outlined' href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}>
               Connect Discord
             </PrimaryButton>
           </Box>

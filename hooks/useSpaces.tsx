@@ -39,9 +39,9 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
       charmClient.getSpaces()
         .then(_spaces => {
           setSpaces(_spaces);
-          setIsLoaded(true);
         })
-        .catch(err => {});
+        .catch(err => {})
+        .finally(() => setIsLoaded(true));
     }
     else if (isUserLoaded) {
       setIsLoaded(true);
