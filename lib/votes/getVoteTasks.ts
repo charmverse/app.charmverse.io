@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
@@ -21,7 +22,9 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
       deadline: 'desc'
     },
     include: {
-      page: true,
+      page: {
+        select: pageMetaSelect()
+      },
       space: true,
       userVotes: true,
       voteOptions: true
