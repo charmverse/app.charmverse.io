@@ -92,7 +92,8 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
 
     flatPages.push(node);
 
-    const { children, permissions, createdBy, updatedBy, spaceId, cardId, proposalId, parentId, bountyId, blocks, ...pageWithoutJoins } = node;
+    const { children, permissions, createdBy, updatedBy, spaceId, cardId, proposalId, parentId, bountyId, blocks, postId,
+      ...pageWithoutJoins } = node;
 
     typedKeys(pageWithoutJoins).forEach(key => {
       if (pageWithoutJoins[key] == null) {

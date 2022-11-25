@@ -7,9 +7,6 @@
 -- CreateEnum
 CREATE TYPE "PostStatus" AS ENUM ('draft', 'published');
 
--- AlterEnum
-ALTER TYPE "PageType" ADD VALUE 'PostVote';
-
 -- AlterTable
 ALTER TABLE "Page" ADD COLUMN     "postId" UUID;
 
@@ -18,6 +15,7 @@ CREATE TABLE "PostCategory" (
     "id" UUID NOT NULL,
     "color" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "spaceId" UUID NOT NULL,
 
     CONSTRAINT "PostCategory_pkey" PRIMARY KEY ("id")
 );
@@ -32,7 +30,7 @@ CREATE TABLE "Post" (
 );
 
 -- CreateTable
-CREATE TABLE "PostVote" (
+CREATE TABLE "PageUpDownVote" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
     "upvoted" BOOLEAN NOT NULL,
@@ -40,7 +38,7 @@ CREATE TABLE "PostVote" (
 );
 
 -- CreateTable
-CREATE TABLE "PostComment" (
+CREATE TABLE "PageComment" (
     "id" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
@@ -50,31 +48,38 @@ CREATE TABLE "PostComment" (
     "parentId" TEXT NOT NULL,
     "pageId" UUID NOT NULL,
 
-    CONSTRAINT "PostComment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "PageComment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "PostCommentVote" (
+CREATE TABLE "PageCommentUpDownVote" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" UUID NOT NULL,
     "upvoted" BOOLEAN NOT NULL,
-    "commentId" UUID NOT NULL
+    "commentId" UUID NOT NULL,
+    "pageId" UUID NOT NULL
 );
 
 -- CreateIndex
-CREATE INDEX "PostVote_pageId_idx" ON "PostVote"("pageId");
+CREATE UNIQUE INDEX "PostCategory_spaceId_key" ON "PostCategory"("spaceId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PostVote_createdBy_pageId_key" ON "PostVote"("createdBy", "pageId");
+CREATE INDEX "PageUpDownVote_pageId_idx" ON "PageUpDownVote"("pageId");
 
 -- CreateIndex
-CREATE INDEX "PostComment_pageId_idx" ON "PostComment"("pageId");
+CREATE UNIQUE INDEX "PageUpDownVote_createdBy_pageId_key" ON "PageUpDownVote"("createdBy", "pageId");
 
 -- CreateIndex
-CREATE INDEX "PostCommentVote_commentId_idx" ON "PostCommentVote"("commentId");
+CREATE INDEX "PageComment_pageId_idx" ON "PageComment"("pageId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PostCommentVote_createdBy_commentId_key" ON "PostCommentVote"("createdBy", "commentId");
+CREATE INDEX "PageCommentUpDownVote_commentId_idx" ON "PageCommentUpDownVote"("commentId");
+
+-- CreateIndex
+CREATE INDEX "PageCommentUpDownVote_pageId_idx" ON "PageCommentUpDownVote"("pageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PageCommentUpDownVote_createdBy_commentId_key" ON "PageCommentUpDownVote"("createdBy", "commentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Page_postId_key" ON "Page"("postId");
@@ -86,13 +91,19 @@ CREATE INDEX "Page_postId_idx" ON "Page"("postId");
 ALTER TABLE "Page" ADD CONSTRAINT "Page_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "PostCategory" ADD CONSTRAINT "PostCategory_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "PostCategory"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PostVote" ADD CONSTRAINT "PostVote_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PageUpDownVote" ADD CONSTRAINT "PageUpDownVote_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PostComment" ADD CONSTRAINT "PostComment_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PageComment" ADD CONSTRAINT "PageComment_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PostCommentVote" ADD CONSTRAINT "PostCommentVote_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "PostComment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PageCommentUpDownVote" ADD CONSTRAINT "PageCommentUpDownVote_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "PageComment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PageCommentUpDownVote" ADD CONSTRAINT "PageCommentUpDownVote_pageId_fkey" FOREIGN KEY ("pageId") REFERENCES "Page"("id") ON DELETE CASCADE ON UPDATE CASCADE;

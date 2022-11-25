@@ -89,7 +89,7 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
 }
 
 // Page without content and contentText props - used for list of pages (on the client)
-export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText' | 'version'>
+export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText' | 'version' | 'postId'>
 
 export type PageDetails = {
   id: string;
