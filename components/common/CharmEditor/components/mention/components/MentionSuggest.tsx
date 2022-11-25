@@ -43,12 +43,10 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
-  const filteredMembers = useMemo(() => {
-    return triggerText.length !== 0 ? members.filter(
-      member => (
-        member.username?.toLowerCase()?.match(triggerText.toLowerCase()))
-    ) : members;
-  }, [triggerText, members]);
+  const filteredMembers = triggerText.length !== 0 ? members.filter(
+    member => (
+      member.username.toLowerCase().match(triggerText.toLowerCase()))
+  ) : members;
 
   const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
   const totalItems = (filteredMembers.length + filteredPages.length);
