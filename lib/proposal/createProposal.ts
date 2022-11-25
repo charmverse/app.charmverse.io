@@ -19,16 +19,22 @@ type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], catego
 
 export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
 
-  const { createdBy, id: existingPageId, spaceId } = pageProps;
+  const { createdBy, id: pageId, spaceId } = pageProps;
 
-  const proposalId = existingPageId ?? uuid();
+  const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
 
+  const existingPage = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    }
+  });
+
   function upsertPage (): PrismaPromise<Page> {
-    if (existingPageId) {
+    if (existingPage) {
       return prisma.page.update({
         where: {
-          id: existingPageId
+          id: pageId
         },
         data: {
           proposalId,
