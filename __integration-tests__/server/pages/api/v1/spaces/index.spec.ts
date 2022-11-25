@@ -138,8 +138,11 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, name: existingDomain });
 
     expect(response.statusCode).toBe(201);
-    expect(response.body.domain).not.toBe(existingDomain);
-    expect((response.body.domain as string).startsWith(existingDomain)).toBe(true);
+
+    const space = await prisma.space.findUnique({ where: { id: response.body.id } });
+
+    expect(space?.domain).not.toBe(existingDomain);
+    expect((space?.domain as string).startsWith(existingDomain)).toBe(true);
   });
 });
 
