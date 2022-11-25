@@ -17,11 +17,13 @@ import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { getViewCardsSortedFilteredAndGrouped, sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
@@ -91,6 +93,7 @@ function CenterPanel (props: Props) {
   const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
+  const { members } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPage = pages[board.id];
@@ -105,8 +108,11 @@ function CenterPanel (props: Props) {
     boardId: activeBoard?.id || '',
     viewId: activeView?.id || ''
   }));
+
   // filter cards by whats accessible
-  const cards = _cards.filter(card => pages[card.id]);
+  const cardPages: CardPage[] = _cards.map(card => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
+  const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
+  const cards = sortedCardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {

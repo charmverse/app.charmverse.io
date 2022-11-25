@@ -13,15 +13,15 @@ import TextOption from './textOption';
 type Props = {
     children: React.ReactNode;
     position?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top' | 'bottom' | 'left' | 'right';
+    disablePortal?: boolean;
 }
 
 const StyledPopper = styled(Popper)`
     z-index: var(--z-index-modal);
 `;
 
-function Menu (props: Props) {
+function Menu ({ position, children, disablePortal = true }: Props) {
 
-  const { position, children } = props;
   const [anchorEl] = useMenuContext();
   const popperRef = useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = useState(0);
@@ -53,7 +53,7 @@ function Menu (props: Props) {
   }, []);
 
   return (
-    <StyledPopper anchorEl={anchorEl} open={true} disablePortal placement={position || 'bottom-start'}>
+    <StyledPopper anchorEl={anchorEl} open={true} disablePortal={disablePortal} placement={position || 'bottom-start'}>
       <div
         ref={popperRef}
         style={{ maxHeight: maxHeight || 'none' }}

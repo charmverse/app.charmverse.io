@@ -27,6 +27,7 @@ describe('components/table/TableHeaderMenu', () => {
         activeView={view}
         cards={[]}
         views={[view, view2]}
+        type='text'
         template={board.fields.cardProperties[0]}
         offset={0}
         onDrop={jest.fn()}

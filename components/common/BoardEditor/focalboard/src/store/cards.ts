@@ -2,6 +2,9 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import type { Member } from 'lib/members/interfaces';
+import type { PageMeta } from 'lib/pages';
+
 import type { Board } from '../blocks/board';
 import type { BoardView } from '../blocks/boardView';
 import type { Card } from '../blocks/card';
@@ -22,6 +25,11 @@ type CardsState = {
     current: string;
     cards: { [key: string]: Card };
     templates: { [key: string]: Card };
+}
+
+export type CardPage = {
+  card: Card;
+  page: PageMeta;
 }
 
 const cardsSlice = createSlice({
@@ -167,7 +175,7 @@ export const getCurrentBoardTemplates = createSelector(
   }
 );
 
-function titleOrCreatedOrder (cardA: Card, cardB: Card) {
+function titleOrCreatedOrder (cardA: PageMeta, cardB: PageMeta) {
   const aValue = cardA.title;
   const bValue = cardB.title;
 
@@ -184,15 +192,15 @@ function titleOrCreatedOrder (cardA: Card, cardB: Card) {
   }
 
   // If both cards are untitled, use the create date
-  return cardA.createdAt - cardB.createdAt;
+  return new Date(cardA.createdAt).getTime() - new Date(cardB.createdAt).getTime();
 }
 
-function manualOrder (activeView: BoardView, cardA: Card, cardB: Card) {
-  const indexA = activeView.fields.cardOrder.indexOf(cardA.id);
-  const indexB = activeView.fields.cardOrder.indexOf(cardB.id);
+function manualOrder (activeView: BoardView, cardA: CardPage, cardB: CardPage) {
+  const indexA = activeView.fields.cardOrder.indexOf(cardA.card.id);
+  const indexB = activeView.fields.cardOrder.indexOf(cardB.card.id);
 
   if (indexA < 0 && indexB < 0) {
-    return titleOrCreatedOrder(cardA, cardB);
+    return titleOrCreatedOrder(cardA.page, cardB.page);
   }
   else if (indexA < 0 && indexB >= 0) {
     // If cardA's order is not defined, put it at the end
@@ -201,22 +209,27 @@ function manualOrder (activeView: BoardView, cardA: Card, cardB: Card) {
   return indexA - indexB;
 }
 
-function sortCards (cards: Card[], board: Board, activeView: BoardView, usersById: { [key: string]: IUser }): Card[] {
+export function sortCards (cardPages: CardPage[], board: Board, activeView: BoardView, members: Member[]): CardPage[] {
+
   if (!activeView) {
-    return cards;
+    return cardPages;
   }
   const { sortOptions } = activeView.fields;
+  const membersById = members.reduce<{ [id: string]: string }>((acc, member) => {
+    acc[member.id] = member.username;
+    return acc;
+  }, {});
 
   if (sortOptions?.length < 1) {
-    return cards.sort((a, b) => manualOrder(activeView, a, b));
+    return cardPages.sort((a, b) => manualOrder(activeView, a, b));
   }
 
-  let sortedCards = cards;
+  let sortedCards = cardPages;
   for (const sortOption of sortOptions) {
     if (sortOption.propertyId === Constants.titleColumnId) {
       Utils.log('Sort by title');
       sortedCards = sortedCards.sort((a, b) => {
-        const result = titleOrCreatedOrder(a, b);
+        const result = titleOrCreatedOrder(a.page, b.page);
         return sortOption.reversed ? -result : result;
       });
     }
@@ -230,16 +243,16 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
       Utils.log(`Sort by property: ${template?.name}`);
       sortedCards = sortedCards.sort((a, b) => {
 
-        let aValue = a.fields.properties[sortPropertyId] || '';
-        let bValue = b.fields.properties[sortPropertyId] || '';
+        let aValue = a.card.fields.properties[sortPropertyId] || '';
+        let bValue = b.card.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = usersById[a.createdBy]?.username || '';
-          bValue = usersById[b.createdBy]?.username || '';
+          aValue = membersById[a.page.createdBy] || '';
+          bValue = membersById[b.page.createdBy] || '';
         }
         else if (template.type === 'updatedBy') {
-          aValue = usersById[a.updatedBy]?.username || '';
-          bValue = usersById[b.updatedBy]?.username || '';
+          aValue = membersById[a.page.updatedBy] || '';
+          bValue = membersById[b.page.updatedBy] || '';
         }
         else if (template.type === 'date') {
           aValue = (aValue === '') ? '' : JSON.parse(aValue as string).from;
@@ -256,16 +269,16 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
             result = 1;
           }
           if (!aValue && !bValue) {
-            result = titleOrCreatedOrder(a, b);
+            result = titleOrCreatedOrder(a.page, b.page);
           }
 
           result = Number(aValue) - Number(bValue);
         }
         else if (template.type === 'createdTime') {
-          result = a.createdAt - b.createdAt;
+          result = a.card.createdAt - b.card.createdAt;
         }
         else if (template.type === 'updatedTime') {
-          result = a.updatedAt - b.updatedAt;
+          result = a.card.updatedAt - b.card.updatedAt;
         }
         else if (template.type === 'checkbox') {
           // aValue will be true or empty string
@@ -276,7 +289,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
             result = -1;
           }
           else {
-            result = titleOrCreatedOrder(a, b);
+            result = titleOrCreatedOrder(a.page, b.page);
           }
         }
         else {
@@ -289,7 +302,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
             result = 1;
           }
           if (aValue.length <= 0 && bValue.length <= 0) {
-            result = titleOrCreatedOrder(a, b);
+            result = titleOrCreatedOrder(a.page, b.page);
           }
 
           if (template.type === 'select' || template.type === 'multiSelect') {
@@ -304,7 +317,7 @@ function sortCards (cards: Card[], board: Board, activeView: BoardView, usersByI
 
         if (result === 0) {
           // In case of "ties", use the title order
-          result = titleOrCreatedOrder(a, b);
+          result = titleOrCreatedOrder(a.page, b.page);
         }
 
         return sortOption.reversed ? -result : result;
@@ -373,7 +386,6 @@ export const getCurrentViewCardsSortedFilteredAndGrouped = createSelector(
     if (searchText) {
       result = searchFilterCards(result, board, searchText);
     }
-    result = sortCards(result, board, view, users);
     return result;
   }
 );
@@ -391,8 +403,6 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string, bo
     if (view.fields.filter) {
       result = CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
     }
-
-    result = sortCards(result, board, view, users);
     return result;
   }
 );
