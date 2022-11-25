@@ -19,15 +19,16 @@ import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/c
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/src/csvExporter';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { getViewCardsSortedFilteredAndGrouped, sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import { isTruthy } from 'lib/utilities/types';
 
 interface Props {
   closeMenu: () => void;
@@ -61,6 +62,7 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
   const boards = useAppSelector(getSortedBoards);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId });
   const { showMessage } = useSnackbar();
+  const { members } = useMembers();
 
   const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
   const board = boards.find(b => b.id === activeBoardId);
@@ -69,10 +71,13 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
     return null;
   }
 
-  const _cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
+  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
     boardId: board.id,
     viewId: view.id
   }));
+  const cardPages: CardPage[] = cards.map(card => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
+
+  const sortedCardPages = sortCards(cardPages, board, view, members);
 
   async function onDeletePage () {
     if (pageId) {
@@ -84,20 +89,15 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
   }
 
   const exportCsv = () => {
-    const cards = _cards.map(card => {
-      const page = pages[card.id];
-      // filter cards by whats accessible
-      if (!page) {
-        return null;
-      }
+    const _cards = sortedCardPages.map(({ card, page }) => {
       return {
         ...card,
         // update the title from correct model
-        title: page?.title
+        title: page.title
       };
-    }).filter(isTruthy);
+    });
 
-    onExportCsvTrigger(board, view, cards, intl);
+    onExportCsvTrigger(board, view, _cards, intl);
     closeMenu();
   };
 
