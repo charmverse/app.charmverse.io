@@ -132,7 +132,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     return null;
   }
   return (
-    <span style={{ display: isLoading ? 'none' : 'initial' }}>
+    <span style={{ display: isLoading ? 'none' : 'inherit' }}>
       { children }
     </span>
   );
