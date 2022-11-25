@@ -25,15 +25,9 @@ export function requireKeys<T> (keys: (RequiredKey| keyof T)[], location: 'body'
 
     for (const key of keys) {
       const keyName = typeof key === 'object' ? key.key : key;
+      const invalidTruthyKey = typeof key === 'object' && key.truthy && !toVerify[keyName];
 
-      if (!(keyName as string in toVerify)) {
-        throw new ApiError({
-          errorType: 'Invalid input',
-          message: `Key ${key as string} is required in request ${location}.`
-        });
-      }
-
-      if (typeof key === 'object' && key.truthy && !toVerify[keyName]) {
+      if (!(keyName as string in toVerify) || invalidTruthyKey) {
         throw new ApiError({
           errorType: 'Invalid input',
           message: `Key ${keyName as string} is required in request ${location} and must not be an empty value.`
