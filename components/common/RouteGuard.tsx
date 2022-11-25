@@ -128,10 +128,6 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
   }
 
-  if (isLoading) {
-    return null;
-  }
-
   return (
     <span style={{ display: isLoading ? 'none' : undefined }}>
       {authorized
