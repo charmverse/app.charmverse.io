@@ -13,7 +13,7 @@ import type { PageUpdates } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import BoardPage from '../BoardPage';
+import BoardPage from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
 
 export default function EditorPage ({ pageId }: { pageId: string }) {

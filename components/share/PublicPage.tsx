@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { validate } from 'uuid';
 
 import charmClient from 'charmClient';
-import BoardPage from 'components/[pageId]/BoardPage';
+import BoardPage from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
