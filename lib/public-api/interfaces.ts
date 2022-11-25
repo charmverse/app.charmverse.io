@@ -298,12 +298,38 @@ export interface Workspace {
  *          example: 260918243123345408
  *        avatar:
  *          required: false
- *          type: string
- *          example: Test DAO Space
+ *          type: url
+ *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
 */
 export interface CreateWorkspaceRequestBody {
   name: string;
   discordServerId: string;
   adminDiscordUserId: string;
   avatar?: string;
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CreateWorkspaceResponseBody:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        spaceUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/test-dao-space
+ *        joinUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/join?domain=test-dao-space
+*/
+export interface CreateWorkspaceResponseBody {
+  id: string;
+  spaceUrl: string;
+  joinUrl: string;
 }

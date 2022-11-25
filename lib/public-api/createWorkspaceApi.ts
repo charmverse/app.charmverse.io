@@ -1,11 +1,18 @@
 import type { SuperApiToken } from '@prisma/client';
 
+import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
 import { IDENTITY_TYPES } from 'models';
+
+export type CreatedSpaceResponse = {
+  id: string;
+  spaceUrl: string;
+  joinUrl: string;
+}
 
 export type CreateSpaceApiInputData = {
   name: string;
@@ -16,7 +23,7 @@ export type CreateSpaceApiInputData = {
 
 export async function createWorkspaceApi (
   { name, discordServerId, adminDiscordUserId, avatar, superApiToken }: CreateSpaceApiInputData & { superApiToken?: SuperApiToken | null }
-) {
+): Promise<CreatedSpaceResponse> {
 // generate a domain name based on space
   const spaceDomain = await getAvailableDomainName(name);
 
@@ -71,5 +78,11 @@ export async function createWorkspaceApi (
     }
   };
 
-  return createWorkspace({ spaceData, userId: botUser.id });
+  const space = await createWorkspace({ spaceData, userId: botUser.id });
+
+  return {
+    id: space.id,
+    spaceUrl: `${baseUrl}/${space.domain}`,
+    joinUrl: `${baseUrl}/join?domain=${space.domain}`
+  };
 }

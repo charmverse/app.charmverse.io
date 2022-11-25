@@ -92,11 +92,17 @@ describe('GET /api/v1/spaces', () => {
       .set('Authorization', apiToken.token)
       .send({ ...defaultSpaceData, domain: 'new-test-domain' });
 
-    expect(response.statusCode).toBe(201);
     expect(response.body.id).toBeDefined();
-    expect(response.body.domain).toBe('test-space');
-    expect(response.body.name).toBe('Test Space');
-    expect(response.body.superApiTokenId).toBe(apiToken.id);
+    expect(response.body.spaceUrl).toBe(`${baseUrl}/test-space`);
+    expect(response.body.joinUrl).toBe(`${baseUrl}/join?domain=test-space`);
+
+    const space = await prisma.space.findUnique({ where: { id: response.body.id } });
+
+    expect(response.statusCode).toBe(201);
+    expect(space).toBeDefined();
+    expect(space?.domain).toBe('test-space');
+    expect(space?.name).toBe('Test Space');
+    expect(space?.superApiTokenId).toBe(apiToken.id);
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: { spaceId: response.body.id },
@@ -117,7 +123,7 @@ describe('GET /api/v1/spaces', () => {
     expect(botUser?.user.isBot).toBe(true);
 
     // Verify that admin user has been created for space
-    expect(adminUser?.user.id).toBe(response.body.createdBy);
+    expect(adminUser?.user.id).toBe(space?.createdBy);
     expect(adminUser).toBeDefined();
     expect(adminUser?.user?.discordUser?.discordId).toBe(defaultSpaceData.adminDiscordUserId);
 

@@ -1,12 +1,11 @@
 
-import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSuperApiKey, requireKeys } from 'lib/middleware';
+import type { CreatedSpaceResponse, CreateSpaceApiInputData } from 'lib/public-api/createWorkspaceApi';
+import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { CreateSpaceApiInputData } from 'lib/spaces/createWorkspaceApi';
-import { createWorkspaceApi } from 'lib/spaces/createWorkspaceApi';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,18 +39,18 @@ handler
  *         content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/Workspace'
+ *                $ref: '#/components/schemas/CreateWorkspaceResponseBody'
  */
-async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
+async function createSpace (req: NextApiRequest, res: NextApiResponse<CreatedSpaceResponse>) {
   const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceApiInputData;
 
   if (name.length < 3) {
     throw new InvalidInputError('Workspace name must be at least 3 characters');
   }
 
-  const space = await createWorkspaceApi({ name, discordServerId, adminDiscordUserId, avatar, superApiToken: req.superApiToken });
+  const result = await createWorkspaceApi({ name, discordServerId, adminDiscordUserId, avatar, superApiToken: req.superApiToken });
 
-  return res.status(201).json(space);
+  return res.status(201).json(result);
 }
 
 export default withSessionRoute(handler);
