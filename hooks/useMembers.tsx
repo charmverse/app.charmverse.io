@@ -23,10 +23,14 @@ export function MembersProvider ({ children }: { children: ReactNode }) {
 
   const { data: members, mutate: mutateMembers } = useSWR(() => space ? `members/${space?.id}` : null, () => {
     return charmClient.members.getMembers(space!.id).then(_members => _members.sort((a, b) => {
-      if (a.username < b.username) {
+
+      const first = a.username?.toLowerCase() || '';
+      const second = b.username?.toLowerCase() || '';
+
+      if (first < second) {
         return -1;
       }
-      else if (a.username > b.username) {
+      else if (second > first) {
         return 1;
       }
       else {
