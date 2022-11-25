@@ -22,11 +22,12 @@ async function init () {
     return acc;
   }, {});
 
-  const addresses = Object.entries(addressMap).filter(([address, _users]) => _users.length > 1);
+  const addressesWithMultipleUsers = Object.entries(addressMap).filter(([address, _users]) => _users.length > 1);
   const duplicateAccounts: typeof users = [];
+  const needsNewWallet: typeof users = [];
 
   // find cases where one user already has a wallet associated - we can mark all the others 'deleted'
-  const unresolved = addresses.filter(([address, _users]) => {
+  const unresolved = addressesWithMultipleUsers.filter(([address, _users]) => {
     const usersWithWallets = _users.filter(u => u.wallets.length > 0);
     if (usersWithWallets.length === 1) {
       duplicateAccounts.push(..._users.filter(u => u.id !== usersWithWallets[0].id));
@@ -41,11 +42,17 @@ async function init () {
     // only one user has a workspace
     if (withSpace.length === 1) {
       duplicateAccounts.push(..._users.filter(u => u.id !== withSpace[0].id));
+      if (withSpace[0].wallets.length === 0) {
+        needsNewWallet.push(withSpace[0]);
+      }
       return false;
     }
     // none of the users have a workspace, just keep the first one
     else if (withSpace.length === 0) {
       duplicateAccounts.push(..._users.filter(u => u.id !== _users[0].id));
+      if (_users[0].wallets.length === 0) {
+        needsNewWallet.push(_users[0]);
+      }
       return false;
     }
     return true;
@@ -62,11 +69,12 @@ async function init () {
   const usersToMarkDeleted = duplicateAccounts.filter(u => u.spaceRoles.length > 0);
   const usersToDelete = duplicateAccounts.filter(u => u.spaceRoles.length === 0);
 
-  console.log('Addresses with multiple users', addresses.length);
+  console.log('Addresses with multiple users', addressesWithMultipleUsers.length);
   console.log('Affected users', usersAffected.size);
   console.log('Unresolved situations', unresolved2.length);
   console.log('Users to "delete"', duplicateAccounts.length);
   console.log('Users to mark deleted', usersToMarkDeleted.length);
+  console.log('Users that need a wallet record created', needsNewWallet.length);
   console.log('Users to delete because they have no workspace', usersToDelete.length);
 
   // for safety
@@ -77,25 +85,34 @@ async function init () {
   });
 
 
-  // await prisma.user.updateMany({
-  //   where: {
-  //     id: {
-  //       in: usersToMarkDeleted.map(u => u.id)
-  //     }
-  //   },
-  //   data: {
-  //     deletedAt: new Date(),
-  //     username: `Profile with duplicate wallet removed`
-  //   }
-  // })
+  console.log('mark deleted', await prisma.user.updateMany({
+    where: {
+      id: {
+        in: usersToMarkDeleted.map(u => u.id)
+      }
+    },
+    data: {
+      deletedAt: new Date(),
+      username: `Profile with duplicate wallet removed`
+    }
+  }))
 
-  // await prisma.user.deleteMany({
-  //   where: {
-  //     id: {
-  //       in: usersToDelete.map(u => u.id)
-  //     }
-  //   }
-  // })
+  console.log('deleted completely', await prisma.user.deleteMany({
+    where: {
+      id: {
+        in: usersToDelete.map(u => u.id)
+      }
+    }
+  }));
+
+  for (let user of needsNewWallet) {
+    await prisma.userWallet.create({
+      data: {
+        userId: user.id,
+        address: user.addresses[0],
+      }
+    });
+  }
 
 }
 
