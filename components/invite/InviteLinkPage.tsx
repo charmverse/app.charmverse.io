@@ -48,7 +48,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
         ) : (
           <Box display='flex' gap={2}>
             <WalletSign signSuccess={loginFromWeb3Account} />
-            <PrimaryButton size='large' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            <PrimaryButton size='large' variant='outlined' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
               Connect Discord
             </PrimaryButton>
           </Box>
