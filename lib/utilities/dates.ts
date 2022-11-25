@@ -111,7 +111,7 @@ export const getRelativeTimeInThePast = (date: Date, options: ({ ago: boolean } 
   const toMin = Math.round(toSec / 60);
   const toHour = Math.round(toMin / 60);
 
-  const agoText = options.ago ? ' ago' : '';
+  const agoText = options?.ago ? ' ago' : '';
 
   switch (true) {
     case (toSec < 60):

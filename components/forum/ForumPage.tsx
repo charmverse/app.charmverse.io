@@ -1,4 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
@@ -7,9 +8,8 @@ import { useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 
-import ForumFilters from './components/ForumFilters/ForumFilters';
+import ForumFilters from './components/ForumFilters';
 import ForumPosts from './components/ForumPosts';
-import SidebarForum from './components/SidebarForum';
 
 export default function ForumPage () {
   const [search, setSearch] = useState('');
@@ -34,11 +34,13 @@ export default function ForumPage () {
       />
       <Grid container spacing={2}>
         <Grid item xs={12} md={9}>
-          <ForumFilters />
+          <Box display={{ xs: 'block', md: 'none' }}>
+            <ForumFilters type='select' />
+          </Box>
           <ForumPosts search={search} />
         </Grid>
         <Grid item xs={12} md={3} display={{ xs: 'none', md: 'initial' }}>
-          <SidebarForum disabled={false} />
+          <ForumFilters type='list' />
         </Grid>
       </Grid>
     </CenteredPageContent>

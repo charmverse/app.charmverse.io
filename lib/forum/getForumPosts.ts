@@ -1,11 +1,11 @@
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
-import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
+import type { AvailableResourcesWithPaginationRequest } from 'pages/api/forum/interfaces';
 
 import type { ForumPost } from './interfaces';
 
-const mockPost1 = {
+const mockPost1: ForumPost = {
   id: '',
   title: 'First Post. Keep it up',
   content: {
@@ -20,7 +20,7 @@ const mockPost1 = {
   createdAt: '2022-06-30T12:48:31.867Z' as any
 };
 
-const mockPost2 = {
+const mockPost2: ForumPost = {
   id: '',
   title: 'Second Post. Keep it up',
   content: {
@@ -28,14 +28,14 @@ const mockPost2 = {
     content: 'https://cdn.pixabay.com/photo/2022/02/10/09/39/nft-7004985_1280.jpg'
   },
   user: undefined as any,
-  upVotes: 20,
-  downVotes: 32,
-  commentsNumber: 32,
-  updatedAt: '2022-05-03T12:31:01.626Z' as any,
+  upVotes: 12,
+  downVotes: 989,
+  commentsNumber: 275,
+  updatedAt: '2022-05-18T12:31:01.626Z' as any,
   createdAt: '2022-06-30T12:48:31.867Z' as any
 };
 
-const mockPost3 = {
+const mockPost3: ForumPost = {
   id: '',
   title: 'Third Post. Keep it up',
   content: {
@@ -43,14 +43,16 @@ const mockPost3 = {
     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
   },
   user: undefined as any,
-  upVotes: 20,
-  downVotes: 32,
-  commentsNumber: 32,
-  updatedAt: '2022-01-03T12:31:01.626Z' as any,
+  upVotes: 8,
+  downVotes: 0,
+  commentsNumber: 2,
+  updatedAt: '2020-01-03T12:31:01.626Z' as any,
   createdAt: '2020-06-30T12:48:31.867Z' as any
 };
 
-export async function getForumPosts ({ spaceId, userId }: AvailableResourcesRequest):Promise<ForumPost[]> {
+const mockArr = [mockPost1, mockPost2, mockPost3];
+
+export async function getForumPosts ({ spaceId, userId, count, page, sort }: AvailableResourcesWithPaginationRequest):Promise<ForumPost[]> {
   // const posts = await prisma.forum.findUnique({});
   // Transform the first text or first image into a ForumPostContent interface
 
@@ -60,11 +62,20 @@ export async function getForumPosts ({ spaceId, userId }: AvailableResourcesRequ
     }
   });
 
-  const posts = [mockPost1, mockPost2, mockPost3].map(item => {
-    item.user = user || undefined;
-    item.id = v4();
-    return item;
-  });
+  const posts = user ? Array(100).fill(null).map(() => mockArr).flat()
+    .map(item => {
+      return {
+        ...item,
+        id: uuid(),
+        user
+      };
+    }) : mockArr;
+
+  if (count && page && sort) {
+    const start = (count * page) - count;
+    const finish = count * page;
+    return posts.slice(start, finish);
+  }
 
   return posts;
 }
