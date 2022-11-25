@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
 import { useContext } from 'react';
 
 import charmClient from 'charmClient';
@@ -21,6 +22,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
   const { connectWallet, walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
   const { loginFromWeb3Account } = useUser();
   const { showOnboarding } = useOnboarding();
+  const router = useRouter();
 
   async function joinSpace () {
     if (!user && verifiableWalletDetected && walletAuthSignature) {
@@ -48,7 +50,7 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
         ) : (
           <Box display='flex' gap={2}>
             <WalletSign signSuccess={loginFromWeb3Account} />
-            <PrimaryButton size='large' variant='outlined' href={`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=login`}>
+            <PrimaryButton size='large' variant='outlined' href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}>
               Connect Discord
             </PrimaryButton>
           </Box>
