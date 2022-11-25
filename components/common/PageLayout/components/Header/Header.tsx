@@ -11,6 +11,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FavoritedIcon from '@mui/icons-material/Star';
 import NotFavoritedIcon from '@mui/icons-material/StarBorder';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Divider, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -28,6 +29,8 @@ import { useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useColorMode } from 'context/darkMode';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
@@ -135,13 +138,19 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const { members } = useMembers();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-
+  const [userSpacePermissions] = useCurrentSpacePermissions();
+  const canCreateProposal = !!userSpacePermissions?.createVote;
   const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
 
   function onCopyLink () {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
     setPageMenuOpen(false);
+  }
+
+  async function convertToProposal (pageId: string) {
+    setPageMenuOpen(false);
+    await charmClient.pages.convertToProposal(pageId);
   }
 
   const documentOptions = (
@@ -207,7 +216,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <NotFavoritedIcon />
           )}
         </Box>
-        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorites'} />
+        <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
       <ListItemButton
         onClick={onCopyLink}
@@ -221,6 +230,27 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
+      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+        <>
+          <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
+            <div>
+              <ListItemButton
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal}
+              >
+                <TaskOutlinedIcon
+                  fontSize='small'
+                  sx={{
+                    mr: 1
+                  }}
+                />
+                <ListItemText primary='Convert to proposal' />
+              </ListItemButton>
+            </div>
+          </Tooltip>
+          <Divider />
+        </>
+      )}
       <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
         <div>
           <ListItemButton

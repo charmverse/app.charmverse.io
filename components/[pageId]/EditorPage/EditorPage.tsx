@@ -121,7 +121,8 @@ export default function EditorPage ({ pageId }: { pageId: string }) {
       currentPage?.title,
       currentPage?.deletedAt,
       currentPage?.fullWidth,
-      currentPagePermissions
+      currentPagePermissions,
+      currentPage?.type
     ]
   );
 

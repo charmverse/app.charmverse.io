@@ -1,30 +1,65 @@
-import type { ProposalStatus, Prisma } from '@prisma/client';
+import type { ProposalStatus, Page, PrismaPromise, Prisma } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'models';
 
 import { getPagePath } from '../pages';
 
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 type PageProps = 'createdBy' | 'spaceId';
-type OptionalPageProps = 'content' | 'contentText' | 'title';
+type OptionalPageProps = 'content' | 'contentText' | 'id' | 'title';
 
 type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
   & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
+
 type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
 
 export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
 
-  const { createdBy, spaceId } = pageProps;
+  const { createdBy, id: pageId, spaceId } = pageProps;
 
-  // Making the page id same as proposalId
-  const proposalId = uuid();
+  const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
+
+  const existingPage = pageId && await prisma.page.findUnique({
+    where: {
+      id: pageId
+    }
+  });
+
+  function upsertPage (): PrismaPromise<Page> {
+    if (existingPage) {
+      return prisma.page.update({
+        where: {
+          id: pageId
+        },
+        data: {
+          proposalId,
+          type: 'proposal',
+          updatedAt: new Date(),
+          updatedBy: createdBy
+        }
+      });
+    }
+    else {
+      return createPage({
+        data: {
+          proposalId,
+          contentText: '',
+          path: getPagePath(),
+          title: '',
+          updatedBy: createdBy,
+          ...pageProps,
+          id: proposalId,
+          type: 'proposal'
+        },
+        include: null
+      });
+    }
+  }
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
@@ -50,19 +85,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
         }
       }
     }),
-    createPage({
-      data: {
-        proposalId,
-        contentText: '',
-        path: getPagePath(),
-        title: '',
-        updatedBy: createdBy,
-        ...pageProps,
-        id: proposalId,
-        type: 'proposal'
-      },
-      include: null
-    }),
+    upsertPage(),
     prisma.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
@@ -89,3 +112,4 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
 
   return { page, proposal, workspaceEvent };
 }
+
