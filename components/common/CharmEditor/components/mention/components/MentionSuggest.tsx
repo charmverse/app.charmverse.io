@@ -1,8 +1,8 @@
-import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
-import { Typography, Divider, MenuItem } from '@mui/material';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { Divider, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { PluginKey } from 'prosemirror-state';
-import { useCallback, useEffect, memo, useMemo } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
