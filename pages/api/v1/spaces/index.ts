@@ -45,8 +45,8 @@ handler
 async function createSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceApiInputData;
 
-  if (!discordServerId) {
-    throw new InvalidInputError('Missing discord server id');
+  if (name.length < 3) {
+    throw new InvalidInputError('Workspace name must be at least 3 characters');
   }
 
   const space = await createWorkspaceApi({ name, discordServerId, adminDiscordUserId, avatar, superApiToken: req.superApiToken });

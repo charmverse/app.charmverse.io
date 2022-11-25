@@ -53,7 +53,7 @@ describe('GET /api/v1/spaces', () => {
       .send({ ...defaultSpaceData, name: 'ab' });
 
     expect(response2.statusCode).toBe(400);
-    expect(response2.body.message).toBe('Space name must be at least 3 characters');
+    expect(response2.body.message).toBe('Workspace name must be at least 3 characters');
   });
 
   it('should respond 400 when discord server id is missing', async () => {
