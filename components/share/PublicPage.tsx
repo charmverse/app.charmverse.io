@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { validate } from 'uuid';
 
 import charmClient from 'charmClient';
-import BoardPage from 'components/[pageId]/BoardPage';
+import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -209,7 +209,7 @@ export default function PublicPage () {
               ? <PublicBountiesPage />
               : (currentPage?.type.match(/board/)
                 ? (
-                  <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
+                  <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
                 ) : (
                   currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
                 )
