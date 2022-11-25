@@ -8,6 +8,7 @@ import type { IPageWithPermissions } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
+import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
@@ -72,6 +73,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   const updatedPageData = {
     id: updatedPage.id,
     spaceId: updatedPage.spaceId,
+    proposalId: updatedPage.proposalId,
     type: updatedPage.type
   };
 
@@ -82,3 +84,5 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   return res.status(200);
 }
+
+export default withSessionRoute(handler);

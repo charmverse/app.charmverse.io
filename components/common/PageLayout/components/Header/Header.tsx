@@ -69,7 +69,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   const router = useRouter();
   const colorMode = useColorMode();
-  const { pages, updatePage, getPagePermissions, deletePage, mutatePage, refreshPage } = usePages();
+  const { pages, updatePage, getPagePermissions, deletePage } = usePages();
   const { user } = useUser();
   const theme = useTheme();
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
@@ -79,7 +79,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const basePageId = router.query.pageId as string;
   const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
-  const currentSpace = useCurrentSpace();
 
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
@@ -149,11 +148,9 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     setPageMenuOpen(false);
   }
 
-  async function convertToProposal () {
-    if (currentSpace && user && basePage) {
-      await charmClient.pages.convertToProposal(basePage.id);
-      setPageMenuOpen(false);
-    }
+  async function convertToProposal (pageId: string) {
+    setPageMenuOpen(false);
+    await charmClient.pages.convertToProposal(pageId);
   }
 
   const documentOptions = (
@@ -199,27 +196,6 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='View polls' />
       </ListItemButton>
       <Divider />
-      {(basePage?.type === 'card' || basePage?.type === 'page') && (
-        <>
-          <Tooltip title={!canCreateProposal && 'You do not have the permission to convert to proposal'}>
-            <div>
-              <ListItemButton
-                onClick={convertToProposal}
-                disabled={!canCreateProposal}
-              >
-                <TaskOutlinedIcon
-                  fontSize='small'
-                  sx={{
-                    mr: 1
-                  }}
-                />
-                <ListItemText primary='Convert to proposal' />
-              </ListItemButton>
-            </div>
-          </Tooltip>
-          <Divider />
-        </>
-      )}
       <ListItemButton
         onClick={() => {
           toggleFavorite();
@@ -240,7 +216,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             <NotFavoritedIcon />
           )}
         </Box>
-        <ListItemText primary={isFavorite ? 'Remove from favourite' : 'Add to favorites'} />
+        <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
       <ListItemButton
         onClick={onCopyLink}
@@ -254,6 +230,27 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
+      {(basePage?.type === 'card' || basePage?.type === 'page') && (
+        <>
+          <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
+            <div>
+              <ListItemButton
+                onClick={() => convertToProposal(basePage.id)}
+                disabled={!canCreateProposal}
+              >
+                <TaskOutlinedIcon
+                  fontSize='small'
+                  sx={{
+                    mr: 1
+                  }}
+                />
+                <ListItemText primary='Convert to proposal' />
+              </ListItemButton>
+            </div>
+          </Tooltip>
+          <Divider />
+        </>
+      )}
       <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
         <div>
           <ListItemButton
