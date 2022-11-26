@@ -1,22 +1,28 @@
 import { Divider, Typography } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
 
 import { UserDetails } from 'components/profile/components';
 import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
-import { useUser } from 'hooks/useUser';
+import type { LoggedInUser } from 'models';
 
-export function MemberOnboardingForm (
-  { userId, spaceId, spaceName, onClose }:
-  { onClose: () => void, spaceName: string, spaceId: string, userId: string }
-) {
-  const { updateSpaceValues } = useMemberPropertyValues(userId);
-  const { setUser, user } = useUser();
+type Props = {
+  user: LoggedInUser;
+  setUser: Dispatch<SetStateAction<LoggedInUser | null>>;
+  onClose: () => void;
+  spaceName: string;
+  spaceId: string;
+}
+
+export function MemberOnboardingForm ({ setUser, user, spaceId, spaceName, onClose }: Props) {
+
+  const { updateSpaceValues } = useMemberPropertyValues(user.id);
 
   return (
     <MemberPropertiesPopupForm
       title={`Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
-      memberId={userId}
+      memberId={user.id}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
       cancelButtonText='Set up later'
@@ -30,10 +36,7 @@ export function MemberOnboardingForm (
             user={user}
             updateUser={setUser}
           />
-          <Divider sx={{
-            my: 1
-          }}
-          />
+          <Divider sx={{ my: 1 }} />
         </>
       )}
       <Typography fontWeight={600}>{spaceName} Member details</Typography>

@@ -10,6 +10,7 @@ import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRe
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
 import { useSnackbar } from 'hooks/useSnackbar';
+import log from 'lib/log';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 type Props = {
@@ -28,6 +29,8 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
   );
+
+  log.debub('get space properties', data);
 
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
   const { showMessage } = useSnackbar();
