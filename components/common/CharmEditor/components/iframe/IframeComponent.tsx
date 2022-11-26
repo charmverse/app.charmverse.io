@@ -5,7 +5,6 @@ import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
 import { FiFigma } from 'react-icons/fi';
@@ -85,7 +84,7 @@ export function iframeSpec (): RawSpecs {
   };
 }
 
-const StyledEmptyIframeContainer = styled(Box)`
+const StyledEmptyIframeContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1.5)};
   width: 100%;
@@ -145,13 +144,17 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnl
   );
 }
 
-const StyledIFrame = styled(Box)`
+const StyledIFrame = styled.div`
+  line-height: 0; // hide margin that appears underneath
   object-fit: contain;
   width: 100%;
   height: 100%;
   user-select: none;
-  &:hover {
-    cursor: initial;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      cursor: initial;
+    }
   }
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
@@ -202,7 +205,7 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
         {node.attrs.type === 'figma' ? (
           <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
         ) : (
-          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.size ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
         )}
       </StyledIFrame>
     );
