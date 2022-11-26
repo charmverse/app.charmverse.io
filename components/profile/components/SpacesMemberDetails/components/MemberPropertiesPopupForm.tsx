@@ -30,7 +30,7 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
     { revalidateOnMount: true }
   );
 
-  log.debub('get space properties', data);
+  log.debug('get space properties', data);
 
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
   const { showMessage } = useSnackbar();
