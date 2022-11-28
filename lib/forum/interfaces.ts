@@ -1,15 +1,13 @@
-import type { User } from '@prisma/client';
-
-export interface ForumPostContent {
+export type ForumPostContent = {
   type: 'text' | 'image';
   content: string;
 }
 
-export interface ForumPost {
+export type ForumPost = {
   id: string;
   title: string;
   content: ForumPostContent;
-  user: Omit<User, 'addresses'>;
+  userId: string;
   upVotes: number;
   downVotes: number;
   commentsNumber: number;

@@ -7,26 +7,15 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { User } from '@prisma/client';
-import Image from 'next/image';
 
 import UserDisplay from 'components/common/UserDisplay';
+import { ForumPostContent } from 'lib/forum/interfaces';
+import type { ForumPost } from 'lib/forum/interfaces';
+import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
-interface ForumPostContent {
-  type: 'text' | 'image';
-  content: string;
-}
-
-interface ForumPostProps {
-  title: string;
-  content: ForumPostContent;
-  user: Omit<User, 'addresses'>;
-  upVotes: number;
-  downVotes: number;
-  commentsNumber: number;
-  updatedAt: Date;
-  createdAt: Date;
+interface ForumPostProps extends Omit<ForumPost, 'userId'> {
+  user?: Member;
 }
 
 function ForumPostContent ({ content, title }: { content: ForumPostContent, title?: string }) {
@@ -35,7 +24,6 @@ function ForumPostContent ({ content, title }: { content: ForumPostContent, titl
   }
   if (content.type === 'image') {
     return <img src={content.content} alt={title || 'Post'} width='100%' />;
-    // return <Image src={content.content} alt='Post' layout='fill' />;
   }
 
   return null;

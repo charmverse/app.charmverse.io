@@ -6,6 +6,7 @@ import useSWRInfinite from 'swr/infinite';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 
 import CreateForumPost from '../CreateForumPost';
@@ -56,8 +57,15 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
     (index) => currentSpace ? { url: 'forum/posts', arguments: { page: index + 1 } } : null,
     (args) => charmClient.forum.listForumPosts(currentSpace!.id, sortValue || 'Most Popular', categoryValue, count, args.arguments.page)
   );
+  const { members } = useMembers();
 
-  const posts = data ? [...data].flat() : [];
+  const posts = data ? [...data].flat().map(post => {
+    const { userId, ...restPost } = post;
+    return {
+      ...restPost,
+      user: members.find(item => item.id === post.userId)
+    };
+  }) : [];
   const isLoadingInitialData = !data && !error;
   const isLoadingMore = isLoadingInitialData || (size > 0 && data && typeof data[size - 1] === 'undefined');
   const isEmpty = data?.[0]?.length === 0;
@@ -70,21 +78,18 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
     }
   }, [isVisible, isRefreshing, isReachingEnd, data, isLoadingMore]);
 
-  if (error) {
-    return (
-      <Alert severity='error'>
-        There was an unexpected error
-      </Alert>
-    );
-  }
-
   return (
     <>
       <CreateForumPost />
-      {posts.map(post => <ForumPost key={post.id} {...post} />)}
+      {error && (
+        <Alert severity='error'>
+          There was an unexpected error while loading the posts
+        </Alert>
+      )}
       {isLoadingMore && (
         <ForumPostSkeleton />
       )}
+      {posts.map(post => <ForumPost key={post.id} {...post} />)}
       <Box ref={ref}>
         {isReachingEnd && (
           <Alert severity='info'>End of the forum</Alert>

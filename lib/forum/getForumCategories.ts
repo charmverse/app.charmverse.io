@@ -1,4 +1,3 @@
-import { prisma } from 'db';
 import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 
 export async function getForumCategories ({ spaceId, userId }: AvailableResourcesRequest): Promise<string[]> {
