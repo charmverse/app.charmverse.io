@@ -80,3 +80,4 @@ export async function generateSpaceForUser (user: LoggedInUser, isAdmin = true, 
 
   return space;
 }
+

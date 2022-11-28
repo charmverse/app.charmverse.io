@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
@@ -15,7 +14,6 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
-import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
   onError,

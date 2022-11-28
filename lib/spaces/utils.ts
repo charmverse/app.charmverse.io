@@ -24,3 +24,7 @@ export function isSpaceDomain (path?: string) {
 
   return domain && !DOMAIN_BLACKLIST.includes(domain);
 }
+
+export function getSpaceDomainFromName (name: string) {
+  return name.replace(/[^\w\s-]/gu, '').replace(/\s/g, '-').toLowerCase();
+}
