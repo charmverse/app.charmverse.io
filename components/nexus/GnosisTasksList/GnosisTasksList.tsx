@@ -1,40 +1,17 @@
-import EmailIcon from '@mui/icons-material/Email';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import PeopleIcon from '@mui/icons-material/People';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Collapse from '@mui/material/Collapse';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import type { UserGnosisSafe } from '@prisma/client';
-import { DateTime } from 'luxon';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
-import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
-import type { GnosisSafeTasks, GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
-import { getGnosisSafeUrl } from 'lib/gnosis/utils';
-import { shortenHex } from 'lib/utilities/strings';
+import type { GnosisSafeTasks } from 'lib/gnosis/gnosis.tasks';
 
 import { GnosisConnectCard } from '../../integrations/components/GnosisSafes';
-import { EmptyTaskState } from '../components/EmptyTaskState';
-import Table from '../components/NexusTable';
 import useTasksState from '../hooks/useTasksState';
 
 import { SafeTasks } from './GnosisTasksTable';
@@ -97,10 +74,10 @@ export function GnosisTasksList ({ error, mutateTasks, tasks }: GnosisTasksSecti
 
   return (
     <>
-      {gnosisSigner && user && (
+      {safeData.length === 0 && (
         <GnosisConnectCard loading={isRefreshingSafes} onClick={importSafes} />
       )}
-      {safeData?.map(safe => {
+      {safeData.map(safe => {
         const safeTasks = tasks.filter(taskGroup => taskGroup.safeAddress === safe.address).map(taskGroup => taskGroup.tasks).flat();
         return (
           <SafeTasks
