@@ -1,16 +1,9 @@
-
 import React from 'react';
 
-export default function DashboardOnboardingSvg (props: React.HTMLAttributes<HTMLSpanElement>): JSX.Element {
+export default function DashboardOnboardingSvg(props: React.HTMLAttributes<HTMLSpanElement>): JSX.Element {
   return (
     <span {...props}>
-      <svg
-        width='140'
-        height='224'
-        viewBox='0 0 140 224'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
+      <svg width='140' height='224' viewBox='0 0 140 224' fill='none' xmlns='http://www.w3.org/2000/svg'>
         <g clipPath='url(#clip0)'>
           <path
             d='M79.7585 57.1415L77.2974 48.396L80.5538 44.7262C81.2834 40.092 78.9882 39.09 77.7357 38.2038C74.8738 36.1748 73.8217 33.3442 71.5735 33.9955C70.321 34.4307 67.409 37.5306 65.6492 40.164C64.7099 41.5856 63.4574 42.5312 64.1212 43.9058C64.607 44.7553 65.1642 45.5619 65.787 46.3168L67.9037 58.0652L79.7585 57.1415Z'
@@ -176,17 +169,10 @@ export default function DashboardOnboardingSvg (props: React.HTMLAttributes<HTML
         />
         <defs>
           <clipPath id='clip0'>
-            <rect
-              width='140'
-              height='193.262'
-              fill='white'
-              transform='translate(0 30)'
-            />
+            <rect width='140' height='193.262' fill='white' transform='translate(0 30)' />
           </clipPath>
         </defs>
       </svg>
-
     </span>
   );
 }
-

@@ -1,4 +1,3 @@
-
 import type { Bounty, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -20,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('updateBountySettings', () => {
-
   it("should be able to update 'title' | 'descriptionNodes' | 'description' | 'reviewer' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'", async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
@@ -47,16 +44,14 @@ describe('updateBountySettings', () => {
       updateContent: newContent
     });
 
-    (Object.keys(newContent) as (keyof UpdateableBountyFields)[]).forEach(key => {
+    (Object.keys(newContent) as (keyof UpdateableBountyFields)[]).forEach((key) => {
       if (key !== 'permissions') {
         expect(updatedBounty[key]).toBe(newContent[key]);
       }
     });
-
   });
 
   it('should not be able to update the status', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
@@ -73,11 +68,9 @@ describe('updateBountySettings', () => {
     });
 
     expect(updatedBounty.status).toBe('suggestion');
-
   });
 
   it('should fail is a null or number equal or below 0 is given for the reward amount', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
@@ -94,8 +87,7 @@ describe('updateBountySettings', () => {
         updateContent: newContent
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
     }
 
@@ -107,8 +99,7 @@ describe('updateBountySettings', () => {
         updateContent: newContent
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
     }
 
@@ -120,15 +111,12 @@ describe('updateBountySettings', () => {
         updateContent: newContent
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(PositiveNumbersOnlyError);
     }
-
   });
 
   it('should fail if the new cap would be lower than the current valid amount of submissions', async () => {
-
     const bounty = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -145,12 +133,8 @@ describe('updateBountySettings', () => {
         }
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
-
 });
-

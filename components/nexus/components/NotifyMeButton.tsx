@@ -1,4 +1,3 @@
-
 import EmailIcon from '@mui/icons-material/Mail';
 import Tooltip from '@mui/material/Tooltip';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -9,8 +8,7 @@ import { useUser } from 'hooks/useUser';
 
 import NotifyMeModal from './NotifyMeModal';
 
-export default function NotifyMeButton () {
-
+export default function NotifyMeButton() {
   const { user, setUser } = useUser();
 
   const popupState = usePopupState({
@@ -18,12 +16,12 @@ export default function NotifyMeButton () {
     variant: 'popover'
   });
 
-  async function saveEmail (email: string | null) {
+  async function saveEmail(email: string | null) {
     await charmClient.updateUser({
       email
     });
     // @ts-ignore can't get types to work
-    setUser(_user => ({ ..._user, email }));
+    setUser((_user) => ({ ..._user, email }));
   }
 
   return (

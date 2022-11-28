@@ -1,11 +1,9 @@
-
 import log from 'lib/log';
 import { count } from 'lib/metrics';
 
 import updateVoteStatus from './updateVoteStatus';
 
-export async function task () {
-
+export async function task() {
   log.debug('Running update vote status cron job');
 
   try {
@@ -14,8 +12,7 @@ export async function task () {
     log.info(`Updated ${updateCount} votes`);
 
     count('cron.vote-status.updated', updateCount);
-  }
-  catch (error: any) {
+  } catch (error: any) {
     log.error(`Error running vote status update: ${error.stack || error.message || error}`, { error });
   }
 }

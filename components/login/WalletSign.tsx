@@ -21,7 +21,7 @@ interface Props {
   loading?: boolean;
 }
 
-export function WalletSign ({
+export function WalletSign({
   signSuccess,
   buttonStyle,
   buttonSize,
@@ -30,7 +30,6 @@ export function WalletSign ({
   enableAutosign = true,
   loading
 }: Props) {
-
   const {
     account,
     sign,
@@ -61,16 +60,13 @@ export function WalletSign ({
     }
   }, [verifiableWalletDetected]);
 
-  async function generateWalletAuth () {
-
+  async function generateWalletAuth() {
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
-
       signSuccess(walletAuthSignature);
-    }
-    else {
+    } else {
       sign()
         .then(signSuccess)
-        .catch(error => {
+        .catch((error) => {
           log.error('Error requesting wallet signature in login page', error);
           showMessage('Wallet signature failed', 'warning');
         });
@@ -96,7 +92,15 @@ export function WalletSign ({
   }
 
   return (
-    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} disabled={showLoadingState} loading={showLoadingState} variant={buttonOutlined ? 'outlined' : undefined}>
+    <ButtonComponent
+      data-test='verify-wallet-button'
+      sx={buttonStyle}
+      size={buttonSize ?? 'large'}
+      onClick={generateWalletAuth}
+      disabled={showLoadingState}
+      loading={showLoadingState}
+      variant={buttonOutlined ? 'outlined' : undefined}
+    >
       Verify wallet
     </ButtonComponent>
   );

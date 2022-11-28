@@ -1,4 +1,3 @@
-
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -13,10 +12,10 @@ import MenuWrapper from '../../widgets/menuWrapper';
 import { typeDisplayName } from '../../widgets/propertyMenu';
 
 type Props = {
-    properties: readonly IPropertyTemplate[];
-    activeView: BoardView;
-    dateDisplayPropertyName?: string;
-}
+  properties: readonly IPropertyTemplate[];
+  activeView: BoardView;
+  dateDisplayPropertyName?: string;
+};
 
 const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
   const { properties, activeView, dateDisplayPropertyName } = props;
@@ -24,8 +23,10 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
 
   const createdDateName = typeDisplayName(intl, 'createdTime');
 
-  const getDateProperties = () : IPropertyTemplate[] => {
-    return properties?.filter((o: IPropertyTemplate) => o.type === 'date' || o.type === 'createdTime' || o.type === 'updatedTime');
+  const getDateProperties = (): IPropertyTemplate[] => {
+    return properties?.filter(
+      (o: IPropertyTemplate) => o.type === 'date' || o.type === 'createdTime' || o.type === 'updatedTime'
+    );
   };
 
   return (
@@ -36,10 +37,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
           defaultMessage='Display by: {property}'
           values={{
             property: (
-              <span
-                style={{ color: 'rgb(var(--center-channel-color-rgb))' }}
-                id='displayByLabel'
-              >
+              <span style={{ color: 'rgb(var(--center-channel-color-rgb))' }} id='displayByLabel'>
                 {dateDisplayPropertyName || createdDateName}
               </span>
             )
@@ -47,30 +45,32 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
         />
       </Button>
       <Menu>
-        {getDateProperties().length > 0 && getDateProperties().map((date: IPropertyTemplate) => (
-          <Menu.Text
-            key={date.id}
-            id={date.id}
-            name={date.name}
-            rightIcon={activeView.fields.dateDisplayPropertyId === date.id ? <CheckOutlinedIcon fontSize='small' /> : undefined}
-            onClick={(id) => {
-              if (activeView.fields.dateDisplayPropertyId === id) {
-                return;
+        {getDateProperties().length > 0 &&
+          getDateProperties().map((date: IPropertyTemplate) => (
+            <Menu.Text
+              key={date.id}
+              id={date.id}
+              name={date.name}
+              rightIcon={
+                activeView.fields.dateDisplayPropertyId === date.id ? <CheckOutlinedIcon fontSize='small' /> : undefined
               }
-              mutator.changeViewDateDisplayPropertyId(activeView.id, activeView.fields.dateDisplayPropertyId, id);
-            }}
+              onClick={(id) => {
+                if (activeView.fields.dateDisplayPropertyId === id) {
+                  return;
+                }
+                mutator.changeViewDateDisplayPropertyId(activeView.id, activeView.fields.dateDisplayPropertyId, id);
+              }}
+            />
+          ))}
+        {getDateProperties().length === 0 && (
+          <Menu.Text
+            key='createdDate'
+            id='createdDate'
+            name={createdDateName}
+            rightIcon={<CheckOutlinedIcon fontSize='small' />}
+            onClick={() => {}}
           />
-        ))}
-        {getDateProperties().length === 0
-                    && (
-                      <Menu.Text
-                        key='createdDate'
-                        id='createdDate'
-                        name={createdDateName}
-                        rightIcon={<CheckOutlinedIcon fontSize='small' />}
-                        onClick={() => {}}
-                      />
-                    )}
+        )}
       </Menu>
     </MenuWrapper>
   );

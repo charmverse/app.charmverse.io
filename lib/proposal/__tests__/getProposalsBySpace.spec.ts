@@ -88,9 +88,8 @@ describe('Get all proposals of a space', () => {
 
     expect(adminAccessibleProposals.length).toBe(2);
 
-    expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal1.id)).toBe(true);
-    expect(adminAccessibleProposals.some(p => p.id === accessibleSpacePageProposal2.id)).toBe(true);
-
+    expect(adminAccessibleProposals.some((p) => p.id === accessibleSpacePageProposal1.id)).toBe(true);
+    expect(adminAccessibleProposals.some((p) => p.id === accessibleSpacePageProposal2.id)).toBe(true);
   });
 
   it('should not return proposal templates', async () => {
@@ -120,6 +119,5 @@ describe('Get all proposals of a space', () => {
 
     expect(proposals.length).toBe(1);
     expect(proposals[0].id).toBe(proposalPage.id);
-
   });
 });

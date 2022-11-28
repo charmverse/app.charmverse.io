@@ -7,14 +7,14 @@ import type { IChainDetails } from 'connectors';
 import { RPCList } from 'connectors';
 import { useEffect, useState } from 'react';
 
-interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'>{
+interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;
   defaultChainId?: number; // allow setting a default
   chainId?: number; // allow overriding from the parent
   sx?: SxProps;
 }
 
-export default function InputSearchBlockchain ({
+export default function InputSearchBlockchain({
   defaultChainId,
   chainId,
   onChange = () => {},
@@ -22,12 +22,11 @@ export default function InputSearchBlockchain ({
   disabled,
   readOnly
 }: Props) {
-
   const [value, setValue] = useState<IChainDetails | null>(null);
 
   useEffect(() => {
     if (defaultChainId && !value) {
-      const chain = RPCList.find(rpc => rpc.chainId === defaultChainId);
+      const chain = RPCList.find((rpc) => rpc.chainId === defaultChainId);
       if (chain) {
         setValue(chain);
       }
@@ -36,16 +35,18 @@ export default function InputSearchBlockchain ({
 
   useEffect(() => {
     if (chainId) {
-      const chain = RPCList.find(rpc => rpc.chainId === chainId);
+      const chain = RPCList.find((rpc) => rpc.chainId === chainId);
       if (chain) {
         setValue(chain);
       }
     }
   }, [chainId]);
 
-  const defaultValueToAssign = defaultChainId ? RPCList.find(rpc => {
-    return rpc.chainId === defaultChainId;
-  }) : undefined;
+  const defaultValueToAssign = defaultChainId
+    ? RPCList.find((rpc) => {
+        return rpc.chainId === defaultChainId;
+      })
+    : undefined;
 
   return (
     <Autocomplete
@@ -63,12 +64,10 @@ export default function InputSearchBlockchain ({
       disableClearable
       autoHighlight
       size='small'
-      getOptionLabel={option => `${option.chainName}`}
+      getOptionLabel={(option) => `${option.chainName}`}
       renderOption={(props, option) => (
         <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-          <Box component='span'>
-            {option.chainName}
-          </Box>
+          <Box component='span'>{option.chainName}</Box>
         </Box>
       )}
       renderInput={(params) => (

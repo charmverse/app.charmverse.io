@@ -46,8 +46,7 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
-export default function PublicPage () {
-
+export default function PublicPage() {
   const { account, verifiableWalletDetected } = useWeb3AuthSig();
   const { setUser } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
@@ -55,7 +54,8 @@ export default function PublicPage () {
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();
-  const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
+  const pageIdOrPath =
+    router.query.pageId instanceof Array ? router.query.pageId.join('/') : (router.query.pageId as string);
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId, getPagePermissions } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
@@ -72,7 +72,7 @@ export default function PublicPage () {
   const hasShareInPath = router.asPath.split('/')[1] === 'share';
   const editString = router.asPath.replace('/share', '');
 
-  async function onLoad () {
+  async function onLoad() {
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
@@ -88,13 +88,11 @@ export default function PublicPage () {
         foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
         if (foundSpace) {
           setSpaces([foundSpace]);
-        }
-        else {
+        } else {
           setPageNotFound(true);
         }
       }
-    }
-    catch (err) {
+    } catch (err) {
       setPageNotFound(true);
     }
 
@@ -117,17 +115,16 @@ export default function PublicPage () {
         setSpaces([space]);
 
         dispatch(setCurrent(rootPage.id));
-        cards.forEach(card => {
+        cards.forEach((card) => {
           dispatch(addCard(card));
         });
 
-        views.forEach(view => {
+        views.forEach((view) => {
           dispatch(addView(view));
         });
 
         dispatch(updateBoards(boards));
-      }
-      catch (err) {
+      } catch (err) {
         setPageNotFound(true);
       }
     }
@@ -135,13 +132,11 @@ export default function PublicPage () {
   }
 
   useEffect(() => {
-
     onLoad();
 
     return () => {
       setCurrentPageId('');
     };
-
   }, []);
 
   if (!router.query || loadingSpace) {
@@ -149,11 +144,11 @@ export default function PublicPage () {
   }
 
   if (isBountiesPage && !currentSpace) {
-    return <ErrorPage message={'Sorry, that space doesn\'t exist'} />;
+    return <ErrorPage message={"Sorry, that space doesn't exist"} />;
   }
 
   if (pageNotFound) {
-    return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
+    return <ErrorPage message={"Sorry, that page doesn't exist"} />;
   }
 
   const currentPage = pages[basePageId];
@@ -166,17 +161,16 @@ export default function PublicPage () {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-
         <AppBar sidebarWidth={0} position='fixed' open={false}>
-
           <StyledToolbar variant='dense'>
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 1,
-              width: '100%'
-            }}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 1,
+                width: '100%'
+              }}
             >
               <PageTitleWithBreadcrumbs pageId={basePageId} />
               <Box display='flex' alignItems='center'>
@@ -191,7 +185,11 @@ export default function PublicPage () {
                 {/** dark mode toggle */}
                 <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>
                   <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-                    {theme.palette.mode === 'dark' ? <SunIcon color='secondary' fontSize='small' /> : <MoonIcon color='secondary' fontSize='small' />}
+                    {theme.palette.mode === 'dark' ? (
+                      <SunIcon color='secondary' fontSize='small' />
+                    ) : (
+                      <MoonIcon color='secondary' fontSize='small' />
+                    )}
                   </IconButton>
                 </Tooltip>
                 {/** user account */}
@@ -205,20 +203,23 @@ export default function PublicPage () {
           <PageContainer>
             <HeaderSpacer />
 
-            {isBountiesPage
-              ? <PublicBountiesPage />
-              : (currentPage?.type.match(/board/)
-                ? (
-                  <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
-                ) : (
-                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
-                )
-              )}
+            {isBountiesPage ? (
+              <PublicBountiesPage />
+            ) : currentPage?.type.match(/board/) ? (
+              <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
+            ) : (
+              currentPage && (
+                <DocumentPage
+                  page={currentPage}
+                  setPage={() => {}}
+                  readOnly={true}
+                  parentProposalId={parentProposalId}
+                />
+              )
+            )}
             <PageDialogGlobalModal />
-
           </PageContainer>
         </PageDialogProvider>
-
       </LayoutContainer>
     </>
   );

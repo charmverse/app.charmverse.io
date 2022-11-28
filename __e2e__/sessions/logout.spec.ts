@@ -23,21 +23,18 @@ const test = base.extend<Fixtures>({
 });
 
 test('login - allows user to logout even with a connected wallet', async ({ loginPage, nexusPage }) => {
-
   const { address, privateKey } = await generateUserAndSpace();
 
   await mockWeb3({
     page: loginPage.page,
     context: { privateKey, address },
     init: ({ Web3Mock, context }) => {
-
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {
           return: [context.address]
         }
       });
-
     }
   });
 
@@ -49,5 +46,4 @@ test('login - allows user to logout even with a connected wallet', async ({ logi
 
   // should auto redirect to workspace
   await loginPage.waitForURL();
-
 });

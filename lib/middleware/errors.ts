@@ -2,8 +2,7 @@ import type { ISystemErrorInput } from 'lib/utilities/errors';
 import { SystemError } from 'lib/utilities/errors';
 
 export class SpaceAccessDeniedError extends SystemError {
-
-  constructor () {
+  constructor() {
     super({
       severity: 'warning',
       errorType: 'Access denied',
@@ -13,8 +12,7 @@ export class SpaceAccessDeniedError extends SystemError {
 }
 
 export class NotFoundError extends SystemError {
-
-  constructor (message = 'Data not found') {
+  constructor(message = 'Data not found') {
     super({
       severity: 'warning',
       errorType: 'Data not found',
@@ -24,8 +22,7 @@ export class NotFoundError extends SystemError {
 }
 
 export class ActionNotPermittedError extends SystemError {
-
-  constructor (message?: string) {
+  constructor(message?: string) {
     super({
       severity: 'warning',
       errorType: 'Access denied',
@@ -35,7 +32,7 @@ export class ActionNotPermittedError extends SystemError {
 }
 
 export class UnknownError extends SystemError {
-  constructor (error: any = {}) {
+  constructor(error: any = {}) {
     super({
       errorType: 'Unknown',
       message: 'Something went wrong!',
@@ -46,7 +43,7 @@ export class UnknownError extends SystemError {
 }
 
 export class InvalidStateError extends SystemError {
-  constructor (message: string = 'Something went wrong') {
+  constructor(message: string = 'Something went wrong') {
     super({
       message,
       errorType: 'Unable to respond',
@@ -56,8 +53,7 @@ export class InvalidStateError extends SystemError {
 }
 
 export class ApiError extends SystemError {
-
-  constructor (errorInfo: Pick<ISystemErrorInput, 'errorType' | 'message'>) {
+  constructor(errorInfo: Pick<ISystemErrorInput, 'errorType' | 'message'>) {
     super({
       errorType: errorInfo.errorType,
       message: errorInfo.message

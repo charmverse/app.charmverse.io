@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 
 export const FieldLabel = styled(Typography)`
   font-weight: bold;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 `;
 
 export default FieldLabel;

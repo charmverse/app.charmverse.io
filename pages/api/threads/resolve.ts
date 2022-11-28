@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,11 +9,9 @@ import type { MultipleThreadsInput } from 'lib/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(requireKeys<MultipleThreadsInput>(['threadIds', 'pageId'], 'body'), resolveThreads);
+handler.use(requireUser).post(requireKeys<MultipleThreadsInput>(['threadIds', 'pageId'], 'body'), resolveThreads);
 
-async function resolveThreads (req: NextApiRequest, res: NextApiResponse) {
-
+async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
   const { threadIds, pageId } = req.body as MultipleThreadsInput;
 
   const userId = req.session.user.id;

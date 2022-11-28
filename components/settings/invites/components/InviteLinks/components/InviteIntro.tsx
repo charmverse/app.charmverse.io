@@ -15,16 +15,20 @@ const StyledListItemText = styled(ListItemText)`
   display: list-item;
 `;
 
-function InviteIntro () {
+function InviteIntro() {
   return (
     <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} whiteSpace='normal'>
-      <Typography variant='h2' fontSize='inherit' fontWeight={700} marginBottom='24px'>Invite Members to this Workspace</Typography>
+      <Typography variant='h2' fontSize='inherit' fontWeight={700} marginBottom='24px'>
+        Invite Members to this Workspace
+      </Typography>
       <Typography variant='body1' gutterBottom>
         There are 2 ways admins can invite users to this Workspace:
       </Typography>
       <StyledList>
         <StyledListItemText>Private Invite Links: Anyone with this link can join your workspace.</StyledListItemText>
-        <StyledListItemText>Token Gates: Control access to your workspace automatically with tokens/NFTs.</StyledListItemText>
+        <StyledListItemText>
+          Token Gates: Control access to your workspace automatically with tokens/NFTs.
+        </StyledListItemText>
       </StyledList>
     </Legend>
   );

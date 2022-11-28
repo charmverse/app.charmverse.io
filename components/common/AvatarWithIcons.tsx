@@ -31,12 +31,14 @@ export type AvatarWithIconsProps = InitialAvatarProps & {
   icons: ReactNode;
 };
 
-export default function AvatarWithIcons (props: AvatarWithIconsProps) {
+export default function AvatarWithIcons(props: AvatarWithIconsProps) {
   const { icons } = props;
 
   return (
     <StyledBox>
-      <StyledStack direction='row' spacing={1} padding={1} className='icons-stack'>{ icons }</StyledStack>
+      <StyledStack direction='row' spacing={1} padding={1} className='icons-stack'>
+        {icons}
+      </StyledStack>
       <Avatar {...props} />
     </StyledBox>
   );

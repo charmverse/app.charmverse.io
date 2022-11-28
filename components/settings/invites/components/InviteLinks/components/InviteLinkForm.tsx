@@ -20,13 +20,13 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 interface FormProps {
-  defaultValues?: { name: string, domain: string };
+  defaultValues?: { name: string; domain: string };
   onClose?: () => void;
   onSubmit: (values: FormValues) => void;
   submitText?: string;
 }
 
-const maxAgeOptions: { value: FormValues['maxAgeMinutes'], label: string }[] = [
+const maxAgeOptions: { value: FormValues['maxAgeMinutes']; label: string }[] = [
   { value: 1 * 30, label: '30 minutes' },
   { value: 1 * 60, label: '1 hour' },
   { value: 6 * 60, label: '6 hours' },
@@ -36,7 +36,7 @@ const maxAgeOptions: { value: FormValues['maxAgeMinutes'], label: string }[] = [
   { value: -1, label: 'Never' }
 ];
 
-const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
+const maxUsesOptions: { value: FormValues['maxUses']; label: string }[] = [
   { value: -1, label: 'No limit' },
   { value: 1, label: '1 use' },
   { value: 5, label: '5 uses' },
@@ -46,8 +46,7 @@ const maxUsesOptions: { value: FormValues['maxUses'], label: string }[] = [
   { value: 100, label: '100 uses' }
 ];
 
-export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: FormProps) {
-
+export default function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
   const defaultMaxAge = maxAgeOptions[maxAgeOptions.length - 2].value; // the longest duration thats not infinite
   const defaultMaxUses = maxUsesOptions[0].value; // no limit
 
@@ -64,32 +63,25 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: For
     resolver: yupResolver(schema)
   });
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     try {
       _onSubmit(values);
-    }
-    catch (e) {
+    } catch (e) {
       setError('apiError', {
-        message: (e as Error).message || e as string
+        message: (e as Error).message || (e as string)
       });
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle onClose={onClose}>
-        Create an invite link
-      </DialogTitle>
+      <DialogTitle onClose={onClose}>Create an invite link</DialogTitle>
       <Divider />
       <br />
       <Grid container direction='column' spacing={3}>
         <Grid item>
           <FieldLabel>Expire after</FieldLabel>
-          <Select
-            {...register('maxAgeMinutes')}
-            fullWidth
-            defaultValue={defaultMaxAge}
-          >
+          <Select {...register('maxAgeMinutes')} fullWidth defaultValue={defaultMaxAge}>
             {maxAgeOptions.map(({ value, label }) => (
               <MenuItem key={value} value={value}>
                 {label}
@@ -99,11 +91,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: For
         </Grid>
         <Grid item>
           <FieldLabel>Max number of uses</FieldLabel>
-          <Select
-            {...register('maxUses')}
-            fullWidth
-            defaultValue={defaultMaxUses}
-          >
+          <Select {...register('maxUses')} fullWidth defaultValue={defaultMaxUses}>
             {maxUsesOptions.map(({ value, label }) => (
               <MenuItem key={value} value={value}>
                 {label}
@@ -115,9 +103,7 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: For
           <Button variant='outlined' color='secondary' onClick={onClose}>
             Cancel
           </Button>
-          <PrimaryButton type='submit'>
-            Generate a New Link
-          </PrimaryButton>
+          <PrimaryButton type='submit'>Generate a New Link</PrimaryButton>
         </Grid>
         {errors.apiError && (
           <Grid item>
@@ -127,5 +113,4 @@ export default function WorkspaceSettings ({ onSubmit: _onSubmit, onClose }: For
       </Grid>
     </form>
   );
-
 }

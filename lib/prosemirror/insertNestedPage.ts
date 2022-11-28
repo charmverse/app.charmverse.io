@@ -12,7 +12,7 @@ import type { NestedPagePluginState } from 'components/common/CharmEditor/compon
  * @param view Editor view
  * @param pageId Page id to be linked with
  */
-export function insertNestedPage (pluginKey: PluginKey<NestedPagePluginState>, view: EditorView, pageId: string) {
+export function insertNestedPage(pluginKey: PluginKey<NestedPagePluginState>, view: EditorView, pageId: string) {
   const { suggestTooltipKey } = pluginKey.getState(view.state) as NestedPagePluginState;
   replaceSuggestionMarkWith(pluginKey, '', true)(view.state, view.dispatch, view);
   hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);

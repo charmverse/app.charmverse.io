@@ -10,7 +10,7 @@ interface Props {
   label?: string;
 }
 
-export function EditIcon ({ iconSize, label, fontSize }: Props) {
+export function EditIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <ModeEditOutlineOutlinedIcon fontSize={iconSize} />

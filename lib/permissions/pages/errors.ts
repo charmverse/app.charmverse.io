@@ -3,8 +3,7 @@ import { PagePermissionLevel } from '@prisma/client';
 import { SystemError } from 'lib/utilities/errors';
 
 export class PermissionNotFoundError extends SystemError {
-
-  constructor (permissionId: string) {
+  constructor(permissionId: string) {
     super({
       errorType: 'Data not found',
       message: `Could not find permission with ID ${permissionId}`,
@@ -14,8 +13,7 @@ export class PermissionNotFoundError extends SystemError {
 }
 
 export class InvalidPermissionLevelError extends SystemError {
-
-  constructor (wrongPermissionLevel: string) {
+  constructor(wrongPermissionLevel: string) {
     super({
       errorType: 'Invalid input',
       message: `'${wrongPermissionLevel} is an invalid permission level`,
@@ -28,8 +26,7 @@ export class InvalidPermissionLevelError extends SystemError {
 }
 
 export class SelfInheritancePermissionError extends SystemError {
-
-  constructor () {
+  constructor() {
     super({
       errorType: 'Invalid input',
       message: 'Pages cannot inherit permissions from themselves',
@@ -39,7 +36,7 @@ export class SelfInheritancePermissionError extends SystemError {
 }
 
 export class CannotInheritOutsideTreeError extends SystemError {
-  constructor (attemptedToInheritFromPage: string, targetPageId: string) {
+  constructor(attemptedToInheritFromPage: string, targetPageId: string) {
     super({
       errorType: 'Invalid input',
       message: `Page ${targetPageId} cannot inherit from ${attemptedToInheritFromPage} as the latter is not a parent of the former`,

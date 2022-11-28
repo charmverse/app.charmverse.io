@@ -17,8 +17,6 @@ type WorkspaceAvatarProps = {
   image: string | null;
 };
 
-export default function WorkspaceAvatar ({ active = false, name = '', image = '' }: WorkspaceAvatarProps) {
-  return (
-    <StyledAvatar active={active} avatar={image} name={name} variant='rounded' />
-  );
+export default function WorkspaceAvatar({ active = false, name = '', image = '' }: WorkspaceAvatarProps) {
+  return <StyledAvatar active={active} avatar={image} name={name} variant='rounded' />;
 }

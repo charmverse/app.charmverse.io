@@ -5,7 +5,7 @@ import { RPC } from 'connectors';
 
 import log from 'lib/log';
 
-type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider }
+type WindowType = Window & typeof globalThis & { ethereum: ExternalProvider };
 
 const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) => async () => {
   // @ts-ignore Not using .toHexString(), because the method requires unpadded format: '0x1' for mainnet, not '0x01'
@@ -19,10 +19,9 @@ const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) 
       params: [{ chainId }]
     });
     callback?.();
-  }
-  catch (e) {
+  } catch (e) {
     // This error code indicates that the chain has not been added to MetaMask.
-    if ((<any> e).code === 4902) {
+    if ((<any>e).code === 4902) {
       try {
         if (!RPC[targetNetwork]) throw Error();
 
@@ -30,8 +29,7 @@ const requestNetworkChange = (targetNetwork: Blockchain, callback?: () => void) 
           method: 'wallet_addEthereumChain',
           params: [RPC[targetNetwork]]
         });
-      }
-      catch (addError) {
+      } catch (addError) {
         log.warn('Failed to add network to MetaMask');
       }
     }

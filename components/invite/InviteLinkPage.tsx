@@ -16,15 +16,14 @@ import type { InviteLinkPopulated } from 'lib/invites';
 
 import { CenteredBox } from './components/CenteredBox';
 
-export default function InvitationPage ({ invite }: { invite: InviteLinkPopulated }) {
-
+export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
   const { connectWallet, walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
   const { loginFromWeb3Account } = useUser();
   const { showOnboarding } = useOnboarding();
   const router = useRouter();
 
-  async function joinSpace () {
+  async function joinSpace() {
     if (!user && verifiableWalletDetected && walletAuthSignature) {
       await charmClient.createUser({ address: walletAuthSignature.address, walletSignature: walletAuthSignature });
     }
@@ -50,7 +49,11 @@ export default function InvitationPage ({ invite }: { invite: InviteLinkPopulate
         ) : (
           <Box display='flex' gap={2}>
             <WalletSign signSuccess={loginFromWeb3Account} />
-            <PrimaryButton size='large' variant='outlined' href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}>
+            <PrimaryButton
+              size='large'
+              variant='outlined'
+              href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}
+            >
               Connect Discord
             </PrimaryButton>
           </Box>

@@ -14,17 +14,15 @@ import useInactiveListener from './hooks/useInactiveListener';
 
 const Web3Connection = createContext({
   isWalletSelectorModalOpen: false,
-  openWalletSelectorModal: () => { },
-  closeWalletSelectorModal: () => { },
+  openWalletSelectorModal: () => {},
+  closeWalletSelectorModal: () => {},
   triedEager: false,
   isNetworkModalOpen: false,
-  openNetworkModal: () => { },
-  closeNetworkModal: () => { }
+  openNetworkModal: () => {},
+  closeNetworkModal: () => {}
 });
 
-function Web3ConnectionManager ({
-  children
-}: PropsWithChildren<any>) {
+function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   const { connector, active } = useWeb3React();
   const {
     isOpen: isWalletSelectorModalOpen,
@@ -53,11 +51,7 @@ function Web3ConnectionManager ({
   useInactiveListener(!triedEager || !!activatingConnector);
 
   useEffect(() => {
-    if (
-      triedEager
-      && !active
-      && (router.query.discordId || router.query.redirectUrl)
-    ) openWalletSelectorModal();
+    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
   }, [triedEager, active, router.query]);
 
   return (
@@ -83,9 +77,7 @@ function Web3ConnectionManager ({
           openNetworkModal
         }}
       />
-      <NetworkModal
-        {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }}
-      />
+      <NetworkModal {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }} />
     </Web3Connection.Provider>
   );
 }

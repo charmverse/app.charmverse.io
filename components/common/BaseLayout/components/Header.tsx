@@ -9,12 +9,12 @@ const HeaderBox = styled.div`
   margin: ${({ theme }) => theme.spacing(3)};
   display: flex;
   justify-content: center;
-  ${props => props.theme.breakpoints.up('sm')} {
+  ${(props) => props.theme.breakpoints.up('sm')} {
     display: block;
   }
 `;
 
-export default function Header () {
+export default function Header() {
   const theme = useTheme();
   const logo = theme.palette.mode === 'dark' ? whiteLogoImage : darkLogoImage;
   return (

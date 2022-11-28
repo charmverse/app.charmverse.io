@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -21,8 +20,7 @@ handler
   .post(addFavoritePage)
   .delete(unFavoritePage);
 
-async function addFavoritePage (req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
-
+async function addFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
   const pageId = req.body.pageId as string;
   const user = await prisma.user.update({
     where: {
@@ -48,8 +46,7 @@ async function addFavoritePage (req: NextApiRequest, res: NextApiResponse<Partia
   return res.status(200).json(user);
 }
 
-async function unFavoritePage (req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
-
+async function unFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
   const pageId = req.body.pageId as string;
   const user = await prisma.user.update({
     where: {

@@ -10,7 +10,7 @@ interface Props {
   label?: string;
 }
 
-export function AddIcon ({ iconSize, label, fontSize }: Props) {
+export function AddIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <MuiAddIcon fontSize={iconSize} />

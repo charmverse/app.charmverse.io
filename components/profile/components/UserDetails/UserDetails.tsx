@@ -55,13 +55,14 @@ const StyledStack = styled(Stack)`
   ${hoverIconsStyle()}
 `;
 
-function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {
+function EditIconContainer({
+  children,
+  readOnly,
+  onClick,
+  ...props
+}: { children: ReactNode; readOnly?: boolean; onClick: IconButtonProps['onClick'] } & IconButtonProps) {
   return (
-    <StyledStack
-      direction='row'
-      spacing={1}
-      alignItems='center'
-    >
+    <StyledStack direction='row' spacing={1} alignItems='center'>
       {children}
       {!readOnly && (
         <IconButton onClick={onClick} {...props} className='icons'>
@@ -72,7 +73,7 @@ function EditIconContainer ({ children, readOnly, onClick, ...props }: { childre
   );
 }
 
-function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
+function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
   const { account } = useWeb3AuthSig();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -96,7 +97,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const socialDetails: Social = userDetails?.social as Social ?? {
+  const socialDetails: Social = (userDetails?.social as Social) ?? {
     twitterURL: '',
     githubURL: '',
     discordUsername: '',
@@ -168,11 +169,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <EditIconContainer
-              data-testid='edit-identity'
-              readOnly={readOnly}
-              onClick={identityModalState.open}
-            >
+            <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{user?.username}</Typography>
             </EditIconContainer>
@@ -181,13 +178,12 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             <Grid item>
               <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
                 <Typography>
-                  {hostname}/u/<Link external href={userLink} target='_blank'>{userPath}</Link>
+                  {hostname}/u/
+                  <Link external href={userLink} target='_blank'>
+                    {userPath}
+                  </Link>
                 </Typography>
-                <Tooltip
-                  placement='top'
-                  title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'}
-                  arrow
-                >
+                <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
                   <Box sx={{ display: 'grid' }}>
                     <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
                       <IconButton>
@@ -202,17 +198,13 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
           <Grid item mt={1} height={40}>
             <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
               <SocialIcons social={socialDetails} />
-              {!readOnly && (
-                <StyledDivider orientation='vertical' flexItem />
-              )}
+              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
             </EditIconContainer>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
-                {
-                  userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
-                }
+                {userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
               </span>
             </EditIconContainer>
           </Grid>
@@ -220,7 +212,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             <EditIconContainer readOnly={readOnly} onClick={timezoneModalState.open} data-testid='edit-timezone'>
               <TimezoneDisplay
                 timezone={userDetails?.timezone}
-                defaultValue={(readOnly ? 'N/A' : 'Update your timezone')}
+                defaultValue={readOnly ? 'N/A' : 'Update your timezone'}
               />
             </EditIconContainer>
           </Grid>
@@ -232,7 +224,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
             save={(id: string, identityType: IdentityType) => {
-              const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
+              const username: string = identityType === IDENTITY_TYPES[0] ? ENSName || shortenHex(id) : id;
               handleUserUpdate({ username, identityType });
             }}
             identityTypes={identityTypes}
@@ -259,7 +251,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
                 path
               });
               // @ts-ignore - not sure why types are wrong
-              updateUser(_user => ({ ..._user, path }));
+              updateUser((_user) => ({ ..._user, path }));
               userPathModalState.close();
             }}
             currentValue={user.path}
@@ -276,22 +268,20 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             }}
             social={socialDetails}
           />
-          {
-            timezoneModalState.isOpen && (
-              <TimezoneModal
-                isOpen={timezoneModalState.isOpen}
-                close={timezoneModalState.close}
-                onSave={async (timezone) => {
-                  await charmClient.updateUserDetails({
-                    timezone
-                  });
-                  mutate();
-                  timezoneModalState.close();
-                }}
-                initialTimezone={userDetails?.timezone}
-              />
-            )
-          }
+          {timezoneModalState.isOpen && (
+            <TimezoneModal
+              isOpen={timezoneModalState.isOpen}
+              close={timezoneModalState.close}
+              onSave={async (timezone) => {
+                await charmClient.updateUserDetails({
+                  timezone
+                });
+                mutate();
+                timezoneModalState.close();
+              }}
+              initialTimezone={userDetails?.timezone}
+            />
+          )}
         </>
       )}
     </>

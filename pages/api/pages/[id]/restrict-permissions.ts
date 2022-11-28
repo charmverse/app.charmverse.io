@@ -9,11 +9,9 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(restrictPermissions);
+handler.use(requireUser).post(restrictPermissions);
 
-async function restrictPermissions (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function restrictPermissions(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
 
   const computed = await computeUserPagePermissions({

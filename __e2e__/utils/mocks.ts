@@ -1,4 +1,3 @@
-
 import type { Page as BrowserPage } from '@playwright/test';
 import type { Bounty, Page, Prisma, Space } from '@prisma/client';
 import { Wallet } from 'ethers';
@@ -17,45 +16,67 @@ import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
-export async function createUser ({ browserPage, address }: { browserPage: BrowserPage, address: string }): Promise<LoggedInUser> {
-
-  return browserPage.request.post(`${baseUrl}/api/profile/dev`, {
-    data: {
-      address
-    }
-  }).then(res => res.json());
+export async function createUser({
+  browserPage,
+  address
+}: {
+  browserPage: BrowserPage;
+  address: string;
+}): Promise<LoggedInUser> {
+  return browserPage.request
+    .post(`${baseUrl}/api/profile/dev`, {
+      data: {
+        address
+      }
+    })
+    .then((res) => res.json());
 }
 
-export async function createSpace ({ browserPage, createdBy, permissionConfigurationMode }: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
-  return browserPage.request.post(`${baseUrl}/api/spaces`, {
-    data: {
-      author: {
-        connect: {
-          id: createdBy
-        }
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      updatedBy: createdBy,
-      spaceRoles: {
-        create: [{
-          isAdmin: true,
-          user: {
-            connect: {
-              id: createdBy
-            }
+export async function createSpace({
+  browserPage,
+  createdBy,
+  permissionConfigurationMode
+}: { browserPage: BrowserPage } & Pick<Space, 'createdBy'> &
+  Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<Space> {
+  return browserPage.request
+    .post(`${baseUrl}/api/spaces`, {
+      data: {
+        author: {
+          connect: {
+            id: createdBy
           }
-        }]
-      },
-      permissionConfigurationMode,
-      domain: `domain-${v4()}`,
-      name: 'Testing space'
-    }
-  }).then(res => res.json());
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        updatedBy: createdBy,
+        spaceRoles: {
+          create: [
+            {
+              isAdmin: true,
+              user: {
+                connect: {
+                  id: createdBy
+                }
+              }
+            }
+          ]
+        },
+        permissionConfigurationMode,
+        domain: `domain-${v4()}`,
+        name: 'Testing space'
+      }
+    })
+    .then((res) => res.json());
 }
 
-export async function getPages ({ browserPage, spaceId }: { browserPage: BrowserPage, spaceId: string }): Promise<IPageWithPermissions[]> {
-  return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then(res => res.json());
+export async function getPages({
+  browserPage,
+  spaceId
+}: {
+  browserPage: BrowserPage;
+  spaceId: string;
+}): Promise<IPageWithPermissions[]> {
+  return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then((res) => res.json());
 }
 
 /**
@@ -63,13 +84,18 @@ export async function getPages ({ browserPage, spaceId }: { browserPage: Browser
  *
  * Returns a user and space along with this space's pages
  */
-export async function createUserAndSpace ({
+export async function createUserAndSpace({
   browserPage,
   permissionConfigurationMode = 'collaborative'
 }: {
   browserPage: BrowserPage;
-} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{ user: LoggedInUser, address: string, privateKey: string, space: Space, pages: IPageWithPermissions[] }> {
-
+} & Partial<Pick<Space, 'permissionConfigurationMode'>>): Promise<{
+  user: LoggedInUser;
+  address: string;
+  privateKey: string;
+  space: Space;
+  pages: IPageWithPermissions[];
+}> {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
@@ -86,7 +112,7 @@ export async function createUserAndSpace ({
   };
 }
 
-export async function createDiscordUser ({ userId, discordUserId }: { userId: string, discordUserId: string }) {
+export async function createDiscordUser({ userId, discordUserId }: { userId: string; discordUserId: string }) {
   return prisma.discordUser.create({
     data: {
       account: {},
@@ -96,15 +122,38 @@ export async function createDiscordUser ({ userId, discordUserId }: { userId: st
   });
 }
 
-export async function generateBounty ({ content = undefined, contentText = '', spaceId, createdBy, status, maxSubmissions, approveSubmitters, title = 'Example', rewardToken = 'ETH', rewardAmount = 1, chainId = 1, bountyPermissions = {}, pagePermissions = [], page = {}, type = 'bounty', id }: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> & Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> & Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & { bountyPermissions?: Partial<BountyPermissions>, pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[], page?: Partial<Pick<Page, 'deletedAt'>> }): Promise<BountyWithDetails> {
-
+export async function generateBounty({
+  content = undefined,
+  contentText = '',
+  spaceId,
+  createdBy,
+  status,
+  maxSubmissions,
+  approveSubmitters,
+  title = 'Example',
+  rewardToken = 'ETH',
+  rewardAmount = 1,
+  chainId = 1,
+  bountyPermissions = {},
+  pagePermissions = [],
+  page = {},
+  type = 'bounty',
+  id
+}: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> &
+  Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> &
+  Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
+    bountyPermissions?: Partial<BountyPermissions>;
+    pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
+    page?: Partial<Pick<Page, 'deletedAt'>>;
+  }): Promise<BountyWithDetails> {
   const pageId = id ?? v4();
 
-  const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(bountyPermissions).reduce((createManyInputs, permissionLevel) => {
-
+  const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
+    bountyPermissions
+  ).reduce((createManyInputs, permissionLevel) => {
     const permissions = bountyPermissions[permissionLevel] as TargetPermissionGroup[];
 
-    permissions.forEach(p => {
+    permissions.forEach((p) => {
       createManyInputs.push({
         permissionLevel,
         userId: p.group === 'user' ? p.id : undefined,
@@ -116,7 +165,6 @@ export async function generateBounty ({ content = undefined, contentText = '', s
 
     createManyInputs.push({
       permissionLevel
-
     });
 
     return createManyInputs;
@@ -158,7 +206,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
     }),
     // Step 2 populate the page permissions
     prisma.pagePermission.createMany({
-      data: pagePermissions.map(p => {
+      data: pagePermissions.map((p) => {
         return {
           ...p,
           pageId
@@ -170,7 +218,7 @@ export async function generateBounty ({ content = undefined, contentText = '', s
   return getBountyOrThrow(pageId);
 }
 
-export async function generateUser ({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
+export async function generateUser({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
   const user = await prisma.user.create({
     data: {
       identityType: IDENTITY_TYPES[0],
@@ -187,7 +235,7 @@ export async function generateUser ({ walletAddress = Wallet.createRandom().addr
   return user;
 }
 
-export async function generateDiscordUser () {
+export async function generateDiscordUser() {
   const user = await prisma.user.create({
     data: {
       identityType: IDENTITY_TYPES[0],
@@ -205,13 +253,7 @@ export async function generateDiscordUser () {
   return user;
 }
 
-export async function generateSpaceRole ({
-  spaceId,
-  userId
-}: {
-  userId: string;
-  spaceId: string;
-}) {
+export async function generateSpaceRole({ spaceId, userId }: { userId: string; spaceId: string }) {
   return prisma.spaceRole.create({
     data: {
       isAdmin: false,
@@ -221,8 +263,10 @@ export async function generateSpaceRole ({
   });
 }
 
-export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Space' }: { isAdmin?: boolean, spaceName?: string } = {}) {
-
+export async function generateUserAndSpace({
+  isAdmin,
+  spaceName = 'Example Space'
+}: { isAdmin?: boolean; spaceName?: string } = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
@@ -233,9 +277,11 @@ export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Spac
   let space: Space;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUniqueOrThrow({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
-  }
-  else {
+    space = await prisma.space.findUniqueOrThrow({
+      where: { id: user.spaceRoles?.[0]?.spaceId },
+      include: { apiToken: true, spaceRoles: true }
+    });
+  } else {
     space = await prisma.space.create({
       data: {
         name: spaceName,
@@ -247,7 +293,7 @@ export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Spac
           }
         },
         updatedBy: user.id,
-        updatedAt: (new Date()).toISOString(),
+        updatedAt: new Date().toISOString(),
         spaceRoles: {
           create: {
             userId: user.id,
@@ -262,10 +308,12 @@ export async function generateUserAndSpace ({ isAdmin, spaceName = 'Example Spac
     spaceId: space.id,
     createdBy: user.id,
     title: 'Test Page',
-    pagePermissions: [{
-      spaceId: space.id,
-      permissionLevel: 'full_access'
-    }]
+    pagePermissions: [
+      {
+        spaceId: space.id,
+        permissionLevel: 'full_access'
+      }
+    ]
   });
 
   return {

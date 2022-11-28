@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Box, IconButton } from '@mui/material';
@@ -14,8 +13,8 @@ const SidebarContainer = styled.div`
 
   // hide scrollbar but allow scrolling
   overflow: auto;
-  scrollbar-width: none;  /* Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
   ::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
   }
@@ -37,11 +36,14 @@ interface SidebarProps {
   closeSidebar: () => void;
 }
 
-export default function Sidebar ({ closeSidebar }: SidebarProps) {
-
+export default function Sidebar({ closeSidebar }: SidebarProps) {
   return (
     <SidebarContainer>
-      <Box sx={{ height: headerHeight, display: { xs: 'flex', sm: 'none' } }} justifyContent='center' alignItems='center'>
+      <Box
+        sx={{ height: headerHeight, display: { xs: 'flex', sm: 'none' } }}
+        justifyContent='center'
+        alignItems='center'
+      >
         <IconButton onClick={closeSidebar} size='small'>
           <ChevronLeftIcon />
         </IconButton>

@@ -11,12 +11,9 @@ export interface TestResult {
   status?: 'loading' | 'error' | 'success';
 }
 
-interface Props extends Omit<ComponentProps<typeof Modal>, 'children'>, TestResult {
+interface Props extends Omit<ComponentProps<typeof Modal>, 'children'>, TestResult {}
 
-}
-
-export default function StatusModal ({ status, message, ...props }: Props) {
-
+export default function StatusModal({ status, message, ...props }: Props) {
   if (!status) {
     return null;
   }

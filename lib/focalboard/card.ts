@@ -1,19 +1,18 @@
-
 import type { Block } from './block';
 import { createBlock } from './block';
 
 type CardFields = {
-    icon?: string;
-    isTemplate?: boolean;
-    properties: Record<string, string | string[]>;
-    contentOrder: (string | string[])[];
-}
+  icon?: string;
+  isTemplate?: boolean;
+  properties: Record<string, string | string[]>;
+  contentOrder: (string | string[])[];
+};
 
 type Card = Block & {
-    fields: CardFields;
-}
+  fields: CardFields;
+};
 
-function createCard (block?: Partial<Block>): Card {
+function createCard(block?: Partial<Block>): Card {
   const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 
@@ -21,8 +20,7 @@ function createCard (block?: Partial<Block>): Card {
     for (const contentId of contentIds) {
       if (typeof contentId === 'string') {
         contentOrder.push(contentId);
-      }
-      else {
+      } else {
         contentOrder.push(contentId.slice());
       }
     }
@@ -42,4 +40,3 @@ function createCard (block?: Partial<Block>): Card {
 
 export { createCard };
 export type { Card };
-

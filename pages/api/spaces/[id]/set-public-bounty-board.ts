@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,15 +10,17 @@ import { togglePublicBounties } from 'lib/spaces/togglePublicBounties';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .use(requireSpaceMembership({
-    adminOnly: true,
-    spaceIdKey: 'id'
-  }))
+handler
+  .use(requireUser)
+  .use(
+    requireSpaceMembership({
+      adminOnly: true,
+      spaceIdKey: 'id'
+    })
+  )
   .post(setPublicBountyBoardController);
 
-async function setPublicBountyBoardController (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
   const { publicBountyBoard } = req.body as Pick<PublicBountyToggle, 'publicBountyBoard'>;
 

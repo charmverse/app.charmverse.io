@@ -2,24 +2,24 @@ import { createNanoEvents } from 'nanoevents';
 import React, { useState, useEffect } from 'react';
 
 export type FlashMessage = {
-    content: React.ReactNode;
-    severity: 'low' | 'normal' | 'high';
-}
+  content: React.ReactNode;
+  severity: 'low' | 'normal' | 'high';
+};
 
 const emitter = createNanoEvents();
 
-export function sendFlashMessage (message: FlashMessage): void {
+export function sendFlashMessage(message: FlashMessage): void {
   emitter.emit('message', message);
 }
 
 type Props = {
-    milliseconds: number;
-}
+  milliseconds: number;
+};
 
 export const FlashMessages = React.memo((props: Props) => {
-  const [message, setMessage] = useState<FlashMessage|null>();
+  const [message, setMessage] = useState<FlashMessage | null>();
   const [fadeOut, setFadeOut] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>|null>(null);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleTimeout = (): void => {
     setMessage(null);
@@ -61,10 +61,7 @@ export const FlashMessages = React.memo((props: Props) => {
   }
 
   return (
-    <div
-      className={`FlashMessages ${message.severity}${fadeOut ? ' flashOut' : ' flashIn'}`}
-      onClick={handleClick}
-    >
+    <div className={`FlashMessages ${message.severity}${fadeOut ? ' flashOut' : ' flashIn'}`} onClick={handleClick}>
       {message.content}
     </div>
   );

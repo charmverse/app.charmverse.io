@@ -10,7 +10,7 @@ import type { ProposalWithUsers } from './interface';
 import { proposalStatusTransitionRecord } from './proposalStatusTransition';
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
-export async function updateProposalStatus ({
+export async function updateProposalStatus({
   proposalId,
   newStatus,
   userId
@@ -22,8 +22,7 @@ export async function updateProposalStatus ({
   proposal: ProposalWithUsers;
   workspaceEvent: WorkspaceEvent;
 }> {
-
-  const proposal = await prisma.proposal.findUnique({
+  const proposal = (await prisma.proposal.findUnique({
     where: {
       id: proposalId
     },
@@ -37,7 +36,7 @@ export async function updateProposalStatus ({
         }
       }
     }
-  }) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
+  })) as ProposalWithUsers & { page: { snapshotProposalId?: string } };
 
   if (!proposal) {
     throw new MissingDataError(`Proposal with id ${proposal} not found`);
@@ -61,8 +60,7 @@ export async function updateProposalStatus ({
         reviewedAt: new Date()
       }
     });
-  }
-  else if (currentStatus === 'reviewed' && newStatus === 'discussion') {
+  } else if (currentStatus === 'reviewed' && newStatus === 'discussion') {
     await prisma.proposal.update({
       where: {
         id: proposalId
@@ -86,7 +84,9 @@ export async function updateProposalStatus ({
     throw new InvalidStateError();
   }
 
-  const snapshotProposal = proposal.page.snapshotProposalId ? await getSnapshotProposal(proposal.page.snapshotProposalId) : null;
+  const snapshotProposal = proposal.page.snapshotProposalId
+    ? await getSnapshotProposal(proposal.page.snapshotProposalId)
+    : null;
 
   return prisma.$transaction(async (tx) => {
     const createdWorkspaceEvent = await tx.workspaceEvent.create({
@@ -128,5 +128,4 @@ export async function updateProposalStatus ({
       proposal: updatedProposal
     };
   });
-
 }

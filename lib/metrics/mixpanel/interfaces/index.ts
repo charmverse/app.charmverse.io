@@ -1,4 +1,3 @@
-
 import type { BountyEventMap } from 'lib/metrics/mixpanel/interfaces/BountyEvents';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvents';
 import type { SettingEventMap } from 'lib/metrics/mixpanel/interfaces/SettingEvents';
@@ -21,5 +20,4 @@ export interface MixpanelUserProfile {
 
 export type MixpanelEventMap = UserEventMap & ProposalEventMap & PageEventMap & BountyEventMap & SettingEventMap;
 
-export type MixpanelEventName = keyof MixpanelEventMap
-
+export type MixpanelEventName = keyof MixpanelEventMap;

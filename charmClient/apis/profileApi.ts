@@ -9,12 +9,11 @@ export interface UpdateProfileItemRequest {
 }
 
 export class ProfileApi {
-  setAvatar (data: UserAvatar) {
+  setAvatar(data: UserAvatar) {
     return http.PUT<LoggedInUser>('/api/profile/avatar', data);
   }
 
-  updateProfileItem (data: UpdateProfileItemRequest) {
+  updateProfileItem(data: UpdateProfileItemRequest) {
     return http.PUT('/api/profile/items', data);
   }
 }
-

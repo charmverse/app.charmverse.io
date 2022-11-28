@@ -24,7 +24,6 @@ let page_1_2_1: Page;
 let page_1_2_1_1: Page;
 
 beforeAll(async () => {
-
   const generated = await generateUserAndSpaceWithApiToken(undefined, false);
 
   user = generated.user;
@@ -102,11 +101,10 @@ beforeAll(async () => {
     createdBy: user.id,
     spaceId: space.id
   });
-
 });
 
 // Reusable set of assertions to validate the shape of the tree from the root
-function validateRootNode (node: PageNodeWithChildren) {
+function validateRootNode(node: PageNodeWithChildren) {
   expect(node.id).toBe(root_1.id);
 
   expect(node.children[0].id).toBe(page_1_1.id);
@@ -120,7 +118,6 @@ function validateRootNode (node: PageNodeWithChildren) {
 }
 
 describe('resolvePageTree', () => {
-
   it('should return the list of parents from closest to root, along with the page and its children', async () => {
     const { parents, targetPage } = await resolvePageTree({ pageId: page_1_1.id });
 
@@ -161,7 +158,6 @@ describe('resolvePageTree', () => {
 
     expect(parents[0].children[0].id).toBe(page_1_1_1.id);
     expect(parents[1].children[0].id).toBe(page_1_1.id);
-
   });
 
   it('should return an empty list of parents for a root page, along with the page and its children', async () => {
@@ -170,7 +166,6 @@ describe('resolvePageTree', () => {
     expect(parents.length).toBe(0);
 
     validateRootNode(targetPage);
-
   });
 
   it('should not return the full page content by default', async () => {
@@ -178,18 +173,15 @@ describe('resolvePageTree', () => {
 
     expect(targetPage).not.toMatchObject(expect.objectContaining(root_1));
     expect((targetPage as any as Page).content).toBeUndefined();
-
   });
 
   it('should return the full page content if the full page option is passed', async () => {
     const { targetPage } = await resolvePageTree({ pageId: root_1.id, fullPage: true });
 
     expect(targetPage).toMatchObject(expect.objectContaining(root_1));
-
   });
 
   it('should ignore deleted pages by default', async () => {
-
     const rootPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -221,7 +213,6 @@ describe('resolvePageTree', () => {
     expect(parents[0].id).toBe(rootPage.id);
 
     expect(targetPage.children.length).toBe(0);
-
   });
 
   it('should include deleted pages if requested', async () => {
@@ -260,12 +251,10 @@ describe('resolvePageTree', () => {
 
     expect(targetPage.children[0].children.length).toBe(1);
     expect(targetPage.children[0].children[0].id).toBe(childPage_1_1_1.id);
-
   });
 });
 
 describe('multiResolvePageTree', () => {
-
   it('should return the target page tree for each page in a record with the page ids as key', async () => {
     const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
 
@@ -287,7 +276,6 @@ describe('multiResolvePageTree', () => {
   });
 
   it('should return null if resolution failed for a specific page', async () => {
-
     const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
 
     const page1 = await createPage({
@@ -309,11 +297,9 @@ describe('multiResolvePageTree', () => {
     expect(result[page1.id]?.flatChildren[0].id).toBe(page1Child.id);
 
     expect(result[inexistentPageId]).toBeNull();
-
   });
 
   it('should not flatten children by default', async () => {
-
     const { space: space1, user: user1 } = await generateUserAndSpaceWithApiToken();
 
     const page1 = await createPage({
@@ -333,8 +319,7 @@ describe('multiResolvePageTree', () => {
 
     expect((result[page1.id] as any).flatChildren).toBeUndefined();
     // Make sure normal tree still got resolved
-    expect((result[page1.id])?.targetPage.children[0].id).toBe(page1Child.id);
-
+    expect(result[page1.id]?.targetPage.children[0].id).toBe(page1Child.id);
   });
 
   it('should fail if the pages are in a separate space', async () => {
@@ -352,6 +337,5 @@ describe('multiResolvePageTree', () => {
     });
 
     await expect(multiResolvePageTree({ pageIds: [page1.id, page2.id] })).rejects.toBeInstanceOf(InvalidInputError);
-
   });
 });

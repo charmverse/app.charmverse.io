@@ -1,4 +1,3 @@
-
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -20,7 +19,10 @@ import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/c
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/src/csvExporter';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { getViewCardsSortedFilteredAndGrouped, sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import {
+  getViewCardsSortedFilteredAndGrouped,
+  sortCards
+} from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -36,7 +38,7 @@ interface Props {
   pagePermissions?: IPagePermissionFlags;
 }
 
-function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
+function onExportCsvTrigger(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape) {
   try {
     CsvExporter.exportTableCsv(board, activeView, cards, intl);
     const exportCompleteMessage = intl.formatMessage({
@@ -44,8 +46,7 @@ function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[],
       defaultMessage: 'Export complete!'
     });
     sendFlashMessage({ content: exportCompleteMessage, severity: 'normal' });
-  }
-  catch (e) {
+  } catch (e) {
     const exportFailedMessage = intl.formatMessage({
       id: 'ViewHeader.export-failed',
       defaultMessage: 'Export failed!'
@@ -54,7 +55,7 @@ function onExportCsvTrigger (board: Board, activeView: BoardView, cards: Card[],
   }
 }
 
-export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }: Props) {
+export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: Props) {
   const intl = useIntl();
   const router = useRouter();
   const { pages, deletePage } = usePages();
@@ -65,21 +66,23 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
   const { members } = useMembers();
 
   const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
-  const board = boards.find(b => b.id === activeBoardId);
+  const board = boards.find((b) => b.id === activeBoardId);
 
   if (!board || !view) {
     return null;
   }
 
-  const cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
-    boardId: board.id,
-    viewId: view.id
-  }));
-  const cardPages: CardPage[] = cards.map(card => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
+  const cards = useAppSelector(
+    getViewCardsSortedFilteredAndGrouped({
+      boardId: board.id,
+      viewId: view.id
+    })
+  );
+  const cardPages: CardPage[] = cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
 
   const sortedCardPages = sortCards(cardPages, board, view, members);
 
-  async function onDeletePage () {
+  async function onDeletePage() {
     if (pageId) {
       await deletePage({
         pageId
@@ -101,7 +104,7 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
     closeMenu();
   };
 
-  function onCopyLink () {
+  function onCopyLink() {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
     closeMenu();
@@ -115,25 +118,20 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
           closeMenu();
         }}
       >
-        <Box sx={{
-          mr: 0.5,
-          position: 'relative',
-          left: -4,
-          display: 'flex',
-          alignItems: 'center'
-        }}
+        <Box
+          sx={{
+            mr: 0.5,
+            position: 'relative',
+            left: -4,
+            display: 'flex',
+            alignItems: 'center'
+          }}
         >
-          {isFavorite ? (
-            <FavoritedIcon />
-          ) : (
-            <NotFavoritedIcon />
-          )}
+          {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
         </Box>
         <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
-      <ListItemButton
-        onClick={onCopyLink}
-      >
+      <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
           fontSize='small'
           sx={{
@@ -143,12 +141,9 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
         <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
-      <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
+      <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>
-          <ListItemButton
-            disabled={!pagePermissions?.delete}
-            onClick={onDeletePage}
-          >
+          <ListItemButton disabled={!pagePermissions?.delete} onClick={onDeletePage}>
             <DeleteOutlinedIcon
               fontSize='small'
               sx={{
@@ -159,9 +154,7 @@ export default function DatabaseOptions ({ pagePermissions, closeMenu, pageId }:
           </ListItemButton>
         </div>
       </Tooltip>
-      <ListItemButton
-        onClick={exportCsv}
-      >
+      <ListItemButton onClick={exportCsv}>
         <FormatListBulletedIcon
           fontSize='small'
           sx={{

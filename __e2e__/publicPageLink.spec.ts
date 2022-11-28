@@ -15,10 +15,9 @@ test.beforeAll(async () => {
 });
 
 test('click on link for another public page in same workspace and make sure that page renders', async () => {
-
   // Arrange ------------------
 
-  const loggedInPage = await browser.newContext().then(c => c.newPage());
+  const loggedInPage = await browser.newContext().then((c) => c.newPage());
 
   const publicContext = await browser.newContext();
   const publicPage = await publicContext.newPage();
@@ -33,7 +32,10 @@ test('click on link for another public page in same workspace and make sure that
     spaceId: space.id,
     id: firstPageId,
     title: 'First Page',
-    pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }, { permissionLevel: 'view', public: true }],
+    pagePermissions: [
+      { permissionLevel: 'view', spaceId: space.id },
+      { permissionLevel: 'view', public: true }
+    ],
     linkedPageId: secondPageId
   });
 
@@ -42,7 +44,10 @@ test('click on link for another public page in same workspace and make sure that
     spaceId: space.id,
     id: secondPageId,
     title: 'Second Page',
-    pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }, { permissionLevel: 'view', public: true }],
+    pagePermissions: [
+      { permissionLevel: 'view', spaceId: space.id },
+      { permissionLevel: 'view', public: true }
+    ],
     linkedPageId: firstPageId
   });
 
@@ -79,5 +84,4 @@ test('click on link for another public page in same workspace and make sure that
   secondPageNestedLink = page.locator(`data-test=nested-page-${secondPage.id}`);
 
   await expect(secondPageNestedLink).toBeVisible();
-
 });

@@ -6,7 +6,10 @@ import { getVotesBySpace } from '../getVotesBySpace';
 describe('getVotesBySpace', () => {
   it('should get all votes of a space for an admin user', async () => {
     const { space, user: accessibleSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const { space: inaccessibleSpace, user: inaccessibleSpaceUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { space: inaccessibleSpace, user: inaccessibleSpaceUser } = await generateUserAndSpaceWithApiToken(
+      undefined,
+      true
+    );
 
     const [accessibleSpacePage, inaccessibleSpacePage] = await Promise.all([
       createPage({

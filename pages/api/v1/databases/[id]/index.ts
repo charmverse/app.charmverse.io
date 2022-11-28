@@ -1,4 +1,3 @@
-
 import type { Block } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -12,9 +11,7 @@ import { filterObjectKeys } from 'lib/utilities/objects';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireApiKey)
-  .get(getDatabase);
+handler.use(requireApiKey).get(getDatabase);
 
 /**
  * @swagger
@@ -30,8 +27,7 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/DatabasePage'
  */
-async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
-
+async function getDatabase(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -47,34 +43,43 @@ async function getDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   // eslint-disable-next-line prefer-const
   const database = await prisma.page.findFirst({
-    where: isValidUuid ? {
-      type: 'board',
-      boardId: id as string,
-      spaceId
-    } : {
-      type: 'board',
-      path: id as string,
-      spaceId
-    }
-
+    where: isValidUuid
+      ? {
+          type: 'board',
+          boardId: id as string,
+          spaceId
+        }
+      : {
+          type: 'board',
+          path: id as string,
+          spaceId
+        }
   });
 
   if (!database) {
     throw new DatabasePageNotFoundError(id as string);
   }
 
-  const board = await prisma.block.findFirst({
+  const board = (await prisma.block.findFirst({
     where: {
       type: 'board',
       id: database.boardId as string
     }
-  }) as any as Block;
+  })) as any as Block;
 
   if (!board) {
     throw new DatabasePageNotFoundError(id as string);
   }
 
-  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', ['id', 'createdAt', 'updatedAt', 'type', 'title', 'url', 'spaceId']);
+  const filteredDatabaseObject = filterObjectKeys(database as any as DatabasePage, 'include', [
+    'id',
+    'createdAt',
+    'updatedAt',
+    'type',
+    'title',
+    'url',
+    'spaceId'
+  ]);
 
   const domain = process.env.DOMAIN;
 

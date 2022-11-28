@@ -29,13 +29,15 @@ beforeAll(async () => {
 
 describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page permission level for a space', () => {
   it('should retrieve updated space with updated defaultPagePermissionGroup', async () => {
-    const updatedSpace = (await request(baseUrl)
-      .post(`/api/spaces/${adminUserSpace.id}/set-default-page-permissions`)
-      .set('Cookie', adminCookie)
-      .send({
-        pagePermissionLevel: 'view_comment'
-      })
-      .expect(200)).body as Space;
+    const updatedSpace = (
+      await request(baseUrl)
+        .post(`/api/spaces/${adminUserSpace.id}/set-default-page-permissions`)
+        .set('Cookie', adminCookie)
+        .send({
+          pagePermissionLevel: 'view_comment'
+        })
+        .expect(200)
+    ).body as Space;
     expect(updatedSpace.defaultPagePermissionGroup).toBe('view_comment');
   });
 
@@ -50,7 +52,6 @@ describe('POST /api/spaces/[id]/set-default-page-permissions - Set default page 
   });
 
   it('should fail if the user is admin, but the space permission mode is not "custom", and respond 401', async () => {
-
     const { space: extraSpace, user: extraAdminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     await updateSpacePermissionConfigurationMode({

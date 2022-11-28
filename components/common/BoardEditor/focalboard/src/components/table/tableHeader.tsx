@@ -1,4 +1,3 @@
-
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import { IconButton, Typography } from '@mui/material';
@@ -19,21 +18,21 @@ import HorizontalGrip from './horizontalGrip';
 import TableHeaderMenu from './tableHeaderMenu';
 
 type Props = {
-    readOnly: boolean;
-    sorted: 'up'|'down'|'none';
-    name: React.ReactNode;
-    board: Board;
-    activeView: BoardView;
-    cards: Card[];
-    views: BoardView[];
-    template: IPropertyTemplate;
-    offset: number;
-    type: PropertyType;
-    onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
-    onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
-}
+  readOnly: boolean;
+  sorted: 'up' | 'down' | 'none';
+  name: React.ReactNode;
+  board: Board;
+  activeView: BoardView;
+  cards: Card[];
+  views: BoardView[];
+  template: IPropertyTemplate;
+  offset: number;
+  type: PropertyType;
+  onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+  onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
+};
 
-function TableHeader (props: Props): JSX.Element {
+function TableHeader(props: Props): JSX.Element {
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !props.readOnly, props.onDrop);
   const columnWidth = (templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (props.activeView.fields.columnWidths[templateId] || 0) + props.offset);
@@ -54,12 +53,10 @@ function TableHeader (props: Props): JSX.Element {
     className += ' dragover';
   }
 
-  function reverseSort (e: React.MouseEvent<HTMLButtonElement>) {
-    mutator.changeViewSortOptions(
-      props.activeView.id,
-      props.activeView.fields.sortOptions,
-      [{ propertyId: props.template.id, reversed: props.sorted === 'up' }]
-    );
+  function reverseSort(e: React.MouseEvent<HTMLButtonElement>) {
+    mutator.changeViewSortOptions(props.activeView.id, props.activeView.fields.sortOptions, [
+      { propertyId: props.template.id, reversed: props.sorted === 'up' }
+    ]);
     e.stopPropagation();
   }
 
@@ -72,15 +69,18 @@ function TableHeader (props: Props): JSX.Element {
       <MenuWrapper disabled={props.readOnly}>
         <Label>
           <div>
-            <div style={{ marginRight: 4, display: 'flex' }}>{iconForPropertyType(props.type, {
-              sx: {
-                width: 18,
-                height: 18
-              }
-            })}
+            <div style={{ marginRight: 4, display: 'flex' }}>
+              {iconForPropertyType(props.type, {
+                sx: {
+                  width: 18,
+                  height: 18
+                }
+              })}
             </div>
           </div>
-          <Typography component='span' variant='subtitle1'>{props.name}</Typography>
+          <Typography component='span' variant='subtitle1'>
+            {props.name}
+          </Typography>
           <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>
             {props.sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize='small' />}
             {props.sorted === 'down' && <ArrowDownwardOutlinedIcon fontSize='small' />}
@@ -97,13 +97,7 @@ function TableHeader (props: Props): JSX.Element {
 
       <div className='octo-spacer' />
 
-      {!props.readOnly
-                && (
-                  <HorizontalGrip
-                    templateId={props.template.id}
-                    onAutoSizeColumn={onAutoSizeColumn}
-                  />
-                )}
+      {!props.readOnly && <HorizontalGrip templateId={props.template.id} onAutoSizeColumn={onAutoSizeColumn} />}
     </div>
   );
 }

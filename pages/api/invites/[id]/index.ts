@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,13 +12,9 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(acceptInvite)
-  .delete(deleteInvite);
+handler.use(requireUser).post(acceptInvite).delete(deleteInvite);
 
-async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
-
+async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
   const invite = await prisma.inviteLink.findUnique({
     where: {
       id: req.query.id as string
@@ -60,29 +55,33 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
     updateTrackUserProfileById(userId);
     trackUserAction('join_a_workspace', { userId, source: 'invite_link', spaceId: invite.spaceId });
 
-    const roleIdsToAssign: string[] = (await prisma.inviteLinkToRole.findMany({
-      where: {
-        inviteLinkId: invite.id
-      },
-      select: {
-        roleId: true
-      }
-    })).map(({ roleId }) => roleId);
+    const roleIdsToAssign: string[] = (
+      await prisma.inviteLinkToRole.findMany({
+        where: {
+          inviteLinkId: invite.id
+        },
+        select: {
+          roleId: true
+        }
+      })
+    ).map(({ roleId }) => roleId);
 
     await prisma.$transaction([
-      ...roleIdsToAssign.map(roleId => prisma.spaceRoleToRole.upsert({
-        where: {
-          spaceRoleId_roleId: {
-            spaceRoleId: createdSpaceRole.id,
-            roleId
-          }
-        },
-        create: {
-          roleId,
-          spaceRoleId: createdSpaceRole.id
-        },
-        update: {}
-      })),
+      ...roleIdsToAssign.map((roleId) =>
+        prisma.spaceRoleToRole.upsert({
+          where: {
+            spaceRoleId_roleId: {
+              spaceRoleId: createdSpaceRole.id,
+              roleId
+            }
+          },
+          create: {
+            roleId,
+            spaceRoleId: createdSpaceRole.id
+          },
+          update: {}
+        })
+      ),
       prisma.inviteLink.update({
         where: { id: invite.id },
         data: {
@@ -95,8 +94,7 @@ async function acceptInvite (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({ ok: true });
 }
 
-async function deleteInvite (req: NextApiRequest, res: NextApiResponse) {
-
+async function deleteInvite(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const existingInvite = await prisma.inviteLink.findUnique({
@@ -128,4 +126,3 @@ async function deleteInvite (req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default withSessionRoute(handler);
-

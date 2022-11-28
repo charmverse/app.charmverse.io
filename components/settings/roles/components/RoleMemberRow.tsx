@@ -32,8 +32,8 @@ interface Props {
   onRemove: (id: string) => void;
 }
 
-export default function MemberRow ({ member, isEditable, onRemove }: Props) {
-  function removeMember () {
+export default function MemberRow({ member, isEditable, onRemove }: Props) {
+  function removeMember() {
     onRemove(member.id);
   }
 

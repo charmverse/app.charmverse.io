@@ -17,31 +17,29 @@ interface Options {
   editor: FidusEditor;
 }
 
-export function trackPlugin (options: Options) {
+export function trackPlugin(options: Options) {
   return new Plugin({
     key,
     state: {
-      init (config, state) {
+      init(config, state) {
         // Make sure there are colors for all users who have left marks
         // in the document and that they are registered as past
         // participants for the marginbox filter.
         const users: Record<string, string> = {};
         users[options.editor.user.id] = options.editor.user.username;
-        state.doc.descendants(node => {
+        state.doc.descendants((node) => {
           if (node.attrs.track) {
             node.attrs.track.forEach((track: TrackAttribute) => {
-              if (
-                !users[track.user] && track.user !== ''
-              ) {
+              if (!users[track.user] && track.user !== '') {
                 users[track.user] = track.username;
               }
             });
-          }
-          else {
-            node.marks.forEach(mark => {
+          } else {
+            node.marks.forEach((mark) => {
               if (
-                ['deletion', 'insertion', 'format_change'].includes(mark.type.name)
-                                && !users[mark.attrs.user] && mark.attrs.user !== 0
+                ['deletion', 'insertion', 'format_change'].includes(mark.type.name) &&
+                !users[mark.attrs.user] &&
+                mark.attrs.user !== 0
               ) {
                 users[mark.attrs.user] = mark.attrs.username;
               }
@@ -52,19 +50,17 @@ export function trackPlugin (options: Options) {
         if (options.editor.mod.collab) {
           Object.entries(users).forEach(([userId, username]) => {
             options.editor.mod.collab.colors.ensureUserColor(userId, username);
-            if (!options.editor.mod.collab.pastParticipants.some(participant => participant.id === userId)) {
+            if (!options.editor.mod.collab.pastParticipants.some((participant) => participant.id === userId)) {
               options.editor.mod.collab.pastParticipants.push({ id: userId, name: username });
             }
           });
-
         }
 
         return {
           decos: DecorationSet.empty
         };
-
       },
-      apply (tr, prev, oldState, state) {
+      apply(tr, prev, oldState, state) {
         const meta = tr.getMeta(key);
         if (meta) {
           // There has been an update, return values from meta instead
@@ -72,31 +68,49 @@ export function trackPlugin (options: Options) {
           return meta;
         }
 
-        let {
-          decos
-        } = this.getState(oldState);
+        let { decos } = this.getState(oldState);
 
         if (tr.selectionSet) {
           const { insertion, deletion, formatChange } = findSelectedChanges(state);
           decos = DecorationSet.empty;
           const decoType = (tr.selection as NodeSelection).node ? Decoration.node : Decoration.inline;
           if (insertion) {
-            decos = decos.add(tr.doc, [decoType(insertion.from, insertion.to, {
-              class: 'selected-insertion'
-            }, selectedInsertionSpec)]);
+            decos = decos.add(tr.doc, [
+              decoType(
+                insertion.from,
+                insertion.to,
+                {
+                  class: 'selected-insertion'
+                },
+                selectedInsertionSpec
+              )
+            ]);
           }
           if (deletion) {
-            decos = decos.add(tr.doc, [decoType(deletion.from, deletion.to, {
-              class: 'selected-deletion'
-            }, selectedDeletionSpec)]);
+            decos = decos.add(tr.doc, [
+              decoType(
+                deletion.from,
+                deletion.to,
+                {
+                  class: 'selected-deletion'
+                },
+                selectedDeletionSpec
+              )
+            ]);
           }
           if (formatChange) {
-            decos = decos.add(tr.doc, [decoType(formatChange.from, formatChange.to, {
-              class: 'selected-format_change'
-            }, selectedChangeFormatSpec)]);
+            decos = decos.add(tr.doc, [
+              decoType(
+                formatChange.from,
+                formatChange.to,
+                {
+                  class: 'selected-format_change'
+                },
+                selectedChangeFormatSpec
+              )
+            ]);
           }
-        }
-        else {
+        } else {
           decos = decos.map(tr.mapping, tr.doc);
         }
         return {
@@ -105,10 +119,8 @@ export function trackPlugin (options: Options) {
       }
     },
     props: {
-      decorations (state) {
-        const {
-          decos
-        } = this.getState(state);
+      decorations(state) {
+        const { decos } = this.getState(state);
         return decos;
       }
       // handleDOMEvents: {

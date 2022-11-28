@@ -18,17 +18,16 @@ const StyledButton = styled(Button)`
  */
 type Props = {
   onSuccess: () => void;
-}
+};
 
 /**
  * Used to add a wallet to an account
  */
-export function WalletConnect ({ onSuccess }: Props) {
-
+export function WalletConnect({ onSuccess }: Props) {
   const { account, connectWallet } = useWeb3AuthSig();
   const { updateUser } = useUser();
 
-  async function signSuccess (signature: AuthSig) {
+  async function signSuccess(signature: AuthSig) {
     const updatedUser = await charmClient.addUserWallets([signature]);
 
     updateUser(updatedUser);
@@ -47,6 +46,9 @@ export function WalletConnect ({ onSuccess }: Props) {
     );
   }
 
-  return <StyledButton onClick={connectWallet} variant='outlined' color='primary'>Switch</StyledButton>;
+  return (
+    <StyledButton onClick={connectWallet} variant='outlined' color='primary'>
+      Switch
+    </StyledButton>
+  );
 }
-

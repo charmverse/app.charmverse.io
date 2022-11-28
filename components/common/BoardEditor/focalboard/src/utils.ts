@@ -23,23 +23,23 @@ const base32Alphabet = 'ybndrfg8ejkmcpqxot1uwisza345h769';
 
 // eslint-disable-next-line no-shadow
 enum IDType {
-    None = '7',
-    Workspace = 'w',
-    Board = 'b',
-    Card = 'c',
-    View = 'v',
-    Session = 's',
-    User = 'u',
-    Token = 'k',
-    BlockID = 'a',
+  None = '7',
+  Workspace = 'w',
+  Board = 'b',
+  Card = 'c',
+  View = 'v',
+  Session = 's',
+  User = 'u',
+  Token = 'k',
+  BlockID = 'a'
 }
 
 class Utils {
-  static createGuid (idType: IDType): string {
+  static createGuid(idType: IDType): string {
     return uuid(); // idType + Utils.base32encode(data, false)
   }
 
-  static blockTypeToIDType (blockType: string | undefined): IDType {
+  static blockTypeToIDType(blockType: string | undefined): IDType {
     let ret: IDType = IDType.None;
     switch (blockType) {
       case 'workspace':
@@ -60,21 +60,20 @@ class Utils {
     return ret;
   }
 
-  static randomArray (size: number): Uint8Array {
+  static randomArray(size: number): Uint8Array {
     const crypto = window.crypto || window.msCrypto;
     const rands = new Uint8Array(size);
     if (crypto && crypto.getRandomValues) {
       crypto.getRandomValues(rands);
-    }
-    else {
+    } else {
       for (let i = 0; i < size; i++) {
-        rands[i] = Math.floor((Math.random() * 255));
+        rands[i] = Math.floor(Math.random() * 255);
       }
     }
     return rands;
   }
 
-  static base32encode (data: Int8Array | Uint8Array | Uint8ClampedArray, pad: boolean): string {
+  static base32encode(data: Int8Array | Uint8Array | Uint8ClampedArray, pad: boolean): string {
     const dview = new DataView(data.buffer, data.byteOffset, data.byteLength);
     let bits = 0;
     let value = 0;
@@ -94,39 +93,41 @@ class Utils {
       output += base32Alphabet[(value << (5 - bits)) & 31];
     }
     if (pad) {
-      while ((output.length % 8) !== 0) {
+      while (output.length % 8 !== 0) {
         output += '=';
       }
     }
     return output;
   }
 
-  static htmlToElement (html: string): HTMLElement {
+  static htmlToElement(html: string): HTMLElement {
     const template = document.createElement('template');
     template.innerHTML = html.trim();
     return template.content.firstChild as HTMLElement;
   }
 
-  static getElementById (elementId: string): HTMLElement {
+  static getElementById(elementId: string): HTMLElement {
     const element = document.getElementById(elementId);
     Utils.assert(element, `getElementById "${elementId}$`);
     return element!;
   }
 
-  static htmlEncode (text: string): string {
-    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  static htmlEncode(text: string): string {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  static htmlDecode (text: string): string {
-    return String(text).replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  static htmlDecode(text: string): string {
+    return String(text)
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"');
   }
 
   // re-use canvas object for better performance
-  static canvas : HTMLCanvasElement | undefined;
+  static canvas: HTMLCanvasElement | undefined;
 
-  static getTextWidth (displayText: string, fontDescriptor: string): number {
+  static getTextWidth(displayText: string, fontDescriptor: string): number {
     if (displayText !== '') {
       if (!Utils.canvas) {
         Utils.canvas = document.createElement('canvas') as HTMLCanvasElement;
@@ -141,7 +142,7 @@ class Utils {
     return 0;
   }
 
-  static getFontAndPaddingFromCell = (cell: Element) : { fontDescriptor: string, padding: number } => {
+  static getFontAndPaddingFromCell = (cell: Element): { fontDescriptor: string; padding: number } => {
     const style = getComputedStyle(cell);
     const padding = Utils.getTotalHorizontalPadding(style);
     return Utils.getFontAndPaddingFromChildren(cell.children, padding);
@@ -149,7 +150,10 @@ class Utils {
 
   // recursive routine to determine the padding and font from its children
   // specifically for the table view
-  static getFontAndPaddingFromChildren = (children: HTMLCollection, pad: number) : { fontDescriptor: string, padding: number } => {
+  static getFontAndPaddingFromChildren = (
+    children: HTMLCollection,
+    pad: number
+  ): { fontDescriptor: string; padding: number } => {
     const myResults = {
       fontDescriptor: '',
       padding: pad
@@ -162,8 +166,7 @@ class Utils {
         myResults.padding += Utils.getHorizontalBorder(style);
         myResults.padding += Utils.getHorizontalMargin(style);
         myResults.fontDescriptor = Utils.getFontString(style);
-      }
-      else {
+      } else {
         switch (element.className) {
           case IconClass:
           case HorizontalGripClass:
@@ -187,7 +190,7 @@ class Utils {
     return myResults;
   };
 
-  private static getFontString (style: CSSStyleDeclaration): string {
+  private static getFontString(style: CSSStyleDeclaration): string {
     if (style.font) {
       return style.font;
     }
@@ -200,35 +203,37 @@ class Utils {
     return props.join(' ');
   }
 
-  private static getHorizontalMargin (style: CSSStyleDeclaration): number {
+  private static getHorizontalMargin(style: CSSStyleDeclaration): number {
     return parseInt(style.marginLeft, 10) + parseInt(style.marginRight, 10);
   }
 
-  private static getHorizontalBorder (style: CSSStyleDeclaration): number {
+  private static getHorizontalBorder(style: CSSStyleDeclaration): number {
     return parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10);
   }
 
-  private static getHorizontalPadding (style: CSSStyleDeclaration): number {
+  private static getHorizontalPadding(style: CSSStyleDeclaration): number {
     return parseInt(style.paddingLeft, 10) + parseInt(style.paddingRight, 10);
   }
 
-  private static getTotalHorizontalPadding (style: CSSStyleDeclaration): number {
+  private static getTotalHorizontalPadding(style: CSSStyleDeclaration): number {
     return Utils.getHorizontalPadding(style) + Utils.getHorizontalMargin(style) + Utils.getHorizontalBorder(style);
   }
 
   // Markdown
 
-  static htmlFromMarkdown (text: string): string {
+  static htmlFromMarkdown(text: string): string {
     // HACKHACK: Somehow, marked doesn't encode angle brackets
     const renderer = new marked.Renderer();
     renderer.link = (href, title, contents) => {
-      return '<a '
-                + 'target="_blank" '
-                + 'rel="noreferrer" '
-                + `href="${encodeURI(href || '')}" `
-                + `title="${title ? encodeURI(title) : ''}" `
-                + `onclick="${(window.openInNewBrowser ? ' openInNewBrowser && openInNewBrowser(event.target.href);' : '')}"`
-            + `>${contents}</a>`;
+      return (
+        '<a ' +
+        'target="_blank" ' +
+        'rel="noreferrer" ' +
+        `href="${encodeURI(href || '')}" ` +
+        `title="${title ? encodeURI(title) : ''}" ` +
+        `onclick="${window.openInNewBrowser ? ' openInNewBrowser && openInNewBrowser(event.target.href);' : ''}"` +
+        `>${contents}</a>`
+      );
     };
 
     renderer.table = (header, body) => {
@@ -238,12 +243,12 @@ class Utils {
     return this.htmlFromMarkdownWithRenderer(text, renderer);
   }
 
-  static htmlFromMarkdownWithRenderer (text: string, renderer: marked.Renderer): string {
+  static htmlFromMarkdownWithRenderer(text: string, renderer: marked.Renderer): string {
     const html = marked(text.replace(/</g, '&lt;'), { renderer, breaks: true });
     return html.trim();
   }
 
-  static countCheckboxesInMarkdown (text: string): { total: number, checked: number } {
+  static countCheckboxesInMarkdown(text: string): { total: number; checked: number } {
     let total = 0;
     let checked = 0;
     const renderer = new marked.Renderer();
@@ -259,12 +264,12 @@ class Utils {
   }
 
   // Date and Time
-  private static yearOption (date: Date) {
+  private static yearOption(date: Date) {
     const isCurrentYear = date.getFullYear() === new Date().getFullYear();
     return isCurrentYear ? undefined : 'numeric';
   }
 
-  static displayDate (date: Date, intl: IntlShape): string {
+  static displayDate(date: Date, intl: IntlShape): string {
     return intl.formatDate(date, {
       year: Utils.yearOption(date),
       month: 'long',
@@ -272,7 +277,7 @@ class Utils {
     });
   }
 
-  static inputDate (date: Date, intl: IntlShape): string {
+  static inputDate(date: Date, intl: IntlShape): string {
     return intl.formatDate(date, {
       year: 'numeric',
       month: '2-digit',
@@ -280,7 +285,7 @@ class Utils {
     });
   }
 
-  static displayDateTime (date: Date, intl: IntlShape): string {
+  static displayDateTime(date: Date, intl: IntlShape): string {
     return intl.formatDate(date, {
       year: Utils.yearOption(date),
       month: 'long',
@@ -290,11 +295,11 @@ class Utils {
     });
   }
 
-  static relativeDisplayDateTime (date: Date, intl: IntlShape): string {
+  static relativeDisplayDateTime(date: Date, intl: IntlShape): string {
     return DateTime.fromJSDate(date).setLocale(intl.locale.toLowerCase()).toRelativeCalendar() || '';
   }
 
-  static sleep (miliseconds: number): Promise<void> {
+  static sleep(miliseconds: number): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(resolve, miliseconds);
     });
@@ -302,7 +307,7 @@ class Utils {
 
   // Errors
 
-  static assertValue (valueObject: any): void {
+  static assertValue(valueObject: any): void {
     const name = Object.keys(valueObject)[0];
     const value = valueObject[name];
     if (!value) {
@@ -310,7 +315,7 @@ class Utils {
     }
   }
 
-  static assert (condition: any, tag = ''): void {
+  static assert(condition: any, tag = ''): void {
     /// #!if ENV !== "production"
     if (!condition) {
       log.error(`ASSERT [${tag ?? new Error().stack}]`);
@@ -319,14 +324,14 @@ class Utils {
     /// #!endif
   }
 
-  static assertFailure (tag = ''): void {
+  static assertFailure(tag = ''): void {
     /// #!if ENV !== "production"
     Utils.assert(false, tag);
 
     /// #!endif
   }
 
-  static log (message: string): void {
+  static log(message: string): void {
     /// #!if ENV !== "production"
     const timestamp = (Date.now() / 1000).toFixed(2);
     // eslint-disable-next-line no-console
@@ -335,7 +340,7 @@ class Utils {
     /// #!endif
   }
 
-  static logError (message: string): void {
+  static logError(message: string): void {
     /// #!if ENV !== "production"
     // eslint-disable-next-line no-console
     log.error(message);
@@ -343,7 +348,7 @@ class Utils {
     /// #!endif
   }
 
-  static logWarn (message: string): void {
+  static logWarn(message: string): void {
     /// #!if ENV !== "production"
     // eslint-disable-next-line no-console
     log.warn(message);
@@ -353,7 +358,7 @@ class Utils {
 
   // favicon
 
-  static setFavicon (icon?: string): void {
+  static setFavicon(icon?: string): void {
     if (Utils.isFocalboardPlugin()) {
       // Do not change the icon from focalboard plugin
       return;
@@ -373,28 +378,27 @@ class Utils {
 
   // URL
 
-  static replaceUrlQueryParam (paramName: string, value?: string): void {
+  static replaceUrlQueryParam(paramName: string, value?: string): void {
     const queryString = new URLSearchParams(window.location.search);
     const currentValue = queryString.get(paramName) || '';
     if (currentValue !== value) {
       const newUrl = new URL(window.location.toString());
       if (value) {
         newUrl.searchParams.set(paramName, value);
-      }
-      else {
+      } else {
         newUrl.searchParams.delete(paramName);
       }
       window.history.pushState({}, document.title, newUrl.toString());
     }
   }
 
-  static ensureProtocol (url: string): string {
+  static ensureProtocol(url: string): string {
     return url.match(/^.+:\/\//) ? url : `https://${url}`;
   }
 
   // File names
 
-  static sanitizeFilename (filename: string): string {
+  static sanitizeFilename(filename: string): string {
     // TODO: Use an industrial-strength sanitizer
     let sanitizedFilename = filename;
     const illegalCharacters = ['\\', '/', '?', ':', '<', '>', '*', '|', '"', '.'];
@@ -406,7 +410,7 @@ class Utils {
 
   // File picker
 
-  static selectLocalFile (onSelect?: (file: File) => void, accept = '.jpg,.jpeg,.png'): void {
+  static selectLocalFile(onSelect?: (file: File) => void, accept = '.jpg,.jpeg,.png'): void {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;
@@ -424,7 +428,7 @@ class Utils {
 
   // Arrays
 
-  static arraysEqual (a: readonly any[], b: readonly any[]): boolean {
+  static arraysEqual(a: readonly any[], b: readonly any[]): boolean {
     if (a === b) {
       return true;
     }
@@ -446,19 +450,18 @@ class Utils {
     return true;
   }
 
-  static arrayMove (arr: any[], srcIndex: number, destIndex: number): void {
+  static arrayMove(arr: any[], srcIndex: number, destIndex: number): void {
     arr.splice(destIndex, 0, arr.splice(srcIndex, 1)[0]);
   }
 
   // Clipboard
 
-  static copyTextToClipboard (text: string): boolean {
+  static copyTextToClipboard(text: string): boolean {
     let result = false;
     try {
       navigator.clipboard.writeText(text);
       result = true;
-    }
-    catch (err) {
+    } catch (err) {
       Utils.logError(`copyTextToClipboard ERROR: ${err}`);
       result = false;
     }
@@ -466,7 +469,7 @@ class Utils {
     return result;
   }
 
-  static getBaseURL (absolute?: boolean): string {
+  static getBaseURL(absolute?: boolean): string {
     let baseURL = window.baseURL || '';
     baseURL = baseURL.replace(/\/+$/, '');
     if (baseURL.indexOf('/') === 0) {
@@ -478,7 +481,7 @@ class Utils {
     return baseURL;
   }
 
-  static getFrontendBaseURL (absolute?: boolean): string {
+  static getFrontendBaseURL(absolute?: boolean): string {
     let frontendBaseURL = window.frontendBaseURL || Utils.getBaseURL(absolute);
     frontendBaseURL = frontendBaseURL.replace(/\/+$/, '');
     if (frontendBaseURL.indexOf('/') === 0) {
@@ -490,7 +493,7 @@ class Utils {
     return frontendBaseURL;
   }
 
-  static buildURL (path: string, absolute?: boolean): string {
+  static buildURL(path: string, absolute?: boolean): string {
     const baseURL = Utils.getBaseURL();
     let finalPath = baseURL + path;
     if (path.indexOf('/') !== 0) {
@@ -505,22 +508,22 @@ class Utils {
     return finalPath;
   }
 
-  static roundTo (num: number, decimalPlaces: number): number {
+  static roundTo(num: number, decimalPlaces: number): number {
     return Math.round(num * 10 ** decimalPlaces) / 10 ** decimalPlaces;
   }
 
-  static isFocalboardPlugin (): boolean {
+  static isFocalboardPlugin(): boolean {
     return Boolean(window.isFocalboardPlugin);
   }
 
   // this is a temporary solution while we're using legacy routes
   // for shared boards as a way to check if we're accessing the
   // legacy routes inside the plugin
-  static isFocalboardLegacy (): boolean {
+  static isFocalboardLegacy(): boolean {
     return window.location.pathname.includes('/plugins/focalboard');
   }
 
-  static fixBlock (block: Block): Block {
+  static fixBlock(block: Block): Block {
     switch (block.type) {
       case 'board':
         return createBoard({ block });
@@ -535,15 +538,15 @@ class Utils {
     }
   }
 
-  static userAgent (): string {
+  static userAgent(): string {
     return window.navigator.userAgent;
   }
 
-  static isDesktopApp (): boolean {
+  static isDesktopApp(): boolean {
     return Utils.userAgent().indexOf('Mattermost') !== -1 && Utils.userAgent().indexOf('Electron') !== -1;
   }
 
-  static getDesktopVersion (): string {
+  static getDesktopVersion(): string {
     // use if the value window.desktop.version is not set yet
     const regex = /Mattermost\/(\d+\.\d+\.\d+)/gm;
     const match = regex.exec(window.navigator.appVersion)?.[1] || '';
@@ -551,20 +554,20 @@ class Utils {
   }
 
   /**
-     * Function to check how a version compares to another
-     *
-     * eg.  versionA = 4.16.0, versionB = 4.17.0 returns  1
-     *      versionA = 4.16.1, versionB = 4.16.1 returns  0
-     *      versionA = 4.16.1, versionB = 4.15.0 returns -1
-     */
-  static compareVersions (versionA: string, versionB: string): number {
+   * Function to check how a version compares to another
+   *
+   * eg.  versionA = 4.16.0, versionB = 4.17.0 returns  1
+   *      versionA = 4.16.1, versionB = 4.16.1 returns  0
+   *      versionA = 4.16.1, versionB = 4.15.0 returns -1
+   */
+  static compareVersions(versionA: string, versionB: string): number {
     if (versionA === versionB) {
       return 0;
     }
 
     // We only care about the numbers
-    const versionANumber = (versionA || '').split('.').filter((x) => (/^[0-9]+$/).exec(x) !== null);
-    const versionBNumber = (versionB || '').split('.').filter((x) => (/^[0-9]+$/).exec(x) !== null);
+    const versionANumber = (versionA || '').split('.').filter((x) => /^[0-9]+$/.exec(x) !== null);
+    const versionBNumber = (versionB || '').split('.').filter((x) => /^[0-9]+$/.exec(x) !== null);
 
     for (let i = 0; i < Math.max(versionANumber.length, versionBNumber.length); i++) {
       const a = parseInt(versionANumber[i], 10) || 0;
@@ -582,21 +585,24 @@ class Utils {
     return 0;
   }
 
-  static isDesktop (): boolean {
-    return Utils.isDesktopApp() && (Utils.compareVersions(Utils.getDesktopVersion(), '5.0.0') <= 0);
+  static isDesktop(): boolean {
+    return Utils.isDesktopApp() && Utils.compareVersions(Utils.getDesktopVersion(), '5.0.0') <= 0;
   }
 
-  static getReadToken (): string {
+  static getReadToken(): string {
     const queryString = new URLSearchParams(window.location.search);
     const readToken = queryString.get('r') || '';
     return readToken;
   }
 
-  static generateClassName (conditions: Record<string, boolean>): string {
-    return Object.entries(conditions).map(([className, condition]) => (condition ? className : '')).filter((className) => className !== '').join(' ');
+  static generateClassName(conditions: Record<string, boolean>): string {
+    return Object.entries(conditions)
+      .map(([className, condition]) => (condition ? className : ''))
+      .filter((className) => className !== '')
+      .join(' ');
   }
 
-  static buildOriginalPath (workspaceId = '', boardId = '', viewId = '', cardId = ''): string {
+  static buildOriginalPath(workspaceId = '', boardId = '', viewId = '', cardId = ''): string {
     let originalPath = '';
 
     if (workspaceId) {

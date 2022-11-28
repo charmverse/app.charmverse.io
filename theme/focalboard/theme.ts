@@ -1,7 +1,4 @@
-
-import type {
-  Theme
-} from 'components/common/BoardEditor/focalboard/src/theme';
+import type { Theme } from 'components/common/BoardEditor/focalboard/src/theme';
 import {
   darkTheme as originalDarkTheme,
   lightTheme as originalLightTheme
@@ -12,9 +9,8 @@ import { darkModeColors, lightModeColors } from 'theme/colors';
 /**
  * Automatically generate property names that are in sync with our brand colours
  */
-function renameColorsForFocalboard (colorScheme: BrandColorScheme): Record<string, string> {
+function renameColorsForFocalboard(colorScheme: BrandColorScheme): Record<string, string> {
   return Object.entries(colorScheme).reduce((computedColorScheme, color) => {
-
     const propName = color[0];
     const capitalisedPropName = `prop${propName.slice(0, 1).toUpperCase()}${propName.slice(1)}`;
 
@@ -38,5 +34,4 @@ const lightFocalboardBrandColors = renameColorsForFocalboard(lightModeColors);
 export const lightTheme: Theme = {
   ...originalLightTheme,
   ...lightFocalboardBrandColors
-
 };

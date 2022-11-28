@@ -1,4 +1,3 @@
-
 import { forwardRef, memo } from 'react';
 
 import type { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
@@ -15,27 +14,13 @@ interface BoardViewTreeItemProps {
 }
 
 const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
-  const {
-    href,
-    label,
-    viewType,
-    nodeId,
-    onClick
-  } = props;
+  const { href, label, viewType, nodeId, onClick } = props;
 
   const labelIcon = iconForViewType(viewType);
 
   return (
     <StyledTreeItem
-      label={(
-        <PageLink
-          href={href}
-          label={label}
-          labelIcon={labelIcon}
-          showPicker={false}
-          onClick={onClick}
-        />
-      )}
+      label={<PageLink href={href} label={label} labelIcon={labelIcon} showPicker={false} onClick={onClick} />}
       nodeId={nodeId}
       ref={ref}
       TransitionProps={{ timeout: 50 }}

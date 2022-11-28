@@ -6,14 +6,11 @@ import { hasParentNodeOfType } from '@bangle.dev/utils';
 
 import { backspaceCmd } from './commands';
 
-export function spec () {
-  return [
-    summarySpec(),
-    detailsSpec()
-  ];
+export function spec() {
+  return [summarySpec(), detailsSpec()];
 }
 
-function summarySpec (): RawSpecs {
+function summarySpec(): RawSpecs {
   return {
     type: 'node',
     name: 'disclosureSummary',
@@ -31,7 +28,7 @@ function summarySpec (): RawSpecs {
   };
 }
 
-function detailsSpec (): RawSpecs {
+function detailsSpec(): RawSpecs {
   return {
     type: 'node',
     name: 'disclosureDetails',
@@ -50,7 +47,7 @@ function detailsSpec (): RawSpecs {
   };
 }
 
-export function plugins (): RawPlugins {
+export function plugins(): RawPlugins {
   return () => {
     return [
       keymap({
@@ -63,7 +60,7 @@ export function plugins (): RawPlugins {
   };
 }
 
-function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMOutputSpec }) {
+function ContainerPlugin({ type, contentDOM }: { type: string; contentDOM: DOMOutputSpec }) {
   return new Plugin({
     key: new PluginKey(`${type}-NodeView`),
     props: {
@@ -99,13 +96,13 @@ function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMO
         }
       },
       nodeViews: {
-        [type]: function nodeView (node, view, getPos, decorations) {
+        [type]: function nodeView(node, view, getPos, decorations) {
           // @ts-ignore
           const element = createElement(contentDOM);
           return {
             contentDOM: element,
             dom: element,
-            ignoreMutation (mutation) {
+            ignoreMutation(mutation) {
               if ((mutation as MutationRecord).attributeName === 'open') {
                 return true;
               }
@@ -113,7 +110,7 @@ function ContainerPlugin ({ type, contentDOM }: { type: string, contentDOM: DOMO
             },
             node,
             view,
-            destroy () {
+            destroy() {
               this.contentDOM = undefined;
               this.dom = undefined;
             }

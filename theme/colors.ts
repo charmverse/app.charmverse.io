@@ -36,10 +36,10 @@ export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackg
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
-export type BrandColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red'
+export type BrandColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
 export type SupportedColor = BrandColor | 'default';
 
-export type BrandColorScheme = Record<BrandColor, string>
+export type BrandColorScheme = Record<BrandColor, string>;
 
 export const darkModeColors: BrandColorScheme = {
   gray: '#757570', // Dark Gray

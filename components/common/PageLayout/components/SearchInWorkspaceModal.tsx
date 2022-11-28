@@ -30,14 +30,14 @@ type SearchResultItem = {
   name: string;
   link: string;
   type: ResultType;
-  path? :string;
+  path?: string;
   id: string;
 };
-
+// eslint-disable-next-line
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
-    marginTop: 0px;
-    paddingRight: 0px !important;
+    margintop: 0px;
+    paddingright: 0px !important;
   }
   label: {
     transform: inherit;
@@ -72,7 +72,8 @@ const StyledListItem = styled(ListItem)`
     padding-bottom: 10px;
     border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
 
-    &:hover, &.Mui-focused {
+    &:hover,
+    &.Mui-focused {
       color: inherit;
     }
   }
@@ -90,16 +91,16 @@ const StyledTypographyPage = styled(Typography)`
 `;
 
 const StyledTypographyPath = styled(Typography)`
-    ${baseLine}
-    font-style: italic;
+  ${baseLine}
+  font-style: italic;
 `;
 
 type SearchInWorkspaceModalProps = {
-    close: () => void;
-    isOpen: boolean;
+  close: () => void;
+  isOpen: boolean;
 };
 
-function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
+function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const router = useRouter();
   const { pages } = usePages();
@@ -111,7 +112,6 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   const throttledSearch = throttle(getSearchResults, 200);
 
   useEffect(() => {
-
     if (!space) {
       return;
     }
@@ -132,7 +132,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
       ?.then((results) => {
         setOptions(results);
       })
-      .catch(err => {
+      .catch((err) => {
         log.error('Error searching for pages', err);
       });
 
@@ -142,13 +142,7 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   }, [!!space, inputValue]);
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={close}
-      position={ModalPosition.top}
-      style={{ height: '100%' }}
-      size='large'
-    >
+    <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <StyledAutocomplete
         options={options}
@@ -165,12 +159,12 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
             router.push((item as SearchResultItem).link);
           }
         }}
-        getOptionLabel={option => typeof option === 'object' ? option.name : option}
+        getOptionLabel={(option) => (typeof option === 'object' ? option.name : option)}
         open={isSearching}
         disablePortal
         disableClearable
         // disable filtering when doing async search (see MUI docs)
-        filterOptions={x => x}
+        filterOptions={(x) => x}
         PopperComponent={StyledPopper}
         renderOption={(listItemProps, option: SearchResultItem, state) => {
           const matches = match(option.name, state.inputValue, { insideWords: true, findAllOccurrences: true });
@@ -179,26 +173,25 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
           return (
             <StyledListItem {...listItemProps} key={option.id}>
               <Stack direction='row' spacing={1}>
-                {
-                    option.type === ResultType.page
-                      ? <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
-                      : <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
-                  }
+                {option.type === ResultType.page ? (
+                  <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
+                ) : (
+                  <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
+                )}
                 <Stack>
                   <StyledTypographyPage>
-                    {
-                        parts.map((part: { text: string, highlight: boolean }) => {
-                          return (
-                            <span
-                              key={`${part.text}${part.highlight}`}
-                              style={{
-                                fontWeight: part.highlight ? 700 : 400
-                              }}
-                            >{part.text}
-                            </span>
-                          );
-                        })
-                      }
+                    {parts.map((part: { text: string; highlight: boolean }) => {
+                      return (
+                        <span
+                          key={`${part.text}${part.highlight}`}
+                          style={{
+                            fontWeight: part.highlight ? 700 : 400
+                          }}
+                        >
+                          {part.text}
+                        </span>
+                      );
+                    })}
                   </StyledTypographyPage>
                   {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
                 </Stack>
@@ -229,26 +222,32 @@ function SearchInWorkspaceModal (props: SearchInWorkspaceModalProps) {
   );
 }
 
-function getSearchResults (params: { spaceDomain: string, spaceId: string, query: string, allPages: PageMeta[] }): Promise<SearchResultItem[]> {
-  return charmClient.pages.searchPages(params.spaceId, params.query)
-    .then(pages => pages.map(page => ({
-      name: page.title || 'Untitled',
-      path: getPagePath(page, params.allPages),
-      link: `/${params.spaceDomain}/${page.path}`,
-      type: ResultType.page,
-      id: page.id
-    }))
-      .sort((item1, item2) => item1.name > item2.name ? 1 : -1));
+function getSearchResults(params: {
+  spaceDomain: string;
+  spaceId: string;
+  query: string;
+  allPages: PageMeta[];
+}): Promise<SearchResultItem[]> {
+  return charmClient.pages.searchPages(params.spaceId, params.query).then((pages) =>
+    pages
+      .map((page) => ({
+        name: page.title || 'Untitled',
+        path: getPagePath(page, params.allPages),
+        link: `/${params.spaceDomain}/${page.path}`,
+        type: ResultType.page,
+        id: page.id
+      }))
+      .sort((item1, item2) => (item1.name > item2.name ? 1 : -1))
+  );
 }
 
-function getPagePath (page: PageMeta, pageList: PageMeta[] = []): string {
-
+function getPagePath(page: PageMeta, pageList: PageMeta[] = []): string {
   const pathElements: string[] = [];
   let currentPage: PageMeta | undefined = { ...page };
 
   while (currentPage && currentPage.parentId) {
     const pageId: string = currentPage.parentId;
-    currentPage = pageList.find(p => p && p.id === pageId);
+    currentPage = pageList.find((p) => p && p.id === pageId);
     if (currentPage) {
       pathElements.unshift(currentPage.title);
     }

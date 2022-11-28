@@ -4,7 +4,15 @@ import { prisma } from 'db';
 
 import { getBountyAction } from './getBountyAction';
 
-export type BountyTaskAction = 'application_pending' | 'application_approved' | 'application_rejected' | 'work_submitted' | 'work_approved' | 'payment_needed' | 'payment_complete' | 'suggested_bounty';
+export type BountyTaskAction =
+  | 'application_pending'
+  | 'application_approved'
+  | 'application_rejected'
+  | 'work_submitted'
+  | 'work_approved'
+  | 'payment_needed'
+  | 'payment_complete'
+  | 'suggested_bounty';
 
 export interface BountyTask {
   id: string;
@@ -21,15 +29,15 @@ export interface BountyTask {
 export type BountyTasksGroup = {
   marked: BountyTask[];
   unmarked: BountyTask[];
-}
+};
 
-function sortBounties (bounties: BountyTask[]) {
+function sortBounties(bounties: BountyTask[]) {
   bounties.sort((bountyA, bountyB) => {
     return bountyA.eventDate > bountyB.eventDate ? -1 : 1;
   });
 }
 
-export async function getBountyTasks (userId: string): Promise<{
+export async function getBountyTasks(userId: string): Promise<{
   marked: BountyTask[];
   unmarked: BountyTask[];
 }> {
@@ -63,8 +71,11 @@ export async function getBountyTasks (userId: string): Promise<{
     }
   });
 
-  const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
-  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole).flat().map(({ role }) => role.id);
+  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
+  const roleIds = spaceRoles
+    .map((spaceRole) => spaceRole.spaceRoleToRole)
+    .flat()
+    .map(({ role }) => role.id);
 
   const pagesWithBounties = await prisma.page.findMany({
     where: {
@@ -85,20 +96,24 @@ export async function getBountyTasks (userId: string): Promise<{
     }
   });
 
-  const userNotificationIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
+  const userNotificationIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
 
-  const bountyRecord: { marked: BountyTask[], unmarked: BountyTask[] } = {
+  const bountyRecord: { marked: BountyTask[]; unmarked: BountyTask[] } = {
     marked: [],
     unmarked: []
   };
 
   pagesWithBounties.forEach(({ bounty, ...page }) => {
     if (bounty) {
-      const isSpaceAdmin = spaceRoles.find(space => space.isAdmin && space.spaceId === bounty.spaceId);
-      const isReviewer = bounty.permissions.some(perm => perm.roleId ? roleIds.includes(perm.roleId) : perm.userId === userId);
-      const applications = isReviewer ? bounty.applications : bounty.applications.filter(app => app.createdBy === userId);
+      const isSpaceAdmin = spaceRoles.find((space) => space.isAdmin && space.spaceId === bounty.spaceId);
+      const isReviewer = bounty.permissions.some((perm) =>
+        perm.roleId ? roleIds.includes(perm.roleId) : perm.userId === userId
+      );
+      const applications = isReviewer
+        ? bounty.applications
+        : bounty.applications.filter((app) => app.createdBy === userId);
 
-      applications.forEach(application => {
+      applications.forEach((application) => {
         const action = getBountyAction({
           isSpaceAdmin: !!isSpaceAdmin,
           bountyStatus: bounty.status,
@@ -124,8 +139,7 @@ export async function getBountyTasks (userId: string): Promise<{
 
           if (!userNotificationIds.has(bountyTaskId)) {
             bountyRecord.unmarked.push(bountyTask);
-          }
-          else {
+          } else {
             bountyRecord.marked.push(bountyTask);
           }
         }

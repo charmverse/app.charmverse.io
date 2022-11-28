@@ -22,83 +22,83 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
     id1: {
       calculation: 'countEmpty',
       propertyId: '1'
-
     }
   };
-  const option:IPropertyOption = {
+  const option: IPropertyOption = {
     id: 'id1',
     value: 'Title',
     color: 'propColorDefault'
   };
-  beforeAll(() => {
-
-  });
+  beforeAll(() => {});
   beforeEach(jest.resetAllMocks);
   test('should match snapshot', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot readonly', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={true}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={true}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('return kanbanColumnHeader and edit title', () => {
     const mockedPropertyNameChanged = jest.fn();
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={mockedPropertyNameChanged}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={mockedPropertyNameChanged}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const inputTitle = screen.getByRole('textbox', { name: option.value });
     expect(inputTitle).toBeDefined();
     fireEvent.change(inputTitle, { target: { value: '' } });
@@ -108,50 +108,52 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
     expect(container).toMatchSnapshot();
   });
   test('return kanbanColumnHeader and click on menuwrapper', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).toBeDefined();
     userEvent.click(buttonMenuWrapper);
     expect(container).toMatchSnapshot();
   });
   test('return kanbanColumnHeader, click on menuwrapper and click on hide menu', () => {
-    render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).toBeDefined();
     userEvent.click(buttonMenuWrapper);
@@ -161,25 +163,26 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
     expect(mockedMutator.hideViewColumn).toBeCalledTimes(1);
   });
   test('return kanbanColumnHeader, click on menuwrapper and click on delete menu', () => {
-    render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).toBeDefined();
     userEvent.click(buttonMenuWrapper);
@@ -189,25 +192,26 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
     expect(mockedMutator.deletePropertyOption).toBeCalledTimes(1);
   });
   test('return kanbanColumnHeader, click on menuwrapper and click on blue color menu', () => {
-    render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).toBeDefined();
     userEvent.click(buttonMenuWrapper);
@@ -219,25 +223,26 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
 
   test('return kanbanColumnHeader and click to add card', () => {
     const mockedAddCard = jest.fn();
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={mockedAddCard}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={mockedAddCard}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonAddCard = container.querySelector('.AddIcon')?.parentElement;
     expect(buttonAddCard).toBeDefined();
     userEvent.click(buttonAddCard!);
@@ -245,48 +250,52 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
   });
   test('return kanbanColumnHeader and click KanbanCalculationMenu', () => {
     const mockedCalculationMenuOpen = jest.fn();
-    render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={false}
-        onCalculationMenuOpen={mockedCalculationMenuOpen}
-        onCalculationMenuClose={jest.fn()}
-      />
-    ));
+    render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={false}
+          onCalculationMenuOpen={mockedCalculationMenuOpen}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const buttonKanbanCalculation = screen.getByText(/0/i).parentElement;
     expect(buttonKanbanCalculation).toBeDefined();
     userEvent.click(buttonKanbanCalculation!);
     expect(mockedCalculationMenuOpen).toBeCalledTimes(1);
   });
   test('return kanbanColumnHeader and click count on KanbanCalculationMenu', () => {
-    render(wrapDNDIntl(
-      <KanbanColumnHeader
-        board={board}
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        intl={intl}
-        readOnly={false}
-        addCard={jest.fn()}
-        propertyNameChanged={jest.fn()}
-        onDropToColumn={jest.fn()}
-        calculationMenuOpen={true}
-        onCalculationMenuOpen={jest.fn()}
-        onCalculationMenuClose={jest.fn()}
-      />
-    ));
+    render(
+      wrapDNDIntl(
+        <KanbanColumnHeader
+          board={board}
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          intl={intl}
+          readOnly={false}
+          addCard={jest.fn()}
+          propertyNameChanged={jest.fn()}
+          onDropToColumn={jest.fn()}
+          calculationMenuOpen={true}
+          onCalculationMenuOpen={jest.fn()}
+          onCalculationMenuClose={jest.fn()}
+        />
+      )
+    );
     const menuCountEmpty = screen.getByText('Count');
     expect(menuCountEmpty).toBeDefined();
     userEvent.click(menuCountEmpty);

@@ -23,27 +23,25 @@ interface Props {
   closeOnSelect?: boolean;
 }
 
-export default function SelectMenu ({
+export default function SelectMenu({
   selectedValue,
   valueUpdated,
   options,
   loading = false,
   title,
-  closeOnSelect = true } : Props) {
-
+  closeOnSelect = true
+}: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${v4()}` });
 
-  const selectedLabel = options.find(opt => opt.value === selectedValue)?.primary;
+  const selectedLabel = options.find((opt) => opt.value === selectedValue)?.primary;
 
   return (
     <Box display='block'>
-      {
-        title && (
-          <Typography display='block' variant='caption'>
-            {title}
-          </Typography>
-        )
-      }
+      {title && (
+        <Typography display='block' variant='caption'>
+          {title}
+        </Typography>
+      )}
       <Button
         color='secondary'
         variant='outlined'
@@ -60,33 +58,25 @@ export default function SelectMenu ({
           sx: { width: 300 }
         }}
       >
-        {
-            options.map(opt => {
+        {options.map((opt) => {
+          const { value, primary, secondary } = opt;
 
-              const { value, primary, secondary } = opt;
-
-              return (
-                <MenuItem
-                  key={value.primary}
-                  selected={selectedValue === value}
-                  onClick={() => {
-                    valueUpdated(value);
-                    if (closeOnSelect) {
-                      popupState.close();
-                    }
-                  }}
-                >
-                  <StyledListItemText
-                    primary={primary}
-                    secondary={secondary}
-                  />
-                </MenuItem>
-              );
-            })
-          }
-
+          return (
+            <MenuItem
+              key={value.primary}
+              selected={selectedValue === value}
+              onClick={() => {
+                valueUpdated(value);
+                if (closeOnSelect) {
+                  popupState.close();
+                }
+              }}
+            >
+              <StyledListItemText primary={primary} secondary={secondary} />
+            </MenuItem>
+          );
+        })}
       </Menu>
     </Box>
-
   );
 }

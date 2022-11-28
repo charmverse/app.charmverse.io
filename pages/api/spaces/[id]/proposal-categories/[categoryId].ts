@@ -14,7 +14,7 @@ handler
   .put(updateCategory)
   .delete(deleteCategory);
 
-async function updateCategory (req: NextApiRequest, res: NextApiResponse<ProposalCategory>) {
+async function updateCategory(req: NextApiRequest, res: NextApiResponse<ProposalCategory>) {
   const spaceId = req.query.id as string;
   const categoryId = req.query.categoryId as string;
   const categoryData = req.body as Partial<ProposalCategory>;
@@ -24,7 +24,7 @@ async function updateCategory (req: NextApiRequest, res: NextApiResponse<Proposa
   return res.status(200).json(category);
 }
 
-async function deleteCategory (req: NextApiRequest, res: NextApiResponse) {
+async function deleteCategory(req: NextApiRequest, res: NextApiResponse) {
   await deleteProposalCategory(req.query.categoryId as string);
 
   return res.status(200).json({ ok: true });

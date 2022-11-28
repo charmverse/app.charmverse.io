@@ -1,6 +1,17 @@
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Chip, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import {
+  Box,
+  Chip,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -31,11 +42,7 @@ const StyledTableRow = styled(TableRow)`
   ${hoverIconsStyle()}
 `;
 
-function MemberDirectoryTableRow ({
-  member
-}:{
-  member: Member;
-}) {
+function MemberDirectoryTableRow({ member }: { member: Member }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
@@ -45,7 +52,7 @@ function MemberDirectoryTableRow ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { properties = [] } = useMemberProperties();
   const { mutateMembers } = useMembers();
-  const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
+  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
 
   if (visibleProperties.length === 0) {
     return null;
@@ -58,9 +65,10 @@ function MemberDirectoryTableRow ({
 
   return (
     <StyledTableRow>
-      <TableCell sx={{
-        p: 1
-      }}
+      <TableCell
+        sx={{
+          p: 1
+        }}
       >
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
@@ -71,16 +79,20 @@ function MemberDirectoryTableRow ({
               e.stopPropagation();
               setIsModalOpen(true);
             }}
-            style={!admin ? {
-              opacity: 1
-            } : {}}
+            style={
+              !admin
+                ? {
+                    opacity: 1
+                  }
+                : {}
+            }
           >
             <EditIcon fontSize='small' />
           </IconButton>
         )}
       </TableCell>
-      {visibleProperties.map(property => {
-        const memberProperty = member.properties.find(_property => _property.memberPropertyId === property.id);
+      {visibleProperties.map((property) => {
+        const memberProperty = member.properties.find((_property) => _property.memberPropertyId === property.id);
         if (memberProperty) {
           switch (property.type) {
             case 'profile_pic': {
@@ -99,7 +111,11 @@ function MemberDirectoryTableRow ({
               return (
                 <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0 ? '-' : member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                    {member.roles.length === 0
+                      ? '-'
+                      : member.roles.map((role) => (
+                          <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                        ))}
                   </Stack>
                 </TableCell>
               );
@@ -107,16 +123,21 @@ function MemberDirectoryTableRow ({
             case 'discord': {
               return (
                 <TableCell key={property.id}>
-                  {discordUsername ? <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} /> : '-'}
+                  {discordUsername ? (
+                    <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} />
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
               );
             }
             case 'join_date': {
               return (
                 <TableCell>
-                  <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                    withYear: true
-                  })}
+                  <Typography variant='body2'>
+                    {humanFriendlyDate(member.joinDate, {
+                      withYear: true
+                    })}
                   </Typography>
                 </TableCell>
               );
@@ -124,25 +145,31 @@ function MemberDirectoryTableRow ({
             case 'twitter': {
               return (
                 <TableCell key={property.id}>
-                  {twitterHandle ? <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link> : '-'}
+                  {twitterHandle ? (
+                    <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>
+                      @{twitterHandle}
+                    </Link>
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
               );
             }
             case 'timezone': {
               return (
                 <TableCell key={property.id}>
-                  <Box sx={{
-                    gap: 1,
-                    display: 'flex',
-                    flexDirection: 'row'
-                  }}
+                  <Box
+                    sx={{
+                      gap: 1,
+                      display: 'flex',
+                      flexDirection: 'row'
+                    }}
                   >
                     {member.profile?.timezone ? (
-                      <TimezoneDisplay
-                        showTimezone
-                        timezone={member.profile.timezone}
-                      />
-                    ) : '-'}
+                      <TimezoneDisplay showTimezone timezone={member.profile.timezone} />
+                    ) : (
+                      '-'
+                    )}
                   </Box>
                 </TableCell>
               );
@@ -150,10 +177,11 @@ function MemberDirectoryTableRow ({
             case 'name': {
               return (
                 <TableCell key={property.id}>
-                  <Link color='inherit' href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}>
-                    <Typography fontWeight='bold'>
-                      {memberProperty.value ?? member.username}
-                    </Typography>
+                  <Link
+                    color='inherit'
+                    href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
+                  >
+                    <Typography fontWeight='bold'>{memberProperty.value ?? member.username}</Typography>
                   </Link>
                 </TableCell>
               );
@@ -161,20 +189,14 @@ function MemberDirectoryTableRow ({
             case 'bio': {
               return (
                 <TableCell key={property.id}>
-                  <Typography>
-                    {member.profile?.description ?? '-'}
-                  </Typography>
+                  <Typography>{member.profile?.description ?? '-'}</Typography>
                 </TableCell>
               );
             }
             case 'text_multiline': {
               return (
                 <TableCell key={property.id}>
-                  {memberProperty?.value ? (
-                    <MemberPropertyTextMultiline
-                      value={memberProperty.value as string}
-                    />
-                  ) : '-'}
+                  {memberProperty?.value ? <MemberPropertyTextMultiline value={memberProperty.value as string} /> : '-'}
                 </TableCell>
               );
             }
@@ -199,15 +221,15 @@ function MemberDirectoryTableRow ({
                     minWidth: 250
                   }}
                 >
-                  {memberProperty.value
-                    ? (
-                      <SelectPreview
-                        size='small'
-                        options={property.options as SelectOptionType[]}
-                        value={memberProperty.value as (string | string[])}
-                      />
-                    )
-                    : '-'}
+                  {memberProperty.value ? (
+                    <SelectPreview
+                      size='small'
+                      options={property.options as SelectOptionType[]}
+                      value={memberProperty.value as string | string[]}
+                    />
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
               );
             }
@@ -236,14 +258,10 @@ function MemberDirectoryTableRow ({
   );
 }
 
-export function MemberDirectoryTableView ({
-  members
-}: {
-  members: Member[];
-}) {
+export function MemberDirectoryTableView({ members }: { members: Member[] }) {
   const { properties = [] } = useMemberProperties();
 
-  const visibleProperties = properties.filter(property => property.enabledViews.includes('table'));
+  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
   return (
     <Table
       size='small'
@@ -260,11 +278,15 @@ export function MemberDirectoryTableView ({
       <TableHead>
         <TableRow>
           <StyledTableCell></StyledTableCell>
-          {visibleProperties.map(property => <StyledTableCell key={property.id}>{property.name}</StyledTableCell>)}
+          {visibleProperties.map((property) => (
+            <StyledTableCell key={property.id}>{property.name}</StyledTableCell>
+          ))}
         </TableRow>
       </TableHead>
       <TableBody>
-        {members.map(member => <MemberDirectoryTableRow member={member} key={member.id} />)}
+        {members.map((member) => (
+          <MemberDirectoryTableRow member={member} key={member.id} />
+        ))}
       </TableBody>
     </Table>
   );

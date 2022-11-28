@@ -7,11 +7,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .get(checkPathExists);
+handler.use(requireUser).get(checkPathExists);
 
-export async function checkPathExists (req: NextApiRequest, res: NextApiResponse<{ available: boolean }>) {
+export async function checkPathExists(req: NextApiRequest, res: NextApiResponse<{ available: boolean }>) {
   const path = req.query.path as string;
   const isAvailable = await isProfilePathAvailable(path, req.session.user.id);
 

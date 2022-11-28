@@ -10,7 +10,7 @@ interface Props {
   label?: string;
 }
 
-export function DownIcon ({ iconSize, label, fontSize }: Props) {
+export function DownIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <KeyboardArrowDownIcon fontSize={iconSize} />

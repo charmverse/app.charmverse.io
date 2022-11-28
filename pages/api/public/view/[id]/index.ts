@@ -1,4 +1,3 @@
-
 import type { Page } from '@prisma/client';
 import { Prisma, Block } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -14,8 +13,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getPageByBlockViewId);
 
-async function getPageByBlockViewId (req: NextApiRequest, res: NextApiResponse<Page>) {
-
+async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Page>) {
   const { id } = req.query;
 
   const view = await prisma.block.findFirst({

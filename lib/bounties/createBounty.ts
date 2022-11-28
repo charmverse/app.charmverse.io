@@ -14,7 +14,7 @@ import type { BountyCreationData } from './interfaces';
 /**
  * You can create a bounty suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the bounty to suggestion status. Your logic should account for this.
  */
-export async function createBounty ({
+export async function createBounty({
   spaceId,
   createdBy,
   status = 'suggestion',
@@ -26,13 +26,14 @@ export async function createBounty ({
   rewardToken = 'ETH',
   permissions
 }: BountyCreationData) {
-
   const validCreationStatuses: BountyStatus[] = ['suggestion', 'open'];
 
   const statusIsInvalid = status && validCreationStatuses.indexOf(status) === -1;
 
   if (statusIsInvalid) {
-    throw new InvalidInputError(`Bounties can only be created with one of these statuses: ${validCreationStatuses.join(', ')}`);
+    throw new InvalidInputError(
+      `Bounties can only be created with one of these statuses: ${validCreationStatuses.join(', ')}`
+    );
   }
 
   if (rewardAmount === 0 && status === 'open') {
@@ -51,7 +52,6 @@ export async function createBounty ({
       id: true,
       publicBountyBoard: true
     }
-
   });
 
   if (!space) {
@@ -86,9 +86,15 @@ export async function createBounty ({
     bountyCreateInput.suggestedBy = createdBy;
   }
 
-  const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({ createdBy, status, spaceId, permissions, linkedPageId });
+  const bountyPagePermissionSet: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[] = getBountyPagePermissionSet({
+    createdBy,
+    status,
+    spaceId,
+    permissions,
+    linkedPageId
+  });
 
-  const pagePermissionCreateInputs: Prisma.PagePermissionCreateManyInput[] = bountyPagePermissionSet.map(p => {
+  const pagePermissionCreateInputs: Prisma.PagePermissionCreateManyInput[] = bountyPagePermissionSet.map((p) => {
     return {
       ...p,
       pageId: bountyId
@@ -96,7 +102,7 @@ export async function createBounty ({
   });
 
   // We want a smart default so that if a user creates a bounty visible to the space, and public bounty board is enabled, we inject a public permission
-  if (space.publicBountyBoard && pagePermissionCreateInputs.some(p => p.spaceId)) {
+  if (space.publicBountyBoard && pagePermissionCreateInputs.some((p) => p.spaceId)) {
     pagePermissionCreateInputs.push({
       pageId: bountyId,
       permissionLevel: 'view',
@@ -136,8 +142,7 @@ export async function createBounty ({
         data: pagePermissionCreateInputs
       })
     ]);
-  }
-  else {
+  } else {
     await prisma.$transaction([
       prisma.bounty.create({
         data: {
@@ -169,10 +174,12 @@ export async function createBounty ({
     await setBountyPermissions({
       bountyId,
       permissionsToAssign: {
-        creator: [{
-          group: 'user',
-          id: createdBy
-        }]
+        creator: [
+          {
+            group: 'user',
+            id: createdBy
+          }
+        ]
       }
     });
   }

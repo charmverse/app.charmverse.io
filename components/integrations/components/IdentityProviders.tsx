@@ -34,23 +34,17 @@ const GridContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 `;
 
-function ProviderRow ({ children }: { children: ReactNode }) {
+function ProviderRow({ children }: { children: ReactNode }) {
   return (
     <Card sx={{ height: '100%' }}>
-      <Stack
-        direction='column'
-        alignItems='center'
-        justifyContent='space-between'
-        spacing={3}
-        my={3}
-      >
+      <Stack direction='column' alignItems='center' justifyContent='space-between' spacing={3} my={3}>
         {children}
       </Stack>
     </Card>
   );
 }
 
-export default function IdentityProviders () {
+export default function IdentityProviders() {
   const { account, connector, connectWallet } = useWeb3AuthSig();
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
@@ -59,7 +53,7 @@ export default function IdentityProviders () {
 
   const connectedWithTelegram = Boolean(user?.telegramUser);
 
-  function connectorName (c: any) {
+  function connectorName(c: any) {
     switch (c) {
       case injected:
         return 'MetaMask';
@@ -72,38 +66,34 @@ export default function IdentityProviders () {
     }
   }
 
-  async function disconnectFromTelegram () {
+  async function disconnectFromTelegram() {
     if (connectedWithTelegram) {
       setIsConnectingTelegram(true);
       try {
         const updatedUser: User = await charmClient.disconnectTelegram();
         setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser, telegramUser: null }));
-      }
-      catch (err: any) {
+      } catch (err: any) {
         setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
       }
       setIsConnectingTelegram(false);
     }
   }
 
-  function connectToTelegram () {
+  function connectToTelegram() {
     loginWithTelegram(async (telegramAccount: TelegramAccount) => {
       setIsConnectingTelegram(true);
       if (telegramAccount) {
         try {
           const telegramUser = await charmClient.connectTelegram(telegramAccount);
           setUser((_user: LoggedInUser) => ({ ..._user, telegramUser }));
-        }
-        catch (err: any) {
+        } catch (err: any) {
           setTelegramError(err.message || err.error || 'Something went wrong. Please try again');
         }
-      }
-      else {
+      } else {
         setTelegramError('Something went wrong. Please try again');
       }
       setIsConnectingTelegram(false);
     });
-
   }
 
   return (
@@ -125,7 +115,13 @@ export default function IdentityProviders () {
             <Typography color='secondary' variant='button'>
               {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
             </Typography>
-            <Tooltip arrow placement='top' title={user?.wallets.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''}>
+            <Tooltip
+              arrow
+              placement='top'
+              title={
+                user?.wallets.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''
+              }
+            >
               {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
               <div>
                 <StyledButton
@@ -140,11 +136,7 @@ export default function IdentityProviders () {
               </div>
             </Tooltip>
 
-            {error && (
-              <Alert severity='error'>
-                {error}
-              </Alert>
-            )}
+            {error && <Alert severity='error'>{error}</Alert>}
           </ProviderRow>
         )}
       </DiscordProvider>
@@ -162,19 +154,14 @@ export default function IdentityProviders () {
           color={connectedWithTelegram ? 'error' : 'primary'}
           disabled={isLoggingOut || isConnectingTelegram}
           loading={isConnectingTelegram}
-          onClick={() => connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram()}
+          onClick={() => (connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram())}
         >
           {connectedWithTelegram ? 'Disconnect' : 'Connect'}
         </StyledButton>
         <TelegramLoginIframe />
 
-        {telegramError && (
-          <Alert severity='error'>
-            {telegramError}
-          </Alert>
-        )}
+        {telegramError && <Alert severity='error'>{telegramError}</Alert>}
       </ProviderRow>
     </GridContainer>
-
   );
 }

@@ -10,7 +10,7 @@ const LISTBOX_PADDING = 8; // px
 
 type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildsResponse[0]];
 
-function renderRow (props: { data: ItemData[], index: number, style: React.CSSProperties }) {
+function renderRow(props: { data: ItemData[]; index: number; style: React.CSSProperties }) {
   const { data, index, style } = props;
   const [itemProps, guild] = data[index];
   const inlineStyle = {
@@ -40,7 +40,10 @@ function renderRow (props: { data: ItemData[], index: number, style: React.CSSPr
         >
           <Box display='flex' flexGrow={1} gap={1} alignItems='center'>
             <ListItemIcon>
-              <Avatar sx={{ width: 32, height: 32 }} src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl} />
+              <Avatar
+                sx={{ width: 32, height: 32 }}
+                src={guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl}
+              />
             </ListItemIcon>
             <ListItemText
               secondary={guild.urlName}
@@ -73,16 +76,10 @@ const OuterElementContext = React.createContext({});
 
 const OuterElementType = React.forwardRef<HTMLDivElement>((props, ref) => {
   const outerProps = React.useContext(OuterElementContext);
-  return (
-    <div
-      ref={ref}
-      {...props}
-      {...outerProps}
-    />
-  );
+  return <div ref={ref} {...props} {...outerProps} />;
 });
 
-function useResetCache (data: number) {
+function useResetCache(data: number) {
   const ref = React.useRef<VariableSizeList>(null);
   React.useEffect(() => {
     if (ref.current != null) {
@@ -110,7 +107,10 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, { children: ItemData[]
       <OuterElementContext.Provider value={other}>
         <VariableSizeList<ItemData[]>
           itemData={itemData}
-          height={(itemCount > 8 ? LISTBOX_PADDING * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) + 2 * LISTBOX_PADDING}
+          height={
+            (itemCount > 8 ? LISTBOX_PADDING * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) +
+            2 * LISTBOX_PADDING
+          }
           width='100%'
           ref={gridRef}
           outerElementType={OuterElementType}
@@ -125,16 +125,26 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, { children: ItemData[]
   );
 });
 
-export default function GuildsAutocomplete (
-  { disabled, selectedGuildIds, onChange, guilds }:
-  { disabled: boolean, onChange: (guildIds: number[]) => void, selectedGuildIds: number[], guilds: GetGuildsResponse }
-) {
+export default function GuildsAutocomplete({
+  disabled,
+  selectedGuildIds,
+  onChange,
+  guilds
+}: {
+  disabled: boolean;
+  onChange: (guildIds: number[]) => void;
+  selectedGuildIds: number[];
+  guilds: GetGuildsResponse;
+}) {
   const guildRecord = React.useMemo(() => {
-    return guilds.reduce<Record<string, GetGuildsResponse[0]>>((record, guild) => ({
-      ...record,
-      [guild.name]: guild,
-      [guild.id]: guild
-    }), {});
+    return guilds.reduce<Record<string, GetGuildsResponse[0]>>(
+      (record, guild) => ({
+        ...record,
+        [guild.name]: guild,
+        [guild.id]: guild
+      }),
+      {}
+    );
   }, [guilds]);
 
   return (
@@ -144,11 +154,11 @@ export default function GuildsAutocomplete (
       disableListWrap
       getOptionLabel={(guild) => guild}
       ListboxComponent={ListboxComponent as any}
-      options={guilds.map(guild => guild.name)}
+      options={guilds.map((guild) => guild.name)}
       filterSelectedOptions
-      value={selectedGuildIds.map(selectedGuildId => guildRecord[selectedGuildId].name)}
+      value={selectedGuildIds.map((selectedGuildId) => guildRecord[selectedGuildId].name)}
       onChange={(_, guildNames) => {
-        onChange(guildNames.map(guildName => guildRecord[guildName].id));
+        onChange(guildNames.map((guildName) => guildRecord[guildName].id));
       }}
       renderInput={(params) => (
         <TextField

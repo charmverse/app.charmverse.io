@@ -11,25 +11,21 @@ const ReadMoreTypography = styled(Typography)`
   }
 `;
 
-export function MemberPropertyTextMultiline ({
-  label,
-  value
-}: {
-  value?: string;
-  label?: string;
-}) {
+export function MemberPropertyTextMultiline({ label, value }: { value?: string; label?: string }) {
   const [showingFullValue, setShowingFullValue] = useState(false);
 
-  const textContent = (value ?? 'N/A');
+  const textContent = value ?? 'N/A';
   const isOverflowing = textContent.length > MAX_CHAR;
 
   return (
     <Stack>
-      {label && <Typography fontWeight='bold' variant='subtitle2'>{label}</Typography>}
-      <Typography
-        whiteSpace='normal'
-        variant='body2'
-      >{(!showingFullValue && isOverflowing) ? `${textContent.slice(0, MAX_CHAR)}...` : textContent}
+      {label && (
+        <Typography fontWeight='bold' variant='subtitle2'>
+          {label}
+        </Typography>
+      )}
+      <Typography whiteSpace='normal' variant='body2'>
+        {!showingFullValue && isOverflowing ? `${textContent.slice(0, MAX_CHAR)}...` : textContent}
         {isOverflowing && (
           <ReadMoreTypography
             onClick={(e) => {
@@ -39,7 +35,8 @@ export function MemberPropertyTextMultiline ({
             }}
             variant='body2'
             fontWeight='bold'
-          >{!showingFullValue ? 'Read more' : 'Read less'}
+          >
+            {!showingFullValue ? 'Read more' : 'Read less'}
           </ReadMoreTypography>
         )}
       </Typography>

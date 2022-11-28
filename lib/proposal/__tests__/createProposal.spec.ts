@@ -16,9 +16,7 @@ beforeAll(async () => {
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
-
   it('Create a page and proposal', async () => {
-
     const { page, workspaceEvent } = await createProposal({
       contentText: '',
       title: 'page-title',
@@ -26,10 +24,12 @@ describe('Creates a page and proposal with relevant configuration', () => {
       spaceId: space.id
     });
 
-    expect(page).toMatchObject(expect.objectContaining({
-      title: 'page-title',
-      type: 'proposal'
-    }));
+    expect(page).toMatchObject(
+      expect.objectContaining({
+        title: 'page-title',
+        type: 'proposal'
+      })
+    );
 
     const proposal = await prisma.proposal.findUnique({
       where: {
@@ -40,20 +40,25 @@ describe('Creates a page and proposal with relevant configuration', () => {
       }
     });
 
-    expect(proposal).toMatchObject(expect.objectContaining({
-      authors: [{
-        proposalId: proposal?.id,
-        userId: user.id
-      }]
-    }));
+    expect(proposal).toMatchObject(
+      expect.objectContaining({
+        authors: [
+          {
+            proposalId: proposal?.id,
+            userId: user.id
+          }
+        ]
+      })
+    );
 
-    expect(workspaceEvent).toMatchObject(expect.objectContaining({
-      type: 'proposal_status_change'
-    }));
+    expect(workspaceEvent).toMatchObject(
+      expect.objectContaining({
+        type: 'proposal_status_change'
+      })
+    );
   });
 
   it('Should provision the proposal permissions', async () => {
-
     const { page } = await createProposal({
       createdBy: user.id,
       contentText: '',
@@ -69,7 +74,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
 
     const privateDraftAuthorPermissionLevel = proposalPermissionMapping.private_draft.author;
 
-    expect(permissions.some(p => p.userId === user.id && p.permissionLevel === privateDraftAuthorPermissionLevel)).toBe(true);
+    expect(
+      permissions.some((p) => p.userId === user.id && p.permissionLevel === privateDraftAuthorPermissionLevel)
+    ).toBe(true);
   });
-
 });

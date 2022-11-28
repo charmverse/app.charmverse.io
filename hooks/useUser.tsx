@@ -28,18 +28,23 @@ export const UserContext = createContext<Readonly<IContext>>({
   refreshUserWithWeb3Account: () => Promise.resolve()
 });
 
-export function UserProvider ({ children }: { children: ReactNode }) {
-  const { account, sign, getStoredSignature, setLoggedInUser: setLoggedInUserForWeb3Hook, verifiableWalletDetected } = useWeb3AuthSig();
+export function UserProvider({ children }: { children: ReactNode }) {
+  const {
+    account,
+    sign,
+    getStoredSignature,
+    setLoggedInUser: setLoggedInUserForWeb3Hook,
+    verifiableWalletDetected
+  } = useWeb3AuthSig();
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  async function loginFromWeb3Account (authSig?: AuthSig) {
-
+  async function loginFromWeb3Account(authSig?: AuthSig) {
     if (!verifiableWalletDetected && !authSig) {
       throw new MissingWeb3AccountError();
     }
 
-    let signature = authSig ?? getStoredSignature() as AuthSig;
+    let signature = authSig ?? (getStoredSignature() as AuthSig);
 
     if (!signature) {
       signature = await sign();
@@ -52,15 +57,14 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setUser(refreshedProfile);
 
       return refreshedProfile;
-    }
-    catch (err) {
+    } catch (err) {
       const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
       setUser(newProfile);
       return newProfile;
     }
   }
 
-  async function logoutUser () {
+  async function logoutUser() {
     await charmClient.logout();
     setUser(null);
   }
@@ -70,44 +74,43 @@ export function UserProvider ({ children }: { children: ReactNode }) {
    *
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
-  async function refreshUserWithWeb3Account () {
-
+  async function refreshUserWithWeb3Account() {
     const signature = getStoredSignature();
 
     // Support the initial load
-    if (!isLoaded
+    if (
+      !isLoaded ||
       // Account is only ever visible if it belongs to the current user
-      || account
+      account ||
       // If the user is connected with a Discord account, we can ignore changes
-      || user?.discordUser
+      user?.discordUser ||
       // If the web3 wallet is locked, don't log out the user
-      || (!verifiableWalletDetected && user)) {
-      charmClient.getUser()
-        .then(_user => {
+      (!verifiableWalletDetected && user)
+    ) {
+      charmClient
+        .getUser()
+        .then((_user) => {
           setUser(_user);
         })
         .finally(() => {
           setIsLoaded(true);
         });
       // a hack for now to support users that are trying to log in thru discord
-    }
-    else if (verifiableWalletDetected && signature) {
+    } else if (verifiableWalletDetected && signature) {
       loginFromWeb3Account(signature)
-        .then(loggedInUser => setUser(loggedInUser))
+        .then((loggedInUser) => setUser(loggedInUser))
         .catch(logoutUser);
-    }
-    else {
+    } else {
       logoutUser();
     }
   }
 
   useEffect(() => {
     refreshUserWithWeb3Account();
-
   }, [account]);
 
   const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {
-    setUser(u => u ? { ...u, ...updatedUser } : null);
+    setUser((u) => (u ? { ...u, ...updatedUser } : null));
   }, []);
 
   useEffect(() => {
@@ -115,7 +118,6 @@ export function UserProvider ({ children }: { children: ReactNode }) {
   }, [user]);
 
   const value = useMemo<IContext>(() => {
-
     return {
       user,
       setUser,
@@ -123,14 +125,11 @@ export function UserProvider ({ children }: { children: ReactNode }) {
       setIsLoaded,
       updateUser,
       loginFromWeb3Account,
-      refreshUserWithWeb3Account };
+      refreshUserWithWeb3Account
+    };
   }, [user, isLoaded]);
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export const useUser = () => useContext(UserContext);

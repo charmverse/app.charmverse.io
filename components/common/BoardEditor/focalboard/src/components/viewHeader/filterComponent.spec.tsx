@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -40,11 +39,7 @@ describe('components/viewHeader/filterComponent', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterComponenet
-            board={board}
-            activeView={activeView}
-            onClose={jest.fn()}
-          />
+          <FilterComponenet board={board} activeView={activeView} onClose={jest.fn()} />
         </ReduxProvider>
       )
     );
@@ -56,11 +51,7 @@ describe('components/viewHeader/filterComponent', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterComponenet
-            board={board}
-            activeView={activeView}
-            onClose={jest.fn()}
-          />
+          <FilterComponenet board={board} activeView={activeView} onClose={jest.fn()} />
         </ReduxProvider>
       )
     );
@@ -76,11 +67,7 @@ describe('components/viewHeader/filterComponent', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterComponenet
-            board={board}
-            activeView={activeView}
-            onClose={jest.fn()}
-          />
+          <FilterComponenet board={board} activeView={activeView} onClose={jest.fn()} />
         </ReduxProvider>
       )
     );
@@ -96,11 +83,7 @@ describe('components/viewHeader/filterComponent', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterComponenet
-            board={board}
-            activeView={activeView}
-            onClose={jest.fn()}
-          />
+          <FilterComponenet board={board} activeView={activeView} onClose={jest.fn()} />
         </ReduxProvider>
       )
     );

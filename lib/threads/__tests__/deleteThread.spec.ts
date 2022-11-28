@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -19,9 +18,7 @@ beforeAll(async () => {
 });
 
 describe('deleteThread', () => {
-
   it('should delete the thread and return true', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -34,16 +31,11 @@ describe('deleteThread', () => {
   });
 
   it('should fail if the thread does not exist', async () => {
-
     try {
       await deleteThread(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
-
 });
-

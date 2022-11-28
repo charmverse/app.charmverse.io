@@ -14,7 +14,7 @@ handler
   .put(updateMemberPropertyHandler)
   .delete(deleteMemberPropertyHandler);
 
-async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
+async function updateMemberPropertyHandler(req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
   const userId = req.session.user.id;
   const propertyId = req.query.propertyId as string;
   const data = req.body as Partial<MemberProperty>;
@@ -25,7 +25,7 @@ async function updateMemberPropertyHandler (req: NextApiRequest, res: NextApiRes
   return res.status(200).json(updatedProperty);
 }
 
-async function deleteMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse) {
+async function deleteMemberPropertyHandler(req: NextApiRequest, res: NextApiResponse) {
   const memberProperty = await deleteMemberProperty(req.query.propertyId as string);
   if (!memberProperty.count) {
     throw new InvalidStateError("Can't delete default member properties");

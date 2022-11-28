@@ -8,7 +8,7 @@ import type { PageQuery, PaginatedQuery, Page } from './interfaces';
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validatePageQuery (query: PageQuery): true {
+export function validatePageQuery(query: PageQuery): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
@@ -18,16 +18,15 @@ export function validatePageQuery (query: PageQuery): true {
 
   const queryKeys = Object.keys(query);
 
-  const unsupportedKeys: string [] = [];
+  const unsupportedKeys: string[] = [];
 
   for (const key of queryKeys) {
-    if (supportedKeys.some(supported => supported === key) === false) {
+    if (supportedKeys.some((supported) => supported === key) === false) {
       unsupportedKeys.push(key);
     }
   }
 
   if (unsupportedKeys.length > 0) {
-
     const errorDetails: UnsupportedKeyDetails = {
       unsupportedKeys,
       allowedKeys: supportedKeys,
@@ -45,11 +44,9 @@ export function validatePageQuery (query: PageQuery): true {
       message: 'Your query content for pages contains unsupported keys',
       error: errorDetails
     });
-
   }
 
   return true;
-
 }
 
 /**
@@ -59,12 +56,11 @@ export function validatePageQuery (query: PageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateCreationData (creationData: PageQuery): true {
+export function validateCreationData(creationData: PageQuery): true {
   try {
     validatePageQuery(creationData);
     return true;
-  }
-  catch (error) {
+  } catch (error) {
     const modifiedError = error as UnsupportedKeysError<Pick<Page, 'title' | 'properties'>>;
 
     modifiedError.error.example = {
@@ -78,7 +74,6 @@ export function validateCreationData (creationData: PageQuery): true {
 
     throw modifiedError;
   }
-
 }
 
 /**
@@ -88,12 +83,11 @@ export function validateCreationData (creationData: PageQuery): true {
  * @returns true if this is valid
  * @throws An error indicating the invalid fields
  */
-export function validateUpdateData (creationData: PageQuery): true {
+export function validateUpdateData(creationData: PageQuery): true {
   try {
     validatePageQuery(creationData);
     return true;
-  }
-  catch (error) {
+  } catch (error) {
     const modifiedError = error as UnsupportedKeysError;
 
     modifiedError.error.example = {
@@ -106,11 +100,10 @@ export function validateUpdateData (creationData: PageQuery): true {
     modifiedError.message = 'Invalid data inside your update data';
 
     throw modifiedError;
-
   }
 }
 
-export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true {
+export function validatePaginationQuery(query: PaginatedQuery<PageQuery>): true {
   // Empty queries are allowed
   if (query === undefined || query === null) {
     return true;
@@ -120,16 +113,15 @@ export function validatePaginationQuery (query: PaginatedQuery<PageQuery>): true
 
   const queryKeys = Object.keys(query);
 
-  const unsupportedKeys: string [] = [];
+  const unsupportedKeys: string[] = [];
 
   for (const key of queryKeys) {
-    if (supportedKeys.some(supported => supported === key) === false) {
+    if (supportedKeys.some((supported) => supported === key) === false) {
       unsupportedKeys.push(key);
     }
   }
 
   if (unsupportedKeys.length > 0) {
-
     throw new UnsupportedKeysError({
       message: 'Your query contains unsupported keys',
       error: {

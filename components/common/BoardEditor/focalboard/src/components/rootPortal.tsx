@@ -1,10 +1,9 @@
-
 import React, { useState, useLayoutEffect, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 
 type Props = {
-    children: React.ReactNode;
-}
+  children: React.ReactNode;
+};
 
 const RootPortal = React.memo((props: Props) => {
   const [el] = useState(document.createElement('div'));

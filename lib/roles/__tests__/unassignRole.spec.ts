@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -19,9 +18,7 @@ beforeAll(async () => {
 });
 
 describe('unassignRole', () => {
-
   it('should unassign a user from a role and return the role with all current assignees', async () => {
-
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
@@ -38,25 +35,21 @@ describe('unassignRole', () => {
     });
 
     expect(roleAfterUserRemoved.users.length).toBe(0);
-
   });
 
   it('should fail if the role does not exist', async () => {
-
     try {
       await unassignRole({
         roleId: v4(),
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
 
   it('should fail if the user is not assigned to the role', async () => {
-
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
@@ -68,14 +61,12 @@ describe('unassignRole', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
 
   it('should fail if trying to unassign a user from a role managed by guild.xyz', async () => {
-
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id,
@@ -93,10 +84,8 @@ describe('unassignRole', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(UndesirableOperationError);
     }
   });
-
 });

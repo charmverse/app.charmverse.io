@@ -3,7 +3,6 @@ import { Grid } from '@mui/material';
 import type { ComponentProps } from 'react';
 
 const StyledGrid = styled(Grid)`
-
   // typography taken from focalboard styles
   color: rgba(var(--center-channel-color-rgb), 0.6);
   font-size: 0.85rem;
@@ -14,7 +13,7 @@ const StyledGrid = styled(Grid)`
   width: 100%;
 `;
 
-export default function GridContainer ({ children, ...props }: ComponentProps<typeof Grid>) {
+export default function GridContainer({ children, ...props }: ComponentProps<typeof Grid>) {
   return (
     <StyledGrid container alignItems='flex-end' {...props}>
       {children}

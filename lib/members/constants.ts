@@ -1,6 +1,12 @@
 import type { MemberPropertyType } from '@prisma/client';
 
-type MemberPropertyConfig = { label: string, hidden?: boolean, readonly?: boolean, default?: boolean, unhideable?: boolean };
+type MemberPropertyConfig = {
+  label: string;
+  hidden?: boolean;
+  readonly?: boolean;
+  default?: boolean;
+  unhideable?: boolean;
+};
 
 // the following properties are listed in the order they should appear in the UI. Chronological sort is guaranteed since es2015
 export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyConfig> = {
@@ -74,8 +80,8 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
 
 const propertyTypes = Object.keys(MEMBER_PROPERTY_CONFIG) as MemberPropertyType[];
 
-export const READONLY_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].readonly);
+export const READONLY_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PROPERTY_CONFIG[prop].readonly);
 
-export const HIDDEN_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].hidden);
+export const HIDDEN_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PROPERTY_CONFIG[prop].hidden);
 
-export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter(prop => MEMBER_PROPERTY_CONFIG[prop].default);
+export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PROPERTY_CONFIG[prop].default);

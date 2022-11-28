@@ -1,4 +1,3 @@
-
 import type { EVMChain } from 'lit-js-sdk';
 
 import { getDaylightRequirements } from '../daylight';
@@ -39,11 +38,13 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        addresses: ['0x123'],
-        type: 'onAllowlist',
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          addresses: ['0x123'],
+          type: 'onAllowlist',
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
@@ -52,12 +53,14 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        address: '0x00001',
-        type: 'hasTokenBalance',
-        minAmount: 1337,
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00001',
+          type: 'hasTokenBalance',
+          minAmount: 1337,
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
@@ -66,12 +69,14 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        address: '0x00002',
-        type: 'hasNftWithSpecificId',
-        id: ['1337'],
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00002',
+          type: 'hasNftWithSpecificId',
+          id: ['1337'],
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
@@ -80,18 +85,20 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        address: '0x00002',
-        type: 'hasNftWithSpecificId',
-        id: ['1337'],
-        chain: 'ethereum'
-      },
-      {
-        address: '0x00001',
-        type: 'hasTokenBalance',
-        minAmount: 1337,
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00002',
+          type: 'hasNftWithSpecificId',
+          id: ['1337'],
+          chain: 'ethereum'
+        },
+        {
+          address: '0x00001',
+          type: 'hasTokenBalance',
+          minAmount: 1337,
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
@@ -100,18 +107,20 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'AND',
-      requirements: [{
-        address: '0x00002',
-        type: 'hasNftWithSpecificId',
-        id: ['1337'],
-        chain: 'ethereum'
-      },
-      {
-        address: '0x00001',
-        type: 'hasTokenBalance',
-        minAmount: 1337,
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00002',
+          type: 'hasNftWithSpecificId',
+          id: ['1337'],
+          chain: 'ethereum'
+        },
+        {
+          address: '0x00001',
+          type: 'hasTokenBalance',
+          minAmount: 1337,
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
@@ -120,28 +129,36 @@ describe('getDaylightRequirements', () => {
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        address: '0x00002',
-        type: 'hasNftWithSpecificId',
-        id: ['1337'],
-        chain: 'ethereum'
-      },
-      {
-        address: '0x00001',
-        type: 'hasTokenBalance',
-        minAmount: 1337,
-        chain: 'ethereum'
-      },
-      {
-        addresses: ['0x123'],
-        type: 'onAllowlist',
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00002',
+          type: 'hasNftWithSpecificId',
+          id: ['1337'],
+          chain: 'ethereum'
+        },
+        {
+          address: '0x00001',
+          type: 'hasTokenBalance',
+          minAmount: 1337,
+          chain: 'ethereum'
+        },
+        {
+          addresses: ['0x123'],
+          type: 'onAllowlist',
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 
   it('should not return conditions with mixed operators', () => {
-    const tokenGateConditions = [nftCondition, { operator: 'AND'as const }, tokenCondition, { operator: 'OR'as const }, walletCondition];
+    const tokenGateConditions = [
+      nftCondition,
+      { operator: 'AND' as const },
+      tokenCondition,
+      { operator: 'OR' as const },
+      walletCondition
+    ];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'AND',
@@ -150,28 +167,33 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return requirements for nested conditions', () => {
-    const tokenGateConditions = [[nftCondition, { operator: 'OR' as const }, walletCondition], { operator: 'OR' as const }, tokenCondition];
+    const tokenGateConditions = [
+      [nftCondition, { operator: 'OR' as const }, walletCondition],
+      { operator: 'OR' as const },
+      tokenCondition
+    ];
 
     expect(getDaylightRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
-      requirements: [{
-        address: '0x00002',
-        type: 'hasNftWithSpecificId',
-        id: ['1337'],
-        chain: 'ethereum'
-      },
-      {
-        addresses: ['0x123'],
-        type: 'onAllowlist',
-        chain: 'ethereum'
-      },
-      {
-        address: '0x00001',
-        type: 'hasTokenBalance',
-        minAmount: 1337,
-        chain: 'ethereum'
-      }]
+      requirements: [
+        {
+          address: '0x00002',
+          type: 'hasNftWithSpecificId',
+          id: ['1337'],
+          chain: 'ethereum'
+        },
+        {
+          addresses: ['0x123'],
+          type: 'onAllowlist',
+          chain: 'ethereum'
+        },
+        {
+          address: '0x00001',
+          type: 'hasTokenBalance',
+          minAmount: 1337,
+          chain: 'ethereum'
+        }
+      ]
     });
   });
 });
-

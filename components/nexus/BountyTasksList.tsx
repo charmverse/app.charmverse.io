@@ -19,7 +19,7 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
-function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
+function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
   const { pageTitle, spaceName, spaceDomain, pagePath, action } = bountyTask;
   const bountyLink = `/${spaceDomain}/${pagePath}`;
   const workspaceBounties = `/${spaceDomain}/bounties`;
@@ -28,10 +28,8 @@ function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
     <TableRow>
       <TableCell>
         <Link color='inherit' href={bountyLink}>
-          <Typography
-            variant='body1'
-            noWrap
-          >{pageTitle || 'Untitled'}
+          <Typography variant='body1' noWrap>
+            {pageTitle || 'Untitled'}
           </Typography>
         </Link>
       </TableCell>
@@ -40,9 +38,7 @@ function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
           <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
-      <TableCell align='center'>
-        {action ? <BountyStatusNexusChip action={action} /> : 'No action'}
-      </TableCell>
+      <TableCell align='center'>{action ? <BountyStatusNexusChip action={action} /> : 'No action'}</TableCell>
       <TableCell>
         <Button
           sx={{
@@ -62,7 +58,7 @@ function BountiesTasksListRow ({ bountyTask }: { bountyTask: BountyTask }) {
   );
 }
 
-function BountiesTasksList ({
+function BountiesTasksList({
   tasks,
   error,
   mutateTasks
@@ -74,21 +70,26 @@ function BountiesTasksList ({
   const bounties = tasks?.bounties ? [...tasks.bounties.unmarked, ...tasks.bounties.marked] : [];
 
   useEffect(() => {
-    async function main () {
+    async function main() {
       if (tasks?.bounties && tasks.bounties.unmarked.length !== 0) {
-        await charmClient.tasks.markTasks(tasks.bounties.unmarked.map(task => ({ id: task.id, type: 'bounty' })));
-        mutateTasks((_tasks) => {
-          const unmarked = _tasks?.bounties.unmarked ?? [];
-          return _tasks ? {
-            ..._tasks,
-            bounties: {
-              marked: [...unmarked, ..._tasks.bounties.marked],
-              unmarked: []
-            }
-          } : undefined;
-        }, {
-          revalidate: false
-        });
+        await charmClient.tasks.markTasks(tasks.bounties.unmarked.map((task) => ({ id: task.id, type: 'bounty' })));
+        mutateTasks(
+          (_tasks) => {
+            const unmarked = _tasks?.bounties.unmarked ?? [];
+            return _tasks
+              ? {
+                  ..._tasks,
+                  bounties: {
+                    marked: [...unmarked, ..._tasks.bounties.marked],
+                    unmarked: []
+                  }
+                }
+              : undefined;
+          },
+          {
+            revalidate: false
+          }
+        );
       }
     }
     main();
@@ -97,23 +98,18 @@ function BountiesTasksList ({
   if (error) {
     return (
       <Box>
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
+        <Alert severity='error'>There was an error. Please try again later!</Alert>
       </Box>
     );
-  }
-  else if (!tasks?.bounties) {
+  } else if (!tasks?.bounties) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
-  const filteredBounties = bounties.filter(b => !!b.action);
+  const filteredBounties = bounties.filter((b) => !!b.action);
   const totalBounties = filteredBounties.length;
 
   if (totalBounties === 0) {
-    return (
-      <EmptyTaskState taskType='bounties' />
-    );
+    return <EmptyTaskState taskType='bounties' />;
   }
 
   return (
@@ -123,12 +119,18 @@ function BountiesTasksList ({
           <TableRow>
             <TableCell>Bounty Name</TableCell>
             <TableCell>Workspace</TableCell>
-            <TableCell align='center' width={200}>Status</TableCell>
-            <TableCell align='center' width={135}>Action</TableCell>
+            <TableCell align='center' width={200}>
+              Status
+            </TableCell>
+            <TableCell align='center' width={135}>
+              Action
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredBounties.map(bounty => <BountiesTasksListRow key={bounty.id} bountyTask={bounty} />)}
+          {filteredBounties.map((bounty) => (
+            <BountiesTasksListRow key={bounty.id} bountyTask={bounty} />
+          ))}
         </TableBody>
       </Table>
     </Box>

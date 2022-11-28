@@ -1,9 +1,18 @@
 import type { ApplicationStatus, Space, User } from '@prisma/client';
 import { BountyStatus } from '@prisma/client';
 
-import { generateBounty, generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBounty,
+  generateBountyWithSingleApplication,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
-import { bountyCanReceiveNewSubmissionsOrApplications, countValidSubmissions, submissionIsEditable, submissionsCapReached } from '../shared';
+import {
+  bountyCanReceiveNewSubmissionsOrApplications,
+  countValidSubmissions,
+  submissionIsEditable,
+  submissionsCapReached
+} from '../shared';
 
 let user: User;
 let space: Space;
@@ -15,9 +24,7 @@ beforeAll(async () => {
 });
 
 describe('submissionsCapReached', () => {
-
   it('should return true if the amount of valid submissions which are inProgress, review, complete or paid for a bounty is equal to or above its max submissions cap', async () => {
-
     const bountiesWithRelevantApplicationStatuses = await Promise.all([
       generateBountyWithSingleApplication({
         bountyCap: 1,
@@ -45,12 +52,11 @@ describe('submissionsCapReached', () => {
       })
     ]);
 
-    bountiesWithRelevantApplicationStatuses.forEach(bounty => {
+    bountiesWithRelevantApplicationStatuses.forEach((bounty) => {
       const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
 
       expect(capReached).toBe(true);
     });
-
   });
 
   it('should return true if the maxSubmissions cap for a bounty is 0', async () => {
@@ -91,13 +97,10 @@ describe('submissionsCapReached', () => {
 
     expect(capReached).toBe(false);
   });
-
 });
 
 describe('countValidSubmissions', () => {
-
   it('should only count submissions which are inProgress, review, complete or paid', async () => {
-
     const bountiesWithRelevantApplicationStatuses = await Promise.all([
       generateBountyWithSingleApplication({
         bountyCap: 1,
@@ -125,12 +128,11 @@ describe('countValidSubmissions', () => {
       })
     ]);
 
-    bountiesWithRelevantApplicationStatuses.forEach(bounty => {
+    bountiesWithRelevantApplicationStatuses.forEach((bounty) => {
       const validSubmissions = countValidSubmissions(bounty.applications);
 
       expect(validSubmissions).toBe(1);
     });
-
   });
 
   it("should ignore applications with 'rejected' status when calculating the cap", async () => {
@@ -166,7 +168,6 @@ describe('countValidSubmissions', () => {
 });
 
 describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
-
   it('should return true if the bounty status is open and the submissions cap is not reached', async () => {
     const bounty = await generateBounty({
       approveSubmitters: false,
@@ -198,20 +199,20 @@ describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
     });
 
     expect(canReceive).toBe(false);
-
   });
 
   it('should return false if the bounty status is not open', async () => {
-
-    const notOpenStatuses = (Object.keys(BountyStatus) as BountyStatus[]).filter(status => status !== 'open');
+    const notOpenStatuses = (Object.keys(BountyStatus) as BountyStatus[]).filter((status) => status !== 'open');
 
     const bounties = await Promise.all(
-      notOpenStatuses.map(status => generateBounty({
-        createdBy: user.id,
-        spaceId: space.id,
-        status,
-        approveSubmitters: false
-      }))
+      notOpenStatuses.map((status) =>
+        generateBounty({
+          createdBy: user.id,
+          spaceId: space.id,
+          status,
+          approveSubmitters: false
+        })
+      )
     );
 
     for (const bounty of bounties) {
@@ -223,8 +224,7 @@ describe('bountyCanReceiveNewSubmissionsOrApplications', () => {
 
 describe('submissionIsEditable', () => {
   it('should return true  if submission status is "inProgress" or "review" AND bounty is "open" or "inProgress"', async () => {
-
-    const validStatusCombinations: { bountyStatus: BountyStatus, submissionStatus: ApplicationStatus }[] = [
+    const validStatusCombinations: { bountyStatus: BountyStatus; submissionStatus: ApplicationStatus }[] = [
       {
         bountyStatus: 'inProgress',
         submissionStatus: 'inProgress'
@@ -243,24 +243,25 @@ describe('submissionIsEditable', () => {
       }
     ];
 
-    const bountiesWithSubmissions = await Promise.all(validStatusCombinations.map(combo => {
-      return generateBountyWithSingleApplication({
-        applicationStatus: combo.submissionStatus,
-        bountyCap: 2,
-        spaceId: space.id,
-        userId: user.id,
-        bountyStatus: combo.bountyStatus
-      });
-    }));
+    const bountiesWithSubmissions = await Promise.all(
+      validStatusCombinations.map((combo) => {
+        return generateBountyWithSingleApplication({
+          applicationStatus: combo.submissionStatus,
+          bountyCap: 2,
+          spaceId: space.id,
+          userId: user.id,
+          bountyStatus: combo.bountyStatus
+        });
+      })
+    );
 
-    bountiesWithSubmissions.forEach(bountyWithSubmission => {
+    bountiesWithSubmissions.forEach((bountyWithSubmission) => {
       const isUpdateable = submissionIsEditable({
         bounty: bountyWithSubmission,
         submission: bountyWithSubmission.applications[0]
       });
       expect(isUpdateable).toBe(true);
     });
-
   });
 
   it('should return false if submission status is not "inProgress" or "review"', async () => {

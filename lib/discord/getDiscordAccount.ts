@@ -11,7 +11,7 @@ export interface DiscordAccount {
   bot?: boolean;
 }
 
-export async function getDiscordAccount (props: { code: string, discordApiUrl?: string, redirectUrl: string }) {
+export async function getDiscordAccount(props: { code: string; discordApiUrl?: string; redirectUrl: string }) {
   const token = await getDiscordToken(props);
   return http.GET<DiscordAccount>(`${props.discordApiUrl ?? DISCORD_API_URL}/users/@me`, undefined, {
     headers: {

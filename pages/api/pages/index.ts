@@ -1,4 +1,3 @@
-
 import type { Page, Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -26,7 +25,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createPageHandler);
 
-async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
@@ -45,8 +44,7 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   if (data.type === 'proposal' && !permissions.createVote) {
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
-  }
-  else if (data.type !== 'proposal' && !permissions.createPage) {
+  } else if (data.type !== 'proposal' && !permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
@@ -62,34 +60,36 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
   if (pageCreationData.type === 'proposal_template') {
     throw new UnauthorisedActionError('You cannot create a proposal template using this endpoint.');
-  }
-  else if (pageCreationData.type === 'proposal') {
+  } else if (pageCreationData.type === 'proposal') {
     ({ page } = await createProposal({
       ...pageCreationData,
       spaceId,
       createdBy
     }));
-  }
-  else {
-    page = await createPage({ data: {
-      spaceId,
-      createdBy,
-      ...pageCreationData
-    } });
+  } else {
+    page = await createPage({
+      data: {
+        spaceId,
+        createdBy,
+        ...pageCreationData
+      }
+    });
   }
 
   try {
-
-    const proposalIdForPermissions = page.parentId ? (await resolvePageTree({
-      pageId: page.id
-      // includeDeletedPages: true
-    })).parents.find(p => p.type === 'proposal')?.id : undefined;
+    const proposalIdForPermissions = page.parentId
+      ? (
+          await resolvePageTree({
+            pageId: page.id
+            // includeDeletedPages: true
+          })
+        ).parents.find((p) => p.type === 'proposal')?.id
+      : undefined;
 
     // Create proposal method provisions proposal permissions, so we only need this operation for child pages of a proposal
     if (proposalIdForPermissions) {
       await syncProposalPermissions({ proposalId: proposalIdForPermissions as string });
-    }
-    else if (page.type !== 'proposal') {
+    } else if (page.type !== 'proposal') {
       await setupPermissionsAfterPageCreated(page.id);
     }
 
@@ -113,16 +113,19 @@ async function createPageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
 
     const { content, contentText, ...newPageToNotify } = pageWithPermissions;
-    relay.broadcast({
-      type: 'pages_created',
-      payload: [newPageToNotify]
-    }, page.spaceId);
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: [newPageToNotify]
+      },
+      page.spaceId
+    );
 
     res.status(201).json(pageWithPermissions);
-  }
-  catch (error) {
-
-    log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction', { error });
+  } catch (error) {
+    log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction', {
+      error
+    });
     await prisma.page.delete({ where: { id: page.id } });
 
     throw error;

@@ -3,8 +3,7 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { CommentCreate, CommentWithUser } from './interfaces';
 
-export async function addComment ({ content, threadId, userId }: CommentCreate): Promise<CommentWithUser> {
-
+export async function addComment({ content, threadId, userId }: CommentCreate): Promise<CommentWithUser> {
   if (!content) {
     throw new InvalidInputError('Please provide non-empty content to create a comment');
   }
@@ -50,7 +49,6 @@ export async function addComment ({ content, threadId, userId }: CommentCreate):
           id: thread.pageId
         }
       }
-
     },
     include: {
       user: true

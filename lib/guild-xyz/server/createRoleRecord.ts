@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-export async function createRoleRecord (spaceId: string) {
+export async function createRoleRecord(spaceId: string) {
   const rolesImportedFromGuild = await prisma.role.findMany({
     where: {
       spaceId,
@@ -16,7 +16,7 @@ export async function createRoleRecord (spaceId: string) {
   });
 
   const guildRoleIdCharmverseRoleIdRecord: Record<string, string> = {};
-  rolesImportedFromGuild.forEach(roleImportedFromGuild => {
+  rolesImportedFromGuild.forEach((roleImportedFromGuild) => {
     guildRoleIdCharmverseRoleIdRecord[roleImportedFromGuild.sourceId as string] = roleImportedFromGuild.id;
   });
 

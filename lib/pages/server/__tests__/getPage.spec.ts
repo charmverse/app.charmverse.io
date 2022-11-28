@@ -33,7 +33,7 @@ describe('getPage', () => {
 
     const foundPage = await getPage(childPage.id);
 
-    expect(foundPage).toEqual <Page>(
+    expect(foundPage).toEqual<Page>(
       expect.objectContaining<Partial<Page>>({
         id: expect.stringMatching(childPage.id),
         parentId: expect.stringMatching(page.id),
@@ -61,7 +61,7 @@ describe('getPage', () => {
 
     const foundPage = await getPage(page.path, page.spaceId as string);
 
-    expect(foundPage).toEqual <Page>(
+    expect(foundPage).toEqual<Page>(
       expect.objectContaining<Partial<Page>>({
         id: page.id,
         path: page.path,
@@ -134,13 +134,13 @@ describe('getPage', () => {
       }
     });
 
-    const found = await getPage(childPage.id) as IPageWithPermissions;
+    const found = (await getPage(childPage.id)) as IPageWithPermissions;
 
     expect(found).toBeDefined();
 
     expect(found.permissions).toBeInstanceOf(Array);
 
-    expect(found.permissions[0]).toEqual <PagePermission>(
+    expect(found.permissions[0]).toEqual<PagePermission>(
       expect.objectContaining<Partial<IPagePermissionWithSource>>({
         id: expect.stringMatching(inherited.id),
         spaceId: expect.stringMatching(space.id),
@@ -149,7 +149,7 @@ describe('getPage', () => {
       })
     );
 
-    expect(found.permissions[0].sourcePermission).toEqual <PagePermission>(
+    expect(found.permissions[0].sourcePermission).toEqual<PagePermission>(
       expect.objectContaining<Partial<IPagePermissionWithSource>>({
         id: expect.stringMatching(source.id),
         spaceId: expect.stringMatching(space.id),

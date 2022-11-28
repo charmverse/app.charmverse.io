@@ -19,7 +19,7 @@ export interface ApplicationActionRequest {
   applicationOrApplicationId: string | Application;
 }
 
-export type ReviewDecision = 'approve' | 'reject'
+export type ReviewDecision = 'approve' | 'reject';
 
 export interface SubmissionReview {
   submissionId: string;
@@ -31,7 +31,7 @@ export interface ApplicationWithBounty extends Application {
   bounty: Bounty;
 }
 
-export type SubmissionContent = RequiredNotNull<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>
+export type SubmissionContent = RequiredNotNull<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>;
 
 export interface SubmissionCreationData {
   bountyId: string;
@@ -47,4 +47,3 @@ export interface SubmissionUpdateData {
 export interface ApplicationWithTransactions extends Application {
   transactions: Transaction[];
 }
-

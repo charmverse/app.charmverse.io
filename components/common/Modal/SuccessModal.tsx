@@ -4,7 +4,10 @@ import type { ComponentProps } from 'react';
 
 import { Modal, DialogTitle } from './Modal';
 
-export default function SuccessModal ({ title, ...props }: { title?: string } & Omit<ComponentProps<typeof Modal>, 'children'>) {
+export default function SuccessModal({
+  title,
+  ...props
+}: { title?: string } & Omit<ComponentProps<typeof Modal>, 'children'>) {
   return (
     <Modal size='fluid' {...props}>
       <DialogTitle onClose={props.onClose} sx={{ padding: 0 }}>
