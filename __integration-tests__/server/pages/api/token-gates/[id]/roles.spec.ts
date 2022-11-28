@@ -103,7 +103,7 @@ describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', (
   it('Should fail if correct keys are not provided in body', async () => {
     const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie1).send({});
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value');
+    expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value.');
   });
 
   it('Should fail if the user is not an admin of the space', async () => {

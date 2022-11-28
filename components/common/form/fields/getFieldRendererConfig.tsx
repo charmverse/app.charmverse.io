@@ -4,6 +4,7 @@ import type { RegisterOptions } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 type Props = {
   type: FieldType;
@@ -53,13 +54,7 @@ function getFieldTypeRules (type: FieldType): RegisterOptions {
             return true;
           }
 
-          try {
-            const url = new URL(val);
-            return url.protocol === 'http:' || url.protocol === 'https:';
-          }
-          catch (_) {
-            return false;
-          }
+          return isValidUrl(val);
         }
       };
     }

@@ -3,16 +3,17 @@
 export type ErrorSeverity = 'warning' | 'error';
 
 const ErrorCodes = {
-  Unknown: 500,
-  'Invalid input': 400,
-  'Unable to respond': 421,
-  'Undesirable operation': 400,
   'Duplicate data': 400,
-  'Data not found': 404,
+  'Invalid input': 400,
+  'Undesirable operation': 400,
   'Maximum size exceeded': 400,
   'Access denied': 401,
   'Insecure operation': 401,
+  'Data not found': 404,
+  Conflict: 409,
+  'Unable to respond': 421,
   'External service': 500,
+  Unknown: 500,
   'Unexpected result': 500
 };
 
@@ -145,6 +146,16 @@ export class MissingWeb3SignatureError extends SystemError {
     super({
       message: 'This operation requires a signature from your connected wallet.',
       errorType: 'Insecure operation',
+      severity: 'warning'
+    });
+  }
+}
+
+export class DataConflictError extends SystemError {
+  constructor (message = 'Data conflict') {
+    super({
+      message,
+      errorType: 'Conflict',
       severity: 'warning'
     });
   }

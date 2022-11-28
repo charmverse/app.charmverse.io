@@ -10,6 +10,7 @@ interface BlockAlignerProps {
 }
 
 const StyledBlockAligner = styled.div`
+  line-height: 0; // hide margin that appears underneath iframe
   position: relative;
   max-width: 100%;
   text-align: center;
