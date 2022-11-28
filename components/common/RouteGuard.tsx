@@ -131,5 +131,5 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   if (!authorized || !router.isReady) {
     return null;
   }
-  return <span style={{ display: isLoading ? 'none' : 'inherit' }}>{children}</span>;
+  return <span style={{ display: isLoading ? 'none' : 'inline' }}>{children}</span>;
 }
