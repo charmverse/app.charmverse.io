@@ -12,7 +12,7 @@ import FilterList from './components/FilterList';
 import FilterSelect from './components/FilterSelect';
 import ForumPosts from './components/ForumPosts';
 
-export default function ForumPage () {
+export default function ForumPage() {
   const [search, setSearch] = useState('');
 
   return (
@@ -24,7 +24,13 @@ export default function ForumPage () {
         onChange={(e) => setSearch(e.target.value)}
         fullWidth
         sx={{ padding: '20px 0' }}
-        InputProps={{ endAdornment: <InputAdornment position='end'><SearchIcon color='secondary' fontSize='small' /></InputAdornment> }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position='end'>
+              <SearchIcon color='secondary' fontSize='small' />
+            </InputAdornment>
+          )
+        }}
       />
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>

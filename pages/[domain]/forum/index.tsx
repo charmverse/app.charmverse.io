@@ -4,21 +4,17 @@ import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function ForumPage () {
-
+export default function ForumPage() {
   setTitle('Forum');
 
   const space = useCurrentSpace();
 
   // Show this page only to charmverse users
-  if (!(space?.name.includes('charmverse')) && isProdEnv) {
+  if (!space?.name.includes('charmverse') && isProdEnv) {
     return null;
   }
 
-  return (
-    <ForumPageComponent />
-  );
-
+  return <ForumPageComponent />;
 }
 
 ForumPage.getLayout = getPageLayout;

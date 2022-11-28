@@ -8,10 +8,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getCategories)
-  .use(requireUser);
+handler.get(getCategories).use(requireUser);
 
-async function getCategories (req: NextApiRequest, res: NextApiResponse<string[]>) {
+async function getCategories(req: NextApiRequest, res: NextApiResponse<string[]>) {
   const { spaceId } = req.query as any as AvailableResourcesRequest;
 
   const categories = await getForumCategories({

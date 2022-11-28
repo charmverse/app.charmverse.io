@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import Button from 'components/common/Button';
 import { useForumFilters } from 'hooks/useForumFilters';
 
-export default function FilterList () {
+export default function FilterList() {
   const { disabled, handleClick, categories, sortList, error } = useForumFilters();
   const { query } = useRouter();
 
@@ -20,14 +20,29 @@ export default function FilterList () {
     <Card variant='outlined'>
       <CardContent>
         <ButtonGroup orientation='vertical' sx={{ alignItems: 'flex-start' }} color='inherit' disabled={disabled}>
-          {sortList.map(sort => (
-            <Button key={sort} variant='text' onClick={() => handleClick(sort)} sx={{ fontWeight: sort === query.sort ? 'bold' : 'initial' }}>{sort}</Button>
+          {sortList.map((sort) => (
+            <Button
+              key={sort}
+              variant='text'
+              onClick={() => handleClick(sort)}
+              sx={{ fontWeight: sort === query.sort ? 'bold' : 'initial' }}
+            >
+              {sort}
+            </Button>
           ))}
         </ButtonGroup>
         <Divider sx={{ pt: '10px', mb: '10px' }} />
         <ButtonGroup orientation='vertical' sx={{ alignItems: 'flex-start' }} color='inherit' disabled={disabled}>
-          {categories?.map(category => (
-            <Button key={category} variant='text' onClick={() => handleClick(category)} disabled={disabled} sx={{ fontWeight: category === query.category ? 'bold' : 'initial' }}>{category}</Button>
+          {categories?.map((category) => (
+            <Button
+              key={category}
+              variant='text'
+              onClick={() => handleClick(category)}
+              disabled={disabled}
+              sx={{ fontWeight: category === query.category ? 'bold' : 'initial' }}
+            >
+              {category}
+            </Button>
           ))}
         </ButtonGroup>
       </CardContent>

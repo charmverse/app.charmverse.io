@@ -18,7 +18,7 @@ interface ForumPostProps extends Omit<ForumPost, 'userId'> {
   user?: Member;
 }
 
-function ForumPostContent ({ content, title }: { content: ForumPostContent, title?: string }) {
+function ForumPostContent({ content, title }: { content: ForumPostContent; title?: string }) {
   if (content.type === 'text') {
     return <Typography>{content.content}</Typography>;
   }
@@ -29,19 +29,35 @@ function ForumPostContent ({ content, title }: { content: ForumPostContent, titl
   return null;
 }
 
-export default function ForumPost ({ title, user, content, commentsNumber, upVotes, downVotes, createdAt, updatedAt }: ForumPostProps) {
+export default function ForumPost({
+  title,
+  user,
+  content,
+  commentsNumber,
+  upVotes,
+  downVotes,
+  createdAt,
+  updatedAt
+}: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
-  const relativeTime = getRelativeTimeInThePast(date, { ago: false });
+  const relativeTime = getRelativeTimeInThePast(date);
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea>
         <CardContent>
-          <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>{title}</Typography>
+          <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
+            {title}
+          </Typography>
           <ForumPostContent content={content} title={title} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Box display='flex' alignItems='center'>
-              <UserDisplay user={user} avatarSize='small' fontSize='medium' sx={{ '> p': { display: { xs: 'none', sm: 'block' } } }} />
+              <UserDisplay
+                user={user}
+                avatarSize='small'
+                fontSize='medium'
+                sx={{ '> p': { display: { xs: 'none', sm: 'block' } } }}
+              />
               <Box display='flex' alignItems='center' padding='0 15px'>
                 <MessageOutlined fontSize='small' sx={{ pr: '5px' }} />
                 {commentsNumber}

@@ -19,7 +19,7 @@ interface ForumPostsProps {
 
 const count = 15;
 
-export default function ForumPosts ({ search }: ForumPostsProps) {
+export default function ForumPosts({ search }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const { query } = useRouter();
@@ -33,8 +33,7 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
     if (querySort) {
       if (Array.isArray(querySort)) {
         return querySort[0] || defaultValue;
-      }
-      else {
+      } else {
         return querySort;
       }
     }
@@ -45,8 +44,7 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
     if (queryCategory) {
       if (Array.isArray(queryCategory)) {
         return queryCategory[0];
-      }
-      else {
+      } else {
         return queryCategory;
       }
     }
@@ -54,18 +52,27 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
   }, [queryCategory]);
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(
-    (index) => currentSpace ? { url: 'forum/posts', arguments: { page: index + 1 } } : null,
-    (args) => charmClient.forum.listForumPosts(currentSpace!.id, sortValue || 'Most Popular', categoryValue, count, args.arguments.page)
+    (index) => (currentSpace ? { url: 'forum/posts', arguments: { page: index + 1 } } : null),
+    (args) =>
+      charmClient.forum.listForumPosts(
+        currentSpace!.id,
+        sortValue || 'Most Popular',
+        categoryValue,
+        count,
+        args.arguments.page
+      )
   );
   const { members } = useMembers();
 
-  const posts = data ? [...data].flat().map(post => {
-    const { userId, ...restPost } = post;
-    return {
-      ...restPost,
-      user: members.find(item => item.id === post.userId)
-    };
-  }) : [];
+  const posts = data
+    ? [...data].flat().map((post) => {
+        const { userId, ...restPost } = post;
+        return {
+          ...restPost,
+          user: members.find((item) => item.id === post.userId)
+        };
+      })
+    : [];
   const isLoadingInitialData = !data && !error;
   const isLoadingMore = isLoadingInitialData || (size > 0 && data && typeof data[size - 1] === 'undefined');
   const isEmpty = data?.[0]?.length === 0;
@@ -81,20 +88,12 @@ export default function ForumPosts ({ search }: ForumPostsProps) {
   return (
     <>
       <CreateForumPost />
-      {error && (
-        <Alert severity='error'>
-          There was an unexpected error while loading the posts
-        </Alert>
-      )}
-      {isLoadingMore && (
-        <ForumPostSkeleton />
-      )}
-      {posts.map(post => <ForumPost key={post.id} {...post} />)}
-      <Box ref={ref}>
-        {isReachingEnd && (
-          <Alert severity='info'>End of the forum</Alert>
-        )}
-      </Box>
+      {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
+      {isLoadingMore && <ForumPostSkeleton />}
+      {posts.map((post) => (
+        <ForumPost key={post.id} {...post} />
+      ))}
+      <Box ref={ref}>{isReachingEnd && <Alert severity='info'>End of the forum</Alert>}</Box>
     </>
   );
 }

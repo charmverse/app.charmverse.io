@@ -8,7 +8,7 @@ import Button from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 
-export default function CreateForumPost () {
+export default function CreateForumPost() {
   const { user } = useUser();
 
   return (
@@ -17,14 +17,12 @@ export default function CreateForumPost () {
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
             <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
-            <TextField
-              variant='outlined'
-              placeholder='Create post'
-              fullWidth
-            />
+            <TextField variant='outlined' placeholder='Create post' fullWidth />
           </Box>
           <Box display='flex' justifyContent='flex-end'>
-            <Button component='div' float='right'>Create Post</Button>
+            <Button component='div' float='right'>
+              Create Post
+            </Button>
           </Box>
         </CardContent>
       </CardActionArea>

@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumFilters } from 'hooks/useForumFilters';
 
-export default function FilterSelect () {
+export default function FilterSelect() {
   const { query } = useRouter();
   const querySort = query.sort;
   const queryCategory = query.category;
@@ -22,8 +22,7 @@ export default function FilterSelect () {
     if (querySort) {
       if (Array.isArray(querySort)) {
         return querySort[0] || defaultValue;
-      }
-      else {
+      } else {
         return querySort;
       }
     }
@@ -34,8 +33,7 @@ export default function FilterSelect () {
     if (queryCategory) {
       if (Array.isArray(queryCategory)) {
         return queryCategory[0] || 'none';
-      }
-      else {
+      } else {
         return queryCategory;
       }
     }
@@ -49,12 +47,8 @@ export default function FilterSelect () {
   return (
     <Box justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
-        <Select
-          disabled={disabled}
-          value={sortValue}
-          onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}
-        >
-          {sortList.map(property => (
+        <Select disabled={disabled} value={sortValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
+          {sortList.map((property) => (
             <MenuItem key={property} value={property}>
               <Typography>{property}</Typography>
             </MenuItem>
@@ -62,12 +56,9 @@ export default function FilterSelect () {
         </Select>
       </ViewOptions>
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
-        <Select
-          value={categoryValue}
-          onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}
-        >
+        <Select value={categoryValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
           <MenuItem value='none'>Select a category</MenuItem>
-          {categories?.map(category => (
+          {categories?.map((category) => (
             <MenuItem key={category} value={category}>
               <Typography>{category}</Typography>
             </MenuItem>
