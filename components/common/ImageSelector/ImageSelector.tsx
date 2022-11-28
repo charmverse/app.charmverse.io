@@ -71,8 +71,12 @@ export default function ImageSelector({
                         setIsUploading(true);
                         const firstFile = e.target.files?.[0];
                         if (firstFile) {
-                          const { url } = await uploadToS3(firstFile);
-                          onImageSelect(url);
+                          try {
+                            const { url } = await uploadToS3(firstFile);
+                            onImageSelect(url);
+                          } catch (error) {
+                            log.error('Error uploading image to s3', { error });
+                          }
                         }
                         setIsUploading(false);
                       }}
