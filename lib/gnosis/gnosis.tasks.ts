@@ -9,6 +9,7 @@ import log from 'lib/log';
 
 import type { GnosisTransaction } from './gnosis';
 import { getTransactionsforSafes } from './gnosis';
+import { getFriendlyEthValue, getGnosisTransactionQueueUrl } from './utils';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
@@ -55,22 +56,6 @@ export interface GnosisSafeTasks {
   safeUrl: string;
   tasks: GnosisTask[];
   taskId: string;
-}
-
-function getFriendlyEthValue (value: string) {
-  const valueBigNumber = ethers.BigNumber.from(value);
-  const ethersValue = ethers.utils.formatEther(valueBigNumber);
-  const upperBound = ethers.BigNumber.from(ethers.utils.parseEther('0.001'));
-  if (valueBigNumber.gt(0) && valueBigNumber.lt(upperBound)) {
-    return '< 0.0001';
-  }
-  else {
-    return ethersValue;
-  }
-}
-
-function getGnosisTransactionUrl (address: string, chainId: number) {
-  return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
 }
 
 function getTaskDescription (transaction: GnosisTransaction): string {
@@ -160,7 +145,7 @@ interface TransactionToTaskProps {
 
 function transactionToTask ({ myAddresses, transaction, safe, wallets }: TransactionToTaskProps): GnosisTransactionPopulated {
   const actions = getTaskActions(transaction, getRecipient);
-  const gnosisUrl = getGnosisTransactionUrl(transaction.safe, safe.chainId);
+  const gnosisUrl = getGnosisTransactionQueueUrl(transaction.safe, safe.chainId);
   const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
   const myOwnedAddresses = intersection(myAddresses, safe.owners).length; // handle owner of multiple addresses in one safe
   // console.log('transaction', transaction);
@@ -239,7 +224,7 @@ function transactionsToTasks ({ transactions, safes, myUserId, wallets }: Transa
         taskId,
         safeAddress: _transactions[0].safeAddress,
         safeName: _transactions[0].safeName,
-        safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
+        safeUrl: getGnosisTransactionQueueUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
         tasks
       };
     })

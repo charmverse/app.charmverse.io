@@ -15,6 +15,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { UserGnosisSafe } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Fragment, useState } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -28,13 +29,13 @@ import { useUser } from 'hooks/useUser';
 import useGnosisSigner from 'hooks/useWeb3Signer';
 import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
 import type { GnosisSafeTasks, GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import { getGnosisSafeUrl } from 'lib/gnosis/utils';
 import { shortenHex } from 'lib/utilities/strings';
 
-import { GnosisConnectCard } from '../integrations/components/GnosisSafes';
-
-import { EmptyTaskState } from './components/EmptyTaskState';
-import Table from './components/NexusTable';
-import useTasksState from './hooks/useTasksState';
+import { GnosisConnectCard } from '../../integrations/components/GnosisSafes';
+import { EmptyTaskState } from '../components/EmptyTaskState';
+import Table from '../components/NexusTable';
+import useTasksState from '../hooks/useTasksState';
 
 function TransactionRow (
   { firstNonce, isSnoozed, transaction, showNonce, isLastTransaction }:
@@ -191,9 +192,55 @@ function TransactionRow (
   );
 }
 
-function SafeTasks (
-  { isSnoozed, address, safeName, safeUrl, tasks }:
-  { isSnoozed: boolean, address: string, safeName: string | null, safeUrl: string, tasks: GnosisTask[] }
+function GnosisTasksTable ({ tasks, isSnoozed }: { tasks: GnosisTask[], isSnoozed: boolean }) {
+  return (
+    <Table size='medium' aria-label='Nexus multisign table'>
+      <TableHead>
+        <TableRow>
+          <TableCell align='center'>Nonse</TableCell>
+          <TableCell sx={{ minWidth: { xs: 150, sm: 'inherit' } }}>Payment</TableCell>
+          <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Date</TableCell>
+          <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Required Signers</TableCell>
+          <TableCell width='100'>
+            <Typography variant='body2' fontWeight='500' marginLeft='12px' variantMapping={{ body2: 'span' }}>Action</Typography>
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {tasks.map((task: GnosisTask) => (
+          <Fragment key={task.nonce}>
+            {task.transactions.length > 1 && (
+              <TableRow sx={{ '& > .MuiTableCell-root': { borderBottom: 0 } }}>
+                <TableCell align='center'>
+                  <Typography fontWeight='bold'>{task.transactions[0].nonce}</Typography>
+                </TableCell>
+                <TableCell colSpan={4}>
+                  <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
+                    These transactions conflict as they use the same nonce. Executing one will automatically replace the other(s).
+                  </Alert>
+                </TableCell>
+              </TableRow>
+            )}
+            {task.transactions.map((transaction, index, arr) => (
+              <TransactionRow
+                key={transaction.id}
+                isLastTransaction={arr.length - 1 === index}
+                showNonce={index === 0 && task.transactions.length === 1}
+                firstNonce={tasks[0].transactions[0].nonce}
+                isSnoozed={isSnoozed}
+                transaction={transaction}
+              />
+            ))}
+          </Fragment>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function SafeTasks (
+  { isSnoozed, safe, tasks }:
+  { isSnoozed: boolean, safe: UserGnosisSafe, tasks: GnosisTask[] }
 ) {
   return (
     <Box margin='40px 0'>
@@ -207,142 +254,19 @@ function SafeTasks (
       >
         <strong>Gnosis Safe:</strong>
         <Link
-          href={safeUrl}
+          href={getGnosisSafeUrl(safe.address, safe.chainId)}
           external
           target='_blank'
           display='inline-flex'
           alignItems='center'
           gap={0.5}
         >
-          {safeName || shortenHex(address)} <OpenInNewIcon fontSize='small' />
+          {safe.name || shortenHex(safe.address)} <OpenInNewIcon fontSize='small' />
         </Link>
       </Typography>
       <Box overflow='auto'>
-        <Table size='medium' aria-label='Nexus multisign table'>
-          <TableHead>
-            <TableRow>
-              <TableCell align='center'>Nonse</TableCell>
-              <TableCell sx={{ minWidth: { xs: 150, sm: 'inherit' } }}>Payment</TableCell>
-              <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Date</TableCell>
-              <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Required Signers</TableCell>
-              <TableCell width='100'>
-                <Typography variant='body2' fontWeight='500' marginLeft='12px' variantMapping={{ body2: 'span' }}>Action</Typography>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tasks.map((task: GnosisTask) => (
-              <Fragment key={task.nonce}>
-                {task.transactions.length > 1 && (
-                  <TableRow sx={{ '& > .MuiTableCell-root': { borderBottom: 0 } }}>
-                    <TableCell align='center'>
-                      <Typography fontWeight='bold'>{task.transactions[0].nonce}</Typography>
-                    </TableCell>
-                    <TableCell colSpan={4}>
-                      <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
-                        These transactions conflict as they use the same nonce. Executing one will automatically replace the other(s).
-                      </Alert>
-                    </TableCell>
-                  </TableRow>
-                )}
-                {task.transactions.map((transaction, index, arr) => (
-                  <TransactionRow
-                    key={transaction.id}
-                    isLastTransaction={arr.length - 1 === index}
-                    showNonce={index === 0 && task.transactions.length === 1}
-                    firstNonce={tasks[0].transactions[0].nonce}
-                    isSnoozed={isSnoozed}
-                    transaction={transaction}
-                  />
-                ))}
-              </Fragment>
-            ))}
-          </TableBody>
-        </Table>
+        {tasks.length === 0 ? <EmptyTaskState key={safe.address} taskType='transactions' /> : <GnosisTasksTable tasks={tasks} isSnoozed={isSnoozed} />}
       </Box>
     </Box>
-  );
-}
-
-interface GnosisTasksSectionProps {
-  tasks: GnosisSafeTasks[] | undefined;
-  error: any;
-  mutateTasks: KeyedMutator<GnosisSafeTasks[]>;
-}
-
-export default function GnosisTasksSection ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
-  const { data: safeData, mutate } = useMultiWalletSigs();
-  const { snoozedForDate } = useTasksState();
-  const { user } = useUser();
-  const gnosisSigner = useGnosisSigner();
-
-  const isSnoozed = snoozedForDate !== null;
-
-  const [isLoadingSafes, setIsLoadingSafes] = useState(false);
-  const { showMessage } = useSnackbar();
-
-  async function importSafes () {
-    if (gnosisSigner && user) {
-      setIsLoadingSafes(true);
-      try {
-        await importSafesFromWallet({
-          signer: gnosisSigner,
-          addresses: user.wallets.map(wallet => wallet.address)
-        });
-        const safes = await mutate();
-        await mutateTasks();
-        if (!safes || safes.length === 0) {
-          showMessage('You don\'t have any gnosis safes connected to your wallet');
-        }
-        else {
-          showMessage(`Successfully connected ${safes.length} safes`, 'success');
-        }
-      }
-      finally {
-        setIsLoadingSafes(false);
-      }
-    }
-  }
-
-  if (!tasks) {
-    if (error) {
-      return (
-        <Box>
-          <Alert severity='error'>
-            There was an error. Please try again later!
-          </Alert>
-        </Box>
-      );
-    }
-    else {
-      return <LoadingComponent height='200px' isLoading={true} />;
-    }
-  }
-
-  return (
-    <>
-      {tasks.map(safe => (
-        <SafeTasks
-          isSnoozed={isSnoozed}
-          key={safe.safeAddress}
-          address={safe.safeAddress}
-          safeName={safe.safeName}
-          tasks={safe.tasks}
-          safeUrl={safe.safeUrl}
-        />
-      ))}
-      {(safeData?.length !== undefined && safeData.length >= 1) && tasks.length === 0 && (
-        <EmptyTaskState taskType='transactions' />
-      )}
-      {gnosisSigner && user && safeData?.length === 0 ? (
-        <GnosisConnectCard loading={isLoadingSafes} onClick={importSafes} />
-      ) : (!gnosisSigner || !user) ? (
-        <Box>
-          <Alert severity='warning'>
-            Please connect your Metamask wallet.
-          </Alert>
-        </Box>
-      ) : null}
-    </>
   );
 }

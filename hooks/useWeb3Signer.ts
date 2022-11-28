@@ -13,6 +13,9 @@ export default function useWeb3Signer () {
     if (account && library) {
       setSigner(library.getSigner(account));
     }
+    else {
+      setSigner(null);
+    }
   }, [account, library]);
 
   return signer;
