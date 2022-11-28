@@ -8,7 +8,8 @@ import { useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 
-import ForumFilters from './components/ForumFilters';
+import FilterList from './components/FilterList';
+import FilterSelect from './components/FilterSelect';
 import ForumPosts from './components/ForumPosts';
 
 export default function ForumPage () {
@@ -26,14 +27,14 @@ export default function ForumPage () {
         InputProps={{ endAdornment: <InputAdornment position='end'><SearchIcon color='secondary' fontSize='small' /></InputAdornment> }}
       />
       <Grid container spacing={2}>
-        <Grid item xs={12} md={9}>
-          <Box display={{ xs: 'block', md: 'none' }}>
-            <ForumFilters type='select' />
+        <Grid item xs={12} lg={9}>
+          <Box display={{ xs: 'block', lg: 'none' }}>
+            <FilterSelect />
           </Box>
           <ForumPosts search={search} />
         </Grid>
-        <Grid item xs={12} md={3} display={{ xs: 'none', md: 'initial' }}>
-          <ForumFilters type='list' />
+        <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
+          <FilterList />
         </Grid>
       </Grid>
     </CenteredPageContent>

@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import type { SelectChangeEvent } from '@mui/material/Select';
@@ -7,19 +8,14 @@ import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
 import { ViewOptions } from 'components/common/ViewOptions';
+import { useForumFilters } from 'hooks/useForumFilters';
 
-interface ForumSelectProps {
-  disabled?: boolean;
-  sortList: string[];
-  categories: string[];
-  handleClick: (id: string) => void;
-}
-
-export default function FilterSelect (props: ForumSelectProps) {
-  const { disabled, categories, sortList, handleClick } = props;
+export default function FilterSelect () {
   const { query } = useRouter();
   const querySort = query.sort;
   const queryCategory = query.category;
+
+  const { disabled, handleClick, categories, sortList, error } = useForumFilters();
 
   const sortValue = useMemo(() => {
     const defaultValue = sortList[0];
@@ -46,8 +42,12 @@ export default function FilterSelect (props: ForumSelectProps) {
     return 'none';
   }, [queryCategory]);
 
+  if (error) {
+    return <Alert severity='error'>An error occured while loading the categories</Alert>;
+  }
+
   return (
-    <Box justifyContent='flex-start' flexWrap='wrap' sx={{ display: { xs: 'flex', md: 'none' } }}>
+    <Box justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
         <Select
           disabled={disabled}
@@ -67,7 +67,7 @@ export default function FilterSelect (props: ForumSelectProps) {
           onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}
         >
           <MenuItem value='none'>Select a category</MenuItem>
-          {categories.map(category => (
+          {categories?.map(category => (
             <MenuItem key={category} value={category}>
               <Typography>{category}</Typography>
             </MenuItem>
