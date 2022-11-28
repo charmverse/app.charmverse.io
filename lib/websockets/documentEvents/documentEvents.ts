@@ -153,7 +153,10 @@ export class DocumentEventHandler {
     try {
       await this.handleMessage(message);
     } catch (error) {
-      log.error('Error handling socket message', { error, userId: this.getSession().user.id });
+      log.error('Error handling socket message', {
+        error: (error as any).stack || error,
+        userId: this.getSession().user.id
+      });
     }
   }
 
