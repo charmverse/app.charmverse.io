@@ -11,7 +11,7 @@ import Button from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-async function validatePath (path: string) {
+async function validatePath(path: string) {
   const result = await charmClient.checkNexusPath(path);
   return result.available;
 }
@@ -19,7 +19,11 @@ async function validatePath (path: string) {
 const debouncedValidate = debouncePromise(validatePath, 500);
 
 export const schema = yup.object({
-  path: yup.string().ensure().trim().lowercase()
+  path: yup
+    .string()
+    .ensure()
+    .trim()
+    .lowercase()
     .min(3)
     .max(50)
     .matches(/^[a-zA-Z0-9-]+$/g, 'Only alphanumeric characters and hyphens are allowed')
@@ -43,7 +47,7 @@ type Props = {
   isOpen: boolean;
 };
 
-export default function UserPathModal (props: Props) {
+export default function UserPathModal(props: Props) {
   const { currentValue, close, isOpen, save } = props;
 
   const {
@@ -66,7 +70,7 @@ export default function UserPathModal (props: Props) {
     });
   }, [currentValue]);
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     save(values.path);
   }
 
@@ -76,35 +80,30 @@ export default function UserPathModal (props: Props) {
   let statusIcon = null;
   if (pathValue) {
     if (errors.path) {
-      statusIcon = <Close color='error' />;
-    }
-    else {
-      statusIcon = <Check color='success' />;
+      statusIcon = <Close color="error" />;
+    } else {
+      statusIcon = <Check color="success" />;
     }
   }
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={close}
-      size='large'
-    >
+    <Modal open={isOpen} onClose={close} size="large">
       <DialogTitle onClose={close}>Personalize your link</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
           <TextField
             {...register('path')}
             InputProps={{
-              startAdornment: <InputAdornment position='start'>{hostname}/</InputAdornment>,
-              endAdornment: <InputAdornment position='end'>{statusIcon}</InputAdornment>
+              startAdornment: <InputAdornment position="start">{hostname}/</InputAdornment>,
+              endAdornment: <InputAdornment position="end">{statusIcon}</InputAdornment>
             }}
             fullWidth
             error={!!errors.path}
             helperText={errors.path?.message || ' '}
-            placeholder='awesome-bot'
+            placeholder="awesome-bot"
           />
           <Box mt={2} sx={{ display: 'flex' }}>
-            <Button disabled={!!errors.path} type='submit'>
+            <Button disabled={!!errors.path} type="submit">
               Save
             </Button>
           </Box>

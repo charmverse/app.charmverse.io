@@ -5,7 +5,6 @@ import { Permissions } from '../permissions.class';
 import type { BountyPermissionFlags } from './interfaces';
 
 export class AvailableBountyPermissions extends Permissions<BountyOperation> implements BountyPermissionFlags {
-
   grant_permissions: boolean = false;
 
   work: boolean = false;
@@ -22,7 +21,7 @@ export class AvailableBountyPermissions extends Permissions<BountyOperation> imp
 
   approve_applications: boolean = false;
 
-  constructor (operations: BountyOperation[] = []) {
+  constructor(operations: BountyOperation[] = []) {
     super({ allowedOperations: Object.keys(BountyOperation) as BountyOperation[] });
 
     this.addPermissions(operations);

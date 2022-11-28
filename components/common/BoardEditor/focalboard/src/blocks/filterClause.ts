@@ -1,14 +1,14 @@
 import { Utils } from '../utils';
 
-type FilterCondition = 'includes' | 'notIncludes' | 'isEmpty' | 'isNotEmpty'
+type FilterCondition = 'includes' | 'notIncludes' | 'isEmpty' | 'isNotEmpty';
 
 type FilterClause = {
-    propertyId: string;
-    condition: FilterCondition;
-    values: string[];
-}
+  propertyId: string;
+  condition: FilterCondition;
+  values: string[];
+};
 
-function createFilterClause (o?: FilterClause): FilterClause {
+function createFilterClause(o?: FilterClause): FilterClause {
   return {
     propertyId: o?.propertyId || '',
     condition: o?.condition || 'includes',
@@ -16,12 +16,8 @@ function createFilterClause (o?: FilterClause): FilterClause {
   };
 }
 
-function areEqual (a: FilterClause, b: FilterClause): boolean {
-  return (
-    a.propertyId === b.propertyId
-        && a.condition === b.condition
-        && Utils.arraysEqual(a.values, b.values)
-  );
+function areEqual(a: FilterClause, b: FilterClause): boolean {
+  return a.propertyId === b.propertyId && a.condition === b.condition && Utils.arraysEqual(a.values, b.values);
 }
 
 export { createFilterClause, areEqual };

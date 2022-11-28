@@ -42,7 +42,7 @@ const GalleryGroupImage = styled.div`
   }
 `;
 
-export default function ImageSelectorGallery (props: ImageSelectorGalleryProps) {
+export default function ImageSelectorGallery(props: ImageSelectorGalleryProps) {
   const { items, onImageClick } = props;
   return (
     <div>
@@ -50,8 +50,8 @@ export default function ImageSelectorGallery (props: ImageSelectorGalleryProps) 
         <GalleryGroup key={groupName}>
           <GalleryGroupName>{groupName}</GalleryGroupName>
           <GalleryGroupImages>
-            {images.map(image => (
-              <GalleryGroupImage key={image} role='button' tabIndex={0} onClick={() => onImageClick(image)}>
+            {images.map((image) => (
+              <GalleryGroupImage key={image} role="button" tabIndex={0} onClick={() => onImageClick(image)}>
                 {/* eslint-disable-next-line */}
                 <img src={image} alt={groupName} />
               </GalleryGroupImage>

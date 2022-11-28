@@ -15,16 +15,12 @@ describe('src/components/topBar', () => {
   beforeEach(jest.resetAllMocks);
   test('should match snapshot for focalboardPlugin', () => {
     mockedUtils.isFocalboardPlugin.mockReturnValue(true);
-    const { container } = render(wrapDNDIntl(
-      <TopBar />
-    ));
+    const { container } = render(wrapDNDIntl(<TopBar />));
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot for none focalboardPlugin', () => {
     mockedUtils.isFocalboardPlugin.mockReturnValue(false);
-    const { container } = render(wrapDNDIntl(
-      <TopBar />
-    ));
+    const { container } = render(wrapDNDIntl(<TopBar />));
     expect(container).toMatchSnapshot();
   });
 });

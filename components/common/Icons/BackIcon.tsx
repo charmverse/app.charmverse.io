@@ -10,11 +10,11 @@ interface Props {
   label?: string;
 }
 
-export function BackIcon ({ iconSize, label, fontSize }: Props) {
+export function BackIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <ArrowBackIcon fontSize={iconSize} />
-      <Box component='span' fontSize={fontSize}>
+      <Box component="span" fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

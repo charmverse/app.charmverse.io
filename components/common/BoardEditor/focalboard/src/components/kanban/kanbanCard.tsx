@@ -37,7 +37,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
-}
+};
 
 const BountyFooter = styled.div`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
@@ -73,13 +73,15 @@ const KanbanCard = React.memo((props: Props) => {
   const space = useCurrentSpace();
 
   const { bounties } = useBounties();
-  const linkedBounty = bounties.find(bounty => bounty.page?.id === card.id);
+  const linkedBounty = bounties.find((bounty) => bounty.page?.id === card.id);
 
   const { pages, getPagePermissions } = usePages();
   const cardPage = pages[card.id];
   const router = useRouter();
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
-  const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${cardPage?.path}` : `/${domain}/${cardPage?.path}`;
+  const fullPageUrl = router.route.startsWith('/share')
+    ? `/share/${domain}/${cardPage?.path}`
+    : `/${domain}/${cardPage?.path}`;
 
   // Check if the current user is an admin, admin means implicit full access
   const pagePermissions = getPagePermissions(card.id);
@@ -95,8 +97,14 @@ const KanbanCard = React.memo((props: Props) => {
     }
   };
   const confirmDialogProps: ConfirmationDialogBoxProps = {
-    heading: intl.formatMessage({ id: 'CardDialog.delete-confirmation-dialog-heading', defaultMessage: 'Confirm card delete?' }),
-    confirmButtonText: intl.formatMessage({ id: 'CardDialog.delete-confirmation-dialog-button-text', defaultMessage: 'Delete' }),
+    heading: intl.formatMessage({
+      id: 'CardDialog.delete-confirmation-dialog-heading',
+      defaultMessage: 'Confirm card delete?'
+    }),
+    confirmButtonText: intl.formatMessage({
+      id: 'CardDialog.delete-confirmation-dialog-button-text',
+      defaultMessage: 'Delete'
+    }),
     onConfirm: handleDeleteCard,
     onClose: () => {
       setShowConfirmationDialogBox(false);
@@ -115,20 +123,18 @@ const KanbanCard = React.memo((props: Props) => {
 
   const duplicateCard = () => {
     if (space && cardPage) {
-      mutator.duplicateCard(
-        {
-          cardId: card.id,
-          board,
-          cardPage,
-          afterRedo: async (newCardId) => {
-            props.showCard(newCardId);
-            mutate(`pages/${space.id}`);
-          },
-          beforeUndo: async () => {
-            props.showCard(null);
-          }
+      mutator.duplicateCard({
+        cardId: card.id,
+        board,
+        cardPage,
+        afterRedo: async (newCardId) => {
+          props.showCard(newCardId);
+          mutate(`pages/${space.id}`);
+        },
+        beforeUndo: async () => {
+          props.showCard(null);
         }
-      );
+      });
     }
   };
 
@@ -148,31 +154,26 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly && cardPage
-            && (
-              <PageActions
-                page={cardPage}
-                onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-                onClickDuplicate={duplicateCard}
-              />
-            )}
+          {!props.readOnly && cardPage && (
+            <PageActions
+              page={cardPage}
+              onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+              onClickDuplicate={duplicateCard}
+            />
+          )}
 
-          <div className='octo-icontitle'>
+          <div className="octo-icontitle">
             <div>
-              {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage.hasContent} pageType='page' icon={cardPage.icon} /> : undefined}
+              {cardPage?.icon ? (
+                <PageIcon isEditorEmpty={!cardPage.hasContent} pageType="page" icon={cardPage.icon} />
+              ) : undefined}
             </div>
-            <div
-              key='__title'
-              className='octo-titletext'
-            >
+            <div key="__title" className="octo-titletext">
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
           {visiblePropertyTemplates.map((template) => (
-            <Tooltip
-              key={template.id}
-              title={template.name}
-            >
+            <Tooltip key={template.id} title={template.name}>
               <PropertyValueElement
                 board={board}
                 readOnly={true}
@@ -181,34 +182,30 @@ const KanbanCard = React.memo((props: Props) => {
                 updatedBy={cardPage?.updatedBy || ''}
                 propertyTemplate={template}
                 showEmptyPlaceholder={false}
-                displayType='kanban'
+                displayType="kanban"
               />
             </Tooltip>
           ))}
           {linkedBounty && (
             <BountyFooter>
-              <Box sx={{
-                display: 'flex',
-                gap: 0.25
-              }}
-              >
-                <CurrencyIcon>
-                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-                    <img
-                      loading='lazy'
-                      height={20}
-                      src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]}
-                    />
-                  )}
-                </CurrencyIcon>
-                <Box sx={{
+              <Box
+                sx={{
                   display: 'flex',
                   gap: 0.25
                 }}
+              >
+                <CurrencyIcon>
+                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
+                    <img loading="lazy" height={20} src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]} />
+                  )}
+                </CurrencyIcon>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 0.25
+                  }}
                 >
-                  <Box component='span'>
-                    {linkedBounty.rewardAmount}
-                  </Box>
+                  <Box component="span">{linkedBounty.rewardAmount}</Box>
                 </Box>
               </Box>
               <BountyStatusChip status={linkedBounty.status} />

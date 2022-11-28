@@ -1,56 +1,34 @@
-
-import {
-  sendableSteps,
-  receiveTransaction
-} from 'prosemirror-collab';
+import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
-import {
-  EditorState
-} from 'prosemirror-state';
-import {
-  Mapping,
-  Step,
-  Transform
-} from 'prosemirror-transform';
+import { EditorState } from 'prosemirror-state';
+import { Mapping, Step, Transform } from 'prosemirror-transform';
 
 import log from 'lib/log';
 import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
 
-import {
-  getSettings
-} from '../../schema/convert';
-import {
-  trackedTransaction,
-  acceptAllNoInsertions
-} from '../../track';
+import { getSettings } from '../../schema/convert';
+import { trackedTransaction, acceptAllNoInsertions } from '../../track';
 import type { ModCollab } from '../index';
 
-import {
-  ChangeSet
-} from './changeset';
+import { ChangeSet } from './changeset';
 // import {
 //   MergeEditor
 // } from './editor';
-import {
-  recreateTransform
-} from './recreate_transform';
-import {
-  simplifyTransform
-} from './tools';
+import { recreateTransform } from './recreate_transform';
+import { simplifyTransform } from './tools';
 
 export class Merge {
-
   mod: ModCollab;
 
   remoteTrackOfflineLimit = 50; // Limit of remote changes while offline for tracking to kick in when multiple users edit
 
-  trackOfflineLimit = 50;// Limit of local changes while offline for tracking to kick in when multiple users edit
+  trackOfflineLimit = 50; // Limit of local changes while offline for tracking to kick in when multiple users edit
 
-  constructor (mod: ModCollab) {
+  constructor(mod: ModCollab) {
     this.mod = mod;
   }
 
-  adjustDocument (data: ServerDocDataMessage) {
+  adjustDocument(data: ServerDocDataMessage) {
     // Adjust the document when reconnecting after offline and many changes
     // happening on server.
     if (this.mod.editor.docInfo.version < data.doc.v && sendableSteps(this.mod.editor.view.state)) {
@@ -59,47 +37,55 @@ export class Merge {
       const unconfirmedTr = confirmedState.tr;
       const sendable = sendableSteps(this.mod.editor.view.state);
       if (sendable) {
-        sendable.steps.forEach(step => unconfirmedTr.step(step));
+        sendable.steps.forEach((step) => unconfirmedTr.step(step));
       }
       const rollbackTr = this.mod.editor.view.state.tr;
-      unconfirmedTr.steps.slice().reverse().forEach(
-        (step, index) => rollbackTr.step(step.invert(unconfirmedTr.docs[unconfirmedTr.docs.length - index - 1]))
-      );
+      unconfirmedTr.steps
+        .slice()
+        .reverse()
+        .forEach((step, index) =>
+          rollbackTr.step(step.invert(unconfirmedTr.docs[unconfirmedTr.docs.length - index - 1]))
+        );
       // We reset to there being no local changes to send.
-      this.mod.editor.view.dispatch(receiveTransaction(
-        this.mod.editor.view.state,
-        unconfirmedTr.steps,
-        unconfirmedTr.steps.map(_step => this.mod.editor.client_id)
-      ));
-      this.mod.editor.view.dispatch(receiveTransaction(
-        this.mod.editor.view.state,
-        rollbackTr.steps,
-        rollbackTr.steps.map(_step => 'remote')
-      ).setMeta('remote', true));
+      this.mod.editor.view.dispatch(
+        receiveTransaction(
+          this.mod.editor.view.state,
+          unconfirmedTr.steps,
+          unconfirmedTr.steps.map((_step) => this.mod.editor.client_id)
+        )
+      );
+      this.mod.editor.view.dispatch(
+        receiveTransaction(
+          this.mod.editor.view.state,
+          rollbackTr.steps,
+          rollbackTr.steps.map((_step) => 'remote')
+        ).setMeta('remote', true)
+      );
       const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
       // Apply the online Transaction
       let lostTr: Transform;
       if (data.m) {
         lostTr = new Transform(this.mod.editor.view.state.doc);
-        data.m.forEach(message => {
+        data.m.forEach((message) => {
           if (message.ds && message.cid !== this.mod.editor.client_id) {
-            message.ds.forEach(j => lostTr.maybeStep(Step.fromJSON(this.mod.editor.schema, j)));
+            message.ds.forEach((j) => lostTr.maybeStep(Step.fromJSON(this.mod.editor.schema, j)));
           }
         });
         if (!lostTr.doc.eq(toDoc)) {
           // We were not able to recreate the document using the steps in the diffs. So instead we recreate the steps artificially.
           lostTr = recreateTransform(this.mod.editor.view.state.doc, toDoc);
         }
-      }
-      else {
+      } else {
         lostTr = recreateTransform(this.mod.editor.view.state.doc, toDoc);
       }
 
-      this.mod.editor.view.dispatch(receiveTransaction(
-        this.mod.editor.view.state,
-        lostTr.steps,
-        lostTr.steps.map(_step => 'remote')
-      ).setMeta('remote', true));
+      this.mod.editor.view.dispatch(
+        receiveTransaction(
+          this.mod.editor.view.state,
+          lostTr.steps,
+          lostTr.steps.map((_step) => 'remote')
+        ).setMeta('remote', true)
+      );
 
       // We split the complex steps that delete and insert into simple steps so that finding conflicts is more pronounced.
       const modifiedLostTr = simplifyTransform(lostTr);
@@ -123,62 +109,64 @@ export class Merge {
           //   { bibliography: data.doc.bibliography, images: data.doc.images }
           // );
           // editor.init();
-        }
-        catch (error) {
+        } catch (error) {
           this.handleMergeFailure(error, unconfirmedTr.doc, toDoc, editor);
         }
-      }
-      else {
+      } else {
         try {
           this.autoMerge(unconfirmedTr, lostTr, data);
-        }
-        catch (error) {
+        } catch (error) {
           this.handleMergeFailure(error, unconfirmedTr.doc, toDoc);
         }
       }
 
       this.mod.doc.receiving = false;
       // this.mod.doc.sendToCollaborators()
-    }
-    else if (data.m) {
+    } else if (data.m) {
       // There are no local changes, so we can just receive all the remote messages directly
-      data.m.forEach(message => this.mod.doc.receiveDiff(message, true));
-    }
-    else {
+      data.m.forEach((message) => this.mod.doc.receiveDiff(message, true));
+    } else {
       // The server seems to have lost some data. We reset.
       this.mod.doc.loadDocument(data);
     }
   }
 
-  autoMerge (unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
+  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
     /* This automerges documents incase of no conflicts */
     const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
     const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
     const maps = new Mapping(
       // @ts-ignore
-      [].concat(unconfirmedTr.mapping.maps.slice().reverse().map(map => map.invert()))
-      // @ts-ignore
+      []
+        .concat(
+          unconfirmedTr.mapping.maps
+            .slice()
+            .reverse()
+            .map((map) => map.invert())
+        )
+        // @ts-ignore
         .concat(lostTr.mapping.maps.slice())
     );
 
-    unconfirmedTr.steps.forEach(
-      (step, index) => {
-        const mapped = step.map(maps.slice(unconfirmedTr.steps.length - index));
-        if (mapped && !rebasedTr.maybeStep(mapped).failed) {
-          maps.appendMap(mapped.getMap());
-          // @ts-ignore types are wrong
-          maps.setMirror(unconfirmedTr.steps.length - index - 1, (unconfirmedTr.steps.length + lostTr.steps.length + rebasedTr.steps.length - 1));
-        }
+    unconfirmedTr.steps.forEach((step, index) => {
+      const mapped = step.map(maps.slice(unconfirmedTr.steps.length - index));
+      if (mapped && !rebasedTr.maybeStep(mapped).failed) {
+        maps.appendMap(mapped.getMap());
+        // @ts-ignore types are wrong
+        maps.setMirror(
+          unconfirmedTr.steps.length - index - 1,
+          unconfirmedTr.steps.length + lostTr.steps.length + rebasedTr.steps.length - 1
+        );
       }
-    );
+    });
 
     let tracked;
     let rebasedTrackedTr; // offline steps to be tracked
     if (
-    // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
-    // &&
-      unconfirmedTr.steps.length > this.trackOfflineLimit
-        || lostTr.steps.length > this.remoteTrackOfflineLimit
+      // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
+      // &&
+      unconfirmedTr.steps.length > this.trackOfflineLimit ||
+      lostTr.steps.length > this.remoteTrackOfflineLimit
     ) {
       tracked = true;
       // Either this user has made 50 changes since going offline,
@@ -191,8 +179,7 @@ export class Merge {
         false,
         new Date(Date.now() - this.mod.editor.clientTimeAdjustment)
       );
-    }
-    else {
+    } else {
       tracked = false;
       rebasedTrackedTr = rebasedTr;
     }
@@ -206,22 +193,19 @@ export class Merge {
         'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
       );
     }
-
   }
 
-  getDocData (offlineDoc: Node) {
+  getDocData(offlineDoc: Node) {
     const pmArticle = acceptAllNoInsertions(offlineDoc).firstChild;
     if (!pmArticle?.firstChild) {
       throw new Error('No child element of article');
     }
     let title = '';
-    pmArticle.firstChild.forEach(
-      child => {
-        if (!child.marks.find(mark => mark.type.name === 'deletion')) {
-          title += child.textContent;
-        }
+    pmArticle.firstChild.forEach((child) => {
+      if (!child.marks.find((mark) => mark.type.name === 'deletion')) {
+        title += child.textContent;
       }
-    );
+    });
 
     return {
       content: pmArticle.toJSON(),
@@ -231,10 +215,9 @@ export class Merge {
       id: this.mod.editor.docInfo.id,
       updated: this.mod.editor.docInfo.updated
     };
-
   }
 
-  handleMergeFailure (error: unknown, offlineDoc: Node, _onlineDoc: Node, mergeEditor = false) {
+  handleMergeFailure(error: unknown, offlineDoc: Node, _onlineDoc: Node, mergeEditor = false) {
     // In case the auto-merge or manual merge failed due to JS Errors,
     // make a copy of the offline doc available for download.
     log.error('TODO: Handle merge failure', { error });

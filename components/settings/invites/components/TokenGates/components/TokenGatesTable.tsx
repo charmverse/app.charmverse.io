@@ -41,18 +41,27 @@ const StyledTableRow = styled(TableRow)`
   margin-bottom: 20px;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
 
-  & > th, & > td {
+  & > th,
+  & > td {
     border-bottom-style: dashed;
   }
 `;
 
-function CopyLinkButton ({ clickable = false }: { clickable?: boolean }) {
+function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
   return (
-    <Chip sx={{ width: 90 }} clickable={clickable} disabled={!clickable} color='secondary' size='small' variant='outlined' label='Copy Link' />
+    <Chip
+      sx={{ width: 90 }}
+      clickable={clickable}
+      disabled={!clickable}
+      color="secondary"
+      size="small"
+      variant="outlined"
+      label="Copy Link"
+    />
   );
 }
 
-export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Props) {
+export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
   const { account, walletAuthSignature, sign } = useWeb3AuthSig();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
@@ -63,61 +72,68 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   const shareLink = `${window.location.origin}/join?domain=${router.query.domain}`;
   const { openWalletSelectorModal } = useContext(Web3Connection);
 
-  function onCopy () {
+  function onCopy() {
     showMessage('Link copied to clipboard');
   }
 
-  async function updateTokenGateRoles (tokenGateId: string, roleIds: string[]) {
+  async function updateTokenGateRoles(tokenGateId: string, roleIds: string[]) {
     if (space) {
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
       mutate(`tokenGates/${space.id}`);
     }
   }
 
-  async function deleteRoleFromTokenGate (tokenGateId: string, roleId: string) {
-    const tokenGate = tokenGates.find(_tokenGate => _tokenGate.id === tokenGateId);
+  async function deleteRoleFromTokenGate(tokenGateId: string, roleId: string) {
+    const tokenGate = tokenGates.find((_tokenGate) => _tokenGate.id === tokenGateId);
     if (tokenGate && space) {
-      const roleIds = tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId).filter(tokenGateRoleId => tokenGateRoleId !== roleId);
+      const roleIds = tokenGate.tokenGateToRoles
+        .map((tokenGateToRole) => tokenGateToRole.roleId)
+        .filter((tokenGateRoleId) => tokenGateRoleId !== roleId);
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
       mutate(`tokenGates/${space.id}`);
     }
   }
 
   useEffect(() => {
-    async function main () {
+    async function main() {
       const results = await Promise.all(
-        tokenGates.map(tokenGate => humanizeAccessControlConditions({
-          myWalletAddress: account || '',
-          ...tokenGate.conditions as any
-        }).catch(err => {
-          log.warn('Could not retrieve humanized format of conditions', err);
-          return null;
-        }))
+        tokenGates.map((tokenGate) =>
+          humanizeAccessControlConditions({
+            myWalletAddress: account || '',
+            ...(tokenGate.conditions as any)
+          }).catch((err) => {
+            log.warn('Could not retrieve humanized format of conditions', err);
+            return null;
+          })
+        )
       );
       setDescriptions(results);
     }
     main();
   }, [tokenGates]);
 
-  async function testConnect (tokenGate: TokenGate) {
+  async function testConnect(tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
     try {
       if (!litClient) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const authSig = walletAuthSignature ?? await sign();
+      const authSig = walletAuthSignature ?? (await sign());
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
         chain: (tokenGate.conditions as any).chain || 'ethereum',
-        ...tokenGate.conditions as any
+        ...(tokenGate.conditions as any)
       });
 
-      await charmClient.verifyTokenGate({ commit: false, spaceId: space?.id as string, tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }] });
+      await charmClient.verifyTokenGate({
+        commit: false,
+        spaceId: space?.id as string,
+        tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }]
+      });
 
       setTestResult({ status: 'success' });
-    }
-    catch (error) {
+    } catch (error) {
       log.warn('Error when verifying wallet', error);
       let message = '';
       switch ((error as any).errorCode) {
@@ -132,34 +148,36 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
   }
 
   // sort oldest to newest
-  const sortedTokenGates = tokenGates.sort((a, b) => b.createdAt > a.createdAt ? -1 : 1);
+  const sortedTokenGates = tokenGates.sort((a, b) => (b.createdAt > a.createdAt ? -1 : 1));
 
   const padding = 32;
 
   return (
     <>
-      <Box overflow='auto'>
-        <Table size='small' aria-label='Token gates table'>
+      <Box overflow="auto">
+        <Table size="small" aria-label="Token gates table">
           <TableHead>
             <StyledTableRow>
               <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant='body1' fontWeight='600'>
+                <Typography variant="body1" fontWeight="600">
                   Token Gated Link
                 </Typography>
               </TableCell>
               <TableCell sx={{ width: 150 }}></TableCell>
-              <TableCell sx={{ width: 90 + padding }} align='center'>
-                {sortedTokenGates.length === 0
-                  ? (
-                    <Tooltip title='Add a token gate to use this link'>
-                      <span><CopyLinkButton /></span>
-                    </Tooltip>
-                  )
-                  : (
-                    <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                      <span><CopyLinkButton clickable /></span>
-                    </CopyToClipboard>
-                  )}
+              <TableCell sx={{ width: 90 + padding }} align="center">
+                {sortedTokenGates.length === 0 ? (
+                  <Tooltip title="Add a token gate to use this link">
+                    <span>
+                      <CopyLinkButton />
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <CopyToClipboard text={shareLink} onCopy={onCopy}>
+                    <span>
+                      <CopyLinkButton clickable />
+                    </span>
+                  </CopyToClipboard>
+                )}
               </TableCell>
               <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
             </StyledTableRow>
@@ -167,17 +185,22 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
           <TableBody>
             {sortedTokenGates.length === 0 && (
               <TableRow>
-                <TableCell align='center' colSpan={4} sx={{ padding: '20px 16px' }}>This Workspace has no Token Gates</TableCell>
+                <TableCell align="center" colSpan={4} sx={{ padding: '20px 16px' }}>
+                  This Workspace has no Token Gates
+                </TableCell>
               </TableRow>
             )}
             {sortedTokenGates.map((tokenGate, tokenGateIndex, tokenGateArray) => (
               <TableRow key={tokenGate.id} sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
                 <TableCell>
-                  <Typography variant='caption' sx={{ my: 1, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ my: 1, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
                     {descriptions[tokenGateIndex]}
                   </Typography>
                   {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='caption' sx={{ mt: 1 }}>
+                    <Typography variant="caption" sx={{ mt: 1 }}>
                       -- OR --
                     </Typography>
                   )}
@@ -185,7 +208,7 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                 <TableCell>
                   <TokenGateRolesSelect
                     isAdmin={isAdmin}
-                    selectedRoleIds={tokenGate.tokenGateToRoles.map(tokenGateToRole => tokenGateToRole.roleId)}
+                    selectedRoleIds={tokenGate.tokenGateToRoles.map((tokenGateToRole) => tokenGateToRole.roleId)}
                     onChange={(roleIds) => {
                       updateTokenGateRoles(tokenGate.id, roleIds);
                     }}
@@ -194,40 +217,49 @@ export default function TokenGatesTable ({ isAdmin, onDelete, tokenGates }: Prop
                     }}
                   />
                 </TableCell>
-                <TableCell align='center'>
-                  <Tooltip arrow placement='top' title={litClient ? (!account ? 'Connect your wallet to test' : 'Test this gate using your own wallet') : 'Lit Protocol client has not initialized'}>
-                    <Box component='span'>
+                <TableCell align="center">
+                  <Tooltip
+                    arrow
+                    placement="top"
+                    title={
+                      litClient
+                        ? !account
+                          ? 'Connect your wallet to test'
+                          : 'Test this gate using your own wallet'
+                        : 'Lit Protocol client has not initialized'
+                    }
+                  >
+                    <Box component="span">
                       <Chip
                         onClick={() => {
                           if (litClient) {
                             if (account) {
                               testConnect(tokenGate);
-                            }
-                            else {
+                            } else {
                               openWalletSelectorModal();
                             }
                           }
                         }}
                         sx={{ width: 90 }}
                         clickable={Boolean(account && litClient)}
-                        color='secondary'
-                        size='small'
-                        variant='outlined'
-                        label='Test'
+                        color="secondary"
+                        size="small"
+                        variant="outlined"
+                        label="Test"
                       />
                     </Box>
                   </Tooltip>
                 </TableCell>
                 <TableCell width={30}>
                   {isAdmin && (
-                    <Tooltip arrow placement='top' title='Delete'>
+                    <Tooltip arrow placement="top" title="Delete">
                       <ButtonChip
-                        className='row-actions'
+                        className="row-actions"
                         icon={<DeleteOutlinedIcon />}
                         clickable
-                        color='secondary'
-                        size='small'
-                        variant='outlined'
+                        color="secondary"
+                        size="small"
+                        variant="outlined"
                         onClick={() => onDelete(tokenGate)}
                       />
                     </Tooltip>

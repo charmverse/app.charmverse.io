@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -26,8 +25,8 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
-        class='fooClass'
-        value='none'
+        class="fooClass"
+        value="none"
         menuOpen={false}
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
@@ -52,8 +51,8 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
-        class='fooClass'
-        value='count'
+        class="fooClass"
+        value="count"
         menuOpen={false}
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
@@ -78,8 +77,8 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
-        class='fooClass'
-        value='countValue'
+        class="fooClass"
+        value="countValue"
         menuOpen={false}
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
@@ -104,8 +103,8 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
-        class='fooClass'
-        value='countUniqueValue'
+        class="fooClass"
+        value="countUniqueValue"
         menuOpen={false}
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
@@ -134,8 +133,8 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
-        class='fooClass'
-        value='none'
+        class="fooClass"
+        value="none"
         menuOpen={true}
         onMenuClose={onMenuClose}
         onMenuOpen={onMenuOpen}

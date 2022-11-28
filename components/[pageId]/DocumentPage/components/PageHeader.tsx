@@ -51,7 +51,7 @@ const EditorHeader = styled.div`
   }
 
   &:hover .page-controls {
-    opacity: 1
+    opacity: 1;
   }
 `;
 
@@ -64,22 +64,21 @@ interface PageHeaderProps {
   updatedAt: string;
 }
 
-function PageHeader ({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
-
-  function addPageIcon () {
+function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
+  function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
 
-  function updatePageIcon (_icon: string | null) {
+  function updatePageIcon(_icon: string | null) {
     setPage({ icon: _icon });
   }
 
-  function updateTitle (page: { title: string, updatedAt: any }) {
+  function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
 
-  function addPageHeader () {
+  function addPageHeader() {
     setPage({ headerImage: randomBannerImage() });
   }
 
@@ -88,30 +87,27 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title, updatedAt }:
       <EditorHeader>
         {icon && (
           <MenuWrapper>
-            <EmojiIcon size='large' icon={icon} />
+            <EmojiIcon size="large" icon={icon} />
             <Menu>
               <Menu.Text
-                id='random'
+                id="random"
                 icon={<EmojiEmotionsOutlinedIcon />}
-                name='Random'
+                name="Random"
                 onClick={() => {
                   updatePageIcon(BlockIcons.shared.randomIcon());
                 }}
               />
-              <Menu.SubMenu
-                id='pick'
-                icon={<EmojiEmotionsOutlinedIcon />}
-                name='Pick icon'
-              >
-                <EmojiPicker onSelect={(emoji) => {
-                  updatePageIcon(emoji);
-                }}
+              <Menu.SubMenu id="pick" icon={<EmojiEmotionsOutlinedIcon />} name="Pick icon">
+                <EmojiPicker
+                  onSelect={(emoji) => {
+                    updatePageIcon(emoji);
+                  }}
                 />
               </Menu.SubMenu>
               <Menu.Text
-                id='remove'
+                id="remove"
                 icon={<DeleteOutlineOutlinedIcon />}
-                name='Remove icon'
+                name="Remove icon"
                 onClick={() => {
                   updatePageIcon(null);
                 }}
@@ -119,33 +115,22 @@ function PageHeader ({ headerImage, icon, readOnly, setPage, title, updatedAt }:
             </Menu>
           </MenuWrapper>
         )}
-        <Controls className='page-controls'>
+        <Controls className="page-controls">
           {!readOnly && !icon && (
             <PageControlItem onClick={addPageIcon}>
-              <EmojiEmotionsOutlinedIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
+              <EmojiEmotionsOutlinedIcon fontSize="small" sx={{ marginRight: 1 }} />
               Add icon
             </PageControlItem>
           )}
           {!readOnly && !headerImage && (
             <PageControlItem onClick={addPageHeader}>
-              <ImageIcon
-                fontSize='small'
-                sx={{ marginRight: 1 }}
-              />
+              <ImageIcon fontSize="small" sx={{ marginRight: 1 }} />
               Add cover
             </PageControlItem>
           )}
         </Controls>
       </EditorHeader>
-      <PageTitleInput
-        readOnly={readOnly}
-        value={title}
-        onChange={updateTitle}
-        updatedAt={updatedAt}
-      />
+      <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>
   );
 }

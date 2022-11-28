@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -16,8 +15,7 @@ handler
   .use(requireKeys(['snapshotDomain', 'defaultVotingDuration'], 'body'))
   .put(updateSnapshotConnection);
 
-async function updateSnapshotConnection (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function updateSnapshotConnection(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { snapshotDomain, defaultVotingDuration } = req.body;
 
   const spaceId = req.query.id as string;

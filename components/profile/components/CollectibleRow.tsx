@@ -25,7 +25,6 @@ interface ProfileItemProps {
 }
 
 export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
-
   .hidden-on-visible {
     opacity: ${({ visible }) => (visible ? 1 : 0.25)};
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
@@ -42,48 +41,35 @@ export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stac
   .action {
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
-
 `;
 
-export default function CollectibleRow ({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
+export default function CollectibleRow({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
-    <ProfileItemContainer
-      visible={visible}
-      display='flex'
-      gap={2}
-      flexDirection='row'
-    >
-      <Link className='hidden-on-visible' href={collectable.link} target='_blank' display='flex'>
-        <Avatar size='large' isNft={collectable.type === 'nft'} avatar={collectable.image} />
+    <ProfileItemContainer visible={visible} display="flex" gap={2} flexDirection="row">
+      <Link className="hidden-on-visible" href={collectable.link} target="_blank" display="flex">
+        <Avatar size="large" isNft={collectable.type === 'nft'} avatar={collectable.image} />
       </Link>
-      <Stack
-        className='hidden-on-visible'
-        justifyContent='center'
-        flexGrow={1}
-      >
-        <Box
-          display='flex'
-          gap={1}
-          alignItems='center'
-        >
+      <Stack className="hidden-on-visible" justifyContent="center" flexGrow={1}>
+        <Box display="flex" gap={1} alignItems="center">
           <Typography
-            fontWeight='bold'
+            fontWeight="bold"
             sx={{
               fontSize: {
                 sm: '1.15rem',
                 xs: '1.05rem'
               }
             }}
-          >{collectable.title}
+          >
+            {collectable.title}
           </Typography>
         </Box>
-        <Typography variant='subtitle2'>{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
+        <Typography variant="subtitle2">{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
       </Stack>
       {showVisibilityIcon && (
-        <Box display='flex' alignItems='center'>
+        <Box display="flex" alignItems="center">
           <IconButton
-            size='small'
-            className='action'
+            size="small"
+            className="action"
             sx={{
               opacity: {
                 md: 0,
@@ -94,11 +80,11 @@ export default function CollectibleRow ({ onClick, collectable, visible, showVis
           >
             {visible ? (
               <Tooltip title={`Hide ${collectable.type.toUpperCase()} from profile`}>
-                <VisibilityIcon fontSize='small' />
+                <VisibilityIcon fontSize="small" />
               </Tooltip>
             ) : (
               <Tooltip title={`Show ${collectable.type.toUpperCase()} in profile`}>
-                <VisibilityOffIcon fontSize='small' />
+                <VisibilityOffIcon fontSize="small" />
               </Tooltip>
             )}
           </IconButton>

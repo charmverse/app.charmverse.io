@@ -1,4 +1,3 @@
-
 export type TrackType = 'block_change' | 'format_change' | 'deletion' | 'insertion';
 
 export interface TrackAttribute {
@@ -6,6 +5,6 @@ export interface TrackAttribute {
   username: string;
   date: string;
   type: TrackType;
-  before?: { type: string, attrs: any } | string[];
-  after?: { type: string, attrs: any } | string[];
+  before?: { type: string; attrs: any } | string[];
+  after?: { type: string; attrs: any } | string[];
 }

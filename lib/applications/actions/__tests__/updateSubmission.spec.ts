@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -20,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('updateSubmission', () => {
-
   it('should return the updated submission', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -33,7 +30,8 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: 'New content',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
+      submissionNodes:
+        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
       walletAddress: '0x123456789'
     };
 
@@ -44,7 +42,6 @@ describe('updateSubmission', () => {
 
     expect(updated.submission).toBe(submissionUpdate.submission);
     expect(updated.submissionNodes).toBe(submissionUpdate.submissionNodes);
-
   });
 
   it('should auto-set the submission to review status if it is marked as in progress', async () => {
@@ -58,7 +55,8 @@ describe('updateSubmission', () => {
 
     const submissionUpdate: SubmissionContent = {
       submission: 'New content',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
+      submissionNodes:
+        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"New content"}]}]}',
       walletAddress: '0x123456789'
     };
 
@@ -71,21 +69,18 @@ describe('updateSubmission', () => {
   });
 
   it('should fail if the submission does not exist', async () => {
-
     try {
       await updateSubmission({
         submissionId: v4(),
         submissionContent: generateSubmissionContent()
       });
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(DataNotFoundError);
     }
   });
 
   it('should fail if empty submission content is provided', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -106,14 +101,12 @@ describe('updateSubmission', () => {
         submissionContent: submissionUpdate
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(MissingDataError);
     }
   });
 
   it('should fail if the bounty is not open or in progress', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -130,8 +123,7 @@ describe('updateSubmission', () => {
         submissionContent: submissionUpdate
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(UnauthorisedActionError);
     }
   });
@@ -153,11 +145,8 @@ describe('updateSubmission', () => {
         submissionContent: submissionUpdate
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(UnauthorisedActionError);
     }
   });
-
 });
-

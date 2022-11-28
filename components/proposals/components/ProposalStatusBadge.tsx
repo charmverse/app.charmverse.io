@@ -14,7 +14,7 @@ import type { ReactNode } from 'react';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
-const PROPOSAL_STATUS_ICONS : Record<ProposalStatus, ReactNode> = {
+const PROPOSAL_STATUS_ICONS: Record<ProposalStatus, ReactNode> = {
   private_draft: <LockOutlinedIcon />,
   draft: <ModeEditOutlineOutlinedIcon />,
   discussion: <ChatOutlinedIcon />,
@@ -54,16 +54,13 @@ const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatus }>`
   }
 `;
 
-export function ProposalStatusChip ({
-  status,
-  size = 'small'
-}: { size?: ChipProps['size'], status: ProposalStatus }) {
+export function ProposalStatusChip({ status, size = 'small' }: { size?: ChipProps['size']; status: ProposalStatus }) {
   return (
     <StyledProposalStatusChip
       size={size}
       status={status}
       label={PROPOSAL_STATUS_LABELS[status]}
-      variant='filled'
+      variant="filled"
       icon={<span>{PROPOSAL_STATUS_ICONS[status]}</span>}
     />
   );

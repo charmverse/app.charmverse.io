@@ -13,9 +13,9 @@ export interface MultiPaymentResult {
 
 type Props = GnosisPaymentProps & {
   isLoading: boolean;
-}
+};
 
-export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
+export default function MultiPaymentButton({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
   const { safe, makePayment } = useGnosisPayment({
     chainId,
     onSuccess,
@@ -24,7 +24,7 @@ export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, t
   });
 
   return (
-    <Tooltip arrow placement='top' title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
+    <Tooltip arrow placement="top" title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
       <span>
         <Button disabled={isLoading || !safe || transactions.length === 0} onClick={makePayment}>
           Make Payment ({transactions.length})

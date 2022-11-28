@@ -40,16 +40,12 @@ const StyledSidebar = styled.div`
   }
 `;
 
-function MemberPropertyItemForm ({
-  property,
-  close
-}: {
-  property: MemberProperty;
-  close: VoidFunction;
-}) {
+function MemberPropertyItemForm({ property, close }: { property: MemberProperty; close: VoidFunction }) {
   const { updateProperty } = useMemberProperties();
   const [propertyName, setPropertyName] = useState('');
-  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>((property?.options as SelectOptionType[]) ?? []);
+  const [propertyOptions, setPropertyOptions] = useState<SelectOptionType[]>(
+    (property?.options as SelectOptionType[]) ?? []
+  );
 
   useEffect(() => {
     setPropertyName(property.name);
@@ -57,11 +53,11 @@ function MemberPropertyItemForm ({
 
   const isSelectPropertyType = isSelectType(property.type);
 
-  const isDisabled = propertyName.length === 0
-    || (isSelectPropertyType
-      && (property.options as SelectOptionType[])?.find(po => po.name.length === 0));
+  const isDisabled =
+    propertyName.length === 0 ||
+    (isSelectPropertyType && (property.options as SelectOptionType[])?.find((po) => po.name.length === 0));
 
-  async function onSubmit () {
+  async function onSubmit() {
     if (!isDisabled) {
       await updateProperty({
         name: propertyName,
@@ -91,9 +87,7 @@ function MemberPropertyItemForm ({
         />
       </Stack>
 
-      {isSelectPropertyType && (
-        <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
-      )}
+      {isSelectPropertyType && <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />}
 
       <Button
         disabled={isDisabled}
@@ -108,11 +102,7 @@ function MemberPropertyItemForm ({
   );
 }
 
-export function MemberPropertySidebarItem ({
-  property
-}: {
-  property: MemberPropertyWithPermissions;
-}) {
+export function MemberPropertySidebarItem({ property }: { property: MemberPropertyWithPermissions }) {
   const ref = useRef<HTMLDivElement>(null);
 
   const [toggled, setToggled] = useState(false);
@@ -123,47 +113,53 @@ export function MemberPropertySidebarItem ({
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
     item: property,
-    collect (monitor) {
+    collect(monitor) {
       return {
         offset: monitor.getDifferenceFromInitialOffset()
       };
     }
   }));
 
-  const [{ canDrop, isOverCurrent }, drop] = useDrop<MemberPropertyWithPermissions, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
-    accept: 'item',
-    drop: async (droppedProperty, monitor) => {
-      const didDrop = monitor.didDrop();
-      if (didDrop) {
-        return;
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<
+    MemberPropertyWithPermissions,
+    any,
+    { canDrop: boolean; isOverCurrent: boolean }
+  >(
+    () => ({
+      accept: 'item',
+      drop: async (droppedProperty, monitor) => {
+        const didDrop = monitor.didDrop();
+        if (didDrop) {
+          return;
+        }
+        await updateProperty({
+          id: droppedProperty.id,
+          index: property.index
+        });
+      },
+      collect: (monitor) => {
+        let canDropItem: boolean = true;
+        // We use this to bypass the thrown error: Invariant Violation: Expected to find a valid target.
+        // If there is an error thrown, set canDrop to false.
+        try {
+          canDropItem = monitor.canDrop();
+        } catch {
+          canDropItem = false;
+        }
+        return {
+          isOverCurrent: monitor.isOver({ shallow: true }),
+          canDrop: canDropItem
+        };
       }
-      await updateProperty({
-        id: droppedProperty.id,
-        index: property.index
-      });
-    },
-    collect: monitor => {
-      let canDropItem: boolean = true;
-      // We use this to bypass the thrown error: Invariant Violation: Expected to find a valid target.
-      // If there is an error thrown, set canDrop to false.
-      try {
-        canDropItem = monitor.canDrop();
-      }
-      catch {
-        canDropItem = false;
-      }
-      return {
-        isOverCurrent: monitor.isOver({ shallow: true }),
-        canDrop: canDropItem
-      };
-    }
-  }), [property]);
+    }),
+    [property]
+  );
 
   const deleteConfirmation = usePopupState({ variant: 'popover', popupId: 'delete-confirmation' });
   const isAdjacentActive = admin && canDrop && isOverCurrent;
 
   return (
-    <Stack height='fit-content' ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
+    <Stack height="fit-content" ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
       <MenuItem
         dense
         sx={{
@@ -178,15 +174,17 @@ export function MemberPropertySidebarItem ({
             minWidth: 30
           },
           pl: 1,
-          ...((offset?.y ?? 0) < 0 ? {
-            borderTopColor: isAdjacentActive ? 'action.focus' : 'background.paper',
-            borderTopWidth: 2,
-            borderTopStyle: 'solid'
-          } : {
-            borderBottomColor: isAdjacentActive ? 'action.focus' : 'background.paper',
-            borderBottomWidth: 2,
-            borderBottomStyle: 'solid'
-          })
+          ...((offset?.y ?? 0) < 0
+            ? {
+                borderTopColor: isAdjacentActive ? 'action.focus' : 'background.paper',
+                borderTopWidth: 2,
+                borderTopStyle: 'solid'
+              }
+            : {
+                borderBottomColor: isAdjacentActive ? 'action.focus' : 'background.paper',
+                borderBottomWidth: 2,
+                borderBottomStyle: 'solid'
+              })
         }}
         onClick={() => setToggled(!toggled)}
       >
@@ -197,15 +195,12 @@ export function MemberPropertySidebarItem ({
             transition: 'transform 150ms ease-in-out'
           }}
         />
-        <MemberPropertyItem
-          type={property.type}
-          name={property.name}
-        />
+        <MemberPropertyItem type={property.type} name={property.name} />
         {admin && (
           <Box
-            display='flex'
+            display="flex"
             gap={0.5}
-            className='icons'
+            className="icons"
             sx={{
               opacity: 0,
               alignItems: 'center'
@@ -213,9 +208,9 @@ export function MemberPropertySidebarItem ({
           >
             <Tooltip title={`Edit ${property.name} property.`}>
               <EditIcon
-                cursor='pointer'
-                fontSize='small'
-                color='secondary'
+                cursor="pointer"
+                fontSize="small"
+                color="secondary"
                 onClick={(e) => {
                   e.stopPropagation();
                   propertyRenamePopupState.open();
@@ -225,9 +220,9 @@ export function MemberPropertySidebarItem ({
             {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
               <Tooltip title={`Delete ${property.name} property.`}>
                 <DeleteOutlinedIcon
-                  cursor='pointer'
-                  fontSize='small'
-                  color='secondary'
+                  cursor="pointer"
+                  fontSize="small"
+                  color="secondary"
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteConfirmation.open();
@@ -236,8 +231,8 @@ export function MemberPropertySidebarItem ({
               </Tooltip>
             )}
             <ConfirmDeleteModal
-              title='Delete property'
-              question='Are you sure you want to delete this property?'
+              title="Delete property"
+              question="Are you sure you want to delete this property?"
               onConfirm={() => {
                 deleteProperty(property.id);
               }}
@@ -254,35 +249,34 @@ export function MemberPropertySidebarItem ({
         addPermissions={addPropertyPermissions}
         removePermission={removePropertyPermission}
       />
-      <Modal size='large' open={propertyRenamePopupState.isOpen} onClose={propertyRenamePopupState.close} title={`Update ${property.name}`}>
-        <MemberPropertyItemForm
-          close={propertyRenamePopupState.close}
-          property={property}
-        />
+      <Modal
+        size="large"
+        open={propertyRenamePopupState.isOpen}
+        onClose={propertyRenamePopupState.close}
+        title={`Update ${property.name}`}
+      >
+        <MemberPropertyItemForm close={propertyRenamePopupState.close} property={property} />
       </Modal>
     </Stack>
   );
 }
 
-export function MemberPropertiesSidebar ({
-  isOpen,
-  onClose
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function MemberPropertiesSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { properties } = useMemberProperties();
 
   return properties ? (
-    <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
-      <Collapse in={isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000, height: 'fit-content', marginBottom: 1 }}>
+    <ClickAwayListener mouseEvent="onClick" onClickAway={onClose}>
+      <Collapse
+        in={isOpen}
+        orientation="horizontal"
+        sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000, height: 'fit-content', marginBottom: 1 }}
+      >
         <StyledSidebar>
-          <SidebarHeader
-            closeSidebar={onClose}
-            title='Properties'
-          />
-          <Stack height='fit-content'>
-            {properties.map(property => <MemberPropertySidebarItem property={property} key={property.id} />)}
+          <SidebarHeader closeSidebar={onClose} title="Properties" />
+          <Stack height="fit-content">
+            {properties.map((property) => (
+              <MemberPropertySidebarItem property={property} key={property.id} />
+            ))}
           </Stack>
           <AddMemberPropertyButton />
         </StyledSidebar>

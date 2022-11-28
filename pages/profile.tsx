@@ -8,8 +8,7 @@ import PublicProfile from 'components/profile';
 import { setTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 
-export default function PublicProfilePage () {
-
+export default function PublicProfilePage() {
   setTitle('My Profile');
 
   useEffect(() => {
@@ -24,17 +23,12 @@ export default function PublicProfilePage () {
 
   return (
     <>
-      <NexusPageTitle subPage='My Profile' />
+      <NexusPageTitle subPage="My Profile" />
       <PublicProfile user={user} updateUser={setUser} />
     </>
   );
-
 }
 
 PublicProfilePage.getLayout = (page: ReactElement) => {
-  return (
-    <PageLayout>
-      {page}
-    </PageLayout>
-  );
+  return <PageLayout>{page}</PageLayout>;
 };

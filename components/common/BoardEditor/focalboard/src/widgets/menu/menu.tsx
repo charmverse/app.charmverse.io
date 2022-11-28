@@ -11,17 +11,16 @@ import SwitchOption from './switchOption';
 import TextOption from './textOption';
 
 type Props = {
-    children: React.ReactNode;
-    position?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top' | 'bottom' | 'left' | 'right';
-    disablePortal?: boolean;
-}
+  children: React.ReactNode;
+  position?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top' | 'bottom' | 'left' | 'right';
+  disablePortal?: boolean;
+};
 
 const StyledPopper = styled(Popper)`
-    z-index: var(--z-index-modal);
+  z-index: var(--z-index-modal);
 `;
 
-function Menu ({ position, children, disablePortal = true }: Props) {
-
+function Menu({ position, children, disablePortal = true }: Props) {
   const [anchorEl] = useMenuContext();
   const popperRef = useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = useState(0);
@@ -34,8 +33,7 @@ function Menu ({ position, children, disablePortal = true }: Props) {
       if (box) {
         if (box.top + box.bottom + padding > windowHeight) {
           setMaxHeight(windowHeight - box.top - padding);
-        }
-        else {
+        } else {
           setMaxHeight(0);
         }
       }
@@ -59,20 +57,13 @@ function Menu ({ position, children, disablePortal = true }: Props) {
         style={{ maxHeight: maxHeight || 'none' }}
         className={`Menu noselect ${position || 'bottom-start'}`}
       >
-        <div className='menu-contents'>
-          <div className='menu-options'>
-            {children}
-          </div>
+        <div className="menu-contents">
+          <div className="menu-options">{children}</div>
 
-          <div className='menu-spacer hideOnWidescreen' />
+          <div className="menu-spacer hideOnWidescreen" />
 
-          <div className='menu-options hideOnWidescreen'>
-            <Menu.Text
-              id='menu-cancel'
-              name='Cancel'
-              className='menu-cancel'
-              onClick={() => undefined}
-            />
+          <div className="menu-options hideOnWidescreen">
+            <Menu.Text id="menu-cancel" name="Cancel" className="menu-cancel" onClick={() => undefined} />
           </div>
         </div>
       </div>

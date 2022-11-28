@@ -10,11 +10,11 @@ interface Props {
   label?: string;
 }
 
-export function AddIcon ({ iconSize, label, fontSize }: Props) {
+export function AddIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <MuiAddIcon fontSize={iconSize} />
-      <Box component='span' fontSize={fontSize}>
+      <Box component="span" fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import React from 'react';
 
@@ -15,15 +14,17 @@ describe('components/calculations/Options', () => {
 
     const component = wrapIntl(
       <CalculationOptions
-        value='none'
+        value="none"
         onChange={() => {}}
         property={property}
         menuOpen={false}
-        options={[{
-          label: 'Count',
-          value: 'count',
-          displayName: 'Count'
-        }]}
+        options={[
+          {
+            label: 'Count',
+            value: 'count',
+            displayName: 'Count'
+          }
+        ]}
       />
     );
 
@@ -38,7 +39,7 @@ describe('components/calculations/Options', () => {
 
     const component = wrapIntl(
       <CalculationOptions
-        value='none'
+        value="none"
         menuOpen={true}
         onChange={() => {}}
         property={property}

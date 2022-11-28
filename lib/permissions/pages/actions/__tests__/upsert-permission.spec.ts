@@ -27,7 +27,6 @@ beforeAll(async () => {
 });
 
 describe('upsertPermission', () => {
-
   it('should create a permission for a page', async () => {
     const page = await createPage({
       createdBy: user.id,
@@ -77,7 +76,6 @@ describe('upsertPermission', () => {
 
     // Test groups
     try {
-
       await upsertPermission(page.id, {
         permissionLevel: 'full_access',
         userId: user.id,
@@ -85,14 +83,12 @@ describe('upsertPermission', () => {
       });
 
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(InvalidPermissionGranteeError);
     }
 
     // Test public
     try {
-
       await upsertPermission(page.id, {
         permissionLevel: 'full_access',
         userId: user.id,
@@ -100,8 +96,7 @@ describe('upsertPermission', () => {
       });
 
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(InvalidPermissionGranteeError);
     }
   });
@@ -121,8 +116,7 @@ describe('upsertPermission', () => {
     try {
       await upsertPermission(parentPage.id, parentPagePermission.id);
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(SelfInheritancePermissionError);
     }
   });
@@ -146,11 +140,9 @@ describe('upsertPermission', () => {
     const newPermission = await upsertPermission(otherParent.id, parentPagePermission.id);
 
     expect(newPermission.inheritedFromPermission).toBeNull();
-
   });
 
   it('should drop the inheritance reference if trying to inherit from a parent page that has more permissions', async () => {
-
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -176,11 +168,9 @@ describe('upsertPermission', () => {
 
     expect(newPermission.inheritedFromPermission).toBeNull();
     expect(newPermission.userId).toBe(parentPagePermission.userId);
-
   });
 
   it('should auto-add an inheritance reference if the value of the permission is the same as the parent and the child page can inherit from the parent page', async () => {
-
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -206,11 +196,9 @@ describe('upsertPermission', () => {
 
     expect(newPermission.inheritedFromPermission).toBe(parentPagePermission.id);
     expect(newPermission.userId).toBe(parentPagePermission.userId);
-
   });
 
   it('should not auto-add an inheritance reference if the page could inherit from its parent, but the value of the new permission is different', async () => {
-
     const parentPage = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -245,7 +233,6 @@ describe('upsertPermission', () => {
 
     expect(childPagePermission.inheritedFromPermission).toBe(parentPagePermission.id);
     expect(childRolePermission.inheritedFromPermission).toBe(null);
-
   });
 
   it('should specify which permission the permission was inherited from when created', async () => {
@@ -268,7 +255,6 @@ describe('upsertPermission', () => {
     const created = await upsertPermission(child.id, parentPermission.id);
 
     expect(created.sourcePermission?.id).toBe(parentPermission.id);
-
   });
 
   it('should delete the reference to the page the permission was inherited from if not provided in upsert mode', async () => {
@@ -296,7 +282,6 @@ describe('upsertPermission', () => {
     });
 
     expect(updated.inheritedFromPermission).toBeNull();
-
   });
 
   it('should update the permissions that inherit from an existing permission when updated', async () => {
@@ -333,7 +318,6 @@ describe('upsertPermission', () => {
     expect(updatedChild!.permissionLevel).toBe(updatedParent.permissionLevel);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(updatedChild!.inheritedFromPermission).toBe(updatedParent.id);
-
   });
 
   it('should not update the permissions that inherit from an existing permission, where the related page is a sibling', async () => {
@@ -397,11 +381,9 @@ describe('upsertPermission', () => {
     expect(childPermissionAfterUpdate!.inheritedFromPermission).toBeNull();
     expect(subChildPermissionAfterUpdate!.inheritedFromPermission).toBe(childPermissionAfterUpdate!.id);
     expect(siblingPermissionAfterUpdate!.inheritedFromPermission).toBe(parentPermission.id);
-
   });
 
   it('should not create a permission for another space than the space the page belongs to', async () => {
-
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -412,15 +394,12 @@ describe('upsertPermission', () => {
     try {
       await upsertPermission(page.id, { permissionLevel: 'full_access', spaceId: differentSpace.id });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
-
   });
 
   it('should not create a permission for a role that is outside the space the page belongs to', async () => {
-
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -436,14 +415,12 @@ describe('upsertPermission', () => {
     try {
       await upsertPermission(page.id, { permissionLevel: 'full_access', roleId: differentSpaceRole.id });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
 
   it('should not create a permission for a user who is not a member of the space the page belongs to', async () => {
-
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -454,10 +431,8 @@ describe('upsertPermission', () => {
     try {
       await upsertPermission(page.id, { permissionLevel: 'full_access', userId: userFromDifferentSpace.id });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
-
 });

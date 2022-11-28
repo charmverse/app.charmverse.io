@@ -6,7 +6,7 @@ import { UndesirableOperationError } from 'lib/utilities/errors';
 
 import { getVote } from './getVote';
 
-export async function deleteVote (id: string, userId: string): Promise<Vote | null> {
+export async function deleteVote(id: string, userId: string): Promise<Vote | null> {
   const vote: Vote | null = await getVote(id, userId);
 
   if (!vote) {

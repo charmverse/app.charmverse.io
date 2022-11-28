@@ -65,51 +65,56 @@ const ACTIONS: Record<string, string> = {
 const containerNodeTypes = ['listItem', 'columnBlock', 'disclosureSummary'];
 
 // isOwner allows owners to always delete their own suggestions
-type Props = TrackedEvent & { readOnly?: boolean, isOwner?: boolean };
+type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean };
 
-function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, type }: Props) {
+function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type }: Props) {
   const view = useEditorViewContext();
   const { members } = useMembers();
   // get parentNode for lists
-  const parentNode = useMemo(() => (
-    pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null
-  ), [pos]);
+  const parentNode = useMemo(
+    () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
+    [pos]
+  );
 
-  function acceptOne (_type: string, _pos: number) {
+  function acceptOne(_type: string, _pos: number) {
     accept(_type, _pos, view);
   }
 
-  function rejectOne (_type: string, _pos: number) {
+  function rejectOne(_type: string, _pos: number) {
     reject(_type, _pos, view);
   }
 
   return (
-    <Paper sx={{ p: 2, left: active ? -16 : 0, position: 'relative', transition: 'left ease-in .15s' }} elevation={active ? 4 : 0} variant={active ? undefined : 'outlined'}>
+    <Paper
+      sx={{ p: 2, left: active ? -16 : 0, position: 'relative', transition: 'left ease-in .15s' }}
+      elevation={active ? 4 : 0}
+      variant={active ? undefined : 'outlined'}
+    >
       <Stack gap={1}>
-        <Box display='flex' justifyContent='space-between'>
-          <Box display='flex' alignItems='center' gap={1}>
-            <SidebarUser user={members.find(member => member.id === data.user)} />
+        <Box display="flex" justifyContent="space-between">
+          <Box display="flex" alignItems="center" gap={1}>
+            <SidebarUser user={members.find((member) => member.id === data.user)} />
             <RelativeDate createdAt={data.date} />
           </Box>
-          <Box display='flex' gap={1}>
+          <Box display="flex" gap={1}>
             {!readOnly && (
-              <Tooltip title='Accept suggestion'>
+              <Tooltip title="Accept suggestion">
                 <IconButton
-                  color='primary'
+                  color="primary"
                   onClick={() => {
                     acceptOne(type, pos);
                   }}
-                  size='small'
+                  size="small"
                 >
                   <Check />
                 </IconButton>
               </Tooltip>
             )}
             {(!readOnly || isOwner) && (
-              <Tooltip title='Reject suggestion'>
+              <Tooltip title="Reject suggestion">
                 <IconButton
-                  color='primary'
-                  size='small'
+                  color="primary"
+                  size="small"
                   onClick={() => {
                     rejectOne(type, pos);
                   }}
@@ -120,9 +125,18 @@ function SuggestionCardComponent ({ readOnly, isOwner, active, data, node, pos, 
             )}
           </Box>
         </Box>
-        <Typography variant='body2'>
-          {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && <FormatChangeDisplay before={data.before} after={data.after} />}
-          {type !== 'format_change' && <FormattedAction type={type} parentNodeType={parentNode?.type.name} nodeType={node.type.name} content={node.textContent} />}
+        <Typography variant="body2">
+          {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && (
+            <FormatChangeDisplay before={data.before} after={data.after} />
+          )}
+          {type !== 'format_change' && (
+            <FormattedAction
+              type={type}
+              parentNodeType={parentNode?.type.name}
+              nodeType={node.type.name}
+              content={node.textContent}
+            />
+          )}
         </Typography>
       </Stack>
     </Paper>
@@ -138,38 +152,40 @@ type ActionInfo = {
   content?: string;
 };
 
-function FormattedAction ({ type, nodeType, parentNodeType = '', content }: ActionInfo) {
+function FormattedAction({ type, nodeType, parentNodeType = '', content }: ActionInfo) {
   const friendlyNodeType = containerNodeTypes.includes(parentNodeType) ? parentNodeType : nodeType;
   const nodeActionType = `${type}_${friendlyNodeType}`;
 
   if (ACTIONS[nodeActionType]) {
     return <span>{ACTIONS[nodeActionType]}</span>;
-  }
-  else {
-    return <><strong>{VERBS[type]}:</strong> "{content}"</>;
+  } else {
+    return (
+      <>
+        <strong>{VERBS[type]}:</strong> "{content}"
+      </>
+    );
   }
 }
 
-function FormatChangeDisplay ({ before, after }: { before: string[], after: string[] }) {
+function FormatChangeDisplay({ before, after }: { before: string[]; after: string[] }) {
   if (before.length) {
-    return <><strong>Remove format:</strong> {before.map(markName => FORMAT_MARK_NAMES[markName]).join(', ')}</>;
+    return (
+      <>
+        <strong>Remove format:</strong> {before.map((markName) => FORMAT_MARK_NAMES[markName]).join(', ')}
+      </>
+    );
   }
   if (after.length) {
-    return <><strong>Add format:</strong> {after.map(markName => FORMAT_MARK_NAMES[markName]).join(', ')}</>;
+    return (
+      <>
+        <strong>Add format:</strong> {after.map((markName) => FORMAT_MARK_NAMES[markName]).join(', ')}
+      </>
+    );
   }
   return null;
 }
 
-function SidebarUser ({ user }: { user?: Member }) {
+function SidebarUser({ user }: { user?: Member }) {
   if (!user) return null;
-  return (
-    <UserDisplay
-      component='div'
-      user={user}
-      avatarSize='small'
-      fontSize={14}
-      fontWeight={500}
-    />
-  );
-
+  return <UserDisplay component="div" user={user} avatarSize="small" fontSize={14} fontWeight={500} />;
 }

@@ -58,42 +58,56 @@ beforeAll(async () => {
 
 describe('POST /api/votes/[id]/cast - Cast a vote using one of the provided options', () => {
   it('Should cast vote and respond 200', async () => {
-    await request(baseUrl).post(`/api/votes/${inProgressVote.id}/cast`).set('Cookie', userCookie).send({
-      choice: '1'
-    })
+    await request(baseUrl)
+      .post(`/api/votes/${inProgressVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: '1'
+      })
       .expect(200);
   });
 
-  it('Should fail if the body doesn\'t have correct fields and respond 400', async () => {
-    await request(baseUrl).post(`/api/votes/${inProgressVote.id}/cast`).set('Cookie', userCookie).send({})
-      .expect(400);
+  it("Should fail if the body doesn't have correct fields and respond 400", async () => {
+    await request(baseUrl).post(`/api/votes/${inProgressVote.id}/cast`).set('Cookie', userCookie).send({}).expect(400);
   });
 
-  it('Should fail if the vote doesn\'t exist and respond 404', async () => {
-    await request(baseUrl).post(`/api/votes/${v4()}/cast`).set('Cookie', userCookie).send({
-      choice: '3'
-    })
+  it("Should fail if the vote doesn't exist and respond 404", async () => {
+    await request(baseUrl)
+      .post(`/api/votes/${v4()}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: '3'
+      })
       .expect(404);
   });
 
   it('Should fail if the vote has been cancelled and respond 400', async () => {
-    await request(baseUrl).post(`/api/votes/${cancelledVote.id}/cast`).set('Cookie', userCookie).send({
-      choice: '3'
-    })
+    await request(baseUrl)
+      .post(`/api/votes/${cancelledVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: '3'
+      })
       .expect(400);
   });
 
-  it('Should fail if the user choice is not included in vote\'s options and respond 400', async () => {
-    await request(baseUrl).post(`/api/votes/${inProgressVote.id}/cast`).set('Cookie', userCookie).send({
-      choice: v4()
-    })
+  it("Should fail if the user choice is not included in vote's options and respond 400", async () => {
+    await request(baseUrl)
+      .post(`/api/votes/${inProgressVote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: v4()
+      })
       .expect(400);
   });
 
-  it('Should fail if the user don\'t have access to the space the page of the vote is part of and respond 401', async () => {
-    await request(baseUrl).post(`/api/votes/${space2Vote.id}/cast`).set('Cookie', userCookie).send({
-      choice: ['1']
-    })
+  it("Should fail if the user don't have access to the space the page of the vote is part of and respond 401", async () => {
+    await request(baseUrl)
+      .post(`/api/votes/${space2Vote.id}/cast`)
+      .set('Cookie', userCookie)
+      .send({
+        choice: ['1']
+      })
       .expect(401);
   });
 });

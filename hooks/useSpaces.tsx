@@ -25,8 +25,7 @@ export const SpacesContext = createContext<Readonly<IContext>>({
   isCreatingSpace: false
 });
 
-export function SpacesProvider ({ children }: { children: ReactNode }) {
-
+export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, isLoaded: isUserLoaded, setUser } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -36,14 +35,14 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user && router.route !== '/share/[...pageId]') {
       setIsLoaded(false);
-      charmClient.getSpaces()
-        .then(_spaces => {
+      charmClient
+        .getSpaces()
+        .then((_spaces) => {
           setSpaces(_spaces);
         })
-        .catch(err => {})
+        .catch((err) => {})
         .finally(() => setIsLoaded(true));
-    }
-    else if (isUserLoaded) {
+    } else if (isUserLoaded) {
       setIsLoaded(true);
     }
   }, [user?.id, isUserLoaded]);
@@ -63,33 +62,35 @@ export function SpacesProvider ({ children }: { children: ReactNode }) {
         setIsCreatingSpace(false);
       }, 200);
       return space;
-    }
-    catch (e) {
+    } catch (e) {
       setIsCreatingSpace(false);
     }
 
     return null;
   }, []);
 
-  const setSpace = useCallback((_space: Space) => {
-    const newSpaces = spaces.map(s => s.id === _space.id ? _space : s);
-    setSpaces(newSpaces);
-  }, [spaces, setSpaces]);
-
-  const value = useMemo(() => ({
-    spaces,
-    setSpace,
-    setSpaces,
-    isLoaded,
-    createNewSpace,
-    isCreatingSpace
-  }) as IContext, [spaces, isLoaded, isCreatingSpace]);
-
-  return (
-    <SpacesContext.Provider value={value}>
-      {children}
-    </SpacesContext.Provider>
+  const setSpace = useCallback(
+    (_space: Space) => {
+      const newSpaces = spaces.map((s) => (s.id === _space.id ? _space : s));
+      setSpaces(newSpaces);
+    },
+    [spaces, setSpaces]
   );
+
+  const value = useMemo(
+    () =>
+      ({
+        spaces,
+        setSpace,
+        setSpaces,
+        isLoaded,
+        createNewSpace,
+        isCreatingSpace
+      } as IContext),
+    [spaces, isLoaded, isCreatingSpace]
+  );
+
+  return <SpacesContext.Provider value={value}>{children}</SpacesContext.Provider>;
 }
 
 export const useSpaces = () => useContext(SpacesContext);

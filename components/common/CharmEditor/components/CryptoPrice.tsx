@@ -21,13 +21,13 @@ import { isTruthy } from 'lib/utilities/types';
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
  */
-type OptionListName = Extract<keyof IPairQuote, 'base' | 'quote'>
+type OptionListName = Extract<keyof IPairQuote, 'base' | 'quote'>;
 
 /**
  * TODO - Implement spec
  * @returns
  */
-export function cryptoPriceSpec () {
+export function cryptoPriceSpec() {
   const spec: BaseRawNodeSpec = {
     name: 'cryptoPrice',
     type: 'node',
@@ -56,17 +56,21 @@ export function cryptoPriceSpec () {
   return spec;
 }
 
-export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrencyChange }: {
+export function CryptoPrice({
+  base,
+  quote,
+  onQuoteCurrencyChange,
+  onBaseCurrencyChange
+}: {
   base: CryptoCurrency | null;
   quote: FiatCurrency | null;
-  onQuoteCurrencyChange: ((currency: FiatCurrency) => void);
-  onBaseCurrencyChange: ((currency: CryptoCurrency) => void);
+  onQuoteCurrencyChange: (currency: FiatCurrency) => void;
+  onBaseCurrencyChange: (currency: CryptoCurrency) => void;
 }) {
-
   const [loading, setLoadingState] = useState(false);
   const [baseCurrency, setBaseCurrency] = useState<CryptoCurrency | null>(base);
   const [quoteCurrency, setQuoteCurrency] = useState<FiatCurrency>(quote ?? 'USD');
-  const [lastQuote, setPrice] = useState<{ amount: number, receivedOn: number }>({
+  const [lastQuote, setPrice] = useState<{ amount: number; receivedOn: number }>({
     amount: 0,
     receivedOn: 0
   });
@@ -77,14 +81,14 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
   const [paymentMethods] = usePaymentMethods();
 
   const customCryptoContractAddresses = paymentMethods
-    .filter(method => {
+    .filter((method) => {
       const chainId = method.chainId;
       const chain = getChainById(chainId);
       return chain?.testnet !== true && isTruthy(method.contractAddress);
     })
-    .map(method => method.contractAddress) as string[];
+    .map((method) => method.contractAddress) as string[];
 
-  const cryptoList = (CryptoCurrencies as string []).concat(customCryptoContractAddresses);
+  const cryptoList = (CryptoCurrencies as string[]).concat(customCryptoContractAddresses);
 
   useEffect(() => {
     setBaseCurrency(base);
@@ -98,8 +102,7 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
     }
   }, [baseCurrency, quoteCurrency]);
 
-  function refreshPrice () {
-
+  function refreshPrice() {
     if (!baseCurrency || !quoteCurrency) {
       return;
     }
@@ -108,9 +111,9 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
 
     const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
 
-    charmClient.getPricing(symbol, quoteCurrency)
+    charmClient
+      .getPricing(symbol, quoteCurrency)
       .then((_quote) => {
-
         setError(null);
         setPrice({ ..._quote, receivedOn: typeof _quote.receivedOn === 'number' ? _quote.receivedOn : Date.now() });
         setLoadingState(false);
@@ -121,23 +124,22 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
       });
   }
 
-  function changeBaseCurrency (newBase: CryptoCurrency): void {
+  function changeBaseCurrency(newBase: CryptoCurrency): void {
     setSelectionList(null);
     setBaseCurrency(newBase);
     onBaseCurrencyChange(newBase);
   }
 
-  function changeQuoteCurrency (newQuote: FiatCurrency): void {
+  function changeQuoteCurrency(newQuote: FiatCurrency): void {
     setSelectionList(null);
     setQuoteCurrency(newQuote);
     onQuoteCurrencyChange(newQuote);
   }
 
-  function toggleSelectionList (option: OptionListName): void {
+  function toggleSelectionList(option: OptionListName): void {
     if (selectionList === option) {
       setSelectionList(null);
-    }
-    else {
+    } else {
       setSelectionList(option);
     }
   }
@@ -145,15 +147,14 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
   return (
     <Card
       draggable={false}
-      className='cryptoPrice'
-      component='div'
+      className="cryptoPrice"
+      component="div"
       raised={true}
       // disable propagation for bangle.dev
-      onMouseUp={e => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
       sx={{ display: 'inline-block', minWidth: '250px' }}
     >
-
-      {(baseCurrency === null) && (
+      {baseCurrency === null && (
         <CardContent>
           <Box pt={1}>
             <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
@@ -163,25 +164,21 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
       {baseCurrency && (
         <CardContent>
           <div>
-            <StyledButton
-              active={selectionList === 'base'}
-              onClick={() => toggleSelectionList('base')}
-            >
+            <StyledButton active={selectionList === 'base'} onClick={() => toggleSelectionList('base')}>
               <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
             </StyledButton>
-            <Typography component='span' color='secondary'>/</Typography>
-            <StyledButton
-              active={selectionList === 'quote'}
-              onClick={() => toggleSelectionList('quote')}
-            >
+            <Typography component="span" color="secondary">
+              /
+            </Typography>
+            <StyledButton active={selectionList === 'quote'} onClick={() => toggleSelectionList('quote')}>
               {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
             </StyledButton>
-            <IconButton size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
-              <Autorenew color='secondary' fontSize='small' />
+            <IconButton size="small" onClick={() => refreshPrice()} sx={{ float: 'right' }}>
+              <Autorenew color="secondary" fontSize="small" />
             </IconButton>
           </div>
 
-          {(selectionList === 'base') && (
+          {selectionList === 'base' && (
             <Box pt={1}>
               <InputSearchCrypto cryptoList={cryptoList} onChange={changeBaseCurrency} />
             </Box>
@@ -193,29 +190,30 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
             </Box>
           )}
 
-          <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
-            {loading === false && !error && formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
+          <Typography component="div" align="center" sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
+            {loading === false &&
+              !error &&
+              formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
             {loading === true && !error && '- -'}
             {error && 'No price found'}
           </Typography>
         </CardContent>
       )}
 
-      {(loading === true) && (
+      {loading === true && (
         <CardActions sx={{ justifyContent: 'center' }}>
-          <Typography variant='caption' color='secondary'>
-            <CircularProgress size={10} color='inherit' sx={{ mr: 1 }} />
+          <Typography variant="caption" color="secondary">
+            <CircularProgress size={10} color="inherit" sx={{ mr: 1 }} />
             Loading price...
           </Typography>
         </CardActions>
       )}
-      {(loading === false && baseCurrency !== null) && (
+      {loading === false && baseCurrency !== null && (
         <CardActions sx={{ justifyContent: 'center' }}>
-          <Typography variant='caption' color='secondary'>
-            Updated:
-            {' '}
-            <RelativeTime timestamp={(
-              lastQuote?.receivedOn && lastQuote?.receivedOn > 0) ? lastQuote.receivedOn : Date.now()}
+          <Typography variant="caption" color="secondary">
+            Updated:{' '}
+            <RelativeTime
+              timestamp={lastQuote?.receivedOn && lastQuote?.receivedOn > 0 ? lastQuote.receivedOn : Date.now()}
             />
           </Typography>
         </CardActions>
@@ -224,15 +222,15 @@ export function CryptoPrice ({ base, quote, onQuoteCurrencyChange, onBaseCurrenc
   );
 }
 
-type ButtonProps = { children: React.ReactNode, active: boolean, onClick: () => void };
+type ButtonProps = { children: React.ReactNode; active: boolean; onClick: () => void };
 
-function StyledButton ({ children, active, onClick }: ButtonProps) {
+function StyledButton({ children, active, onClick }: ButtonProps) {
   return (
     <Button
-      color='secondary'
+      color="secondary"
       endIcon={<ArrowDropDown />}
-      component='span'
-      variant='text'
+      component="span"
+      variant="text"
       sx={{ color: active ? 'text.primary' : undefined, p: 0, px: 0.5 }}
       onClick={onClick}
     >

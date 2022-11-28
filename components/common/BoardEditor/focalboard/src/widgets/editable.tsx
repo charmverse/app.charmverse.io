@@ -1,48 +1,48 @@
 import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 
 export type EditableProps = {
-    onChange: (value: string) => void;
-    value?: string;
-    placeholderText?: string;
-    className?: string;
-    saveOnEsc?: boolean;
-    readOnly?: boolean;
-    spellCheck?: boolean;
-    autoExpand?: boolean;
+  onChange: (value: string) => void;
+  value?: string;
+  placeholderText?: string;
+  className?: string;
+  saveOnEsc?: boolean;
+  readOnly?: boolean;
+  spellCheck?: boolean;
+  autoExpand?: boolean;
 
-    validator?: (value: string) => boolean;
-    onCancel?: () => void;
-    onSave?: (saveType: 'onEnter'|'onEsc'|'onBlur') => void;
-    onFocus?: () => void;
-}
+  validator?: (value: string) => boolean;
+  onCancel?: () => void;
+  onSave?: (saveType: 'onEnter' | 'onEsc' | 'onBlur') => void;
+  onFocus?: () => void;
+};
 
 export type Focusable = {
-    focus: (selectAll?: boolean) => void;
-}
+  focus: (selectAll?: boolean) => void;
+};
 
-export type ElementType = HTMLInputElement | HTMLTextAreaElement
+export type ElementType = HTMLInputElement | HTMLTextAreaElement;
 
 export type ElementProps = {
-    className: string;
-    placeholder?: string;
-    onChange: (e: React.ChangeEvent<ElementType>) => void;
-    value?: string;
-    title?: string;
-    onBlur: () => void;
-    onKeyDown: (e: React.KeyboardEvent<ElementType>) => void;
-    readOnly?: boolean;
-    spellCheck?: boolean;
-    onFocus?: () => void;
-}
+  className: string;
+  placeholder?: string;
+  onChange: (e: React.ChangeEvent<ElementType>) => void;
+  value?: string;
+  title?: string;
+  onBlur: () => void;
+  onKeyDown: (e: React.KeyboardEvent<ElementType>) => void;
+  readOnly?: boolean;
+  spellCheck?: boolean;
+  onFocus?: () => void;
+};
 
-export function useEditable (
+export function useEditable(
   props: EditableProps,
   focusableRef: React.Ref<Focusable>,
   elementRef: React.RefObject<ElementType>
 ): ElementProps {
   const saveOnBlur = useRef<boolean>(true);
 
-  const save = (saveType: 'onEnter'|'onEsc'|'onBlur'): void => {
+  const save = (saveType: 'onEnter' | 'onEsc' | 'onBlur'): void => {
     if (props.validator && !props.validator(props.value || '')) {
       return;
     }
@@ -65,8 +65,7 @@ export function useEditable (
         elementRef.current.focus();
         if (selectAll) {
           elementRef.current.setSelectionRange(0, valueLength);
-        }
-        else {
+        } else {
           elementRef.current.setSelectionRange(valueLength, valueLength);
         }
       }
@@ -94,17 +93,17 @@ export function useEditable (
     title: value,
     onBlur: () => save('onBlur'),
     onKeyDown: (e: React.KeyboardEvent<ElementType>): void => {
-      if (e.keyCode === 27 && !(e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) { // ESC
+      if (e.keyCode === 27 && !(e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+        // ESC
         e.preventDefault();
         if (props.saveOnEsc) {
           save('onEsc');
-        }
-        else {
+        } else {
           props.onCancel?.();
         }
         blur();
-      }
-      else if (e.keyCode === 13 && !(e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) { // Return
+      } else if (e.keyCode === 13 && !(e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+        // Return
         e.preventDefault();
         save('onEnter');
         blur();
@@ -116,14 +115,11 @@ export function useEditable (
   };
 }
 
-function borderWidth (style: CSSStyleDeclaration): number {
-  return (
-    parseInt(style.borderLeftWidth || '0', 10)
-        + parseInt(style.borderRightWidth || '0', 10)
-  );
+function borderWidth(style: CSSStyleDeclaration): number {
+  return parseInt(style.borderLeftWidth || '0', 10) + parseInt(style.borderRightWidth || '0', 10);
 }
 
-function Editable (props: EditableProps, ref: React.Ref<Focusable>): JSX.Element {
+function Editable(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLInputElement>(null);
   const elementProps = useEditable(props, ref, elementRef);
 
@@ -136,12 +132,7 @@ function Editable (props: EditableProps, ref: React.Ref<Focusable>): JSX.Element
     }
   });
 
-  return (
-    <input
-      {...elementProps}
-      ref={elementRef}
-    />
-  );
+  return <input {...elementProps} ref={elementRef} />;
 }
 
 export default forwardRef(Editable);

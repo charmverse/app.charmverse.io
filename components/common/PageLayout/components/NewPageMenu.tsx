@@ -34,9 +34,9 @@ export const StyledArticleIcon = styled(ArticleIcon)`
   font-size: 22px;
 `;
 
-type Props = { addPage: (p: Partial<Page>) => void, tooltip: string, sx?: any };
+type Props = { addPage: (p: Partial<Page>) => void; tooltip: string; sx?: any };
 
-function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
+function NewPageMenu({ addPage, tooltip, ...props }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -53,23 +53,23 @@ function NewPageMenu ({ addPage, tooltip, ...props }: Props) {
 
   return (
     <>
-      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
+      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement="top" arrow>
         <StyledIconButton onClick={handleClick} {...props}>
-          <AddIcon color='secondary' />
+          <AddIcon color="secondary" />
         </StyledIconButton>
       </Tooltip>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={() => createPage({ type: 'page' })}>
-          <ListItemIcon><StyledArticleIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <StyledArticleIcon fontSize="small" />
+          </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
         <MenuItem onClick={() => createPage({ type: 'board' })}>
-          <ListItemIcon><StyledDatabaseIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <StyledDatabaseIcon fontSize="small" />
+          </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Database</Typography>
         </MenuItem>
       </Menu>

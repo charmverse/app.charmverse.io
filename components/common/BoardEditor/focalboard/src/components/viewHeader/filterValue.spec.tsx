@@ -1,4 +1,3 @@
-
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -43,11 +42,7 @@ describe('components/viewHeader/filterValue', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterValue
-            view={activeView}
-            filter={filter}
-            template={board.fields.cardProperties[0]}
-          />
+          <FilterValue view={activeView} filter={filter} template={board.fields.cardProperties[0]} />
         </ReduxProvider>
       )
     );
@@ -59,11 +54,7 @@ describe('components/viewHeader/filterValue', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterValue
-            view={activeView}
-            filter={filter}
-            template={board.fields.cardProperties[0]}
-          />
+          <FilterValue view={activeView} filter={filter} template={board.fields.cardProperties[0]} />
         </ReduxProvider>
       )
     );
@@ -80,11 +71,7 @@ describe('components/viewHeader/filterValue', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterValue
-            view={activeView}
-            filter={filter}
-            template={board.fields.cardProperties[0]}
-          />
+          <FilterValue view={activeView} filter={filter} template={board.fields.cardProperties[0]} />
         </ReduxProvider>
       )
     );

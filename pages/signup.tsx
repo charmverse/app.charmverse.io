@@ -7,7 +7,7 @@ import { useSpaces } from 'hooks/useSpaces';
 
 import { getDefaultWorkspaceUrl } from './index';
 
-export default function LoginPage () {
+export default function LoginPage() {
   const { spaces } = useSpaces();
   const router = useRouter();
 
@@ -16,9 +16,7 @@ export default function LoginPage () {
       router.push(getDefaultWorkspaceUrl(spaces));
     }
   }, [spaces]);
-  return (
-    <SignupForm />
-  );
+  return <SignupForm />;
 }
 
 LoginPage.getLayout = getBaseLayout;

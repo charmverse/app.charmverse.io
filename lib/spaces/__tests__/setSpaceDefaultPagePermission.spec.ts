@@ -22,8 +22,7 @@ describe('setSpaceDefaultPagePermission', () => {
         spaceId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(SpaceNotFoundError);
     }
   });

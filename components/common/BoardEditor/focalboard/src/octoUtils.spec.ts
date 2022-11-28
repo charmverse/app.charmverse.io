@@ -48,7 +48,7 @@ test('duplicateBlockTree: Card', async () => {
   }
 });
 
-function createBoardTree (): [Block[], Block] {
+function createBoardTree(): [Block[], Block] {
   const blocks: Block[] = [];
 
   const board = TestBlockFactory.createBoard();
@@ -71,7 +71,7 @@ function createBoardTree (): [Block[], Block] {
   return [blocks, board];
 }
 
-function createCardTree (): [Block[], Block] {
+function createCardTree(): [Block[], Block] {
   const blocks: Block[] = [];
 
   const card = TestBlockFactory.createCard();

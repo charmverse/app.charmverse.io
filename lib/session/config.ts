@@ -1,4 +1,3 @@
-
 import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
 
 declare module 'iron-session' {

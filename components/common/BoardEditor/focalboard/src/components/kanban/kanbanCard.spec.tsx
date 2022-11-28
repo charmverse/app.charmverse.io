@@ -50,57 +50,63 @@ describe('src/components/kanban/kanbanCard', () => {
   const store = mockStateStore([], state);
   beforeEach(jest.clearAllMocks);
   test('should match snapshot', () => {
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <KanbanCard
-          card={card}
-          board={board}
-          visiblePropertyTemplates={[propertyTemplate]}
-          visibleBadges={false}
-          isSelected={false}
-          readOnly={false}
-          onDrop={jest.fn()}
-          showCard={jest.fn()}
-          isManualSort={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <KanbanCard
+            card={card}
+            board={board}
+            visiblePropertyTemplates={[propertyTemplate]}
+            visibleBadges={false}
+            isSelected={false}
+            readOnly={false}
+            onDrop={jest.fn()}
+            showCard={jest.fn()}
+            isManualSort={false}
+          />
+        </ReduxProvider>
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot with readonly', () => {
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <KanbanCard
-          card={card}
-          board={board}
-          visiblePropertyTemplates={[propertyTemplate]}
-          visibleBadges={false}
-          isSelected={false}
-          readOnly={true}
-          onDrop={jest.fn()}
-          showCard={jest.fn()}
-          isManualSort={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <KanbanCard
+            card={card}
+            board={board}
+            visiblePropertyTemplates={[propertyTemplate]}
+            visibleBadges={false}
+            isSelected={false}
+            readOnly={true}
+            onDrop={jest.fn()}
+            showCard={jest.fn()}
+            isManualSort={false}
+          />
+        </ReduxProvider>
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('return kanbanCard and click on delete menu ', () => {
-    const result = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <KanbanCard
-          card={card}
-          board={board}
-          visiblePropertyTemplates={[propertyTemplate]}
-          visibleBadges={false}
-          isSelected={false}
-          readOnly={false}
-          onDrop={jest.fn()}
-          showCard={jest.fn()}
-          isManualSort={false}
-        />
-      </ReduxProvider>
-    ));
+    const result = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <KanbanCard
+            card={card}
+            board={board}
+            visiblePropertyTemplates={[propertyTemplate]}
+            visibleBadges={false}
+            isSelected={false}
+            readOnly={false}
+            onDrop={jest.fn()}
+            showCard={jest.fn()}
+            isManualSort={false}
+          />
+        </ReduxProvider>
+      )
+    );
 
     const { container } = result;
 
@@ -122,21 +128,23 @@ describe('src/components/kanban/kanbanCard', () => {
   });
 
   test('return kanbanCard and click on duplicate menu ', () => {
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <KanbanCard
-          card={card}
-          board={board}
-          visiblePropertyTemplates={[propertyTemplate]}
-          visibleBadges={false}
-          isSelected={false}
-          readOnly={false}
-          onDrop={jest.fn()}
-          showCard={jest.fn()}
-          isManualSort={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <KanbanCard
+            card={card}
+            board={board}
+            visiblePropertyTemplates={[propertyTemplate]}
+            visibleBadges={false}
+            isSelected={false}
+            readOnly={false}
+            onDrop={jest.fn()}
+            showCard={jest.fn()}
+            isManualSort={false}
+          />
+        </ReduxProvider>
+      )
+    );
     const elementMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(elementMenuWrapper).not.toBeNull();
     userEvent.click(elementMenuWrapper);
@@ -148,21 +156,23 @@ describe('src/components/kanban/kanbanCard', () => {
   });
 
   test('return kanbanCard and click on copy link menu ', () => {
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <KanbanCard
-          card={card}
-          board={board}
-          visiblePropertyTemplates={[propertyTemplate]}
-          visibleBadges={false}
-          isSelected={false}
-          readOnly={false}
-          onDrop={jest.fn()}
-          showCard={jest.fn()}
-          isManualSort={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <KanbanCard
+            card={card}
+            board={board}
+            visiblePropertyTemplates={[propertyTemplate]}
+            visibleBadges={false}
+            isSelected={false}
+            readOnly={false}
+            onDrop={jest.fn()}
+            showCard={jest.fn()}
+            isManualSort={false}
+          />
+        </ReduxProvider>
+      )
+    );
     const elementMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(elementMenuWrapper).not.toBeNull();
     userEvent.click(elementMenuWrapper);

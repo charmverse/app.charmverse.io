@@ -1,7 +1,6 @@
-
 type AsyncTask = (...args: any) => Promise<any>;
 
-export default function debouncePromise<T extends AsyncTask> (task: T, ms: number): AsyncTask {
+export default function debouncePromise<T extends AsyncTask>(task: T, ms: number): AsyncTask {
   let t: ReturnType<typeof deferred> = {
     cancel: () => null,
     promise: Promise.resolve()
@@ -12,12 +11,13 @@ export default function debouncePromise<T extends AsyncTask> (task: T, ms: numbe
       t = deferred(ms);
       await t.promise;
       return await task(...args);
+    } catch (_) {
+      /* prevent memory leak */
     }
-    catch (_) { /* prevent memory leak */ }
   };
 }
 
-function deferred (ms: number) {
+function deferred(ms: number) {
   let cancel: () => void = () => null;
   const promise = new Promise((resolve, reject) => {
     cancel = reject;

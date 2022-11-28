@@ -7,10 +7,17 @@ import CenterPanel from 'components/common/BoardEditor/focalboard/src/components
 import { FlashMessages, sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import {
+  getCurrentBoard,
+  setCurrent as setCurrentBoard
+} from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
-import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import {
+  getCurrentBoardViews,
+  getView,
+  setCurrent as setCurrentView
+} from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import type { PageMeta } from 'lib/pages';
@@ -30,13 +37,13 @@ interface Props {
   pagePermissions?: IPagePermissionFlags;
 }
 
-export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
+export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const activeView = useAppSelector(getView(router.query.viewId as string));
   const boardViews = useAppSelector(getCurrentBoardViews);
   const dispatch = useAppDispatch();
-  const [shownCardId, setShownCardId] = useState<string | null>(router.query.cardId as string ?? null);
+  const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
@@ -63,7 +70,6 @@ export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions
       dispatch(setCurrentBoard(boardId));
       dispatch(setCurrentView(urlViewId || ''));
     }
-
   }, [page.boardId, router.query.viewId, boardViews]);
 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
@@ -81,13 +87,11 @@ export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions
       mutator.undo().then(() => {
         if (description) {
           sendFlashMessage({ content: `Undo ${description}`, severity: 'low' });
-        }
-        else {
+        } else {
           sendFlashMessage({ content: 'Undo', severity: 'low' });
         }
       });
-    }
-    else {
+    } else {
       sendFlashMessage({ content: 'Nothing to Undo', severity: 'low' });
     }
   });
@@ -99,29 +103,28 @@ export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions
       mutator.redo().then(() => {
         if (description) {
           sendFlashMessage({ content: `Redo ${description}`, severity: 'low' });
-        }
-        else {
+        } else {
           sendFlashMessage({ content: 'Redu', severity: 'low' });
         }
       });
-    }
-    else {
+    } else {
       sendFlashMessage({ content: 'Nothing to Redo', severity: 'low' });
     }
   });
 
-  const showCard = useCallback((cardId: string | null = null) => {
-    setUrlWithoutRerender(router.pathname, { viewId: router.query.viewId as string, cardId });
-    setShownCardId(cardId);
-  }, [router.query]);
+  const showCard = useCallback(
+    (cardId: string | null = null) => {
+      setUrlWithoutRerender(router.pathname, { viewId: router.query.viewId as string, cardId });
+      setShownCardId(cardId);
+    },
+    [router.query]
+  );
 
   if (board && activeView) {
-
     return (
       <>
         <FlashMessages milliseconds={2000} />
-        <div className='focalboard-body full-page'>
-
+        <div className="focalboard-body full-page">
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
             board={board}

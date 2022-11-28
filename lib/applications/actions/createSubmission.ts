@@ -7,7 +7,11 @@ import { DuplicateDataError, MissingDataError, UnauthorisedActionError } from 'l
 import type { SubmissionCreationData } from '../interfaces';
 import { bountyCanReceiveNewSubmissionsOrApplications } from '../shared';
 
-export async function createSubmission ({ bountyId, submissionContent, userId }: SubmissionCreationData): Promise<Application> {
+export async function createSubmission({
+  bountyId,
+  submissionContent,
+  userId
+}: SubmissionCreationData): Promise<Application> {
   const bounty = await getBountyOrThrow(bountyId);
 
   if (bounty.approveSubmitters === true) {
@@ -18,7 +22,7 @@ export async function createSubmission ({ bountyId, submissionContent, userId }:
     throw new UnauthorisedActionError('This bounty cannot accept submissions');
   }
 
-  const existingApplication = bounty.applications.find(app => app.createdBy === userId);
+  const existingApplication = bounty.applications.find((app) => app.createdBy === userId);
 
   if (existingApplication) {
     throw new DuplicateDataError('You already have a submission for this bounty');
@@ -38,7 +42,10 @@ export async function createSubmission ({ bountyId, submissionContent, userId }:
       status: 'review',
       walletAddress: submissionContent.walletAddress,
       submission: submissionContent.submission,
-      submissionNodes: typeof submissionContent.submissionNodes === 'object' ? JSON.stringify(submissionContent.submissionNodes) : submissionContent.submissionNodes,
+      submissionNodes:
+        typeof submissionContent.submissionNodes === 'object'
+          ? JSON.stringify(submissionContent.submissionNodes)
+          : submissionContent.submissionNodes,
       bounty: {
         connect: {
           id: bountyId
@@ -52,5 +59,4 @@ export async function createSubmission ({ bountyId, submissionContent, userId }:
       spaceId: bounty.spaceId
     }
   });
-
 }

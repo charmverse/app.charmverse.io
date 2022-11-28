@@ -28,8 +28,10 @@ interface ProposalPropertiesProps {
   isTemplate: boolean;
 }
 
-export default function ProposalProperties ({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
-  const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () => charmClient.proposals.getProposal(proposalId));
+export default function ProposalProperties({ pageId, proposalId, readOnly, isTemplate }: ProposalPropertiesProps) {
+  const { data: proposal, mutate: refreshProposal } = useSWR(`proposal/${proposalId}`, () =>
+    charmClient.proposals.getProposal(proposalId)
+  );
   const { categories, canEditProposalCategories, addCategory, deleteCategory } = useProposalCategories();
 
   const { members } = useMembers();
@@ -45,20 +47,27 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
   const proposalReviewers = proposal?.reviewers ?? [];
   const proposalReviewerId = proposal?.reviewedBy;
 
-  const proposalReviewer = members?.find(member => member.id === proposalReviewerId);
+  const proposalReviewer = members?.find((member) => member.id === proposalReviewerId);
 
-  const isProposalAuthor = (user && proposalAuthors.some(author => author.userId === user.id));
+  const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
 
-  const isProposalReviewer = (user && (proposalReviewers.some(reviewer => {
-    if (reviewer.userId) {
-      return reviewer.userId === user.id;
-    }
-    return roleups.some(role => role.id === reviewer.roleId && role.users.some(_user => _user.id === user.id));
-  })));
+  const isProposalReviewer =
+    user &&
+    proposalReviewers.some((reviewer) => {
+      if (reviewer.userId) {
+        return reviewer.userId === user.id;
+      }
+      return roleups.some((role) => role.id === reviewer.roleId && role.users.some((_user) => _user.id === user.id));
+    });
 
-  const canUpdateProposalProperties = (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') && (isProposalAuthor || isAdmin);
+  const canUpdateProposalProperties =
+    (proposalStatus === 'draft' || proposalStatus === 'private_draft' || proposalStatus === 'discussion') &&
+    (isProposalAuthor || isAdmin);
 
-  const reviewerOptionsRecord: Record<string, ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)> = {};
+  const reviewerOptionsRecord: Record<
+    string,
+    ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)
+  > = {};
 
   const currentUserGroups: ProposalUserGroup[] = [];
   if (isProposalAuthor) {
@@ -69,29 +78,32 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
     currentUserGroups.push('reviewer');
   }
 
-  members.forEach(member => {
+  members.forEach((member) => {
     reviewerOptionsRecord[member.id] = {
       ...member,
       group: 'user'
     };
   });
 
-  roles.forEach(role => {
+  roles.forEach((role) => {
     reviewerOptionsRecord[role.id] = {
       ...role,
       group: 'role'
     };
   });
 
-  async function onChangeCategory (updatedCategory: ProposalCategory | null) {
+  async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (!proposal) {
       return;
     }
 
     await charmClient.proposals.updateProposal({
       proposalId: proposal.id,
-      authors: proposal.authors.map(author => author.userId),
-      reviewers: proposalReviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string })),
+      authors: proposal.authors.map((author) => author.userId),
+      reviewers: proposalReviewers.map((reviewer) => ({
+        group: reviewer.roleId ? 'role' : 'user',
+        id: reviewer.roleId ?? (reviewer.userId as string)
+      })),
       categoryId: updatedCategory?.id || null
     });
 
@@ -100,7 +112,7 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
 
   return (
     <Box
-      className='octo-propertylist'
+      className="octo-propertylist"
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
@@ -108,34 +120,29 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
       }}
       mt={2}
     >
-      {
-        !isTemplate && (
-          <Grid
-            container
-            mb={2}
-          >
-            <ProposalStepper
-              proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
-              proposal={proposal}
-              refreshProposal={refreshProposal}
-            />
-          </Grid>
-        )
-      }
+      {!isTemplate && (
+        <Grid container mb={2}>
+          <ProposalStepper
+            proposalUserGroups={isAdmin ? ['author', 'reviewer'] : currentUserGroups}
+            proposal={proposal}
+            refreshProposal={refreshProposal}
+          />
+        </Grid>
+      )}
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Box display='flex' gap={1} alignItems='center'>
-            <Typography fontWeight='bold'>Proposal information</Typography>
+          <Box display="flex" gap={1} alignItems="center">
+            <Typography fontWeight="bold">Proposal information</Typography>
           </Box>
         </Grid>
       </Grid>
 
-      <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
-        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <div className='octo-propertyname octo-propertyname--readonly'>
+      <Box justifyContent="space-between" gap={2} alignItems="center" my="6px">
+        <Box display="flex" height="fit-content" flex={1} className="octo-propertyrow">
+          <div className="octo-propertyname octo-propertyname--readonly">
             <Button>Category</Button>
           </div>
-          <Box display='flex' flex={1}>
+          <Box display="flex" flex={1}>
             <ProposalCategoryInput
               disabled={readOnly || !canUpdateProposalProperties || !proposal}
               options={categories || []}
@@ -149,32 +156,35 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
         </Box>
       </Box>
 
-      <Box justifyContent='space-between' gap={2} alignItems='center'>
+      <Box justifyContent="space-between" gap={2} alignItems="center">
         <div
-          className='octo-propertyrow'
+          className="octo-propertyrow"
           style={{
             display: 'flex',
             height: 'fit-content',
             flexGrow: 1
           }}
         >
-          <div className='octo-propertyname octo-propertyname--readonly'>
+          <div className="octo-propertyname octo-propertyname--readonly">
             <Button>Author</Button>
           </div>
           <div style={{ width: '100%' }}>
             <InputSearchMemberBase
               filterSelectedOptions
               multiple
-              placeholder='Select authors'
-              value={members.filter(member => proposalAuthors.find(author => member.id === author.userId))}
+              placeholder="Select authors"
+              value={members.filter((member) => proposalAuthors.find((author) => member.id === author.userId))}
               disableCloseOnSelect
               onChange={async (_, _members) => {
                 // Must have atleast one author of proposal
                 if ((_members as Member[]).length !== 0) {
                   await charmClient.proposals.updateProposal({
                     proposalId,
-                    authors: (_members as Member[]).map(member => member.id),
-                    reviewers: proposalReviewers.map(reviewer => ({ group: reviewer.roleId ? 'role' : 'user', id: reviewer.roleId ?? reviewer.userId as string }))
+                    authors: (_members as Member[]).map((member) => member.id),
+                    reviewers: proposalReviewers.map((reviewer) => ({
+                      group: reviewer.roleId ? 'role' : 'user',
+                      id: reviewer.roleId ?? (reviewer.userId as string)
+                    }))
                   });
                   refreshProposal();
                 }
@@ -189,53 +199,51 @@ export default function ProposalProperties ({ pageId, proposalId, readOnly, isTe
           </div>
         </div>
       </Box>
-      <Box justifyContent='space-between' gap={2} alignItems='center'>
+      <Box justifyContent="space-between" gap={2} alignItems="center">
         <div
-          className='octo-propertyrow'
+          className="octo-propertyrow"
           style={{
             display: 'flex',
             height: 'fit-content',
             flexGrow: 1
           }}
         >
-          <div className='octo-propertyname octo-propertyname--readonly'>
+          <div className="octo-propertyname octo-propertyname--readonly">
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
-            {
-              proposalStatus === 'reviewed' && proposalReviewer ? (
-                <UserDisplay
-                  user={proposalReviewer}
-                  avatarSize='small'
-                />
-              ) : (
-                <InputSearchReviewers
-                  disabled={readOnly || !canUpdateProposalProperties}
-                  readOnly={readOnly}
-                  value={proposalReviewers.map(reviewer => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string])}
-                  disableCloseOnSelect={true}
-                  excludedIds={proposalReviewers.map(reviewer => (reviewer.roleId ?? reviewer.userId) as string)}
-                  onChange={async (e, options) => {
-                    await charmClient.proposals.updateProposal({
-                      proposalId,
-                      authors: proposalAuthors.map(author => author.userId),
-                      reviewers: options.map(option => ({ group: option.group, id: option.id }))
-                    });
-                    refreshProposal();
-                  }}
-                  sx={{
-                    width: '100%'
-                  }}
-                />
-              )
-            }
+            {proposalStatus === 'reviewed' && proposalReviewer ? (
+              <UserDisplay user={proposalReviewer} avatarSize="small" />
+            ) : (
+              <InputSearchReviewers
+                disabled={readOnly || !canUpdateProposalProperties}
+                readOnly={readOnly}
+                value={proposalReviewers.map(
+                  (reviewer) => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string]
+                )}
+                disableCloseOnSelect={true}
+                excludedIds={proposalReviewers.map((reviewer) => (reviewer.roleId ?? reviewer.userId) as string)}
+                onChange={async (e, options) => {
+                  await charmClient.proposals.updateProposal({
+                    proposalId,
+                    authors: proposalAuthors.map((author) => author.userId),
+                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
+                  });
+                  refreshProposal();
+                }}
+                sx={{
+                  width: '100%'
+                }}
+              />
+            )}
           </div>
         </div>
       </Box>
 
-      <Divider sx={{
-        my: 2
-      }}
+      <Divider
+        sx={{
+          my: 2
+        }}
       />
     </Box>
   );

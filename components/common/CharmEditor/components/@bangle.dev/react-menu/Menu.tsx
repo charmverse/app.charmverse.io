@@ -8,12 +8,12 @@ const StyledMenu = styled(Paper)<{ type?: SubMenu }>`
   display: flex;
   padding: ${({ theme }) => theme.spacing(0.75, 0.5)};
   ${({ theme, type }) => type === 'defaultMenu' && theme.breakpoints.down('sm')} {
-   width: 100vw;
-   overflow-x: auto;
+    width: 100vw;
+    overflow-x: auto;
   }
 `;
 
-export function Menu ({
+export function Menu({
   className = '',
   children,
   type

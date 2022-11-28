@@ -30,7 +30,7 @@ const StyledPageBanner = styled(Box)<{ focalBoard?: boolean }>`
   }
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .page-cover-controls {
-      right: ${({ focalBoard }) => focalBoard ? '10px' : '200px'};
+      right: ${({ focalBoard }) => (focalBoard ? '10px' : '200px')};
     }
   }
 
@@ -55,8 +55,10 @@ const bannerImageGroups = {
   ]
 };
 
-export function randomBannerImage () {
-  return bannerImageGroups['Color & Gradient'][randomIntFromInterval(0, bannerImageGroups['Color & Gradient'].length - 1)];
+export function randomBannerImage() {
+  return bannerImageGroups['Color & Gradient'][
+    randomIntFromInterval(0, bannerImageGroups['Color & Gradient'].length - 1)
+  ];
 }
 
 interface PageBannerProps {
@@ -66,11 +68,10 @@ interface PageBannerProps {
   setPage: (page: { headerImage: string | null }) => void;
 }
 
-function PageBanner ({ focalBoard, headerImage, readOnly, setPage }: PageBannerProps) {
-
+function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerProps) {
   const theme = useTheme();
 
-  function setImage (_headerImage: string | null) {
+  function setImage(_headerImage: string | null) {
     setPage({ headerImage: _headerImage });
   }
 
@@ -87,12 +88,9 @@ function PageBanner ({ focalBoard, headerImage, readOnly, setPage }: PageBannerP
             gap: theme.spacing(0.25),
             boxShadow: theme.shadows[2]
           }}
-          className='page-cover-controls'
+          className="page-cover-controls"
         >
-          <ImageSelector
-            galleryImages={bannerImageGroups}
-            onImageSelect={setImage}
-          >
+          <ImageSelector galleryImages={bannerImageGroups} onImageSelect={setImage}>
             <ListItem
               button
               disableRipple
@@ -103,7 +101,7 @@ function PageBanner ({ focalBoard, headerImage, readOnly, setPage }: PageBannerP
                 padding: theme.spacing(0.5, 1.5)
               }}
             >
-              <Typography variant='subtitle1' whiteSpace='nowrap'>
+              <Typography variant="subtitle1" whiteSpace="nowrap">
                 Change Cover
               </Typography>
             </ListItem>
@@ -118,10 +116,7 @@ function PageBanner ({ focalBoard, headerImage, readOnly, setPage }: PageBannerP
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography
-              variant='subtitle1'
-              onClick={() => setImage(null)}
-            >
+            <Typography variant="subtitle1" onClick={() => setImage(null)}>
               Remove
             </Typography>
           </ListItem>

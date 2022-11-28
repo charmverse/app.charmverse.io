@@ -1,6 +1,6 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
-export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
+export function AggregatedDataItem({ value, label }: { value: number; label: string }) {
   return (
     <Paper
       sx={{
@@ -17,35 +17,42 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
       }}
     >
       <Typography
-        color='secondary'
+        color="secondary"
         sx={{
           fontWeight: 500
         }}
-      > {label}
+      >
+        {' '}
+        {label}
       </Typography>
-      <Typography sx={{
-        fontSize: {
-          xs: '1.5rem',
-          sm: '1.75rem'
-        },
-        fontWeight: 'bold'
-      }}
+      <Typography
+        sx={{
+          fontSize: {
+            xs: '1.5rem',
+            sm: '1.75rem'
+          },
+          fontWeight: 'bold'
+        }}
       >
         {value}
       </Typography>
-
     </Paper>
   );
 }
 
-export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
+export default function AggregatedData({
+  totalBounties,
+  totalCommunities,
+  totalProposals,
+  totalVotes
+}: {
   totalCommunities: number;
   totalProposals: number;
   totalVotes: number;
   totalBounties: number;
 }) {
   return (
-    <Grid container display='flex' gap={2} flexDirection='column'>
+    <Grid container display="flex" gap={2} flexDirection="column">
       <Box
         gap={1}
         sx={{
@@ -56,10 +63,10 @@ export default function AggregatedData ({ totalBounties, totalCommunities, total
           }
         }}
       >
-        <AggregatedDataItem label='Communities' value={totalCommunities} />
-        <AggregatedDataItem label='Proposals' value={totalProposals} />
-        <AggregatedDataItem label='Votes' value={totalVotes} />
-        <AggregatedDataItem label='Bounties' value={totalBounties} />
+        <AggregatedDataItem label="Communities" value={totalCommunities} />
+        <AggregatedDataItem label="Proposals" value={totalProposals} />
+        <AggregatedDataItem label="Votes" value={totalVotes} />
+        <AggregatedDataItem label="Bounties" value={totalBounties} />
       </Box>
     </Grid>
   );

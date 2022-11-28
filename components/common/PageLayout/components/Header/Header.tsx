@@ -65,8 +65,7 @@ interface HeaderProps {
 
 const documentTypes = ['page', 'card', 'proposal', 'proposal_template', 'bounty'];
 
-export default function Header ({ open, openSidebar }: HeaderProps) {
-
+export default function Header({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
   const colorMode = useColorMode();
   const { pages, updatePage, getPagePermissions, deletePage } = usePages();
@@ -77,17 +76,18 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const pageMenuAnchor = useRef();
   const { showMessage } = useSnackbar();
   const basePageId = router.query.pageId as string;
-  const basePage = Object.values(pages).find(page => page?.id === basePageId || page?.path === basePageId);
+  const basePage = Object.values(pages).find((page) => page?.id === basePageId || page?.path === basePageId);
   const { isFavorite, toggleFavorite } = useToggleFavorite({ pageId: basePage?.id });
 
   const pagePermissions = basePage ? getPagePermissions(basePage.id) : null;
 
   const pageType = basePage?.type;
-  const isExportablePage = pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
+  const isExportablePage =
+    pageType === 'card' || pageType === 'page' || pageType === 'proposal' || pageType === 'bounty';
 
   const isBountyBoard = router.route === '/[domain]/bounties';
 
-  async function exportMarkdown () {
+  async function exportMarkdown() {
     if (!basePage) {
       return;
     }
@@ -125,7 +125,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
     }
   };
 
-  async function onDeletePage () {
+  async function onDeletePage() {
     if (basePage) {
       await deletePage({
         pageId: basePage.id
@@ -140,60 +140,63 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const canCreateProposal = !!userSpacePermissions?.createVote;
-  const pageCreator = basePage ? members.find(member => member.id === basePage.createdBy) : null;
+  const pageCreator = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
-  function onCopyLink () {
+  function onCopyLink() {
     Utils.copyTextToClipboard(window.location.href);
     showMessage('Copied link to clipboard', 'success');
     setPageMenuOpen(false);
   }
 
-  async function convertToProposal (pageId: string) {
+  async function convertToProposal(pageId: string) {
     setPageMenuOpen(false);
     await charmClient.pages.convertToProposal(pageId);
   }
 
   const documentOptions = (
     <List dense>
-      <ListItemButton onClick={() => {
-        setCurrentPageActionDisplay('comments');
-        setPageMenuOpen(false);
-      }}
+      <ListItemButton
+        onClick={() => {
+          setCurrentPageActionDisplay('comments');
+          setPageMenuOpen(false);
+        }}
       >
         <MessageOutlinedIcon
-          fontSize='small'
+          fontSize="small"
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='View comments' />
+        <ListItemText primary="View comments" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => {
-        setCurrentPageActionDisplay('suggestions');
-        setPageMenuOpen(false);
-      }}
+      <ListItemButton
+        onClick={() => {
+          setCurrentPageActionDisplay('suggestions');
+          setPageMenuOpen(false);
+        }}
       >
         <RateReviewOutlinedIcon
-          fontSize='small'
+          fontSize="small"
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='View suggestions' />
+        <ListItemText primary="View suggestions" />
       </ListItemButton>
-      <ListItemButton onClick={() => {
-        setCurrentPageActionDisplay('polls');
-        setPageMenuOpen(false);
-      }}
+      <ListItemButton
+        onClick={() => {
+          setCurrentPageActionDisplay('polls');
+          setPageMenuOpen(false);
+        }}
       >
         <FormatListBulletedOutlinedIcon
-          fontSize='small'
+          fontSize="small"
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='View polls' />
+        <ListItemText primary="View polls" />
       </ListItemButton>
       <Divider />
       <ListItemButton
@@ -202,68 +205,57 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           setPageMenuOpen(false);
         }}
       >
-        <Box sx={{
-          mr: 0.5,
-          position: 'relative',
-          left: -4,
-          display: 'flex',
-          alignItems: 'center'
-        }}
+        <Box
+          sx={{
+            mr: 0.5,
+            position: 'relative',
+            left: -4,
+            display: 'flex',
+            alignItems: 'center'
+          }}
         >
-          {isFavorite ? (
-            <FavoritedIcon />
-          ) : (
-            <NotFavoritedIcon />
-          )}
+          {isFavorite ? <FavoritedIcon /> : <NotFavoritedIcon />}
         </Box>
         <ListItemText primary={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} />
       </ListItemButton>
-      <ListItemButton
-        onClick={onCopyLink}
-      >
+      <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
-          fontSize='small'
+          fontSize="small"
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='Copy link' />
+        <ListItemText primary="Copy link" />
       </ListItemButton>
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
-              <ListItemButton
-                onClick={() => convertToProposal(basePage.id)}
-                disabled={!canCreateProposal}
-              >
+              <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
                 <TaskOutlinedIcon
-                  fontSize='small'
+                  fontSize="small"
                   sx={{
                     mr: 1
                   }}
                 />
-                <ListItemText primary='Convert to proposal' />
+                <ListItemText primary="Convert to proposal" />
               </ListItemButton>
             </div>
           </Tooltip>
           <Divider />
         </>
       )}
-      <Tooltip title={!pagePermissions?.delete ? 'You don\'t have permission to delete this page' : ''}>
+      <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>
-          <ListItemButton
-            disabled={!pagePermissions?.delete || basePage?.deletedAt !== null}
-            onClick={onDeletePage}
-          >
+          <ListItemButton disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} onClick={onDeletePage}>
             <DeleteOutlineOutlinedIcon
-              fontSize='small'
+              fontSize="small"
               sx={{
                 mr: 1
               }}
             />
-            <ListItemText primary='Delete' />
+            <ListItemText primary="Delete" />
           </ListItemButton>
         </div>
       </Tooltip>
@@ -279,7 +271,7 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
           )}
         />
       )}
-      <Tooltip title={!isExportablePage ? 'This page can\'t be exported' : ''}>
+      <Tooltip title={!isExportablePage ? "This page can't be exported" : ''}>
         <div>
           <ListItemButton
             disabled={!isExportablePage}
@@ -289,12 +281,12 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             }}
           >
             <GetAppOutlinedIcon
-              fontSize='small'
+              fontSize="small"
               sx={{
                 mr: 1
               }}
             />
-            <ListItemText primary='Export to markdown' />
+            <ListItemText primary="Export to markdown" />
           </ListItemButton>
         </div>
       </Tooltip>
@@ -307,40 +299,29 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
             display: 'flex',
             justifyContent: 'space-between'
           }}
-          labelPlacement='start'
-          control={(
-            <Switch
-              size='small'
-              checked={isFullWidth}
-              onChange={onSwitchChange}
-            />
-          )}
-          label={<Typography variant='body2'>Full Width</Typography>}
+          labelPlacement="start"
+          control={<Switch size="small" checked={isFullWidth} onChange={onSwitchChange} />}
+          label={<Typography variant="body2">Full Width</Typography>}
         />
       </ListItemButton>
-      {
-        pageCreator && basePage && (
-          <>
-            <Divider />
-            <Stack sx={{
+      {pageCreator && basePage && (
+        <>
+          <Divider />
+          <Stack
+            sx={{
               mx: 2,
               my: 1
             }}
-            >
-              <Typography variant='subtitle2'>
-                Last edited by {pageCreator.username}
-              </Typography>
-              <Typography variant='subtitle2'>
-                Last edited at {humanFriendlyDate(basePage.updatedAt)}
-              </Typography>
-            </Stack>
-          </>
-        )
-      }
+          >
+            <Typography variant="subtitle2">Last edited by {pageCreator.username}</Typography>
+            <Typography variant="subtitle2">Last edited at {humanFriendlyDate(basePage.updatedAt)}</Typography>
+          </Stack>
+        </>
+      )}
     </List>
   );
 
-  function closeMenu () {
+  function closeMenu() {
     setPageMenuOpen(false);
   }
 
@@ -348,17 +329,18 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
-  }
-  else if (isBasePageDatabase) {
-    pageOptionsList = <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage?.id} closeMenu={closeMenu} />;
+  } else if (isBasePageDatabase) {
+    pageOptionsList = (
+      <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage?.id} closeMenu={closeMenu} />
+    );
   }
 
   return (
-    <StyledToolbar variant='dense'>
+    <StyledToolbar variant="dense">
       <IconButton
-        color='inherit'
+        color="inherit"
         onClick={openSidebar}
-        edge='start'
+        edge="start"
         sx={{
           display: 'inline-flex',
           mr: 2,
@@ -368,47 +350,41 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
         <MenuIcon />
       </IconButton>
 
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        alignSelf: 'stretch',
-        gap: 1,
-        width: '100%'
-      }}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          alignSelf: 'stretch',
+          gap: 1,
+          width: '100%'
+        }}
       >
         <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
-        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
-
-          {
-            isBountyBoard && (
-              <BountyShareButton headerHeight={headerHeight} />
-            )
-          }
+        <Box display="flex" alignItems="center" alignSelf="stretch" mr={-1}>
+          {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
 
           {basePage && (
             <>
               {isBasePageDocument && <DocumentParticipants />}
               <DocumentHistory page={basePage} />
               {isBasePageDocument && <EditingModeToggle />}
-              {basePage?.deletedAt === null && (
-                <ShareButton headerHeight={headerHeight} pageId={basePage.id} />
-              )}
+              {basePage?.deletedAt === null && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
             </>
           )}
 
           {pageOptionsList && (
-            <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
+            <Box ref={pageMenuAnchor} display="flex" alignSelf="stretch" alignItems="center">
               <div>
                 <IconButton
-                  size='small'
+                  size="small"
                   onClick={() => {
                     setPageMenuOpen(!pageMenuOpen);
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title='View comments, polls, export content and more' arrow>
-                    <MoreHorizIcon color='secondary' />
+                  <Tooltip title="View comments, polls, export content and more" arrow>
+                    <MoreHorizIcon color="secondary" />
                   </Tooltip>
                 </IconButton>
               </div>
@@ -429,9 +405,22 @@ export default function Header ({ open, openSidebar }: HeaderProps) {
 
           {/** dark mode toggle */}
           {user && (
-            <IconButton size='small' sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-              <Tooltip title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`} arrow placement='top'>
-                {theme.palette.mode === 'dark' ? <SunIcon fontSize='small' color='secondary' /> : <MoonIcon fontSize='small' color='secondary' />}
+            <IconButton
+              size="small"
+              sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+            >
+              <Tooltip
+                title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
+                arrow
+                placement="top"
+              >
+                {theme.palette.mode === 'dark' ? (
+                  <SunIcon fontSize="small" color="secondary" />
+                ) : (
+                  <MoonIcon fontSize="small" color="secondary" />
+                )}
               </Tooltip>
             </IconButton>
           )}

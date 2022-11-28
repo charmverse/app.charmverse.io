@@ -13,32 +13,33 @@ type CaretPosition = {
   decoSpec: { id: string };
   sessionId: string;
   userId: string;
-}
-type CaretUpdate = { anchor: number, head: number };
-type Collaborator = { id: string, name: string };
+};
+type CaretUpdate = { anchor: number; head: number };
+type Collaborator = { id: string; name: string };
 
 type CollabState = {
   decos: DecorationSet;
   caretPositions: CaretPosition[];
   caretUpdate: CaretUpdate | false;
-}
+};
 
 export const getSelectionUpdate = function (state: EditorState): CaretUpdate {
   const { caretUpdate } = key.getState(state);
   return caretUpdate;
 };
 
-export const updateCollaboratorSelection = function (state: EditorState, collaborator: Collaborator, data: ClientSelectionMessage) {
-  let {
-    decos,
-    caretPositions
-  } = key.getState(state) as CollabState;
+export const updateCollaboratorSelection = function (
+  state: EditorState,
+  collaborator: Collaborator,
+  data: ClientSelectionMessage
+) {
+  let { decos, caretPositions } = key.getState(state) as CollabState;
 
-  const oldCarPos = caretPositions.find(carPos => carPos.sessionId === data.session_id);
+  const oldCarPos = caretPositions.find((carPos) => carPos.sessionId === data.session_id);
 
   if (oldCarPos) {
-    caretPositions = caretPositions.filter(carPos => carPos !== oldCarPos);
-    const removeDecos = decos.find().filter(deco => deco.spec === oldCarPos.decoSpec);
+    caretPositions = caretPositions.filter((carPos) => carPos !== oldCarPos);
+    const removeDecos = decos.find().filter((deco) => deco.spec === oldCarPos.decoSpec);
     decos = decos.remove(removeDecos);
   }
 
@@ -69,9 +70,14 @@ export const updateCollaboratorSelection = function (state: EditorState, collabo
   if (data.anchor !== data.head) {
     const from = data.head > data.anchor ? data.anchor : data.head;
     const to = data.anchor > data.head ? data.anchor : data.head;
-    const inlineDeco = Decoration.inline(from, to, {
-      class: `user-bg-${collaborator.id}`
-    }, decoSpec);
+    const inlineDeco = Decoration.inline(
+      from,
+      to,
+      {
+        class: `user-bg-${collaborator.id}`
+      },
+      decoSpec
+    );
     addDecos.push(inlineDeco);
   }
   decos = decos.add(state.doc, addDecos);
@@ -86,16 +92,13 @@ export const updateCollaboratorSelection = function (state: EditorState, collabo
 };
 
 export const removeCollaboratorSelection = function (state: EditorState, data: { session_id: string }) {
-  let {
-    decos,
-    caretPositions
-  } = key.getState(state) as CollabState;
+  let { decos, caretPositions } = key.getState(state) as CollabState;
 
-  const caretPosition = caretPositions.find(carPos => carPos.sessionId === data.session_id);
+  const caretPosition = caretPositions.find((carPos) => carPos.sessionId === data.session_id);
 
   if (caretPosition) {
-    caretPositions = caretPositions.filter(carPos => carPos !== caretPosition);
-    const removeDecos = decos.find().filter(deco => deco.spec === caretPosition.decoSpec);
+    caretPositions = caretPositions.filter((carPos) => carPos !== caretPosition);
+    const removeDecos = decos.find().filter((deco) => deco.spec === caretPosition.decoSpec);
     decos = decos.remove(removeDecos);
     const tr = state.tr.setMeta(key, {
       decos,
@@ -111,36 +114,33 @@ export const collabCaretsPlugin = function (options: { editor: { docInfo: { acce
   return new Plugin({
     key,
     state: {
-      init () {
+      init() {
         return {
           caretPositions: [],
           decos: DecorationSet.empty,
           caretUpdate: false
         };
       },
-      apply (tr, prev, oldState, state) {
+      apply(tr, prev, oldState, state) {
         const meta = tr.getMeta(key);
         if (meta) {
           // There has been an update, return values from meta instead
           // of previous values
           return meta;
         }
-        let {
-          decos,
-          caretPositions
-        } = this.getState(oldState) as CollabState;
+        let { decos, caretPositions } = this.getState(oldState) as CollabState;
         let caretUpdate: CaretUpdate | false = false;
 
-        decos = decos.map(tr.mapping, tr.doc, { onRemove: (decoSpec) => {
-          caretPositions = caretPositions.filter(
-            carPos => carPos.decoSpec !== decoSpec
-          );
-        } });
+        decos = decos.map(tr.mapping, tr.doc, {
+          onRemove: (decoSpec) => {
+            caretPositions = caretPositions.filter((carPos) => carPos.decoSpec !== decoSpec);
+          }
+        });
         if (
-          tr.selectionSet
-            && !sendableSteps(state)
-            && !tr.getMeta('row-handle-drag')
-            && !['review', 'review-tracked'].includes(options.editor.docInfo.access_rights)
+          tr.selectionSet &&
+          !sendableSteps(state) &&
+          !tr.getMeta('row-handle-drag') &&
+          !['review', 'review-tracked'].includes(options.editor.docInfo.access_rights)
         ) {
           caretUpdate = { anchor: tr.selection.anchor, head: tr.selection.head };
         }
@@ -153,10 +153,8 @@ export const collabCaretsPlugin = function (options: { editor: { docInfo: { acce
       }
     },
     props: {
-      decorations (state) {
-        const {
-          decos
-        } = this.getState(state);
+      decorations(state) {
+        const { decos } = this.getState(state);
         return decos;
       }
     }

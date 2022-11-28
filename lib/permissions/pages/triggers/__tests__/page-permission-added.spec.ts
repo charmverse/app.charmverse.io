@@ -1,4 +1,3 @@
-
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -11,7 +10,6 @@ import { setupPermissionsAfterPagePermissionAdded } from '../page-permission-add
  */
 describe('setupPermissionsAfterPagePermissionAdded', () => {
   it('should assign a new permission to all children', async () => {
-
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const root = await createPage({
@@ -48,7 +46,7 @@ describe('setupPermissionsAfterPagePermissionAdded', () => {
       getPage(child.id),
       getPage(nestedChild.id),
       getPage(ultraNestedChild.id)
-    ])) as IPageWithPermissions [];
+    ])) as IPageWithPermissions[];
 
     expect(childWithPermissions.permissions[0].inheritedFromPermission).toBe(rootPermission.id);
     expect(nestedChildWithPermissions.permissions[0].inheritedFromPermission).toBe(rootPermission.id);
@@ -56,7 +54,6 @@ describe('setupPermissionsAfterPagePermissionAdded', () => {
   });
 
   it('should not assign a new permission to a subtree if the top node of any subtree does not have at least the same amount of permissions as the parent', async () => {
-
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const root = await createPage({
@@ -106,14 +103,12 @@ describe('setupPermissionsAfterPagePermissionAdded', () => {
     const [nestedChildWithPermissions, superNestedChildWithPermissions] = (await Promise.all([
       getPage(nestedChild.id),
       getPage(superNestedChild.id)
-    ])) as IPageWithPermissions [];
+    ])) as IPageWithPermissions[];
 
     const nestedHasSinglePermission = nestedChildWithPermissions.permissions.length === 1;
     const superNestedHasSinglePermission = superNestedChildWithPermissions.permissions.length === 1;
 
     expect(nestedHasSinglePermission).toBe(true);
     expect(superNestedHasSinglePermission).toBe(true);
-
   });
-
 });

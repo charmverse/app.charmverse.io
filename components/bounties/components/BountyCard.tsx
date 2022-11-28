@@ -24,13 +24,13 @@ const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
-function BountyCard ({ onDelete, bounty, getPagePermissions, page, onClick }: Props) {
+function BountyCard({ onDelete, bounty, getPagePermissions, page, onClick }: Props) {
   const { pageDetails } = usePageDetails(page?.id);
   const pagePermission = getPagePermissions(page.id);
   return (
     <StyledBox
       onClick={onClick}
-      className='KanbanCard'
+      className="KanbanCard"
       sx={{
         height: 'fit-content',
         display: 'grid' // make child full height,
@@ -46,21 +46,19 @@ function BountyCard ({ onDelete, bounty, getPagePermissions, page, onClick }: Pr
           justifyContent: 'space-between'
         }}
       >
-        <CardHeader title={page?.title || 'Untitled'} sx={{ p: 0 }} titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }} />
-        <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
-          <Typography paragraph={true}>
-            {fancyTrim(pageDetails?.contentText, 50)}
-          </Typography>
+        <CardHeader
+          title={page?.title || 'Untitled'}
+          sx={{ p: 0 }}
+          titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }}
+        />
+        <Box width="100%" display="flex" flex={1} flexDirection="column" justifyContent="space-between">
+          <Typography paragraph={true}>{fancyTrim(pageDetails?.contentText, 50)}</Typography>
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>
       </Box>
-      {onDelete
-        && (
-          <PageActions
-            page={page}
-            onClickDelete={pagePermission?.delete ? () => onDelete(bounty.id) : undefined}
-          />
-        )}
+      {onDelete && (
+        <PageActions page={page} onClickDelete={pagePermission?.delete ? () => onDelete(bounty.id) : undefined} />
+      )}
     </StyledBox>
   );
 }

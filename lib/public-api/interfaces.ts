@@ -25,16 +25,16 @@ import type { Page as PrismaPage } from '@prisma/client';
  *          items:
  *            type: object
  *            properties:
-*               id:
-*                 type: string
-*                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
-*               color:
-*                 type: string
-*                 example: propColorTeal
-*               value:
-*                 type: string
-*                 example: Complete
-*/
+ *               id:
+ *                 type: string
+ *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+ *               color:
+ *                 type: string
+ *                 example: propColorTeal
+ *               value:
+ *                 type: string
+ *                 example: Complete
+ */
 
 export interface PageProperty {
   id: string;
@@ -44,7 +44,7 @@ export interface PageProperty {
     id: string;
     color: string;
     value: string;
-  } [];
+  }[];
 }
 
 /**
@@ -88,10 +88,11 @@ export interface PageProperty {
  *            $ref: '#/components/schemas/PageProperty'
  *
  */
-export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
+export interface DatabasePage
+  extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
   url: string;
   type: 'board';
-  schema: PageProperty [];
+  schema: PageProperty[];
 }
 
 /**
@@ -104,7 +105,7 @@ export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'upd
  *        markdown:
  *          type: string
  *          example: Markdown content as a string
-*/
+ */
 export interface PageContentFormats {
   markdown: string;
 }
@@ -193,7 +194,7 @@ export interface Page {
  *              required: false
  *
  */
-export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>
+export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>;
 
 /**
  *
@@ -209,7 +210,7 @@ export type PaginatedQuery<T> = {
   cursor?: string;
   limit?: number;
   query: T;
-}
+};
 
 /**
  * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
@@ -258,7 +259,7 @@ export type PaginatedQuery<T> = {
  *        publicBountyBoard:
  *          type: boolean
  *          example: false
-*/
+ */
 
 export interface Workspace {
   id: string;
@@ -300,7 +301,7 @@ export interface Workspace {
  *          required: false
  *          type: url
  *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
-*/
+ */
 export interface CreateWorkspaceRequestBody {
   name: string;
   discordServerId: string;
@@ -327,7 +328,7 @@ export interface CreateWorkspaceRequestBody {
  *        joinUrl:
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
-*/
+ */
 export interface CreateWorkspaceResponseBody {
   id: string;
   spaceUrl: string;

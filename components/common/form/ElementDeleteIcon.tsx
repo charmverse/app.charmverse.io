@@ -8,17 +8,16 @@ interface Props {
   tooltip?: string;
 }
 
-export default function ElementDeleteIcon ({ onClick, tooltip = 'Delete' }: Props) {
-
+export default function ElementDeleteIcon({ onClick, tooltip = 'Delete' }: Props) {
   return (
-    <Tooltip arrow placement='top' title={tooltip}>
+    <Tooltip arrow placement="top" title={tooltip}>
       <ButtonChip
-        className='row-actions'
+        className="row-actions"
         icon={<DeleteOutlinedIcon />}
         clickable
-        color='secondary'
-        size='small'
-        variant='outlined'
+        color="secondary"
+        size="small"
+        variant="outlined"
         onClick={(e) => {
           e.stopPropagation();
           onClick();
@@ -26,6 +25,4 @@ export default function ElementDeleteIcon ({ onClick, tooltip = 'Delete' }: Prop
       />
     </Tooltip>
   );
-
 }
-

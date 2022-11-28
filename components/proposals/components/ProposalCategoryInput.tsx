@@ -10,7 +10,7 @@ import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 type TempOption = NewProposalCategory & {
   inputValue: string;
-}
+};
 
 type OptionType = TempOption | ProposalCategory;
 
@@ -20,9 +20,9 @@ type ProposalCategoryOptionProps = {
   category: OptionType;
   props: HTMLAttributes<HTMLLIElement>;
   onDelete?: (id: string) => void;
-}
+};
 
-function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategoryOptionProps) {
+function ProposalCategoryOption({ props, category, onDelete }: ProposalCategoryOptionProps) {
   if ('inputValue' in category) {
     return <li {...props}>{category.title}</li>;
   }
@@ -34,14 +34,19 @@ function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategory
   }
 
   return (
-    <Box {...props as unknown as HTMLAttributes<HTMLDivElement>}>
-      <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
-        <Chip variant='filled' color={category.color as BrandColor} label={category.title} sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }} />
+    <Box {...(props as unknown as HTMLAttributes<HTMLDivElement>)}>
+      <Box justifyContent="space-between" alignItems="center" display="flex" flex={1}>
+        <Chip
+          variant="filled"
+          color={category.color as BrandColor}
+          label={category.title}
+          sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
+        />
 
         {!!onDelete && (
           <IconButton
-            color='secondary'
-            size='small'
+            color="secondary"
+            size="small"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -52,7 +57,6 @@ function ProposalCategoryOption ({ props, category, onDelete }: ProposalCategory
           </IconButton>
         )}
       </Box>
-
     </Box>
   );
 }
@@ -67,10 +71,18 @@ type Props = {
   onDeleteCategory?: (categoryId: string) => void;
 };
 
-export default function ProposalCategoryInput ({ disabled, options, canEditCategories, value, onChange, onAddCategory, onDeleteCategory }: Props) {
-  const internalValue = useMemo(() => value ? [value] : [], [value]);
+export default function ProposalCategoryInput({
+  disabled,
+  options,
+  canEditCategories,
+  value,
+  onChange,
+  onAddCategory,
+  onDeleteCategory
+}: Props) {
+  const internalValue = useMemo(() => (value ? [value] : []), [value]);
   const newCategoryColorRef = useRef(getRandomThemeColor());
-  const [tempValue, setTempValue] = useState<TempOption| null>(null);
+  const [tempValue, setTempValue] = useState<TempOption | null>(null);
 
   useEffect(() => {
     if (tempValue && value) {
@@ -78,7 +90,7 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
     }
   }, [value, tempValue]);
 
-  async function onValueChange (values: OptionType[]) {
+  async function onValueChange(values: OptionType[]) {
     const newValue = values.pop();
 
     if (newValue === undefined) {
@@ -116,15 +128,19 @@ export default function ProposalCategoryInput ({ disabled, options, canEditCateg
       autoHighlight
       clearIcon={null}
       renderOption={(_props, category) => (
-        <ProposalCategoryOption category={category} props={_props} onDelete={canEditCategories ? onDeleteCategory : undefined} />
+        <ProposalCategoryOption
+          category={category}
+          props={_props}
+          onDelete={canEditCategories ? onDeleteCategory : undefined}
+        />
       )}
       ChipProps={{ color: (tempValue?.color || value?.color || 'gray') as BrandColor }}
-      noOptionsText='No categories available'
+      noOptionsText="No categories available"
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder='Select category'
-          size='small'
+          placeholder="Select category"
+          size="small"
           inputProps={{
             ...params.inputProps,
             // Hack hiding input for single-value tag input

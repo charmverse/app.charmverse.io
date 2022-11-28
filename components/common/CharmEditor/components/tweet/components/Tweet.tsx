@@ -14,7 +14,7 @@ import { TweetInput } from './TweetInput';
 
 type TweetOptions = {
   theme?: 'dark' | 'light';
-}
+};
 
 declare global {
   interface Window {
@@ -37,7 +37,7 @@ const StyledTweet = styled.div`
 `;
 
 // embed Twitter
-function render (tweetId: string, el: HTMLElement, options: TweetOptions) {
+function render(tweetId: string, el: HTMLElement, options: TweetOptions) {
   if (typeof window === 'undefined') {
     return;
   }
@@ -46,22 +46,19 @@ function render (tweetId: string, el: HTMLElement, options: TweetOptions) {
     return;
   }
   if (!window.twttr.widgets.createTweet) {
-    log.error(
-      'Method "createTweet" is not present anymore in twttr.widget api'
-    );
+    log.error('Method "createTweet" is not present anymore in twttr.widget api');
     return;
   }
   window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
-export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
-
+export function TweetComponent({ readOnly, node, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
-  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
+  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
-  function onLoadScript () {
+  function onLoadScript() {
     if (ref.current && attrs.id) {
       render(attrs.id, ref.current, { theme: theme.palette.mode });
     }
@@ -72,8 +69,7 @@ export function TweetComponent ({ readOnly, node, updateAttrs }: NodeViewProps &
     if (readOnly) {
       // hide the row completely
       return <div />;
-    }
-    else {
+    } else {
       return (
         <TweetInput
           autoOpen={autoOpen}

@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,11 +9,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(requireKeys(['aeToken'], 'body'), importCredentials);
+handler.use(requireUser).post(requireKeys(['aeToken'], 'body'), importCredentials);
 
-async function importCredentials (req: NextApiRequest, res: NextApiResponse<CredentialsResult>) {
-
+async function importCredentials(req: NextApiRequest, res: NextApiResponse<CredentialsResult>) {
   const credentials = await getCredentials({
     aeToken: req.body.aeToken
   });

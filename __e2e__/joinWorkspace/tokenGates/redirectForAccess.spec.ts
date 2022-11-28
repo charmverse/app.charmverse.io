@@ -14,7 +14,10 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGates - redirect user to join page if they don\'t have access to workspace (shows alert if no token gate is found)', async ({ page, tokenGatePage }) => {
+test("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
+  page,
+  tokenGatePage
+}) => {
   const { space } = await generateUserAndSpace();
 
   const user = await generateUser();

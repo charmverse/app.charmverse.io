@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -19,9 +18,7 @@ beforeAll(async () => {
 });
 
 describe('toggleThreadStatus', () => {
-
   it('should return thread with resolved: false when it is open', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -37,7 +34,6 @@ describe('toggleThreadStatus', () => {
   });
 
   it('should return thread with resolved: true when it is closed', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -53,22 +49,18 @@ describe('toggleThreadStatus', () => {
   });
 
   it('should fail if the thread does not exist', async () => {
-
     try {
       await toggleThreadStatus({
         id: v4(),
         status: 'closed'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect((err as Error).name).toStrictEqual('NotFoundError');
     }
-
   });
 
   it('should fail if an invalid status is provided', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -81,12 +73,8 @@ describe('toggleThreadStatus', () => {
         status: 'invalid status' as any
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
-
 });
-

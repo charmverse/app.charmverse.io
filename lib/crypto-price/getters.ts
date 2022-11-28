@@ -5,7 +5,6 @@ import { getTimeDifference } from 'lib/utilities/dates';
 import { getPriceFromCoinMarketCap, getPriceFromCryptoCompare } from './dataSources';
 
 class PricingCache {
-
   // Cache any other crypto for half a hour
   private defaultCacheDurationInSeconds = 0;
 
@@ -23,9 +22,9 @@ class PricingCache {
     XDAI: 1053
   };
 
-  cache: IPairQuote [];
+  cache: IPairQuote[];
 
-  constructor () {
+  constructor() {
     this.cache = [];
   }
 
@@ -35,30 +34,27 @@ class PricingCache {
    * @param quote
    * @returns
    */
-  getQuote (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
+  getQuote(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
     return new Promise((resolve, reject) => {
-
       const cachedQuote = this.loadFromCache(base, quote);
       if (cachedQuote === null) {
         this.getPricing(base, quote)
-          .then(freshQuote => {
+          .then((freshQuote) => {
             this.cacheQuote(freshQuote);
             resolve(freshQuote);
           })
-          .catch(error => {
+          .catch((error) => {
             reject(error);
           });
-      }
-      else {
+      } else {
         resolve(cachedQuote);
       }
-
     });
   }
 
   // Loads an item from cache and deletes it if necessary
-  private loadFromCache (base: CryptoCurrency | string, quote: FiatCurrency): IPairQuote | null {
-    const cachedQuoteIndex = this.cache.findIndex(item => {
+  private loadFromCache(base: CryptoCurrency | string, quote: FiatCurrency): IPairQuote | null {
+    const cachedQuoteIndex = this.cache.findIndex((item) => {
       return item.quote === quote && item.base === base;
     });
 
@@ -79,19 +75,17 @@ class PricingCache {
     return null;
   }
 
-  private cacheQuote (pairQuote: IPairQuote) {
+  private cacheQuote(pairQuote: IPairQuote) {
     this.cache.push(pairQuote);
   }
 
-  private getPricing (base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
-
+  private getPricing(base: CryptoCurrency | string, quote: FiatCurrency): Promise<IPairQuote> {
     if (base === 'XDAI') {
       return getPriceFromCoinMarketCap(base, quote);
     }
 
     return getPriceFromCryptoCompare(base, quote);
   }
-
 }
 
 export const pricingGetter = new PricingCache();

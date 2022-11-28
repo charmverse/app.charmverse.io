@@ -26,13 +26,13 @@ export interface SnapshotSpace {
   // validation:
 }
 
-export type SnapshotProposalState = 'pending' | 'active' | 'closed'
+export type SnapshotProposalState = 'pending' | 'active' | 'closed';
 
 export interface SnapshotProposal {
   id: string;
   title: string;
   body: string;
-  choices: string [];
+  choices: string[];
   start: number;
   end: number;
   snapshot: string;
@@ -66,4 +66,3 @@ export const SnapshotVotingMode = {
 };
 
 export type SnapshotVotingModeType = keyof typeof SnapshotVotingMode;
-

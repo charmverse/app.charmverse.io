@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -21,17 +20,17 @@ import URLProperty from './properties/link/link';
 import UserProperty from './properties/user/user';
 
 type Props = {
-    board: Board;
-    readOnly: boolean;
-    card: Card;
-    updatedBy: string;
-    updatedAt: string;
-    propertyTemplate: IPropertyTemplate;
-    showEmptyPlaceholder: boolean;
-    displayType?: PropertyValueDisplayType;
-}
+  board: Board;
+  readOnly: boolean;
+  card: Card;
+  updatedBy: string;
+  updatedAt: string;
+  propertyTemplate: IPropertyTemplate;
+  showEmptyPlaceholder: boolean;
+  displayType?: PropertyValueDisplayType;
+};
 
-function PropertyValueElement (props:Props): JSX.Element {
+function PropertyValueElement(props: Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
 
@@ -39,11 +38,13 @@ function PropertyValueElement (props:Props): JSX.Element {
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl);
-  const emptyDisplayValue = showEmptyPlaceholder ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' }) : '';
+  const emptyDisplayValue = showEmptyPlaceholder
+    ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
+    : '';
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
-  const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? 'page' : 'card';
+  const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
   useEffect(() => {
     if (serverValue === value) {
@@ -60,13 +61,15 @@ function PropertyValueElement (props:Props): JSX.Element {
       case 'number':
         return !Number.isNaN(parseInt(val, 10));
       case 'email': {
-        // eslint-disable-next-line max-len
-        const emailRegexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const emailRegexp =
+          // eslint-disable-next-line max-len
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return emailRegexp.test(val);
       }
       case 'url': {
-        // eslint-disable-next-line max-len
-        const urlRegexp = /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+        const urlRegexp =
+          // eslint-disable-next-line max-len
+          /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
         return urlRegexp.test(val);
       }
       case 'text':
@@ -100,8 +103,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         displayType={displayType}
       />
     );
-  }
-  else if (propertyTemplate.type === 'person') {
+  } else if (propertyTemplate.type === 'person') {
     return (
       <UserProperty
         value={propertyValue?.toString()}
@@ -111,14 +113,13 @@ function PropertyValueElement (props:Props): JSX.Element {
         }}
       />
     );
-  }
-  else if (propertyTemplate.type === 'date') {
+  } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
-      return <div className='octo-propertyvalue'>{displayValue}</div>;
+      return <div className="octo-propertyvalue">{displayValue}</div>;
     }
     return (
       <DateRange
-        className='octo-propertyvalue'
+        className="octo-propertyvalue"
         value={value.toString()}
         showEmptyPlaceholder={showEmptyPlaceholder}
         onChange={(newValue) => {
@@ -126,8 +127,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         }}
       />
     );
-  }
-  else if (propertyTemplate.type === 'url') {
+  } else if (propertyTemplate.type === 'url') {
     return (
       <URLProperty
         value={value.toString()}
@@ -141,8 +141,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
       />
     );
-  }
-  else if (propertyTemplate.type === 'checkbox') {
+  } else if (propertyTemplate.type === 'checkbox') {
     return (
       <Switch
         isOn={Boolean(propertyValue)}
@@ -153,39 +152,21 @@ function PropertyValueElement (props:Props): JSX.Element {
         readOnly={readOnly}
       />
     );
-  }
-  else if (propertyTemplate.type === 'createdBy') {
-    return (
-      <CreatedBy userID={card.createdBy} />
-    );
-  }
-  else if (propertyTemplate.type === 'updatedBy') {
-    return (
-      <LastModifiedBy
-        updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy}
-      />
-    );
-  }
-  else if (propertyTemplate.type === 'createdTime') {
-    return (
-      <CreatedAt createdAt={card.createdAt} />
-    );
-  }
-  else if (propertyTemplate.type === 'updatedTime') {
-    return (
-      <LastModifiedAt
-        updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()}
-      />
-    );
+  } else if (propertyTemplate.type === 'createdBy') {
+    return <CreatedBy userID={card.createdBy} />;
+  } else if (propertyTemplate.type === 'updatedBy') {
+    return <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
+  } else if (propertyTemplate.type === 'createdTime') {
+    return <CreatedAt createdAt={card.createdAt} />;
+  } else if (propertyTemplate.type === 'updatedTime') {
+    return <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />;
   }
 
-  if (
-    editableFields.includes(propertyTemplate.type)
-  ) {
+  if (editableFields.includes(propertyTemplate.type)) {
     if (!readOnly) {
       return (
         <Editable
-          className='octo-propertyvalue'
+          className="octo-propertyvalue"
           placeholderText={emptyDisplayValue}
           value={value.toString()}
           autoExpand={false}
@@ -199,9 +180,9 @@ function PropertyValueElement (props:Props): JSX.Element {
         />
       );
     }
-    return <div className='octo-propertyvalue octo-propertyvalue--readonly'>{displayValue}</div>;
+    return <div className="octo-propertyvalue octo-propertyvalue--readonly">{displayValue}</div>;
   }
-  return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+  return <div className="octo-propertyvalue">{finalDisplayValue}</div>;
 }
 
 export default PropertyValueElement;

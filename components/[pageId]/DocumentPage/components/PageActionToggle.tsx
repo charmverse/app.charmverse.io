@@ -4,7 +4,7 @@ import { IconButton } from '@mui/material';
 
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
-export default function PageActionToggle () {
+export default function PageActionToggle() {
   const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
   const theme = useTheme();
   return (
@@ -12,7 +12,7 @@ export default function PageActionToggle () {
       onClick={() => {
         setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'polls' : null);
       }}
-      size='small'
+      size="small"
       sx={{
         '&.MuiIconButton-root': {
           borderRadius: '4px',

@@ -1,9 +1,5 @@
-import type {
-  BangleEditorProps as CoreBangleEditorProps
-} from '@bangle.dev/core';
-import {
-  BangleEditor as CoreBangleEditor
-} from '@bangle.dev/core';
+import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
+import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
@@ -41,10 +37,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
 }
 
-export const BangleEditor = React.forwardRef<
-  CoreBangleEditor | undefined,
-  BangleEditorProps
->(
+export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(
   (
     {
       pageId,
@@ -102,21 +95,17 @@ export const BangleEditor = React.forwardRef<
       [editor]
     );
 
-    function onError (error: Error) {
+    function onError(error: Error) {
       showMessage(error.message, 'error');
     }
 
     useEffect(() => {
-      const _editor = new CoreBangleEditor(
-        renderRef.current!,
-        editorViewPayloadRef.current
-      );
+      const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
       let fEditor: FidusEditor;
 
       if (isContentControlled) {
         setIsLoading(false);
-      }
-      else if (useSockets) {
+      } else if (useSockets) {
         if (authResponse) {
           log.info('Init FidusEditor');
           fEditor = new FidusEditor({
@@ -126,32 +115,29 @@ export const BangleEditor = React.forwardRef<
             onDocLoaded: () => {
               setIsLoading(false);
               isLoadingRef.current = false;
-            // console.log('set is loading false');
+              // console.log('set is loading false');
             },
             onParticipantUpdate
           });
           fEditor.init(_editor.view, authResponse.authToken, onError);
         }
-      }
-      else if (pageId && readOnly) {
-        charmClient.pages.getPageDetails(pageId)
-          .then((page) => {
-            if (_editor) {
-              setIsLoading(false);
-              isLoadingRef.current = false;
-              const schema = _editor.view.state.schema;
-              const doc = schema.nodeFromJSON(page.content);
+      } else if (pageId && readOnly) {
+        charmClient.pages.getPageDetails(pageId).then((page) => {
+          if (_editor) {
+            setIsLoading(false);
+            isLoadingRef.current = false;
+            const schema = _editor.view.state.schema;
+            const doc = schema.nodeFromJSON(page.content);
 
-              const stateConfig = {
-                schema,
-                doc,
-                plugins: _editor.view.state.plugins
-              };
-              // Set document in prosemirror
-              _editor.view.setProps({ state: EditorState.create(stateConfig) });
-            }
-          });
-
+            const stateConfig = {
+              schema,
+              doc,
+              plugins: _editor.view.state.plugins
+            };
+            // Set document in prosemirror
+            _editor.view.setProps({ state: EditorState.create(stateConfig) });
+          }
+        });
       }
       (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
       setEditor(_editor);
@@ -162,17 +148,15 @@ export const BangleEditor = React.forwardRef<
     }, [user, pageId, useSockets, authResponse, authResponse, ref]);
 
     if (nodeViews.length > 0 && renderNodeViews == null) {
-      throw new Error(
-        'When using nodeViews, you must provide renderNodeViews callback'
-      );
+      throw new Error('When using nodeViews, you must provide renderNodeViews callback');
     }
 
     return (
       <EditorViewContext.Provider value={editor?.view as any}>
-        <div ref={editorRef} className='bangle-editor-core'>
+        <div ref={editorRef} className="bangle-editor-core">
           {editor ? children : null}
           <div ref={renderRef} id={pageId} className={className} style={style} />
-          <LoadingComponent height='400px' isLoading={isLoading} />
+          <LoadingComponent height="400px" isLoading={isLoading} />
         </div>
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(
@@ -181,8 +165,8 @@ export const BangleEditor = React.forwardRef<
               nodeView={nodeView}
               renderNodeViews={renderNodeViews!}
             />,
-              nodeView.containerDOM!,
-              objectUid.get(nodeView)
+            nodeView.containerDOM!,
+            objectUid.get(nodeView)
           );
         })}
       </EditorViewContext.Provider>
@@ -190,7 +174,7 @@ export const BangleEditor = React.forwardRef<
   }
 );
 
-function updatePluginWatcher (editor: CoreBangleEditor) {
+function updatePluginWatcher(editor: CoreBangleEditor) {
   return (watcher: Plugin, remove = false) => {
     if (editor.destroyed) {
       return;
@@ -198,9 +182,7 @@ function updatePluginWatcher (editor: CoreBangleEditor) {
 
     let state = editor.view.state;
 
-    const newPlugins = remove
-      ? state.plugins.filter((p) => p !== watcher)
-      : [...state.plugins, watcher];
+    const newPlugins = remove ? state.plugins.filter((p) => p !== watcher) : [...state.plugins, watcher];
 
     state = state.reconfigure({
       plugins: newPlugins

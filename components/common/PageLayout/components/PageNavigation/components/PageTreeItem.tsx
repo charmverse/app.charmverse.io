@@ -55,8 +55,9 @@ interface PageTreeItemProps {
   onClick?: () => void;
 }
 
-export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: prop => prop !== 'isActive' })<{ isActive?: boolean }>(({ isActive, theme }) => ({
-
+export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => prop !== 'isActive' })<{
+  isActive?: boolean;
+}>(({ isActive, theme }) => ({
   position: 'relative',
   backgroundColor: isActive ? theme.palette.action.focus : 'unset',
 
@@ -181,8 +182,16 @@ interface PageLinkProps {
   onClick?: () => void;
 }
 
-export function PageLink ({ showPicker = !isTouchScreen(), children, href, label, labelIcon, pageType, pageId, onClick }: PageLinkProps) {
-
+export function PageLink({
+  showPicker = !isTouchScreen(),
+  children,
+  href,
+  label,
+  labelIcon,
+  pageType,
+  pageId,
+  onClick
+}: PageLinkProps) {
   const popupState = usePopupState({
     popupId: 'page-emoji',
     variant: 'popover'
@@ -210,7 +219,11 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
       <PageAnchor onClick={stopPropagation}>
         {labelIcon && (
           <span onClick={preventDefault}>
-            <StyledPageIcon icon={labelIcon} {...triggerState} onClick={showPicker ? triggerState.onClick : undefined} />
+            <StyledPageIcon
+              icon={labelIcon}
+              {...triggerState}
+              onClick={showPicker ? triggerState.onClick : undefined}
+            />
           </span>
         )}
         <PageTitle hasContent={isempty} onClick={onClick}>
@@ -223,18 +236,21 @@ export function PageLink ({ showPicker = !isTouchScreen(), children, href, label
   );
 }
 
-function EmojiMenu ({ popupState, pageId, pageType }: { popupState: any, pageId: string, pageType?: Page['type'] }) {
+function EmojiMenu({ popupState, pageId, pageType }: { popupState: any; pageId: string; pageType?: Page['type'] }) {
   const { updatePage } = usePages();
-  const onSelectEmoji = useCallback(async (emoji: string) => {
-    if (pageId) {
-      updatePage({ id: pageId, icon: emoji });
+  const onSelectEmoji = useCallback(
+    async (emoji: string) => {
+      if (pageId) {
+        updatePage({ id: pageId, icon: emoji });
 
-      if (pageType === 'board') {
-        mutator.changeIcon(pageId, emoji, emoji);
+        if (pageType === 'board') {
+          mutator.changeIcon(pageId, emoji, emoji);
+        }
       }
-    }
-    popupState.close();
-  }, [pageId, updatePage]);
+      popupState.close();
+    },
+    [pageId, updatePage]
+  );
 
   return (
     <Menu
@@ -291,69 +307,63 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     event.stopPropagation();
   }, []);
 
-  function closeMenu () {
+  function closeMenu() {
     setAnchorEl(null);
   }
 
   const icon = useMemo(() => {
     if (labelIcon) {
       return labelIcon;
-    }
-    else if (pageType === 'board') {
-      return (<StyledDatabaseIcon />);
-    }
-    else if (isEmptyContent) {
+    } else if (pageType === 'board') {
+      return <StyledDatabaseIcon />;
+    } else if (isEmptyContent) {
       return (
-        <InsertDriveFileOutlinedIcon sx={{
-          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-        }}
+        <InsertDriveFileOutlinedIcon
+          sx={{
+            opacity: theme.palette.mode !== 'light' ? 0.5 : 1
+          }}
         />
       );
-    }
-    else {
+    } else {
       return (
-        <DescriptionOutlinedIcon sx={{
-          opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-        }}
+        <DescriptionOutlinedIcon
+          sx={{
+            opacity: theme.palette.mode !== 'light' ? 0.5 : 1
+          }}
         />
       );
     }
   }, [labelIcon, pageType, isEmptyContent]);
 
-  const ContentProps = useMemo(() => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }), [isAdjacent, hasSelectedChildView]);
+  const ContentProps = useMemo(
+    () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
+    [isAdjacent, hasSelectedChildView]
+  );
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 
-  const labelComponent = useMemo(() => (
-    <PageLink
-      href={href}
-      label={label}
-      labelIcon={icon}
-      pageId={pageId}
-      pageType={pageType}
-      onClick={onClick}
-    >
-      <div className='page-actions'>
-        <MemoizedIconButton size='small' onClick={showMenu}>
-          <MoreHorizIcon color='secondary' fontSize='small' />
-        </MemoizedIconButton>
+  const labelComponent = useMemo(
+    () => (
+      <PageLink href={href} label={label} labelIcon={icon} pageId={pageId} pageType={pageType} onClick={onClick}>
+        <div className="page-actions">
+          <MemoizedIconButton size="small" onClick={showMenu}>
+            <MoreHorizIcon color="secondary" fontSize="small" />
+          </MemoizedIconButton>
 
-        {
-          userSpacePermissions?.createPage && (
-            pageType === 'board' ? (
+          {userSpacePermissions?.createPage &&
+            (pageType === 'board' ? (
               <AddNewCard pageId={pageId} />
             ) : (
-              <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
-            )
-          )
-        }
-
-      </div>
-    </PageLink>
-  ), [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions?.createPage]);
+              <NewPageMenu tooltip="Add a page inside" addPage={addSubPage} />
+            ))}
+        </div>
+      </PageLink>
+    ),
+    [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions?.createPage]
+  );
 
   return (
     <>
@@ -385,7 +395,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   );
 });
 
-function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => void, pageId: string, pagePath: string }) {
+function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
   const boards = useAppSelector(getSortedBoards);
   const { deletePage, currentPageId, getPagePermissions, pages } = usePages();
   const { showMessage } = useSnackbar();
@@ -394,12 +404,12 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
 
   const deletePageDisabled = !permissions.delete;
 
-  async function deletePageWithBoard () {
+  async function deletePageWithBoard() {
     if (deletePageDisabled) {
       return;
     }
     const page = pages[pageId];
-    const board = boards.find(b => b.id === page?.id);
+    const board = boards.find((b) => b.id === page?.id);
     const currentPage = pages[currentPageId];
     const newPage = await deletePage({
       board,
@@ -412,12 +422,12 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
     }
   }
 
-  function onCopy () {
+  function onCopy() {
     closeMenu();
     showMessage('Link copied to clipboard');
   }
 
-  function getAbsolutePath () {
+  function getAbsolutePath() {
     if (typeof window !== 'undefined') {
       return window.location.origin + pagePath;
     }
@@ -426,17 +436,21 @@ function PageActionsMenu ({ closeMenu, pageId, pagePath }: { closeMenu: () => vo
 
   return (
     <>
-      <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
+      <Tooltip arrow placement="top" title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
           <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
-            <ListItemIcon><DeleteOutlinedIcon /></ListItemIcon>
+            <ListItemIcon>
+              <DeleteOutlinedIcon />
+            </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </PageMenuItem>
         </div>
       </Tooltip>
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
         <PageMenuItem dense>
-          <ListItemIcon><ContentCopyIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
         </PageMenuItem>
       </CopyToClipboard>

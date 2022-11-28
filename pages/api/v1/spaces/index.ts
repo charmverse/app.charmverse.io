@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,14 +11,16 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSuperApiKey)
-  .use(requireKeys(
-    [
-      { key: 'name', truthy: true },
-      { key: 'discordServerId', truthy: true },
-      { key: 'adminDiscordUserId', truthy: true }
-    ],
-    'body'
-  ))
+  .use(
+    requireKeys(
+      [
+        { key: 'name', truthy: true },
+        { key: 'discordServerId', truthy: true },
+        { key: 'adminDiscordUserId', truthy: true }
+      ],
+      'body'
+    )
+  )
   .post(createSpace);
 
 /**
@@ -41,17 +42,22 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/CreateWorkspaceResponseBody'
  */
-async function createSpace (req: NextApiRequest, res: NextApiResponse<CreatedSpaceResponse>) {
+async function createSpace(req: NextApiRequest, res: NextApiResponse<CreatedSpaceResponse>) {
   const { name, discordServerId, avatar, adminDiscordUserId } = req.body as CreateSpaceApiInputData;
 
   if (name.length < 3) {
     throw new InvalidInputError('Workspace name must be at least 3 characters');
   }
 
-  const result = await createWorkspaceApi({ name, discordServerId, adminDiscordUserId, avatar, superApiToken: req.superApiToken });
+  const result = await createWorkspaceApi({
+    name,
+    discordServerId,
+    adminDiscordUserId,
+    avatar,
+    superApiToken: req.superApiToken
+  });
 
   return res.status(201).json(result);
 }
 
 export default withSessionRoute(handler);
-

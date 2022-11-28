@@ -32,20 +32,20 @@ interface Props {
   onRemove: (id: string) => void;
 }
 
-export default function MemberRow ({ member, isEditable, onRemove }: Props) {
-  function removeMember () {
+export default function MemberRow({ member, isEditable, onRemove }: Props) {
+  function removeMember() {
     onRemove(member.id);
   }
 
   return (
     <StyledRow py={2}>
-      <Box display='flex' alignItems='center'>
-        <Avatar name={member.username} avatar={member?.avatar} size='small' isNft={hasNftAvatar(member)} />
+      <Box display="flex" alignItems="center">
+        <Avatar name={member.username} avatar={member?.avatar} size="small" isNft={hasNftAvatar(member)} />
         <Box pl={2}>
-          <Typography variant='body1'>{member.username}</Typography>
+          <Typography variant="body1">{member.username}</Typography>
         </Box>
       </Box>
-      {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip='Remove member' />}
+      {isEditable && <ElementDeleteIcon onClick={removeMember} tooltip="Remove member" />}
     </StyledRow>
   );
 }

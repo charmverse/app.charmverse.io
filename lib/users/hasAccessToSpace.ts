@@ -19,7 +19,7 @@ interface Result {
   spaceRole?: SpaceRole;
 }
 
-export async function hasAccessToSpace ({ userId, spaceId, adminOnly = false }: Input): Promise<Result> {
+export async function hasAccessToSpace({ userId, spaceId, adminOnly = false }: Input): Promise<Result> {
   if (!spaceId || !userId) {
     return { error: new InvalidInputError('User ID and space ID are required') };
   }
@@ -32,8 +32,7 @@ export async function hasAccessToSpace ({ userId, spaceId, adminOnly = false }: 
   });
   if (!spaceRole) {
     return { error: new UserIsNotSpaceMemberError() };
-  }
-  else if (adminOnly && spaceRole.isAdmin !== true) {
+  } else if (adminOnly && spaceRole.isAdmin !== true) {
     return { error: new AdministratorOnlyError() };
   }
   return { success: true, isAdmin: spaceRole.isAdmin, spaceRole };

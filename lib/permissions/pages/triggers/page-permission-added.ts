@@ -10,15 +10,17 @@ import { getPagePermission } from '../actions/get-permission';
 import { hasSameOrMorePermissions } from '../actions/has-same-or-more-permissions';
 import { PermissionNotFoundError } from '../errors';
 
-export async function setupPermissionsAfterPagePermissionAdded (permissionId: string, transaction?: TransactionClient): Promise<boolean> {
-
+export async function setupPermissionsAfterPagePermissionAdded(
+  permissionId: string,
+  transaction?: TransactionClient
+): Promise<boolean> {
   if (!transaction) {
     return prisma.$transaction(txHandler);
   }
 
   return txHandler(transaction);
 
-  async function txHandler (tx: TransactionClient) {
+  async function txHandler(tx: TransactionClient) {
     const foundPermission = await getPagePermission(permissionId, tx);
 
     if (!foundPermission) {
@@ -30,25 +32,26 @@ export async function setupPermissionsAfterPagePermissionAdded (permissionId: st
     const { permissions: permissionsToCopy } = updatedPage;
 
     // We want to compare the existing permissions of the parent page without the newly added permission
-    const permissionsToCompare = updatedPage.permissions.filter(permission => permission.id !== permissionId);
+    const permissionsToCompare = updatedPage.permissions.filter((permission) => permission.id !== permissionId);
 
     // We cannot do upsert many currently on Prisma. To keep the number of operations down, we will delete all relevant permissions and recreate them in 2 bulk operations. See https://stackoverflow.com/a/70824192
     const permissionsToDelete: Prisma.PagePermissionWhereInput[] = [];
     const permissionsToCreate: Prisma.PagePermissionCreateManyInput[] = [];
 
-    function findChildPagesToCreatePermissionsFor (node: PageNodeWithChildren<PageNodeWithPermissions>): void {
-      node.children.forEach(child => {
-
+    function findChildPagesToCreatePermissionsFor(node: PageNodeWithChildren<PageNodeWithPermissions>): void {
+      node.children.forEach((child) => {
         const { permissions: childPermissions } = child;
 
         const canInherit = hasSameOrMorePermissions(permissionsToCompare, childPermissions);
 
         if (canInherit) {
-          permissionsToDelete.push(...childPermissions.map(p => {
-            return {
-              id: p.id
-            };
-          }));
+          permissionsToDelete.push(
+            ...childPermissions.map((p) => {
+              return {
+                id: p.id
+              };
+            })
+          );
 
           const copied = copyAllPagePermissions({
             permissions: permissionsToCopy,
@@ -61,7 +64,6 @@ export async function setupPermissionsAfterPagePermissionAdded (permissionId: st
           // This child can inherit, lets check its children
           findChildPagesToCreatePermissionsFor(child);
         }
-
       });
     }
 
@@ -75,5 +77,4 @@ export async function setupPermissionsAfterPagePermissionAdded (permissionId: st
 
     return true;
   }
-
 }

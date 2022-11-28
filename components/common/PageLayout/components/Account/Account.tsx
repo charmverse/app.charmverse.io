@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -39,7 +38,8 @@ const StyledButtonGroup = styled(ButtonGroup)`
     background-color: ${({ theme }) => theme.palette.action.selected};
     color: ${({ theme }) => theme.palette.text.primary};
     &:hover {
-      background-color: ${({ theme }) => alpha(theme.palette.action.selected, theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity)};
+      background-color: ${({ theme }) =>
+        alpha(theme.palette.action.selected, theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity)};
     }
     border-radius: 10px;
     border-width: 0;
@@ -50,7 +50,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-function Account (): JSX.Element {
+function Account(): JSX.Element {
   const { error, account, chainId } = useWeb3React();
 
   const { openNetworkModal } = useContext(Web3Connection);
@@ -70,7 +70,7 @@ function Account (): JSX.Element {
   if (isLoaded && !user) {
     return (
       <AccountCard>
-        <AccountButton href='/'>
+        <AccountButton href="/">
           {
             // This is a quick fix for making the public pages and bounties an acquisition channel.
             // We would still show the "Join" in the classic Charmverse signup page.
@@ -86,7 +86,7 @@ function Account (): JSX.Element {
       <AccountCard>
         <AccountButton
           // leftIcon={<LinkBreak />}
-          colorScheme='red'
+          colorScheme="red"
           onClick={openNetworkModal}
         >
           Wrong Network
@@ -95,28 +95,32 @@ function Account (): JSX.Element {
     );
   }
 
-  const isConnectedWithWallet = (account && chainId);
+  const isConnectedWithWallet = account && chainId;
   const chain = chainId ? getChainById(chainId) : null;
 
   return (
     <AccountCard>
-      <StyledButtonGroup variant='contained' disableElevation>
+      <StyledButtonGroup variant="contained" disableElevation>
         {isConnectedWithWallet && (
           <Tooltip title={chain?.chainName ?? ''} arrow>
             <NetworkButton onClick={networkModalState.open}>
-              <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
-                <img alt='' src={chain?.iconUrl} style={{ height: '100%' }} />
+              <SvgIcon component="object" sx={{ display: 'flex', justifyContent: 'center' }}>
+                <img alt="" src={chain?.iconUrl} style={{ height: '100%' }} />
               </SvgIcon>
             </NetworkButton>
           </Tooltip>
         )}
         <AccountButton
-          href='/profile'
-          sx={isConnectedWithWallet ? ({
-            borderTopLeftRadius: '0 !important',
-            borderBottomLeftRadius: '0 !important'
-          }) : {}}
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
+          href="/profile"
+          sx={
+            isConnectedWithWallet
+              ? {
+                  borderTopLeftRadius: '0 !important',
+                  borderBottomLeftRadius: '0 !important'
+                }
+              : {}
+          }
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size="small" />}
         >
           {user?.username}
         </AccountButton>

@@ -9,9 +9,9 @@ type CreatePropertyInput = {
   data: Prisma.MemberPropertyCreateInput;
   userId: string;
   spaceId: string;
-}
+};
 
-export async function createMemberProperty ({ data, spaceId, userId }: CreatePropertyInput) {
+export async function createMemberProperty({ data, spaceId, userId }: CreatePropertyInput) {
   const properties = await prisma.memberProperty.findMany({
     where: {
       spaceId
@@ -28,7 +28,8 @@ export async function createMemberProperty ({ data, spaceId, userId }: CreatePro
     throw new InvalidInputError(`Can't create default property ${createdPropertyType}`);
   }
   const isReadonlyProperty = READONLY_MEMBER_PROPERTIES.includes(createdPropertyType);
-  const preExistingReadonlyProperty = isReadonlyProperty && properties.find(property => property.type === createdPropertyType);
+  const preExistingReadonlyProperty =
+    isReadonlyProperty && properties.find((property) => property.type === createdPropertyType);
   if (preExistingReadonlyProperty) {
     throw new InvalidInputError('Readonly properties can only be created once');
   }

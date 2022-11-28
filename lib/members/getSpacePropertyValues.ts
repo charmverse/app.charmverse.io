@@ -4,9 +4,13 @@ import type { CommonSpacesInput, PropertyValue } from 'lib/members/interfaces';
 
 type CommonSpaceProps = CommonSpacesInput & {
   spaceId: string;
-}
+};
 
-export async function getSpacePropertyValues ({ memberId, requestingUserId, spaceId }: CommonSpaceProps): Promise<PropertyValue[]> {
+export async function getSpacePropertyValues({
+  memberId,
+  requestingUserId,
+  spaceId
+}: CommonSpaceProps): Promise<PropertyValue[]> {
   const spaceIds = await getCommonSpaceIds({ spaceId, memberId, requestingUserId });
   // We want to retirn results for single specific space
   if (spaceIds.length !== 1) {

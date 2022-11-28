@@ -18,7 +18,6 @@ beforeAll(async () => {
 });
 
 describe('addSpaceOperations', () => {
-
   it('should grant abilities to a specific user', async () => {
     const createdPermission = await addSpaceOperations<'user'>({
       forSpaceId: space.id,
@@ -58,7 +57,6 @@ describe('addSpaceOperations', () => {
   });
 
   it('should add new operations to an existing permission', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     await addSpaceOperations({
@@ -79,7 +77,6 @@ describe('addSpaceOperations', () => {
   });
 
   it('should succeed if the assignee already has this permission', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     const createdPermission = await addSpaceOperations({
@@ -106,8 +103,7 @@ describe('addSpaceOperations', () => {
         operations: ['createPage']
       } as any);
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidPermissionGranteeError);
     }
   });
@@ -121,8 +117,7 @@ describe('addSpaceOperations', () => {
         spaceId: space.id as any
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidPermissionGranteeError);
     }
   });
@@ -135,14 +130,12 @@ describe('addSpaceOperations', () => {
         spaceId: space.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
 
   it('should fail if no operations are provided', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     try {
@@ -152,15 +145,13 @@ describe('addSpaceOperations', () => {
         userId: extraUser.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(MissingDataError);
     }
   });
 
   // This is for now as a security measure. In future, we may allow cross-space permissions
   it('should fail if the assigned space ID is different from target space ID', async () => {
-
     const { space: otherSpace } = await generateUserAndSpaceWithApiToken();
 
     try {
@@ -170,8 +161,7 @@ describe('addSpaceOperations', () => {
         spaceId: otherSpace.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
@@ -191,8 +181,7 @@ describe('addSpaceOperations', () => {
         roleId: role.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
@@ -207,10 +196,8 @@ describe('addSpaceOperations', () => {
         userId: externalUser.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
-
 });

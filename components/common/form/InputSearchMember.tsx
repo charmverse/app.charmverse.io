@@ -8,17 +8,16 @@ import type { Member } from 'lib/members/interfaces';
 
 interface IMembersFilter {
   mode: 'include' | 'exclude';
-  userIds: string [];
+  userIds: string[];
 }
 
-function filterMembers (members: Member [], filter: IMembersFilter): Member[] {
+function filterMembers(members: Member[], filter: IMembersFilter): Member[] {
   if (filter.mode === 'exclude') {
     return members.filter((member) => {
       const shouldInclude = filter.userIds.indexOf(member.id) === -1 && member.isBot !== true;
       return shouldInclude;
     });
-  }
-  else {
+  } else {
     return members.filter((member) => {
       const shouldInclude = filter.userIds.indexOf(member.id) > -1 && member.isBot !== true;
       return shouldInclude;
@@ -28,13 +27,14 @@ function filterMembers (members: Member [], filter: IMembersFilter): Member[] {
 
 type BooleanField = boolean | undefined;
 
-interface Props extends Omit<AutocompleteProps<Member, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
+interface Props
+  extends Omit<AutocompleteProps<Member, BooleanField, BooleanField, BooleanField>, 'options' | 'renderInput'> {
   filter?: IMembersFilter;
   options: Member[];
   disableCloseOnSelect?: boolean;
 }
 
-export function InputSearchMemberBase ({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
+export function InputSearchMemberBase({ filter, options, disableCloseOnSelect, placeholder, ...props }: Props) {
   const filteredOptions = filter ? filterMembers(options, filter) : options;
 
   return (
@@ -48,18 +48,13 @@ export function InputSearchMemberBase ({ filter, options, disableCloseOnSelect, 
       autoHighlight
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => (user as Member).username}
-      renderOption={(_props, user) => (
-        <UserDisplay
-          {..._props as any}
-          user={user}
-        />
-      )}
-      noOptionsText='No options available'
+      renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
+      noOptionsText="No options available"
       renderInput={(params) => (
         <TextField
           {...params}
           placeholder={filteredOptions.length > 0 ? placeholder : ''}
-          size='small'
+          size="small"
           inputProps={{
             ...params.inputProps
           }}
@@ -76,21 +71,20 @@ interface IInputSearchMemberProps {
   filter?: IMembersFilter;
 }
 
-export function InputSearchMember ({ defaultValue, onChange, ...props }: IInputSearchMemberProps) {
-
+export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSearchMemberProps) {
   const { members } = useMembers();
   const [value, setValue] = useState<Member | null>(null);
 
   useEffect(() => {
     if (defaultValue && !value) {
-      const member = members.find(c => c.id === defaultValue);
+      const member = members.find((c) => c.id === defaultValue);
       if (member) {
         setValue(member);
       }
     }
   }, [defaultValue, members]);
 
-  function emitValue (selectedUser: Member) {
+  function emitValue(selectedUser: Member) {
     if (selectedUser) {
       onChange(selectedUser.id);
     }
@@ -101,33 +95,38 @@ export function InputSearchMember ({ defaultValue, onChange, ...props }: IInputS
     <InputSearchMemberBase
       options={members}
       onChange={(e, _value) => emitValue(_value as Member)}
-      placeholder='Select a user'
+      placeholder="Select a user"
       value={value}
       {...props}
     />
   );
 }
 
-interface IInputSearchMemberMultipleProps extends Partial<Omit<AutocompleteProps<Member, true, true, true>, 'onChange'>> {
+interface IInputSearchMemberMultipleProps
+  extends Partial<Omit<AutocompleteProps<Member, true, true, true>, 'onChange'>> {
   onChange: (id: string[]) => void;
   defaultValue?: string[];
   filter?: IMembersFilter;
   disableCloseOnSelect?: boolean;
 }
 
-export function InputSearchMemberMultiple ({ onChange, disableCloseOnSelect, defaultValue, ...props }: IInputSearchMemberMultipleProps) {
-
+export function InputSearchMemberMultiple({
+  onChange,
+  disableCloseOnSelect,
+  defaultValue,
+  ...props
+}: IInputSearchMemberMultipleProps) {
   const { members } = useMembers();
   const [value, setValue] = useState<Member[]>([]);
 
-  function emitValue (users: Member[]) {
-    onChange(users.map(user => user.id));
+  function emitValue(users: Member[]) {
+    onChange(users.map((user) => user.id));
     setValue(users);
   }
 
   useEffect(() => {
     if (defaultValue && value.length === 0) {
-      const defaultMembers = members.filter(member => {
+      const defaultMembers = members.filter((member) => {
         return defaultValue.includes(member.id);
       });
       setValue(defaultMembers);
@@ -138,7 +137,7 @@ export function InputSearchMemberMultiple ({ onChange, disableCloseOnSelect, def
     <InputSearchMemberBase
       filterSelectedOptions
       multiple
-      placeholder='Select users'
+      placeholder="Select users"
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value) => emitValue(_value as Member[])}

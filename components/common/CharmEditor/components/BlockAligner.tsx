@@ -37,11 +37,9 @@ const Controls = styled.div`
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete } = props;
   return (
-    <StyledBlockAligner
-      draggable={false}
-    >
+    <StyledBlockAligner draggable={false}>
       {children}
-      <Controls className='controls'>
+      <Controls className="controls">
         <ListItem
           button
           disableRipple

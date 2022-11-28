@@ -4,7 +4,7 @@ import type { ProposalFilter, ProposalSort } from 'components/proposals/componen
 import { usePages } from 'hooks/usePages';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
-export function useProposalSortAndFilters (proposals: ProposalWithUsers[]) {
+export function useProposalSortAndFilters(proposals: ProposalWithUsers[]) {
   const [proposalSort, setProposalSort] = useState<ProposalSort>('latest_created');
   const [proposalFilter, setProposalFilter] = useState<ProposalFilter>('all');
   const [categoryIdFilter, setCategoryIdFilter] = useState<string>('all');
@@ -13,11 +13,11 @@ export function useProposalSortAndFilters (proposals: ProposalWithUsers[]) {
   let filteredProposals = proposals;
 
   if (proposalFilter !== 'all') {
-    filteredProposals = filteredProposals.filter(proposal => proposal.status === proposalFilter);
+    filteredProposals = filteredProposals.filter((proposal) => proposal.status === proposalFilter);
   }
 
   if (categoryIdFilter !== 'all') {
-    filteredProposals = filteredProposals.filter(proposal => proposal.categoryId === categoryIdFilter);
+    filteredProposals = filteredProposals.filter((proposal) => proposal.categoryId === categoryIdFilter);
   }
 
   filteredProposals = filteredProposals.sort((p1, p2) => {
@@ -27,5 +27,13 @@ export function useProposalSortAndFilters (proposals: ProposalWithUsers[]) {
     return (page1?.createdAt ?? 0) > (page2?.createdAt ?? 0) ? -1 : 1;
   });
 
-  return { filteredProposals, proposalSort, proposalFilter, categoryIdFilter, setProposalFilter, setCategoryIdFilter, setProposalSort };
+  return {
+    filteredProposals,
+    proposalSort,
+    proposalFilter,
+    categoryIdFilter,
+    setProposalFilter,
+    setCategoryIdFilter,
+    setProposalSort
+  };
 }

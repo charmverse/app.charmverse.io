@@ -33,16 +33,20 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
   refetchThreads: undefined as any
 });
 
-export function ThreadsProvider ({ children }: { children: ReactNode }) {
+export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = usePages();
   const [threads, setThreads] = useState<Record<string, ThreadWithCommentsAndAuthors | undefined>>({});
 
-  const { data, isValidating, mutate } = useSWR(() => currentPageId ? `pages/${currentPageId}/threads` : null, () => charmClient.getPageThreads(currentPageId), { revalidateOnFocus: false });
+  const { data, isValidating, mutate } = useSWR(
+    () => (currentPageId ? `pages/${currentPageId}/threads` : null),
+    () => charmClient.getPageThreads(currentPageId),
+    { revalidateOnFocus: false }
+  );
   useEffect(() => {
     setThreads(data?.reduce((acc, page) => ({ ...acc, [page.id]: page }), {}) || {});
   }, [data]);
 
-  async function addComment (threadId: string, commentContent: PageContent) {
+  async function addComment(threadId: string, commentContent: PageContent) {
     const thread = threads[threadId];
     if (thread) {
       const comment = await charmClient.addComment({
@@ -62,50 +66,55 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  async function editComment (threadId: string, editedCommentId: string, commentContent: PageContent) {
+  async function editComment(threadId: string, editedCommentId: string, commentContent: PageContent) {
     const thread = threads[threadId];
     if (thread) {
       await charmClient.editComment(editedCommentId, commentContent);
-      setThreads((_threads) => ({ ..._threads,
+      setThreads((_threads) => ({
+        ..._threads,
         [thread.id]: {
           ...thread,
-          comments: thread.comments
-            .map(comment => comment.id === editedCommentId ? ({ ...comment, content: commentContent, updatedAt: new Date() }) : comment)
-        } }));
+          comments: thread.comments.map((comment) =>
+            comment.id === editedCommentId ? { ...comment, content: commentContent, updatedAt: new Date() } : comment
+          )
+        }
+      }));
     }
   }
 
-  async function deleteComment (threadId: string, commentId: string) {
+  async function deleteComment(threadId: string, commentId: string) {
     const thread = threads[threadId];
     if (thread) {
-      const comment = thread.comments.find(_comment => _comment.id === commentId);
+      const comment = thread.comments.find((_comment) => _comment.id === commentId);
       if (comment) {
         await charmClient.deleteComment(comment.id);
         const threadWithoutComment = {
           ...thread,
-          comments: thread.comments.filter(_comment => _comment.id !== comment.id)
+          comments: thread.comments.filter((_comment) => _comment.id !== comment.id)
         };
         setThreads((_threads) => ({ ..._threads, [thread.id]: threadWithoutComment }));
       }
     }
   }
 
-  async function resolveThread (threadId: string) {
+  async function resolveThread(threadId: string) {
     const thread = threads[threadId];
 
     if (thread) {
       await charmClient.resolveThread(thread.id, {
         resolved: !thread.resolved
       });
-      setThreads((_threads) => ({ ..._threads,
+      setThreads((_threads) => ({
+        ..._threads,
         [thread.id]: {
           ...thread,
           resolved: !thread.resolved
-        } }));
+        }
+      }));
     }
   }
 
-  async function deleteThread (threadId: string) {
+  async function deleteThread(threadId: string) {
     const thread = threads[threadId];
 
     if (thread) {
@@ -115,23 +124,22 @@ export function ThreadsProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  const value: IContext = useMemo(() => ({
-    threads,
-    setThreads,
-    addComment,
-    editComment,
-    deleteComment,
-    resolveThread,
-    deleteThread,
-    isValidating,
-    refetchThreads: mutate
-  }), [currentPageId, threads, isValidating]);
-
-  return (
-    <ThreadsContext.Provider value={value}>
-      {children}
-    </ThreadsContext.Provider>
+  const value: IContext = useMemo(
+    () => ({
+      threads,
+      setThreads,
+      addComment,
+      editComment,
+      deleteComment,
+      resolveThread,
+      deleteThread,
+      isValidating,
+      refetchThreads: mutate
+    }),
+    [currentPageId, threads, isValidating]
   );
+
+  return <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>;
 }
 
 export const useThreads = () => useContext(ThreadsContext);

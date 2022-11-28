@@ -3,7 +3,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { includePagePermissions } from 'lib/pages/server/getAccessiblePages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-export async function getBounty (bountyId: string): Promise<BountyWithDetails | null> {
+export async function getBounty(bountyId: string): Promise<BountyWithDetails | null> {
   return prisma.bounty.findUnique({
     where: {
       id: bountyId
@@ -17,8 +17,7 @@ export async function getBounty (bountyId: string): Promise<BountyWithDetails | 
   }) as Promise<BountyWithDetails | null>;
 }
 
-export async function getBountyOrThrow (bountyId: string): Promise<BountyWithDetails> {
-
+export async function getBountyOrThrow(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBounty(bountyId);
 
   if (!bounty) {

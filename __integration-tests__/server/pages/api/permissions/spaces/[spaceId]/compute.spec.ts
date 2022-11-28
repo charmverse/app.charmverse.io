@@ -7,9 +7,7 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/permissions/space/{spaceId}/compute - Compute user space permissions', () => {
-
   it('should return assigned permissions for the user and respond 200', async () => {
-
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations({
@@ -20,38 +18,38 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
 
     const adminCookie = await loginUser(nonAdminUser.id);
 
-    const computedPermissions = (await request(baseUrl)
-      .get(`/api/permissions/space/${space.id}/compute`)
-      .set('Cookie', adminCookie)
-      .send({})
-      .expect(200)).body as SpacePermissionFlags;
+    const computedPermissions = (
+      await request(baseUrl)
+        .get(`/api/permissions/space/${space.id}/compute`)
+        .set('Cookie', adminCookie)
+        .send({})
+        .expect(200)
+    ).body as SpacePermissionFlags;
 
     expect(computedPermissions.createBounty).toBe(true);
     expect(computedPermissions.createPage).toBe(false);
-
   });
 
   it('should return full permissions for the admin user and respond 200', async () => {
-
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const adminCookie = await loginUser(adminUser.id);
 
     // No need to assign permissions
-    const computedPermissions = (await request(baseUrl)
-      .get(`/api/permissions/space/${space.id}/compute`)
-      .set('Cookie', adminCookie)
-      .send({})
-      .expect(200)).body as SpacePermissionFlags;
+    const computedPermissions = (
+      await request(baseUrl)
+        .get(`/api/permissions/space/${space.id}/compute`)
+        .set('Cookie', adminCookie)
+        .send({})
+        .expect(200)
+    ).body as SpacePermissionFlags;
 
-    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(op => {
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach((op) => {
       expect(computedPermissions[op]).toBe(true);
     });
-
   });
 
   it('should return empty permissions if the user is not a space member, and respond 200', async () => {
-
     const { space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const { user: userInOtherSpace } = await generateUserAndSpaceWithApiToken();
@@ -63,15 +61,16 @@ describe('GET /api/permissions/space/{spaceId}/compute - Compute user space perm
 
     const nonMemberCookie = await loginUser(userInOtherSpace.id);
 
-    const computedPermissions = (await request(baseUrl)
-      .get(`/api/permissions/space/${space.id}/compute`)
-      .set('Cookie', nonMemberCookie)
-      .send({})
-      .expect(200)).body as SpacePermissionFlags;
+    const computedPermissions = (
+      await request(baseUrl)
+        .get(`/api/permissions/space/${space.id}/compute`)
+        .set('Cookie', nonMemberCookie)
+        .send({})
+        .expect(200)
+    ).body as SpacePermissionFlags;
 
-    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(op => {
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach((op) => {
       expect(computedPermissions[op]).toBe(false);
     });
   });
-
 });

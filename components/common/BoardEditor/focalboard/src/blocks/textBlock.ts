@@ -3,10 +3,10 @@ import { createBlock } from './block';
 import type { ContentBlock } from './contentBlock';
 
 export type TextBlock = ContentBlock & {
-    type: 'text';
-}
+  type: 'text';
+};
 
-function createTextBlock (block?: Block): TextBlock {
+function createTextBlock(block?: Block): TextBlock {
   return {
     ...createBlock(block),
     type: 'text'

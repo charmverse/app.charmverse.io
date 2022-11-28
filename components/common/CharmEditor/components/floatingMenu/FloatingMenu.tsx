@@ -15,7 +15,19 @@ import InlineCommandPalette from '../../components/inlinePalette/components/Inli
 import type { SubMenu } from '../@bangle.dev/react-menu/floating-menu';
 import { LinkSubMenu } from '../@bangle.dev/react-menu/LinkSubMenu';
 import { Menu } from '../@bangle.dev/react-menu/Menu';
-import { BoldButton, CalloutButton, CodeButton, FloatingLinkButton, HeadingButton, InlineCommentButton, InlineVoteButton, ItalicButton, ParagraphButton, StrikeButton, UnderlineButton } from '../@bangle.dev/react-menu/MenuButtons';
+import {
+  BoldButton,
+  CalloutButton,
+  CodeButton,
+  FloatingLinkButton,
+  HeadingButton,
+  InlineCommentButton,
+  InlineVoteButton,
+  ItalicButton,
+  ParagraphButton,
+  StrikeButton,
+  UnderlineButton
+} from '../@bangle.dev/react-menu/MenuButtons';
 import { MenuGroup } from '../@bangle.dev/react-menu/MenuGroup';
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
@@ -32,10 +44,15 @@ interface Props {
   disableNestedPage?: boolean;
 }
 
-export default function FloatingMenuComponent (
-  {
-    pluginKey, enableComments = true, enableVoting = false, inline = false, pagePermissions, nestedPagePluginKey, disableNestedPage = false }: Props
-) {
+export default function FloatingMenuComponent({
+  pluginKey,
+  enableComments = true,
+  enableVoting = false,
+  inline = false,
+  pagePermissions,
+  nestedPagePluginKey,
+  disableNestedPage = false
+}: Props) {
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
@@ -48,7 +65,7 @@ export default function FloatingMenuComponent (
       menuKey={pluginKey}
       renderMenuType={(menuType) => {
         const { type } = menuType as { type: SubMenu };
-        if (type as FloatingMenuVariant === 'commentOnlyMenu' && pagePermissions?.comment) {
+        if ((type as FloatingMenuVariant) === 'commentOnlyMenu' && pagePermissions?.comment) {
           return (
             <Menu>
               <InlineCommentButton enableComments menuKey={pluginKey} />
@@ -61,15 +78,15 @@ export default function FloatingMenuComponent (
           return (
             <Menu type={type}>
               <MenuGroup>
-                <Tooltip title={<Typography component='div'>Turn into</Typography>}>
+                <Tooltip title={<Typography component="div">Turn into</Typography>}>
                   <Button
                     {...bindTrigger(popupState)}
                     endIcon={<ArrowDropDown />}
-                    size='small'
+                    size="small"
                     disableElevation
-                    variant='text'
-                    color='inherit'
-                    padding='0'
+                    variant="text"
+                    color="inherit"
+                    padding="0"
                     sx={{ padding: 0 }}
                   >
                     {activeItem}
@@ -79,7 +96,7 @@ export default function FloatingMenuComponent (
                   nestedPagePluginKey={nestedPagePluginKey}
                   disableNestedPage={disableNestedPage}
                   externalPopupState={popupState}
-                  size='small'
+                  size="small"
                   handleActiveItem={handleActiveItem}
                 />
               </MenuGroup>

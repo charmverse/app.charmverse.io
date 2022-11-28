@@ -3,12 +3,12 @@ import React from 'react';
 import type { MenuOptionProps } from './menuItem';
 
 type TextOptionProps = MenuOptionProps & {
-    icon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
-    className?: string;
-}
+  icon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  className?: string;
+};
 
-function TextOption (props:TextOptionProps): JSX.Element {
+function TextOption(props: TextOptionProps): JSX.Element {
   const { name, icon, rightIcon } = props;
   let className = 'MenuOption TextOption menu-option';
   if (props.className) {
@@ -17,7 +17,7 @@ function TextOption (props:TextOptionProps): JSX.Element {
   return (
     // eslint-disable-next-line jsx-a11y/interactive-supports-focus
     <div
-      role='button'
+      role="button"
       aria-label={name}
       className={className}
       onClick={(e: React.MouseEvent) => {
@@ -25,9 +25,9 @@ function TextOption (props:TextOptionProps): JSX.Element {
         props.onClick(props.id);
       }}
     >
-      {icon ?? <div className='noicon' />}
-      <div className='menu-name'>{name}</div>
-      {rightIcon ?? <div className='noicon' />}
+      {icon ?? <div className="noicon" />}
+      <div className="menu-name">{name}</div>
+      {rightIcon ?? <div className="noicon" />}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import type { Block } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -18,7 +17,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getBlockPageViews);
 
-async function getBlockPageViews (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+async function getBlockPageViews(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const { pageId } = req.query;
   const publicPage = await prisma.page.findFirst({
     where: {

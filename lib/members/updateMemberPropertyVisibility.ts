@@ -5,7 +5,7 @@ import { UndesirableOperationError } from 'lib/utilities/errors';
 import { MEMBER_PROPERTY_CONFIG } from './constants';
 import type { UpdateMemberPropertyVisibilityPayload } from './interfaces';
 
-export async function updateMemberPropertyVisibility ({
+export async function updateMemberPropertyVisibility({
   memberPropertyId,
   view,
   visible
@@ -35,7 +35,7 @@ export async function updateMemberPropertyVisibility ({
       id: memberPropertyId
     },
     data: {
-      enabledViews: visible ? [...enabledViews, view] : enabledViews.filter(enabledView => enabledView !== view)
+      enabledViews: visible ? [...enabledViews, view] : enabledViews.filter((enabledView) => enabledView !== view)
     }
   });
 }

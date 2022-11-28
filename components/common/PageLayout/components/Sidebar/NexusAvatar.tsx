@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
@@ -23,14 +22,13 @@ const MyAvatar = styled(Avatar)<{ active: boolean }>`
 
 const nexusRoutes = ['/nexus', '/profile', '/integrations'];
 
-export default function NexusAvatar ({ user }: { user: Pick<LoggedInUser, 'avatar' | 'username'> | null }) {
-
+export default function NexusAvatar({ user }: { user: Pick<LoggedInUser, 'avatar' | 'username'> | null }) {
   const router = useRouter();
-  const isNexusActive = nexusRoutes.some(route => router.pathname === route);
+  const isNexusActive = nexusRoutes.some((route) => router.pathname === route);
 
   return (
-    <AvatarLink href='/nexus'>
-      <Tooltip title='My Nexus' placement='right' arrow>
+    <AvatarLink href="/nexus">
+      <Tooltip title="My Nexus" placement="right" arrow>
         <span>
           <NotificationsBadge>
             <MyAvatar active={isNexusActive} avatar={user?.avatar} name={user?.username} />

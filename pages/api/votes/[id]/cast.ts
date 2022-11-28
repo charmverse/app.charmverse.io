@@ -1,4 +1,3 @@
-
 import type { UserVote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -18,7 +17,7 @@ handler
   .use(requireKeys(['choice'], 'body'))
   .post(castVote);
 
-async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
+async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { error: any }>) {
   const { choice } = req.body as UserVoteDTO;
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
@@ -48,7 +47,13 @@ async function castVote (req: NextApiRequest, res: NextApiResponse<UserVote | { 
   const newUserVote: UserVote = await castVoteService(choice, vote, userId);
 
   if (vote.context === 'proposal') {
-    trackUserAction('user_cast_a_vote', { userId, spaceId: vote.spaceId, pageId: vote.pageId, resourceId: vote.id, platform: 'charmverse' });
+    trackUserAction('user_cast_a_vote', {
+      userId,
+      spaceId: vote.spaceId,
+      pageId: vote.pageId,
+      resourceId: vote.id,
+      platform: 'charmverse'
+    });
   }
 
   return res.status(200).json(newUserVote);

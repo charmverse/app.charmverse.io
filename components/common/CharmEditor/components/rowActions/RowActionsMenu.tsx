@@ -30,7 +30,7 @@ const menuPosition: Partial<MenuProps> = {
   }
 };
 
-function Component ({ menuState }: { menuState: PluginState }) {
+function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, currentPageId, pages } = usePages();
@@ -39,7 +39,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
   const dispatch = useAppDispatch();
   const boards = useAppSelector(getSortedBoards);
 
-  function _getNode () {
+  function _getNode() {
     if (!menuState.rowPos || !menuState.rowDOM) {
       return null;
     }
@@ -61,7 +61,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
 
     const nodeStart = topPos.pos;
-    const nodeSize = (pmNode && pmNode.type.name !== 'doc') ? pmNode.nodeSize : 0;
+    const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
     let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
 
     // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
@@ -78,7 +78,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
     };
   }
 
-  function deleteRow () {
+  function deleteRow() {
     const node = _getNode();
     if (node) {
       let start = node.nodeStart;
@@ -94,7 +94,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
       // If its an embedded inline database delete the board page
       const page = pages[node.node.attrs.pageId];
       if (page?.type === 'inline_board' || page?.type === 'inline_linked_board') {
-        const board = boards.find(b => b.id === page.id);
+        const board = boards.find((b) => b.id === page.id);
         deletePage({
           board,
           pageId: page.id
@@ -103,7 +103,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  async function duplicateRow () {
+  async function duplicateRow() {
     const node = _getNode();
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
@@ -115,14 +115,17 @@ function Component ({ menuState }: { menuState: PluginState }) {
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
         dispatch(initialLoad({ spaceId: currentSpace.id }));
-        await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
-          return [..._pages, duplicatedPage];
-        }, {
-          revalidate: true
-        });
+        await mutate(
+          `pages/${currentSpace.id}`,
+          (_pages: Page[]) => {
+            return [..._pages, duplicatedPage];
+          },
+          {
+            revalidate: true
+          }
+        );
       }
-    }
-    else if (node) {
+    } else if (node) {
       const copy = node.node.copy(node.node.content);
       const newTr = safeInsert(copy, node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
@@ -132,29 +135,29 @@ function Component ({ menuState }: { menuState: PluginState }) {
 
   return (
     <>
-      <span className='charm-drag-handle' draggable='true'>
-        <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
+      <span className="charm-drag-handle" draggable="true">
+        <DragIndicatorIcon color="secondary" {...bindTrigger(popupState)} />
       </span>
 
-      <Menu
-        {...bindMenu(popupState)}
-        {...menuPosition}
-      >
+      <Menu {...bindMenu(popupState)} {...menuPosition}>
         <ListItemButton onClick={deleteRow} dense>
-          <ListItemIcon><DeleteOutlined color='secondary' /></ListItemIcon>
-          <ListItemText primary='Delete' />
+          <ListItemIcon>
+            <DeleteOutlined color="secondary" />
+          </ListItemIcon>
+          <ListItemText primary="Delete" />
         </ListItemButton>
         <ListItemButton onClick={duplicateRow} dense>
-          <ListItemIcon><DuplicateIcon color='secondary' /></ListItemIcon>
-          <ListItemText primary='Duplicate' />
+          <ListItemIcon>
+            <DuplicateIcon color="secondary" />
+          </ListItemIcon>
+          <ListItemText primary="Duplicate" />
         </ListItemButton>
       </Menu>
     </>
   );
 }
 
-export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey }) {
-
+export default function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const menuState: PluginState = usePluginState(pluginKey);
 
   // Fixes the case where undefined menu state throws an error

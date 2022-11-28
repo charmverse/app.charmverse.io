@@ -4,10 +4,15 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 
 import DiscordIcon from 'public/images/discord_logo.svg';
 
-export function DiscordSocialIcon (
-  { username, showLogo = true, showUsername = false }:
-  { username: string, showLogo?: boolean, showUsername?: boolean }
-) {
+export function DiscordSocialIcon({
+  username,
+  showLogo = true,
+  showUsername = false
+}: {
+  username: string;
+  showLogo?: boolean;
+  showUsername?: boolean;
+}) {
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
 
   const onDiscordUsernameCopy = () => {
@@ -17,7 +22,7 @@ export function DiscordSocialIcon (
 
   return (
     <Tooltip
-      placement='top'
+      placement="top"
       title={isDiscordUsernameCopied ? 'Copied' : `Click to copy: ${username}`}
       disableInteractive
       arrow
@@ -26,11 +31,11 @@ export function DiscordSocialIcon (
         <CopyToClipboard text={username} onCopy={onDiscordUsernameCopy}>
           <Box>
             {showLogo && (
-              <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#5865F2', height: '22px' }}>
+              <SvgIcon viewBox="0 -10 70 70" sx={{ color: '#5865F2', height: '22px' }}>
                 <DiscordIcon />
               </SvgIcon>
             )}
-            {showUsername && <Typography variant='body2'>{username}</Typography>}
+            {showUsername && <Typography variant="body2">{username}</Typography>}
           </Box>
         </CopyToClipboard>
       </Box>

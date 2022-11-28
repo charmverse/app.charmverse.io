@@ -14,15 +14,19 @@ const hoverStyle: { [key: string]: string } = {
 };
 
 const StyledMuiLink = styled(MuiLink)`
-  ${props => props.color
-    // @ts-ignore
-    ? `color: ${props.theme.palette[props.color]?.main};` : ''}
+  ${(props) =>
+    props.color
+      ? // @ts-ignore
+        `color: ${props.theme.palette[props.color]?.main};`
+      : ''}
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
     &:hover {
-      color: ${props => typeof props.color === 'string'
-  // @ts-ignore
-    ? (hoverStyle[props.color] || props.theme.palette[props.color]?.main) : props.theme.palette[props.color]?.main};
+      color: ${(props) =>
+        typeof props.color === 'string'
+          ? // @ts-ignore
+            hoverStyle[props.color] || props.theme.palette[props.color]?.main
+          : props.theme.palette[props.color]?.main};
     }
   }
 `;
@@ -31,24 +35,21 @@ interface Props extends LinkProps {
   external?: boolean;
 }
 
-export default function Link ({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
-
+export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
   if (!href) {
     return <div>{children}</div>;
   }
 
-  return (
-    external ? (
-      <StyledMuiLink href={href} color={color} rel='noreferrer' underline='none' {...restProps}>
+  return external ? (
+    <StyledMuiLink href={href} color={color} rel="noreferrer" underline="none" {...restProps}>
+      {children}
+    </StyledMuiLink>
+  ) : (
+    <NextLink href={href} passHref>
+      <StyledMuiLink onClick={onClick} color={color} {...restProps}>
         {children}
       </StyledMuiLink>
-    ) : (
-      <NextLink href={href} passHref>
-        <StyledMuiLink onClick={onClick} color={color} {...restProps}>
-          {children}
-        </StyledMuiLink>
-      </NextLink>
-    )
+    </NextLink>
   );
 }
 
@@ -58,18 +59,15 @@ interface PageLinkProps extends Props {
 }
 
 // use this link component to display a page inside a modal
-export function PageLink ({ bountyId, pageId, ...props }: PageLinkProps) {
-
+export function PageLink({ bountyId, pageId, ...props }: PageLinkProps) {
   const { showPage } = usePageDialog();
 
-  function onClickInternalLink (e: MouseEvent<HTMLAnchorElement>) {
+  function onClickInternalLink(e: MouseEvent<HTMLAnchorElement>) {
     if (bountyId || pageId) {
       showPage({ bountyId, pageId });
       e.preventDefault();
     }
   }
 
-  return (
-    <Link onClick={onClickInternalLink} {...props} />
-  );
+  return <Link onClick={onClickInternalLink} {...props} />;
 }

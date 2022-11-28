@@ -19,7 +19,7 @@ interface InviteLinksProps {
   popupState: PopupState;
 }
 
-export default function InviteLinkList ({ isAdmin, spaceId, popupState }: InviteLinksProps) {
+export default function InviteLinkList({ isAdmin, spaceId, popupState }: InviteLinksProps) {
   const [removedInviteLink, setRemovedInviteLink] = useState<InviteLink | null>(null);
   const { data = [], mutate } = useSWR(`inviteLinks/${spaceId}`, () => charmClient.getInviteLinks(spaceId));
 
@@ -30,12 +30,12 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
     close: closeInviteLinkDelete
   } = usePopupState({ variant: 'popover', popupId: 'invite-link-delete' });
 
-  function closeInviteLinkDeleteModal () {
+  function closeInviteLinkDeleteModal() {
     setRemovedInviteLink(null);
     closeInviteLinkDelete();
   }
 
-  async function createLink (values: InviteLinkFormValues) {
+  async function createLink(values: InviteLinkFormValues) {
     await charmClient.createInviteLink({
       spaceId,
       ...values
@@ -45,7 +45,7 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
     closeInviteModal();
   }
 
-  async function deleteLink (link: InviteLinkPopulated) {
+  async function deleteLink(link: InviteLinkPopulated) {
     setRemovedInviteLink(link);
     openInviteLinkDelete();
   }
@@ -58,11 +58,11 @@ export default function InviteLinkList ({ isAdmin, spaceId, popupState }: Invite
       </Modal>
       {removedInviteLink && (
         <ConfirmDeleteModal
-          title='Delete invite link'
+          title="Delete invite link"
           onClose={closeInviteLinkDeleteModal}
           open={isInviteLinkDeleteOpen}
-          buttonText='Delete'
-          question='Are you sure you want to delete this invite link?'
+          buttonText="Delete"
+          question="Are you sure you want to delete this invite link?"
           onConfirm={async () => {
             await charmClient.deleteInviteLink(removedInviteLink.id);
             // update the list of links

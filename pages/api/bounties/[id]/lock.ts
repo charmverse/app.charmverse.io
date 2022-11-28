@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,11 +10,9 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(closeSubmissionsController);
+handler.use(requireUser).post(closeSubmissionsController);
 
-async function closeSubmissionsController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
-
+async function closeSubmissionsController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id: bountyId } = req.query;
 
   const bounty = await getBountyOrThrow(bountyId as string);
@@ -32,7 +29,10 @@ async function closeSubmissionsController (req: NextApiRequest, res: NextApiResp
     throw new UnauthorisedActionError('You cannot close submissions for this bounty.');
   }
 
-  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions(bountyId as string, (!req.query.lock || req.query.lock === 'true'));
+  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions(
+    bountyId as string,
+    !req.query.lock || req.query.lock === 'true'
+  );
 
   return res.status(200).json(bountyWithClosedSubmissions);
 }

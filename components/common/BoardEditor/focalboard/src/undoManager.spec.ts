@@ -1,4 +1,3 @@
-
 import undoManager from './undomanager';
 
 test('Basic undo/redo', async () => {

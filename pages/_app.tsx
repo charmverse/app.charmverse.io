@@ -47,10 +47,7 @@ import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
-import {
-  darkTheme,
-  lightTheme
-} from 'theme/focalboard/theme';
+import { darkTheme, lightTheme } from 'theme/focalboard/theme';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
@@ -141,15 +138,14 @@ const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Pr
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
-}
+};
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-}
+};
 
-export default function App ({ Component, pageProps }: AppPropsWithLayout) {
-
-  const getLayout = Component.getLayout ?? (page => page);
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
   useEffect(() => {
@@ -164,14 +160,17 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
   const [mode, setMode] = useState<PaletteMode>('dark');
   const [isOldBuild, setIsOldBuild] = useState(false);
-  const colorModeContext = useMemo(() => ({
-    toggleColorMode: () => {
-      setMode((prevMode: PaletteMode) => {
-        const newMode = prevMode === 'light' ? 'dark' : 'light';
-        return newMode;
-      });
-    }
-  }), []);
+  const colorModeContext = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode: PaletteMode) => {
+          const newMode = prevMode === 'light' ? 'dark' : 'light';
+          return newMode;
+        });
+      }
+    }),
+    []
+  );
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
@@ -207,7 +206,6 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
     if (router.isReady) {
       refreshSignupData();
     }
-
   }, [router.isReady]);
 
   if (!router.isReady) {
@@ -236,14 +234,14 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                 <ErrorBoundary>
                                   <Snackbar
                                     isOpen={isOldBuild}
-                                    message='New CharmVerse platform update available. Please refresh.'
+                                    message="New CharmVerse platform update available. Please refresh."
                                     actions={[
-                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                        <RefreshIcon fontSize='small' />
+                                      <IconButton key="reload" onClick={() => window.location.reload()} color="inherit">
+                                        <RefreshIcon fontSize="small" />
                                       </IconButton>
                                     ]}
                                     origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity='warning'
+                                    severity="warning"
                                     handleClose={() => setIsOldBuild(false)}
                                   />
                                   {getLayout(<Component {...pageProps} />)}
@@ -266,8 +264,7 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   );
 }
 
-function DataProviders ({ children }: { children: ReactNode }) {
-
+function DataProviders({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
       <SpacesProvider>
@@ -277,9 +274,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
               <PaymentMethodsProvider>
                 <PagesProvider>
                   <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>
-                      {children}
-                    </PageTitleProvider>
+                    <PageTitleProvider>{children}</PageTitleProvider>
                   </PrimaryCharmEditorProvider>
                 </PagesProvider>
               </PaymentMethodsProvider>
@@ -291,7 +286,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
   );
 }
 
-function PageMetaTags () {
+function PageMetaTags() {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -301,7 +296,7 @@ function PageMetaTags () {
         {title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 workspace'}`}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-      <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+      <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
     </Head>
   );
 }

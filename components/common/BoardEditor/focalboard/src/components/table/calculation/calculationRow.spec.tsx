@@ -58,7 +58,7 @@ describe('components/table/calculation/CalculationRow', () => {
         board={board}
         cards={[card, card2]}
         activeView={view}
-        resizingColumn=''
+        resizingColumn=""
         offset={0}
         readOnly={false}
       />
@@ -80,7 +80,7 @@ describe('components/table/calculation/CalculationRow', () => {
         board={board}
         cards={[card, card2]}
         activeView={view}
-        resizingColumn=''
+        resizingColumn=""
         offset={0}
         readOnly={false}
       />

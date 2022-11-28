@@ -23,13 +23,15 @@ export interface GetTasksResponse {
   bounties: BountyTasksGroup;
 }
 
-async function getTasks (req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
+async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
   const userId = req.session.user.id;
   const discussionTasks = await getDiscussionTasks(userId);
   const voteTasks = await getVoteTasks(userId);
   const proposalTasks = await getProposalTasks(userId);
   const bountiesTasks = await getBountyTasks(userId);
-  return res.status(200).json({ proposals: proposalTasks, votes: voteTasks, discussions: discussionTasks, bounties: bountiesTasks });
+  return res
+    .status(200)
+    .json({ proposals: proposalTasks, votes: voteTasks, discussions: discussionTasks, bounties: bountiesTasks });
 }
 
 export default withSessionRoute(handler);

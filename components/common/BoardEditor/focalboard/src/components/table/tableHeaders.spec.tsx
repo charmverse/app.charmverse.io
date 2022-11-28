@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
@@ -22,7 +21,7 @@ describe('components/table/TableHeaders', () => {
         activeView={view}
         views={[view]}
         readOnly={false}
-        resizingColumn=''
+        resizingColumn=""
         offset={0}
         columnRefs={new Map()}
       />

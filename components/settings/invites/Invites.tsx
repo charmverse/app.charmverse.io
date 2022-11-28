@@ -19,7 +19,7 @@ interface InvitesProps {
   space: Space;
 }
 
-function Invites ({ space }: InvitesProps) {
+function Invites({ space }: InvitesProps) {
   const spaceId = space.id;
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
@@ -34,11 +34,10 @@ function Invites ({ space }: InvitesProps) {
     isTokenGatePending.current = false;
   }
 
-  function handleTokenGate () {
+  function handleTokenGate() {
     if (account) {
       popupTokenGateState.open();
-    }
-    else {
+    } else {
       isTokenGatePending.current = true;
       openWalletSelectorModal();
     }
@@ -54,8 +53,16 @@ function Invites ({ space }: InvitesProps) {
   return (
     <>
       <InviteIntro />
-      <Legend noBorder variant='inherit' variantMapping={{ inherit: 'div' }} display='flex' justifyContent='space-between'>
-        <Typography variant='h2' fontSize='inherit' fontWeight={700}>Invite Links</Typography>
+      <Legend
+        noBorder
+        variant="inherit"
+        variantMapping={{ inherit: 'div' }}
+        display="flex"
+        justifyContent="space-between"
+      >
+        <Typography variant="h2" fontSize="inherit" fontWeight={700}>
+          Invite Links
+        </Typography>
         <InviteActions
           onOpenInvitesClick={popupInvitesState.open}
           onOpenTokenGateClick={handleTokenGate}

@@ -2,8 +2,7 @@ import { useRouter } from 'next/router';
 
 import { useSpaces } from './useSpaces';
 
-export function useCurrentSpace () {
-
+export function useCurrentSpace() {
   const router = useRouter();
   const { spaces } = useSpaces();
 
@@ -11,7 +10,7 @@ export function useCurrentSpace () {
   // The other part of this logic, which retrieves list of spaces in public mode is in components/share/PublicPage
   const domain = router.query.domain ?? router.query.pageId?.[0];
 
-  const space = spaces.find(w => w.domain === domain);
+  const space = spaces.find((w) => w.domain === domain);
 
   return space;
 }

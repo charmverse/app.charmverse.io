@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -9,14 +8,14 @@ import { ContentBlock } from '../../../blocks/contentBlock';
 import { Utils } from '../../../utils';
 
 type Props = {
-    updatedAt: string;
-}
+  updatedAt: string;
+};
 
-function LastModifiedAt (props: Props): JSX.Element {
+function LastModifiedAt(props: Props): JSX.Element {
   const intl = useIntl();
 
   return (
-    <div className='LastModifiedAt octo-propertyvalue readonly'>
+    <div className="LastModifiedAt octo-propertyvalue readonly">
       {Utils.displayDateTime(new Date(props.updatedAt), intl)}
     </div>
   );

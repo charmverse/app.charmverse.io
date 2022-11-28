@@ -13,12 +13,12 @@ type Props = {
   isSaving?: boolean;
 };
 
-export default function NftAvatarGalleryPopup ({ onSelect, isVisible, onClose, isSaving }: Props) {
+export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, isSaving }: Props) {
   const { user } = useUser();
   const { nfts, isLoading } = useMyNfts(user?.id || '');
 
   return (
-    <Dialog onClose={onClose} open={isVisible} scroll='paper'>
+    <Dialog onClose={onClose} open={isVisible} scroll="paper">
       <DialogTitle>Your NFTs gallery</DialogTitle>
 
       <DialogContent dividers>
@@ -27,7 +27,7 @@ export default function NftAvatarGalleryPopup ({ onSelect, isVisible, onClose, i
           isLoading={isLoading}
           onSelect={onSelect}
           isSaving={isSaving}
-          emptyMessage='You do not own any NFTs'
+          emptyMessage="You do not own any NFTs"
         />
       </DialogContent>
     </Dialog>

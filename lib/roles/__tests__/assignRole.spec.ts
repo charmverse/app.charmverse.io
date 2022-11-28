@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { SpacePermission } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -20,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('assignRole', () => {
-
   it('should assign a user to a role and return the role with all current assignees', async () => {
-
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
@@ -47,8 +44,7 @@ describe('assignRole', () => {
     });
 
     expect(roleAfterAssignment.users.length).toBe(2);
-    expect(roleAfterAssignment.users.some(u => u.id === extraUser.id));
-
+    expect(roleAfterAssignment.users.some((u) => u.id === extraUser.id));
   });
 
   it('should fail if the user is not a member of the space', async () => {
@@ -65,8 +61,7 @@ describe('assignRole', () => {
         userId: userInOtherSpace.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
@@ -78,8 +73,7 @@ describe('assignRole', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
@@ -96,10 +90,8 @@ describe('assignRole', () => {
         userId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
-
 });

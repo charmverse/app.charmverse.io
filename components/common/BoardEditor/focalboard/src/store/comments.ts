@@ -1,4 +1,3 @@
-
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -16,8 +15,7 @@ const commentsSlice = createSlice({
       for (const comment of action.payload) {
         if (comment.deletedAt === 0) {
           state.comments[comment.id] = comment;
-        }
-        else {
+        } else {
           delete state.comments[comment.id];
         }
       }
@@ -46,11 +44,13 @@ const commentsSlice = createSlice({
 export const { updateComments } = commentsSlice.actions;
 export const { reducer } = commentsSlice;
 
-export function getCardComments (cardId?: string): (state: RootState) => CommentBlock[] {
+export function getCardComments(cardId?: string): (state: RootState) => CommentBlock[] {
   return (state: RootState): CommentBlock[] => {
-    return cardId ? Object.values(state.comments.comments)
-      .filter((c) => c.parentId === cardId)
-      .sort((a, b) => a.createdAt - b.createdAt) : [];
+    return cardId
+      ? Object.values(state.comments.comments)
+          .filter((c) => c.parentId === cardId)
+          .sort((a, b) => a.createdAt - b.createdAt)
+      : [];
   };
 }
 

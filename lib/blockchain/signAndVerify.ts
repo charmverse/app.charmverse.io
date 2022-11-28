@@ -13,7 +13,7 @@ export type SignatureToGenerate = {
   address: string;
   chainId: number;
   host: string;
-}
+};
 
 export type SignaturePayload = {
   domain: string;
@@ -25,8 +25,7 @@ export type SignaturePayload = {
   issuedAt?: string;
 };
 
-export function generateSignaturePayload ({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
-
+export function generateSignaturePayload({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
   const domain = host.match('https') ? host.split('https://')[1] : host.split('http://')[1];
   const uri = host;
 
@@ -43,13 +42,12 @@ export type SignatureVerification = {
   address: string;
   host: string;
   signature: AuthSig;
-}
+};
 
 /**
  * Use this for
  */
-export function isValidWalletSignature ({ address, host, signature }: SignatureVerification): boolean {
-
+export function isValidWalletSignature({ address, host, signature }: SignatureVerification): boolean {
   if (!address || !host || !signature) {
     throw new InvalidInputError('A wallet address, host and signature are required');
   }
@@ -75,5 +73,4 @@ export function isValidWalletSignature ({ address, host, signature }: SignatureV
   }
 
   return true;
-
 }

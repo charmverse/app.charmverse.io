@@ -23,7 +23,7 @@ const PageTypeQueryParamRecord: Record<SupportedPageType, string> = {
   proposal: 'id'
 };
 
-export function PageActions ({
+export function PageActions({
   page,
   onClickDelete,
   onClickEdit,
@@ -38,7 +38,7 @@ export function PageActions ({
 }) {
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const pageCreator = members.find(member => member.id === page.createdBy);
+  const pageCreator = members.find((member) => member.id === page.createdBy);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -52,7 +52,7 @@ export function PageActions ({
 
   const pageType = page.type as SupportedPageType;
 
-  function onClickCopyLink () {
+  function onClickCopyLink() {
     let link = window.location.href;
 
     const queryString = new URLSearchParams(window.location.search);
@@ -66,7 +66,7 @@ export function PageActions ({
     showMessage(`Copied ${page.type} link to clipboard`, 'success');
   }
 
-  function onClickOpenInNewTab () {
+  function onClickOpenInNewTab() {
     let link = window.location.href;
 
     const queryString = new URLSearchParams(window.location.search);
@@ -80,12 +80,8 @@ export function PageActions ({
   }
   return (
     <>
-      <IconButton
-        size='small'
-        className='icons'
-        onClick={handleClick}
-      >
-        <MoreHorizIcon color='secondary' fontSize='small' />
+      <IconButton size="small" className="icons" onClick={handleClick}>
+        <MoreHorizIcon color="secondary" fontSize="small" />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -100,45 +96,44 @@ export function PageActions ({
       >
         {onClickEdit && (
           <MenuItem dense onClick={onClickEdit}>
-            <EditOutlined fontSize='small' sx={{ mr: 1 }} />
+            <EditOutlined fontSize="small" sx={{ mr: 1 }} />
             <ListItemText>Edit</ListItemText>
           </MenuItem>
         )}
         <MenuItem dense onClick={onClickDelete} disabled={!onClickDelete}>
-          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+          <DeleteOutlineIcon fontSize="small" sx={{ mr: 1 }} />
           <ListItemText>Delete</ListItemText>
         </MenuItem>
         {onClickDuplicate && (
           <MenuItem dense onClick={onClickDuplicate}>
-            <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
+            <DuplicateIcon fontSize="small" sx={{ mr: 1 }} />
             <ListItemText>Duplicate</ListItemText>
           </MenuItem>
         )}
         <MenuItem dense onClick={onClickCopyLink}>
-          <LinkIcon fontSize='small' sx={{ mr: 1 }} />
+          <LinkIcon fontSize="small" sx={{ mr: 1 }} />
           <ListItemText>Copy link</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={onClickOpenInNewTab}>
-          <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
+          <LaunchIcon fontSize="small" sx={{ mr: 1 }} />
           <ListItemText>Open in new tab</ListItemText>
         </MenuItem>
         {children}
         <Divider />
-        {
-      pageCreator && (
-        <Stack sx={{
-          px: 2
-        }}
-        >
-          <Typography variant='caption' color='secondary'>
-            Last edited by {pageCreator.username}
-          </Typography>
-          <Typography variant='caption' color='secondary'>
-            Last edited at {humanFriendlyDate(page.updatedAt)}
-          </Typography>
-        </Stack>
-      )
-    }
+        {pageCreator && (
+          <Stack
+            sx={{
+              px: 2
+            }}
+          >
+            <Typography variant="caption" color="secondary">
+              Last edited by {pageCreator.username}
+            </Typography>
+            <Typography variant="caption" color="secondary">
+              Last edited at {humanFriendlyDate(page.updatedAt)}
+            </Typography>
+          </Stack>
+        )}
       </Menu>
     </>
   );

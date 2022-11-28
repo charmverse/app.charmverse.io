@@ -48,7 +48,10 @@ const ShareModalContainer = styled.div`
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[], chains: string[] };
+type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & {
+  authSigTypes: string[];
+  chains: string[];
+};
 
 interface TokenGatesProps {
   isAdmin: boolean;
@@ -56,7 +59,7 @@ interface TokenGatesProps {
   popupState: PopupState;
 }
 
-export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
@@ -70,24 +73,24 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
 
   const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
 
-  function onSubmit (conditions: ConditionsModalResult) {
+  function onSubmit(conditions: ConditionsModalResult) {
     setApiError('');
     return saveTokenGate(conditions)
       .then(() => {
         closeTokenGateModal();
       })
-      .catch(error => {
+      .catch((error) => {
         setApiError(error.message || error);
         errorPopupState.open();
       });
   }
 
-  function closeTokenGateDeleteModal () {
+  function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);
     deletePopupState.close();
   }
 
-  async function saveTokenGate (conditions: ConditionsModalResult) {
+  async function saveTokenGate(conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
     const resourceId: ResourceId = {
       baseUrl: 'https://app.charmverse.io',
@@ -116,7 +119,7 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
     await mutate();
   }
 
-  async function deleteTokenGate (tokenGate: TokenGate) {
+  async function deleteTokenGate(tokenGate: TokenGate) {
     setRemovedTokenGate(tokenGate);
     deletePopupState.open();
   }
@@ -124,7 +127,7 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
   return (
     <>
       <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
-      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
+      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size="large">
         <ShareModalContainer>
           <LitShareModal
             darkMode={theme.palette.mode === 'dark'}
@@ -138,11 +141,11 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (
         <ConfirmDeleteModal
-          title='Delete token gate'
+          title="Delete token gate"
           onClose={closeTokenGateDeleteModal}
           open={deletePopupState.isOpen}
-          buttonText='Delete token gate'
-          question='Are you sure you want to delete this invite link?'
+          buttonText="Delete token gate"
+          question="Are you sure you want to delete this invite link?"
           onConfirm={async () => {
             await charmClient.deleteTokenGate(removedTokenGate.id);
             // update the list of links

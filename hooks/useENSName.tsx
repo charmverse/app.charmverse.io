@@ -9,10 +9,7 @@ const useENSName = (account: string | null | undefined): string | null | undefin
   const { library, chainId } = useWeb3AuthSig();
   const shouldFetch = Boolean(library && account);
 
-  const { data } = useSWRImmutable(
-    shouldFetch ? ['ENS', library, account, chainId] : null,
-    fetchENSName
-  );
+  const { data } = useSWRImmutable(shouldFetch ? ['ENS', library, account, chainId] : null, fetchENSName);
 
   return data;
 };

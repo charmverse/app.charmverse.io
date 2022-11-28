@@ -11,9 +11,15 @@ import type { SuggestionAction, SuggestionApproveAction, SuggestionRejectAction 
  * Returns newly accepted bounty
  * @param param0
  */
-export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionApproveAction): Promise<BountyWithDetails>
-export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionRejectAction): Promise<true>
-export async function reviewBountySuggestion ({ bountyId, decision }: SuggestionAction): Promise<BountyWithDetails | true> {
+export async function reviewBountySuggestion({
+  bountyId,
+  decision
+}: SuggestionApproveAction): Promise<BountyWithDetails>;
+export async function reviewBountySuggestion({ bountyId, decision }: SuggestionRejectAction): Promise<true>;
+export async function reviewBountySuggestion({
+  bountyId,
+  decision
+}: SuggestionAction): Promise<BountyWithDetails | true> {
   const bounty = await getBountyOrThrow(bountyId);
 
   if (bounty.status !== 'suggestion') {

@@ -9,20 +9,16 @@ const TIMESTAMP_FORMAT = 'yyyy-LL-dd HH:mm:ss';
 const ERRORS_WEBHOOK = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS;
 const originalFactory = _log.methodFactory;
 
-export function apply (log: Logger, logPrefix: string = '') {
-
-  const defaultLevel = process.env.LOG_LEVEL as LogLevelDesc || log.levels.DEBUG;
+export function apply(log: Logger, logPrefix: string = '') {
+  const defaultLevel = (process.env.LOG_LEVEL as LogLevelDesc) || log.levels.DEBUG;
   log.setDefaultLevel(defaultLevel);
 
   // dont apply logger in browser because it changes the stack tracke/line number
   if (isNodeEnv) {
-
     log.methodFactory = (methodName, logLevel, loggerName) => {
-
       const originalMethod = originalFactory(methodName, logLevel, loggerName);
 
       return (message, opt) => {
-
         let prefix = '';
         if (isProdEnv && isNodeEnv) {
           prefix = `[${DateTime.local().toFormat(TIMESTAMP_FORMAT)}]`;
@@ -42,11 +38,10 @@ export function apply (log: Logger, logPrefix: string = '') {
 
         // post errors to Discord
         if (methodName === 'error' && ERRORS_WEBHOOK) {
-          sendErrorToDiscord(ERRORS_WEBHOOK, message, opt)
-            .catch(err => {
-              // eslint-disable-next-line no-console
-              console.error('Error posting to discord', err);
-            });
+          sendErrorToDiscord(ERRORS_WEBHOOK, message, opt).catch((err) => {
+            // eslint-disable-next-line no-console
+            console.error('Error posting to discord', err);
+          });
         }
       };
     };
@@ -57,26 +52,28 @@ export function apply (log: Logger, logPrefix: string = '') {
   return log;
 }
 
-function sendErrorToDiscord (webhook: string, message: any, opt: any) {
-  let fields: { name: string, value?: string }[] = [];
+function sendErrorToDiscord(webhook: string, message: any, opt: any) {
+  let fields: { name: string; value?: string }[] = [];
   if (opt instanceof Error) {
     fields = [
       { name: 'Error', value: opt.message },
       { name: 'Stacktrace', value: opt.stack?.slice(0, 500) }
     ];
-  }
-  else if (opt) {
-    fields = Object.entries<any>(opt).map(([name, _value]) => {
-      const value = typeof _value === 'string' ? _value.slice(0, 500) : JSON.stringify(_value || {});
-      return { name, value };
-    })
+  } else if (opt) {
+    fields = Object.entries<any>(opt)
+      .map(([name, _value]) => {
+        const value = typeof _value === 'string' ? _value.slice(0, 500) : JSON.stringify(_value || {});
+        return { name, value };
+      })
       .slice(0, 5); // add a sane max # of fields just in case
   }
   return http.POST(webhook, {
-    embeds: [{
-      color: 14362664, // #db2828
-      description: message,
-      fields
-    }]
+    embeds: [
+      {
+        color: 14362664, // #db2828
+        description: message,
+        fields
+      }
+    ]
   });
 }

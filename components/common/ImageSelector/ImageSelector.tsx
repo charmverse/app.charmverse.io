@@ -18,29 +18,28 @@ interface ImageSelectorProps {
   galleryImages?: { [category: string]: string[] };
 }
 
-export default function ImageSelector ({ autoOpen = false, children, galleryImages, onImageSelect }: ImageSelectorProps) {
+export default function ImageSelector({
+  autoOpen = false,
+  children,
+  galleryImages,
+  onImageSelect
+}: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
   const [isUploading, setIsUploading] = useState(false);
 
   if (galleryImages) {
-    tabs.push([
-      'Gallery',
-      <ImageSelectorGallery
-        key='gallery'
-        onImageClick={onImageSelect}
-        items={galleryImages}
-      />
-    ]);
+    tabs.push(['Gallery', <ImageSelectorGallery key="gallery" onImageClick={onImageSelect} items={galleryImages} />]);
   }
 
   return (
     <PopperPopup
       autoOpen={autoOpen}
-      popupContent={(
-        <Box sx={{
-          width: 750
-        }}
+      popupContent={
+        <Box
+          sx={{
+            width: 750
+          }}
         >
           <MultiTabs
             disabled={isUploading}
@@ -49,19 +48,25 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
               [
                 'Upload',
                 <Box
-                  key='upload'
+                  key="upload"
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
                     width: '100%'
                   }}
                 >
-                  <PimpedButton loading={isUploading} loadingMessage='Uploading image' disabled={isUploading} component='label' variant='contained'>
+                  <PimpedButton
+                    loading={isUploading}
+                    loadingMessage="Uploading image"
+                    disabled={isUploading}
+                    component="label"
+                    variant="contained"
+                  >
                     Choose an image
                     <input
-                      type='file'
+                      type="file"
                       hidden
-                      accept='image/*'
+                      accept="image/*"
                       onChange={async (e) => {
                         setIsUploading(true);
                         const firstFile = e.target.files?.[0];
@@ -78,7 +83,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
               [
                 'Link',
                 <Box
-                  key='link'
+                  key="link"
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -86,7 +91,12 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
                     alignItems: 'center'
                   }}
                 >
-                  <TextField autoFocus placeholder='Paste the image link...' value={embedLink} onChange={(e) => setEmbedLink(e.target.value)} />
+                  <TextField
+                    autoFocus
+                    placeholder="Paste the image link..."
+                    value={embedLink}
+                    onChange={(e) => setEmbedLink(e.target.value)}
+                  />
                   <Button
                     disabled={!embedLink}
                     sx={{
@@ -104,7 +114,7 @@ export default function ImageSelector ({ autoOpen = false, children, galleryImag
             ]}
           />
         </Box>
-      )}
+      }
     >
       {children}
     </PopperPopup>

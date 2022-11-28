@@ -6,25 +6,31 @@ type GetVisiblePropertiesProps = {
   spaceId: string | string[];
   requestingUserId: string | undefined;
   requestedUserId?: string;
-}
+};
 
-export function getAccessibleMemberPropertiesBySpace ({ requestedUserId, requestingUserId, spaceId }: GetVisiblePropertiesProps) {
+export function getAccessibleMemberPropertiesBySpace({
+  requestedUserId,
+  requestingUserId,
+  spaceId
+}: GetVisiblePropertiesProps) {
   if (!requestingUserId) {
     return [];
   }
 
   const spaceIdQuery = typeof spaceId === 'string' ? [spaceId] : spaceId;
 
-  const memberPropertyWhereAndQuery: Prisma.Enumerable<Prisma.MemberPropertyWhereInput> = [{
-    space: {
-      id: { in: spaceIdQuery },
-      spaceRoles: {
-        some: {
-          userId: requestingUserId
+  const memberPropertyWhereAndQuery: Prisma.Enumerable<Prisma.MemberPropertyWhereInput> = [
+    {
+      space: {
+        id: { in: spaceIdQuery },
+        spaceRoles: {
+          some: {
+            userId: requestingUserId
+          }
         }
       }
     }
-  }];
+  ];
 
   if (requestingUserId !== requestedUserId) {
     memberPropertyWhereAndQuery.push({
@@ -80,8 +86,13 @@ export function getAccessibleMemberPropertiesBySpace ({ requestedUserId, request
   });
 }
 
-export function accessiblePropertiesByPermissionsQuery ({ spaceIds, userId }:
-  { spaceIds: string[], userId: string }): Prisma.MemberPropertyPermissionListRelationFilter {
+export function accessiblePropertiesByPermissionsQuery({
+  spaceIds,
+  userId
+}: {
+  spaceIds: string[];
+  userId: string;
+}): Prisma.MemberPropertyPermissionListRelationFilter {
   return {
     some: {
       role: {

@@ -7,7 +7,7 @@ import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
 
 import log from 'lib/log';
 
-export function rowSpec (): RawSpecs {
+export function rowSpec(): RawSpecs {
   return {
     type: 'node',
     name: 'columnLayout',
@@ -28,7 +28,6 @@ export function rowSpec (): RawSpecs {
     },
     markdown: {
       toMarkdown: (state, node) => {
-
         /*
         An approach to generating columns would be to have a single-row markdown table.
         For this to work, we need to find a way to replace all the whitepace in the inner nodes with a <br> tag
@@ -41,13 +40,12 @@ export function rowSpec (): RawSpecs {
           state.renderInline(column);
         });
         */
-
       }
     }
   };
 }
 
-export function columnSpec (): RawSpecs {
+export function columnSpec(): RawSpecs {
   return {
     type: 'node',
     name: 'columnBlock',
@@ -69,21 +67,23 @@ export function columnSpec (): RawSpecs {
   };
 }
 
-export function plugins (): RawPlugins {
+export function plugins(): RawPlugins {
   return ({ schema }) => {
-
     const isColumnBlock = parentHasDirectParentOfType(schema.nodes.columnBlock, schema.nodes.columnLayout);
 
     return [
       keymap(
         createObject([
           // 'Shift-Tab': undentListItem,
-          ['Tab', filter(isColumnBlock, (state, dispatch) => {
-            // if (dispatch) {
-            //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
-            // }
-            return false;
-          })],
+          [
+            'Tab',
+            filter(isColumnBlock, (state, dispatch) => {
+              // if (dispatch) {
+              //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
+              // }
+              return false;
+            })
+          ],
           // 'Shift-Tab': undentListItem,
           ['Mod-Enter', filter(isColumnBlock, exitColumn)],
           ['Enter', filter(isColumnBlock, chainCommands(newlineInCode, createParagraphNear, splitBlock))]
@@ -102,6 +102,10 @@ export function plugins (): RawPlugins {
     ];
   };
 }
-function exitColumn (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, view: EditorView<any> | undefined) {
+function exitColumn(
+  state: EditorState,
+  dispatch: ((tr: Transaction<any>) => void) | undefined,
+  view: EditorView<any> | undefined
+) {
   return insertEmpty(state.schema.nodes.paragraph, 'below', true)(state, dispatch, view);
 }

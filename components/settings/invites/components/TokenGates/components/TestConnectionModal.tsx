@@ -11,29 +11,26 @@ export interface TestResult {
   status?: 'loading' | 'error' | 'success';
 }
 
-interface Props extends Omit<ComponentProps<typeof Modal>, 'children'>, TestResult {
+interface Props extends Omit<ComponentProps<typeof Modal>, 'children'>, TestResult {}
 
-}
-
-export default function StatusModal ({ status, message, ...props }: Props) {
-
+export default function StatusModal({ status, message, ...props }: Props) {
   if (!status) {
     return null;
   }
 
   return (
-    <Modal size='fluid' {...props}>
+    <Modal size="fluid" {...props}>
       <DialogTitle onClose={props.onClose} sx={!message ? { padding: 0 } : {}}>
-        <Box display='flex' gap={1} width={300} alignItems='center'>
+        <Box display="flex" gap={1} width={300} alignItems="center">
           {status === 'success' && (
             <>
-              <CheckCircleOutlineIcon color='success' fontSize='large' />
+              <CheckCircleOutlineIcon color="success" fontSize="large" />
               Success
             </>
           )}
           {status === 'error' && (
             <>
-              <ErrorOutlineIcon color='error' fontSize='large' />
+              <ErrorOutlineIcon color="error" fontSize="large" />
               Access denied
             </>
           )}

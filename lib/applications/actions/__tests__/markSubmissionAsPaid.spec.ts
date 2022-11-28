@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -19,7 +18,6 @@ beforeAll(async () => {
 
 describe('markSubmissionAsPaid', () => {
   it('should return the updated submission with a paid status when paid', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -34,7 +32,6 @@ describe('markSubmissionAsPaid', () => {
   });
 
   it('should fail if trying to pay a submission that is not in completed status', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -46,8 +43,7 @@ describe('markSubmissionAsPaid', () => {
     try {
       await markSubmissionAsPaid(bountyWithSubmission.applications[0].id);
       throw new ExpectedAnError();
-    }
-    catch (error: any) {
+    } catch (error: any) {
       expect(error).toBeInstanceOf(WrongStateError);
     }
   });

@@ -11,21 +11,21 @@ interface TweetInputProps {
   isValid?: (url: string) => boolean;
 }
 
-export function TweetInput (props: TweetInputProps) {
+export function TweetInput(props: TweetInputProps) {
   const [embedUrl, setEmbedUrl] = useState('');
   const { onSubmit } = props;
 
   return (
     <PopperPopup
       autoOpen={props.autoOpen}
-      popupContent={(
+      popupContent={
         <Box width={750}>
           <Box
-            display='flex'
-            flexDirection='column'
+            display="flex"
+            flexDirection="column"
             gap={2}
             py={2}
-            alignItems='center'
+            alignItems="center"
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -35,7 +35,7 @@ export function TweetInput (props: TweetInputProps) {
           >
             <TextField
               autoFocus
-              placeholder='https://twitter.com...'
+              placeholder="https://twitter.com..."
               value={embedUrl}
               onChange={(e) => setEmbedUrl(e.target.value)}
             />
@@ -51,10 +51,12 @@ export function TweetInput (props: TweetInputProps) {
             >
               Embed Tweet
             </Button>
-            <Typography color='secondary' variant='caption'>Works with links to Tweets</Typography>
+            <Typography color="secondary" variant="caption">
+              Works with links to Tweets
+            </Typography>
           </Box>
         </Box>
-      )}
+      }
     >
       <ListItem
         button
@@ -67,17 +69,9 @@ export function TweetInput (props: TweetInputProps) {
           my: 0.5
         }}
       >
-        <Typography
-          color='secondary'
-          display='flex'
-          gap={1.5}
-          width='100%'
-          alignItems='center'
-        >
-          <TwitterIcon fontSize='small' />
-          <Typography>
-            Embed a Tweet
-          </Typography>
+        <Typography color="secondary" display="flex" gap={1.5} width="100%" alignItems="center">
+          <TwitterIcon fontSize="small" />
+          <Typography>Embed a Tweet</Typography>
         </Typography>
       </ListItem>
     </PopperPopup>

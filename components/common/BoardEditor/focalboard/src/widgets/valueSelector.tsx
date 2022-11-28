@@ -33,7 +33,7 @@ type Props = {
   isMulti?: boolean;
   onDeleteValue?: (value: IPropertyOption) => void;
   onBlur?: () => void;
-}
+};
 
 type LabelProps = {
   option: IPropertyOption;
@@ -42,7 +42,7 @@ type LabelProps = {
   onDeleteOption: (option: IPropertyOption) => void;
   onDeleteValue?: (value: IPropertyOption) => void;
   isMulti?: boolean;
-}
+};
 
 const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
   const { option, onDeleteValue, meta, isMulti } = props;
@@ -53,48 +53,39 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
       className += ' Label-no-margin';
     }
     return (
-      <Label
-        color={option.color}
-        className={className}
-      >
-        <span className='Label-text'>{option.value}</span>
-        {onDeleteValue
-          && (
-            <IconButton
-              onClick={() => onDeleteValue(option)}
-              icon={<CloseOutlinedIcon fontSize='small' />}
-              title='Clear'
-              className='margin-left delete-value'
-            />
-          )}
+      <Label color={option.color} className={className}>
+        <span className="Label-text">{option.value}</span>
+        {onDeleteValue && (
+          <IconButton
+            onClick={() => onDeleteValue(option)}
+            icon={<CloseOutlinedIcon fontSize="small" />}
+            title="Clear"
+            className="margin-left delete-value"
+          />
+        )}
       </Label>
     );
   }
   return (
-    <div className='value-menu-option'>
-      <div className='label-container'>
+    <div className="value-menu-option">
+      <div className="label-container">
         <Label color={option.color}>{option.value}</Label>
       </div>
       <MenuWrapper stopPropagationOnToggle={true}>
         <IconButton
           title={intl.formatMessage({ id: 'ValueSelectorLabel.openMenu', defaultMessage: 'Open menu' })}
-          icon={<MoreHorizOutlinedIcon fontSize='small' />}
+          icon={<MoreHorizOutlinedIcon fontSize="small" />}
         />
-        <Menu position='bottom'>
+        <Menu position="bottom">
           <Menu.Text
-            id='delete'
-            icon={<DeleteOutlinedIcon fontSize='small' />}
+            id="delete"
+            icon={<DeleteOutlinedIcon fontSize="small" />}
             name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
             onClick={() => props.onDeleteOption(option)}
           />
           <Menu.Separator />
           {Object.entries(Constants.menuColors).map(([key, color]: [string, string]) => (
-            <Menu.Color
-              key={key}
-              id={key}
-              name={color}
-              onClick={() => props.onChangeColor(option, key)}
-            />
+            <Menu.Color key={key} id={key} name={color} onClick={() => props.onChangeColor(option, key)} />
           ))}
         </Menu>
       </MenuWrapper>
@@ -157,11 +148,16 @@ const valueSelectorStyle = {
   })
 };
 
-function ValueSelector (props: Props): JSX.Element {
+function ValueSelector(props: Props): JSX.Element {
   const intl = useIntl();
   return (
     <CreatableSelect
-      noOptionsMessage={() => intl.formatMessage({ id: 'ValueSelector.noOptions', defaultMessage: 'No options. Start typing to add the first one!' })}
+      noOptionsMessage={() =>
+        intl.formatMessage({
+          id: 'ValueSelector.noOptions',
+          defaultMessage: 'No options. Start typing to add the first one!'
+        })
+      }
       aria-label={intl.formatMessage({ id: 'ValueSelector.valueSelector', defaultMessage: 'Value selector' })}
       captureMenuScroll={true}
       maxMenuHeight={1200}
@@ -179,7 +175,7 @@ function ValueSelector (props: Props): JSX.Element {
           onDeleteValue={props.onDeleteValue}
         />
       )}
-      className='ValueSelector'
+      className="ValueSelector"
       options={props.options}
       getOptionLabel={(o: IPropertyOption) => o.value}
       getOptionValue={(o: IPropertyOption) => o.id}
@@ -187,12 +183,10 @@ function ValueSelector (props: Props): JSX.Element {
         if (action.action === 'select-option') {
           if (Array.isArray(value)) {
             props.onChange((value as IPropertyOption[]).map((option) => option.id));
-          }
-          else {
+          } else {
             props.onChange((value as IPropertyOption).id);
           }
-        }
-        else if (action.action === 'clear') {
+        } else if (action.action === 'clear') {
           props.onChange('');
         }
       }}

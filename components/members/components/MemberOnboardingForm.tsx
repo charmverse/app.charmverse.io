@@ -5,10 +5,17 @@ import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesM
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
-export function MemberOnboardingForm (
-  { userId, spaceId, spaceName, onClose }:
-  { onClose: () => void, spaceName: string, spaceId: string, userId: string }
-) {
+export function MemberOnboardingForm({
+  userId,
+  spaceId,
+  spaceName,
+  onClose
+}: {
+  onClose: () => void;
+  spaceName: string;
+  spaceId: string;
+  userId: string;
+}) {
   const { updateSpaceValues } = useMemberPropertyValues(userId);
   const { setUser, user } = useUser();
 
@@ -19,7 +26,7 @@ export function MemberOnboardingForm (
       memberId={userId}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
-      cancelButtonText='Set up later'
+      cancelButtonText="Set up later"
     >
       {user && (
         <>
@@ -30,9 +37,10 @@ export function MemberOnboardingForm (
             user={user}
             updateUser={setUser}
           />
-          <Divider sx={{
-            my: 1
-          }}
+          <Divider
+            sx={{
+              my: 1
+            }}
           />
         </>
       )}

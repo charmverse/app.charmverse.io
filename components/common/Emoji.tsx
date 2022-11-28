@@ -9,8 +9,9 @@ type ImgSize = 'large' | 'small';
 
 export const Emoji = styled.div<{ size?: ImgSize }>`
   /* font family taken from Notion */
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
-  font-size: ${({ size }) => size === 'large' ? '78px' : 'inherit'};
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', NotoColorEmoji, 'Noto Color Emoji', 'Segoe UI Symbol',
+    'Android Emoji', EmojiSymbols;
+  font-size: ${({ size }) => (size === 'large' ? '78px' : 'inherit')};
   overflow: hidden;
   white-space: nowrap;
   user-select: none;
@@ -44,15 +45,15 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
     justify-content: center;
   }
   img {
-    border-radius: ${({ size }) => size === 'large' ? '6px' : '3px'};
-    height: ${({ size }) => size === 'large' ? '100%' : '18px'};
+    border-radius: ${({ size }) => (size === 'large' ? '6px' : '3px')};
+    height: ${({ size }) => (size === 'large' ? '100%' : '18px')};
     width: auto;
-    max-width: ${({ size }) => size === 'large' ? '100%' : '18px'};
+    max-width: ${({ size }) => (size === 'large' ? '100%' : '18px')};
   }
 `;
 
 // Use system font for Mac OS, but Twitter emojis for everyone else
-export function getTwitterEmoji (emoji: string): string | null {
+export function getTwitterEmoji(emoji: string): string | null {
   if (isMac()) return null;
 
   // @ts-ignore - library type is incorrect
@@ -64,19 +65,24 @@ export function getTwitterEmoji (emoji: string): string | null {
   return match ? match[1] : null;
 }
 
-function EmojiIcon ({ icon, size = 'small', ...props }: ComponentProps<typeof Emoji> & { icon: string | ReactNode, size?: ImgSize }) {
+function EmojiIcon({
+  icon,
+  size = 'small',
+  ...props
+}: ComponentProps<typeof Emoji> & { icon: string | ReactNode; size?: ImgSize }) {
   let iconContent: string | ReactNode = icon;
   if (typeof icon === 'string' && icon.startsWith('http')) {
     iconContent = <img src={icon} />;
-  }
-  else if (typeof icon === 'string') {
+  } else if (typeof icon === 'string') {
     const twemojiImage = getTwitterEmoji(icon);
     if (twemojiImage) {
       iconContent = <img src={twemojiImage} />;
     }
   }
   return (
-    <Emoji size={size} {...props}>{iconContent}</Emoji>
+    <Emoji size={size} {...props}>
+      {iconContent}
+    </Emoji>
   );
 }
 

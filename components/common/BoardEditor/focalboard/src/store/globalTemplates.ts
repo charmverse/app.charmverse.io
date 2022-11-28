@@ -1,4 +1,3 @@
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import type { Board } from '../blocks/board';
@@ -6,15 +5,12 @@ import client, { OctoClient } from '../octoClient';
 
 import type { RootState } from './index';
 
-export const fetchGlobalTemplates = createAsyncThunk(
-  'globalTemplates/fetch',
-  async () => {
-    const rootClient = new OctoClient(client.serverUrl, '0');
-    const rawBlocks = await rootClient.getGlobalTemplates();
-    const allBoards = rawBlocks as Board[];
-    return allBoards.filter((block) => block.fields.isTemplate).sort((a, b) => a.title.localeCompare(b.title)) as Board[];
-  }
-);
+export const fetchGlobalTemplates = createAsyncThunk('globalTemplates/fetch', async () => {
+  const rootClient = new OctoClient(client.serverUrl, '0');
+  const rawBlocks = await rootClient.getGlobalTemplates();
+  const allBoards = rawBlocks as Board[];
+  return allBoards.filter((block) => block.fields.isTemplate).sort((a, b) => a.title.localeCompare(b.title)) as Board[];
+});
 
 const globalTemplatesSlice = createSlice({
   name: 'globalTemplates',
@@ -29,6 +25,6 @@ const globalTemplatesSlice = createSlice({
 
 export const { reducer } = globalTemplatesSlice;
 
-export function getGlobalTemplates (state: RootState): Board[] {
+export function getGlobalTemplates(state: RootState): Board[] {
   return state.globalTemplates.value;
 }

@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Typography } from '@mui/material';
@@ -21,19 +20,21 @@ const Center = styled.div`
   flex-direction: column;
 `;
 
-export default function NoProposalsMessage ({ message }: { message: string }) {
+export default function NoProposalsMessage({ message }: { message: string }) {
   return (
     <EmptyProposalContainerBox>
       <Center>
         <TaskOutlinedIcon
-          fontSize='large'
-          color='secondary'
+          fontSize="large"
+          color="secondary"
           sx={{
             height: '2em',
             width: '2em'
           }}
         />
-        <Typography variant='subtitle1' color='secondary'>{message}</Typography>
+        <Typography variant="subtitle1" color="secondary">
+          {message}
+        </Typography>
       </Center>
     </EmptyProposalContainerBox>
   );

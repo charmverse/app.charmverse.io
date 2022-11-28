@@ -1,4 +1,3 @@
-
 import { typedKeys } from 'lib/utilities/objects';
 
 import type { SignupCookieType } from '../userAcquisition/interfaces';
@@ -14,31 +13,25 @@ const referrerMapping: Record<Exclude<SignupSource, '' | 'direct' | 'other'>, st
   youtube: 'www.youtube.com'
 };
 
-function extractSignupSource (url: string = ''): SignupSource {
-
+function extractSignupSource(url: string = ''): SignupSource {
   try {
     const referrer = new URL(url).hostname;
 
     const reffererKeys = typedKeys(referrerMapping);
 
     for (const referrerKey of reffererKeys) {
-
       if (referrer.match(referrerMapping[referrerKey])) {
-
         return referrerKey;
       }
     }
-  }
-  catch {
+  } catch {
     return '';
   }
 
   return '';
-
 }
 
-export function extractSignupAnalytics (data: Record<SignupCookieType, string>): SignupAnalytics {
-
+export function extractSignupAnalytics(data: Record<SignupCookieType, string>): SignupAnalytics {
   const signupAnalytics: SignupAnalytics = {
     signupCampaign: '',
     signupLandingUrl: '',

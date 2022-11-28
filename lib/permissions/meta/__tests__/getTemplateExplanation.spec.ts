@@ -1,17 +1,13 @@
 import { getTemplateExplanation } from '../preset-templates';
 
 describe('getTemplateExplanation', () => {
-
   it('should return an empty explanation for when the custom mode type is provided', () => {
     const [can, cannot] = getTemplateExplanation('custom');
     expect(can.length).toBe(0);
     expect(cannot.length).toBe(0);
   });
   it('should return the correct explanation for the read-only template', () => {
-
-    const can = [
-      'Workspace members can view new top-level pages by default.'
-    ];
+    const can = ['Workspace members can view new top-level pages by default.'];
     const cannot = [
       'Workspace members cannot create new bounties.',
       'Workspace members cannot create new pages.',

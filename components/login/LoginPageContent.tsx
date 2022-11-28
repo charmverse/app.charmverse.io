@@ -20,20 +20,13 @@ interface Props {
   walletSigned: (authSig: AuthSig) => void;
 }
 
-export function LoginPageContent ({ walletSigned }: Props) {
+export function LoginPageContent({ walletSigned }: Props) {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (
     <Container px={3}>
       <Grid container>
-        <Grid
-          item
-          xs={12}
-          display={{ xs: 'flex', sm: 'none' }}
-          justifyContent='center'
-          py={3}
-          px={6}
-        >
+        <Grid item xs={12} display={{ xs: 'flex', sm: 'none' }} justifyContent="center" py={3} px={6}>
           <Image sx={{ maxWidth: 300 }} src={splashImage} />
         </Grid>
         <Grid
@@ -58,28 +51,28 @@ export function LoginPageContent ({ walletSigned }: Props) {
                 mb: 3
               }}
             >
-              First Web 3 Native
-              {' '}
-              <br />
+              First Web 3 Native <br />
               All-in-one Workspace
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>
-              Tasks, docs, bounties, and more
-            </Typography>
-            <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-
+            <Typography sx={{ fontSize: 20, mb: 6 }}>Tasks, docs, bounties, and more</Typography>
+            <Box display={{ sm: 'flex' }} gap={2} alignItems="center">
               <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
-              <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
+              <Typography color="secondary" variant="body2" sx={{ lineHeight: '40px' }}>
                 or
               </Typography>
-              <Button data-test='connect-discord' sx={{ width: '100%' }} variant='outlined' size='large' href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}>
+              <Button
+                data-test="connect-discord"
+                sx={{ width: '100%' }}
+                variant="outlined"
+                size="large"
+                href={`/api/discord/oauth?type=login&redirect=${returnUrl ?? '/'}`}
+              >
                 Connect Discord
               </Button>
-
             </Box>
           </Box>
         </Grid>
-        <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems='center'>
+        <Grid item display={{ xs: 'none', sm: 'flex' }} sm={6} alignItems="center">
           <Image px={3} src={splashImage} />
         </Grid>
       </Grid>

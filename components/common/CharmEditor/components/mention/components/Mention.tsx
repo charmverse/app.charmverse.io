@@ -12,13 +12,11 @@ import { usePages } from 'hooks/usePages';
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
 const MentionContainer = styled(Link)`
-
   border-radius: 1px;
   display: inline-block;
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-
     &:hover {
       box-shadow: ${({ theme }) => `0 0 0 2px ${theme.palette.background.light}`};
       background-color: ${({ theme }) => theme.palette.background.light};
@@ -26,28 +24,29 @@ const MentionContainer = styled(Link)`
   }
 `;
 
-export default function Mention ({ node }: NodeViewProps) {
+export default function Mention({ node }: NodeViewProps) {
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { members } = useMembers();
   const { pages } = usePages();
-  const member = members.find(_member => _member.id === attrs.value);
+  const member = members.find((_member) => _member.id === attrs.value);
   const space = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
     value = page && (
-      <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
-        <Box display='flex' alignItems='center'>
+      <MentionContainer color="inherit" href={`/${space?.domain}/${page.path}`}>
+        <Box display="flex" alignItems="center">
           <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
-          <Typography component='span' fontWeight={600}>{page.title || 'Untitled'}</Typography>
+          <Typography component="span" fontWeight={600}>
+            {page.title || 'Untitled'}
+          </Typography>
         </Box>
       </MentionContainer>
     );
-  }
-  else if (attrs.type === 'user') {
+  } else if (attrs.type === 'user') {
     value = (
-      <MentionContainer color='secondary' href={`/u/${member?.path || member?.id}`}>
-        <Typography component='span' fontWeight={600}>
+      <MentionContainer color="secondary" href={`/u/${member?.path || member?.id}`}>
+        <Typography component="span" fontWeight={600}>
           <span style={{ opacity: 0.5 }}>@</span>
           {member?.username}
         </Typography>
@@ -55,9 +54,5 @@ export default function Mention ({ node }: NodeViewProps) {
     );
   }
 
-  return value ? (
-    <span id={`${attrs.type}-${attrs.id}`}>
-      {value}
-    </span>
-  ) : null;
+  return value ? <span id={`${attrs.type}-${attrs.id}`}>{value}</span> : null;
 }

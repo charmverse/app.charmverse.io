@@ -1,4 +1,3 @@
-
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
@@ -16,7 +15,7 @@ import { useUser } from './useUser';
 
 const socketHost = `${websocketsHost || ''}/`;
 
-type LoggedMessage = { type: string, payload: any }
+type LoggedMessage = { type: string; payload: any };
 
 export type SocketConnection = Socket<{ message: (message: WebSocketMessage) => void }>;
 
@@ -25,8 +24,11 @@ type IContext = {
   // Testing purposes
   messageLog: LoggedMessage[];
   clearLog: () => void;
-  subscribe: <T extends ServerMessage['type']>(event: T, callback: (payload: WebSocketPayload<T>) => void) => () => void;
-}
+  subscribe: <T extends ServerMessage['type']>(
+    event: T,
+    callback: (payload: WebSocketPayload<T>) => void
+  ) => () => void;
+};
 
 const WebSocketClientContext = createContext<Readonly<IContext>>({
   sendMessage: () => null,
@@ -38,21 +40,17 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
 
 let socket: SocketConnection;
 
-export function WebSocketClientProvider ({ children }: { children: ReactNode }) {
-
+export function WebSocketClientProvider({ children }: { children: ReactNode }) {
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
   const space = useCurrentSpace();
 
-  const { current: eventFeed } = useRef(
-    new PubSub<ServerMessage['type'], ServerMessage['payload']>()
-  );
+  const { current: eventFeed } = useRef(new PubSub<ServerMessage['type'], ServerMessage['payload']>());
 
   const { user } = useUser();
   const { data: authResponse } = useSWRImmutable(user?.id, () => charmClient.socket()); // refresh when user
 
   useEffect(() => {
-
     if (space && authResponse) {
       connect(space.id, authResponse.authToken);
     }
@@ -62,14 +60,13 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
     };
   }, [space?.id, user?.id, authResponse]);
 
-  function pushToMessageLog (message: LoggedMessage) {
+  function pushToMessageLog(message: LoggedMessage) {
     if (process.env.NODE_ENV === 'development') {
       // setMessageLog((prev) => [message, ...prev.slice(0, 50)]);
     }
   }
 
-  async function connect (spaceId: string, authToken: string) {
-
+  async function connect(spaceId: string, authToken: string) {
     if (socket?.connected) {
       socket.disconnect();
     }
@@ -90,7 +87,7 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       });
     });
 
-    socket.on('message', message => {
+    socket.on('message', (message) => {
       if (isServerMessage(message)) {
         // Key part when we relay messages from the server to consumers
         eventFeed.publish(message.type, message.payload);
@@ -107,34 +104,31 @@ export function WebSocketClientProvider ({ children }: { children: ReactNode }) 
       log.warn('[ws] Connection error - maybe restarting?', { error });
       pushToMessageLog({ type: 'error', payload: error.message });
     });
-
   }
 
-  function sendMessage (message: ClientMessage) {
+  function sendMessage(message: ClientMessage) {
     pushToMessageLog(message);
     socket.emit('message', message);
   }
 
-  function clearLog () {
+  function clearLog() {
     setMessageLog([]);
   }
 
-  const value: IContext = useMemo(() => ({
-    sendMessage,
-    messageLog,
-    clearLog,
-    subscribe: eventFeed.subscribe as IContext['subscribe']
-  }), [authResponse, messageLog]);
-
-  return (
-    <WebSocketClientContext.Provider value={value}>
-      {children}
-    </WebSocketClientContext.Provider>
+  const value: IContext = useMemo(
+    () => ({
+      sendMessage,
+      messageLog,
+      clearLog,
+      subscribe: eventFeed.subscribe as IContext['subscribe']
+    }),
+    [authResponse, messageLog]
   );
 
+  return <WebSocketClientContext.Provider value={value}>{children}</WebSocketClientContext.Provider>;
 }
 
-function isServerMessage (message: WebSocketMessage): message is ServerMessage {
+function isServerMessage(message: WebSocketMessage): message is ServerMessage {
   return Boolean(message?.type && message?.payload);
 }
 

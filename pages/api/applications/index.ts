@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -15,12 +14,13 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .get(getApplications)
   .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
   .post(createApplicationController);
 
-async function getApplications (req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
+async function getApplications(req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
   const bountyId = req.query.bountyId as string;
   const { id: userId } = req.session.user;
 
@@ -59,8 +59,7 @@ async function getApplications (req: NextApiRequest, res: NextApiResponse<Applic
   return res.status(200).json(applicationsOrSubmissions);
 }
 
-async function createApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {
-
+async function createApplicationController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { bountyId, message } = req.body;
 
   // Get the space ID so we can make sure requester has access
@@ -90,7 +89,11 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
   });
 
   if (!permissions.work) {
-    throw new UnauthorisedActionError(`You do not have the permission to ${bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'} to this bounty`);
+    throw new UnauthorisedActionError(
+      `You do not have the permission to ${
+        bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'
+      } to this bounty`
+    );
   }
 
   const createdApplication = await createApplication({
@@ -100,7 +103,14 @@ async function createApplicationController (req: NextApiRequest, res: NextApiRes
   });
 
   const { spaceId, rewardAmount, rewardToken, page } = bountySpaceId;
-  trackUserAction('bounty_application', { userId, spaceId, pageId: page?.id || '', rewardAmount, rewardToken, resourceId: bountyId });
+  trackUserAction('bounty_application', {
+    userId,
+    spaceId,
+    pageId: page?.id || '',
+    rewardAmount,
+    rewardToken,
+    resourceId: bountyId
+  });
 
   return res.status(201).json(createdApplication);
 }

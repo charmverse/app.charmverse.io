@@ -28,7 +28,7 @@ import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/e
 import ConnectSnapshot from './ConnectSnapshot';
 import InputVotingStrategies from './InputVotingStrategies';
 
-async function getSnapshotClient () {
+async function getSnapshotClient() {
   const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
 
   const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
@@ -44,8 +44,7 @@ const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
 
 const MIN_VOTING_OPTIONS = 2;
 
-export default function PublishingForm ({ onSubmit, page }: Props) {
-
+export default function PublishingForm({ onSubmit, page }: Props) {
   const { account, library } = useWeb3AuthSig();
 
   const space = useCurrentSpace();
@@ -60,7 +59,9 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
   // Form data
   const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
-  const [endDate, setEndDate] = useState<DateTime>((DateTime.fromMillis(startDate.toMillis())).plus({ days: space?.defaultVotingDuration ?? 7 }));
+  const [endDate, setEndDate] = useState<DateTime>(
+    DateTime.fromMillis(startDate.toMillis()).plus({ days: space?.defaultVotingDuration ?? 7 })
+  );
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<SnapshotVotingModeType>('single-choice');
@@ -75,22 +76,20 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     if (!snapshotBlockNumber) {
       setCurrentBlockNumberAsDefault();
     }
-
   }, [snapshotSpace]);
 
   useEffect(() => {
     verifyUserCanPostToSnapshot();
   }, [space, snapshotSpace, page]);
 
-  async function setCurrentBlockNumberAsDefault () {
+  async function setCurrentBlockNumberAsDefault() {
     if (snapshotSpace) {
       try {
         const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
         const provider = await snapshot.utils.getProvider(snapshotSpace.network);
         const blockNum = await provider.getBlockNumber();
         setSnapshotBlockNumber(blockNum);
-      }
-      catch (err) {
+      } catch (err) {
         setSnapshotBlockNumber(1);
       }
     }
@@ -99,7 +98,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
   /**
    * Returns markdown content if valid length, or null if not
    */
-  async function checkMarkdownLength (): Promise<string | null> {
+  async function checkMarkdownLength(): Promise<string | null> {
     const pageWithDetails = await charmClient.pages.getPage(page.id);
     const content = await generateMarkdown(pageWithDetails, false);
 
@@ -119,7 +118,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     return content;
   }
 
-  async function verifyUserCanPostToSnapshot () {
+  async function verifyUserCanPostToSnapshot() {
     setChecksComplete(false);
     if (!space || !space?.snapshotDomain) {
       setSnapshotSpace(null);
@@ -127,17 +126,16 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         new SystemError({
           errorType: 'Data not found',
           severity: 'warning',
-          message: 'This space must be connected to Snapshot.org before you can export proposals to it. Only workspace admins can connect Snapshot to this Workspace.'
+          message:
+            'This space must be connected to Snapshot.org before you can export proposals to it. Only workspace admins can connect Snapshot to this Workspace.'
         })
       );
-    }
-    else if (space.snapshotDomain && !snapshotSpace) {
+    } else if (space.snapshotDomain && !snapshotSpace) {
       const existingSnapshotSpace = await getSnapshotSpace(space.snapshotDomain);
       setSnapshotSpace(existingSnapshotSpace);
     }
 
     if (snapshotSpace) {
-
       const hasStrategies = snapshotSpace.strategies.length > 0;
 
       if (!hasStrategies) {
@@ -145,25 +143,27 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
           new SystemError({
             errorType: 'Invalid input',
             severity: 'warning',
-            message: 'You need at least one voting strategy for this space. Visit your space settings on snapshot.org to fix this.'
+            message:
+              'You need at least one voting strategy for this space. Visit your space settings on snapshot.org to fix this.'
           })
         );
         setChecksComplete(true);
       }
 
-      const userCanPost = snapshotSpace.filters.onlyMembers === false
-        || (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
+      const userCanPost =
+        snapshotSpace.filters.onlyMembers === false ||
+        (snapshotSpace.filters.onlyMembers && snapshotSpace.members.indexOf(account as string) > -1);
 
       if (userCanPost === false) {
         setConfigurationError(
           new SystemError({
             errorType: 'Access denied',
             severity: 'warning',
-            message: 'You are not permitted to publish proposals to this snapshot space.\r\n\nIf you believe this should be the case, reach out to the person in charge of your Snapshot.org space.'
+            message:
+              'You are not permitted to publish proposals to this snapshot space.\r\n\nIf you believe this should be the case, reach out to the person in charge of your Snapshot.org space.'
           })
         );
-      }
-      else {
+      } else {
         setConfigurationError(null);
 
         await checkMarkdownLength();
@@ -171,11 +171,9 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     }
 
     setChecksComplete(true);
-
   }
 
-  async function publish () {
-
+  async function publish() {
     setFormError(null);
     setPublishing(true);
 
@@ -189,7 +187,7 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
         new SystemError({
           errorType: 'External service',
           severity: 'warning',
-          message: 'We couldn\'t detect your wallet. Please unlock your wallet and try publishing again.'
+          message: "We couldn't detect your wallet. Please unlock your wallet and try publishing again."
         })
       );
       setPublishing(false);
@@ -198,26 +196,29 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
 
     try {
       const client = await getSnapshotClient();
-      receipt = await client.proposal(library, account as string, {
-        space: space?.snapshotDomain as any,
-        type: snapshotVoteMode,
-        title: page.title,
-        body: content,
-        choices: votingOptions,
-        start: Math.round(startDate.toSeconds()),
-        end: Math.round(endDate.toSeconds()),
-        snapshot: snapshotBlockNumber,
-        network: snapshotSpace?.network,
-        // strategies: JSON.stringify([]),
-        strategies: JSON.stringify(selectedVotingStrategies),
-        plugins: JSON.stringify({}),
-        metadata: JSON.stringify({})
-      } as any) as SnapshotReceipt;
-
-    }
-    catch (err: any) {
-
-      const errorToShow = err?.error_description ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`) : new UnknownError();
+      receipt = (await client.proposal(
+        library,
+        account as string,
+        {
+          space: space?.snapshotDomain as any,
+          type: snapshotVoteMode,
+          title: page.title,
+          body: content,
+          choices: votingOptions,
+          start: Math.round(startDate.toSeconds()),
+          end: Math.round(endDate.toSeconds()),
+          snapshot: snapshotBlockNumber,
+          network: snapshotSpace?.network,
+          // strategies: JSON.stringify([]),
+          strategies: JSON.stringify(selectedVotingStrategies),
+          plugins: JSON.stringify({}),
+          metadata: JSON.stringify({})
+        } as any
+      )) as SnapshotReceipt;
+    } catch (err: any) {
+      const errorToShow = err?.error_description
+        ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
+        : new UnknownError();
 
       setPublishing(false);
       setFormError(errorToShow);
@@ -229,88 +230,98 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
     });
 
     mutatePage(updatedPage);
-    charmClient.track.trackAction('new_vote_created', { platform: 'snapshot', pageId: page.id, resourceId: receipt.id, spaceId: space?.id || '' });
+    charmClient.track.trackAction('new_vote_created', {
+      platform: 'snapshot',
+      pageId: page.id,
+      resourceId: receipt.id,
+      spaceId: space?.id || ''
+    });
 
     onSubmit();
     setPublishing(false);
   }
 
-  const voteDuration = (endDate && startDate) ? Math.abs(Math.round(endDate.diff(startDate, 'days').days)) : undefined;
+  const voteDuration = endDate && startDate ? Math.abs(Math.round(endDate.diff(startDate, 'days').days)) : undefined;
 
   const endDateAfterStart = startDate && endDate && endDate.diff(startDate, 'seconds').seconds > 0;
 
-  function formValid () {
-    return selectedVotingStrategies.length > 0 && endDateAfterStart && !!snapshotBlockNumber && votingOptions.length >= MIN_VOTING_OPTIONS;
+  function formValid() {
+    return (
+      selectedVotingStrategies.length > 0 &&
+      endDateAfterStart &&
+      !!snapshotBlockNumber &&
+      votingOptions.length >= MIN_VOTING_OPTIONS
+    );
   }
 
-  return (
-    !checksComplete ? <LoadingIcon />
-
-      : (configurationError
-        ? (
-          <>
-
-            <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
-              <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
-            </Box>
-            {
-              !snapshotSpace && isAdmin && (
-                <ConnectSnapshot />
-              )
-            }
-          </>
-        )
-
-      // Only proceed with rest of UI if proposal has correct length
-        : (
-          <Box>
-
-            {
-      checksComplete && snapshotSpace && (
+  return !checksComplete ? (
+    <LoadingIcon />
+  ) : configurationError ? (
+    <>
+      <Box sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
+        <Alert severity={configurationError.severity as AlertColor}>{configurationError.message}</Alert>
+      </Box>
+      {!snapshotSpace && isAdmin && <ConnectSnapshot />}
+    </>
+  ) : (
+    // Only proceed with rest of UI if proposal has correct length
+    <Box>
+      {checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
-          <Grid container direction='column' spacing={3}>
-
+          <Grid container direction="column" spacing={3}>
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
-              <InputEnumToOption keyAndLabel={SnapshotVotingMode} defaultValue='single-choice' onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)} />
+              <InputEnumToOption
+                keyAndLabel={SnapshotVotingMode}
+                defaultValue="single-choice"
+                onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
+              />
             </Grid>
 
             <Grid item>
-              <InputVotingStrategies strategies={snapshotSpace.strategies} onChange={(selected) => setSelectedVotingStrategies(selected)} />
+              <InputVotingStrategies
+                strategies={snapshotSpace.strategies}
+                onChange={(selected) => setSelectedVotingStrategies(selected)}
+              />
             </Grid>
 
             <Grid item>
-              <InputGeneratorText defaultOptions={votingOptions} title='Voting options' minimumOptions={MIN_VOTING_OPTIONS} onChange={options => setVotingOptions(options)} />
+              <InputGeneratorText
+                defaultOptions={votingOptions}
+                title="Voting options"
+                minimumOptions={MIN_VOTING_OPTIONS}
+                onChange={(options) => setVotingOptions(options)}
+              />
             </Grid>
 
             <Grid item>
               <FieldLabel>Block number</FieldLabel>
-              {
-                !snapshotBlockNumber ? (
-                  <>
-                    <LoadingIcon size={18} sx={{ mr: 1 }} />
-                    Getting current block number
-                  </>
-                ) : (
-                  <TextField
-                    defaultValue={snapshotBlockNumber}
-                    type='number'
-                    onInput={(input: any) => {
-                      setSnapshotBlockNumber(parseInt(input.target.value));
-                    }}
-                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
-                    fullWidth
-                    helperText={`This is the block number on the ${getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''} blockchain by which DAO members must have held tokens to be able to vote.`}
-                  />
-                )
-              }
-
+              {!snapshotBlockNumber ? (
+                <>
+                  <LoadingIcon size={18} sx={{ mr: 1 }} />
+                  Getting current block number
+                </>
+              ) : (
+                <TextField
+                  defaultValue={snapshotBlockNumber}
+                  type="number"
+                  onInput={(input: any) => {
+                    setSnapshotBlockNumber(parseInt(input.target.value));
+                  }}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
+                  fullWidth
+                  helperText={`This is the block number on the ${
+                    getChainById(parseInt(snapshotSpace.network))?.chainName ?? ''
+                  } blockchain by which DAO members must have held tokens to be able to vote.`}
+                />
+              )}
             </Grid>
 
-            <Grid item display='flex' gap={1} justifyContent='space-between'>
-              <div style={{
-                flexGrow: 1
-              }}
+            <Grid item display="flex" gap={1} justifyContent="space-between">
+              <div
+                style={{
+                  flexGrow: 1
+                }}
               >
                 <FieldLabel>Start date</FieldLabel>
                 <DateTimePicker
@@ -323,9 +334,10 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                   renderInput={(props) => <TextField fullWidth {...props} />}
                 />
               </div>
-              <div style={{
-                flexGrow: 1
-              }}
+              <div
+                style={{
+                  flexGrow: 1
+                }}
               >
                 <FieldLabel>End date</FieldLabel>
                 <DateTimePicker
@@ -336,48 +348,49 @@ export default function PublishingForm ({ onSubmit, page }: Props) {
                       setEndDate(value as DateTime);
                     }
                   }}
-                  renderInput={(props) => <TextField fullWidth {...props} error={!endDateAfterStart} helperText={!endDateAfterStart ? 'End date must be after start date' : null} />}
+                  renderInput={(props) => (
+                    <TextField
+                      fullWidth
+                      {...props}
+                      error={!endDateAfterStart}
+                      helperText={!endDateAfterStart ? 'End date must be after start date' : null}
+                    />
+                  )}
                 />
               </div>
             </Grid>
 
-            {
-              endDateAfterStart && (
-                <Grid item>
-                  <Typography>Voting will last {voteDuration} day{voteDuration !== 1 ? 's' : ''}</Typography>
-                </Grid>
-              )
-            }
-
-            {
-            formError && (
+            {endDateAfterStart && (
               <Grid item>
-                <Alert severity={formError.severity as AlertColor}>{formError.message ?? (formError as any).error}</Alert>
+                <Typography>
+                  Voting will last {voteDuration} day{voteDuration !== 1 ? 's' : ''}
+                </Typography>
               </Grid>
-            )
-          }
+            )}
 
-            <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type='submit'>
-                {
-                  publishing ? (
-                    <>
-                      <LoadingIcon size={18} sx={{ mr: 1 }} />
-                      Publishing
-                    </>
-                  ) : ('Publish to Snapshot')
-                }
+            {formError && (
+              <Grid item>
+                <Alert severity={formError.severity as AlertColor}>
+                  {formError.message ?? (formError as any).error}
+                </Alert>
+              </Grid>
+            )}
 
+            <Grid item display="flex" justifyContent="space-between">
+              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type="submit">
+                {publishing ? (
+                  <>
+                    <LoadingIcon size={18} sx={{ mr: 1 }} />
+                    Publishing
+                  </>
+                ) : (
+                  'Publish to Snapshot'
+                )}
               </PrimaryButton>
             </Grid>
           </Grid>
         </form>
-
-      )
-    }
-
-          </Box>
-        )
-      )
+      )}
+    </Box>
   );
 }

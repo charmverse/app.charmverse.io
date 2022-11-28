@@ -12,13 +12,12 @@ import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import { IDENTITY_TYPES } from 'models';
 
-export async function createUserFromWallet (
+export async function createUserFromWallet(
   address: string,
   signupAnalytics: Partial<SignupAnalytics> = {},
   // An ID set by analytics tools to have pre signup user journey
   preExistingId: string = v4()
 ): Promise<LoggedInUser> {
-
   const lowercaseAddress = address.toLowerCase();
 
   const user = await prisma.user.findFirst({
@@ -34,8 +33,7 @@ export async function createUserFromWallet (
 
   if (user) {
     return user;
-  }
-  else {
+  } else {
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
     const userPath = username.replace('…', '-');
@@ -61,6 +59,5 @@ export async function createUserFromWallet (
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
 
     return newUser;
-
   }
 }

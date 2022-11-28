@@ -11,19 +11,17 @@ import type { LoggedInUser } from 'models';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 if (isTestEnv) {
-  handler
-    .post(register);
+  handler.post(register);
 }
 
-async function register (req: NextApiRequest, res: NextApiResponse) {
+async function register(req: NextApiRequest, res: NextApiResponse) {
   const { address } = req.body;
 
   let user: LoggedInUser;
 
   try {
     user = await getUserProfile('addresses', address);
-  }
-  catch {
+  } catch {
     user = await createUserFromWallet(address);
     user.isNew = true;
   }

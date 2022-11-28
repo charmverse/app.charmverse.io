@@ -10,12 +10,12 @@ interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   index: number;
 }
 
-function TabPanel (props: TabPanelProps) {
+function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
     <div
-      role='tabpanel'
+      role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -23,7 +23,7 @@ function TabPanel (props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography component='div'>{children}</Typography>
+          <Typography component="div">{children}</Typography>
         </Box>
       )}
     </div>
@@ -35,7 +35,7 @@ interface MultiTabsProps {
   disabled?: boolean;
 }
 
-export default function MultiTabs (props: MultiTabsProps) {
+export default function MultiTabs(props: MultiTabsProps) {
   const [value, setValue] = React.useState(0);
   const { tabs, disabled = false } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
@@ -49,7 +49,7 @@ export default function MultiTabs (props: MultiTabsProps) {
           indicatorColor={disabled ? 'secondary' : 'primary'}
           value={value}
           onChange={handleChange}
-          aria-label='multi tabs'
+          aria-label="multi tabs"
         >
           {tabs.map(([tabLabel]) => (
             <Tab
@@ -59,19 +59,16 @@ export default function MultiTabs (props: MultiTabsProps) {
               }}
               key={tabLabel}
               label={tabLabel}
-
             />
           ))}
         </Tabs>
       </Box>
-      {
-        tabs.map(([_, tabComponent], tabIndex) => (
-          /* eslint-disable-next-line */
+      {tabs.map(([_, tabComponent], tabIndex) => (
+        /* eslint-disable-next-line */
           <TabPanel value={value} index={tabIndex} key={tabIndex}>
-            {tabComponent}
-          </TabPanel>
-        ))
-      }
+          {tabComponent}
+        </TabPanel>
+      ))}
     </Box>
   );
 }

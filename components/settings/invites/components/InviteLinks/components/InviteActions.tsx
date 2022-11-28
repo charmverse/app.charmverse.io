@@ -29,8 +29,7 @@ const StyledMenu = styled((props: MenuProps) => (
   '& .MuiPaper-root': {
     borderRadius: 6,
     maxWidth: 260,
-    color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
     boxShadow:
       'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
     '& .MuiMenu-list': {
@@ -52,7 +51,7 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>
+export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>;
 
 interface InviteActionsProps {
   isAdmin: boolean;
@@ -62,7 +61,13 @@ interface InviteActionsProps {
   onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
 }
 
-function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
+function InviteActions({
+  isAdmin,
+  invitePopupState,
+  tokenGatePopupState,
+  onOpenInvitesClick,
+  onOpenTokenGateClick
+}: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -85,14 +90,13 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 
   return (
     <>
-
       <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
-            id='add-invites-menu'
+            id="add-invites-menu"
             aria-controls={open ? 'demo-customized-menu' : undefined}
-            aria-haspopup='true'
+            aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             disableElevation
             onClick={handleAddClick}
@@ -104,7 +108,7 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
         </span>
       </Tooltip>
       <StyledMenu
-        id='demo-customized-menu'
+        id="demo-customized-menu"
         MenuListProps={{
           'aria-labelledby': 'add-invites-menu'
         }}
@@ -113,27 +117,22 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
         onClose={handleClose}
       >
         <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
-          <AddIcon fontSize='small' />
+          <AddIcon fontSize="small" />
           <Box>
             <ListItemText
-              primary='Add a Private Link'
-              secondary='Anyone with this link can join your workspace'
+              primary="Add a Private Link"
+              secondary="Anyone with this link can join your workspace"
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />
           </Box>
         </MenuItem>
-        <MenuItem
-          {...bindTrigger(tokenGatePopupState)}
-          onClick={handleTokenGate}
-          disableRipple
-          dense
-        >
-          <AddIcon fontSize='small' />
+        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
+          <AddIcon fontSize="small" />
           <Box>
             <ListItemText
-              primary='Add a Token Gate'
-              secondary='Control access to your workspace with tokens & NFTS (Wallet Required)'
+              primary="Add a Token Gate"
+              secondary="Control access to your workspace with tokens & NFTS (Wallet Required)"
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />
@@ -145,4 +144,3 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 }
 
 export default memo(InviteActions);
-

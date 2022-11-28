@@ -1,4 +1,3 @@
-
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import TableBody from '@mui/material/TableBody';
@@ -33,11 +32,20 @@ interface VoteTasksListProps {
 /**
  * Page only needs to be provided for proposal type votes
  */
-export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTask, handleVoteId: (voteId: string) => void }) {
+export function VoteTasksListRow({
+  voteTask,
+  handleVoteId
+}: {
+  voteTask: VoteTask;
+  handleVoteId: (voteId: string) => void;
+}) {
   const {
     page: { path: pagePath, title: pageTitle },
     space: { domain: spaceDomain, name: spaceName },
-    deadline, title: voteTitle, id, userChoice
+    deadline,
+    title: voteTitle,
+    id,
+    userChoice
   } = voteTask;
 
   const isDeadlineOverdue = DateTime.now() > DateTime.fromJSDate(new Date(deadline));
@@ -49,23 +57,25 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   return (
     <TableRow>
       <TableCell>
-        <Box alignItems='center' display='flex'>
+        <Box alignItems="center" display="flex">
           <VoteIcon {...voteTask} />
-          <Typography variant='body1' variantMapping={{ body1: 'span' }} marginLeft='5px'>{voteTitle}</Typography>
+          <Typography variant="body1" variantMapping={{ body1: 'span' }} marginLeft="5px">
+            {voteTitle}
+          </Typography>
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant='body1' color='inherit'>
+        <Link href={voteLink} variant="body1" color="inherit">
           {voteLocation}
         </Link>
       </TableCell>
       <TableCell>
         <Typography>{spaceName}</Typography>
       </TableCell>
-      <TableCell align='center'>
+      <TableCell align="center">
         <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
       </TableCell>
-      <TableCell align='center'>
+      <TableCell align="center">
         <Button
           sx={{
             borderRadius: '18px',
@@ -84,8 +94,7 @@ export function VoteTasksListRow ({ voteTask, handleVoteId }: { voteTask: VoteTa
   );
 }
 
-export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps) {
-
+export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps) {
   const [selectedVoteId, setSelectedVoteId] = useState<string | undefined>();
 
   const closeModal = () => setSelectedVoteId(undefined);
@@ -93,14 +102,19 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
   const handleVoteId = (voteId: string) => setSelectedVoteId(voteId);
 
   const removeVoteFromTask = (voteId: string) => {
-    mutateTasks((taskList) => {
-      return taskList ? {
-        ...taskList,
-        votes: taskList.votes.filter(vote => vote.id !== voteId)
-      } : undefined;
-    }, {
-      revalidate: false
-    });
+    mutateTasks(
+      (taskList) => {
+        return taskList
+          ? {
+              ...taskList,
+              votes: taskList.votes.filter((vote) => vote.id !== voteId)
+            }
+          : undefined;
+      },
+      {
+        revalidate: false
+      }
+    );
   };
 
   const castVote: VoteDetailProps['castVote'] = async (voteId, choice) => {
@@ -123,56 +137,44 @@ export function VoteTasksList ({ error, tasks, mutateTasks }: VoteTasksListProps
   if (error) {
     return (
       <Box>
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
+        <Alert severity="error">There was an error. Please try again later!</Alert>
       </Box>
     );
-  }
-  else if (!tasks?.votes) {
-    return <LoadingComponent height='200px' isLoading={true} />;
+  } else if (!tasks?.votes) {
+    return <LoadingComponent height="200px" isLoading={true} />;
   }
 
   const totalVotes = tasks?.votes.length ?? 0;
 
   if (totalVotes === 0) {
-    return (
-      <EmptyTaskState taskType='votes' />
-    );
+    return <EmptyTaskState taskType="votes" />;
   }
 
-  const voteTask = tasks.votes.find(v => v.id === selectedVoteId);
+  const voteTask = tasks.votes.find((v) => v.id === selectedVoteId);
 
   return (
-    <Box overflow='auto'>
-      <Table size='medium' aria-label='Nexus polls table'>
+    <Box overflow="auto">
+      <Table size="medium" aria-label="Nexus polls table">
         <TableHead>
           <TableRow>
             <TableCell>Poll</TableCell>
             <TableCell width={300}>Page</TableCell>
             <TableCell width={200}>Workspace</TableCell>
-            <TableCell align='center'>Due</TableCell>
-            <TableCell width='135' align='center'>Action</TableCell>
+            <TableCell align="center">Due</TableCell>
+            <TableCell width="135" align="center">
+              Action
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.votes.map(vote => <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />)}
+          {tasks.votes.map((vote) => (
+            <VoteTasksListRow handleVoteId={handleVoteId} key={vote.id} voteTask={vote} />
+          ))}
         </TableBody>
       </Table>
-      <Modal
-        title='Poll details'
-        size='large'
-        open={!!selectedVoteId && !!voteTask}
-        onClose={closeModal}
-      >
+      <Modal title="Poll details" size="large" open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
         {voteTask && (
-          <VoteDetail
-            vote={voteTask}
-            detailed
-            castVote={castVote}
-            deleteVote={deleteVote}
-            cancelVote={cancelVote}
-          />
+          <VoteDetail vote={voteTask} detailed castVote={castVote} deleteVote={deleteVote} cancelVote={cancelVote} />
         )}
       </Modal>
     </Box>

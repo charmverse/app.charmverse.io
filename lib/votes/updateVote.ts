@@ -6,7 +6,7 @@ import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/erro
 import type { VoteStatusType } from './interfaces';
 import { VOTE_STATUS } from './interfaces';
 
-export async function updateVote (id: string, userId: string, status: VoteStatusType): Promise<Vote> {
+export async function updateVote(id: string, userId: string, status: VoteStatusType): Promise<Vote> {
   const existingVote = await prisma.vote.findUnique({
     where: {
       id

@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -14,7 +13,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
   test('base case', () => {
     const component = wrapIntl(
       <KanbanCalculationOptions
-        value='count'
+        value="count"
         property={board.fields.cardProperties[1]}
         menuOpen={false}
         onChange={() => {}}
@@ -29,7 +28,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
   test('with menu open', () => {
     const component = wrapIntl(
       <KanbanCalculationOptions
-        value='count'
+        value="count"
         property={board.fields.cardProperties[1]}
         menuOpen={true}
         onChange={() => {}}
@@ -44,7 +43,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
   test('with submenu open', () => {
     const component = wrapIntl(
       <KanbanCalculationOptions
-        value='count'
+        value="count"
         property={board.fields.cardProperties[1]}
         menuOpen={true}
         onChange={() => {}}
@@ -76,7 +75,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
 
     const component = wrapIntl(
       <KanbanCalculationOptions
-        value='count'
+        value="count"
         property={boardWithProps.fields.cardProperties[1]}
         menuOpen={true}
         onChange={() => {}}
@@ -116,7 +115,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
 
     const component = wrapIntl(
       <KanbanCalculationOptions
-        value='count'
+        value="count"
         property={boardWithProps.fields.cardProperties[1]}
         menuOpen={true}
         onChange={() => {}}

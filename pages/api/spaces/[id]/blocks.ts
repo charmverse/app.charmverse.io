@@ -1,4 +1,3 @@
-
 import type { Page } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getBlocks);
 
-async function getBlocks (req: NextApiRequest, res: NextApiResponse<Page[]>) {
+async function getBlocks(req: NextApiRequest, res: NextApiResponse<Page[]>) {
   const pages = await prisma.page.findMany({
     where: {
       spaceId: req.query.id as string

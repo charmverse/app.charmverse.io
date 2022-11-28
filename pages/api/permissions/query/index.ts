@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,12 +8,12 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<IPagePermissionUserRequest>(['pageId', 'userId'], 'query'))
   .get(queryPagePermissions);
 
-async function queryPagePermissions (req: NextApiRequest, res: NextApiResponse) {
-
+async function queryPagePermissions(req: NextApiRequest, res: NextApiResponse) {
   const request = req.query as unknown as IPagePermissionUserRequest;
 
   const userPermissions = await computeUserPagePermissions(request);

@@ -1,4 +1,3 @@
-
 import CloseIcon from '@mui/icons-material/Close';
 import Modal from '@mui/material/Modal';
 import React from 'react';
@@ -14,7 +13,7 @@ type Props = {
   hideCloseButton?: boolean;
   className?: string;
   onClose: () => void;
-}
+};
 
 const Dialog = React.memo((props: Props) => {
   const { toolsMenu } = props;
@@ -32,30 +31,24 @@ const Dialog = React.memo((props: Props) => {
     <Modal open={true}>
       <div className={`Dialog dialog-back ${props.className}`}>
         <div
-          className='wrapper'
+          className="wrapper"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               props.onClose();
             }
           }}
         >
-          <div
-            role='dialog'
-            className='dialog'
-          >
-            <div className='toolbar'>
-              {
-                !props.hideCloseButton
-                && (
-                  <IconButton
-                    onClick={props.onClose}
-                    icon={<CloseIcon />}
-                    title={closeDialogText}
-                    className='IconButton--large'
-                  />
-                )
-              }
-              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
+          <div role="dialog" className="dialog">
+            <div className="toolbar">
+              {!props.hideCloseButton && (
+                <IconButton
+                  onClick={props.onClose}
+                  icon={<CloseIcon />}
+                  title={closeDialogText}
+                  className="IconButton--large"
+                />
+              )}
+              {toolbar && <div className="cardToolbar">{toolbar}</div>}
               {toolsMenu}
             </div>
             {props.children}

@@ -9,7 +9,13 @@ import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
 import { FiFigma } from 'react-icons/fi';
 
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT, VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
+import {
+  MAX_EMBED_WIDTH,
+  MIN_EMBED_HEIGHT,
+  MAX_EMBED_HEIGHT,
+  VIDEO_ASPECT_RATIO,
+  MIN_EMBED_WIDTH
+} from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 
 import BlockAligner from '../BlockAligner';
@@ -22,13 +28,12 @@ import IFrameSelector from './IFrameSelector';
 
 const name = 'iframe';
 
-export function iframeSpec (): RawSpecs {
+export function iframeSpec(): RawSpecs {
   return {
     type: 'node',
     name,
     markdown: {
       toMarkdown: (state, node, parent, index) => {
-
         // eslint-disable-next-line prefer-const
         let { height, width, src } = node.attrs;
 
@@ -92,7 +97,9 @@ const StyledEmptyIframeContainer = styled.div`
   opacity: 0.5;
 `;
 
-function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, type: IFrameSelectorProps['type'] }) {
+function EmptyIframeContainer(
+  props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; type: IFrameSelectorProps['type'] }
+) {
   const theme = useTheme();
   const { type, readOnly, ...rest } = props;
   return (
@@ -113,9 +120,9 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnl
         {(() => {
           switch (type) {
             case 'embed':
-              return <PreviewIcon fontSize='small' />;
+              return <PreviewIcon fontSize="small" />;
             case 'video':
-              return <VideoLibraryIcon fontSize='small' />;
+              return <VideoLibraryIcon fontSize="small" />;
             case 'figma':
               return <FiFigma style={{ fontSize: 'small' }} />;
 
@@ -137,7 +144,6 @@ function EmptyIframeContainer (props: HTMLAttributes<HTMLDivElement> & { readOnl
                 return null;
             }
           })()}
-
         </Typography>
       </StyledEmptyIframeContainer>
     </ListItem>
@@ -159,16 +165,24 @@ const StyledIFrame = styled.div`
   border-radius: ${({ theme }) => theme.spacing(1)};
 `;
 
-function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeStop }:
-  NodeViewProps & { readOnly: boolean, onResizeStop?: (view: EditorView) => void }) {
+function ResizableIframe({
+  readOnly,
+  node,
+  getPos,
+  view,
+  updateAttrs,
+  onResizeStop
+}: NodeViewProps & { readOnly: boolean; onResizeStop?: (view: EditorView) => void }) {
   const [height, setHeight] = useState(node.attrs.height);
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
-  const autoOpen = node.marks.some(mark => mark.type.name === 'tooltip-marker');
+  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return readOnly ? <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} /> : (
+    return readOnly ? (
+      <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} />
+    ) : (
       <IFrameSelector
         autoOpen={autoOpen}
         type={node.attrs.type}
@@ -178,8 +192,7 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
             const pos = getPos();
             const tweetNode = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, tweetNode));
-          }
-          else {
+          } else {
             const attrs = extractEmbedLink(videoLink);
             updateAttrs({
               src: attrs.url,
@@ -193,7 +206,7 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
     );
   }
 
-  function onDelete () {
+  function onDelete() {
     updateAttrs({
       src: null
     });
@@ -203,9 +216,19 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
     return (
       <StyledIFrame>
         {node.attrs.type === 'figma' ? (
-          <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          <iframe
+            allowFullScreen
+            title="iframe"
+            src={figmaSrc}
+            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+          />
         ) : (
-          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }} />
+          <iframe
+            allowFullScreen
+            title="iframe"
+            src={node.attrs.src}
+            style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
+          />
         )}
       </StyledIFrame>
     );
@@ -232,13 +255,17 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
           minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
           <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+            <iframe
+              allowFullScreen
+              title="iframe"
+              src={node.attrs.src}
+              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+            />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
     );
-  }
-  else if (node.attrs.type === 'figma') {
+  } else if (node.attrs.type === 'figma') {
     return (
       <BlockAligner onDelete={onDelete}>
         <VerticalResizer
@@ -259,26 +286,35 @@ function ResizableIframe ({ readOnly, node, getPos, view, updateAttrs, onResizeS
           minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
           <StyledIFrame>
-            <iframe allowFullScreen title='iframe' src={figmaSrc} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+            <iframe
+              allowFullScreen
+              title="iframe"
+              src={figmaSrc}
+              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+            />
           </StyledIFrame>
         </VerticalResizer>
       </BlockAligner>
     );
-  }
-  else {
+  } else {
     return (
       <Resizable
         aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={node.attrs.width}
         minWidth={MIN_EMBED_WIDTH}
-        updateAttrs={args => {
+        updateAttrs={(args) => {
           updateAttrs({ width: args.size });
         }}
         onDelete={onDelete}
         onResizeStop={onResizeStop}
       >
         <StyledIFrame>
-          <iframe allowFullScreen title='iframe' src={node.attrs.src} style={{ height: '100%', border: '0 solid transparent', width: '100%' }} />
+          <iframe
+            allowFullScreen
+            title="iframe"
+            src={node.attrs.src}
+            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+          />
         </StyledIFrame>
       </Resizable>
     );

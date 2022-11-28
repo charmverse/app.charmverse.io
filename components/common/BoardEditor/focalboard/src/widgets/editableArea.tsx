@@ -3,11 +3,11 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 import type { EditableProps, Focusable } from './editable';
 import { useEditable } from './editable';
 
-function getBorderWidth (style: CSSStyleDeclaration): number {
+function getBorderWidth(style: CSSStyleDeclaration): number {
   return parseInt(style.borderTopWidth || '0', 10) + parseInt(style.borderBottomWidth || '0', 10);
 }
 
-function EditableArea (props: EditableProps, ref: React.Ref<Focusable>): JSX.Element {
+function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element {
   const elementRef = useRef<HTMLTextAreaElement>(null);
   const referenceRef = useRef<HTMLTextAreaElement>(null);
   const heightRef = useRef(0);
@@ -38,18 +38,18 @@ function EditableArea (props: EditableProps, ref: React.Ref<Focusable>): JSX.Ele
   };
 
   return (
-    <div className='EditableAreaWrap'>
+    <div className="EditableAreaWrap">
       <textarea
         {...elementProps}
         {...heightProps}
         ref={elementRef}
         className={`EditableArea ${elementProps.className}`}
       />
-      <div className='EditableAreaContainer'>
+      <div className="EditableAreaContainer">
         <textarea
           ref={referenceRef}
           className={`EditableAreaReference ${elementProps.className}`}
-          dir='auto'
+          dir="auto"
           disabled={true}
           rows={1}
           value={elementProps.value}

@@ -1,4 +1,3 @@
-
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress, Menu, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -23,14 +22,8 @@ import DefaultPagePermissions from './components/SpacePermissions/components/Def
 import PermissionConfigurationMode from './components/SpacePermissions/components/PermissionConfigurationMode';
 import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
-export default function RoleSettings () {
-  const {
-    assignRoles,
-    deleteRole,
-    refreshRoles,
-    unassignRole,
-    roles
-  } = useRoles();
+export default function RoleSettings() {
+  const { assignRoles, deleteRole, refreshRoles, unassignRole, roles } = useRoles();
   const isAdmin = useIsAdmin();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-role' });
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -43,81 +36,83 @@ export default function RoleSettings () {
 
   const { isValidating } = useImportDiscordRoles();
 
-  const [selectedPermissionMode, setSelectedPermissionMode] = useState<SpacePermissionConfigurationMode>(space?.permissionConfigurationMode ?? 'custom');
+  const [selectedPermissionMode, setSelectedPermissionMode] = useState<SpacePermissionConfigurationMode>(
+    space?.permissionConfigurationMode ?? 'custom'
+  );
 
   return (
     <>
       {/* Space permissions */}
-      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        Permissions
-      </Legend>
+      <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>Permissions</Legend>
 
       <PermissionConfigurationMode permissionModeSelected={setSelectedPermissionMode} />
 
-      {
-        space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
-          <>
-            <br />
-            <SpacePermissions targetGroup='space' id={space?.id as string} />
+      {space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
+        <>
+          <br />
+          <SpacePermissions targetGroup="space" id={space?.id as string} />
 
-            <br />
+          <br />
 
-            <ShareBountyBoard padding={0} />
+          <ShareBountyBoard padding={0} />
 
-            <br />
-            {/* Default page permissions */}
-            <DefaultPagePermissions />
-          </>
-        )
-      }
+          <br />
+          {/* Default page permissions */}
+          <DefaultPagePermissions />
+        </>
+      )}
 
       {/* Roles */}
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Roles
         {isAdmin && (
-          <Box component='span' display='flex' gap={1}>
+          <Box component="span" display="flex" gap={1}>
             <Button
               onClick={() => {
                 setAnchorEl(buttonRef?.current);
               }}
               ref={buttonRef}
-              variant='outlined'
-              endIcon={(
-                <KeyboardArrowDownIcon />
-              )}
+              variant="outlined"
+              endIcon={<KeyboardArrowDownIcon />}
               disabled={isValidating}
             >
               Import roles
             </Button>
-            <Button {...bindTrigger(popupState)} disabled={isValidating}>Add a role</Button>
+            <Button {...bindTrigger(popupState)} disabled={isValidating}>
+              Add a role
+            </Button>
           </Box>
         )}
       </Legend>
       {isValidating ? (
-        <Box display='flex' alignItems='center' gap={1}>
+        <Box display="flex" alignItems="center" gap={1}>
           <CircularProgress size={24} />
-          <Typography variant='subtitle1' color='secondary'>Importing roles from discord server</Typography>
+          <Typography variant="subtitle1" color="secondary">
+            Importing roles from discord server
+          </Typography>
         </Box>
-      ) : roles?.map(role => (
-        <RoleRow
-          isEditable={isAdmin}
-          assignRoles={assignRoles}
-          unassignRole={unassignRole}
-          deleteRole={deleteRole}
-          refreshRoles={refreshRoles}
-          role={role}
-          key={role.id}
-        />
-      ))}
-      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
+      ) : (
+        roles?.map((role) => (
+          <RoleRow
+            isEditable={isAdmin}
+            assignRoles={assignRoles}
+            unassignRole={unassignRole}
+            deleteRole={deleteRole}
+            refreshRoles={refreshRoles}
+            role={role}
+            key={role.id}
+          />
+        ))
+      )}
+      {roles?.length === 0 && <Typography color="secondary">No roles yet</Typography>}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
-      <Modal {...bindPopover(popupState)} title='Add a role'>
+      <Modal {...bindPopover(popupState)} title="Add a role">
         <RoleForm
-          mode='create'
+          mode="create"
           submitted={() => {
             popupState.close();
             refreshRoles();

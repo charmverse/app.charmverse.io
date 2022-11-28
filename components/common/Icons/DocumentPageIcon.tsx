@@ -11,11 +11,11 @@ interface Props {
   onClick?: () => void;
 }
 
-export function DocumentPageIcon ({ iconSize, label, fontSize, onClick }: Props) {
+export function DocumentPageIcon({ iconSize, label, fontSize, onClick }: Props) {
   return (
     <IconWrapper onClick={onClick}>
       <DescriptionOutlinedIcon fontSize={iconSize} />
-      <Box component='span' fontSize={fontSize}>
+      <Box component="span" fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

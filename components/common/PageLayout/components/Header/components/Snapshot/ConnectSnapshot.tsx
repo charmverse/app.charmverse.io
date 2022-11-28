@@ -19,17 +19,18 @@ import type { SystemError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
 export const schema = yup.object({
-  snapshotDomain: yup.string().required().test('checkDomain', 'Snapshot domain not found', async (domain) => {
+  snapshotDomain: yup
+    .string()
+    .required()
+    .test('checkDomain', 'Snapshot domain not found', async (domain) => {
+      if (!domain || domain.length < 3) {
+        return false;
+      }
 
-    if (!domain || domain.length < 3) {
-      return false;
-    }
+      const foundSpace = await getSnapshotSpace(domain);
 
-    const foundSpace = await getSnapshotSpace(domain);
-
-    return isTruthy(foundSpace);
-
-  }),
+      return isTruthy(foundSpace);
+    }),
   defaultVotingDuration: yup.number().required()
 });
 
@@ -37,8 +38,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const DEFAULT_VOTING_DURATION = 7;
 
-export default function ConnectSnapshot () {
-
+export default function ConnectSnapshot() {
   const space = useCurrentSpace();
   const { setSpace } = useSpaces();
   const [formError, setFormError] = useState<SystemError | null>(null);
@@ -63,14 +63,12 @@ export default function ConnectSnapshot () {
 
   const snapshotDomainUnchanged = space?.snapshotDomain === values.snapshotDomain;
 
-  async function onSubmit (formValues: FormValues) {
-
+  async function onSubmit(formValues: FormValues) {
     setFormError(null);
     try {
       const spaceWithDomain = await charmClient.updateSnapshotConnection(space?.id as any, formValues);
       setSpace(spaceWithDomain);
-    }
-    catch (err) {
+    } catch (err) {
       setFormError(err as any);
     }
     setTouched(false);
@@ -80,65 +78,56 @@ export default function ConnectSnapshot () {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-
-      <Grid container direction='column' spacing={3}>
+      <Grid container direction="column" spacing={3}>
         <Grid item>
           <FieldLabel>Snapshot domain</FieldLabel>
 
-          {
-            !space?.snapshotDomain && !isAdmin ? (
-              <Typography>No Snapshot domain connected yet. Only workspace admins can configure this.</Typography>
-            ) : (
-              <TextField
-                {...register('snapshotDomain', {
-                  onChange: () => {
-                    setTouched(true);
-                  }
-                })}
-                disabled={!isAdmin}
-                fullWidth
-                error={!!errors.snapshotDomain}
-                helperText={errors.snapshotDomain?.message}
-              />
-            )
-          }
+          {!space?.snapshotDomain && !isAdmin ? (
+            <Typography>No Snapshot domain connected yet. Only workspace admins can configure this.</Typography>
+          ) : (
+            <TextField
+              {...register('snapshotDomain', {
+                onChange: () => {
+                  setTouched(true);
+                }
+              })}
+              disabled={!isAdmin}
+              fullWidth
+              error={!!errors.snapshotDomain}
+              helperText={errors.snapshotDomain?.message}
+            />
+          )}
         </Grid>
-        {
-          values.snapshotDomain && !errors.snapshotDomain && (
-            <Grid item>
-              <FieldLabel>Default voting duration (days)</FieldLabel>
-              <TextField
-                {...register('defaultVotingDuration', {
-                  onChange: () => {
-                    setTouched(true);
-                  }
-                })}
-                disabled={!isAdmin}
-                fullWidth
-                error={!!errors.defaultVotingDuration}
-                helperText={errors.defaultVotingDuration?.message}
-              />
-            </Grid>
-          )
-        }
+        {values.snapshotDomain && !errors.snapshotDomain && (
+          <Grid item>
+            <FieldLabel>Default voting duration (days)</FieldLabel>
+            <TextField
+              {...register('defaultVotingDuration', {
+                onChange: () => {
+                  setTouched(true);
+                }
+              })}
+              disabled={!isAdmin}
+              fullWidth
+              error={!!errors.defaultVotingDuration}
+              helperText={errors.defaultVotingDuration?.message}
+            />
+          </Grid>
+        )}
 
-        {
-          formError && (
-            <Grid item>
-              <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
-            </Grid>
-          )
-        }
+        {formError && (
+          <Grid item>
+            <Alert severity="error">{formError.message ?? (formError as any).error}</Alert>
+          </Grid>
+        )}
 
-        {
-          isAdmin && (
-            <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type='submit'>
-                Save
-              </PrimaryButton>
-            </Grid>
-          )
-        }
+        {isAdmin && (
+          <Grid item display="flex" justifyContent="space-between">
+            <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type="submit">
+              Save
+            </PrimaryButton>
+          </Grid>
+        )}
       </Grid>
     </form>
   );

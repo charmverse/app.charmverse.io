@@ -10,7 +10,7 @@ import { Utils } from './utils';
 declare let window: IAppWindow;
 
 class CsvExporter {
-  static exportTableCsv (board: Board, activeView: BoardView, cards: Card[], intl: IntlShape, view?: BoardView): void {
+  static exportTableCsv(board: Board, activeView: BoardView, cards: Card[], intl: IntlShape, view?: BoardView): void {
     const viewToExport = view ?? activeView;
 
     if (!viewToExport) {
@@ -44,19 +44,21 @@ class CsvExporter {
     // TODO: Remove or reuse link
   }
 
-  private static encodeText (text: string): string {
+  private static encodeText(text: string): string {
     return text.replace(/"/g, '""');
   }
 
-  private static generateTableArray (board: Board, cards: Card[], viewToExport: BoardView, intl: IntlShape): string[][] {
+  private static generateTableArray(board: Board, cards: Card[], viewToExport: BoardView, intl: IntlShape): string[][] {
     const rows: string[][] = [];
-    const visibleProperties = board.fields.cardProperties.filter(
-      (template: IPropertyTemplate) => viewToExport.fields.visiblePropertyIds.includes(template.id)
+    const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) =>
+      viewToExport.fields.visiblePropertyIds.includes(template.id)
     );
 
-    if (viewToExport.fields.viewType === 'calendar'
-            && viewToExport.fields.dateDisplayPropertyId
-            && !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)) {
+    if (
+      viewToExport.fields.viewType === 'calendar' &&
+      viewToExport.fields.dateDisplayPropertyId &&
+      !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)
+    ) {
       const dateDisplay = board.fields.cardProperties.find(
         (template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id
       );
@@ -81,12 +83,10 @@ class CsvExporter {
         if (template.type === 'number') {
           const numericValue = propertyValue ? Number(propertyValue).toString() : '';
           _row.push(numericValue);
-        }
-        else if (template.type === 'multiSelect') {
-          const multiSelectValue = ((displayValue as unknown || []) as string[]).join('|');
+        } else if (template.type === 'multiSelect') {
+          const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
           _row.push(multiSelectValue);
-        }
-        else {
+        } else {
           // Export as string
           _row.push(`"${this.encodeText(displayValue)}"`);
         }

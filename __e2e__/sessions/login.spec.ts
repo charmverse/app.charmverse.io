@@ -20,21 +20,18 @@ const test = base.extend<Fixtures>({
 });
 
 test('login - allows user to login and see their workspace', async ({ loginPage }) => {
-
   const { space, address, page, privateKey } = await generateUserAndSpace();
 
   await mockWeb3({
     page: loginPage.page,
     context: { privateKey, address },
     init: ({ Web3Mock, context }) => {
-
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {
           return: [context.address]
         }
       });
-
     }
   });
 
@@ -42,5 +39,4 @@ test('login - allows user to login and see their workspace', async ({ loginPage 
 
   // should auto redirect to workspace
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
-
 });

@@ -49,24 +49,34 @@ type Props = {
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
   toggleViewOptions: (enable?: boolean) => void;
-}
+};
 
-function ViewHeader (props: Props) {
+function ViewHeader(props: Props) {
   const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
 
-  const views = props.views.filter(view => !view.fields.inline);
+  const views = props.views.filter((view) => !view.fields.inline);
 
-  const { maxTabsShown = 3, showView, toggleViewOptions, viewsBoardId, activeBoard, activeView, groupByProperty, cards, dateDisplayProperty } = props;
+  const {
+    maxTabsShown = 3,
+    showView,
+    toggleViewOptions,
+    viewsBoardId,
+    activeBoard,
+    activeView,
+    groupByProperty,
+    cards,
+    dateDisplayProperty
+  } = props;
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
   const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
 
-  async function addPageFromTemplate (pageId: string) {
+  async function addPageFromTemplate(pageId: string) {
     const [blocks] = await mutator.duplicateCard({
       board: props.activeBoard as Board,
       cardId: pageId,
@@ -77,8 +87,8 @@ function ViewHeader (props: Props) {
     props.showCard(newPageId);
   }
 
-  async function deleteCardTemplate (pageId: string) {
-    const card = cardTemplates.find(c => c.id === pageId);
+  async function deleteCardTemplate(pageId: string) {
+    const card = cardTemplates.find((c) => c.id === pageId);
     if (card) {
       await mutator.deleteBlock(card, 'delete card');
       mutate(`pages/${card.spaceId}`);
@@ -103,64 +113,49 @@ function ViewHeader (props: Props) {
 
       {/* add a view */}
 
-      {!props.readOnly && views.length <= maxTabsShown && (
-        props.addViewButton
-      )}
+      {!props.readOnly && views.length <= maxTabsShown && props.addViewButton}
 
-      <div className='octo-spacer' />
+      <div className="octo-spacer" />
 
-      <div className='view-actions'>
-
-        {!props.readOnly && activeView && activeBoard
-        && (
+      <div className="view-actions">
+        {!props.readOnly && activeView && activeBoard && (
           <>
-
             {/* Display by */}
 
-            {withDisplayBy
-              && (
-                <ViewHeaderDisplayByMenu
-                  properties={activeBoard.fields.cardProperties}
-                  activeView={activeView}
-                  dateDisplayPropertyName={dateDisplayProperty?.name}
-                />
-              )}
+            {withDisplayBy && (
+              <ViewHeaderDisplayByMenu
+                properties={activeBoard.fields.cardProperties}
+                activeView={activeView}
+                dateDisplayPropertyName={dateDisplayProperty?.name}
+              />
+            )}
 
             {/* Filter */}
 
             <ModalWrapper>
               <Button
                 color={hasFilter ? 'primary' : 'secondary'}
-                variant='text'
-                size='small'
+                variant="text"
+                size="small"
                 sx={{ minWidth: 0 }}
                 onClick={() => setShowFilter(true)}
               >
-                <FormattedMessage
-                  id='ViewHeader.filter'
-                  defaultMessage='Filter'
-                />
+                <FormattedMessage id="ViewHeader.filter" defaultMessage="Filter" />
               </Button>
-              {showFilter
-                && (
-                  <FilterComponent
-                    board={activeBoard}
-                    activeView={activeView}
-                    onClose={() => setShowFilter(false)}
-                  />
-                )}
+              {showFilter && (
+                <FilterComponent board={activeBoard} activeView={activeView} onClose={() => setShowFilter(false)} />
+              )}
             </ModalWrapper>
 
             {/* Sort */}
 
-            {withSortBy
-              && (
-                <ViewHeaderSortMenu
-                  properties={activeBoard.fields.cardProperties}
-                  activeView={activeView}
-                  orderedCards={cards}
-                />
-              )}
+            {withSortBy && (
+              <ViewHeaderSortMenu
+                properties={activeBoard.fields.cardProperties}
+                activeView={activeView}
+                orderedCards={cards}
+              />
+            )}
           </>
         )}
 
@@ -170,17 +165,24 @@ function ViewHeader (props: Props) {
 
         {/* Link to view embedded table in full */}
         {props.embeddedBoardPath && (
-          <Link href={router.pathname.startsWith('/share') ? `/share/${router.query.pageId?.[0]}/${props.embeddedBoardPath}` : `/${router.query.domain}/${props.embeddedBoardPath}`}>
-            <Tooltip title='Open as full page' placement='top'>
-              <IconButton style={{ width: '32px' }}><OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} /></IconButton>
+          <Link
+            href={
+              router.pathname.startsWith('/share')
+                ? `/share/${router.query.pageId?.[0]}/${props.embeddedBoardPath}`
+                : `/${router.query.domain}/${props.embeddedBoardPath}`
+            }
+          >
+            <Tooltip title="Open as full page" placement="top">
+              <IconButton style={{ width: '32px' }}>
+                <OpenInFullIcon color="secondary" sx={{ fontSize: 14 }} />
+              </IconButton>
             </Tooltip>
           </Link>
         )}
 
         {/* Options menu */}
 
-        {!props.readOnly && activeView
-        && (
+        {!props.readOnly && activeView && (
           <>
             <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
 

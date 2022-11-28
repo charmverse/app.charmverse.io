@@ -21,16 +21,28 @@ type Props = {
   removePermission: (permission: MemberPropertyPermission) => void;
 };
 
-export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermissions, removePermission, property }: Props) {
-  const memberPropertySidebarItemPopupState = usePopupState({ variant: 'popover', popupId: 'member-property-sidebar-item' });
-  const [selectedRoleIds, setSelectedRoleIds] = useState<string []>([]);
+export function MemberPropertySidebarDetails({
+  isExpanded,
+  readOnly,
+  addPermissions,
+  removePermission,
+  property
+}: Props) {
+  const memberPropertySidebarItemPopupState = usePopupState({
+    variant: 'popover',
+    popupId: 'member-property-sidebar-item'
+  });
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 
   const filterRoleIds = useMemo(() => {
-    return [...new Set([...property.permissions.map(p => p.roleId), ...selectedRoleIds])].filter(Boolean) as string[];
+    return [...new Set([...property.permissions.map((p) => p.roleId), ...selectedRoleIds])].filter(Boolean) as string[];
   }, [property.permissions, selectedRoleIds]);
 
-  function savePermissions () {
-    addPermissions(property.id, selectedRoleIds.map(roleId => ({ roleId, memberPropertyId: property.id })));
+  function savePermissions() {
+    addPermissions(
+      property.id,
+      selectedRoleIds.map((roleId) => ({ roleId, memberPropertyId: property.id }))
+    );
     memberPropertySidebarItemPopupState.close();
     setSelectedRoleIds([]);
   }
@@ -47,17 +59,17 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
         <Stack mb={1}>
           <Stack>
             <Box pl={4}>
-              <MemberPropertyVisibility
-                property={property}
-              />
+              <MemberPropertyVisibility property={property} />
             </Box>
             {property?.permissions.length ? (
               <Stack>
                 <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                  <Typography pl={4} variant='overline'>Restricted to roles:</Typography>
+                  <Typography pl={4} variant="overline">
+                    Restricted to roles:
+                  </Typography>
                 </Tooltip>
-                {property?.permissions.map(permission => (
-                  <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+                {property?.permissions.map((permission) => (
+                  <Stack key={permission.id} flexDirection="row" justifyContent="space-between" alignItems="center">
                     <MenuItem
                       dense
                       sx={{
@@ -74,11 +86,11 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
                         }
                       }}
                     >
-                      <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                      <Typography variant="subtitle2">{permission.role?.name || '-'}</Typography>
                       {!readOnly && (
-                        <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
+                        <IconButton size="small" color="secondary" sx={{ opacity: 0 }} className="icons">
                           <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
+                            <DeleteOutlinedIcon fontSize="small" onClick={() => removePermission(permission)} />
                           </Tooltip>
                         </IconButton>
                       )}
@@ -88,9 +100,9 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
               </Stack>
             ) : (
               <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
-                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                <Typography pl={4} variant="overline" alignItems="center" display="flex">
                   Everyone in workspace
-                  <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
+                  <VisibilityOutlinedIcon fontSize="small" color="secondary" sx={{ ml: 1 }} />
                 </Typography>
               </Tooltip>
             )}
@@ -98,9 +110,9 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
 
           {!readOnly && (
             <Button
-              variant='text'
-              size='small'
-              color='secondary'
+              variant="text"
+              size="small"
+              color="secondary"
               startIcon={<AddOutlinedIcon />}
               onClick={memberPropertySidebarItemPopupState.open}
               sx={{
@@ -116,9 +128,13 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
         </Stack>
       </Collapse>
 
-      <Modal size='large' open={memberPropertySidebarItemPopupState.isOpen} onClose={memberPropertySidebarItemPopupState.close} title='Add roles'>
+      <Modal
+        size="large"
+        open={memberPropertySidebarItemPopupState.isOpen}
+        onClose={memberPropertySidebarItemPopupState.close}
+        title="Add roles"
+      >
         <Stack gap={0.5}>
-
           <InputLabel>Role</InputLabel>
           <InputSearchRoleMultiple
             onChange={setSelectedRoleIds}
@@ -136,7 +152,6 @@ export function MemberPropertySidebarDetails ({ isExpanded, readOnly, addPermiss
           >
             Add selected roles
           </Button>
-
         </Stack>
       </Modal>
     </>

@@ -27,7 +27,7 @@ interface Props {
   permissions: AssignedBountyPermissions;
 }
 
-export default function BountySubmissionsTable ({ bounty, permissions }: Props) {
+export default function BountySubmissionsTable({ bounty, permissions }: Props) {
   const theme = useTheme();
 
   const [applications, setListApplications] = useState<ApplicationWithTransactions[]>([]);
@@ -35,7 +35,7 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
   const { refreshBounty } = useBounties();
   const { user } = useUser();
 
-  async function refreshSubmissions () {
+  async function refreshSubmissions() {
     if (bounty) {
       const listApplicationsResponse = await charmClient.bounties.listApplications(bounty.id);
       setListApplications(listApplicationsResponse);
@@ -51,56 +51,64 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
     refreshSubmissions();
   }, [bounty]);
 
-  async function lockBountySubmissions () {
+  async function lockBountySubmissions() {
     const updatedBounty = await charmClient.bounties.lockSubmissions(bounty!.id, !bounty.submissionsLocked);
     refreshBounty(updatedBounty.id);
   }
 
-  const filteredApplications = applications?.filter(a => a.createdBy !== user?.id);
+  const filteredApplications = applications?.filter((a) => a.createdBy !== user?.id);
 
   return (
     <>
-      <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
-        <Box display='flex' gap={1} alignItems='center'>
+      <Box width="100%" display="flex" mb={1} justifyContent="space-between">
+        <Box display="flex" gap={1} alignItems="center">
           <Chip
             sx={{
               my: 1
             }}
-            label={`Submissions: ${bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions}`}
+            label={`Submissions: ${
+              bounty?.maxSubmissions ? `${validSubmissions} / ${bounty.maxSubmissions}` : validSubmissions
+            }`}
           />
-          { permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
-            <Tooltip key='stop-new' arrow placement='top' title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${bounty.approveSubmitters ? 'applications' : 'submissions'} from being made.`}>
+          {permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
+            <Tooltip
+              key="stop-new"
+              arrow
+              placement="top"
+              title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${
+                bounty.approveSubmitters ? 'applications' : 'submissions'
+              } from being made.`}
+            >
               <IconButton
-                size='small'
+                size="small"
                 onClick={() => {
                   lockBountySubmissions();
                 }}
               >
-                { !bounty.submissionsLocked ? <LockOpen color='secondary' fontSize='small' /> : <LockIcon color='secondary' fontSize='small' />}
+                {!bounty.submissionsLocked ? (
+                  <LockOpen color="secondary" fontSize="small" />
+                ) : (
+                  <LockIcon color="secondary" fontSize="small" />
+                )}
               </IconButton>
             </Tooltip>
           )}
         </Box>
       </Box>
 
-      <Table stickyHeader aria-label='bounty applicant table'>
-        <TableHead sx={{
-          background: theme.palette.background.dark,
-          '.MuiTableCell-root': {
-            background: theme.palette.settingsHeader.background
-          }
-        }}
+      <Table stickyHeader aria-label="bounty applicant table">
+        <TableHead
+          sx={{
+            background: theme.palette.background.dark,
+            '.MuiTableCell-root': {
+              background: theme.palette.settingsHeader.background
+            }
+          }}
         >
           <TableRow>
-            <TableCell>
-              Applicant
-            </TableCell>
-            <TableCell>
-              Status
-            </TableCell>
-            <TableCell>
-              Last updated
-            </TableCell>
+            <TableCell>Applicant</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Last updated</TableCell>
             <TableCell />
             <TableCell />
           </TableRow>
@@ -121,16 +129,14 @@ export default function BountySubmissionsTable ({ bounty, permissions }: Props) 
       {filteredApplications.length === 0 && (
         <>
           <Box
-            display='flex'
-            justifyContent='center'
+            display="flex"
+            justifyContent="center"
             my={3}
             sx={{
               opacity: 0.5
             }}
           >
-            <Typography variant='h6'>
-              No submissions to review
-            </Typography>
+            <Typography variant="h6">No submissions to review</Typography>
           </Box>
           <Divider
             sx={{

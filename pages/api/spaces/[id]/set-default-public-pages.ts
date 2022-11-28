@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,21 +10,21 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .use(requireCustomPermissionMode({
-    keyLocation: 'query',
-    spaceIdKey: 'id'
-  }))
+handler
+  .use(requireUser)
+  .use(
+    requireCustomPermissionMode({
+      keyLocation: 'query',
+      spaceIdKey: 'id'
+    })
+  )
   .post(setSpaceDefaultPublicPage);
 
-async function setSpaceDefaultPublicPage (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function setSpaceDefaultPublicPage(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
   const { defaultPublicPages } = req.body as Pick<SpaceDefaultPublicPageToggle, 'defaultPublicPages'>;
 
-  const {
-    error
-  } = await hasAccessToSpace({
+  const { error } = await hasAccessToSpace({
     userId: req.session.user.id as string,
     spaceId: spaceId as string,
     adminOnly: true

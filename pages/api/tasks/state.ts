@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -19,8 +18,7 @@ export interface GetTasksStateResponse {
   snoozedMessage: string | null;
 }
 
-async function getTasksState (req: NextApiRequest, res: NextApiResponse<GetTasksStateResponse>) {
-
+async function getTasksState(req: NextApiRequest, res: NextApiResponse<GetTasksStateResponse>) {
   const taskState = await prisma.userNotificationState.findUnique({
     where: {
       userId: req.session.user.id
@@ -38,7 +36,7 @@ export interface UpdateTasksState {
   snoozeFor: Date | null;
 }
 
-async function updateTasksState (req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
+async function updateTasksState(req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
   const { snoozeFor, snoozeMessage } = req.body as UpdateTasksState;
   await prisma.userNotificationState.upsert({
     where: {

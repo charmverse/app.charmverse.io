@@ -29,7 +29,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
-export default function WorkspaceSettings () {
+export default function WorkspaceSettings() {
   const router = useRouter();
   const space = useCurrentSpace();
   const { spaces, setSpace, setSpaces } = useSpaces();
@@ -58,31 +58,31 @@ export default function WorkspaceSettings () {
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     if (!space || !isAdmin) return;
     setError(null);
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
-    charmClient.updateSpace({ ...space, ...values })
-      .then(updatedSpace => {
+    charmClient
+      .updateSpace({ ...space, ...values })
+      .then((updatedSpace) => {
         if (newDomain) {
           window.location.href = router.asPath.replace(space.domain, values.domain);
-        }
-        else {
+        } else {
           setSpace(updatedSpace);
         }
         reset(updatedSpace);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err?.message || err || 'Something went wrong');
       });
   }
 
-  function closeInviteLinkDeleteModal () {
+  function closeInviteLinkDeleteModal() {
     workspaceRemoveModalState.close();
   }
 
-  async function deleteWorkspace () {
+  async function deleteWorkspace() {
     workspaceRemoveModalState.open();
   }
 
@@ -91,22 +91,18 @@ export default function WorkspaceSettings () {
 
   return (
     <>
-
       <Legend>Space Details</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container direction='column' spacing={3}>
+        <Grid container direction="column" spacing={3}>
           <Grid item>
             <Avatar
               name={watchName}
-              variant='rounded'
+              variant="rounded"
               image={watchSpaceImage}
               updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
               editable={isAdmin}
             />
-            <TextField
-              {...register('spaceImage')}
-              sx={{ visibility: 'hidden', width: '0px' }}
-            />
+            <TextField {...register('spaceImage')} sx={{ visibility: 'hidden', width: '0px' }} />
           </Grid>
           <Grid item>
             <FieldLabel>Name</FieldLabel>
@@ -128,26 +124,22 @@ export default function WorkspaceSettings () {
               helperText={errors.domain?.message}
               sx={{ mb: 1 }}
             />
-            {error && (
-              <FormHelperText error>
-                {error}
-              </FormHelperText>
-            )}
+            {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>
           {isAdmin ? (
-            <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton disabled={!isDirty} type='submit'>
+            <Grid item display="flex" justifyContent="space-between">
+              <PrimaryButton disabled={!isDirty} type="submit">
                 Save
               </PrimaryButton>
-              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
+              <Button variant="outlined" color="error" onClick={deleteWorkspace}>
                 Delete Workspace
               </Button>
             </Grid>
           ) : (
-            <Grid item display='flex'>
+            <Grid item display="flex">
               <Button
-                variant='outlined'
-                color='error'
+                variant="outlined"
+                color="error"
                 onClick={() => {
                   workspaceLeaveModalState.open();
                 }}
@@ -159,26 +151,25 @@ export default function WorkspaceSettings () {
         </Grid>
       </form>
       <Legend>API Key</Legend>
-      <Typography variant='body1'>
-        Request access to the charmverse API in our
-        {' '}
-        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
-          Discord Channel <LaunchIcon fontSize='small' />
+      <Typography variant="body1">
+        Request access to the charmverse API in our{' '}
+        <Link href="https://discord.gg/ACYCzBGC2M" external target="_blank">
+          Discord Channel <LaunchIcon fontSize="small" />
         </Link>
       </Typography>
 
       <Legend>Import Content</Legend>
-      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
+      <Box sx={{ ml: 1 }} display="flex" flexDirection="column" gap={1}>
         <ImportNotionWorkspace />
       </Box>
 
       <Legend>Snapshot.org Integration</Legend>
-      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
+      <Box sx={{ ml: 1 }} display="flex" flexDirection="column" gap={1}>
         <ConnectSnapshot />
       </Box>
       {space && (
         <ConfirmDeleteModal
-          title='Delete workspace'
+          title="Delete workspace"
           onClose={closeInviteLinkDeleteModal}
           open={workspaceRemoveModalState.isOpen}
           buttonText={`Delete ${space.name}`}
@@ -186,7 +177,7 @@ export default function WorkspaceSettings () {
           onConfirm={async () => {
             if (isAdmin) {
               await charmClient.deleteSpace(space.id);
-              const filteredSpaces = spaces.filter(s => s.id !== space.id);
+              const filteredSpaces = spaces.filter((s) => s.id !== space.id);
               setSpaces(filteredSpaces);
               window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
             }
@@ -195,7 +186,7 @@ export default function WorkspaceSettings () {
       )}
       {space && (
         <ConfirmDeleteModal
-          title='Leave workspace'
+          title="Leave workspace"
           onClose={() => {
             workspaceLeaveModalState.close();
           }}
@@ -204,7 +195,7 @@ export default function WorkspaceSettings () {
           question={`Are you sure you want to leave ${space.name}?`}
           onConfirm={async () => {
             await charmClient.leaveSpace(space.id);
-            const filteredSpaces = spaces.filter(s => s.id !== space.id);
+            const filteredSpaces = spaces.filter((s) => s.id !== space.id);
             setSpaces(filteredSpaces);
             window.location.href = filteredSpaces.length !== 0 ? `/${filteredSpaces[0].domain}` : '/signup';
           }}
@@ -212,13 +203,13 @@ export default function WorkspaceSettings () {
       )}
       <ConfirmDeleteModal
         open={unsavedChangesModalState.isOpen}
-        title='You have unsaved changes'
+        title="You have unsaved changes"
         onClose={() => {
           // discard
           unsavedChangesModalState.close();
         }}
-        buttonText='Save changes'
-        question='Are you sure you want to discard unsaved changes'
+        buttonText="Save changes"
+        question="Are you sure you want to discard unsaved changes"
         onConfirm={() => {
           // save
           unsavedChangesModalState.close();
@@ -229,9 +220,5 @@ export default function WorkspaceSettings () {
 }
 
 WorkspaceSettings.getLayout = (page: ReactElement) => {
-  return (
-    <SettingsLayout>
-      {page}
-    </SettingsLayout>
-  );
+  return <SettingsLayout>{page}</SettingsLayout>;
 };

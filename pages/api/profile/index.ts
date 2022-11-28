@@ -20,23 +20,16 @@ import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .post(requireWalletSignature, createUser)
-  .get(getUser)
-  .use(requireUser)
-  .put(updateUser);
+handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
-async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-
+async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { address } = req.body;
 
   let user: LoggedInUser;
 
   try {
     user = await getUserProfile('addresses', address);
-  }
-  catch {
-
+  } catch {
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
@@ -51,19 +44,22 @@ async function createUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 
   req.session.anonymousUserId = undefined;
   req.session.user = { id: user.id };
-  await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
+  await updateGuildRolesForUser(
+    user.wallets.map((w) => w.address),
+    user.spaceRoles
+  );
   await req.session.save();
 
   const cookies = new Cookies(req, res);
 
-  signupCookieNames.forEach(cookie => {
+  signupCookieNames.forEach((cookie) => {
     cookies.set(cookie, null);
   });
 
   res.status(200).json(user);
 }
 
-export async function handleNoProfile (req: NextApiRequest, res: NextApiResponse) {
+export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse) {
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = v4();
     await req.session.save();
@@ -72,8 +68,7 @@ export async function handleNoProfile (req: NextApiRequest, res: NextApiResponse
 }
 
 // Endpoint for a user to retrieve their own profile
-async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-
+async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   if (!req.session?.user?.id) {
     return handleNoProfile(req, res);
   }
@@ -94,8 +89,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser |
   return res.status(200).json(profile);
 }
 
-async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
-
+async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const user = await prisma.user.update({
     where: {
       id: req.session.user.id
@@ -112,4 +106,3 @@ async function updateUser (req: NextApiRequest, res: NextApiResponse<LoggedInUse
 }
 
 export default withSessionRoute(handler);
-

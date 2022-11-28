@@ -31,24 +31,24 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = typeof views[number];
 
-export default function MemberDirectoryPage () {
+export default function MemberDirectoryPage() {
   const router = useRouter();
   const { members } = useMembers();
   const [searchedMembers, setSearchedMembers] = useState<Member[]>(members);
   const { properties = [] } = useMemberProperties();
-  const [currentView, setCurrentView] = useState<View>(router.query.view as View ?? 'gallery');
+  const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const [sortedProperty, setSortedProperty] = useState<string>('');
 
   useEffect(() => {
     // Only set initial property sort if none exist before
     if (!sortedProperty) {
-      setSortedProperty(properties.find(property => property.type === 'name')?.name ?? '');
+      setSortedProperty(properties.find((property) => property.type === 'name')?.name ?? '');
     }
   }, [properties, sortedProperty]);
 
   const sortedMembers = useMemo(() => {
-    const memberProperty = sortedProperty ? properties.find(property => property.name === sortedProperty) : null;
+    const memberProperty = sortedProperty ? properties.find((property) => property.name === sortedProperty) : null;
     if (sortedProperty && memberProperty) {
       return sortMembers(searchedMembers, memberProperty);
     }
@@ -57,54 +57,60 @@ export default function MemberDirectoryPage () {
 
   return (
     <CenteredPageContent>
-      <Typography variant='h1' my={2}>Member Directory</Typography>
-      <MemberDirectorySearchBar
-        onChange={setSearchedMembers}
-      />
-      <Stack flexDirection='row' justifyContent='space-between' mb={1}>
-        <Tabs textColor='primary' indicatorColor='secondary' value={currentView} sx={{ minHeight: 0, height: 'fit-content' }}>
-          {views.map(view => (
+      <Typography variant="h1" my={2}>
+        Member Directory
+      </Typography>
+      <MemberDirectorySearchBar onChange={setSearchedMembers} />
+      <Stack flexDirection="row" justifyContent="space-between" mb={1}>
+        <Tabs
+          textColor="primary"
+          indicatorColor="secondary"
+          value={currentView}
+          sx={{ minHeight: 0, height: 'fit-content' }}
+        >
+          {views.map((view) => (
             <Tab
-              component='div'
+              component="div"
               disableRipple
               key={view}
-              label={(
+              label={
                 <StyledButton
                   startIcon={iconForViewType(view)}
                   onClick={() => {
                     setCurrentView(view);
                     setUrlWithoutRerender(router.pathname, { view });
                   }}
-                  variant='text'
-                  size='small'
+                  variant="text"
+                  size="small"
                   color={currentView === view ? 'textPrimary' : 'secondary'}
                 >
                   {view[0].toUpperCase() + view.slice(1)}
                 </StyledButton>
-              )}
+              }
               sx={{ p: 0, mb: '5px' }}
               value={view}
             />
           ))}
         </Tabs>
-        <Stack flexDirection='row' gap={1}>
+        <Stack flexDirection="row" gap={1}>
           <MemberDirectorySort
             setSortedProperty={setSortedProperty}
             sortedProperty={sortedProperty}
             view={currentView}
           />
-          <IconButton onClick={() => {
-            setTimeout(() => {
-              setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
-            });
-          }}
+          <IconButton
+            onClick={() => {
+              setTimeout(() => {
+                setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+              });
+            }}
           >
-            <MoreHoriz color='secondary' />
+            <MoreHoriz color="secondary" />
           </IconButton>
         </Stack>
       </Stack>
-      <Box position='relative' display='flex' height='100%'>
-        <Box width='100%' overflow='auto' height='fit-content'>
+      <Box position="relative" display="flex" height="100%">
+        <Box width="100%" overflow="auto" height="fit-content">
           {currentView === 'table' && <MemberDirectoryTableView members={sortedMembers} />}
           {currentView === 'gallery' && <MemberDirectoryGalleryView members={sortedMembers} />}
         </Box>

@@ -4,10 +4,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-  isTouchDevice,
-  safeScrollIntoViewIfNeeded
-} from 'lib/utilities/browser';
+import { isTouchDevice, safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
 import type { InlinePaletteSize } from './InlineCommandPalette';
 
@@ -28,8 +25,8 @@ interface InlinePaletteRowProps {
 }
 
 const StyledPaper = styled(Paper)<{ size: InlinePaletteSize }>`
-  width: ${({ size }) => (size === 'small') ? '22px' : '46px'};
-  height: ${({ size }) => (size === 'small') ? '22px' : '46px'};
+  width: ${({ size }) => (size === 'small' ? '22px' : '46px')};
+  height: ${({ size }) => (size === 'small' ? '22px' : '46px')};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,18 +34,22 @@ const StyledPaper = styled(Paper)<{ size: InlinePaletteSize }>`
   margin-left: 10px;
 `;
 
-const StyledInlinePaletteRow = styled.div<{ disabled: boolean, size: InlinePaletteSize }>`
+const StyledInlinePaletteRow = styled.div<{ disabled: boolean; size: InlinePaletteSize }>`
   padding: 0.3rem 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   font-weight: bold;
   font-size: 14px;
-  ${({ size }) => size === 'big' && `
+  ${({ size }) =>
+    size === 'big' &&
+    `
       min-height: 55px;
   `}
 
-  ${({ size }) => size === 'small' && `
+  ${({ size }) =>
+    size === 'small' &&
+    `
     svg {
       width: 17px;
       height: 17px;
@@ -56,7 +57,7 @@ const StyledInlinePaletteRow = styled.div<{ disabled: boolean, size: InlinePalet
   `}
 `;
 
-export default function InlinePaletteRow ({
+export default function InlinePaletteRow({
   dataId,
   title,
   description,
@@ -106,16 +107,16 @@ export default function InlinePaletteRow ({
       style={style}
       size={size}
     >
-      <StyledPaper
-        elevation={0}
-        variant='outlined'
-        size={size}
-      >
+      <StyledPaper elevation={0} variant="outlined" size={size}>
         {icon}
       </StyledPaper>
-      <Box padding='0 12px 0 6px' display='flex' flexDirection='column'>
-        <Typography variant='body2' noWrap whiteSpace='normal'>{title}</Typography>
-        <Typography variant='caption' noWrap whiteSpace='normal' color='secondary.light'>{description}</Typography>
+      <Box padding="0 12px 0 6px" display="flex" flexDirection="column">
+        <Typography variant="body2" noWrap whiteSpace="normal">
+          {title}
+        </Typography>
+        <Typography variant="caption" noWrap whiteSpace="normal" color="secondary.light">
+          {description}
+        </Typography>
       </Box>
     </StyledInlinePaletteRow>
   );

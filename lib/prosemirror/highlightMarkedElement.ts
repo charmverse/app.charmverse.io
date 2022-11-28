@@ -4,13 +4,19 @@ import { TextSelection } from '@bangle.dev/pm';
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
 import { highlightDomElement } from 'lib/utilities/browser';
 
-export function highlightMarkedElement ({
+export function highlightMarkedElement({
   view,
   elementId,
   markName,
   key,
   prefix
-}: { view: EditorView, markName: string, key: PluginKey, elementId: string, prefix: string }) {
+}: {
+  view: EditorView;
+  markName: string;
+  key: PluginKey;
+  elementId: string;
+  prefix: string;
+}) {
   const { $from, $to } = view.state.selection;
   const fromNodeAfter = $from.nodeAfter;
   const toNodeAfter = $to.nodeAfter;
@@ -28,14 +34,25 @@ export function highlightMarkedElement ({
   return false;
 }
 
-export function highlightElement ({ ids, key, prefix, elementId, view }:
-  { ids: string[], key: PluginKey, prefix: string, elementId: string, markName: string, view: EditorView }) {
-
+export function highlightElement({
+  ids,
+  key,
+  prefix,
+  elementId,
+  view
+}: {
+  ids: string[];
+  key: PluginKey;
+  prefix: string;
+  elementId: string;
+  markName: string;
+  view: EditorView;
+}) {
   const pageActionListNode = document.getElementById(elementId) as HTMLDivElement;
   // Page action list node might not be present
   const isShowingActionList = pageActionListNode.style.visibility !== 'hidden';
   // Check if we are inside a card page modal
-  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+  const cardId = new URLSearchParams(window.location.href).get('cardId');
   if (ids.length > 0) {
     // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
     if (isShowingActionList && !cardId) {
@@ -46,8 +63,7 @@ export function highlightElement ({ ids, key, prefix, elementId, view }:
         highlightDomElement(actionDocument);
         return true;
       }
-    }
-    else {
+    } else {
       // If the page thread list isn't open, then we need to show the inline thread component
       renderSuggestionsTooltip(key, {
         ids

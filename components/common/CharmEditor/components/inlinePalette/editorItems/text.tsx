@@ -1,4 +1,3 @@
-
 import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
@@ -39,70 +38,71 @@ interface ItemsProps {
 
 const iconSize = 30;
 
-function createTableCell (state: EditorState, text: string) {
-  return state.schema.nodes.table_cell.create(undefined, Fragment.fromArray([
-    state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-      state.schema.text(text)
-    ]))
-  ]));
+function createTableCell(state: EditorState, text: string) {
+  return state.schema.nodes.table_cell.create(
+    undefined,
+    Fragment.fromArray([state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([state.schema.text(text)]))])
+  );
 }
 
-function createTableHeader (state: EditorState, text: string) {
-  return state.schema.nodes.table_cell.create({ header: true }, Fragment.fromArray([
-    state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([
-      state.schema.text(text)
-    ]))
-  ]));
+function createTableHeader(state: EditorState, text: string) {
+  return state.schema.nodes.table_cell.create(
+    { header: true },
+    Fragment.fromArray([state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([state.schema.text(text)]))])
+  );
 }
 
 const { convertToParagraph } = paragraph;
-const {
-  toggleTodoList,
-  queryIsBulletListActive,
-  queryIsTodoListActive,
-  toggleBulletList
-} = bulletList;
+const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBulletList } = bulletList;
 const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
 
-const setHeadingBlockType = (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {
-  const type = state.schema.nodes.heading;
-  return setBlockType(type, { level })(state, dispatch);
-};
+const setHeadingBlockType =
+  (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {
+    const type = state.schema.nodes.heading;
+    return setBlockType(type, { level })(state, dispatch);
+  };
 
-export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
+export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
   const { addNestedPage, disableNestedPage, nestedPagePluginKey, pageType, userSpacePermissions } = props;
 
-  const insertPageItem = pageType !== 'card_template' && !disableNestedPage ? [{
-    uid: 'insert-page',
-    title: 'Insert page',
-    requiredSpacePermission: 'createPage' as SpaceOperation,
-    keywords: ['page', 'nested'],
-    icon: <DescriptionOutlinedIcon sx={{
-      fontSize: iconSize
-    }}
-    />,
-    description: 'Insert a new page',
-    editorExecuteCommand: (() => {
-      return (async (state, dispatch, view) => {
-        await addNestedPage();
-        return replaceSuggestionMarkWith(palettePluginKey, '')(
-          state,
-          dispatch,
-          view
-        );
-      }) as PromisedCommand;
-    })
-  }] : [];
+  const insertPageItem =
+    pageType !== 'card_template' && !disableNestedPage
+      ? [
+          {
+            uid: 'insert-page',
+            title: 'Insert page',
+            requiredSpacePermission: 'createPage' as SpaceOperation,
+            keywords: ['page', 'nested'],
+            icon: (
+              <DescriptionOutlinedIcon
+                sx={{
+                  fontSize: iconSize
+                }}
+              />
+            ),
+            description: 'Insert a new page',
+            editorExecuteCommand: () => {
+              return (async (state, dispatch, view) => {
+                await addNestedPage();
+                return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+              }) as PromisedCommand;
+            }
+          }
+        ]
+      : [];
 
   const paletteItems: PaletteItemTypeNoGroup[] = [
     {
       uid: 'paraConvert',
       keywords: ['paragraph', 'text'],
       title: 'Text',
-      icon: <TextFieldsIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <TextFieldsIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       description: 'Create a plain text block',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -119,11 +119,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             return convertToParagraph()(_state, _dispatch, _view);
           });
 
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -131,10 +127,13 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
     {
       uid: 'todoListConvert',
       title: 'Todo List',
-      icon: <LibraryAddCheckIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <LibraryAddCheckIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
       description: 'Create a todo list',
       editorExecuteCommand: () => {
@@ -143,11 +142,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleTodoList()(_view!.state, _view!.dispatch, _view);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -155,7 +150,19 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       const level = i + 1;
       return {
         uid: `headingConvert${level}`,
-        icon: <svg stroke='currentColor' fill='currentColor' strokeWidth={0} viewBox='0 0 512 512' height={iconSize} width={iconSize} xmlns='http://www.w3.org/2000/svg'><path d='M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z' /></svg>,
+        icon: (
+          <svg
+            stroke="currentColor"
+            fill="currentColor"
+            strokeWidth={0}
+            viewBox="0 0 512 512"
+            height={iconSize}
+            width={iconSize}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z" />
+          </svg>
+        ),
         title: `Heading ${level}`,
         description: `Create a heading level ${level}`,
         disabled: (state) => {
@@ -165,58 +172,66 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
             rafCommandExec(view!, setHeadingBlockType(level));
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
+            return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
           };
         }
       } as PaletteItemTypeNoGroup;
     }),
     {
       uid: 'insertSimpleTable',
-      icon: <DatabaseIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <DatabaseIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       title: 'Table',
       keywords: ['table'],
       description: 'Insert a simple table below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-            return insertNode(_state, _dispatch, _state.schema.nodes.table.create(
-              undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableHeader(_state, 'Header 1'),
-                  createTableHeader(_state, 'Header 2'),
-                  createTableHeader(_state, 'Header 3')
-                ])),
-                _state.schema.nodes.table_row.create(undefined, Fragment.fromArray([
-                  createTableCell(_state, 'Cell 1'),
-                  createTableCell(_state, 'Cell 2'),
-                  createTableCell(_state, 'Cell 3')
-                ]))
-              ])
-            ));
+            return insertNode(
+              _state,
+              _dispatch,
+              _state.schema.nodes.table.create(
+                undefined,
+                Fragment.fromArray([
+                  _state.schema.nodes.table_row.create(
+                    undefined,
+                    Fragment.fromArray([
+                      createTableHeader(_state, 'Header 1'),
+                      createTableHeader(_state, 'Header 2'),
+                      createTableHeader(_state, 'Header 3')
+                    ])
+                  ),
+                  _state.schema.nodes.table_row.create(
+                    undefined,
+                    Fragment.fromArray([
+                      createTableCell(_state, 'Cell 1'),
+                      createTableCell(_state, 'Cell 2'),
+                      createTableCell(_state, 'Cell 3')
+                    ])
+                  )
+                ])
+              )
+            );
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
     {
       uid: 'bulletListConvert',
       title: 'Bulleted List',
-      icon: <FormatListBulletedIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <FormatListBulletedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       keywords: ['unordered', 'lists'],
       description: 'Create a simple bulleted list',
       editorExecuteCommand: () => {
@@ -225,20 +240,19 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
     {
       uid: 'orderedListConvert',
-      icon: <FormatListNumberedIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <FormatListNumberedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       title: 'Ordered List',
       keywords: ['numbered', 'lists'],
       description: 'Create an ordered list',
@@ -248,11 +262,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleOrderedList()(_view!.state, _view!.dispatch, _view);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -264,9 +274,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       description: 'Insert a summary and content',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
-
           rafCommandExec(view!, (_state, _dispatch) => {
-
             const { $from, $to } = _state.selection;
             const range = $from.blockRange($to);
 
@@ -279,9 +287,13 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
                     type: _state.schema.nodes.disclosureDetails
                   }
                 ]);
-                tr.insert(range.start + 1, _state.schema.nodes.disclosureSummary.createChecked(null, Fragment.fromArray([
-                  _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
-                ])));
+                tr.insert(
+                  range.start + 1,
+                  _state.schema.nodes.disclosureSummary.createChecked(
+                    null,
+                    Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
+                  )
+                );
                 const resolvedPos = tr.doc.resolve(range.start + 1);
 
                 tr.setSelection(TextSelection.near(resolvedPos));
@@ -292,31 +304,27 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             return true;
           });
 
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
     {
       uid: 'quote',
       title: 'Quote',
-      icon: <ChatOutlinedIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <ChatOutlinedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       description: 'Insert a quote in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-
             const node = _state.schema.nodes.quote.create(
               undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.paragraph.create()
-              ])
+              Fragment.fromArray([_state.schema.nodes.paragraph.create()])
             );
 
             if (_dispatch && isAtBeginningOfLine(_state)) {
@@ -331,11 +339,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             }
             return insertNode(_state, _dispatch, node);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -356,12 +360,7 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             }
             return insertNode(_state, _dispatch, node);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -369,45 +368,48 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
       uid: 'link-to-page',
       title: 'Link to page',
       keywords: ['link', 'page'],
-      icon: <DescriptionOutlinedIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <DescriptionOutlinedIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       description: 'Link to a new page',
-      editorExecuteCommand: (() => {
+      editorExecuteCommand: () => {
         return (async (state, dispatch, view) => {
           if (nestedPagePluginKey) {
             const nestedPagePluginState = nestedPagePluginKey.getState(state);
             if (nestedPagePluginState) {
-              replaceSuggestionMarkWith(palettePluginKey, state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})), true)(
-                state,
-                dispatch,
-                view
-              );
+              replaceSuggestionMarkWith(
+                palettePluginKey,
+                state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})),
+                true
+              )(state, dispatch, view);
             }
             return false;
           }
           return false;
         }) as PromisedCommand;
-      })
+      }
     },
     {
       uid: 'callout',
       title: 'Callout',
-      icon: <ChatBubbleIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <ChatBubbleIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       description: 'Insert a callout block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-
             const node = _state.schema.nodes.blockquote.create(
               undefined,
-              Fragment.fromArray([
-                _state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))
-              ])
+              Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
             );
 
             if (_dispatch && isAtBeginningOfLine(_state)) {
@@ -422,19 +424,17 @@ export function items (props: ItemsProps): PaletteItemTypeNoGroup[] {
             }
             return insertNode(_state, _dispatch, node);
           });
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     }
   ];
 
-  const allowedDynamicOtherItems = paletteItems.filter(paletteItem => {
-    return !paletteItem.requiredSpacePermission
-      || (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission]);
+  const allowedDynamicOtherItems = paletteItems.filter((paletteItem) => {
+    return (
+      !paletteItem.requiredSpacePermission ||
+      (paletteItem.requiredSpacePermission && userSpacePermissions?.[paletteItem.requiredSpacePermission])
+    );
   });
 
   return allowedDynamicOtherItems;

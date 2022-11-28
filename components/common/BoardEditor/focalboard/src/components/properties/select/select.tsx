@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
@@ -6,16 +5,16 @@ import Label from '../../../widgets/label';
 import ValueSelector from '../../../widgets/valueSelector';
 
 type Props = {
-    emptyValue?: string;
-    propertyValue: string;
-    propertyTemplate: IPropertyTemplate;
-    onCreate?: (value: string) => void;
-    onChange?: (value: string) => void;
-    onChangeColor?: (option: IPropertyOption, color: string) => void;
-    onDeleteOption?: (option: IPropertyOption) => void;
-    onDeleteValue?: () => void;
-    isEditable: boolean;
-}
+  emptyValue?: string;
+  propertyValue: string;
+  propertyTemplate: IPropertyTemplate;
+  onCreate?: (value: string) => void;
+  onChange?: (value: string) => void;
+  onChangeColor?: (option: IPropertyOption, color: string) => void;
+  onDeleteOption?: (option: IPropertyOption) => void;
+  onDeleteValue?: () => void;
+  isEditable: boolean;
+};
 
 const SelectProperty = React.memo((props: Props) => {
   const { emptyValue, propertyValue, propertyTemplate, isEditable } = props;
@@ -29,14 +28,14 @@ const SelectProperty = React.memo((props: Props) => {
   if (!isEditable || !open) {
     return (
       <div
-        className='octo-propertyvalue'
-        data-testid='select-non-editable'
+        className="octo-propertyvalue"
+        data-testid="select-non-editable"
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         onClick={() => setOpen(true)}
       >
         <Label color={displayValue ? propertyColorCssClassName : 'empty'}>
-          <span className='Label-text'>{finalDisplayValue}</span>
+          <span className="Label-text">{finalDisplayValue}</span>
         </Label>
       </div>
     );
@@ -47,7 +46,7 @@ const SelectProperty = React.memo((props: Props) => {
       options={propertyTemplate.options}
       value={propertyTemplate.options.find((p) => p.id === propertyValue)}
       onCreate={props.onCreate ?? (() => {})}
-      onChange={(value) => (props.onChange ? props.onChange(value as string) : (() => {}))}
+      onChange={(value) => (props.onChange ? props.onChange(value as string) : () => {})}
       onChangeColor={props.onChangeColor ?? (() => {})}
       onDeleteOption={props.onDeleteOption ?? (() => {})}
       onDeleteValue={props.onDeleteValue ?? (() => {})}

@@ -1,4 +1,3 @@
-
 import { fontFamily } from 'theme';
 import { blackColor, blueColor, greyColor, greyColor2, lightGreyColor } from 'theme/colors';
 

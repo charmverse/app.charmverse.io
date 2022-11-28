@@ -16,7 +16,10 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
-import type { IPagePermissionWithAssignee, PagePermissionLevelType } from 'lib/permissions/pages/page-permission-interfaces';
+import type {
+  IPagePermissionWithAssignee,
+  PagePermissionLevelType
+} from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
@@ -49,14 +52,14 @@ const StyledInput = styled(Input)`
  * @sideEffect Removes the permission from currrent space from the list so it can be handled in its own row
  * @param pagePermissions
  */
-function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
-  (IPagePermissionWithAssignee & { displayName: string })[] {
+function sortPagePermissions(
+  pagePermissions: IPagePermissionWithAssignee[]
+): (IPagePermissionWithAssignee & { displayName: string })[] {
   const sortedPermissions = pagePermissions
-    .filter(permission => {
+    .filter((permission) => {
       return !permission.spaceId && !permission.public;
     })
-    .map(permission => {
-
+    .map((permission) => {
       const permissionSource = permission.user ? 'user' : 'role';
 
       const permissionDisplayName = permissionSource === 'user' ? permission.user!.username : permission.role!.name;
@@ -66,18 +69,16 @@ function sortPagePermissions (pagePermissions: IPagePermissionWithAssignee[]):
         permissionSource,
         displayName: permissionDisplayName as string
       };
-    }).sort((a, b) => {
-
+    })
+    .sort((a, b) => {
       const aPermission = permissionDisplayOrder.indexOf(a.permissionSource);
       const bPermission = permissionDisplayOrder.indexOf(b.permissionSource);
 
       if (aPermission < bPermission) {
         return -1;
-      }
-      else if (aPermission > bPermission) {
+      } else if (aPermission > bPermission) {
         return 1;
-      }
-      else {
+      } else {
         return 0;
       }
     });
@@ -93,26 +94,30 @@ interface Props {
   proposalParentId?: string | null;
 }
 
-export default function PagePermissions ({ pageId, pagePermissions, refreshPermissions, pageType, proposalParentId }: Props) {
-
+export default function PagePermissions({
+  pageId,
+  pagePermissions,
+  refreshPermissions,
+  pageType,
+  proposalParentId
+}: Props) {
   const { pages, getPagePermissions } = usePages();
   const space = useCurrentSpace();
   const popupState = usePopupState({ variant: 'popover', popupId: 'add-a-permission' });
 
-  const spaceLevelPermission = pagePermissions.find(permission => space && permission.spaceId === space?.id);
+  const spaceLevelPermission = pagePermissions.find((permission) => space && permission.spaceId === space?.id);
   const userPagePermissions = getPagePermissions(pageId);
 
   useEffect(() => {
     refreshPermissions();
   }, [pageId]);
 
-  async function updateSpacePagePermissionLevel (permissionLevel: PagePermissionLevelType | 'delete') {
+  async function updateSpacePagePermissionLevel(permissionLevel: PagePermissionLevelType | 'delete') {
     if (permissionLevel === 'delete') {
       if (spaceLevelPermission) {
         await charmClient.deletePermission(spaceLevelPermission.id);
       }
-    }
-    else if (space) {
+    } else if (space) {
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId,
@@ -123,12 +128,13 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
     await refreshPermissions();
   }
 
-  async function updatePagePermissionLevel (permission: IPagePermissionWithAssignee, permissionLevel: PagePermissionLevelType | 'delete') {
-
+  async function updatePagePermissionLevel(
+    permission: IPagePermissionWithAssignee,
+    permissionLevel: PagePermissionLevelType | 'delete'
+  ) {
     if (permissionLevel === 'delete') {
       await charmClient.deletePermission(permission.id);
-    }
-    else if (permissionLevel !== permission.permissionLevel) {
+    } else if (permissionLevel !== permission.permissionLevel) {
       // The permission is being manually edited, so we drop the inheritance reference
       await charmClient.createPermission({
         pageId: permission.pageId,
@@ -147,119 +153,112 @@ export default function PagePermissions ({ pageId, pagePermissions, refreshPermi
   const { custom, proposal_editor, ...permissionsWithoutCustom } = permissionLevels as Record<string, string>;
   const permissionsWithRemove = { ...permissionsWithoutCustom, delete: 'Remove' };
 
-  const canEdit = userPagePermissions?.grant_permissions === true && canReceiveManualPermissionUpdates({ pageType }) && !proposalParentId;
+  const canEdit =
+    userPagePermissions?.grant_permissions === true &&
+    canReceiveManualPermissionUpdates({ pageType }) &&
+    !proposalParentId;
 
   return (
     <Box p={1}>
       {canEdit && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
-            placeholder='Add people and roles'
+            placeholder="Add people and roles"
             fullWidth
             readOnly
-            endAdornment={(
-              <InputAdornment position='end'>
+            endAdornment={
+              <InputAdornment position="end">
                 <Button disableElevation>Invite</Button>
               </InputAdornment>
-            )}
+            }
           />
         </Box>
       )}
 
-      <Box display='block' py={0.5}>
-        <Box
-          display='flex'
-          justifyContent='space-between'
-          alignItems='center'
-
-        >
-          <Typography variant='body2'>
-            Everyone at {space?.name}
-          </Typography>
+      <Box display="block" py={0.5}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="body2">Everyone at {space?.name}</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
-            {
-            canEdit ? (
+            {canEdit ? (
               <SmallSelect
-                renderValue={value => permissionsWithoutCustom[value as string] || 'No access'}
-                onChange={level => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
+                renderValue={(value) => permissionsWithoutCustom[value as string] || 'No access'}
+                onChange={(level) => updateSpacePagePermissionLevel(level as PagePermissionLevelType)}
                 keyAndLabel={permissionsWithRemove}
                 defaultValue={spaceLevelPermission?.permissionLevel ?? 'No access'}
               />
             ) : (
-              <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
-                <Typography
-                  color='secondary'
-                  variant='caption'
-                >
+              <Tooltip
+                title={
+                  userPagePermissions?.edit_isPublic && Boolean(proposalParentId)
+                    ? 'You can only change this setting from the top proposal page.'
+                    : ''
+                }
+              >
+                <Typography color="secondary" variant="caption">
                   {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
                 </Typography>
               </Tooltip>
-            )
-          }
+            )}
           </div>
         </Box>
-        {
-
-          spaceLevelPermission?.sourcePermission && (
-            <Box display='block'>
-              <Typography variant='caption'>
-                Inherited from
-                <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[spaceLevelPermission?.sourcePermission.pageId]?.path}`}>
-                  {pages[spaceLevelPermission?.sourcePermission.pageId]?.title || 'Untitled'}
-                </Link>
-              </Typography>
-            </Box>
-          )
-        }
-
+        {spaceLevelPermission?.sourcePermission && (
+          <Box display="block">
+            <Typography variant="caption">
+              Inherited from
+              <Link
+                sx={{ ml: 0.5 }}
+                href={`/${space?.domain}/${pages[spaceLevelPermission?.sourcePermission.pageId]?.path}`}
+              >
+                {pages[spaceLevelPermission?.sourcePermission.pageId]?.title || 'Untitled'}
+              </Link>
+            </Typography>
+          </Box>
+        )}
       </Box>
 
-      {
-        sortedPermissions.map(permission => {
-          return (
-            <Box display='block' py={0.5} key={permission.id}>
-              <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
-                <Typography variant='body2'>
-                  {permission.displayName}
-                </Typography>
-                <div style={{ width: '160px', textAlign: 'right' }}>
-                  {
-                  canEdit ? (
-                    <SmallSelect
-                      renderValue={value => permissionsWithoutCustom[value as string]}
-                      onChange={level => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
-                      keyAndLabel={permissionsWithRemove}
-                      defaultValue={permission.permissionLevel}
-                    />
-                  ) : (
-                    <Tooltip title={userPagePermissions?.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
-                      <Typography color='secondary' variant='caption'>
-                        {permissionLevels[permission.permissionLevel]}
-                      </Typography>
-                    </Tooltip>
-                  )
-                }
-                </div>
-              </Box>
-              {
-              permission.sourcePermission && (
-                <Box display='block'>
-                  <Typography variant='caption'>
-                    Inherited from
-                    <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[permission.sourcePermission.pageId]?.path}`}>
-                      {pages[permission.sourcePermission.pageId]?.title || 'Untitled'}
-                    </Link>
-                  </Typography>
-                </Box>
-              )
-             }
+      {sortedPermissions.map((permission) => {
+        return (
+          <Box display="block" py={0.5} key={permission.id}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" key={permission.displayName}>
+              <Typography variant="body2">{permission.displayName}</Typography>
+              <div style={{ width: '160px', textAlign: 'right' }}>
+                {canEdit ? (
+                  <SmallSelect
+                    renderValue={(value) => permissionsWithoutCustom[value as string]}
+                    onChange={(level) => updatePagePermissionLevel(permission, level as PagePermissionLevelType)}
+                    keyAndLabel={permissionsWithRemove}
+                    defaultValue={permission.permissionLevel}
+                  />
+                ) : (
+                  <Tooltip
+                    title={
+                      userPagePermissions?.edit_isPublic && Boolean(proposalParentId)
+                        ? 'You can only change this setting from the top proposal page.'
+                        : ''
+                    }
+                  >
+                    <Typography color="secondary" variant="caption">
+                      {permissionLevels[permission.permissionLevel]}
+                    </Typography>
+                  </Tooltip>
+                )}
+              </div>
             </Box>
+            {permission.sourcePermission && (
+              <Box display="block">
+                <Typography variant="caption">
+                  Inherited from
+                  <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[permission.sourcePermission.pageId]?.path}`}>
+                    {pages[permission.sourcePermission.pageId]?.title || 'Untitled'}
+                  </Link>
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
 
-          );
-        })
-      }
-
-      <Modal {...bindPopover(popupState)} title='Invite people to this page'>
+      <Modal {...bindPopover(popupState)} title="Invite people to this page">
         <AddPagePermissionsForm
           existingPermissions={pagePermissions}
           pageId={pageId}

@@ -6,7 +6,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import type { PageProperty } from '../interfaces';
 import { PageFromBlock } from '../pageFromBlock.class';
 
-const exampleBoardSchema: PageProperty [] = [
+const exampleBoardSchema: PageProperty[] = [
   {
     id: '87b42bed-1dbe-4491-9b6e-fc4c45caa81e',
     name: 'Status',
@@ -38,9 +38,7 @@ const exampleBoardSchema: PageProperty [] = [
 ];
 
 describe('PageFromBlock', () => {
-
   it('should preserve block data and convert properties to human-readable format', async () => {
-
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const createdBlock = await prisma?.block.create({
@@ -80,7 +78,5 @@ describe('PageFromBlock', () => {
     expect(converted.title).toEqual(createdBlock.title);
     expect(converted.properties.Status).toEqual('Completed');
     expect(converted.properties.Text).toEqual('text value');
-
   });
-
 });

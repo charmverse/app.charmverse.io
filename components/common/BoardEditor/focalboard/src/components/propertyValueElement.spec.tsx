@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -22,8 +21,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedAt=''
-        updatedBy=''
+        updatedAt=""
+        updatedBy=""
         propertyTemplate={propertyTemplate || board.fields.cardProperties[0]}
         showEmptyPlaceholder={true}
       />
@@ -40,8 +39,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={true}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate || board.fields.cardProperties[0]}
         showEmptyPlaceholder={true}
       />
@@ -74,8 +73,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -99,8 +98,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -124,8 +123,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -149,8 +148,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -174,8 +173,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -197,8 +196,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />
@@ -225,8 +224,8 @@ describe('components/propertyValueElement', () => {
         board={board}
         readOnly={false}
         card={card}
-        updatedBy=''
-        updatedAt=''
+        updatedBy=""
+        updatedAt=""
         propertyTemplate={propertyTemplate}
         showEmptyPlaceholder={true}
       />

@@ -25,28 +25,31 @@ import randomName from 'lib/utilities/randomName';
 
 export const schema = yup.object({
   id: yup.string(),
-  domain: domainSchema
-    .test('domain-exists', 'Domain already exists', async function checkDomain (domain) {
-      const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
-      return !ok;
-    }),
-  name: yup.string().ensure().trim()
-    .min(3, 'Name must be at least 3 characters')
-    .required('Name is required'),
+  domain: domainSchema.test('domain-exists', 'Domain already exists', async function checkDomain(domain) {
+    const { ok } = await charmClient.checkDomain({ domain, spaceId: this.parent.id });
+    return !ok;
+  }),
+  name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
-  defaultValues?: { name: string, domain: string };
+  defaultValues?: { name: string; domain: string };
   onCancel?: () => void;
   onSubmit: (values: Prisma.SpaceCreateInput) => Promise<Space | null>;
   submitText?: string;
   isSubmitting: boolean;
 }
 
-export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit, onCancel, submitText, isSubmitting }: Props) {
+export default function WorkspaceSettings({
+  defaultValues,
+  onSubmit: _onSubmit,
+  onCancel,
+  submitText,
+  isSubmitting
+}: Props) {
   const { user } = useUser();
   const [saveError, setSaveError] = useState<any | null>(null);
   const {
@@ -65,7 +68,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
   const watchDomain = watch('domain');
   const watchSpaceImage = watch('spaceImage');
 
-  async function onSubmit (values: FormValues) {
+  async function onSubmit(values: FormValues) {
     try {
       setSaveError(null);
       const space = await _onSubmit({
@@ -78,51 +81,51 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         updatedAt: new Date(),
         updatedBy: user!.id,
         spaceRoles: {
-          create: [{
-            isAdmin: true,
-            user: {
-              connect: {
-                id: user!.id
+          create: [
+            {
+              isAdmin: true,
+              user: {
+                connect: {
+                  id: user!.id
+                }
               }
             }
-          }]
+          ]
         },
         ...values
       });
       if (space) {
         showOnboarding(space.id);
       }
-    }
-    catch (err) {
+    } catch (err) {
       log.error('Error creating space', err);
       setSaveError((err as Error).message || err);
     }
   }
 
-  function onChangeName (event: ChangeEvent<HTMLInputElement>) {
+  function onChangeName(event: ChangeEvent<HTMLInputElement>) {
     const name = event.target.value;
     if (!touchedFields.domain) {
       setValue('domain', getSpaceDomainFromName(name));
     }
-
   }
 
-  function randomizeName () {
+  function randomizeName() {
     const { name, domain } = getDefaultName();
     setValue('name', name);
     setValue('domain', domain);
   }
 
   return (
-    <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
+    <form data-test="create-space-form" onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
       <br />
-      <Grid container direction='column' spacing={2}>
-        <Grid item display='flex' justifyContent='center'>
+      <Grid container direction="column" spacing={2}>
+        <Grid item display="flex" justifyContent="center">
           <Avatar
             name={watchName}
-            variant='rounded'
+            variant="rounded"
             image={watchSpaceImage}
             updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
             editable={true}
@@ -131,7 +134,7 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
-            data-test='workspace-name-input'
+            data-test="workspace-name-input"
             {...register('name', {
               onChange: onChangeName
             })}
@@ -139,17 +142,21 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
             fullWidth
             error={!!errors.name}
             helperText={errors.name?.message}
-            InputProps={defaultValues ? {} : {
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <Tooltip arrow placement='top' title='Regenerate random name'>
-                    <IconButton size='small' onClick={randomizeName}>
-                      <RefreshIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              )
-            }}
+            InputProps={
+              defaultValues
+                ? {}
+                : {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Tooltip arrow placement="top" title="Regenerate random name">
+                          <IconButton size="small" onClick={randomizeName}>
+                            <RefreshIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>
+                    )
+                  }
+            }
           />
         </Grid>
         <Grid item>
@@ -165,24 +172,26 @@ export default function WorkspaceSettings ({ defaultValues, onSubmit: _onSubmit,
           />
         </Grid>
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton disabled={!watchName || !watchDomain} type='submit' data-test='create-workspace' loading={isSubmitting}>
+          <PrimaryButton
+            disabled={!watchName || !watchDomain}
+            type="submit"
+            data-test="create-workspace"
+            loading={isSubmitting}
+          >
             {submitText || 'Create Workspace'}
           </PrimaryButton>
         </Grid>
         {saveError && (
           <Grid item>
-            <Alert severity='error'>
-              {saveError}
-            </Alert>
+            <Alert severity="error">{saveError}</Alert>
           </Grid>
         )}
       </Grid>
     </form>
   );
-
 }
 
-function getDefaultName (): { name: string, domain: string } {
+function getDefaultName(): { name: string; domain: string } {
   const name = randomName();
   return {
     name,

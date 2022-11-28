@@ -16,7 +16,7 @@ import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
-function transformPoap (poap: ExtendedPoap): Collectable {
+function transformPoap(poap: ExtendedPoap): Collectable {
   return {
     type: 'poap',
     date: poap.created as string,
@@ -28,7 +28,7 @@ function transformPoap (poap: ExtendedPoap): Collectable {
   };
 }
 
-function transformNft (nft: NftData): Collectable {
+function transformNft(nft: NftData): Collectable {
   const tokenId = nft.tokenId.startsWith('0x') ? parseInt(nft.tokenId, 16) : nft.tokenId;
   return {
     type: 'nft',
@@ -36,13 +36,15 @@ function transformNft (nft: NftData): Collectable {
     id: nft.id,
     image: nft.image ?? nft.imageThumb,
     title: nft.title,
-    link: nft.chainId === 42161 ? `https://stratosnft.io/assets/${nft.contract}/${tokenId}` : `https://opensea.io/assets/${nft.chainId === 1 ? 'ethereum' : 'matic'}/${nft.contract}/${tokenId}`,
+    link:
+      nft.chainId === 42161
+        ? `https://stratosnft.io/assets/${nft.contract}/${tokenId}`
+        : `https://opensea.io/assets/${nft.chainId === 1 ? 'ethereum' : 'matic'}/${nft.contract}/${tokenId}`,
     isHidden: nft.isHidden
   };
 }
 
-export default function PublicProfile (props: UserDetailsProps) {
-
+export default function PublicProfile(props: UserDetailsProps) {
   const { user } = props;
 
   const { aeToken, setAeToken } = useCollablandCredentials();
@@ -51,130 +53,156 @@ export default function PublicProfile (props: UserDetailsProps) {
     () => charmClient.collabland.importCredentials(aeToken as string)
   );
 
-  const { data, mutate, isValidating: isAggregatedDataValidating } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
+  const {
+    data,
+    mutate,
+    isValidating: isAggregatedDataValidating
+  } = useSWRImmutable(user ? `userAggregatedData/${user.id}` : null, () => {
     return charmClient.getAggregatedData(user.id);
   });
   const readOnly = isPublicUser(user);
 
-  const { data: poapData, mutate: mutatePoaps, isValidating: isPoapDataValidating } = useSWRImmutable(`/poaps/${user.id}/${readOnly}`, () => {
-    return readOnly
-      ? Promise.resolve(user.visiblePoaps as ExtendedPoap[])
-      : charmClient.getUserPoaps();
+  const {
+    data: poapData,
+    mutate: mutatePoaps,
+    isValidating: isPoapDataValidating
+  } = useSWRImmutable(`/poaps/${user.id}/${readOnly}`, () => {
+    return readOnly ? Promise.resolve(user.visiblePoaps as ExtendedPoap[]) : charmClient.getUserPoaps();
   });
 
-  const { data: nftData, mutate: mutateNfts, isValidating: isNftDataValidating } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
-    return readOnly
-      ? Promise.resolve(user.visibleNfts)
-      : charmClient.blockchain.listNFTs(user.id);
+  const {
+    data: nftData,
+    mutate: mutateNfts,
+    isValidating: isNftDataValidating
+  } = useSWRImmutable(`/nfts/${user.id}/${readOnly}`, () => {
+    return readOnly ? Promise.resolve(user.visibleNfts) : charmClient.blockchain.listNFTs(user.id);
   });
 
-  const isLoading = !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
+  const isLoading =
+    !data || !poapData || !nftData || isNftDataValidating || isPoapDataValidating || isAggregatedDataValidating;
 
   const collectables: Collectable[] = [];
 
-  poapData?.forEach(poap => {
+  poapData?.forEach((poap) => {
     collectables.push(transformPoap(poap));
   });
 
-  nftData?.forEach(nft => {
+  nftData?.forEach((nft) => {
     collectables.push(transformNft(nft));
   });
 
-  collectables.sort((itemA, itemB) => new Date(itemB.date) > new Date(itemA.date) ? 1 : -1);
+  collectables.sort((itemA, itemB) => (new Date(itemB.date) > new Date(itemA.date) ? 1 : -1));
 
-  async function toggleCommunityVisibility (community: CommunityDetails) {
+  async function toggleCommunityVisibility(community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
-      profileItems: [{
-        id: community.id,
-        isHidden: !community.isHidden,
-        type: 'community',
-        metadata: null
-      }]
+      profileItems: [
+        {
+          id: community.id,
+          isHidden: !community.isHidden,
+          type: 'community',
+          metadata: null
+        }
+      ]
     });
-    mutate((aggregateData) => {
-      return aggregateData ? {
-        ...aggregateData,
-        communities: aggregateData.communities.map(comm => {
-          if (comm.id === community.id) {
-            return {
-              ...comm,
-              isHidden: !community.isHidden
-            };
-          }
-          return comm;
-        })
-      } : undefined;
-    }, {
-      revalidate: false
-    });
+    mutate(
+      (aggregateData) => {
+        return aggregateData
+          ? {
+              ...aggregateData,
+              communities: aggregateData.communities.map((comm) => {
+                if (comm.id === community.id) {
+                  return {
+                    ...comm,
+                    isHidden: !community.isHidden
+                  };
+                }
+                return comm;
+              })
+            }
+          : undefined;
+      },
+      {
+        revalidate: false
+      }
+    );
   }
 
-  async function toggleCollectibleVisibility (item: Collectable) {
+  async function toggleCollectibleVisibility(item: Collectable) {
     await charmClient.profile.updateProfileItem({
-      profileItems: [{
-        id: item.id,
-        isHidden: !item.isHidden,
-        type: item.type,
-        metadata: null
-      }]
+      profileItems: [
+        {
+          id: item.id,
+          isHidden: !item.isHidden,
+          type: item.type,
+          metadata: null
+        }
+      ]
     });
     if (item.type === 'nft') {
-      mutateNfts((_nftData) => {
-        return _nftData?.map(nft => {
-          if (nft.id === item.id) {
-            return {
-              ...nft,
-              isHidden: !item.isHidden
-            };
-          }
-          return nft;
-        });
-      }, {
-        revalidate: false
-      });
-    }
-    else {
-      mutatePoaps((_poapData) => {
-        return _poapData?.map(poap => {
-          if (poap.id === item.id) {
-            return {
-              ...poap,
-              isHidden: !item.isHidden
-            };
-          }
-          return poap;
-        });
-      }, {
-        revalidate: false
-      });
+      mutateNfts(
+        (_nftData) => {
+          return _nftData?.map((nft) => {
+            if (nft.id === item.id) {
+              return {
+                ...nft,
+                isHidden: !item.isHidden
+              };
+            }
+            return nft;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
+    } else {
+      mutatePoaps(
+        (_poapData) => {
+          return _poapData?.map((poap) => {
+            if (poap.id === item.id) {
+              return {
+                ...poap,
+                isHidden: !item.isHidden
+              };
+            }
+            return poap;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
     }
   }
 
   const bountyEvents = credentials?.bountyEvents ?? [];
 
   const communities = (data?.communities ?? [])
-    .filter((community) => readOnly ? !community.isHidden : true)
+    .filter((community) => (readOnly ? !community.isHidden : true))
     .map((community) => {
-      community.bounties.forEach(bounty => {
+      community.bounties.forEach((bounty) => {
         bounty.hasCredential = bountyEvents.some((event) => event.subject.bountyId === bounty.bountyId);
       });
       return community;
     });
 
-  const discordCommunities = (credentials?.discordEvents ?? []).map((credential): CommunityDetails => ({
-    isHidden: false,
-    joinDate: credential.createdAt,
-    id: credential.subject.discordGuildId,
-    name: credential.subject.discordGuildName,
-    logo: credential.subject.discordGuildAvatar,
-    votes: [],
-    proposals: [],
-    bounties: []
-    // roles: credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)
-  }));
+  const discordCommunities = (credentials?.discordEvents ?? []).map(
+    (credential): CommunityDetails => ({
+      isHidden: false,
+      joinDate: credential.createdAt,
+      id: credential.subject.discordGuildId,
+      name: credential.subject.discordGuildName,
+      logo: credential.subject.discordGuildAvatar,
+      votes: [],
+      proposals: [],
+      bounties: []
+      // roles: credential.subject.discordRoles.map((role, i) => <><strong>{role.name} </strong>{i < credential.subject.discordRoles.length - 1 && ' and '}</>)} issued on {toMonthDate(credential.createdAt)
+    })
+  );
 
-  const allCommunities = communities.concat(discordCommunities)
-    .sort((commA, commB) => commB.joinDate > commA.joinDate ? 1 : -1);
+  const allCommunities = communities
+    .concat(discordCommunities)
+    .sort((commA, commB) => (commB.joinDate > commA.joinDate ? 1 : -1));
 
   // clear the  api token if it fails once
   useEffect(() => {
@@ -197,9 +225,9 @@ export default function PublicProfile (props: UserDetailsProps) {
         />
         {allCommunities.length > 0 ? (
           <>
-            <SectionHeader title='Communities' count={allCommunities.length} />
+            <SectionHeader title="Communities" count={allCommunities.length} />
             <Stack gap={2} mb={2}>
-              {allCommunities.map(community => (
+              {allCommunities.map((community) => (
                 <CommunityRow
                   key={community.id}
                   onClick={() => {
@@ -216,9 +244,9 @@ export default function PublicProfile (props: UserDetailsProps) {
 
         {collectables.length > 0 ? (
           <>
-            <SectionHeader title='NFTs & POAPs' count={collectables.length} />
+            <SectionHeader title="NFTs & POAPs" count={collectables.length} />
             <Stack gap={2} mb={2}>
-              {collectables.map(collectable => (
+              {collectables.map((collectable) => (
                 <CollectableRow
                   key={collectable.id}
                   showVisibilityIcon={!readOnly}
@@ -238,9 +266,9 @@ export default function PublicProfile (props: UserDetailsProps) {
   );
 }
 
-function SectionHeader ({ title, count }: { title: string, count: number }) {
+function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
-    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
+    <Stack flexDirection="row" justifyContent="space-between" alignItems="center" my={2}>
       <Typography
         sx={{
           fontSize: {
