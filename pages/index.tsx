@@ -13,7 +13,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
-import { isSpaceDomain } from 'lib/spaces';
+import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
