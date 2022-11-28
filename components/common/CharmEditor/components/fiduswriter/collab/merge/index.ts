@@ -136,9 +136,9 @@ export class Merge {
     const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
     const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
     const maps = new Mapping(
-      // @ts-ignore
       []
         .concat(
+          // @ts-ignore
           unconfirmedTr.mapping.maps
             .slice()
             .reverse()

@@ -26,7 +26,8 @@ const StyledMuiLink = styled(MuiLink)`
         typeof props.color === 'string'
           ? // @ts-ignore
             hoverStyle[props.color] || props.theme.palette[props.color]?.main
-          : props.theme.palette[props.color]?.main};
+          : // @ts-ignore
+            props.theme.palette[props.color]?.main};
     }
   }
 `;
