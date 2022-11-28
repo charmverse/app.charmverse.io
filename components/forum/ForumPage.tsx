@@ -14,13 +14,6 @@ import ForumPosts from './components/ForumPosts';
 export default function ForumPage () {
   const [search, setSearch] = useState('');
 
-  /*
-   // track page_view for the forum main page
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: currentSpace?.id, type: 'forum' });
-  }, []);
-  */
-
   return (
     <CenteredPageContent>
       <Typography variant='h1'>Forum</Typography>
