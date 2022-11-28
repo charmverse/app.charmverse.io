@@ -6,7 +6,12 @@ import type { ForumPost } from 'lib/forum/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { AvailableResourcesWithPaginationRequest } from './interfaces';
+interface GetForumPostsRequest{
+  spaceId: string;
+  page?: number;
+  count?: number;
+  sort?: string;
+}
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,14 +19,9 @@ handler.get(getPosts)
   .use(requireUser);
 
 async function getPosts (req: NextApiRequest, res: NextApiResponse<ForumPost[]>) {
-  const { spaceId, publicOnly, count, page, sort } = req.query as any as AvailableResourcesWithPaginationRequest;
-
-  const publicResourcesOnly = ((publicOnly as any) === 'true' || publicOnly === true);
-
-  const userId = req.session?.user?.id;
+  const { spaceId, count, page, sort } = req.query as any as GetForumPostsRequest;
 
   const posts = await getForumPosts({
-    userId: publicResourcesOnly ? undefined : userId,
     spaceId,
     count,
     page,

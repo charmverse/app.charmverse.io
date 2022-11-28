@@ -12,7 +12,7 @@ const mockPost1: ForumPost = {
     type: 'text' as const,
     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
   },
-  user: undefined as any,
+  userId: '',
   upVotes: 20,
   downVotes: 32,
   commentsNumber: 32,
@@ -27,7 +27,7 @@ const mockPost2: ForumPost = {
     type: 'image' as const,
     content: 'https://cdn.pixabay.com/photo/2022/02/10/09/39/nft-7004985_1280.jpg'
   },
-  user: undefined as any,
+  userId: '',
   upVotes: 12,
   downVotes: 989,
   commentsNumber: 275,
@@ -42,7 +42,7 @@ const mockPost3: ForumPost = {
     type: 'text' as const,
     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
   },
-  user: undefined as any,
+  userId: '',
   upVotes: 8,
   downVotes: 0,
   commentsNumber: 2,
