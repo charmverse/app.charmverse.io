@@ -2,12 +2,14 @@ import { DateTime } from 'luxon';
 
 import { prisma } from 'db';
 
-export async function deleteArchivedPages (maxDay: number) {
+export async function deleteArchivedPages(maxDay: number) {
   const whereQuery = {
     deletedAt: {
-      lte: DateTime.now().minus({
-        days: maxDay
-      }).toISO()
+      lte: DateTime.now()
+        .minus({
+          days: maxDay
+        })
+        .toISO()
     }
   } as const;
 

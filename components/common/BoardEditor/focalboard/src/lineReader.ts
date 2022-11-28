@@ -1,6 +1,5 @@
-
 class LineReader {
-  private static appendBuffer (buffer1: Uint8Array, buffer2: Uint8Array): Uint8Array {
+  private static appendBuffer(buffer1: Uint8Array, buffer2: Uint8Array): Uint8Array {
     const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
     tmp.set(buffer1, 0);
     tmp.set(buffer2, buffer1.byteLength);
@@ -8,7 +7,7 @@ class LineReader {
     return tmp;
   }
 
-  private static arrayBufferIndexOf (buffer: Uint8Array, charCode: number): number {
+  private static arrayBufferIndexOf(buffer: Uint8Array, charCode: number): number {
     for (let i = 0; i < buffer.byteLength; ++i) {
       if (buffer[i] === charCode) {
         return i;
@@ -18,7 +17,7 @@ class LineReader {
     return -1;
   }
 
-  static readFile (file: File, callback: (line: string, completed: boolean) => Promise<void>): void {
+  static readFile(file: File, callback: (line: string, completed: boolean) => Promise<void>): void {
     let buffer = new Uint8Array(0);
 
     const chunkSize = 1024 * 1000;
@@ -62,7 +61,7 @@ class LineReader {
 
     seek();
 
-    function seek () {
+    function seek() {
       const slice = file.slice(offset, offset + chunkSize);
 
       // Need to read as an ArrayBuffer (instead of text) to handle unicode boundaries

@@ -14,13 +14,21 @@ export interface FindParentOfTypeOptions<P extends PageNode> {
  * Traverses parents until a matching item is found
  * @returns
  */
-export function findParentOfType<P extends PageNode = PageNode>({ pageType, targetPageTree }:
-  Required<Pick<FindParentOfTypeOptions<P>, 'targetPageTree' | 'pageType'>>): string | null
-export function findParentOfType<P extends PageNode = PageNode>({ pageType, pageId, pageMap }:
-  Required<Pick<FindParentOfTypeOptions<P>, 'pageType' | 'pageId' | 'pageMap'>>): string | null
-export function findParentOfType<P extends PageNode = PageNode> ({ pageType, pageId, pageMap, targetPageTree }:
-  FindParentOfTypeOptions<P>):string | null {
-
+export function findParentOfType<P extends PageNode = PageNode>({
+  pageType,
+  targetPageTree
+}: Required<Pick<FindParentOfTypeOptions<P>, 'targetPageTree' | 'pageType'>>): string | null;
+export function findParentOfType<P extends PageNode = PageNode>({
+  pageType,
+  pageId,
+  pageMap
+}: Required<Pick<FindParentOfTypeOptions<P>, 'pageType' | 'pageId' | 'pageMap'>>): string | null;
+export function findParentOfType<P extends PageNode = PageNode>({
+  pageType,
+  pageId,
+  pageMap,
+  targetPageTree
+}: FindParentOfTypeOptions<P>): string | null {
   if (pageMap) {
     let currentNode = pageMap[pageId as string];
 
@@ -36,12 +44,8 @@ export function findParentOfType<P extends PageNode = PageNode> ({ pageType, pag
       if (currentNode?.type === pageType) {
         return currentNode.id;
       }
-
     }
-
-  }
-  else if (targetPageTree) {
-
+  } else if (targetPageTree) {
     const length = targetPageTree.parents.length;
 
     for (let i = 0; i < length; i++) {
@@ -50,10 +54,8 @@ export function findParentOfType<P extends PageNode = PageNode> ({ pageType, pag
       if (parent?.type === pageType) {
         return parent.id;
       }
-
     }
   }
 
   return null;
-
 }

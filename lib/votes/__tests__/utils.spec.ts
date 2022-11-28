@@ -19,31 +19,40 @@ const vote: Vote = {
 };
 
 describe('voting status', () => {
-
   it('should be closed', () => {
-    expect(isVotingClosed({
-      ...vote,
-      status: VOTE_STATUS[1] // Passed
-    })).toBe(true);
-    expect(isVotingClosed({
-      ...vote,
-      status: VOTE_STATUS[2] // Rejected
-    })).toBe(true);
-    expect(isVotingClosed({
-      ...vote,
-      status: VOTE_STATUS[3] // Cancelled
-    })).toBe(true);
-    expect(isVotingClosed({
-      ...vote,
-      deadline: new Date('2021-07-07') // passed deadline
-    })).toBe(true);
+    expect(
+      isVotingClosed({
+        ...vote,
+        status: VOTE_STATUS[1] // Passed
+      })
+    ).toBe(true);
+    expect(
+      isVotingClosed({
+        ...vote,
+        status: VOTE_STATUS[2] // Rejected
+      })
+    ).toBe(true);
+    expect(
+      isVotingClosed({
+        ...vote,
+        status: VOTE_STATUS[3] // Cancelled
+      })
+    ).toBe(true);
+    expect(
+      isVotingClosed({
+        ...vote,
+        deadline: new Date('2021-07-07') // passed deadline
+      })
+    ).toBe(true);
   });
 
   it('should not be closed', () => {
-    expect(isVotingClosed({
-      ...vote,
-      status: VOTE_STATUS[0], // InProgress
-      deadline: new Date('2777-07-07') // future deadline
-    })).toBe(false);
+    expect(
+      isVotingClosed({
+        ...vote,
+        status: VOTE_STATUS[0], // InProgress
+        deadline: new Date('2777-07-07') // future deadline
+      })
+    ).toBe(false);
   });
 });

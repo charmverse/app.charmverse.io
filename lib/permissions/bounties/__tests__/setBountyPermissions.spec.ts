@@ -1,4 +1,3 @@
-
 import type { BountyPermission, BountyPermissionLevel, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -21,9 +20,7 @@ beforeAll(async () => {
 });
 
 describe('setBountyPermissions', () => {
-
   it('should set the bounty permissions to match selected ones, deleting any outdated permissions', async () => {
-
     const bounty = await generateBounty({
       createdBy: user.id,
       approveSubmitters: true,
@@ -68,13 +65,12 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.reviewer.some(p => p.group === 'user' && p.id === user.id)).toBe(true);
+    expect(queryResult.reviewer.some((p) => p.group === 'user' && p.id === user.id)).toBe(true);
     expect(queryResult.reviewer.length === 1).toBe(true);
     expect(queryResult.submitter.length === 0).toBe(true);
   });
 
   it('should accept bounty permissions as an input too', async () => {
-
     const bounty = await generateBounty({
       createdBy: user.id,
       approveSubmitters: true,
@@ -86,10 +82,12 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id,
       // Only 1 permission should exist
       permissionsToAssign: {
-        reviewer: [{
-          group: 'space',
-          id: space.id
-        }]
+        reviewer: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       }
     });
 
@@ -97,12 +95,10 @@ describe('setBountyPermissions', () => {
       bountyId: bounty.id
     });
 
-    expect(queryResult.reviewer.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
-
+    expect(queryResult.reviewer.some((p) => p.group === 'space' && p.id === space.id)).toBe(true);
   });
 
   it('should not recreate existing permissions, only adding missing ones', async () => {
-
     const extraUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -129,56 +125,50 @@ describe('setBountyPermissions', () => {
     const bulkAssignment: BulkBountyPermissionAssignment = {
       bountyId: bounty.id,
       // Only 1 permission should exist
-      permissionsToAssign: [
-        assignment
-      ]
+      permissionsToAssign: [assignment]
     };
 
     await setBountyPermissions(bulkAssignment);
 
-    const afterFirst = await prisma.bountyPermission.findFirst({
+    const afterFirst = (await prisma.bountyPermission.findFirst({
       where: {
         permissionLevel,
         bountyId: bounty.id,
         userId: extraUser.id
-
       }
-    }) as BountyPermission;
+    })) as BountyPermission;
 
     await setBountyPermissions(bulkAssignment);
 
-    const afterSecond = await prisma.bountyPermission.findFirst({
+    const afterSecond = (await prisma.bountyPermission.findFirst({
       where: {
         permissionLevel,
         bountyId: bounty.id,
         userId: extraUser.id
-
       }
-    }) as BountyPermission;
+    })) as BountyPermission;
 
     expect(typeof afterFirst.id === 'string').toBe(true);
     expect(afterFirst.id).toBe(afterSecond.id);
-
   });
 
   it('should fail if the bounty does not exist', async () => {
-
     const randomId = v4();
 
-    await expect(setBountyPermissions({
-      bountyId: randomId,
-      // Only 1 permission should exist
-      permissionsToAssign: [
-        {
-          level: 'reviewer',
-          assignee: {
-            group: 'user',
-            id: user.id
+    await expect(
+      setBountyPermissions({
+        bountyId: randomId,
+        // Only 1 permission should exist
+        permissionsToAssign: [
+          {
+            level: 'reviewer',
+            assignee: {
+              group: 'user',
+              id: user.id
+            }
           }
-        }
-      ]
-    })).rejects.toBeInstanceOf(DataNotFoundError);
-
+        ]
+      })
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
-
 });

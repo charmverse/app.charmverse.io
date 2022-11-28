@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
@@ -6,24 +5,37 @@ import Label from '../../../widgets/label';
 import ValueSelector from '../../../widgets/valueSelector';
 
 type Props = {
-    emptyValue: string;
-    propertyTemplate: IPropertyTemplate;
-    propertyValue: string | string[];
-    onChange: (value: string | string[]) => void;
-    onChangeColor?: (option: IPropertyOption, color: string) => void;
-    onDeleteOption?: (option: IPropertyOption) => void;
-    onCreate?: (newValue: string, currentValues: IPropertyOption[]) => void;
-    onDeleteValue?: (valueToDelete: IPropertyOption, currentValues: IPropertyOption[]) => void;
-    isEditable: boolean;
-}
+  emptyValue: string;
+  propertyTemplate: IPropertyTemplate;
+  propertyValue: string | string[];
+  onChange: (value: string | string[]) => void;
+  onChangeColor?: (option: IPropertyOption, color: string) => void;
+  onDeleteOption?: (option: IPropertyOption) => void;
+  onCreate?: (newValue: string, currentValues: IPropertyOption[]) => void;
+  onDeleteValue?: (valueToDelete: IPropertyOption, currentValues: IPropertyOption[]) => void;
+  isEditable: boolean;
+};
 
-function MultiSelectProperty (props: Props): JSX.Element {
-  const { propertyTemplate, emptyValue, propertyValue, isEditable, onChange, onChangeColor, onDeleteOption, onCreate, onDeleteValue } = props;
+function MultiSelectProperty(props: Props): JSX.Element {
+  const {
+    propertyTemplate,
+    emptyValue,
+    propertyValue,
+    isEditable,
+    onChange,
+    onChangeColor,
+    onDeleteOption,
+    onCreate,
+    onDeleteValue
+  } = props;
   const [open, setOpen] = useState(false);
 
-  const values = Array.isArray(propertyValue) && propertyValue.length > 0
-    ? propertyValue.map((v) => propertyTemplate.options.find((o) => o!.id === v)).filter((v): v is IPropertyOption => Boolean(v))
-    : [];
+  const values =
+    Array.isArray(propertyValue) && propertyValue.length > 0
+      ? propertyValue
+          .map((v) => propertyTemplate.options.find((o) => o!.id === v))
+          .filter((v): v is IPropertyOption => Boolean(v))
+      : [];
 
   if (!isEditable || !open) {
     return (
@@ -35,19 +47,11 @@ function MultiSelectProperty (props: Props): JSX.Element {
         onClick={() => setOpen(true)}
       >
         {values.map((v) => (
-          <Label
-            key={v.id}
-            color={v.color}
-          >
+          <Label key={v.id} color={v.color}>
             {v.value}
           </Label>
         ))}
-        {values.length === 0 && (
-          <Label
-            color='empty'
-          >{emptyValue}
-          </Label>
-        )}
+        {values.length === 0 && <Label color='empty'>{emptyValue}</Label>}
       </div>
     );
   }

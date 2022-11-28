@@ -6,11 +6,10 @@ import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/erro
 import type { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 
-export async function unassignRole ({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
-
+export async function unassignRole({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
   const role = await listRoleMembers({ roleId });
 
-  if (role.users.every(u => u.id !== userId)) {
+  if (role.users.every((u) => u.id !== userId)) {
     throw new InvalidInputError('User is not assigned to this role and cannot be removed from it.');
   }
 
@@ -18,7 +17,7 @@ export async function unassignRole ({ roleId, userId }: RoleAssignment): Promise
     throw new UndesirableOperationError('Cannot remove role as it is managed by Guild.xyz');
   }
 
-  const targetSpaceRole = await prisma.spaceRole.findFirst({
+  const targetSpaceRole = (await prisma.spaceRole.findFirst({
     where: {
       userId,
       spaceRoleToRole: {
@@ -27,7 +26,7 @@ export async function unassignRole ({ roleId, userId }: RoleAssignment): Promise
         }
       }
     }
-  }) as SpaceRole;
+  })) as SpaceRole;
 
   await prisma.spaceRoleToRole.delete({
     where: {

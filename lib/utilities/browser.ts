@@ -1,19 +1,10 @@
-
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
-export function isMac () {
+export function isMac() {
   return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 }
 
-export function isTouchScreen (): boolean {
-  const toMatch = [
-    /Android/i,
-    /webOS/i,
-    /iPhone/i,
-    /iPad/i,
-    /iPod/i,
-    /BlackBerry/i,
-    /Windows Phone/i
-  ];
+export function isTouchScreen(): boolean {
+  const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
   if (typeof window === 'undefined') {
     return false;
   }
@@ -23,7 +14,7 @@ export function isTouchScreen (): boolean {
   });
 }
 
-export function isSmallScreen () {
+export function isSmallScreen() {
   if (typeof window !== 'undefined') {
     return window.innerWidth < 600;
   }
@@ -31,39 +22,31 @@ export function isSmallScreen () {
 }
 
 /** Based on https://developer.mozilla.org/docs/Web/HTTP/Browser_detection_using_the_user_agent */
-export function isTouchDevice () {
+export function isTouchDevice() {
   let hasTouchScreen = false;
   if ('maxTouchPoints' in navigator) {
     hasTouchScreen = navigator.maxTouchPoints > 0;
-  }
-  else if ('msMaxTouchPoints' in navigator) {
+  } else if ('msMaxTouchPoints' in navigator) {
     // @ts-ignore
     hasTouchScreen = navigator.msMaxTouchPoints > 0;
-  }
-  else {
-    const mQ = typeof window !== 'undefined'
-      && window.matchMedia('(pointer:coarse)');
+  } else {
+    const mQ = typeof window !== 'undefined' && window.matchMedia('(pointer:coarse)');
     if (mQ && mQ.media === '(pointer:coarse)') {
       hasTouchScreen = !!mQ.matches;
-    }
-    else if ('orientation' in window) {
+    } else if ('orientation' in window) {
       hasTouchScreen = true; // deprecated, but good fallback
-    }
-    else {
+    } else {
       // Only as a last resort, fall back to user agent sniffing
       // @ts-ignore
       const UA = navigator.userAgent;
-      hasTouchScreen = /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(UA)
-        || /\b(Android|Windows Phone|iPad|iPod)\b/i.test(UA);
+      hasTouchScreen =
+        /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(UA) || /\b(Android|Windows Phone|iPad|iPod)\b/i.test(UA);
     }
   }
   return hasTouchScreen;
 }
 
-export const safeScrollIntoViewIfNeeded = (
-  element: HTMLElement,
-  centerIfNeeded?: boolean
-) => {
+export const safeScrollIntoViewIfNeeded = (element: HTMLElement, centerIfNeeded?: boolean) => {
   if (typeof window !== 'undefined') {
     return 'scrollIntoViewIfNeeded' in document.body
       ? (element as any).scrollIntoViewIfNeeded(centerIfNeeded)
@@ -72,10 +55,7 @@ export const safeScrollIntoViewIfNeeded = (
   return () => {};
 };
 
-function scrollIntoViewIfNeededPolyfill (
-  element: HTMLElement,
-  centerIfNeeded?: boolean
-) {
+function scrollIntoViewIfNeededPolyfill(element: HTMLElement, centerIfNeeded?: boolean) {
   centerIfNeeded = arguments.length === 0 ? true : !!centerIfNeeded;
 
   const parent = (element.closest('#inline-palette-wrapper') || element.parentNode)! as HTMLElement;
@@ -86,28 +66,21 @@ function scrollIntoViewIfNeededPolyfill (
   const parentComputedStyle = window.getComputedStyle(parent, null);
   const parentBorderTopWidth = parseInt(parentComputedStyle.getPropertyValue('border-top-width'), 10);
   const parentBorderLeftWidth = parseInt(parentComputedStyle.getPropertyValue('border-left-width'), 10);
-  const overTop = elementOffsetTop < 0; const // element.offsetTop - parent.offsetTop < parent.scrollTop,
+  const overTop = elementOffsetTop < 0;
+  const // element.offsetTop - parent.offsetTop < parent.scrollTop,
     overBottom = elementOffsetBottom > parentCoords.height;
   const overLeft = element.offsetLeft - parent.offsetLeft < parent.scrollLeft;
-  const overRight = element.offsetLeft
-        - parent.offsetLeft
-        + element.clientWidth
-        - parentBorderLeftWidth
-      > parent.scrollLeft + parent.clientWidth;
+  const overRight =
+    element.offsetLeft - parent.offsetLeft + element.clientWidth - parentBorderLeftWidth >
+    parent.scrollLeft + parent.clientWidth;
   if ((overTop || overBottom) && centerIfNeeded) {
-    parent.scrollTop = element.offsetTop
-      - parent.offsetTop
-      - parent.clientHeight / 2
-      - parentBorderTopWidth
-      + element.clientHeight / 2;
+    parent.scrollTop =
+      element.offsetTop - parent.offsetTop - parent.clientHeight / 2 - parentBorderTopWidth + element.clientHeight / 2;
   }
 
   if ((overLeft || overRight) && centerIfNeeded) {
-    parent.scrollLeft = element.offsetLeft
-      - parent.offsetLeft
-      - parent.clientWidth / 2
-      - parentBorderLeftWidth
-      + element.clientWidth / 2;
+    parent.scrollLeft =
+      element.offsetLeft - parent.offsetLeft - parent.clientWidth / 2 - parentBorderLeftWidth + element.clientWidth / 2;
   }
   if ((overTop || overBottom || overLeft || overRight) && !centerIfNeeded) {
     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -115,7 +88,7 @@ function scrollIntoViewIfNeededPolyfill (
 }
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
-export function getNewUrl (params: Record<string, string | null>, currentUrl = window.location.href) {
+export function getNewUrl(params: Record<string, string | null>, currentUrl = window.location.href) {
   const url = new URL(currentUrl, currentUrl.match('http') ? undefined : window.location.origin);
   const urlParams: URLSearchParams = new URLSearchParams(url.search);
   for (const key in params) {
@@ -123,8 +96,7 @@ export function getNewUrl (params: Record<string, string | null>, currentUrl = w
       const value = params[key];
       if (typeof value === 'string') {
         urlParams.set(key, value);
-      }
-      else {
+      } else {
         urlParams.delete(key);
       }
     }
@@ -135,8 +107,7 @@ export function getNewUrl (params: Record<string, string | null>, currentUrl = w
 
 // update URL without Next.js re-rendering the page
 // source: https://github.com/vercel/next.js/discussions/18072
-export function setUrlWithoutRerender (pathname: string, params: Record<string, string | null>) {
-
+export function setUrlWithoutRerender(pathname: string, params: Record<string, string | null>) {
   const newUrl = getNewUrl(params);
   // get the path that Next.js uses internally
   const nextjsPath = `${pathname}${newUrl.search}`;
@@ -152,7 +123,7 @@ export function setUrlWithoutRerender (pathname: string, params: Record<string, 
   window.history.replaceState(newState, '', displayPath);
 }
 
-export function getCookie (name: string): string {
+export function getCookie(name: string): string {
   const cookieMap = document.cookie.split(';').reduce<{ [key: string]: string }>((cookies, cookie) => {
     const _name = cookie.trim().split('=')[0];
     const value = cookie.trim().split('=')[1];
@@ -163,17 +134,25 @@ export function getCookie (name: string): string {
 }
 
 // cookies reference: https://developer.mozilla.org/en-US/docs/Web/API/document/cookie
-export function setCookie ({ name, value, expiresInDays = 10 * 365 }: { name: string, value: string, expiresInDays: number }) {
+export function setCookie({
+  name,
+  value,
+  expiresInDays = 10 * 365
+}: {
+  name: string;
+  value: string;
+  expiresInDays: number;
+}) {
   const expires = new Date();
   expires.setDate(expires.getDate() + expiresInDays);
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
 }
 
-export function deleteCookie (name: string) {
+export function deleteCookie(name: string) {
   setCookie({ name, value: '', expiresInDays: 0 });
 }
 
-export function createHighlightDomElement (parentElement: HTMLElement | null) {
+export function createHighlightDomElement(parentElement: HTMLElement | null) {
   if (parentElement) {
     setTimeout(() => {
       const boundingRect = parentElement.getBoundingClientRect();
@@ -196,7 +175,7 @@ export function createHighlightDomElement (parentElement: HTMLElement | null) {
   }
 }
 
-export function highlightDomElement (domElement: HTMLElement, postHighlight?: () => void) {
+export function highlightDomElement(domElement: HTMLElement, postHighlight?: () => void) {
   domElement.scrollIntoView({
     behavior: 'smooth'
   });

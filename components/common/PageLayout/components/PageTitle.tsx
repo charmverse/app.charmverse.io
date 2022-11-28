@@ -13,7 +13,7 @@ const PageTitle = styled(({ hasContent, ...props }: any) => <Typography {...prop
   &:hover {
     color: inherit;
   }
-  ${(props) => props.hasContent ? 'opacity: 0.5;' : ''}
+  ${(props) => (props.hasContent ? 'opacity: 0.5;' : '')}
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

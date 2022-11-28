@@ -7,13 +7,13 @@ import type { Option as SelectOption } from '../../calculations/options';
 import { typesByOptions } from '../../calculations/options';
 
 type OptionProps = SelectOption & {
-    cardProperties: IPropertyTemplate[];
-    onChange: (data: { calculation: string, propertyId: string }) => void;
-    activeValue: string;
-    activeProperty: IPropertyTemplate;
-}
+  cardProperties: IPropertyTemplate[];
+  onChange: (data: { calculation: string; propertyId: string }) => void;
+  activeValue: string;
+  activeProperty: IPropertyTemplate;
+};
 
-function Option (props: { data: OptionProps }): JSX.Element {
+function Option(props: { data: OptionProps }): JSX.Element {
   const [submenu, setSubmenu] = useState(false);
   const [height, setHeight] = useState(0);
   const [menuOptionRight, setMenuOptionRight] = useState(0);
@@ -22,8 +22,7 @@ function Option (props: { data: OptionProps }): JSX.Element {
   const toggleOption = (e: any) => {
     if (submenu) {
       setSubmenu(false);
-    }
-    else {
+    } else {
       const rect = e.target.getBoundingClientRect();
       setHeight(rect.y);
       setMenuOptionRight(rect.x + rect.width);
@@ -34,12 +33,14 @@ function Option (props: { data: OptionProps }): JSX.Element {
   if (!calculationToProperties.get(props.data.value)) {
     const supportedPropertyTypes = new Map<string, boolean>([]);
     if (typesByOptions.get(props.data.value)) {
-      (typesByOptions.get(props.data.value) || [])
-        .forEach((propertyType) => supportedPropertyTypes.set(propertyType, true));
+      (typesByOptions.get(props.data.value) || []).forEach((propertyType) =>
+        supportedPropertyTypes.set(propertyType, true)
+      );
     }
 
-    const supportedProperties = props.data.cardProperties
-      .filter((property) => supportedPropertyTypes.get(property.type) || supportedPropertyTypes.get('common'));
+    const supportedProperties = props.data.cardProperties.filter(
+      (property) => supportedPropertyTypes.get(property.type) || supportedPropertyTypes.get('common')
+    );
 
     calculationToProperties.set(props.data.value, supportedProperties);
     setCalculationToProperties(calculationToProperties);
@@ -65,37 +66,28 @@ function Option (props: { data: OptionProps }): JSX.Element {
         {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
       </span>
 
-      {
-                submenu && props.data.value !== 'count' && (
-                  <div
-                    className='dropdown-submenu'
-                    style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}
-                  >
-
-                    {
-                            calculationToProperties.get(props.data.value)
-                            && calculationToProperties.get(props.data.value)!.map((property) => (
-                              <div
-                                key={property.id}
-                                className={`drops ${props.data.activeProperty.id === property.id ? 'active' : ''}`}
-                                onClick={() => {
-                                  props.data.onChange({
-                                    calculation: props.data.value,
-                                    propertyId: property.id
-                                  });
-                                }}
-                              >
-                                <span>{property.name}</span>
-                              </div>
-                            ))
-                        }
-                  </div>
-                )
-            }
+      {submenu && props.data.value !== 'count' && (
+        <div className='dropdown-submenu' style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}>
+          {calculationToProperties.get(props.data.value) &&
+            calculationToProperties.get(props.data.value)!.map((property) => (
+              <div
+                key={property.id}
+                className={`drops ${props.data.activeProperty.id === property.id ? 'active' : ''}`}
+                onClick={() => {
+                  props.data.onChange({
+                    calculation: props.data.value,
+                    propertyId: property.id
+                  });
+                }}
+              >
+                <span>{property.name}</span>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
 
 export { Option };
 export type { OptionProps };
-

@@ -15,7 +15,7 @@ import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
 import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
 
-export function AddMemberPropertyButton () {
+export function AddMemberPropertyButton() {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
   const admin = isAdmin();
   const { mutateMembers } = useMembers();
@@ -32,7 +32,7 @@ export function AddMemberPropertyButton () {
     }
   }, [propertyNamePopupState.isOpen]);
 
-  async function onSubmit () {
+  async function onSubmit() {
     if (propertyName && selectedPropertyType) {
       await addProperty({
         index: properties?.length ?? 0,
@@ -51,7 +51,7 @@ export function AddMemberPropertyButton () {
       return false;
     }
     // Read-only properties can only have one instance, join_date is an example
-    if (propertyConfig.readonly && properties?.find(property => property.type === propertyType)) {
+    if (propertyConfig.readonly && properties?.find((property) => property.type === propertyType)) {
       return false;
     }
 
@@ -97,7 +97,12 @@ export function AddMemberPropertyButton () {
           </MenuItem>
         ))}
       </Menu>
-      <Modal size='large' open={propertyNamePopupState.isOpen} onClose={propertyNamePopupState.close} title='Name your property'>
+      <Modal
+        size='large'
+        open={propertyNamePopupState.isOpen}
+        onClose={propertyNamePopupState.close}
+        title='Name your property'
+      >
         <Stack gap={1}>
           <TextField
             fullWidth
@@ -119,13 +124,14 @@ export function AddMemberPropertyButton () {
             <SelectOptionsList options={propertyOptions} onChange={setPropertyOptions} />
           )}
           <Button
-            onMouseDown={e => e.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
             disabled={!propertyName || !selectedPropertyType}
             sx={{
               width: 'fit-content'
             }}
             onClick={onSubmit}
-          >Add property
+          >
+            Add property
           </Button>
         </Stack>
       </Modal>

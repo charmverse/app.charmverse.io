@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function NewBountyButton () {
+export default function NewBountyButton() {
   const { user } = useUser();
   const router = useRouter();
   const currentSpace = useCurrentSpace();
@@ -21,7 +21,7 @@ export default function NewBountyButton () {
   const { mutatePage } = usePages();
   const { showPage } = usePageDialog();
 
-  async function onClickCreate () {
+  async function onClickCreate() {
     if (currentSpace && user) {
       let createdBounty: BountyWithDetails;
 
@@ -34,14 +34,15 @@ export default function NewBountyButton () {
           rewardAmount: 0,
           rewardToken: 'ETH',
           permissions: {
-            submitter: [{
-              group: 'space',
-              id: currentSpace.id
-            }]
+            submitter: [
+              {
+                group: 'space',
+                id: currentSpace.id
+              }
+            ]
           }
         });
-      }
-      else {
+      } else {
         createdBounty = await charmClient.bounties.createBounty({
           chainId: 1,
           status: 'open',
@@ -50,10 +51,12 @@ export default function NewBountyButton () {
           rewardAmount: 1,
           rewardToken: 'ETH',
           permissions: {
-            submitter: [{
-              group: 'space',
-              id: currentSpace.id
-            }]
+            submitter: [
+              {
+                group: 'space',
+                id: currentSpace.id
+              }
+            ]
           }
         });
       }
@@ -62,7 +65,7 @@ export default function NewBountyButton () {
       showPage({
         pageId: createdBounty.page.id,
         hideToolsMenu: suggestBounties,
-        onClose () {
+        onClose() {
           setUrlWithoutRerender(router.pathname, { bountyId: null });
         }
       });
@@ -70,9 +73,5 @@ export default function NewBountyButton () {
     }
   }
 
-  return (
-    <Button onClick={onClickCreate}>
-      {suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}
-    </Button>
-  );
+  return <Button onClick={onClickCreate}>{suggestBounties ? 'Suggest Bounty' : 'Create Bounty'}</Button>;
 }

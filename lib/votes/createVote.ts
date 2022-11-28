@@ -1,4 +1,3 @@
-
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utilities/errors';
@@ -7,7 +6,7 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
-export async function createVote (vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
+export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
   const { spaceId, createdBy, pageId, title, threshold, description, deadline, type, voteOptions, context } = vote;
 
   const page = await prisma.page.findUnique({
@@ -23,7 +22,7 @@ export async function createVote (vote: VoteDTO & { spaceId: string }): Promise<
     throw new PageNotFoundError(pageId);
   }
 
-  if (context === 'proposal' && page.votes.some(v => v.context === 'proposal')) {
+  if (context === 'proposal' && page.votes.some((v) => v.context === 'proposal')) {
     throw new DuplicateDataError('A proposal vote has already been created for this page.');
   }
 
@@ -52,7 +51,7 @@ export async function createVote (vote: VoteDTO & { spaceId: string }): Promise<
         }
       },
       voteOptions: {
-        create: voteOptions.map(option => ({
+        create: voteOptions.map((option) => ({
           name: option
         }))
       }

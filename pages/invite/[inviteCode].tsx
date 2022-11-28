@@ -7,7 +7,6 @@ import InviteLinkPageError from 'components/invite/InviteLinkPageError';
 import { getInviteLink } from 'lib/invites';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-
   const inviteCode = context.query.inviteCode as string;
   const { invite, expired } = await getInviteLink(inviteCode);
 
@@ -33,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default function InvitationPage ({ invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function InvitationPage({ invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (invite) {
     <Head>
       <meta name='robots' content='noindex' />

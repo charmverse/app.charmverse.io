@@ -23,7 +23,7 @@ beforeAll(async () => {
  * Generates a tree where all pages inherit 1 space / full_access from root_1 (except root 2, which is standalone)
  * Each test can then fuzz the tree permissions state
  */
-async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: string, spaceId: string }): Promise<{
+async function generateTreeWithSpaceFullAccess({ userId, spaceId }: { userId: string; spaceId: string }): Promise<{
   root_1: IPageWithPermissions;
   root_2: IPageWithPermissions;
   page_1_1: IPageWithPermissions;
@@ -37,24 +37,26 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
     parentId: null
   });
 
-  root_1.permissions.push(await prisma.pagePermission.create({
-    data: {
-      page: {
-        connect: {
-          id: root_1.id
+  root_1.permissions.push(
+    await prisma.pagePermission.create({
+      data: {
+        page: {
+          connect: {
+            id: root_1.id
+          }
+        },
+        permissionLevel: 'full_access',
+        space: {
+          connect: {
+            id: space.id
+          }
         }
       },
-      permissionLevel: 'full_access',
-      space: {
-        connect: {
-          id: space.id
-        }
+      include: {
+        sourcePermission: true
       }
-    },
-    include: {
-      sourcePermission: true
-    }
-  }));
+    })
+  );
 
   const rootPermissionId = root_1.permissions[0].id;
 
@@ -65,24 +67,26 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
     parentId: null
   });
 
-  root_2.permissions.push(await prisma.pagePermission.create({
-    data: {
-      page: {
-        connect: {
-          id: root_2.id
+  root_2.permissions.push(
+    await prisma.pagePermission.create({
+      data: {
+        page: {
+          connect: {
+            id: root_2.id
+          }
+        },
+        permissionLevel: 'full_access',
+        space: {
+          connect: {
+            id: space.id
+          }
         }
       },
-      permissionLevel: 'full_access',
-      space: {
-        connect: {
-          id: space.id
-        }
+      include: {
+        sourcePermission: true
       }
-    },
-    include: {
-      sourcePermission: true
-    }
-  }));
+    })
+  );
 
   const page_1_1 = await createPage({
     createdBy: user.id,
@@ -91,29 +95,31 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
     parentId: root_1.id
   });
 
-  page_1_1.permissions.push(await prisma.pagePermission.create({
-    data: {
-      page: {
-        connect: {
-          id: page_1_1.id
+  page_1_1.permissions.push(
+    await prisma.pagePermission.create({
+      data: {
+        page: {
+          connect: {
+            id: page_1_1.id
+          }
+        },
+        permissionLevel: 'full_access',
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        sourcePermission: {
+          connect: {
+            id: rootPermissionId
+          }
         }
       },
-      permissionLevel: 'full_access',
-      space: {
-        connect: {
-          id: space.id
-        }
-      },
-      sourcePermission: {
-        connect: {
-          id: rootPermissionId
-        }
+      include: {
+        sourcePermission: true
       }
-    },
-    include: {
-      sourcePermission: true
-    }
-  }));
+    })
+  );
 
   const page_1_1_1 = await createPage({
     createdBy: user.id,
@@ -122,29 +128,31 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
     parentId: page_1_1.id
   });
 
-  page_1_1_1.permissions.push(await prisma.pagePermission.create({
-    data: {
-      page: {
-        connect: {
-          id: page_1_1_1.id
+  page_1_1_1.permissions.push(
+    await prisma.pagePermission.create({
+      data: {
+        page: {
+          connect: {
+            id: page_1_1_1.id
+          }
+        },
+        permissionLevel: 'full_access',
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        sourcePermission: {
+          connect: {
+            id: rootPermissionId
+          }
         }
       },
-      permissionLevel: 'full_access',
-      space: {
-        connect: {
-          id: space.id
-        }
-      },
-      sourcePermission: {
-        connect: {
-          id: rootPermissionId
-        }
+      include: {
+        sourcePermission: true
       }
-    },
-    include: {
-      sourcePermission: true
-    }
-  }));
+    })
+  );
 
   const page_1_1_1_1 = await createPage({
     createdBy: user.id,
@@ -153,29 +161,31 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
     parentId: page_1_1_1.id
   });
 
-  page_1_1_1_1.permissions.push(await prisma.pagePermission.create({
-    data: {
-      page: {
-        connect: {
-          id: page_1_1_1_1.id
+  page_1_1_1_1.permissions.push(
+    await prisma.pagePermission.create({
+      data: {
+        page: {
+          connect: {
+            id: page_1_1_1_1.id
+          }
+        },
+        permissionLevel: 'full_access',
+        space: {
+          connect: {
+            id: space.id
+          }
+        },
+        sourcePermission: {
+          connect: {
+            id: rootPermissionId
+          }
         }
       },
-      permissionLevel: 'full_access',
-      space: {
-        connect: {
-          id: space.id
-        }
-      },
-      sourcePermission: {
-        connect: {
-          id: rootPermissionId
-        }
+      include: {
+        sourcePermission: true
       }
-    },
-    include: {
-      sourcePermission: true
-    }
-  }));
+    })
+  );
 
   return {
     root_1,
@@ -189,13 +199,14 @@ async function generateTreeWithSpaceFullAccess ({ userId, spaceId }: { userId: s
 describe('replaceIllegalPermissions', () => {
   it('should reset the permissions of a tree to a correct state by dropping references to inherited permissions from outside the tree, establishing inheritance if possible', async () => {
     const { page_1_1, page_1_1_1, page_1_1_1_1, root_1, root_2 } = await generateTreeWithSpaceFullAccess({
-      userId: user.id, spaceId: space.id
+      userId: user.id,
+      spaceId: space.id
     });
 
     // Put tree in wrong state by making pages inherit from root 2
     await prisma.pagePermission.updateMany({
       where: {
-        OR: [page_1_1, page_1_1_1, page_1_1_1_1].map(page => {
+        OR: [page_1_1, page_1_1_1, page_1_1_1_1].map((page) => {
           return {
             pageId: page.id
           };
@@ -220,18 +231,17 @@ describe('replaceIllegalPermissions', () => {
     expect(page_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(rootFullAccessPermission.id);
     expect(page_1_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(rootFullAccessPermission.id);
     expect(page_1_1_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(rootFullAccessPermission.id);
-
   });
 
   it('should make the target page the source for children who were previously inheriting from elsewhere if the target page has less permissions than its parent, and the parent page permission is not in an erroneous inheritance state', async () => {
-
     const { page_1_1, page_1_1_1, page_1_1_1_1, root_1, root_2 } = await generateTreeWithSpaceFullAccess({
-      userId: user.id, spaceId: space.id
+      userId: user.id,
+      spaceId: space.id
     });
 
     await prisma.pagePermission.updateMany({
       where: {
-        OR: [page_1_1_1, page_1_1_1_1].map(page => {
+        OR: [page_1_1_1, page_1_1_1_1].map((page) => {
           return {
             pageId: page.id
           };
@@ -270,7 +280,8 @@ describe('replaceIllegalPermissions', () => {
 
     expect(page_1_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(null);
 
-    expect(page_1_1_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(page_1_1_1_afterUpdate.permissions[0].id);
+    expect(page_1_1_1_1_afterUpdate.permissions[0].inheritedFromPermission).toBe(
+      page_1_1_1_afterUpdate.permissions[0].id
+    );
   });
-
 });

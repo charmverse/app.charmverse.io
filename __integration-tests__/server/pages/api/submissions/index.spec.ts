@@ -22,9 +22,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/submissions - create a submission', () => {
-
   it('should return the created submission and respond with 201', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -49,19 +47,15 @@ describe('POST /api/submissions - create a submission', () => {
 
     const extraUserCookie = await loginUser(extraUser.id);
 
-    const createdSubmission = (await request(baseUrl)
-      .post('/api/submissions')
-      .set('Cookie', extraUserCookie)
-      .send(creationContent)
-      .expect(201)).body as Application;
+    const createdSubmission = (
+      await request(baseUrl).post('/api/submissions').set('Cookie', extraUserCookie).send(creationContent).expect(201)
+    ).body as Application;
 
     expect(createdSubmission.submission).toBe(submissionContent.submission);
     expect(createdSubmission.submissionNodes).toBe(submissionContent.submissionNodes);
-
   });
 
   it('should fail if the user does not have the "work" permission for this bounty and respond with 401', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const bounty = await generateBounty({
@@ -80,16 +74,10 @@ describe('POST /api/submissions - create a submission', () => {
 
     const extraUserCookie = await loginUser(extraUser.id);
 
-    await request(baseUrl)
-      .post('/api/submissions')
-      .set('Cookie', extraUserCookie)
-      .send(creationContent)
-      .expect(401);
-
+    await request(baseUrl).post('/api/submissions').set('Cookie', extraUserCookie).send(creationContent).expect(401);
   });
 
   it('should fail if the user is not a member of the space and respond with 401', async () => {
-
     const { user: otherUser, space: otherSpace } = await generateUserAndSpaceWithApiToken();
 
     const bounty = await generateBounty({
@@ -106,12 +94,6 @@ describe('POST /api/submissions - create a submission', () => {
       submissionContent
     };
 
-    await request(baseUrl)
-      .post('/api/submissions')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(401);
-
+    await request(baseUrl).post('/api/submissions').set('Cookie', nonAdminCookie).send(creationContent).expect(401);
   });
-
 });

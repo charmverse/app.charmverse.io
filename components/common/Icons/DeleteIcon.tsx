@@ -10,7 +10,7 @@ interface Props {
   label?: string;
 }
 
-export function DeleteIcon ({ iconSize, label, fontSize }: Props) {
+export function DeleteIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <MuiDeleteIcon fontSize={iconSize} />

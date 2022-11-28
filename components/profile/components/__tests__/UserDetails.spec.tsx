@@ -13,7 +13,8 @@ const theme = createThemeLightSensitive('light');
 
 const userDetails: UserDetails = {
   id: '1',
-  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vitae quam quis ligula tincidunt euismod placerat vel augue. Praesent porta sapien et tincidunt ultrices.',
+  description:
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vitae quam quis ligula tincidunt euismod placerat vel augue. Praesent porta sapien et tincidunt ultrices.',
   social: {
     githubURL: 'https://github.com/charmverse',
     twitterURL: 'https://mobile.twitter.com/charmverse',
@@ -22,7 +23,7 @@ const userDetails: UserDetails = {
   timezone: null
 };
 
-function WrappedUserDetails () {
+function WrappedUserDetails() {
   const props = {
     readOnly: false,
     user: {
@@ -63,7 +64,6 @@ jest.mock('swr/immutable', () => ({
 }));
 
 describe('User details', () => {
-
   it('should have correct username displayed', () => {
     render(<WrappedUserDetails />);
     expect(screen.getByText('test.ens')).toBeTruthy();
@@ -93,5 +93,4 @@ describe('User details', () => {
     fireEvent.click(screen.getByTestId('edit-description'));
     expect(screen.getByText('Describe yourself in a few words')).toBeTruthy();
   });
-
 });

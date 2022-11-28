@@ -14,96 +14,102 @@ export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'tot
   communities: CommunityDetails[];
 };
 
-export async function getAggregatedData (userId: string, apiToken?: string): Promise<AggregatedProfileData> {
+export async function getAggregatedData(userId: string, apiToken?: string): Promise<AggregatedProfileData> {
   const wallets = await prisma.userWallet.findMany({
     where: {
       userId
     }
   });
 
-  const profiles = (await Promise.all(
-    wallets.map(({ address }) => getProfile(address, apiToken)
-      .catch(error => {
-        log.error('Error calling DEEP DAO API', error);
-        return null;
-      }))
-  )).filter(isTruthy);
+  const profiles = (
+    await Promise.all(
+      wallets.map(({ address }) =>
+        getProfile(address, apiToken).catch((error) => {
+          log.error('Error calling DEEP DAO API', error);
+          return null;
+        })
+      )
+    )
+  ).filter(isTruthy);
 
-  const proposals = profiles.reduce<DeepDaoProfile['proposals']>((_proposals, profile) => ([..._proposals, ...profile.data.proposals]), []);
+  const proposals = profiles.reduce<DeepDaoProfile['proposals']>(
+    (_proposals, profile) => [..._proposals, ...profile.data.proposals],
+    []
+  );
 
-  const [
-    allOrganizations,
-    bountiesCreated,
-    bountyApplications,
-    userWorkspaces,
-    userProposalsCount
-  ] = await Promise.all([
-    getAllOrganizations(apiToken),
-    prisma.bounty.findMany({
-      where: {
-        createdBy: userId
-      },
-      include: {
-        page: true,
-        space: true
-      }
-    }),
-    prisma.application.findMany({
-      where: {
-        createdBy: userId,
-        status: {
-          in: ['inProgress', 'complete', 'review', 'paid']
+  const [allOrganizations, bountiesCreated, bountyApplications, userWorkspaces, userProposalsCount] = await Promise.all(
+    [
+      getAllOrganizations(apiToken),
+      prisma.bounty.findMany({
+        where: {
+          createdBy: userId
+        },
+        include: {
+          page: true,
+          space: true
         }
-      },
-      include: {
-        bounty: {
-          include: {
-            page: true,
-            space: true
-          }
-        }
-      }
-    }),
-    getSpacesOfUser(userId),
-    prisma.proposal.count({
-      where: {
-        page: {
-          deletedAt: null,
-          type: 'proposal',
-          snapshotProposalId: {
-            notIn: proposals.map(prop => prop.proposalId)
+      }),
+      prisma.application.findMany({
+        where: {
+          createdBy: userId,
+          status: {
+            in: ['inProgress', 'complete', 'review', 'paid']
           }
         },
-        authors: {
-          some: {
-            userId
+        include: {
+          bounty: {
+            include: {
+              page: true,
+              space: true
+            }
           }
         }
-      }
-    })
-  ]);
+      }),
+      getSpacesOfUser(userId),
+      prisma.proposal.count({
+        where: {
+          page: {
+            deletedAt: null,
+            type: 'proposal',
+            snapshotProposalId: {
+              notIn: proposals.map((prop) => prop.proposalId)
+            }
+          },
+          authors: {
+            some: {
+              userId
+            }
+          }
+        }
+      })
+    ]
+  );
 
   const daoLogos = allOrganizations.data.resources.reduce<Record<string, string | null>>((logos, org) => {
     logos[org.organizationId] = org.logo;
     return logos;
   }, {});
 
-  const completedApplications = bountyApplications.filter(application => application.status === 'complete' || application.status === 'paid');
+  const completedApplications = bountyApplications.filter(
+    (application) => application.status === 'complete' || application.status === 'paid'
+  );
 
-  const hiddenItems = (await prisma.profileItem.findMany({
-    where: {
-      type: 'community',
-      isHidden: true
-    },
-    select: {
-      id: true
-    }
-  })).map(profileItem => profileItem.id);
+  const hiddenItems = (
+    await prisma.profileItem.findMany({
+      where: {
+        type: 'community',
+        isHidden: true
+      },
+      select: {
+        id: true
+      }
+    })
+  ).map((profileItem) => profileItem.id);
 
   const userVotes = await prisma.vote.findMany({
     where: {
       spaceId: {
-        in: userWorkspaces.map(userWorkspace => userWorkspace.id)
+        in: userWorkspaces.map((userWorkspace) => userWorkspace.id)
       },
       userVotes: {
         some: {
@@ -142,20 +148,22 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
   });
 
   const deepDaoCommunities: UserCommunity[] = Object.values(profiles)
-    .map(profile => profile.data.organizations
-      .map(org => ({
+    .map((profile) =>
+      profile.data.organizations.map((org) => ({
         joinDate: '',
         id: org.organizationId,
         isHidden: hiddenItems.includes(org.organizationId),
         name: org.name,
         // sometimes the logo is just a filename, do some basic validation
         logo: daoLogos[org.organizationId]?.includes('http') ? daoLogos[org.organizationId] : null
-      }))).flat();
+      }))
+    )
+    .flat();
 
-  const charmVerseCommunities: UserCommunity[] = userWorkspaces.map(userWorkspace => ({
+  const charmVerseCommunities: UserCommunity[] = userWorkspaces.map((userWorkspace) => ({
     id: userWorkspace.id,
     isHidden: hiddenItems.includes(userWorkspace.id),
-    joinDate: userWorkspace.spaceRoles.find(spaceRole => spaceRole.userId === userId)?.createdAt.toISOString(),
+    joinDate: userWorkspace.spaceRoles.find((spaceRole) => spaceRole.userId === userId)?.createdAt.toISOString(),
     name: userWorkspace.name,
     logo: userWorkspace.spaceImage
   }));
@@ -164,34 +172,41 @@ export async function getAggregatedData (userId: string, apiToken?: string): Pro
 
   const votes = [
     // Deepdao votes
-    ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => ([..._votes, ...profile.data.votes]), []),
-    ...userVotes.map(vote => ({
-      createdAt: vote.createdAt.toString(),
-      description: vote.description ?? '',
-      organizationId: vote.spaceId,
-      title: vote.title || vote.page?.title,
-      voteId: vote.id,
-      successful: vote.status === 'Passed'
-    } as DeepDaoVote))
+    ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => [..._votes, ...profile.data.votes], []),
+    ...userVotes.map(
+      (vote) =>
+        ({
+          createdAt: vote.createdAt.toString(),
+          description: vote.description ?? '',
+          organizationId: vote.spaceId,
+          title: vote.title || vote.page?.title,
+          voteId: vote.id,
+          successful: vote.status === 'Passed'
+        } as DeepDaoVote)
+    )
   ];
 
   const bounties: ProfileBountyEvent[] = [
-    ...bountiesCreated.map((bounty): ProfileBountyEvent => ({
-      bountyId: bounty.id,
-      bountyPath: `/${bounty.space.domain}/${bounty.page?.path}`,
-      bountyTitle: bounty.page?.title,
-      createdAt: bounty.createdAt.toISOString(),
-      organizationId: bounty.spaceId,
-      eventName: 'bounty_created'
-    })),
-    ...bountyApplications.map((app): ProfileBountyEvent => ({
-      bountyId: app.bounty.id,
-      bountyPath: `/${app.bounty.space.domain}/${app.bounty.page?.path}`,
-      bountyTitle: app.bounty.page?.title,
-      createdAt: app.createdAt.toISOString(),
-      organizationId: app.spaceId,
-      eventName: (app.status === 'complete' || app.status === 'paid') ? 'bounty_completed' : 'bounty_started'
-    }))
+    ...bountiesCreated.map(
+      (bounty): ProfileBountyEvent => ({
+        bountyId: bounty.id,
+        bountyPath: `/${bounty.space.domain}/${bounty.page?.path}`,
+        bountyTitle: bounty.page?.title,
+        createdAt: bounty.createdAt.toISOString(),
+        organizationId: bounty.spaceId,
+        eventName: 'bounty_created'
+      })
+    ),
+    ...bountyApplications.map(
+      (app): ProfileBountyEvent => ({
+        bountyId: app.bounty.id,
+        bountyPath: `/${app.bounty.space.domain}/${app.bounty.page?.path}`,
+        bountyTitle: app.bounty.page?.title,
+        createdAt: app.createdAt.toISOString(),
+        organizationId: app.spaceId,
+        eventName: app.status === 'complete' || app.status === 'paid' ? 'bounty_completed' : 'bounty_started'
+      })
+    )
   ];
 
   const sortedCommunities = combineCommunityData({

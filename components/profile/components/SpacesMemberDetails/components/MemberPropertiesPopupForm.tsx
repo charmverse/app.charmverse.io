@@ -22,7 +22,15 @@ type Props = {
   children?: ReactNode;
 };
 
-export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', children, memberId, spaceId, updateMemberPropertyValues, onClose, title = 'Edit workspace profile' }: Props) {
+export function MemberPropertiesPopupForm({
+  cancelButtonText = 'Cancel',
+  children,
+  memberId,
+  spaceId,
+  updateMemberPropertyValues,
+  onClose,
+  title = 'Edit workspace profile'
+}: Props) {
   const { data, mutate } = useSWR(
     spaceId ? `members/${memberId}/values/${spaceId}` : null,
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
@@ -43,15 +51,22 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
     return undefined;
   }, [data]);
 
-  const { control, handleSubmit, formState: { errors, isSubmitting, isDirty }, reset } = useForm();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+    reset
+  } = useForm();
 
   const onSubmit = async (submitData: any) => {
     if (!spaceId) {
       return;
     }
 
-    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData)
-      .map(key => ({ memberPropertyId: key, value: submitData[key] }));
+    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
+      memberPropertyId: key,
+      value: submitData[key]
+    }));
 
     await updateMemberPropertyValues(spaceId, updateData);
     showMessage('Profile updated successfully', 'success');
@@ -68,47 +83,58 @@ export function MemberPropertiesPopupForm ({ cancelButtonText = 'Cancel', childr
 
   return (
     <Dialog open={!!spaceId} onClose={onClose} fullWidth>
-      {
-        !data ? <DialogContent><LoadingComponent isLoading /></DialogContent> : (
-          <>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogContent dividers>
-              {children}
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Box display='flex' flexDirection='column'>
-                  {data.map(property => {
-                    const fieldRendererConfig = getFieldRendererConfig({
-                      type: property.type,
-                      label: property.name,
-                      error: errors[property.memberPropertyId],
-                      inline: true,
-                      options: property.options,
-                      onCreateOption: (option) => createOption(property, option),
-                      onUpdateOption: (option) => updateOption(property, option),
-                      onDeleteOption: (option) => deleteOption(property, option)
-                    });
+      {!data ? (
+        <DialogContent>
+          <LoadingComponent isLoading />
+        </DialogContent>
+      ) : (
+        <>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogContent dividers>
+            {children}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Box display='flex' flexDirection='column'>
+                {data.map((property) => {
+                  const fieldRendererConfig = getFieldRendererConfig({
+                    type: property.type,
+                    label: property.name,
+                    error: errors[property.memberPropertyId],
+                    inline: true,
+                    options: property.options,
+                    onCreateOption: (option) => createOption(property, option),
+                    onUpdateOption: (option) => updateOption(property, option),
+                    onDeleteOption: (option) => deleteOption(property, option)
+                  });
 
-                    return fieldRendererConfig.renderer
-                      ? (
-                        <Controller
-                          key={property.memberPropertyId}
-                          name={property.memberPropertyId}
-                          control={control}
-                          rules={fieldRendererConfig.rules}
-                          render={fieldRendererConfig.renderer}
-                        />
-                      ) : null;
-                  })}
-                </Box>
-              </form>
-              <DialogActions>
-                <Button data-test='close-member-properties-modal' onClick={onClose} variant='text' color='secondary' sx={{ px: 4 }}>{cancelButtonText}</Button>
-                <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>Save</Button>
-              </DialogActions>
-            </DialogContent>
-          </>
-        )
-      }
+                  return fieldRendererConfig.renderer ? (
+                    <Controller
+                      key={property.memberPropertyId}
+                      name={property.memberPropertyId}
+                      control={control}
+                      rules={fieldRendererConfig.rules}
+                      render={fieldRendererConfig.renderer}
+                    />
+                  ) : null;
+                })}
+              </Box>
+            </form>
+            <DialogActions>
+              <Button
+                data-test='close-member-properties-modal'
+                onClick={onClose}
+                variant='text'
+                color='secondary'
+                sx={{ px: 4 }}
+              >
+                {cancelButtonText}
+              </Button>
+              <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} loading={isSubmitting} sx={{ px: 4 }}>
+                Save
+              </Button>
+            </DialogActions>
+          </DialogContent>
+        </>
+      )}
     </Dialog>
   );
 }

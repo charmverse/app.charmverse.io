@@ -16,7 +16,7 @@ export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')
 });
 
-type FormValues = yup.InferType<typeof schema>
+type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
   submitted?: (value: Partial<Role>) => void;
@@ -24,14 +24,10 @@ interface Props {
   mode: 'create' | 'edit';
 }
 
-export default function RoleForm ({ role = {}, mode = 'create', submitted = () => {} }: Props) {
-
+export default function RoleForm({ role = {}, mode = 'create', submitted = () => {} }: Props) {
   const [formError, setFormError] = useState<ISystemError | null>(null);
 
-  const {
-    createRole,
-    updateRole
-  } = useRoles();
+  const { createRole, updateRole } = useRoles();
 
   const {
     register,
@@ -47,37 +43,34 @@ export default function RoleForm ({ role = {}, mode = 'create', submitted = () =
 
   return (
     <form
-      onSubmit={handleSubmit(formValue => {
+      onSubmit={handleSubmit((formValue) => {
         setFormError(null);
         if (mode === 'edit') {
           updateRole({
             ...role,
             ...formValue
-          }).then((updatedRole) => {
-            submitted(updatedRole);
           })
-            .catch(error => {
+            .then((updatedRole) => {
+              submitted(updatedRole);
+            })
+            .catch((error) => {
               setFormError(error);
             });
-        }
-        else {
+        } else {
           createRole(formValue)
             .then((newRole) => {
               submitted(newRole);
             })
-            .catch(error => {
+            .catch((error) => {
               setFormError(error);
             });
         }
-
       })}
       style={{ margin: 'auto' }}
     >
       <Grid container direction='column' spacing={3}>
         <Grid item>
-          <InputLabel>
-            Role name
-          </InputLabel>
+          <InputLabel>Role name</InputLabel>
           <TextField
             {...register('name')}
             autoFocus
@@ -86,29 +79,20 @@ export default function RoleForm ({ role = {}, mode = 'create', submitted = () =
             type='text'
             fullWidth
           />
-          {
-                errors?.name && (
-                  <Alert severity='error'>
-                    {errors.name.message}
-                  </Alert>
-                )
-              }
+          {errors?.name && <Alert severity='error'>{errors.name.message}</Alert>}
         </Grid>
 
-        {
-          formError && (
-            <Grid item>
-              <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
-            </Grid>
-          )
-        }
+        {formError && (
+          <Grid item>
+            <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
+          </Grid>
+        )}
         <Grid item>
-          <Button disabled={!isValid} type='submit'>{mode === 'edit' ? 'Rename role' : 'Create role'}</Button>
+          <Button disabled={!isValid} type='submit'>
+            {mode === 'edit' ? 'Rename role' : 'Create role'}
+          </Button>
         </Grid>
-
       </Grid>
-
     </form>
   );
-
 }

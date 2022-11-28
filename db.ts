@@ -6,8 +6,9 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma = global.prisma
-  || new PrismaClient({
+export const prisma =
+  global.prisma ||
+  new PrismaClient({
     //    log: ['query']
   });
 
@@ -16,9 +17,8 @@ if (process.env.NODE_ENV === 'development') {
   global.prisma = prisma;
 }
 
-export type TransactionClient = PrismaClient | Prisma.TransactionClient
+export type TransactionClient = PrismaClient | Prisma.TransactionClient;
 
 // Pass a transaction from outer scope of function calling this
-export type Transaction = { tx: TransactionClient }
-export type OptionalTransaction = Partial<Transaction>
-
+export type Transaction = { tx: TransactionClient };
+export type OptionalTransaction = Partial<Transaction>;

@@ -15,36 +15,39 @@ import { handleNoProfile } from './index';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .post(addWalletsController);
+handler.post(addWalletsController);
 
-async function addWalletsController (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
-
+async function addWalletsController(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   let user: LoggedInUser & { addressesToAdd?: AuthSig[] };
 
   const addressesToAdd = req.body.addressesToAdd as AuthSig[];
 
   for (const addressToVerify of addressesToAdd) {
-    if (!isValidWalletSignature({ address: addressToVerify.address, signature: addressToVerify, host: req.headers.origin as string })) {
+    if (
+      !isValidWalletSignature({
+        address: addressToVerify.address,
+        signature: addressToVerify,
+        host: req.headers.origin as string
+      })
+    ) {
       throw new InsecureOperationError('Could not verify wallet');
     }
   }
 
   await prisma.userWallet.createMany({
-    data: addressesToAdd.map(signature => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
+    data: addressesToAdd.map((signature) => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
   });
 
-  const updatedProfile = await prisma.user.findUnique({
+  const updatedProfile = (await prisma.user.findUnique({
     where: {
       id: req.session.user.id
     },
     include: sessionUserRelations
-  }) as LoggedInUser;
+  })) as LoggedInUser;
 
   if (!updatedProfile) {
     return handleNoProfile(req, res);
-  }
-  else {
+  } else {
     user = updatedProfile;
   }
 
@@ -54,4 +57,3 @@ async function addWalletsController (req: NextApiRequest, res: NextApiResponse<L
 }
 
 export default withSessionRoute(handler);
-

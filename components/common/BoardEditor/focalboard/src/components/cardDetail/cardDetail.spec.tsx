@@ -52,21 +52,12 @@ describe('components/cardDetail/CardDetail', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       users: {
-        workspaceUsers: [
-          { username: 'username_1' }
-        ]
+        workspaceUsers: [{ username: 'username_1' }]
       }
     });
 
     const component = (
-      <ReduxProvider store={store}>
-        {wrapIntl(
-          <CardDetail
-            card={card}
-            readOnly={false}
-          />
-        )}
-      </ReduxProvider>
+      <ReduxProvider store={store}>{wrapIntl(<CardDetail card={card} readOnly={false} />)}</ReduxProvider>
     );
 
     let container: Element | DocumentFragment | null = null;
@@ -91,21 +82,12 @@ describe('components/cardDetail/CardDetail', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       users: {
-        workspaceUsers: [
-          { username: 'username_1' }
-        ]
+        workspaceUsers: [{ username: 'username_1' }]
       }
     });
 
     const component = (
-      <ReduxProvider store={store}>
-        {wrapIntl(
-          <CardDetail
-            card={card}
-            readOnly={true}
-          />
-        )}
-      </ReduxProvider>
+      <ReduxProvider store={store}>{wrapIntl(<CardDetail card={card} readOnly={true} />)}</ReduxProvider>
     );
 
     let container: Element | DocumentFragment | null = null;

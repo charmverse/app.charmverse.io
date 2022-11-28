@@ -20,9 +20,7 @@ beforeAll(async () => {
 });
 
 describe('GET /databases/{id}', () => {
-
   it('should respond with 200 status and the created database', async () => {
-
     const database = await createDatabase({
       createdBy: user.id,
       spaceId: space.id,
@@ -51,18 +49,15 @@ describe('GET /databases/{id}', () => {
   });
 
   it('should respond with 401 status when an invalid API key is provided', async () => {
-
     const response = await request(baseUrl)
       .get(`/api/v1/databases/${v4()}`)
       .set('Authorization', `Bearer ${v4()}`)
       .send({});
 
     expect(response.statusCode).toBe(401);
-
   });
 
   it('should respond with 404 status when the database exists, but the API token belongs to a different space', async () => {
-
     const database = await createDatabase({
       createdBy: user.id,
       spaceId: space.id,
@@ -77,19 +72,14 @@ describe('GET /databases/{id}', () => {
       .send({});
 
     expect(response.statusCode).toBe(404);
-
   });
 
   it('should respond with 404 status when the database does not exist', async () => {
-
     const response = await request(baseUrl)
       .get(`/api/v1/databases/${v4()}`)
       .set('Authorization', `Bearer ${apiToken.token}`)
       .send({});
 
     expect(response.statusCode).toBe(404);
-
   });
-
 });
-

@@ -8,36 +8,36 @@ export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as 
 export type VoteStatusType = typeof VOTE_STATUS[number];
 
 export interface VoteOptionsDTO {
-    name: string;
-    threshold?: number;
+  name: string;
+  threshold?: number;
 }
 
-export interface VoteDTO extends Omit<Vote, 'id'|'status'|'createdAt'> {
-    voteOptions: string[];
+export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt'> {
+  voteOptions: string[];
 }
 
 export interface UpdateVoteDTO {
-    status: VoteStatusType;
+  status: VoteStatusType;
 }
 
 export interface UserVoteDTO {
-    choice: string;
+  choice: string;
 }
 export interface ExtendedVote extends Vote {
-    aggregatedResult: Record<string, number>;
-    voteOptions: VoteOptions[];
-    userChoice: null | string;
-    totalVotes: number;
+  aggregatedResult: Record<string, number>;
+  voteOptions: VoteOptions[];
+  userChoice: null | string;
+  totalVotes: number;
 }
 
 export type VoteTask = ExtendedVote & {
   page: PageMeta;
   space: Space;
-}
+};
 
 export type UserVoteExtendedDTO = UserVote & {
   user: Pick<User, 'avatar' | 'username'>;
-}
+};
 
 export interface SpaceVotesRequest {
   userId: string;

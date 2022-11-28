@@ -10,8 +10,7 @@ interface CommunitiesData {
   bounties: ProfileBountyEvent[];
 }
 
-export function combineCommunityData (params: CommunitiesData): CommunityDetails[] {
-
+export function combineCommunityData(params: CommunitiesData): CommunityDetails[] {
   const { communities, proposals, votes, bounties } = params;
 
   const communityMap = communities.reduce<Record<string, CommunityDetails>>((acc, org) => {
@@ -29,34 +28,34 @@ export function combineCommunityData (params: CommunitiesData): CommunityDetails
 
   proposals
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .forEach(event => {
+    .forEach((event) => {
       const organization = communityMap[event.organizationId];
       organization?.proposals.push(event);
     });
 
   votes
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .forEach(event => {
+    .forEach((event) => {
       const organization = communityMap[event.organizationId];
       organization?.votes.push(event);
     });
 
   bounties
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .forEach(event => {
+    .forEach((event) => {
       const organization = communityMap[event.organizationId];
       organization?.bounties.push(event);
     });
 
   const communitiesResult = Object.values(communityMap)
-    .map(community => {
+    .map((community) => {
       const commEvents = [...community.proposals, ...community.votes, ...community.bounties];
       commEvents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       community.joinDate ||= commEvents[0]?.createdAt;
       community.latestEventDate = commEvents[commEvents.length - 1]?.createdAt;
       return community;
     })
-    .sort((commA, commB) => commA.joinDate > commB.joinDate ? -1 : 1);
+    .sort((commA, commB) => (commA.joinDate > commB.joinDate ? -1 : 1));
 
   return communitiesResult;
 }

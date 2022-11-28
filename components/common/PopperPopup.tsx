@@ -15,7 +15,7 @@ interface PopperPopupProps {
   onClick?: () => void;
 }
 
-export default function PopperPopup (props: PopperPopupProps) {
+export default function PopperPopup(props: PopperPopupProps) {
   const { closeOnClick = false, popupContent, children, autoOpen = false, onClose, onOpen } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
@@ -72,20 +72,12 @@ export default function PopperPopup (props: PopperPopupProps) {
   return (
     <div ref={toggleRef}>
       {children && (
-        <div
-          {...popoverToggleProps}
-          onMouseDown={e => e.preventDefault()}
-        >
+        <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()}>
           {children}
         </div>
       )}
-      <Popover
-        disableRestoreFocus
-        {...popoverProps}
-      >
-        <Paper>
-          {popupContent}
-        </Paper>
+      <Popover disableRestoreFocus {...popoverProps}>
+        <Paper>{popupContent}</Paper>
       </Popover>
     </div>
   );

@@ -27,7 +27,8 @@ beforeAll(async () => {
     userId: user.id,
     submissionContent: {
       submission: 'Hello World',
-      submissionNodes: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+      submissionNodes:
+        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
       walletAddress: '0x123456789'
     }
   });
@@ -44,7 +45,7 @@ describe('createTransaction', () => {
     expect(transaction).not.toBeNull();
   });
 
-  it('Should throw error if application doesn\'t exist', async () => {
+  it("Should throw error if application doesn't exist", async () => {
     const applicationId = v4();
     try {
       await createTransaction({
@@ -53,8 +54,7 @@ describe('createTransaction', () => {
         transactionId: '123'
       });
       throw new ExpectedAnError();
-    }
-    catch (err: any) {
+    } catch (err: any) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });

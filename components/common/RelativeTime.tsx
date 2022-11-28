@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-function convertToUnixSeconds (timestamp: number | Date): number {
+function convertToUnixSeconds(timestamp: number | Date): number {
   if (timestamp instanceof Date) {
     timestamp = timestamp.valueOf();
   }
@@ -11,14 +11,11 @@ function convertToUnixSeconds (timestamp: number | Date): number {
   return timestamp;
 }
 
-function timestampDifferenceInSeconds (
-  first: number | Date,
-  second: number | Date
-): number {
+function timestampDifferenceInSeconds(first: number | Date, second: number | Date): number {
   return Math.floor(convertToUnixSeconds(first) - convertToUnixSeconds(second));
 }
 
-export function RelativeTime ({ timestamp }: { timestamp: number | Date }) {
+export function RelativeTime({ timestamp }: { timestamp: number | Date }) {
   const [, refreshLabel] = useState('');
 
   const now = Date.now();

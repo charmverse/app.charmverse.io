@@ -3,7 +3,7 @@ import type { MemberProperty } from '@prisma/client';
 import type { Social } from 'components/profile/interfaces';
 import type { Member } from 'lib/members/interfaces';
 
-export function sortMembers (members: Member[], property: MemberProperty) {
+export function sortMembers(members: Member[], property: MemberProperty) {
   switch (property.type) {
     case 'phone':
     case 'email':
@@ -11,14 +11,14 @@ export function sortMembers (members: Member[], property: MemberProperty) {
     case 'text_multiline':
     case 'url':
       return members.sort((memA, memB) => {
-        const memberAProperty = memA.properties.find(prop => prop.memberPropertyId === property.id);
-        const memberBProperty = memB.properties.find(prop => prop.memberPropertyId === property.id);
+        const memberAProperty = memA.properties.find((prop) => prop.memberPropertyId === property.id);
+        const memberBProperty = memB.properties.find((prop) => prop.memberPropertyId === property.id);
         return (memberAProperty?.value ?? '') > (memberBProperty?.value ?? '') ? 1 : -1;
       });
     case 'name':
       return members.sort((memA, memB) => {
-        const memberAProperty = memA.properties.find(prop => prop.memberPropertyId === property.id);
-        const memberBProperty = memB.properties.find(prop => prop.memberPropertyId === property.id);
+        const memberAProperty = memA.properties.find((prop) => prop.memberPropertyId === property.id);
+        const memberBProperty = memB.properties.find((prop) => prop.memberPropertyId === property.id);
         // Use username if value is empty
         return (memberAProperty?.value ?? memA.username) > (memberBProperty?.value ?? memB.username) ? 1 : -1;
       });
@@ -38,7 +38,7 @@ export function sortMembers (members: Member[], property: MemberProperty) {
     }
     case 'join_date': {
       return members.sort((memA, memB) => {
-        return (memA.joinDate) > (memB.joinDate) ? 1 : -1;
+        return memA.joinDate > memB.joinDate ? 1 : -1;
       });
     }
     case 'twitter': {
@@ -50,8 +50,8 @@ export function sortMembers (members: Member[], property: MemberProperty) {
     }
     case 'number': {
       return members.sort((memA, memB) => {
-        const memberAProperty = memA.properties.find(prop => prop.memberPropertyId === property.id);
-        const memberBProperty = memB.properties.find(prop => prop.memberPropertyId === property.id);
+        const memberAProperty = memA.properties.find((prop) => prop.memberPropertyId === property.id);
+        const memberBProperty = memB.properties.find((prop) => prop.memberPropertyId === property.id);
         return (memberAProperty?.value ?? 0) > (memberBProperty?.value ?? 0) ? 1 : -1;
       });
     }

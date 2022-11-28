@@ -26,13 +26,7 @@ describe('/components/confirmationDialogBox', () => {
     let container;
 
     await act(async () => {
-      const result = render(
-        wrapDNDIntl(
-          <ConfirmationDialogBox
-            dialogBox={dialogPropsWithCnfrmBtnText}
-          />
-        )
-      );
+      const result = render(wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogPropsWithCnfrmBtnText} />));
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -41,22 +35,14 @@ describe('/components/confirmationDialogBox', () => {
   it('confirmDialog with Confirm Button Text should match snapshot', async () => {
     let containerWithCnfrmBtnText;
     await act(async () => {
-      const result = render(
-        wrapDNDIntl(
-          <ConfirmationDialogBox
-            dialogBox={dialogPropsWithCnfrmBtnText}
-          />
-        )
-      );
+      const result = render(wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogPropsWithCnfrmBtnText} />));
       containerWithCnfrmBtnText = result.container;
     });
     expect(containerWithCnfrmBtnText).toMatchSnapshot();
   });
 
   it('confirm button click, run onConfirm Function once', () => {
-    const result = render(
-      wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogProps} />)
-    );
+    const result = render(wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogProps} />));
 
     userEvent.click(result.getByTitle('Confirm'));
     expect(dialogProps.onConfirm).toBeCalledTimes(1);
@@ -64,26 +50,16 @@ describe('/components/confirmationDialogBox', () => {
 
   it('confirm button (with passed prop text), run onConfirm Function once', () => {
     const resultWithConfirmBtnText = render(
-      wrapDNDIntl(
-        <ConfirmationDialogBox
-          dialogBox={dialogPropsWithCnfrmBtnText}
-        />
-      )
+      wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogPropsWithCnfrmBtnText} />)
     );
 
-    userEvent.click(
-      resultWithConfirmBtnText.getByTitle(dialogPropsWithCnfrmBtnText.confirmButtonText)
-    );
+    userEvent.click(resultWithConfirmBtnText.getByTitle(dialogPropsWithCnfrmBtnText.confirmButtonText));
 
     expect(dialogPropsWithCnfrmBtnText.onConfirm).toBeCalledTimes(1);
   });
 
   it('cancel button click runs onClose function', () => {
-    const result = render(wrapDNDIntl(
-      <ConfirmationDialogBox
-        dialogBox={dialogProps}
-      />
-    ));
+    const result = render(wrapDNDIntl(<ConfirmationDialogBox dialogBox={dialogProps} />));
 
     userEvent.click(result.getByTitle('Cancel'));
     expect(dialogProps.onClose).toBeCalledTimes(1);

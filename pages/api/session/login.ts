@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -15,11 +14,9 @@ import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireWalletSignature)
-  .post(login);
+handler.use(requireWalletSignature).post(login);
 
-async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
   const { address } = req.body as Web3LoginRequest;
 
   const user = await prisma.user.findFirst({
@@ -38,7 +35,10 @@ async function login (req: NextApiRequest, res: NextApiResponse<LoggedInUser | {
   }
 
   req.session.user = { id: user.id };
-  await updateGuildRolesForUser(user.wallets.map(w => w.address), user.spaceRoles);
+  await updateGuildRolesForUser(
+    user.wallets.map((w) => w.address),
+    user.spaceRoles
+  );
   await req.session.save();
 
   trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });

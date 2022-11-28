@@ -7,7 +7,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 
 import charmClient from 'charmClient';
 
-export async function uploadToS3 (file: File) {
+export async function uploadToS3(file: File) {
   const data = await charmClient.uploadToS3(file);
 
   const client = new S3Client({

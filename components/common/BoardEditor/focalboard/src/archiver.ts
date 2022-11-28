@@ -10,17 +10,17 @@ import { Utils } from './utils';
 declare let window: IAppWindow;
 
 class Archiver {
-  static async exportBoardArchive (board: Board): Promise<void> {
+  static async exportBoardArchive(board: Board): Promise<void> {
     const blocks = await mutator.exportArchive(board.id);
     this.exportArchive(blocks);
   }
 
-  static async exportFullArchive (): Promise<void> {
+  static async exportFullArchive(): Promise<void> {
     const blocks = await mutator.exportArchive();
     this.exportArchive(blocks);
   }
 
-  private static exportArchive (blocks: readonly Block[]): void {
+  private static exportArchive(blocks: readonly Block[]): void {
     const content = ArchiveUtils.buildBlockArchive(blocks);
 
     const date = new Date();
@@ -44,7 +44,7 @@ class Archiver {
     // TODO: Remove or reuse link
   }
 
-  private static async importBlocksFromFile (file: File): Promise<void> {
+  private static async importBlocksFromFile(file: File): Promise<void> {
     let blockCount = 0;
     const maxBlocksPerImport = 1000;
     let blocks: Block[] = [];
@@ -69,8 +69,7 @@ class Archiver {
             const date = new Date(header.date);
             Utils.log(`Import archive, version: ${header.version}, date/time: ${date.toLocaleString()}.`);
           }
-        }
-        else {
+        } else {
           const row = JSON.parse(line) as ArchiveLine;
           if (!row || !row.type || !row.data) {
             Utils.logError('importFullArchive ERROR parsing line');
@@ -92,14 +91,14 @@ class Archiver {
               break;
             }
             default:
-              // nothing
+            // nothing
           }
         }
       });
     });
   }
 
-  static isValidBlock (block: Block): boolean {
+  static isValidBlock(block: Block): boolean {
     if (!block.id || !block.rootId) {
       return false;
     }
@@ -107,7 +106,7 @@ class Archiver {
     return true;
   }
 
-  static importFullArchive (onComplete?: () => void): void {
+  static importFullArchive(onComplete?: () => void): void {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.focalboard';

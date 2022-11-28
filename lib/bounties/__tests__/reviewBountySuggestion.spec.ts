@@ -1,11 +1,14 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { countValidSubmissions } from 'lib/applications/shared';
 import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { generateUserAndSpaceWithApiToken, generateBountyWithSingleApplication, generateBounty } from 'testing/setupDatabase';
+import {
+  generateUserAndSpaceWithApiToken,
+  generateBountyWithSingleApplication,
+  generateBounty
+} from 'testing/setupDatabase';
 
 import { createApplication, createSubmission } from '../../applications/actions';
 import { closeOutBounty } from '../closeOutBounty';
@@ -20,7 +23,6 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   space = generated.space;
-
 });
 
 describe('reviewBountySuggestion', () => {
@@ -70,25 +72,21 @@ describe('reviewBountySuggestion', () => {
         decision: 'reject'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(WrongStateError);
     }
-
   });
 
   // See rollupBountyStatus for how this works
 
   it('should fail if the bounty does not exist', async () => {
-
     try {
       await reviewBountySuggestion({
         bountyId: v4(),
         decision: 'approve'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });

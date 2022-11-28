@@ -1,4 +1,3 @@
-
 import { createIntl } from 'react-intl';
 
 import type { IAppWindow } from './types';
@@ -41,12 +40,15 @@ describe('utils', () => {
 
   describe('htmlFromMarkdown', () => {
     test('should not allow XSS on links href on the webapp', () => {
-      expect(Utils.htmlFromMarkdown('[]("xss-attack="true"other="whatever)')).toBe('<p><a target="_blank" rel="noreferrer" href="%22xss-attack=%22true%22other=%22whatever" title="" onclick=""></a></p>');
+      expect(Utils.htmlFromMarkdown('[]("xss-attack="true"other="whatever)')).toBe(
+        '<p><a target="_blank" rel="noreferrer" href="%22xss-attack=%22true%22other=%22whatever" title="" onclick=""></a></p>'
+      );
     });
 
     test('should not allow XSS on links href on the desktop app', () => {
       window.openInNewBrowser = () => null;
-      const expectedHtml = '<p><a target="_blank" rel="noreferrer" href="%22xss-attack=%22true%22other=%22whatever" title="" onclick=" openInNewBrowser && openInNewBrowser(event.target.href);"></a></p>';
+      const expectedHtml =
+        '<p><a target="_blank" rel="noreferrer" href="%22xss-attack=%22true%22other=%22whatever" title="" onclick=" openInNewBrowser && openInNewBrowser(event.target.href);"></a></p>';
       expect(Utils.htmlFromMarkdown('[]("xss-attack="true"other="whatever)')).toBe(expectedHtml);
       window.openInNewBrowser = null;
     });

@@ -26,30 +26,30 @@ interface Props {
   refetchInvites: VoidFunction;
 }
 
-export default function InvitesTable (props: Props) {
+export default function InvitesTable(props: Props) {
   const { isAdmin, invites, onDelete, refetchInvites } = props;
   const space = useCurrentSpace();
 
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
 
-  function onCopy (id: string) {
+  function onCopy(id: string) {
     setCopied({ [id]: true });
     setTimeout(() => setCopied({ [id]: false }), 1000);
   }
 
-  async function updateInviteLinkRoles (inviteLinkId: string, roleIds: string[]) {
+  async function updateInviteLinkRoles(inviteLinkId: string, roleIds: string[]) {
     if (space) {
       await charmClient.updateInviteLinkRoles(inviteLinkId, space.id, roleIds);
       refetchInvites();
     }
   }
 
-  async function deleteRoleFromInviteLink (inviteLinkId: string, roleId: string) {
-    const inviteLink = invites.find(invite => invite.id === inviteLinkId);
+  async function deleteRoleFromInviteLink(inviteLinkId: string, roleId: string) {
+    const inviteLink = invites.find((invite) => invite.id === inviteLinkId);
     if (inviteLink && space) {
       const roleIds = inviteLink.inviteLinkToRoles
-        .map(inviteLinkToRole => inviteLinkToRole.roleId)
-        .filter(inviteLinkRoleId => inviteLinkRoleId !== roleId);
+        .map((inviteLinkToRole) => inviteLinkToRole.roleId)
+        .filter((inviteLinkRoleId) => inviteLinkRoleId !== roleId);
       await updateInviteLinkRoles(inviteLinkId, roleIds);
     }
   }
@@ -65,21 +65,23 @@ export default function InvitesTable (props: Props) {
             <TableCell>Uses</TableCell>
             <TableCell>Expires</TableCell>
             <TableCell sx={{ width: 150 }}>Assigned Role</TableCell>
-            <TableCell sx={{ width: 90 + padding }} align='center'>Link</TableCell>
+            <TableCell sx={{ width: 90 + padding }} align='center'>
+              Link
+            </TableCell>
             <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {invites.length === 0 && (
             <TableRow>
-              <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>This Workspace has no Invite Links</TableCell>
+              <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>
+                This Workspace has no Invite Links
+              </TableCell>
             </TableRow>
           )}
           {invites.map((invite) => (
             <TableRow key={invite.id}>
-              <TableCell sx={{ padding: '20px 16px' }}>
-                Private Link
-              </TableCell>
+              <TableCell sx={{ padding: '20px 16px' }}>Private Link</TableCell>
               <TableCell>
                 <Typography>
                   {invite.useCount}
@@ -90,7 +92,7 @@ export default function InvitesTable (props: Props) {
               <TableCell width={150}>
                 <TokenGateRolesSelect
                   isAdmin={isAdmin}
-                  selectedRoleIds={invite.inviteLinkToRoles.map(inviteLinkToRole => inviteLinkToRole.roleId)}
+                  selectedRoleIds={invite.inviteLinkToRoles.map((inviteLinkToRole) => inviteLinkToRole.roleId)}
                   onChange={(roleIds) => {
                     updateInviteLinkRoles(invite.id, roleIds);
                   }}
@@ -108,7 +110,14 @@ export default function InvitesTable (props: Props) {
                 >
                   <Box component='span'>
                     <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
-                      <Chip sx={{ width: 90 }} clickable color='secondary' size='small' variant='outlined' label={copied[invite.id] ? 'Copied!' : 'Copy Link'} />
+                      <Chip
+                        sx={{ width: 90 }}
+                        clickable
+                        color='secondary'
+                        size='small'
+                        variant='outlined'
+                        label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                      />
                     </CopyToClipboard>
                   </Box>
                 </Tooltip>
@@ -136,13 +145,13 @@ export default function InvitesTable (props: Props) {
   );
 }
 
-function getInviteLink (code: string) {
+function getInviteLink(code: string) {
   return `${window.location.origin}/invite/${code}`;
 }
 
-function getExpires (invite: InviteLinkPopulated) {
+function getExpires(invite: InviteLinkPopulated) {
   if (invite.maxAgeMinutes > 0) {
-    const expireDate = new Date(invite.createdAt).getTime() + (invite.maxAgeMinutes * 60 * 1000);
+    const expireDate = new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000;
     if (expireDate < Date.now()) {
       return (
         <Tooltip arrow placement='top' title={`Expired on ${new Date(expireDate).toDateString()}`}>
@@ -152,7 +161,9 @@ function getExpires (invite: InviteLinkPopulated) {
     }
     return (
       <Tooltip arrow placement='top' title={`Expires on ${new Date(expireDate).toDateString()}`}>
-        <span><Countdown date={expireDate} /></span>
+        <span>
+          <Countdown date={expireDate} />
+        </span>
       </Tooltip>
     );
   }

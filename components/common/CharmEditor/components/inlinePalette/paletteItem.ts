@@ -7,12 +7,13 @@ export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
 export const PALETTE_ITEM_HINT_TYPE = 'HINT_TYPE';
 const allTypes = [PALETTE_ITEM_HINT_TYPE, PALETTE_ITEM_REGULAR_TYPE];
 
-export type PromisedCommand = ((state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView) => boolean | Promise<boolean>)
+export type PromisedCommand = (
+  state: EditorState,
+  dispatch?: (tr: Transaction) => void,
+  view?: EditorView
+) => boolean | Promise<boolean>;
 
-type EditorExecuteCommand = (arg: {
-  item: InlinePaletteItem;
-  itemIndex: number;
-}) => PromisedCommand;
+type EditorExecuteCommand = (arg: { item: InlinePaletteItem; itemIndex: number }) => PromisedCommand;
 
 /**
  * @requiredSpacePermission Optional parameter. If this is provided, the palette item should not be available to a user without this space permission.
@@ -37,7 +38,7 @@ export interface PaletteItemType extends PaletteItemTypeNoGroup {
 }
 
 export class PaletteItem implements PaletteItemType {
-  static create (obj: PaletteItemType) {
+  static create(obj: PaletteItemType) {
     return new PaletteItem(obj);
   }
 
@@ -67,7 +68,7 @@ export class PaletteItem implements PaletteItemType {
 
   keybinding?: string;
 
-  constructor (obj: PaletteItemType) {
+  constructor(obj: PaletteItemType) {
     const {
       uid,
       title,
@@ -87,11 +88,7 @@ export class PaletteItem implements PaletteItemType {
     } = obj;
 
     if (Object.keys(otherKeys).length > 0) {
-      throw new Error(
-        `PaletteItem: the following fields are not recognized "${Object.keys(
-          otherKeys
-        ).join(',')}"`
-      );
+      throw new Error(`PaletteItem: the following fields are not recognized "${Object.keys(otherKeys).join(',')}"`);
     }
     if (!allTypes.includes(type)) {
       throw new Error(`PaletteItem: Unknown type ${type}`);

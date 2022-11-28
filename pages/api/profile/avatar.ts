@@ -16,11 +16,9 @@ import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .put(updateAvatar);
+handler.use(requireUser).put(updateAvatar);
 
-async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
+async function updateAvatar(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const { avatar, avatarTokenId, avatarContract, avatarChain } = req.body as UserAvatar;
   const { id: userId } = req.session.user;
 
@@ -39,8 +37,8 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
     const user = await getUserProfile('id', req.session.user.id);
     const owners = await alchemyApi.getOwners(updatedContract, updatedTokenId, avatarChain);
 
-    const isOwner = user?.wallets.some(a => {
-      return owners.find(o => o.toLowerCase() === a.address.toLowerCase());
+    const isOwner = user?.wallets.some((a) => {
+      return owners.find((o) => o.toLowerCase() === a.address.toLowerCase());
     });
 
     if (!isOwner) {
@@ -54,7 +52,6 @@ async function updateAvatar (req: NextApiRequest, res: NextApiResponse<LoggedInU
       const { url } = await uploadUrlToS3({ pathInS3, url: nft.image });
       avatarUrl = url;
     }
-
   }
 
   const user = await prisma.user.update({

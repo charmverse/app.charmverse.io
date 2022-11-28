@@ -1,4 +1,3 @@
-
 import { createIntl } from 'react-intl';
 
 import type { IPropertyTemplate } from '../../blocks/board';
@@ -148,7 +147,12 @@ describe('components/calculations/calculation logic', () => {
     updatedBy: { id: 'property_lastUpdatedBy', type: 'updatedBy', name: '', options: [] }
   };
 
-  const autofilledProperties = new Set([properties.createdBy, properties.createdTime, properties.updatedBy, properties.updatedTime]);
+  const autofilledProperties = new Set([
+    properties.createdBy,
+    properties.createdTime,
+    properties.updatedBy,
+    properties.updatedTime
+  ]);
 
   const intl = createIntl({ locale: 'en-us' });
 
@@ -160,32 +164,40 @@ describe('components/calculations/calculation logic', () => {
   });
 
   // testing count empty
-  Object.values(properties).filter((p) => !autofilledProperties.has(p)).forEach((property) => {
-    it(`should correctly count empty for property type "${property.type}"`, () => {
-      expect(Calculations.countEmpty(cards, property, intl)).toBe('1');
+  Object.values(properties)
+    .filter((p) => !autofilledProperties.has(p))
+    .forEach((property) => {
+      it(`should correctly count empty for property type "${property.type}"`, () => {
+        expect(Calculations.countEmpty(cards, property, intl)).toBe('1');
+      });
     });
-  });
 
   // testing percent empty
-  Object.values(properties).filter((p) => !autofilledProperties.has(p)).forEach((property) => {
-    it(`should correctly compute empty percent for property type "${property.type}"`, () => {
-      expect(Calculations.percentEmpty(cards, property, intl)).toBe('25%');
+  Object.values(properties)
+    .filter((p) => !autofilledProperties.has(p))
+    .forEach((property) => {
+      it(`should correctly compute empty percent for property type "${property.type}"`, () => {
+        expect(Calculations.percentEmpty(cards, property, intl)).toBe('25%');
+      });
     });
-  });
 
   // testing count not empty
-  Object.values(properties).filter((p) => !autofilledProperties.has(p)).forEach((property) => {
-    it(`should correctly count not empty for property type "${property.type}"`, () => {
-      expect(Calculations.countNotEmpty(cards, property, intl)).toBe('3');
+  Object.values(properties)
+    .filter((p) => !autofilledProperties.has(p))
+    .forEach((property) => {
+      it(`should correctly count not empty for property type "${property.type}"`, () => {
+        expect(Calculations.countNotEmpty(cards, property, intl)).toBe('3');
+      });
     });
-  });
 
   // testing percent not empty
-  Object.values(properties).filter((p) => !autofilledProperties.has(p)).forEach((property) => {
-    it(`should correctly compute not empty percent for property type "${property.type}"`, () => {
-      expect(Calculations.percentNotEmpty(cards, property, intl)).toBe('75%');
+  Object.values(properties)
+    .filter((p) => !autofilledProperties.has(p))
+    .forEach((property) => {
+      it(`should correctly compute not empty percent for property type "${property.type}"`, () => {
+        expect(Calculations.percentNotEmpty(cards, property, intl)).toBe('75%');
+      });
     });
-  });
 
   // testing countValues
   const countValueTests: Record<string, string> = {
@@ -229,7 +241,9 @@ describe('components/calculations/calculation logic', () => {
   };
   Object.keys(countUniqueValueTests).forEach((propertyType) => {
     it(`should correctly count unique values for property type ${propertyType}`, () => {
-      expect(Calculations.countUniqueValue(cards, properties[propertyType]!, intl)).toBe(countUniqueValueTests[propertyType]!);
+      expect(Calculations.countUniqueValue(cards, properties[propertyType]!, intl)).toBe(
+        countUniqueValueTests[propertyType]!
+      );
     });
   });
 

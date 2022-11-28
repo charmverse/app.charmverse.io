@@ -17,7 +17,7 @@ let apiToken: SpaceApiToken;
 // Setup value we can assert against, ignore the rest of the request
 let failedCreateResponse: { body: UnsupportedKeysError };
 
-function invalidCreateRequest (): Promise<Response> {
+function invalidCreateRequest(): Promise<Response> {
   return request(baseUrl)
     .post(`/api/v1/databases/${database.boardId}/pages`)
     .set('Authorization', `Bearer ${apiToken.token}`)
@@ -43,9 +43,7 @@ beforeAll(async () => {
 });
 
 describe('POST /databases/{id}/pages', () => {
-
   it('should create a new card in the database', async () => {
-
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/pages`)
       .set('Authorization', `Bearer ${apiToken.token}`)
@@ -80,7 +78,6 @@ describe('POST /databases/{id}/pages', () => {
   });
 
   it('should create a new card in the database without needing custom properties', async () => {
-
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/pages`)
       .set('Authorization', `Bearer ${apiToken.token}`)
@@ -103,40 +100,28 @@ describe('POST /databases/{id}/pages', () => {
         title: expect.any(String)
       })
     );
-
   });
 
   it('should fail with 400 error code when a title is not provided', async () => {
-
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/pages`)
       .set('Authorization', `Bearer ${apiToken.token}`)
-      .send({
-      });
+      .send({});
 
     expect(response.statusCode).toBe(400);
-
   });
 
   it('should fail with 400 error code when invalid properties are provided', async () => {
-
     const response = await invalidCreateRequest();
 
     expect(response.statusCode).toBe(400);
-
   });
 
   it('should inform the user which invalid properties were provided', async () => {
-
     expect((failedCreateResponse.body.error as UnsupportedKeyDetails).unsupportedKeys).toContain('unsupportedProperty');
-
   });
 
   it('should inform the user which valid properties are available', async () => {
-
-    expect((failedCreateResponse.body.error).allowedKeys).toBeInstanceOf(Array);
-
+    expect(failedCreateResponse.body.error.allowedKeys).toBeInstanceOf(Array);
   });
-
 });
-

@@ -1,7 +1,6 @@
 import { encodeFilename } from '../encodeFilename';
 
 describe('encoding filename', () => {
-
   it('should escape unsafe characters', () => {
     const formatted = encodeFilename('foo@bar.png');
 
@@ -13,5 +12,4 @@ describe('encoding filename', () => {
 
     expect(formatted).toBe('foo.bar.png');
   });
-
 });

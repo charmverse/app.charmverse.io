@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 
-export function EmptyStateVideo (props: { description: string, videoTitle: string, videoUrl: string }) {
+export function EmptyStateVideo(props: { description: string; videoTitle: string; videoUrl: string }) {
   return (
     <div>
       <Typography variant='h6' gutterBottom>
@@ -14,8 +14,7 @@ export function EmptyStateVideo (props: { description: string, videoTitle: strin
         height='367px'
         width='650px'
         title={props.videoTitle}
-      >
-      </iframe>
+      ></iframe>
     </div>
   );
 }

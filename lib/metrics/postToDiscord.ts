@@ -21,7 +21,19 @@ export interface UserSpaceAction {
 /// ------ Event types
 export type FunnelEvent = 'awareness' | 'acquisition' | 'activation' | 'revenue' | 'referral';
 
-export type EventType = 'create_user' | 'create_workspace'| 'first_user_create_page' | 'first_workspace_create_page' | 'create_bounty' | 'first_user_create_bounty' | 'first_workspace_create_bounty' | 'join_workspace_from_link' | 'first_user_proposal_create' | 'first_user_proposal_template_create' | 'first_workspace_proposal_create' | 'first_workspace_proposal_template_create';
+export type EventType =
+  | 'create_user'
+  | 'create_workspace'
+  | 'first_user_create_page'
+  | 'first_workspace_create_page'
+  | 'create_bounty'
+  | 'first_user_create_bounty'
+  | 'first_workspace_create_bounty'
+  | 'join_workspace_from_link'
+  | 'first_user_proposal_create'
+  | 'first_user_proposal_template_create'
+  | 'first_workspace_proposal_create'
+  | 'first_workspace_proposal_template_create';
 
 /// ------
 /**
@@ -36,8 +48,7 @@ export interface IEventToLog {
 const isProdEnvironment = isProdEnv;
 const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
 
-export async function postToDiscord (eventLog: IEventToLog) {
-
+export async function postToDiscord(eventLog: IEventToLog) {
   let message = `Event: **${eventLog.funnelStage.toUpperCase()}**  / ${eventLog.eventType}\r\n`;
 
   message += eventLog.message;
@@ -45,22 +56,17 @@ export async function postToDiscord (eventLog: IEventToLog) {
   log.debug('New event logged', message);
 
   if (isProdEnvironment && webhook) {
-
     try {
       const discordReponse = await http.POST<IDiscordMessage>(webhook, { content: message });
       return discordReponse;
-    }
-    catch (error) {
+    } catch (error) {
       log.warn('Error posting to discord', error);
     }
-
   }
-
 }
 // ----- List of events
 
-export async function logFirstProposal ({ spaceId, userId }: UserSpaceAction) {
-
+export async function logFirstProposal({ spaceId, userId }: UserSpaceAction) {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -70,21 +76,24 @@ export async function logFirstProposal ({ spaceId, userId }: UserSpaceAction) {
     }
   });
 
-  const [userProposals, spaceProposals] = await Promise.all([prisma.proposal.count({
-    where: {
-      createdBy: userId,
-      page: {
-        type: 'proposal'
+  const [userProposals, spaceProposals] = await Promise.all([
+    prisma.proposal.count({
+      where: {
+        createdBy: userId,
+        page: {
+          type: 'proposal'
+        }
       }
-    }
-  }), prisma.proposal.count({
-    where: {
-      spaceId,
-      page: {
-        type: 'proposal'
+    }),
+    prisma.proposal.count({
+      where: {
+        spaceId,
+        page: {
+          type: 'proposal'
+        }
       }
-    }
-  })]);
+    })
+  ]);
 
   if (userProposals === 1) {
     const eventLog: IEventToLog = {
@@ -103,10 +112,9 @@ export async function logFirstProposal ({ spaceId, userId }: UserSpaceAction) {
     };
     postToDiscord(eventLog);
   }
-
 }
 
-export async function logFirstProposalTemplate ({ spaceId, userId }: UserSpaceAction) {
+export async function logFirstProposalTemplate({ spaceId, userId }: UserSpaceAction) {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -116,21 +124,24 @@ export async function logFirstProposalTemplate ({ spaceId, userId }: UserSpaceAc
     }
   });
 
-  const [userProposals, spaceProposals] = await Promise.all([prisma.proposal.count({
-    where: {
-      createdBy: userId,
-      page: {
-        type: 'proposal_template'
+  const [userProposals, spaceProposals] = await Promise.all([
+    prisma.proposal.count({
+      where: {
+        createdBy: userId,
+        page: {
+          type: 'proposal_template'
+        }
       }
-    }
-  }), prisma.proposal.count({
-    where: {
-      spaceId,
-      page: {
-        type: 'proposal_template'
+    }),
+    prisma.proposal.count({
+      where: {
+        spaceId,
+        page: {
+          type: 'proposal_template'
+        }
       }
-    }
-  })]);
+    })
+  ]);
 
   if (userProposals === 1) {
     const eventLog: IEventToLog = {
@@ -151,7 +162,7 @@ export async function logFirstProposalTemplate ({ spaceId, userId }: UserSpaceAc
   }
 }
 
-export async function logSignupViaDiscord () {
+export async function logSignupViaDiscord() {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
@@ -159,7 +170,7 @@ export async function logSignupViaDiscord () {
   });
 }
 
-export async function logWorkspaceFirstBountyEvents (bounty: Bounty) {
+export async function logWorkspaceFirstBountyEvents(bounty: Bounty) {
   const bountiesInWorkspace = await prisma.bounty.findMany({
     where: {
       spaceId: bounty.spaceId
@@ -168,7 +179,6 @@ export async function logWorkspaceFirstBountyEvents (bounty: Bounty) {
 
   // Only 1 bounty exists
   if (bountiesInWorkspace.length === 1) {
-
     const workspace = await prisma.space.findUnique({
       where: {
         id: bounty.spaceId
@@ -190,7 +200,7 @@ export async function logWorkspaceFirstBountyEvents (bounty: Bounty) {
   return false;
 }
 
-export async function logUserFirstBountyEvents (bounty: Bounty) {
+export async function logUserFirstBountyEvents(bounty: Bounty) {
   const bountiesFromUser = await prisma.bounty.findMany({
     where: {
       createdBy: bounty.createdBy
@@ -198,7 +208,6 @@ export async function logUserFirstBountyEvents (bounty: Bounty) {
   });
 
   if (bountiesFromUser.length === 1) {
-
     const workspace = await prisma.space.findUnique({
       where: {
         id: bounty.spaceId
@@ -225,8 +234,7 @@ export async function logUserFirstBountyEvents (bounty: Bounty) {
  * Should be called after a page is created
  * @param page
  */
-export async function logInviteAccepted ({ spaceId }: Omit<UserSpaceAction, 'userId'>) {
-
+export async function logInviteAccepted({ spaceId }: Omit<UserSpaceAction, 'userId'>) {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -250,7 +258,7 @@ export async function logInviteAccepted ({ spaceId }: Omit<UserSpaceAction, 'use
  * Should be called after a page is created
  * @param page
  */
-export async function logFirstWorkspacePageCreation (page: Page) {
+export async function logFirstWorkspacePageCreation(page: Page) {
   const workspaceCreatedPages = await prisma.page.count({
     where: {
       spaceId: page.spaceId,
@@ -262,7 +270,6 @@ export async function logFirstWorkspacePageCreation (page: Page) {
 
   // Default page plus the just created page
   if (workspaceCreatedPages === 1) {
-
     const space = await prisma.space.findUnique({
       where: {
         id: page.spaceId!
@@ -287,7 +294,7 @@ export async function logFirstWorkspacePageCreation (page: Page) {
  * Should be called after a page is created
  * @param page
  */
-export async function logFirstUserPageCreation (page: Page) {
+export async function logFirstUserPageCreation(page: Page) {
   const userCreatedPages = await prisma.page.count({
     where: {
       createdBy: page.createdBy,
@@ -299,7 +306,6 @@ export async function logFirstUserPageCreation (page: Page) {
 
   // Default page plus the just created page
   if (userCreatedPages === 1) {
-
     const space = await prisma.space.findUnique({
       where: {
         id: page.spaceId!
@@ -319,7 +325,7 @@ export async function logFirstUserPageCreation (page: Page) {
   }
 }
 
-export async function logSignupViaWallet () {
+export async function logSignupViaWallet() {
   postToDiscord({
     funnelStage: 'acquisition',
     eventType: 'create_user',
@@ -327,7 +333,7 @@ export async function logSignupViaWallet () {
   });
 }
 
-export function logSpaceCreation (space: Space) {
+export function logSpaceCreation(space: Space) {
   const eventLog: IEventToLog = {
     funnelStage: 'acquisition',
     eventType: 'create_workspace',
@@ -337,8 +343,7 @@ export function logSpaceCreation (space: Space) {
   postToDiscord(eventLog);
 }
 
-export async function logWorkspaceJoinedViaTokenGate (spaceId: string) {
-
+export async function logWorkspaceJoinedViaTokenGate(spaceId: string) {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -355,6 +360,4 @@ export async function logWorkspaceJoinedViaTokenGate (spaceId: string) {
       message: `A user has joined the ${space.domain} workspace via token gate.`
     });
   }
-
 }
-

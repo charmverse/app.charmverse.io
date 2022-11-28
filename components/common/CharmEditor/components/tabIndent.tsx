@@ -4,7 +4,7 @@ import { keymap } from '@bangle.dev/pm';
 
 const name = 'tabIndent';
 
-export function spec (): RawSpecs {
+export function spec(): RawSpecs {
   return {
     type: 'node',
     name,
@@ -21,7 +21,7 @@ export function spec (): RawSpecs {
   };
 }
 
-export function plugins (): RawPlugins {
+export function plugins(): RawPlugins {
   return [
     keymap({
       // 'Shift-Tab': undentListItem,

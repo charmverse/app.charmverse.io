@@ -9,10 +9,9 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getMemberValuesHandler);
+handler.get(getMemberValuesHandler);
 
-async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse<MemberPropertyValuesBySpace[]>) {
+async function getMemberValuesHandler(req: NextApiRequest, res: NextApiResponse<MemberPropertyValuesBySpace[]>) {
   const userId = req.session.user?.id;
   const memberId = req.query.memberId as string;
 

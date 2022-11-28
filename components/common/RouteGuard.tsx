@@ -15,7 +15,7 @@ import { isSpaceDomain } from 'lib/spaces/utils';
 const publicPages = ['/', 'share', 'api-docs', 'u'];
 const accountPages = ['profile'];
 
-export default function RouteGuard ({ children }: { children: ReactNode }) {
+export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(true);
   const { user, setUser, isLoaded } = useUser();
@@ -24,7 +24,10 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   const isLoading = !isLoaded || isRouterLoading || !isSpacesLoaded;
 
   if (typeof window !== 'undefined') {
-    const pathSegments: string[] = router.asPath.split('?')[0].split('/').filter(segment => !!segment);
+    const pathSegments: string[] = router.asPath
+      .split('?')[0]
+      .split('/')
+      .filter((segment) => !!segment);
     const firstSegment: string = pathSegments[0];
     const isDomain: boolean = !!isSpaceDomain(firstSegment) || firstSegment === 'nexus';
     const workspaceDomain = isDomain ? firstSegment : null;
@@ -41,14 +44,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-
     // wait to listen to events until data is loaded
     if (isLoading) {
       return;
     }
 
-    async function authCheckAndRedirect (path: string) {
-
+    async function authCheckAndRedirect(path: string) {
       const result = await authCheck(path);
 
       setAuthorized(result.authorized);
@@ -82,19 +83,19 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   }, [isLoading, user, spaces]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck (url: string): Promise<{ authorized: boolean, redirect?: UrlObject, user?: User }> {
-
+  async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject; user?: User }> {
     const path = url.split('?')[0];
 
-    const firstPathSegment = path.split('/').filter(pathElem => {
-      // Only get segments that evaluate to some value
-      return pathElem;
-    })[0] ?? '/';
+    const firstPathSegment =
+      path.split('/').filter((pathElem) => {
+        // Only get segments that evaluate to some value
+        return pathElem;
+      })[0] ?? '/';
 
     const spaceDomain = path.split('/')[1];
 
     // condition: public page
-    if (publicPages.some(basePath => firstPathSegment === basePath)) {
+    if (publicPages.some((basePath) => firstPathSegment === basePath)) {
       return { authorized: true };
     }
     // condition: no user session and no wallet address
@@ -109,11 +110,11 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
       };
     }
     // condition: user accesses account pages (profile, tasks)
-    else if (accountPages.some(basePath => firstPathSegment === basePath)) {
+    else if (accountPages.some((basePath) => firstPathSegment === basePath)) {
       return { authorized: true };
     }
     // condition: trying to access a space without access
-    else if (isSpaceDomain(spaceDomain) && !spaces.some(s => s.domain === spaceDomain)) {
+    else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
       log.info('[RouteGuard]: send to join workspace page');
       return {
         authorized: false,
@@ -122,8 +123,7 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
           query: { domain: spaceDomain, returnUrl: router.asPath }
         }
       };
-    }
-    else {
+    } else {
       return { authorized: true };
     }
   }
@@ -131,9 +131,5 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
   if (!authorized || !router.isReady) {
     return null;
   }
-  return (
-    <span style={{ display: isLoading ? 'none' : 'inherit' }}>
-      { children }
-    </span>
-  );
+  return <span style={{ display: isLoading ? 'none' : 'inherit' }}>{children}</span>;
 }

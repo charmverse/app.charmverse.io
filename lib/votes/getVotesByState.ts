@@ -3,29 +3,25 @@ import { VoteType } from '@prisma/client';
 
 const YES_OPTION = 'Yes';
 
-export type VoteWithUserVotes = (Vote & { userVotes: UserVote[], voteOptions: VoteOptions[] })
+export type VoteWithUserVotes = Vote & { userVotes: UserVote[]; voteOptions: VoteOptions[] };
 
 export const getVotesByState = (votes: VoteWithUserVotes[]) => {
-
   const passedVotes: Vote[] = [];
   const rejectedVotes: Vote[] = [];
 
   for (const vote of votes) {
     if (vote.userVotes.length === 0) {
       rejectedVotes.push(vote);
-    }
-    else if (vote.type === VoteType.Approval) {
+    } else if (vote.type === VoteType.Approval) {
       const yesVoteCount = vote.userVotes.filter((uv) => uv.choice === YES_OPTION).length;
-      const isPassed = ((yesVoteCount * 100) / vote.userVotes.length) >= vote.threshold;
+      const isPassed = (yesVoteCount * 100) / vote.userVotes.length >= vote.threshold;
 
       if (isPassed) {
         passedVotes.push(vote);
-      }
-      else {
+      } else {
         rejectedVotes.push(vote);
       }
-    }
-    else {
+    } else {
       const choices: string[] = vote.userVotes.map((uv) => uv.choice).sort();
 
       let index = 0;
@@ -42,8 +38,7 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
         if (currentIndex - index > maxCount) {
           maxCount = currentIndex - index;
           maxChoices = [choices[index]];
-        }
-        else if (currentIndex - index === maxCount) {
+        } else if (currentIndex - index === maxCount) {
           maxChoices.push(choices[index]);
         }
 
@@ -54,8 +49,7 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
 
       if (maxChoicePercentage < vote.threshold) {
         rejectedVotes.push(vote);
-      }
-      else {
+      } else {
         passedVotes.push(vote);
       }
     }

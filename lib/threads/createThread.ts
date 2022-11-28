@@ -3,8 +3,12 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { ThreadCreate, ThreadWithCommentsAndAuthors } from './interfaces';
 
-export async function createThread ({ comment, pageId, userId, context }: ThreadCreate): Promise<ThreadWithCommentsAndAuthors> {
-
+export async function createThread({
+  comment,
+  pageId,
+  userId,
+  context
+}: ThreadCreate): Promise<ThreadWithCommentsAndAuthors> {
   if (!comment) {
     throw new InvalidInputError('Please provide a valid comment');
   }

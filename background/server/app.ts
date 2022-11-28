@@ -8,9 +8,6 @@ const router = new Router();
 
 router.get('/', routes.healthCheck);
 
-app
-  .use(routes.errorHandler)
-  .use(router.routes())
-  .use(router.allowedMethods());
+app.use(routes.errorHandler).use(router.routes()).use(router.allowedMethods());
 
 export default app;

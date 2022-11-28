@@ -7,10 +7,15 @@ import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/
 import type { ApplicationCreationData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
 
-export async function createApplication ({ bountyId, message, userId, status = 'applied' }: ApplicationCreationData): Promise<Application> {
+export async function createApplication({
+  bountyId,
+  message,
+  userId,
+  status = 'applied'
+}: ApplicationCreationData): Promise<Application> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  const existingApplication = bounty.applications.find(app => app.createdBy === userId);
+  const existingApplication = bounty.applications.find((app) => app.createdBy === userId);
 
   if (existingApplication) {
     throw new DuplicateDataError('You have already applied to this bounty');
@@ -23,7 +28,11 @@ export async function createApplication ({ bountyId, message, userId, status = '
   const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
 
   if (capReached) {
-    throw new LimitReachedError(`The submissions cap of ${bounty.maxSubmissions} submission${bounty.maxSubmissions !== 1 ? 's' : ''} has been reached for this bounty.`);
+    throw new LimitReachedError(
+      `The submissions cap of ${bounty.maxSubmissions} submission${
+        bounty.maxSubmissions !== 1 ? 's' : ''
+      } has been reached for this bounty.`
+    );
   }
 
   return prisma.application.create({

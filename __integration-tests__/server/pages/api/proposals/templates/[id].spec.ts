@@ -17,12 +17,10 @@ beforeAll(async () => {
   space = generated.space;
 
   nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
-
 });
 
 describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal template', () => {
   it('should delete a proposal template if the user is a space admin and respond with 200', async () => {
-
     const adminCookie = await loginUser(adminUser.id);
 
     const proposalTemplate = await createProposalTemplate({
@@ -34,11 +32,9 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
       .delete(`/api/proposals/templates/${proposalTemplate.id}`)
       .set('Cookie', adminCookie)
       .expect(200);
-
   });
 
   it('should fail if the user is not a space admin and respond with 401', async () => {
-
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const proposalTemplate = await createProposalTemplate({
@@ -51,5 +47,4 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
       .set('Cookie', nonAdminCookie)
       .expect(401);
   });
-
 });

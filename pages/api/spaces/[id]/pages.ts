@@ -1,4 +1,3 @@
-
 import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -14,10 +13,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getPages);
+handler.get(getPages);
 
-async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions[]>) {
+async function getPages(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions[]>) {
   const spaceId = req.query.id as string;
   const archived = req.query.archived === 'true';
   const userId = req.session?.user?.id;
@@ -42,7 +40,7 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPerm
     });
 
     if (totalPages === 0) {
-      const createdPage = await createPage({
+      const createdPage = (await createPage({
         data: untitledPage({
           userId,
           spaceId
@@ -50,7 +48,7 @@ async function getPages (req: NextApiRequest, res: NextApiResponse<IPageWithPerm
         include: {
           ...includePagePermissionsMeta()
         }
-      }) as IPageWithPermissions;
+      })) as IPageWithPermissions;
 
       await setupPermissionsAfterPageCreated(createdPage.id);
       createdPages.push(createdPage);

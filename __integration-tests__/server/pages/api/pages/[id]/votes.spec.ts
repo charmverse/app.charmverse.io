@@ -20,10 +20,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
       spaceId: space.id
     });
 
-    await request(baseUrl)
-      .get(`/api/pages/${page.id}/votes`)
-      .set('Cookie', userCookie)
-      .expect(200);
+    await request(baseUrl).get(`/api/pages/${page.id}/votes`).set('Cookie', userCookie).expect(200);
   });
 
   it('should get votes of a page for a member who has read access, responding with 200', async () => {
@@ -51,7 +48,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
       .expect(200);
   });
 
-  it('should fail to get votes of a page for a member who doesn\'t have read access, responding with 404', async () => {
+  it("should fail to get votes of a page for a member who doesn't have read access, responding with 404", async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
 
     const page = await createPage({

@@ -1,4 +1,3 @@
-
 import { batch } from 'react-redux';
 
 import type { Block } from './focalboard/src/blocks/block';
@@ -27,9 +26,9 @@ export const publishIncrementalUpdate = async (blocks: Block[]) => {
 export const publishDeletes = async (blocks: (Pick<Block, 'id'> & { type: string })[]) => {
   store.dispatch((dispatch) => {
     batch(() => {
-      dispatch(deleteBoards(blocks.filter((b => b.type === 'board'))));
-      dispatch(deleteViews(blocks.filter((b => b.type === 'view'))));
-      dispatch(deleteCards(blocks.filter((b => b.type === 'card'))));
+      dispatch(deleteBoards(blocks.filter((b) => b.type === 'board')));
+      dispatch(deleteViews(blocks.filter((b) => b.type === 'view')));
+      dispatch(deleteCards(blocks.filter((b) => b.type === 'card')));
     });
   });
 };

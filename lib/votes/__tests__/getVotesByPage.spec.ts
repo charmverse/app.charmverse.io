@@ -43,24 +43,28 @@ describe('getVotesByPage', () => {
       pageId: page1.id,
       userId: user.id
     });
-    expect(votes[0]).toMatchObject(expect.objectContaining({
-      id: createdVote1.id,
-      userChoice: '1',
-      totalVotes: 1,
-      aggregatedResult: {
-        1: 1,
-        2: 0
-      }
-    }));
+    expect(votes[0]).toMatchObject(
+      expect.objectContaining({
+        id: createdVote1.id,
+        userChoice: '1',
+        totalVotes: 1,
+        aggregatedResult: {
+          1: 1,
+          2: 0
+        }
+      })
+    );
 
-    expect(votes[1]).toMatchObject(expect.objectContaining({
-      id: createdVote2.id,
-      userChoice: 'a',
-      totalVotes: 1,
-      aggregatedResult: {
-        a: 1,
-        b: 0
-      }
-    }));
+    expect(votes[1]).toMatchObject(
+      expect.objectContaining({
+        id: createdVote2.id,
+        userChoice: 'a',
+        totalVotes: 1,
+        aggregatedResult: {
+          a: 1,
+          b: 0
+        }
+      })
+    );
   });
 });

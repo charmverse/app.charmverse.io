@@ -1,11 +1,11 @@
 import React from 'react';
 
 type LabelOptionProps = {
-    icon?: string;
-    children: React.ReactNode;
-}
+  icon?: string;
+  children: React.ReactNode;
+};
 
-function LabelOption (props: LabelOptionProps): JSX.Element {
+function LabelOption(props: LabelOptionProps): JSX.Element {
   return (
     <div className='MenuOption LabelOption menu-option'>
       {props.icon ?? <div className='noicon' />}

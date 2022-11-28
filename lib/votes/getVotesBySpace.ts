@@ -5,28 +5,31 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { ExtendedVote, SpaceVotesRequest } from './interfaces';
 
-export async function getVotesBySpace ({ spaceId, userId }: SpaceVotesRequest): Promise<ExtendedVote[]> {
+export async function getVotesBySpace({ spaceId, userId }: SpaceVotesRequest): Promise<ExtendedVote[]> {
   const spaceVotes = await prisma.vote.findMany({
     where: {
       spaceId,
       page: {
         deletedAt: null,
-        OR: [{
-          permissions: accessiblePagesByPermissionsQuery({
-            spaceId,
-            userId
-          })
-        }, {
-          space: {
-            spaceRoles: {
-              some: {
-                spaceId,
-                userId,
-                isAdmin: true
+        OR: [
+          {
+            permissions: accessiblePagesByPermissionsQuery({
+              spaceId,
+              userId
+            })
+          },
+          {
+            space: {
+              spaceRoles: {
+                some: {
+                  spaceId,
+                  userId,
+                  isAdmin: true
+                }
               }
             }
           }
-        }]
+        ]
       }
     },
     include: {
@@ -35,7 +38,7 @@ export async function getVotesBySpace ({ spaceId, userId }: SpaceVotesRequest): 
     }
   });
 
-  return spaceVotes.map(spaceVote => {
+  return spaceVotes.map((spaceVote) => {
     const voteStatus = calculateVoteStatus(spaceVote);
     const userVotes = spaceVote.userVotes;
     const { aggregatedResult, userChoice } = aggregateVoteResult({

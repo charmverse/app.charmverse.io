@@ -9,12 +9,11 @@ import type { PermissionComputeRequest } from '../interfaces';
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
-export async function computeSpacePermissions ({
+export async function computeSpacePermissions({
   allowAdminBypass,
   resourceId,
   userId
 }: PermissionComputeRequest): Promise<SpacePermissionFlags> {
-
   const allowedOperations = new AvailableSpacePermissions();
 
   if (!userId) {
@@ -76,7 +75,6 @@ export async function computeSpacePermissions ({
           ]
         }
       ]
-
     }
   });
 

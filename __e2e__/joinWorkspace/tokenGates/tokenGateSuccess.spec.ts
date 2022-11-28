@@ -17,7 +17,10 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({ page, tokenGatePage }) => {
+test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({
+  page,
+  tokenGatePage
+}) => {
   const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
 

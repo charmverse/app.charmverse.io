@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -23,13 +22,7 @@ describe('components/properties/dateRange', () => {
   });
 
   test('returns default correctly', () => {
-    const component = wrapIntl(
-      <DateRange
-        className='octo-propertyvalue'
-        value=''
-        onChange={jest.fn()}
-      />
-    );
+    const component = wrapIntl(<DateRange className='octo-propertyvalue' value='' onChange={jest.fn()} />);
 
     const { container } = render(component);
     expect(container).toMatchSnapshot();
@@ -38,11 +31,7 @@ describe('components/properties/dateRange', () => {
   test('returns local correctly - es local', () => {
     const component = (
       <IntlProvider locale='es'>
-        <DateRange
-          className='octo-propertyvalue'
-          value={June15Local.getTime().toString()}
-          onChange={jest.fn()}
-        />
+        <DateRange className='octo-propertyvalue' value={June15Local.getTime().toString()} onChange={jest.fn()} />
       </IntlProvider>
     );
 
@@ -55,12 +44,7 @@ describe('components/properties/dateRange', () => {
   test('handles calendar click event', () => {
     const callback = jest.fn();
     const component = wrapIntl(
-      <DateRange
-        className='octo-propertyvalue'
-        value=''
-        showEmptyPlaceholder={true}
-        onChange={callback}
-      />
+      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
     );
 
     const date = new Date();
@@ -82,12 +66,7 @@ describe('components/properties/dateRange', () => {
   test('handles setting range', () => {
     const callback = jest.fn();
     const component = wrapIntl(
-      <DateRange
-        className='octo-propertyvalue'
-        value=''
-        showEmptyPlaceholder={true}
-        onChange={callback}
-      />
+      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
     );
 
     // open modal
@@ -119,11 +98,7 @@ describe('components/properties/dateRange', () => {
   test('handle clear', () => {
     const callback = jest.fn();
     const component = wrapIntl(
-      <DateRange
-        className='octo-propertyvalue'
-        value={June15Local.getTime().toString()}
-        onChange={callback}
-      />
+      <DateRange className='octo-propertyvalue' value={June15Local.getTime().toString()} onChange={callback} />
     );
 
     const { container, getByText, getByTitle } = render(component);
@@ -246,12 +221,7 @@ describe('components/properties/dateRange', () => {
   test('handles `Today` button click event', () => {
     const callback = jest.fn();
     const component = wrapIntl(
-      <DateRange
-        className='octo-propertyvalue'
-        value=''
-        showEmptyPlaceholder={true}
-        onChange={callback}
-      />
+      <DateRange className='octo-propertyvalue' value='' showEmptyPlaceholder={true} onChange={callback} />
     );
 
     // To see if 'Today' button correctly selects today's date,

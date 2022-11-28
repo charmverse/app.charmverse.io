@@ -23,7 +23,7 @@ const StyledSidebar = styled(CommentsSidebar)`
 export type VoteSort = 'position' | 'latest_deadline' | 'highest_votes' | 'latest_created';
 export type VoteFilter = 'in_progress' | 'completed' | 'all';
 
-export default function VotesSidebar () {
+export default function VotesSidebar() {
   const router = useRouter();
   const { votes, cancelVote, castVote, deleteVote } = useVotes();
   const votesArray = Object.values(votes);
@@ -34,7 +34,7 @@ export default function VotesSidebar () {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
 
   // Don't show a proposal vote inside the votes
-  const filteredVotes = filterVotes(votesArray, voteFilter).filter(v => v.context !== 'proposal');
+  const filteredVotes = filterVotes(votesArray, voteFilter).filter((v) => v.context !== 'proposal');
 
   const sortedVotes = sortVotes(filteredVotes, voteSort, inlineVoteIds, votes);
 
@@ -70,7 +70,12 @@ export default function VotesSidebar () {
   return (
     <>
       <ViewOptions label='Sort'>
-        <Select variant='outlined' value={voteSort} onChange={(e) => setVoteSort(e.target.value as VoteSort)} sx={{ mr: 2 }}>
+        <Select
+          variant='outlined'
+          value={voteSort}
+          onChange={(e) => setVoteSort(e.target.value as VoteSort)}
+          sx={{ mr: 2 }}
+        >
           <MenuItem value='position'>Position</MenuItem>
           <MenuItem value='highest_votes'>Most voted</MenuItem>
           <MenuItem value='latest_deadline'>Deadline</MenuItem>
@@ -85,9 +90,10 @@ export default function VotesSidebar () {
       </ViewOptions>
 
       <StyledSidebar>
-        {sortedVotes.length === 0
-          ? <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} polls yet`} />
-          : sortedVotes.map(inlineVote => (
+        {sortedVotes.length === 0 ? (
+          <NoVotesMessage message={`No ${voteFilter === 'completed' ? 'completed' : 'in progress'} polls yet`} />
+        ) : (
+          sortedVotes.map((inlineVote) => (
             <VoteDetail
               cancelVote={cancelVote}
               castVote={castVote}
@@ -96,63 +102,61 @@ export default function VotesSidebar () {
               detailed={false}
               vote={inlineVote}
             />
-          ))}
+          ))
+        )}
       </StyledSidebar>
     </>
   );
 }
 
-export function filterVotes <T extends { status: string }> (votes: T[], voteFilter: VoteFilter) {
+export function filterVotes<T extends { status: string }>(votes: T[], voteFilter: VoteFilter) {
   if (voteFilter === 'completed') {
-    return votes.filter(sortedVote => sortedVote.status !== 'InProgress');
-  }
-  else if (voteFilter === 'in_progress') {
-    return votes.filter(sortedVote => sortedVote.status === 'InProgress' || sortedVote.status === 'Draft');
+    return votes.filter((sortedVote) => sortedVote.status !== 'InProgress');
+  } else if (voteFilter === 'in_progress') {
+    return votes.filter((sortedVote) => sortedVote.status === 'InProgress' || sortedVote.status === 'Draft');
   }
   return votes;
 }
 
-export function sortVotes <T extends Pick<ExtendedVote, 'createdAt' | 'deadline' | 'id'> & { totalVotes?: number }> (
+export function sortVotes<T extends Pick<ExtendedVote, 'createdAt' | 'deadline' | 'id'> & { totalVotes?: number }>(
   votes: T[],
   voteSort: VoteSort,
   inlineVoteIds: string[] = [],
   inlineVotes: Record<string, T> = {}
 ) {
   if (voteSort === 'highest_votes') {
-    votes.sort((voteA, voteB) => (typeof voteA.totalVotes === 'number' && typeof voteB.totalVotes === 'number' && voteA.totalVotes > voteB.totalVotes) ? -1 : 1);
-  }
-  else if (voteSort === 'latest_created') {
-    votes.sort(
-      (voteA, voteB) => new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1
+    votes.sort((voteA, voteB) =>
+      typeof voteA.totalVotes === 'number' &&
+      typeof voteB.totalVotes === 'number' &&
+      voteA.totalVotes > voteB.totalVotes
+        ? -1
+        : 1
     );
-  }
-  else if (voteSort === 'latest_deadline') {
-    votes.sort(
-      (voteA, voteB) => {
-        // if neither vote has a deadline, sort by created date
-        if (!voteA.deadline && !voteB.deadline) {
-          return new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1;
-        }
-        else if (!voteA.deadline) {
-          return -1;
-        }
-        else if (!voteB.deadline) {
-          return 1;
-        }
-        return new Date(voteA.deadline) > new Date(voteB.deadline) ? -1 : 1;
+  } else if (voteSort === 'latest_created') {
+    votes.sort((voteA, voteB) => (new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1));
+  } else if (voteSort === 'latest_deadline') {
+    votes.sort((voteA, voteB) => {
+      // if neither vote has a deadline, sort by created date
+      if (!voteA.deadline && !voteB.deadline) {
+        return new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1;
+      } else if (!voteA.deadline) {
+        return -1;
+      } else if (!voteB.deadline) {
+        return 1;
       }
-    );
-  }
-  else if (voteSort === 'position') {
-    const voteIds = new Set(votes.map(vote => vote.id));
-    const votesWithoutPosition = votes.filter(vote => !inlineVoteIds.includes(vote.id))
-    // sort by created Date
-      .sort(
-        (voteA, voteB) => new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1
-      );
+      return new Date(voteA.deadline) > new Date(voteB.deadline) ? -1 : 1;
+    });
+  } else if (voteSort === 'position') {
+    const voteIds = new Set(votes.map((vote) => vote.id));
+    const votesWithoutPosition = votes
+      .filter((vote) => !inlineVoteIds.includes(vote.id))
+      // sort by created Date
+      .sort((voteA, voteB) => (new Date(voteA.createdAt) > new Date(voteB.createdAt) ? -1 : 1));
     return [
       ...votesWithoutPosition,
-      ...inlineVoteIds.map(inlineVoteId => inlineVotes[inlineVoteId]).filter((vote) => isTruthy(vote) && voteIds.has(vote.id))
+      ...inlineVoteIds
+        .map((inlineVoteId) => inlineVotes[inlineVoteId])
+        .filter((vote) => isTruthy(vote) && voteIds.has(vote.id))
     ];
   }
   return votes;

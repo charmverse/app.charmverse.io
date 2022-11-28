@@ -1,4 +1,3 @@
-
 import type { IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { FilterClause } from '../../blocks/filterClause';
@@ -10,12 +9,12 @@ import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    view: BoardView;
-    filter: FilterClause;
-    template: IPropertyTemplate;
-}
+  view: BoardView;
+  filter: FilterClause;
+  template: IPropertyTemplate;
+};
 
-const filterValue = (props: Props): JSX.Element|null => {
+const filterValue = (props: Props): JSX.Element | null => {
   const { filter, template, view } = props;
   if (filter.condition !== 'includes' && filter.condition !== 'notIncludes') {
     return null;
@@ -23,12 +22,13 @@ const filterValue = (props: Props): JSX.Element|null => {
 
   let displayValue: string;
   if (filter.values.length > 0) {
-    displayValue = filter.values.map((id) => {
-      const option = template.options.find((o) => o.id === id);
-      return option?.value || '(Unknown)';
-    }).join(', ');
-  }
-  else {
+    displayValue = filter.values
+      .map((id) => {
+        const option = template.options.find((o) => o.id === id);
+        return option?.value || '(Unknown)';
+      })
+      .join(', ');
+  } else {
     displayValue = '(empty)';
   }
 
@@ -52,8 +52,7 @@ const filterValue = (props: Props): JSX.Element|null => {
               if (filter.values.includes(o.id)) {
                 newFilter.values = newFilter.values.filter((id) => id !== optionId);
                 mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
-              }
-              else {
+              } else {
                 newFilter.values.push(optionId);
                 mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
               }

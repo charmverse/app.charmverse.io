@@ -5,7 +5,7 @@ const StyledTable = styled(Table)`
   & > .MuiTableBody-root {
     .MuiTableRow-root {
       &:hover {
-        background-color: rgba(var(--center-channel-color-rgb),.05);
+        background-color: rgba(var(--center-channel-color-rgb), 0.05);
       }
     }
   }

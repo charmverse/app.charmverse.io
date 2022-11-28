@@ -10,7 +10,7 @@ interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   index: number;
 }
 
-function TabPanel (props: TabPanelProps) {
+function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -35,7 +35,7 @@ interface MultiTabsProps {
   disabled?: boolean;
 }
 
-export default function MultiTabs (props: MultiTabsProps) {
+export default function MultiTabs(props: MultiTabsProps) {
   const [value, setValue] = React.useState(0);
   const { tabs, disabled = false } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
@@ -59,19 +59,16 @@ export default function MultiTabs (props: MultiTabsProps) {
               }}
               key={tabLabel}
               label={tabLabel}
-
             />
           ))}
         </Tabs>
       </Box>
-      {
-        tabs.map(([_, tabComponent], tabIndex) => (
-          /* eslint-disable-next-line */
+      {tabs.map(([_, tabComponent], tabIndex) => (
+        /* eslint-disable-next-line */
           <TabPanel value={value} index={tabIndex} key={tabIndex}>
-            {tabComponent}
-          </TabPanel>
-        ))
-      }
+          {tabComponent}
+        </TabPanel>
+      ))}
     </Box>
   );
 }

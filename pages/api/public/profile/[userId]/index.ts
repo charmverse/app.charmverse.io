@@ -15,14 +15,13 @@ export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
   visiblePoaps: Partial<ExtendedPoap>[];
   visibleNfts: NftData[];
-}
+};
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getUserProfile);
 
-async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicUser>) {
-
+async function getUserProfile(req: NextApiRequest, res: NextApiResponse<PublicUser>) {
   const { userId } = req.query;
 
   if (typeof userId !== 'string') {
@@ -32,11 +31,8 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   // support lookup by user id or path
   const condition = isUUID(userId)
     ? {
-      OR: [
-        { id: userId },
-        { path: userId }
-      ]
-    }
+        OR: [{ id: userId }, { path: userId }]
+      }
     : { path: userId };
 
   const users = await prisma.user.findMany({
@@ -49,18 +45,18 @@ async function getUserProfile (req: NextApiRequest, res: NextApiResponse<PublicU
   });
 
   // prefer match by user id
-  const userById = users.find(user => user.id === userId) ?? users[0];
+  const userById = users.find((user) => user.id === userId) ?? users[0];
 
   if (!userById) {
     throw new DataNotFoundError('User not found');
   }
 
-  function isVisible (item: { id: string }): boolean {
-    return !userById.profileItems.some(profileItem => profileItem.isHidden && profileItem.id === item.id);
+  function isVisible(item: { id: string }): boolean {
+    return !userById.profileItems.some((profileItem) => profileItem.isHidden && profileItem.id === item.id);
   }
 
-  const allPoaps = await getPOAPs(userById.wallets.map(w => w.address));
-  const allNfts = await getNFTs(userById.wallets.map(w => w.address));
+  const allPoaps = await getPOAPs(userById.wallets.map((w) => w.address));
+  const allNfts = await getNFTs(userById.wallets.map((w) => w.address));
 
   const visiblePoaps = allPoaps.filter(isVisible);
   const visibleNfts = allNfts.filter(isVisible);

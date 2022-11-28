@@ -31,7 +31,7 @@ interface Props {
   hideToolsMenu?: boolean;
 }
 
-export default function PageDialog (props: Props) {
+export default function PageDialog(props: Props) {
   const { hideToolsMenu = false, page, bounty, toolbar, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -70,20 +70,19 @@ export default function PageDialog (props: Props) {
     }
   }, [page?.id]);
 
-  async function onClickDelete () {
+  async function onClickDelete() {
     if (page) {
       if (page.type === 'card') {
         await charmClient.deleteBlock(page.id, () => {});
-      }
-      else if (page.type === 'bounty') {
-        setBounties((bounties) => bounties.filter(_bounty => _bounty.id !== page.id));
+      } else if (page.type === 'bounty') {
+        setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
       }
       await deletePage({ pageId: page.id });
       onClose();
     }
   }
 
-  function onClose () {
+  function onClose() {
     popupState.close();
     props.onClose();
   }
@@ -102,17 +101,19 @@ export default function PageDialog (props: Props) {
     await updatePage(updates);
   }, 500);
 
-  const setPage = useCallback(async (updates: Partial<Page>) => {
-    if (!page || !mounted.current) {
-      return;
-    }
-    debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>)
-      .catch((err: any) => {
+  const setPage = useCallback(
+    async (updates: Partial<Page>) => {
+      if (!page || !mounted.current) {
+        return;
+      }
+      debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>).catch((err: any) => {
         log.error('Error saving page', err);
       });
-  }, [page]);
+    },
+    [page]
+  );
 
-  async function closeBounty (bountyId: string) {
+  async function closeBounty(bountyId: string) {
     await charmClient.bounties.closeBounty(bountyId);
     if (refreshBounty) {
       refreshBounty(bountyId);
@@ -124,28 +125,42 @@ export default function PageDialog (props: Props) {
       {popupState.isOpen && (
         <Dialog
           hideCloseButton
-          toolsMenu={!hideToolsMenu && !readOnly && page && (
-            <PageActions
-              page={page}
-              onClickDelete={pagePermission?.delete ? () => {
-                onClickDelete();
-                onClose();
-              } : undefined}
-            >
-              {bounty && (
-                <MenuItem dense onClick={() => closeBounty(bounty.id)} disabled={bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')}>
-                  <CheckCircleOutlinedIcon
-                    sx={{
-                      mr: 1
-                    }}
-                    fontSize='small'
-                  />
-                  <ListItemText primary='Mark complete' />
-                </MenuItem>
-              )}
-            </PageActions>
-          )}
-          toolbar={(
+          toolsMenu={
+            !hideToolsMenu &&
+            !readOnly &&
+            page && (
+              <PageActions
+                page={page}
+                onClickDelete={
+                  pagePermission?.delete
+                    ? () => {
+                        onClickDelete();
+                        onClose();
+                      }
+                    : undefined
+                }
+              >
+                {bounty && (
+                  <MenuItem
+                    dense
+                    onClick={() => closeBounty(bounty.id)}
+                    disabled={
+                      bounty.status === 'complete' || (bounty.status !== 'inProgress' && bounty.status !== 'open')
+                    }
+                  >
+                    <CheckCircleOutlinedIcon
+                      sx={{
+                        mr: 1
+                      }}
+                      fontSize='small'
+                    />
+                    <ListItemText primary='Mark complete' />
+                  </MenuItem>
+                )}
+              </PageActions>
+            )
+          }
+          toolbar={
             <Box display='flex' justifyContent='space-between'>
               <Button
                 size='small'
@@ -158,12 +173,19 @@ export default function PageDialog (props: Props) {
               </Button>
               {toolbar}
             </Box>
-          )}
+          }
           onClose={onClose}
         >
-          {page && <DocumentPage insideModal page={page} setPage={setPage} readOnly={readOnlyPage} parentProposalId={parentProposalId} />}
+          {page && (
+            <DocumentPage
+              insideModal
+              page={page}
+              setPage={setPage}
+              readOnly={readOnlyPage}
+              parentProposalId={parentProposalId}
+            />
+          )}
         </Dialog>
-
       )}
     </RootPortal>
   );

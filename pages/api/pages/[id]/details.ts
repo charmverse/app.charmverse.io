@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,11 +10,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireKeys(['id'], 'query'))
-  .get(getPageDetailsHandler);
+handler.use(requireKeys(['id'], 'query')).get(getPageDetailsHandler);
 
-async function getPageDetailsHandler (req: NextApiRequest, res: NextApiResponse<PageDetails>) {
+async function getPageDetailsHandler(req: NextApiRequest, res: NextApiResponse<PageDetails>) {
   const pageIdOrPath = req.query.id as string;
   const userId = req.session?.user?.id;
   const pageDetails = await getPageDetails(pageIdOrPath, req.query.spaceId as string | undefined);

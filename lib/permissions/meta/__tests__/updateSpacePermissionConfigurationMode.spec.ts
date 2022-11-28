@@ -10,7 +10,6 @@ import { computeGroupSpacePermissions } from '../../spaces/computeGroupSpacePerm
 import { updateSpacePermissionConfigurationMode } from '../updateSpacePermissionConfigurationMode';
 
 describe('updateSpacePermissionConfigurationMode', () => {
-
   it('should set the new mode and return the updated space', async () => {
     const { space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -20,7 +19,6 @@ describe('updateSpacePermissionConfigurationMode', () => {
     });
 
     expect(updatedSpace.permissionConfigurationMode).toBe('custom');
-
   });
 
   it('should update individual settings to match the readOnly template', async () => {
@@ -51,10 +49,9 @@ describe('updateSpacePermissionConfigurationMode', () => {
       select: {
         publicBountyBoard: true
       }
-    }) as Space);
+    })) as Space;
 
     expect(publicBountyBoard).toBe(false);
-
   });
 
   it('should update individual settings to match the collaborative template', async () => {
@@ -85,7 +82,7 @@ describe('updateSpacePermissionConfigurationMode', () => {
       select: {
         publicBountyBoard: true
       }
-    }) as Space);
+    })) as Space;
 
     expect(publicBountyBoard).toBe(false);
   });
@@ -118,7 +115,7 @@ describe('updateSpacePermissionConfigurationMode', () => {
       select: {
         publicBountyBoard: true
       }
-    }) as Space);
+    })) as Space;
 
     expect(publicBountyBoard).toBe(true);
   });
@@ -131,8 +128,7 @@ describe('updateSpacePermissionConfigurationMode', () => {
         spaceId: space.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
@@ -144,10 +140,8 @@ describe('updateSpacePermissionConfigurationMode', () => {
         spaceId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
-
 });

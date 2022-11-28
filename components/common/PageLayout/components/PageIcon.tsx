@@ -32,23 +32,27 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export default function PageIcon ({ icon, isEditorEmpty, pageType }: { icon?: ReactNode, pageType: Page['type'], isEditorEmpty: boolean }) {
+export default function PageIcon({
+  icon,
+  isEditorEmpty,
+  pageType
+}: {
+  icon?: ReactNode;
+  pageType: Page['type'];
+  isEditorEmpty: boolean;
+}) {
   if (icon) {
     return <StyledPageIcon icon={icon} />;
   }
   if (pageType === 'board' || pageType === 'inline_board') {
     return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
-  }
-  else if (pageType === 'proposal') {
+  } else if (pageType === 'proposal') {
     return <StyledPageIcon icon={<ProposalIcon />} />;
-  }
-  else if (pageType === 'bounty') {
+  } else if (pageType === 'bounty') {
     return <StyledPageIcon icon={<BountyIcon />} />;
-  }
-  else if (isEditorEmpty) {
+  } else if (isEditorEmpty) {
     return <StyledPageIcon icon={<EmptyPageIcon />} />;
-  }
-  else {
+  } else {
     return <StyledPageIcon icon={<FilledPageIcon />} />;
   }
 }

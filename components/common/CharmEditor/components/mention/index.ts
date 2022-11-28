@@ -5,7 +5,5 @@ export * from './mention.plugins';
 export * from './mention.interfaces';
 export * from './mention.specs';
 export * from './mention.utils';
-export {
-  MentionSuggest
-};
+export { MentionSuggest };
 export default Mention;

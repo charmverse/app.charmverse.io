@@ -27,13 +27,15 @@ import BountyApplicantStatus from '../../BountyApplicantStatus';
 const schema = yup.object({
   submission: yup.string().required(),
   submissionNodes: yup.mixed().required(),
-  walletAddress: yup.string().required('Please provide a valid wallet address.')
+  walletAddress: yup
+    .string()
+    .required('Please provide a valid wallet address.')
     .test('verifyContractFormat', 'Invalid wallet address', (value) => {
       return !value || isValidChainAddress(value);
     })
 });
 
-type FormValues = yup.InferType<typeof schema>
+type FormValues = yup.InferType<typeof schema>;
 
 interface Props {
   submission?: Application;
@@ -46,9 +48,16 @@ interface Props {
   alwaysExpanded?: boolean;
 }
 
-export default function SubmissionInput (
-  { permissions, readOnly = false, submission, onSubmit: onSubmitProp, bountyId, alwaysExpanded, expandedOnLoad, onCancel = () => null }: Props
-) {
+export default function SubmissionInput({
+  permissions,
+  readOnly = false,
+  submission,
+  onSubmit: onSubmitProp,
+  bountyId,
+  alwaysExpanded,
+  expandedOnLoad,
+  onCancel = () => null
+}: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
 
@@ -62,7 +71,7 @@ export default function SubmissionInput (
     defaultValues: {
       submission: submission?.submission as string,
       submissionNodes: submission?.submissionNodes as any as JSON,
-      walletAddress: (submission?.walletAddress ?? user?.wallets[0]?.address)
+      walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address
     },
     resolver: yupResolver(schema)
   });
@@ -71,7 +80,7 @@ export default function SubmissionInput (
 
   //  const defaultWalletAddress = submission.walletAddress ?? ;
 
-  async function onSubmit (values: FormValues) {
+  async function onSubmit(values: FormValues) {
     setFormError(null);
     let application: Application;
     try {
@@ -81,8 +90,7 @@ export default function SubmissionInput (
           submissionId: submission.id,
           content: values
         });
-      }
-      else {
+      } else {
         // create
         application = await charmClient.bounties.createSubmission({
           bountyId,
@@ -93,8 +101,7 @@ export default function SubmissionInput (
         onSubmitProp(application);
       }
       setIsVisible(false);
-    }
-    catch (err: any) {
+    } catch (err: any) {
       setFormError(err);
     }
   }
@@ -136,13 +143,10 @@ export default function SubmissionInput (
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
           <Grid container direction='column' spacing={2}>
-
-            <Grid
-              item
-            >
+            <Grid item>
               <InlineCharmEditor
                 content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
-                onContentChange={content => {
+                onContentChange={(content) => {
                   setValue('submission', content.rawText, {
                     shouldValidate: true
                   });
@@ -157,16 +161,17 @@ export default function SubmissionInput (
                   minHeight: 130
                 }}
                 readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
-                placeholderText={permissions.userPermissions.review ? 'No submission yet' : 'Enter the content of your submission here.'}
+                placeholderText={
+                  permissions.userPermissions.review
+                    ? 'No submission yet'
+                    : 'Enter the content of your submission here.'
+                }
               />
-
             </Grid>
 
             {!readOnly && (
               <Grid item>
-                <InputLabel>
-                  Address to get paid for this bounty
-                </InputLabel>
+                <InputLabel>Address to get paid for this bounty</InputLabel>
                 <TextField
                   {...register('walletAddress')}
                   type='text'
@@ -181,11 +186,9 @@ export default function SubmissionInput (
             {!readOnly && (
               <Grid item display='flex' gap={1}>
                 <Button disabled={!isValid && submission?.status === 'inProgress'} type='submit'>
-                  {
-                    submission?.submission ? 'Update' : 'Submit'
-                  }
+                  {submission?.submission ? 'Update' : 'Submit'}
                 </Button>
-                {(!submission?.submission && !alwaysExpanded) && (
+                {!submission?.submission && !alwaysExpanded && (
                   <Button
                     onClick={() => {
                       setIsVisible(false);
@@ -193,24 +196,20 @@ export default function SubmissionInput (
                     }}
                     variant='outlined'
                     color='secondary'
-                  >Cancel
+                  >
+                    Cancel
                   </Button>
                 )}
               </Grid>
             )}
 
-            {
-              formError && (
-                <Grid item>
-                  <Alert severity={formError.severity}>
-                    {formError.message}
-                  </Alert>
-                </Grid>
-              )
-            }
+            {formError && (
+              <Grid item>
+                <Alert severity={formError.severity}>{formError.message}</Alert>
+              </Grid>
+            )}
           </Grid>
         </form>
-
       </Collapse>
     </Stack>
   );

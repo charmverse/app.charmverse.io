@@ -14,12 +14,9 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(updatePageHandler);
+handler.use(requireUser).post(updatePageHandler);
 
-async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-
+async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -77,10 +74,13 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     type: updatedPage.type
   };
 
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: [updatedPageData]
-  }, page.spaceId);
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [updatedPageData]
+    },
+    page.spaceId
+  );
 
   return res.status(200);
 }

@@ -33,7 +33,7 @@ describe('getPageMeta', () => {
 
     const foundPage = await getPageMeta(childPage.id);
 
-    expect(foundPage).toEqual <PageMeta>(
+    expect(foundPage).toEqual<PageMeta>(
       expect.objectContaining<Partial<PageMeta>>({
         id: expect.stringMatching(childPage.id),
         parentId: expect.stringMatching(page.id),
@@ -62,7 +62,7 @@ describe('getPageMeta', () => {
 
     const foundPage = await getPageMeta(page.path, page.spaceId as string);
 
-    expect(foundPage).toEqual <Page>(
+    expect(foundPage).toEqual<Page>(
       expect.objectContaining<Partial<Page>>({
         id: page.id,
         path: page.path,
@@ -135,13 +135,13 @@ describe('getPageMeta', () => {
       }
     });
 
-    const found = await getPageMeta(childPage.id) as IPageWithPermissions;
+    const found = (await getPageMeta(childPage.id)) as IPageWithPermissions;
 
     expect(found).toBeDefined();
 
     expect(found.permissions).toBeInstanceOf(Array);
 
-    expect(found.permissions[0]).toEqual <PagePermission>(
+    expect(found.permissions[0]).toEqual<PagePermission>(
       expect.objectContaining<Partial<IPagePermissionWithSource>>({
         id: expect.stringMatching(inherited.id),
         spaceId: expect.stringMatching(space.id),

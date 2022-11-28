@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -34,7 +33,7 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-export async function createPage (req: NextApiRequest, res: NextApiResponse) {
+export async function createPage(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -46,7 +45,7 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!board || (board.spaceId !== spaceId)) {
+  if (!board || board.spaceId !== spaceId) {
     throw new DatabasePageNotFoundError(id as string);
   }
 
@@ -62,7 +61,6 @@ export async function createPage (req: NextApiRequest, res: NextApiResponse) {
   await setupPermissionsAfterPageCreated(card.id);
 
   return res.status(201).json(card);
-
 }
 
 export default handler;

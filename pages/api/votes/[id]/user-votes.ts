@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,11 +8,9 @@ import type { UserVoteExtendedDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .get(getUserVotes);
+handler.use(requireUser).get(getUserVotes);
 
-async function getUserVotes (req: NextApiRequest, res: NextApiResponse<UserVoteExtendedDTO[] | { error: any }>) {
+async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteExtendedDTO[] | { error: any }>) {
   const voteId = req.query.id as string;
 
   const userVotes = await prisma.userVote.findMany({

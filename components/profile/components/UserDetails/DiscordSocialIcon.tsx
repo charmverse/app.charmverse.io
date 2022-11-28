@@ -4,10 +4,15 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 
 import DiscordIcon from 'public/images/discord_logo.svg';
 
-export function DiscordSocialIcon (
-  { username, showLogo = true, showUsername = false }:
-  { username: string, showLogo?: boolean, showUsername?: boolean }
-) {
+export function DiscordSocialIcon({
+  username,
+  showLogo = true,
+  showUsername = false
+}: {
+  username: string;
+  showLogo?: boolean;
+  showUsername?: boolean;
+}) {
   const [isDiscordUsernameCopied, setIsDiscordUsernameCopied] = useState(false);
 
   const onDiscordUsernameCopy = () => {

@@ -10,7 +10,7 @@ export interface PageWithBlocks {
   };
 }
 
-export type ExportedPage = PageNodeWithChildren<IPageWithPermissions & Partial<PageWithBlocks>>
+export type ExportedPage = PageNodeWithChildren<IPageWithPermissions & Partial<PageWithBlocks>>;
 
 export interface WorkspaceExport {
   pages: ExportedPage[];

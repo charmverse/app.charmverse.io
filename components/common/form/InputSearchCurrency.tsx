@@ -4,9 +4,8 @@ import { FiatCurrencyList } from 'connectors';
 
 const currencyOptions = Object.keys(FiatCurrencyList);
 
-export function InputSearchCurrency ({ onChange }: { onChange: (value: FiatCurrency) => any }) {
-
-  function emitValue (value: string) {
+export function InputSearchCurrency({ onChange }: { onChange: (value: FiatCurrency) => any }) {
+  function emitValue(value: string) {
     if (value !== null && currencyOptions.indexOf(value) >= 0) {
       onChange(value as FiatCurrency);
     }
@@ -23,9 +22,7 @@ export function InputSearchCurrency ({ onChange }: { onChange: (value: FiatCurre
       autoHighlight
       renderOption={(props, option) => (
         <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-          {option}
-          {' '}
-          {FiatCurrencyList[option as FiatCurrency]}
+          {option} {FiatCurrencyList[option as FiatCurrency]}
         </Box>
       )}
       renderInput={(params) => (
@@ -40,4 +37,3 @@ export function InputSearchCurrency ({ onChange }: { onChange: (value: FiatCurre
     />
   );
 }
-

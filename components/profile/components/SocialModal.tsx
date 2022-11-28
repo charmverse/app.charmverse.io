@@ -15,26 +15,44 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 import type { Social } from '../interfaces';
 
 export const schema = yup.object({
-  twitterURL: yup.string().notRequired().ensure().trim()
+  twitterURL: yup
+    .string()
+    .notRequired()
+    .ensure()
+    .trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid Twitter link'),
-  githubURL: yup.string().notRequired().ensure().trim()
+  githubURL: yup
+    .string()
+    .notRequired()
+    .ensure()
+    .trim()
     .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/i, 'Invalid GitHub link'),
-  discordUsername: yup.string().notRequired().ensure().trim()
+  discordUsername: yup
+    .string()
+    .notRequired()
+    .ensure()
+    .trim()
     .matches(/^$|^((?!(discordtag|everyone|here)#)((?!@|#|:|```).{2,32})#\d{4})/, 'Invalid Discord username'),
-  linkedinURL: yup.string().notRequired().ensure()
-    .matches(/^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i, 'Invalid LinkedIn link')
+  linkedinURL: yup
+    .string()
+    .notRequired()
+    .ensure()
+    .matches(
+      /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i,
+      'Invalid LinkedIn link'
+    )
 });
 
 export type FormValues = yup.InferType<typeof schema>;
 
 type SocialModalProps = {
-    social: Social;
-    save: (social: Social) => void;
-    close: () => void;
-    isOpen: boolean;
+  social: Social;
+  save: (social: Social) => void;
+  close: () => void;
+  isOpen: boolean;
 };
 
-function SocialModal (props: SocialModalProps) {
+function SocialModal(props: SocialModalProps) {
   const { social, save, close, isOpen } = props;
   const {
     register,
@@ -46,7 +64,7 @@ function SocialModal (props: SocialModalProps) {
     resolver: yupResolver(schema)
   });
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     save(values as Social);
   }
 
@@ -55,12 +73,7 @@ function SocialModal (props: SocialModalProps) {
   }, [social]);
 
   return (
-
-    <Modal
-      open={isOpen}
-      onClose={close}
-      size='large'
-    >
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Social media links</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={4}>
@@ -128,11 +141,7 @@ function SocialModal (props: SocialModalProps) {
           </Grid>
         </Grid>
         <Box mt={4} sx={{ display: 'flex' }}>
-          <Button
-            type='submit'
-          >
-            Save
-          </Button>
+          <Button type='submit'>Save</Button>
         </Box>
       </form>
     </Modal>

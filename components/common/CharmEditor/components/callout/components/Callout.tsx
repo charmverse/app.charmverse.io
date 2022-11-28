@@ -1,4 +1,3 @@
-
 import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -41,7 +40,7 @@ const CalloutEmoji = styled.div`
   }
 `;
 
-export default function Callout ({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
+export default function Callout({ children, node, updateAttrs }: NodeViewProps & { children: ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -84,20 +83,17 @@ export default function Callout ({ children, node, updateAttrs }: NodeViewProps 
               src={twemojiImage}
             />
           ) : (
-            <div style={{
-              cursor: 'pointer',
-              transition: 'background 100ms ease-in-out'
-            }}
+            <div
+              style={{
+                cursor: 'pointer',
+                transition: 'background 100ms ease-in-out'
+              }}
             >
               {node.attrs.emoji}
             </div>
           )}
         </Box>
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-        >
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           <Picker
             theme={theme.palette.mode}
             onSelect={(emoji: BaseEmoji) => {

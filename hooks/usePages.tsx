@@ -21,9 +21,9 @@ import useIsAdmin from './useIsAdmin';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
-export type LinkedPage = (Page & { children: LinkedPage[], parent: null | LinkedPage });
+export type LinkedPage = Page & { children: LinkedPage[]; parent: null | LinkedPage };
 
-export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<PageMeta>
+export type PageUpdater = (updates: PageUpdates, revalidate?: boolean) => Promise<PageMeta>;
 
 export type PagesContext = {
   currentPageId: string;
@@ -35,7 +35,7 @@ export type PagesContext = {
   updatePage: PageUpdater;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => void;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string, board?: Block }) => Promise<PageMeta | null | undefined>;
+  deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
   getPagePermissions: (pageId: string, page?: PageMeta) => IPagePermissionFlags;
   mutatePagesList: KeyedMutator<PagesMap<PageMeta>>;
 };
@@ -57,7 +57,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
   mutatePagesList: () => Promise.resolve({} as any)
 });
 
-export function PagesProvider ({ children }: { children: ReactNode }) {
+export function PagesProvider({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin();
   const currentSpace = useCurrentSpace();
   const [currentPageId, setCurrentPageId] = useState<string>('');
@@ -66,31 +66,38 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { subscribe } = useWebSocketClient();
 
-  const { data, mutate: mutatePagesList } = useSWR(() => currentSpace ? getPagesListCacheKey(currentSpace.id) : null, async () => {
-    if (!currentSpace) {
-      return {};
-    }
+  const { data, mutate: mutatePagesList } = useSWR(
+    () => (currentSpace ? getPagesListCacheKey(currentSpace.id) : null),
+    async () => {
+      if (!currentSpace) {
+        return {};
+      }
 
-    const pagesRes = await charmClient.pages.getPages(currentSpace.id);
-    const pagesDict: PagesContext['pages'] = {};
-    pagesRes?.forEach((page) => {
-      pagesDict[page.id] = page;
-    }, {});
+      const pagesRes = await charmClient.pages.getPages(currentSpace.id);
+      const pagesDict: PagesContext['pages'] = {};
+      pagesRes?.forEach((page) => {
+        pagesDict[page.id] = page;
+      }, {});
 
-    return pagesDict;
-  }, { refreshInterval });
+      return pagesDict;
+    },
+    { refreshInterval }
+  );
 
   const pages = data || {};
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
 
-    mutatePagesList((currentData) => {
-      updatedData = _pages instanceof Function ? _pages(currentData || {}) : _pages;
-      return updatedData;
-    }, {
-      revalidate: false
-    });
+    mutatePagesList(
+      (currentData) => {
+        updatedData = _pages instanceof Function ? _pages(currentData || {}) : _pages;
+        return updatedData;
+      },
+      {
+        revalidate: false
+      }
+    );
 
     return updatedData;
   };
@@ -98,7 +105,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
    * Will return permissions for the currently connected user
    * @param pageId
    */
-  function getPagePermissions (pageId: string, page?: PageMeta): IPagePermissionFlags {
+  function getPagePermissions(pageId: string, page?: PageMeta): IPagePermissionFlags {
     const computedPermissions = new AllowedPagePermissions();
 
     const targetPage = (pages[pageId] as PageMeta) ?? page;
@@ -107,26 +114,30 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     if (!targetPage) {
       return computedPermissions;
     }
-    const userSpaceRole = user?.spaceRoles.find(spaceRole => spaceRole.spaceId === targetPage.spaceId);
+    const userSpaceRole = user?.spaceRoles.find((spaceRole) => spaceRole.spaceId === targetPage.spaceId);
 
     // For now, we allow admin users to override explicitly assigned permissions
     if (isAdmin) {
-      computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType []);
+      computedPermissions.addPermissions(Object.keys(PageOperations) as PageOperationType[]);
       return computedPermissions;
     }
 
-    const applicableRoles: Role [] = userSpaceRole?.spaceRoleToRole?.map(spaceRoleToRole => spaceRoleToRole.role) ?? [];
+    const applicableRoles: Role[] =
+      userSpaceRole?.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role) ?? [];
 
-    targetPage.permissions?.forEach(permission => {
-
+    targetPage.permissions?.forEach((permission) => {
       // User gets permission via role or as an individual
-      const shouldApplyPermission = (permission.userId && permission.userId === user?.id)
-        || (permission.roleId && applicableRoles.some(role => role.id === permission.roleId))
-        || (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) || permission.public === true;
+      const shouldApplyPermission =
+        (permission.userId && permission.userId === user?.id) ||
+        (permission.roleId && applicableRoles.some((role) => role.id === permission.roleId)) ||
+        (userSpaceRole && permission.spaceId === userSpaceRole.spaceId) ||
+        permission.public === true;
 
       if (shouldApplyPermission) {
-
-        const permissionsToEnable = permission.permissionLevel === 'custom' ? permission.permissions : permissionTemplates[permission.permissionLevel];
+        const permissionsToEnable =
+          permission.permissionLevel === 'custom'
+            ? permission.permissions
+            : permissionTemplates[permission.permissionLevel];
 
         computedPermissions.addPermissions(permissionsToEnable);
       }
@@ -135,18 +146,22 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     return computedPermissions;
   }
 
-  async function deletePage ({ pageId, board }: { pageId: string, board?: Block }) {
+  async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];
-    const totalNonArchivedPages = Object.values(pages).filter((p => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board'))).length;
+    const totalNonArchivedPages = Object.values(pages).filter(
+      (p) => p?.deletedAt === null && (p?.type === 'page' || p?.type === 'board')
+    ).length;
 
     if (page && user && currentSpace) {
       const { pageIds } = await charmClient.archivePage(page.id);
       let newPage: null | PageMeta = null;
       if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
-        newPage = await charmClient.createPage(untitledPage({
-          userId: user.id,
-          spaceId: currentSpace.id
-        }));
+        newPage = await charmClient.createPage(
+          untitledPage({
+            userId: user.id,
+            spaceId: currentSpace.id
+          })
+        );
       }
 
       // Delete the page associated with the card
@@ -164,7 +179,7 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       }
 
       _setPages((_pages) => {
-        pageIds.forEach(_pageId => {
+        pageIds.forEach((_pageId) => {
           _pages[_pageId] = {
             ..._pages[_pageId],
             deletedAt: new Date()
@@ -181,34 +196,48 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     }
   }
 
-  const mutatePage = useCallback((page: PageUpdates, revalidate = false) => {
-    mutatePagesList(pagesData => {
-      const currentPageData = pagesData?.[page.id];
-      if (pagesData) {
-        const updatedData: PageMeta = currentPageData ? { ...currentPageData, ...page } : page as PageMeta;
-        return { ...pagesData, [page.id]: updatedData };
-      }
-    }, { revalidate });
-  }, [mutate]);
+  const mutatePage = useCallback(
+    (page: PageUpdates, revalidate = false) => {
+      mutatePagesList(
+        (pagesData) => {
+          const currentPageData = pagesData?.[page.id];
+          if (pagesData) {
+            const updatedData: PageMeta = currentPageData ? { ...currentPageData, ...page } : (page as PageMeta);
+            return { ...pagesData, [page.id]: updatedData };
+          }
+        },
+        { revalidate }
+      );
+    },
+    [mutate]
+  );
 
-  const mutatePagesRemove = useCallback((pageIds: string[], revalidate = false) => {
-    mutatePagesList(pagesData => {
-      if (pagesData) {
-        const udpatedData = { ...pagesData };
-        pageIds.forEach(id => delete udpatedData[id]);
-        return udpatedData;
-      }
-    }, { revalidate });
-  }, [mutate]);
+  const mutatePagesRemove = useCallback(
+    (pageIds: string[], revalidate = false) => {
+      mutatePagesList(
+        (pagesData) => {
+          if (pagesData) {
+            const udpatedData = { ...pagesData };
+            pageIds.forEach((id) => delete udpatedData[id]);
+            return udpatedData;
+          }
+        },
+        { revalidate }
+      );
+    },
+    [mutate]
+  );
 
-  const updatePage = useCallback(async (updates: PageUpdates) => {
+  const updatePage = useCallback(
+    async (updates: PageUpdates) => {
+      const updatedPage = await charmClient.pages.updatePage(updates);
 
-    const updatedPage = await charmClient.pages.updatePage(updates);
+      return updatedPage;
+    },
+    [mutatePage]
+  );
 
-    return updatedPage;
-  }, [mutatePage]);
-
-  async function refreshPage (pageId: string): Promise<PageMeta> {
+  async function refreshPage(pageId: string): Promise<PageMeta> {
     const freshPageVersion = await charmClient.pages.getPage(pageId);
     mutatePage(freshPageVersion);
 
@@ -216,35 +245,34 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
   }
 
   const handleUpdateEvent = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
+    mutatePagesList(
+      (existingPages) => {
+        const _existingPages = existingPages || {};
+        const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
+          const existingPage = _existingPages[updatedPageMeta.id];
 
-    mutatePagesList(existingPages => {
-      const _existingPages = existingPages || {};
-      const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
+          if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
+            pageMap[updatedPageMeta.id] = {
+              ...existingPage,
+              ...updatedPageMeta
+            };
+          }
 
-        const existingPage = _existingPages[updatedPageMeta.id];
+          return pageMap;
+        }, {});
 
-        if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
-          pageMap[updatedPageMeta.id] = {
-            ...existingPage,
-            ...updatedPageMeta
-          };
-        }
-
-        return pageMap;
-
-      }, {});
-
-      return {
-        ..._existingPages,
-        ...pagesToUpdate
-      };
-    }, {
-      revalidate: false
-    });
+        return {
+          ..._existingPages,
+          ...pagesToUpdate
+        };
+      },
+      {
+        revalidate: false
+      }
+    );
   }, []);
 
   const handleNewPageEvent = useCallback((value: WebSocketPayload<'pages_created'>) => {
-
     const newPages = value.reduce<PagesMap>((pageMap, page) => {
       if (page.spaceId === currentSpaceId.current) {
         pageMap[page.id] = page;
@@ -252,30 +280,34 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
       return pageMap;
     }, {});
 
-    mutatePagesList(existingPages => {
-      return {
-        ...(existingPages ?? {}),
-        ...newPages
-      };
-    }, {
-      revalidate: false
-    });
+    mutatePagesList(
+      (existingPages) => {
+        return {
+          ...(existingPages ?? {}),
+          ...newPages
+        };
+      },
+      {
+        revalidate: false
+      }
+    );
   }, []);
 
   const handleDeleteEvent = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
+    mutatePagesList(
+      (existingPages) => {
+        const newValue = { ...existingPages };
 
-    mutatePagesList(existingPages => {
+        value.forEach((deletedPage) => {
+          delete newValue[deletedPage.id];
+        });
 
-      const newValue = { ...existingPages };
-
-      value.forEach(deletedPage => {
-        delete newValue[deletedPage.id];
-      });
-
-      return newValue;
-    }, {
-      revalidate: false
-    });
+        return newValue;
+      },
+      {
+        revalidate: false
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -294,29 +326,28 @@ export function PagesProvider ({ children }: { children: ReactNode }) {
     currentSpaceId.current = currentSpace?.id;
   }, [currentSpace]);
 
-  const value: PagesContext = useMemo(() => ({
-    currentPageId,
-    deletePage,
-    loadingPages: !data,
-    pages,
-    setCurrentPageId,
-    setPages: _setPages,
-    getPagePermissions,
-    refreshPage,
-    updatePage,
-    mutatePage,
-    mutatePagesRemove,
-    mutatePagesList
-  }), [currentPageId, router, !!data, pages, user]);
-
-  return (
-    <PagesContext.Provider value={value}>
-      {children}
-    </PagesContext.Provider>
+  const value: PagesContext = useMemo(
+    () => ({
+      currentPageId,
+      deletePage,
+      loadingPages: !data,
+      pages,
+      setCurrentPageId,
+      setPages: _setPages,
+      getPagePermissions,
+      refreshPage,
+      updatePage,
+      mutatePage,
+      mutatePagesRemove,
+      mutatePagesList
+    }),
+    [currentPageId, router, !!data, pages, user]
   );
+
+  return <PagesContext.Provider value={value}>{children}</PagesContext.Provider>;
 }
 
-export function getPagesListCacheKey (spaceId: string) {
+export function getPagesListCacheKey(spaceId: string) {
   return `pages/${spaceId}`;
 }
 

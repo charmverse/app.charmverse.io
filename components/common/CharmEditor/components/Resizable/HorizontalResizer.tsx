@@ -15,7 +15,7 @@ interface ResizerProps {
   onResizeStop?: ResizableProps['onResizeStop'];
 }
 
-function Resizer (props: ResizerProps) {
+function Resizer(props: ResizerProps) {
   const height = props.aspectRatio ? props.width / props.aspectRatio : 0;
   return (
     <ResizableContainer>
@@ -27,7 +27,11 @@ function Resizer (props: ResizerProps) {
         resizeHandles={['w', 'e']}
         onResizeStop={props.onResizeStop}
         minConstraints={[props.minWidth, Infinity]}
-        maxConstraints={props.maxWidth ? [props.maxWidth, props.aspectRatio ? props.maxWidth / props.aspectRatio : Infinity] : undefined}
+        maxConstraints={
+          props.maxWidth
+            ? [props.maxWidth, props.aspectRatio ? props.maxWidth / props.aspectRatio : Infinity]
+            : undefined
+        }
         // handle={(handleAxis: string, ref: React.Ref<unknown>) => <ResizableHandle ref={ref} className={`react-resizable-handle react-resizable-handle-${handleAxis}`} />}
       >
         {props.children}

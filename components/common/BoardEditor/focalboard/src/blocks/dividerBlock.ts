@@ -3,10 +3,10 @@ import { createBlock } from './block';
 import type { ContentBlock } from './contentBlock';
 
 type DividerBlock = ContentBlock & {
-    type: 'divider';
-}
+  type: 'divider';
+};
 
-function createDividerBlock (block?: Block): DividerBlock {
+function createDividerBlock(block?: Block): DividerBlock {
   return {
     ...createBlock(block),
     type: 'divider'

@@ -25,7 +25,7 @@ interface CustomizedSnackbarProps {
   isOpen?: boolean;
 }
 
-export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
+export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
   const { setIsOpen, severity, message, actions, origin, handleClose, isOpen } = useSnackbar();
   const router = useRouter();
 
@@ -55,7 +55,7 @@ export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
         <Alert
           action={[
             ...(actionsProp || actions || []),
-            <IconButton key='clear' onClick={handleCloseProp ?? handleClose as any} color='inherit'>
+            <IconButton key='clear' onClick={handleCloseProp ?? (handleClose as any)} color='inherit'>
               <ClearIcon fontSize='small' />
             </IconButton>
           ]}

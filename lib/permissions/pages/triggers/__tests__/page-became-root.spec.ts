@@ -1,4 +1,3 @@
-
 import type { PagePermission } from '@prisma/client';
 
 import { prisma } from 'db';
@@ -16,7 +15,6 @@ import { setupPermissionsAfterPageRepositioned } from '../page-repositioned';
  */
 describe('setupPermissionsAfterPageRepositioned / page became root', () => {
   it('should convert all permissions inherited by the page to permissions owned by the page', async () => {
-
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const root = await createPage({
@@ -52,7 +50,6 @@ describe('setupPermissionsAfterPageRepositioned / page became root', () => {
     expect(updatedPage.permissions.length).toBe(1);
     expect(updatedPage.permissions[0].permissionLevel).toBe('full_access');
     expect(updatedPage.permissions[0].inheritedFromPermission).toBeNull();
-
   });
 
   it('should update inherited permissions for child pages of the page to now inherit from this page', async () => {
@@ -115,10 +112,9 @@ describe('setupPermissionsAfterPageRepositioned / page became root', () => {
     const { targetPage } = await resolvePageTree({ pageId: child.id });
     const childPages = flattenTree(targetPage);
 
-    childPages.forEach(nestedPage => {
-      nestedPage.permissions.forEach(nestedPagePermission => {
+    childPages.forEach((nestedPage) => {
+      nestedPage.permissions.forEach((nestedPagePermission) => {
         expect(nestedPagePermission.inheritedFromPermission).toBe(childPermission.id);
-
       });
     });
   });
@@ -168,22 +164,20 @@ describe('setupPermissionsAfterPageRepositioned / page became root', () => {
 
     await setupPermissionsAfterPageRepositioned(child.id);
 
-    const nestedPage = await getPage(subChild1.id) as IPageWithPermissions;
+    const nestedPage = (await getPage(subChild1.id)) as IPageWithPermissions;
 
     expect(nestedPage.permissions.length).toBe(2);
 
-    const stillHasLocalPermission = nestedPage.permissions.some(permission => {
+    const stillHasLocalPermission = nestedPage.permissions.some((permission) => {
       return permission.userId === user.id && permission.inheritedFromPermission === null;
     });
 
     expect(stillHasLocalPermission).toBe(true);
-
   });
 });
 
 describe('setupPermissionsAfterPageRepositioned / page repositioned below other page', () => {
   it('should establish an inheritance link with the parent if it has at least the same amount of permissions', async () => {
-
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const root = await createPage({
@@ -238,9 +232,13 @@ describe('setupPermissionsAfterPageRepositioned / page repositioned below other 
 
     expect(updatedPage.permissions.length).toBe(2);
 
-    const childSpacePermission = updatedPage.permissions.find(permission => permission.spaceId === space.id) as PagePermission;
+    const childSpacePermission = updatedPage.permissions.find(
+      (permission) => permission.spaceId === space.id
+    ) as PagePermission;
 
-    const childUserPermission = updatedPage.permissions.find(permission => permission.userId === user.id) as PagePermission;
+    const childUserPermission = updatedPage.permissions.find(
+      (permission) => permission.userId === user.id
+    ) as PagePermission;
 
     // Permission is same as parent, so we can update it to inherit from there
     expect(childSpacePermission.permissionLevel).toBe('full_access');
@@ -249,7 +247,5 @@ describe('setupPermissionsAfterPageRepositioned / page repositioned below other 
     // The permission should have been maintained without modification or inheritance
     expect(childUserPermission.permissionLevel).toBe('full_access');
     expect(childUserPermission.inheritedFromPermission).toBeNull();
-
   });
-
 });

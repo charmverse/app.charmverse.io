@@ -6,8 +6,7 @@ import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { fetchLanguage, getLanguage } from 'components/common/BoardEditor/focalboard/src/store/language';
 
-export default function IntlProviderComponent ({ children }: { children: ReactNode }) {
-
+export default function IntlProviderComponent({ children }: { children: ReactNode }) {
   const language = useAppSelector<string>(getLanguage);
   const dispatch = useAppDispatch();
 
@@ -16,10 +15,7 @@ export default function IntlProviderComponent ({ children }: { children: ReactNo
   }, []);
 
   return (
-    <IntlProvider
-      locale={language.split(/[_]/)[0]}
-      messages={getMessages(language)}
-    >
+    <IntlProvider locale={language.split(/[_]/)[0]} messages={getMessages(language)}>
       {children}
     </IntlProvider>
   );

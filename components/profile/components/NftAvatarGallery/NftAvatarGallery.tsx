@@ -28,7 +28,7 @@ type Props = {
   emptyMessage?: string;
 };
 
-export default function NftAvatarGallery ({ onSelect, isSaving, nfts, isLoading, emptyMessage }: Props) {
+export default function NftAvatarGallery({ onSelect, isSaving, nfts, isLoading, emptyMessage }: Props) {
   const { user } = useUser();
 
   const getIsSelected = (nft: NftData) => {
@@ -36,29 +36,34 @@ export default function NftAvatarGallery ({ onSelect, isSaving, nfts, isLoading,
       return false;
     }
 
-    return user.avatarContract?.toLowerCase() === nft.contract.toLowerCase()
-    && user.avatarTokenId?.toLowerCase() === nft.tokenId.toLowerCase()
-    && user.avatarChain === nft.chainId;
+    return (
+      user.avatarContract?.toLowerCase() === nft.contract.toLowerCase() &&
+      user.avatarTokenId?.toLowerCase() === nft.tokenId.toLowerCase() &&
+      user.avatarChain === nft.chainId
+    );
   };
 
   return (
     <Box position='relative'>
       <Grid container spacing={1}>
-        {isLoading ? [0, 1, 2].map(id => (
-          <Grid key={id} item xs={6} sm={3} sx={{ minWidth: 110 }}>
-            <Stack spacing={1}>
-              <Skeleton variant='rectangular' width={100} height={80} />
-              <Skeleton variant='text' sx={{ fontSize: '1rem' }} />
-            </Stack>
-          </Grid>
-        ))
-          : nfts?.length ? nfts.map(nft => (
+        {isLoading ? (
+          [0, 1, 2].map((id) => (
+            <Grid key={id} item xs={6} sm={3} sx={{ minWidth: 110 }}>
+              <Stack spacing={1}>
+                <Skeleton variant='rectangular' width={100} height={80} />
+                <Skeleton variant='text' sx={{ fontSize: '1rem' }} />
+              </Stack>
+            </Grid>
+          ))
+        ) : nfts?.length ? (
+          nfts.map((nft) => (
             <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
               <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
             </Grid>
-          )) : (
-            <EmptyAvatarGallery emptyMessage={emptyMessage} />
-          )}
+          ))
+        ) : (
+          <EmptyAvatarGallery emptyMessage={emptyMessage} />
+        )}
       </Grid>
 
       {isSaving && (

@@ -1,4 +1,3 @@
-
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
@@ -12,9 +11,9 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   buttonText?: string;
   title?: string;
   onConfirm: () => void;
-}
+};
 
-export default function ConfirmDeleteModal ({
+export default function ConfirmDeleteModal({
   onClose,
   open,
   question,
@@ -23,39 +22,21 @@ export default function ConfirmDeleteModal ({
   onConfirm,
   size
 }: Props) {
-
-  function _onConfirm () {
+  function _onConfirm() {
     onConfirm();
     onClose();
   }
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={title}
-      size={size}
-    >
-      {typeof question === 'string' ? (
-        <Typography>
-          {question}
-        </Typography>
-      ) : question}
+    <Modal open={open} onClose={onClose} title={title} size={size}>
+      {typeof question === 'string' ? <Typography>{question}</Typography> : question}
 
       <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
-        <Button
-          color='error'
-          sx={{ mr: 2, fontWeight: 'bold' }}
-          onClick={_onConfirm}
-        >
+        <Button color='error' sx={{ mr: 2, fontWeight: 'bold' }} onClick={_onConfirm}>
           {buttonText}
         </Button>
 
-        <Button
-          color='secondary'
-          variant='outlined'
-          onClick={onClose}
-        >
+        <Button color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
       </Box>

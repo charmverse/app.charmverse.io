@@ -4,10 +4,16 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { PageNode, PageNodeWithChildren, PageTreeMappingInput, TargetPageTree } from './interfaces';
 
-export function sortNodes <T> (nodes: PageNode<T>[]) {
+export function sortNodes<T>(nodes: PageNode<T>[]) {
   return [
-    ...sortBy(nodes.filter(node => node.index >= 0), ['index', 'createdAt']),
-    ...sortBy(nodes.filter(node => node.index < 0), ['createdAt'])
+    ...sortBy(
+      nodes.filter((node) => node.index >= 0),
+      ['index', 'createdAt']
+    ),
+    ...sortBy(
+      nodes.filter((node) => node.index < 0),
+      ['createdAt']
+    )
   ];
 }
 
@@ -15,20 +21,25 @@ export function sortNodes <T> (nodes: PageNode<T>[]) {
  * @targetPageId If provided, the only root node returned will be the one whose child tree contains the target page ID
  * @includeCards - Defaults to false
  */
-export function reducePagesToPageTree<
-    T extends PageNode = PageNode> ({ items, rootPageIds, includeCards = false, includeDeletedPages, includeProposals }: Omit<PageTreeMappingInput<T>, 'targetPageId'>): { itemMap: { [key: string]: number }, itemsWithChildren: PageNodeWithChildren<T>[], rootNodes: PageNodeWithChildren<T>[] } {
-
-  function includableNode (node: PageNode): boolean {
+export function reducePagesToPageTree<T extends PageNode = PageNode>({
+  items,
+  rootPageIds,
+  includeCards = false,
+  includeDeletedPages,
+  includeProposals
+}: Omit<PageTreeMappingInput<T>, 'targetPageId'>): {
+  itemMap: { [key: string]: number };
+  itemsWithChildren: PageNodeWithChildren<T>[];
+  rootNodes: PageNodeWithChildren<T>[];
+} {
+  function includableNode(node: PageNode): boolean {
     if (!includeDeletedPages && node.deletedAt) {
       return false;
-    }
-    else if (!includeProposals && node.type === 'proposal') {
+    } else if (!includeProposals && node.type === 'proposal') {
       return false;
-    }
-    else if (!includeCards && node.type === 'card') {
+    } else if (!includeCards && node.type === 'card') {
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
@@ -57,14 +68,14 @@ export function reducePagesToPageTree<
     node = tempItems[i];
     const parentId = node.parentId;
     const parentIndex = parentId ? map[parentId] : -1;
-    const parentNode = (typeof parentIndex === 'number' && parentIndex >= 0) ? tempItems[parentIndex] : undefined;
+    const parentNode = typeof parentIndex === 'number' && parentIndex >= 0 ? tempItems[parentIndex] : undefined;
 
     if (parentNode && includableNode(node)) {
       parentNode.children.push(node);
       parentNode.children = sortNodes(parentNode.children);
     }
     // If it's a root page always show it
-    else if ((node.parentId === null) && !rootPageIds && includableNode(node)) {
+    else if (node.parentId === null && !rootPageIds && includableNode(node)) {
       roots.push(node);
     }
 
@@ -78,15 +89,24 @@ export function reducePagesToPageTree<
     rootNodes: sortNodes(roots),
     itemsWithChildren: tempItems
   };
-
 }
 
 /**
  * Used in the user interface to map pages to a navigable tree
  */
-export function mapPageTree<
-T extends PageNode = PageNode> ({ items, rootPageIds, includeDeletedPages, includeProposals = false }: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): PageNodeWithChildren<T>[] {
-  const { rootNodes } = reducePagesToPageTree({ items, rootPageIds, includeCards: false, includeDeletedPages, includeProposals });
+export function mapPageTree<T extends PageNode = PageNode>({
+  items,
+  rootPageIds,
+  includeDeletedPages,
+  includeProposals = false
+}: Omit<PageTreeMappingInput<T>, 'targetPageId' | 'includeCards'>): PageNodeWithChildren<T>[] {
+  const { rootNodes } = reducePagesToPageTree({
+    items,
+    rootPageIds,
+    includeCards: false,
+    includeDeletedPages,
+    includeProposals
+  });
 
   return sortNodes(rootNodes);
 }
@@ -95,16 +115,21 @@ T extends PageNode = PageNode> ({ items, rootPageIds, includeDeletedPages, inclu
  * Given a list of pages, resolve only the tree specific to the target page
  * @return parents is the array of parent pages from nearest parent to the root. target page is the target page along with all child pages as a tree
  */
-export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targetPageId, includeDeletedPages }: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
-
+export function mapTargetPageTree<T extends PageNode = PageNode>({
+  items,
+  targetPageId,
+  includeDeletedPages
+}: Omit<PageTreeMappingInput<T>, 'rootPageIds'> & { targetPageId: string }): TargetPageTree<T> {
   const { itemMap, itemsWithChildren } = reducePagesToPageTree({ items, includeCards: true, includeDeletedPages });
 
   /**
    * Goes from the page to its root, and generates a list of references corresponding to the path
    * @childIdChain A list of page IDs going from the target page to the first child of the root
    */
-  function resolveRootId (currentNodeId: string, childIdChain: string[] = []): { rootId: string, childIdChain: string[] } {
-
+  function resolveRootId(
+    currentNodeId: string,
+    childIdChain: string[] = []
+  ): { rootId: string; childIdChain: string[] } {
     const currentNode = itemsWithChildren[itemMap[currentNodeId]];
 
     const parentId = currentNode.parentId;
@@ -129,16 +154,14 @@ export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targe
   const parents: PageNodeWithChildren<T>[] = [];
 
   if (rootNode.id !== targetPageId) {
-
     const childIdChainFromRootChild = childIdChain.reverse();
 
     let currentNode = rootNode as PageNodeWithChildren<T>;
 
     for (const childId of childIdChainFromRootChild) {
-
       parents.push(currentNode);
 
-      const childNode = currentNode.children.find(child => child.id === childId);
+      const childNode = currentNode.children.find((child) => child.id === childId);
 
       if (!childNode) {
         throw new DataNotFoundError('Could not find the target child page');
@@ -155,16 +178,16 @@ export function mapTargetPageTree<T extends PageNode = PageNode> ({ items, targe
     parents: parents.reverse(),
     targetPage: targetPageNode
   } as TargetPageTree<T>;
-
 }
 
 /**
-* Given a page node, returns a flattened list of its children
-*/
-export function flattenTree<T extends PageNode = PageNode> (node: PageNodeWithChildren<T>, flatNodes: PageNodeWithChildren<T>[] = []):
- PageNodeWithChildren<T>[] {
-
-  node.children.forEach(childNode => {
+ * Given a page node, returns a flattened list of its children
+ */
+export function flattenTree<T extends PageNode = PageNode>(
+  node: PageNodeWithChildren<T>,
+  flatNodes: PageNodeWithChildren<T>[] = []
+): PageNodeWithChildren<T>[] {
+  node.children.forEach((childNode) => {
     flatNodes.push(childNode);
     flattenTree(childNode, flatNodes);
   });

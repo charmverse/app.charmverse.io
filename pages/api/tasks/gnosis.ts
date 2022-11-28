@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getGnosisTasks);
 
-async function getGnosisTasks (req: NextApiRequest, res: NextApiResponse<GnosisSafeTasks[]>) {
+async function getGnosisTasks(req: NextApiRequest, res: NextApiResponse<GnosisSafeTasks[]>) {
   const userId = req.session.user.id;
   const gnosisTasks = await getPendingGnosisTasks(userId);
   return res.status(200).json(gnosisTasks);

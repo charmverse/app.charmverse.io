@@ -5,13 +5,12 @@ import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 
 const name = 'iframe';
 
-export function spec (): RawSpecs {
+export function spec(): RawSpecs {
   return {
     type: 'node',
     name,
     markdown: {
       toMarkdown: (state, node) => {
-
         // eslint-disable-next-line prefer-const
         let { height, width, src } = node.attrs;
 

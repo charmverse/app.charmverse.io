@@ -5,31 +5,25 @@
 import { diffWordsWithSpace, diffChars } from 'diff';
 import type { Node, Schema } from 'prosemirror-model';
 import type { Step } from 'prosemirror-transform';
-import {
-  Transform, ReplaceStep
-} from 'prosemirror-transform';
+import { Transform, ReplaceStep } from 'prosemirror-transform';
 import type { Operation, TestOperation } from 'rfc6902';
 import { applyPatch, createPatch } from 'rfc6902';
 
-function getReplaceStep (fromDoc: Node, toDoc: Node) {
+function getReplaceStep(fromDoc: Node, toDoc: Node) {
   let start = toDoc.content.findDiffStart(fromDoc.content);
   if (!start) {
     return false;
   }
-  let {
-    a: endA,
-    b: endB
-  } = toDoc.content.findDiffEnd(fromDoc.content) as { a: number, b: number };
+  let { a: endA, b: endB } = toDoc.content.findDiffEnd(fromDoc.content) as { a: number; b: number };
   const overlap = start - Math.min(endA, endB);
   if (overlap > 0) {
     if (
-    // If there is an overlap, there is some freedom of choise in how to calculate the start/end boundary.
-    // for an inserted/removed slice. We choose the extreme with the lowest depth value.
+      // If there is an overlap, there is some freedom of choise in how to calculate the start/end boundary.
+      // for an inserted/removed slice. We choose the extreme with the lowest depth value.
       fromDoc.resolve(start - overlap).depth < toDoc.resolve(endA + overlap).depth
     ) {
       start -= overlap;
-    }
-    else {
+    } else {
       endA += overlap;
       endB += overlap;
     }
@@ -38,7 +32,6 @@ function getReplaceStep (fromDoc: Node, toDoc: Node) {
 }
 
 class RecreateTransform {
-
   fromDoc: Node;
 
   toDoc: Node;
@@ -58,7 +51,7 @@ class RecreateTransform {
 
   tr: Transform;
 
-  constructor (fromDoc: Node, toDoc: Node, complexSteps: boolean, wordDiffs: boolean) {
+  constructor(fromDoc: Node, toDoc: Node, complexSteps: boolean, wordDiffs: boolean) {
     this.fromDoc = fromDoc;
     this.toDoc = toDoc;
     this.complexSteps = complexSteps; // Whether to return steps other than ReplaceSteps
@@ -67,7 +60,7 @@ class RecreateTransform {
     this.tr = new Transform(fromDoc);
   }
 
-  init () {
+  init() {
     if (this.complexSteps) {
       // For First steps: we create versions of the documents without marks as
       // these will only confuse the diffing mechanism and marks won't cause
@@ -77,8 +70,7 @@ class RecreateTransform {
       this.ops = createPatch(this.currentJSON, this.finalJSON);
       this.recreateChangeContentSteps();
       this.recreateChangeMarkSteps();
-    }
-    else {
+    } else {
       // We don't differentiate between mark changes and other changes.
       this.currentJSON = this.fromDoc.toJSON();
       this.finalJSON = this.toDoc.toJSON();
@@ -91,7 +83,7 @@ class RecreateTransform {
     return this.tr;
   }
 
-  recreateChangeContentSteps () {
+  recreateChangeContentSteps() {
     // First step: find content changing steps.
     let ops = [];
     let afterStepJSON = JSON.parse(JSON.stringify(this.currentJSON));
@@ -105,14 +97,12 @@ class RecreateTransform {
         try {
           toDoc = this.schema.nodeFromJSON(afterStepJSON);
           toDoc.check();
-        }
-        catch (error) {
+        } catch (error) {
           toDoc = false;
           if (this.ops.length) {
             op = this.ops.shift()!;
             ops.push(op);
-          }
-          else {
+          } else {
             throw error;
           }
         }
@@ -123,21 +113,19 @@ class RecreateTransform {
         this.addSetNodeMarkup();
         ops = [];
         afterStepJSON = JSON.parse(JSON.stringify(this.currentJSON));
-      }
-      else if (ops.length === 1 && op.op === 'replace' && pathParts[pathParts.length - 1] === 'text') {
+      } else if (ops.length === 1 && op.op === 'replace' && pathParts[pathParts.length - 1] === 'text') {
         // Text is being replaced, we apply text diffing to find the smallest possible diffs.
         this.addReplaceTextSteps(op, afterStepJSON);
         ops = [];
         afterStepJSON = JSON.parse(JSON.stringify(this.currentJSON));
-      }
-      else if (this.addReplaceStep(toDoc, afterStepJSON)) {
+      } else if (this.addReplaceStep(toDoc, afterStepJSON)) {
         ops = [];
         afterStepJSON = JSON.parse(JSON.stringify(this.currentJSON));
       }
     }
   }
 
-  recreateChangeMarkSteps () {
+  recreateChangeMarkSteps() {
     // Now the documents should be the same, except their marks, so everything should map 1:1.
     // Second step: Iterate through the toDoc and make sure all marks are the same in tr.doc
     this.toDoc.descendants((tNode, tPos) => {
@@ -151,12 +139,12 @@ class RecreateTransform {
         }
         const from = Math.max(tPos, fPos);
         const to = Math.min(tPos + tNode.nodeSize, fPos + fNode.nodeSize);
-        fNode.marks.forEach(nodeMark => {
+        fNode.marks.forEach((nodeMark) => {
           if (!nodeMark.isInSet(tNode.marks)) {
             this.tr.removeMark(from, to, nodeMark);
           }
         });
-        tNode.marks.forEach(nodeMark => {
+        tNode.marks.forEach((nodeMark) => {
           if (!nodeMark.isInSet(fNode.marks)) {
             this.tr.addMark(from, to, nodeMark);
           }
@@ -165,29 +153,27 @@ class RecreateTransform {
     });
   }
 
-  marklessDoc (doc: Node) {
+  marklessDoc(doc: Node) {
     const tr = new Transform(doc);
     tr.removeMark(0, doc.nodeSize - 2);
     return tr.doc;
   }
 
   // From http://prosemirror.net/examples/footnote/
-  addReplaceStep (toDoc: Node, afterStepJSON: any) {
+  addReplaceStep(toDoc: Node, afterStepJSON: any) {
     const fromDoc = this.schema.nodeFromJSON(this.currentJSON);
     const step = getReplaceStep(fromDoc, toDoc);
     if (!step) {
       return false;
-    }
-    else if (!this.tr.maybeStep(step).failed) {
+    } else if (!this.tr.maybeStep(step).failed) {
       this.currentJSON = afterStepJSON;
       return true;
-    }
-    else {
+    } else {
       throw new Error('No valid step found.');
     }
   }
 
-  addSetNodeMarkup () {
+  addSetNodeMarkup() {
     const fromDoc = this.schema.nodeFromJSON(this.currentJSON);
     const toDoc = this.schema.nodeFromJSON(this.finalJSON);
     const start = toDoc.content.findDiffStart(fromDoc.content);
@@ -195,9 +181,13 @@ class RecreateTransform {
       const fromNode = fromDoc.nodeAt(start)!;
       const toNode = toDoc.nodeAt(start)!;
       try {
-        this.tr.setNodeMarkup(start, fromNode.type === toNode.type ? undefined : toNode.type, toNode.attrs, toNode.marks);
-      }
-      catch (error) {
+        this.tr.setNodeMarkup(
+          start,
+          fromNode.type === toNode.type ? undefined : toNode.type,
+          toNode.attrs,
+          toNode.marks
+        );
+      } catch (error) {
         return;
       }
       this.currentJSON = this.marklessDoc(this.tr.doc).toJSON();
@@ -206,7 +196,7 @@ class RecreateTransform {
     }
   }
 
-  addReplaceTextSteps (op: Operation, afterStepJSON: any) {
+  addReplaceTextSteps(op: Operation, afterStepJSON: any) {
     // We find the position number of the first character in the string
     const op1 = { ...op, value: 'xx' };
     const op2 = { ...op, value: 'yy' };
@@ -248,16 +238,11 @@ class RecreateTransform {
             offset + nextDiff.value.length,
             this.schema.nodeFromJSON({ type: 'text', text: diff.value }).mark(marks)
           );
-        }
-        else {
-          this.tr.insert(
-            offset,
-            this.schema.nodeFromJSON({ type: 'text', text: diff.value }).mark(marks)
-          );
+        } else {
+          this.tr.insert(offset, this.schema.nodeFromJSON({ type: 'text', text: diff.value }).mark(marks));
         }
         offset += diff.value.length;
-      }
-      else if (diff.removed) {
+      } else if (diff.removed) {
         if (textDiffs[0]?.added) {
           const nextDiff = textDiffs.shift()!;
           this.tr.replaceWith(
@@ -266,12 +251,10 @@ class RecreateTransform {
             this.schema.nodeFromJSON({ type: 'text', text: nextDiff.value }).mark(marks)
           );
           offset += nextDiff.value.length;
-        }
-        else {
+        } else {
           this.tr.delete(offset, offset + diff.value.length);
         }
-      }
-      else {
+      } else {
         offset += diff.value.length;
       }
     }
@@ -279,7 +262,7 @@ class RecreateTransform {
   }
 
   // join adjacent ReplaceSteps
-  simplifyTr () {
+  simplifyTr() {
     if (!this.tr.steps.length) {
       return;
     }
@@ -292,8 +275,7 @@ class RecreateTransform {
         const addedStep = oldSteps.shift()!;
         if (step instanceof ReplaceStep && addedStep instanceof ReplaceStep) {
           step = getReplaceStep(newTr.doc, addedStep.apply(step.apply(newTr.doc).doc!).doc!) || step.merge(addedStep);
-        }
-        else {
+        } else {
           step = step.merge(addedStep);
         }
       }
@@ -305,7 +287,7 @@ class RecreateTransform {
   }
 }
 
-export function recreateTransform (fromDoc: Node, toDoc: Node, complexSteps = true, wordDiffs = true) {
+export function recreateTransform(fromDoc: Node, toDoc: Node, complexSteps = true, wordDiffs = true) {
   const recreator = new RecreateTransform(fromDoc, toDoc, complexSteps, wordDiffs);
   return recreator.init();
 }

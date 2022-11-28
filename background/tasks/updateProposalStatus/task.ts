@@ -1,10 +1,8 @@
-
 import { prisma } from 'db';
 import log from 'lib/log';
 import { count } from 'lib/metrics';
 
-export async function task () {
-
+export async function task() {
   log.debug('Running Proposal status cron job');
 
   try {
@@ -21,7 +19,7 @@ export async function task () {
     await prisma.proposal.updateMany({
       where: {
         id: {
-          in: proposalsToUpdate.map(proposal => proposal.id)
+          in: proposalsToUpdate.map((proposal) => proposal.id)
         }
       },
       data: {
@@ -30,8 +28,7 @@ export async function task () {
     });
 
     count('cron.proposal-status.expired-snapshot-votes', proposalsToUpdate.length);
-  }
-  catch (error: any) {
+  } catch (error: any) {
     log.error(`Error expiring proposals: ${error.stack || error.message || error}`, { error });
   }
 }

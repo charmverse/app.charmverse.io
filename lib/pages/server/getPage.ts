@@ -6,8 +6,11 @@ import { prisma } from 'db';
 
 import type { IPageWithPermissions } from '../interfaces';
 
-export async function getPage (pageIdOrPath: string, spaceId?: string, tx: TransactionClient = prisma): Promise<IPageWithPermissions | null> {
-
+export async function getPage(
+  pageIdOrPath: string,
+  spaceId?: string,
+  tx: TransactionClient = prisma
+): Promise<IPageWithPermissions | null> {
   const isValidUUid = validate(pageIdOrPath);
 
   // We need a spaceId if looking up by path
@@ -15,12 +18,14 @@ export async function getPage (pageIdOrPath: string, spaceId?: string, tx: Trans
     return null;
   }
 
-  const searchQuery: Prisma.PageWhereInput = isValidUUid ? {
-    id: pageIdOrPath
-  } : {
-    path: pageIdOrPath,
-    spaceId
-  };
+  const searchQuery: Prisma.PageWhereInput = isValidUUid
+    ? {
+        id: pageIdOrPath
+      }
+    : {
+        path: pageIdOrPath,
+        spaceId
+      };
 
   return tx.page.findFirst({
     where: searchQuery,
@@ -33,4 +38,3 @@ export async function getPage (pageIdOrPath: string, spaceId?: string, tx: Trans
     }
   });
 }
-

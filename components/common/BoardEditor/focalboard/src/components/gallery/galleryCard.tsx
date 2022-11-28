@@ -32,13 +32,18 @@ type Props = {
   readOnly: boolean;
   isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-}
+};
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
   const { pages, getPagePermissions } = usePages();
   const space = useCurrentSpace();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, props.isManualSort && !props.readOnly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable(
+    'card',
+    card,
+    props.isManualSort && !props.readOnly && !isTouchScreen(),
+    props.onDrop
+  );
   const cardPage = pages[card.id];
 
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
@@ -69,75 +74,55 @@ const GalleryCard = React.memo((props: Props) => {
     }
   };
 
-  return (
-    cardPage ? (
-      <StyledBox
-        className={className}
-        onClick={(e: React.MouseEvent) => props.onClick(e, card)}
-        style={{ opacity: isDragging ? 0.5 : 1 }}
-        ref={cardRef}
-      >
-        {!props.readOnly
-        && (
-          <PageActions
-            page={cardPage}
-            onClickDuplicate={duplicateCard}
-            onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
-          />
-        )}
-        {galleryImageUrl
-        && (
-          <div className='gallery-image'>
-            <img
-              className='ImageElement'
-              src={galleryImageUrl}
-              alt='Gallery item'
-            />
+  return cardPage ? (
+    <StyledBox
+      className={className}
+      onClick={(e: React.MouseEvent) => props.onClick(e, card)}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      ref={cardRef}
+    >
+      {!props.readOnly && (
+        <PageActions
+          page={cardPage}
+          onClickDuplicate={duplicateCard}
+          onClickDelete={pagePermissions.delete && cardPage.deletedAt === null ? deleteCard : undefined}
+        />
+      )}
+      {galleryImageUrl && (
+        <div className='gallery-image'>
+          <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
+        </div>
+      )}
+      {!galleryImageUrl && <div className='gallery-item' />}
+      {props.visibleTitle && (
+        <div className='gallery-title'>
+          {cardPage?.icon ? (
+            <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} />
+          ) : undefined}
+          <div key='__title'>
+            {cardPage?.title || <FormattedMessage id='KanbanCard.untitled' defaultMessage='Untitled' />}
           </div>
-        )}
-        {!galleryImageUrl
-          && <div className='gallery-item' />}
-        {props.visibleTitle
-        && (
-          <div className='gallery-title'>
-            {cardPage?.icon ? <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} /> : undefined}
-            <div key='__title'>
-              {cardPage?.title
-              || (
-                <FormattedMessage
-                  id='KanbanCard.untitled'
-                  defaultMessage='Untitled'
-                />
-              )}
-            </div>
-          </div>
-        )}
-        {visiblePropertyTemplates.length > 0
-        && (
-          <div className='gallery-props'>
-            {visiblePropertyTemplates.map((template) => (
-              <Tooltip
-                key={template.id}
-                title={template.name}
-                placement='top'
-              >
-                <PropertyValueElement
-                  updatedAt={cardPage?.updatedAt.toString() || ''}
-                  updatedBy={cardPage?.updatedBy || ''}
-                  board={board}
-                  readOnly={true}
-                  card={card}
-                  propertyTemplate={template}
-                  showEmptyPlaceholder={false}
-                />
-              </Tooltip>
-            ))}
-          </div>
-        )}
-      </StyledBox>
-    ) : null
-  );
+        </div>
+      )}
+      {visiblePropertyTemplates.length > 0 && (
+        <div className='gallery-props'>
+          {visiblePropertyTemplates.map((template) => (
+            <Tooltip key={template.id} title={template.name} placement='top'>
+              <PropertyValueElement
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
+                board={board}
+                readOnly={true}
+                card={card}
+                propertyTemplate={template}
+                showEmptyPlaceholder={false}
+              />
+            </Tooltip>
+          ))}
+        </div>
+      )}
+    </StyledBox>
+  ) : null;
 });
 
 export default GalleryCard;
-

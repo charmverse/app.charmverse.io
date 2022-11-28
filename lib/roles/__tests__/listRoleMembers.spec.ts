@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -17,9 +16,7 @@ beforeAll(async () => {
 });
 
 describe('listRoleMembers', () => {
-
   it('should return the list of users in a role', async () => {
-
     const role = await generateRole({
       spaceId: space.id,
       createdBy: user.id
@@ -36,20 +33,16 @@ describe('listRoleMembers', () => {
 
     expect(roleAfterAssignment.users.length).toBe(1);
     expect(roleAfterAssignment.users[0].id).toBe(user.id);
-
   });
 
   it('should fail if the role does not exist', async () => {
-
     try {
       await listRoleMembers({
         roleId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
-
 });

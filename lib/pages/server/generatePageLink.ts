@@ -6,15 +6,18 @@ import type { PageLink } from '../interfaces';
 
 import { PageNotFoundError } from './errors';
 
-export async function generatePageLink (pageIdOrPageWithSpaceId: string | (Page & { space: Space })): Promise<PageLink> {
-  const pageWithSpace = typeof pageIdOrPageWithSpaceId === 'string' ? await prisma.page.findUnique({
-    where: {
-      id: pageIdOrPageWithSpaceId
-    },
-    include: {
-      space: true
-    }
-  }) : pageIdOrPageWithSpaceId;
+export async function generatePageLink(pageIdOrPageWithSpaceId: string | (Page & { space: Space })): Promise<PageLink> {
+  const pageWithSpace =
+    typeof pageIdOrPageWithSpaceId === 'string'
+      ? await prisma.page.findUnique({
+          where: {
+            id: pageIdOrPageWithSpaceId
+          },
+          include: {
+            space: true
+          }
+        })
+      : pageIdOrPageWithSpaceId;
 
   if (!pageWithSpace) {
     throw new PageNotFoundError(pageIdOrPageWithSpaceId as string);
