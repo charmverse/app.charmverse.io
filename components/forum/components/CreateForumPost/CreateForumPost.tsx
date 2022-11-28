@@ -11,10 +11,6 @@ import { useUser } from 'hooks/useUser';
 export default function CreateForumPost () {
   const { user } = useUser();
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea onClick={() => alert('Create page')}>
