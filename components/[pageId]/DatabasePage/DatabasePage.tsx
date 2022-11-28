@@ -13,7 +13,6 @@ import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/sr
 import { getCurrentBoardViews, getView, setCurrent as setCurrentView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
-import { WebSocketTester } from 'components/WebSocketTester';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -31,7 +30,7 @@ interface Props {
   pagePermissions?: IPagePermissionFlags;
 }
 
-export default function BoardPage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
+export function DatabasePage ({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
   const activeView = useAppSelector(getView(router.query.viewId as string));

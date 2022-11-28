@@ -22,7 +22,7 @@ function TableHeaderMenu (props: Props): JSX.Element {
   const { board, activeView, templateId, views, cards } = props;
   const intl = useIntl();
   return (
-    <Menu>
+    <Menu disablePortal={false}>
       <Menu.Text
         id='sortAscending'
         name={intl.formatMessage({ id: 'TableHeaderMenu.sort-ascending', defaultMessage: 'Sort ascending' })}
@@ -66,28 +66,28 @@ function TableHeaderMenu (props: Props): JSX.Element {
         }}
       />
       {props.templateId !== Constants.titleColumnId
-                && (
-                  <>
-                    <Menu.Text
-                      id='hide'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
-                      onClick={() => {
-                        const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
-                        mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
-                      }}
-                    />
-                    <Menu.Text
-                      id='duplicate'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
-                      onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
-                    />
-                    <Menu.Text
-                      id='delete'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
-                      onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
-                    />
-                  </>
-                )}
+        && (
+          <>
+            <Menu.Text
+              id='hide'
+              name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
+              onClick={() => {
+                const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
+                mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
+              }}
+            />
+            <Menu.Text
+              id='duplicate'
+              name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
+              onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
+            />
+            <Menu.Text
+              id='delete'
+              name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
+              onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
+            />
+          </>
+        )}
     </Menu>
   );
 }

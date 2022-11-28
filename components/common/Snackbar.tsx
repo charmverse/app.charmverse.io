@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import type { SnackbarOrigin, SnackbarProps } from '@mui/material/Snackbar';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect } from 'react';
 
@@ -26,11 +27,12 @@ interface CustomizedSnackbarProps {
 
 export default function CustomizedSnackbar (props: CustomizedSnackbarProps) {
   const { setIsOpen, severity, message, actions, origin, handleClose, isOpen } = useSnackbar();
+  const router = useRouter();
 
   // Close the snackbar if we change url
   useEffect(() => {
     setIsOpen(false);
-  }, [window.location.href]);
+  }, [router.asPath]);
 
   const {
     actions: actionsProp,

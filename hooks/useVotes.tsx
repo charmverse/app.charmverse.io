@@ -5,11 +5,13 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import useTasks from 'components/nexus/hooks/useTasks';
-import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
+import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { usePages } from './usePages';
 import { useUser } from './useUser';
+import { useWebSocketClient } from './useWebSocketClient';
 
 type IContext = {
   isValidating: boolean;
@@ -32,18 +34,98 @@ const VotesContext = createContext<Readonly<IContext>>({
 });
 
 export function VotesProvider ({ children }: { children: ReactNode }) {
-  const { currentPageId } = usePages();
+  const { currentPageId, pages } = usePages();
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
+  const currentSpace = useCurrentSpace();
+  const { mutate: mutateTasks, tasks: userTasks } = useTasks();
+
+  const { subscribe } = useWebSocketClient();
+
+  useEffect(() => {
+    const unsubscribeFromCreatedVotes = subscribe('votes_created', (newVotes) => {
+
+      // Mutate the votes
+      setVotes((prev) => {
+        const votesToAssign = newVotes.reduce((acc, vote) => {
+          // In future, we'll want to check if the vote is linked to current space.
+          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions.
+          acc[vote.id] = vote;
+          return acc;
+        }, {} as Record<string, VoteTask>);
+
+        return { ...prev, ...votesToAssign };
+      });
+
+      // Mutate the tasks
+      const mutatedTasks: GetTasksResponse = userTasks ?? {
+        bounties: { marked: [], unmarked: [] }, votes: [], discussions: { marked: [], unmarked: [] }, proposals: { marked: [], unmarked: [] }
+      };
+      newVotes.forEach(newVote => {
+        if (!mutatedTasks.votes.find(vote => vote.id === newVote.id)) {
+          mutatedTasks.votes.push(newVote);
+        }
+      });
+      mutateTasks(mutatedTasks);
+
+    });
+
+    const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
+      // Mutate the votes
+
+      setVotes(_votes => {
+        deletedVotes.forEach((vote) => {
+          delete _votes[vote.id];
+        });
+        return { ..._votes };
+      });
+
+      // Mutate the tasks
+      const mutatedTasks: GetTasksResponse = userTasks ?? {
+        bounties: { marked: [], unmarked: [] }, votes: [], discussions: { marked: [], unmarked: [] }, proposals: { marked: [], unmarked: [] }
+      };
+
+      const deletedVoteIds = deletedVotes.map(vote => vote.id);
+
+      mutatedTasks.votes = mutatedTasks.votes.filter(taskVote => !deletedVoteIds.includes(taskVote.id));
+
+      mutateTasks(mutatedTasks);
+    });
+
+    const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
+      // Mutate the votes
+
+      setVotes(_votes => {
+        updatedVotes.forEach((vote) => {
+          _votes[vote.id] = vote;
+        });
+        return { ..._votes };
+      });
+
+      // Remove cancelled votes from tasks
+      const mutatedTasks: GetTasksResponse = userTasks ?? {
+        bounties: { marked: [], unmarked: [] }, votes: [], discussions: { marked: [], unmarked: [] }, proposals: { marked: [], unmarked: [] }
+      };
+
+      const cancelledVoteIds = updatedVotes.filter(v => v.status === 'Cancelled').map(vote => vote.id);
+
+      mutatedTasks.votes = mutatedTasks.votes.filter(taskVote => !cancelledVoteIds.includes(taskVote.id));
+
+      mutateTasks(mutatedTasks);
+    });
+
+    return () => {
+      unsubscribeFromCreatedVotes();
+      unsubscribeFromDeletedVotes();
+      unsubscribeFromUpdatedVotes();
+    };
+  }, []);
 
   const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
 
   const { data, isValidating } = useSWR(() => currentPageId && !cardId ? `pages/${currentPageId}/votes` : null, async () => charmClient.votes.getVotesByPage(currentPageId), {
     revalidateOnFocus: false
   });
-
-  const currentSpace = useCurrentSpace();
-  const { mutate: mutateTasks } = useTasks();
 
   function removeVoteFromTask (voteId: string) {
     mutateTasks((tasks) => {

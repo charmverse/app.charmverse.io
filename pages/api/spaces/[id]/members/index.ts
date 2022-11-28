@@ -132,7 +132,21 @@ async function getMembers (req: NextApiRequest, res: NextApiResponse<Member[]>) 
     } as Member;
   })
     .filter(member => !member.deletedAt) // filter out deleted members
-    .sort((a, b) => b.createdAt > a.createdAt ? -1 : 1); // sort oldest first
+    .sort((a, b) => {
+
+      const first = a.username.toLowerCase();
+      const second = b.username.toLowerCase();
+
+      if (first < second) {
+        return -1;
+      }
+      else if (second > first) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }); // sort members alphabetically
 
   return res.status(200).json(members);
 }

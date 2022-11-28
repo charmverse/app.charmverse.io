@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
@@ -33,7 +33,7 @@ export function AlternateRouteButton ({ href, children }: { href: string, childr
 
 export default function JoinWorkspace () {
   const router = useRouter();
-  const domain = router.query.domain;
+  const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const { showOnboarding } = useOnboarding();
 
@@ -50,7 +50,7 @@ export default function JoinWorkspace () {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join a workspace</DialogTitle>
         <Divider />
-        {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain as string} /> : <JoinDynamicSpaceForm />}
+        {domain ? <JoinPredefinedSpaceDomain spaceDomain={domain} /> : <JoinDynamicSpaceForm />}
       </Card>
       <AlternateRouteButton href='/createWorkspace'>
         Create a workspace

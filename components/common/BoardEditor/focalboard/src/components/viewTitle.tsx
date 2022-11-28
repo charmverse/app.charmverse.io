@@ -162,6 +162,7 @@ function ViewTitle (props: Props) {
           <div className='description'>
             <CharmEditor
               disablePageSpecificFeatures
+              isContentControlled={true}
               content={board.fields.description}
               onContentChange={(content: ICharmEditorOutput) => {
                 onDescriptionChange(content.doc);

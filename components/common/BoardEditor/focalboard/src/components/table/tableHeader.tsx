@@ -1,7 +1,7 @@
 
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
-import { Typography } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import React from 'react';
 
 import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
@@ -9,6 +9,7 @@ import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
+import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Label from '../../widgets/label';
 import MenuWrapper from '../../widgets/menuWrapper';
@@ -53,6 +54,15 @@ function TableHeader (props: Props): JSX.Element {
     className += ' dragover';
   }
 
+  function reverseSort (e: React.MouseEvent<HTMLButtonElement>) {
+    mutator.changeViewSortOptions(
+      props.activeView.id,
+      props.activeView.fields.sortOptions,
+      [{ propertyId: props.template.id, reversed: props.sorted === 'up' }]
+    );
+    e.stopPropagation();
+  }
+
   return (
     <div
       className={className}
@@ -61,16 +71,20 @@ function TableHeader (props: Props): JSX.Element {
     >
       <MenuWrapper disabled={props.readOnly}>
         <Label>
-          <div style={{ marginRight: 4, display: 'flex' }}>{iconForPropertyType(props.type, {
-            sx: {
-              width: 18,
-              height: 18
-            }
-          })}
+          <div>
+            <div style={{ marginRight: 4, display: 'flex' }}>{iconForPropertyType(props.type, {
+              sx: {
+                width: 18,
+                height: 18
+              }
+            })}
+            </div>
           </div>
-          <Typography component='div' variant='subtitle1'>{props.name}</Typography>
-          {props.sorted === 'up' && <ArrowUpwardOutlinedIcon />}
-          {props.sorted === 'down' && <ArrowDownwardOutlinedIcon />}
+          <Typography component='span' variant='subtitle1'>{props.name}</Typography>
+          <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>
+            {props.sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize='small' />}
+            {props.sorted === 'down' && <ArrowDownwardOutlinedIcon fontSize='small' />}
+          </IconButton>
         </Label>
         <TableHeaderMenu
           board={props.board}

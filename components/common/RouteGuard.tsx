@@ -128,14 +128,12 @@ export default function RouteGuard ({ children }: { children: ReactNode }) {
     }
   }
 
-  if (isLoading) {
+  if (!authorized || !router.isReady) {
     return null;
   }
   return (
-    <span>
-      {authorized
-        ? children
-        : null}
+    <span style={{ display: isLoading ? 'none' : 'inherit' }}>
+      { children }
     </span>
   );
 }

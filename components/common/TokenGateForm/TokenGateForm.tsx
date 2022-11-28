@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { Space } from '@prisma/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
@@ -12,8 +12,10 @@ import { WalletSign } from 'components/login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { TokenGateEvaluationResult, TokenGateWithRoles, TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import TokenGateOption from './TokenGateOption';
 
@@ -22,13 +24,19 @@ interface Props {
   spaceDomain: string;
   joinButtonLabel?: string;
   joinType?: TokenGateJoinType;
+  // Allow the Token Gate Form to auto trigger verification when a user is detected
+  autoVerify?: boolean;
 }
 
-export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate' }: Props) {
+export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate', autoVerify }: Props) {
 
+  const renders = useRef(0);
+  renders.current += 1;
+  //  console.log('Renders', renders.current);
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { refreshUserWithWeb3Account } = useUser();
+  const { getStoredSignature } = useWeb3AuthSig();
+  const { refreshUserWithWeb3Account, loginFromWeb3Account, user } = useUser();
 
   const [tokenGates, setTokenGates] = useState<TokenGateWithRoles[] | null>(null);
 
@@ -40,6 +48,17 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   // Token gates with those that succeedeed first
 
   useEffect(() => {
+    if (autoVerify) {
+      const signature = getStoredSignature();
+
+      if (user && !!signature && user.wallets.some(wallet => lowerCaseEqual(wallet.address, signature.address))) {
+        evaluateEligibility(signature);
+      }
+    }
+
+  }, [user]);
+
+  useEffect(() => {
     if (!spaceDomain || spaceDomain.length < 3) {
       setTokenGates(null);
       setTokenGateResult(null);
@@ -47,6 +66,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
     else {
       setIsLoading(true);
+
       charmClient.getTokenGatesForSpace({ spaceDomain })
         .then(gates => {
           setTokenGates(gates);
@@ -60,25 +80,34 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
   }, [spaceDomain]);
 
   async function evaluateEligibility (authSig: AuthSig) {
+
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
 
-    try {
-      const verifyResult = await charmClient.evalueTokenGateEligibility({
-        authSig,
-        spaceIdOrDomain: spaceDomain
-      });
+    if (!user) {
+      try {
+        await loginFromWeb3Account(authSig);
+      }
+      catch {
+        setIsVerifyingGates(false);
+        return;
+      }
+    }
+
+    charmClient.evalueTokenGateEligibility({
+      authSig,
+      spaceIdOrDomain: spaceDomain
+    }).then(verifyResult => {
       setTokenGateResult(verifyResult);
       if (verifyResult.canJoinSpace) {
         showMessage('Verification succeeded.', 'success');
       }
-
-      setIsVerifyingGates(false);
-    }
-    catch (err) {
-      setIsVerifyingGates(false);
-    }
+      else {
+        showMessage('Verification failed.', 'warning');
+      }
+    })
+      .finally(() => setIsVerifyingGates(false));
   }
 
   async function onSubmit () {
@@ -175,7 +204,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       <Grid item>
         {
           !tokenGateResult?.canJoinSpace ? (
-            <WalletSign signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
+            <WalletSign loading={verifyingGates} signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
           ) : (
             <PrimaryButton
               size='large'

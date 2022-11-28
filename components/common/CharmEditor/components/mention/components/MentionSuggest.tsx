@@ -1,8 +1,8 @@
-import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
-import { Typography, Divider, MenuItem } from '@mui/material';
+import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import { Divider, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { PluginKey } from 'prosemirror-state';
-import { useCallback, useEffect, memo } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -45,7 +45,7 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
 
   const filteredMembers = triggerText.length !== 0 ? members.filter(
     member => (
-      member.username?.toLowerCase()?.startsWith(triggerText.toLowerCase()))
+      member.username.toLowerCase().match(triggerText.toLowerCase()))
   ) : members;
 
   const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));

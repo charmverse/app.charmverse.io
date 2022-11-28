@@ -1,6 +1,7 @@
 import type { Block } from '@prisma/client';
 
 import type { PageMeta } from 'lib/pages';
+import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
 export type ResourceWithSpaceId = Resource & { spaceId: string };
@@ -43,6 +44,22 @@ type PagesDeleted = {
   payload: Resource[];
 };
 
+type VotesCreated = {
+  type: 'votes_created';
+  // We need a VoteTask, not just an extended vote, so this can be passed to the users' tasks, which will span different spaces
+  payload: VoteTask[];
+};
+
+type VotesDeleted = {
+  type: 'votes_deleted';
+  payload: Resource[];
+};
+
+type VotesUpdated = {
+  type: 'votes_updated';
+  payload: ExtendedVote[];
+};
+
 type ErrorMessage = {
   type: 'error';
   payload: string;
@@ -63,7 +80,10 @@ export type ServerMessage = BlocksUpdated
   | PagesMetaUpdated
   | PagesCreated
   | PagesDeleted
-  | ErrorMessage;
+  | ErrorMessage
+  | VotesCreated
+  | VotesDeleted
+  | VotesUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
