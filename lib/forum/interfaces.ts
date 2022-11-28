@@ -1,7 +1,7 @@
 export type ForumPostContent = {
   type: 'text' | 'image';
   content: string;
-}
+};
 
 export type ForumPost = {
   id: string;
@@ -13,4 +13,4 @@ export type ForumPost = {
   commentsNumber: number;
   updatedAt: Date;
   createdAt: Date;
-}
+};

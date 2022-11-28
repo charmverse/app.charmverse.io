@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { prisma } from 'db';
-import type { AvailableResourcesWithPaginationRequest } from 'pages/api/forum/interfaces';
+import type { GetForumPostsRequest } from 'pages/api/forum/posts';
 
 import type { ForumPost } from './interfaces';
 
@@ -10,7 +9,8 @@ const mockPost1: ForumPost = {
   title: 'First Post. Keep it up',
   content: {
     type: 'text' as const,
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
+    content:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
   },
   userId: '',
   upVotes: 20,
@@ -40,7 +40,8 @@ const mockPost3: ForumPost = {
   title: 'Third Post. Keep it up',
   content: {
     type: 'text' as const,
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
+    content:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe'
   },
   userId: '',
   upVotes: 8,
@@ -52,27 +53,23 @@ const mockPost3: ForumPost = {
 
 const mockArr = [mockPost1, mockPost2, mockPost3];
 
-export async function getForumPosts ({ spaceId, userId, count, page, sort }: AvailableResourcesWithPaginationRequest):Promise<ForumPost[]> {
+export async function getForumPosts({ spaceId, count, page, sort }: GetForumPostsRequest): Promise<ForumPost[]> {
   // const posts = await prisma.forum.findUnique({});
   // Transform the first text or first image into a ForumPostContent interface
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    }
-  });
-
-  const posts = user ? Array(100).fill(null).map(() => mockArr).flat()
-    .map(item => {
+  const posts = Array(100)
+    .fill(null)
+    .map(() => mockArr)
+    .flat()
+    .map((item) => {
       return {
         ...item,
-        id: uuid(),
-        user
+        id: uuid()
       };
-    }) : mockArr;
+    });
 
   if (count && page && sort) {
-    const start = (count * page) - count;
+    const start = count * page - count;
     const finish = count * page;
     return posts.slice(start, finish);
   }

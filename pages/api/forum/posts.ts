@@ -6,7 +6,7 @@ import type { ForumPost } from 'lib/forum/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-interface GetForumPostsRequest{
+export interface GetForumPostsRequest {
   spaceId: string;
   page?: number;
   count?: number;
@@ -15,10 +15,9 @@ interface GetForumPostsRequest{
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPosts)
-  .use(requireUser);
+handler.get(getPosts).use(requireUser);
 
-async function getPosts (req: NextApiRequest, res: NextApiResponse<ForumPost[]>) {
+async function getPosts(req: NextApiRequest, res: NextApiResponse<ForumPost[]>) {
   const { spaceId, count, page, sort } = req.query as any as GetForumPostsRequest;
 
   const posts = await getForumPosts({

@@ -1,15 +1,15 @@
+import { Box } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 
-import Button from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useForumFilters } from 'hooks/useForumFilters';
 
 export default function FilterList() {
-  const { disabled, handleClick, categories, sortList, error } = useForumFilters();
+  const { getLinkUrl, categories, sortList, error } = useForumFilters();
   const { query } = useRouter();
 
   if (error) {
@@ -19,32 +19,31 @@ export default function FilterList() {
   return (
     <Card variant='outlined'>
       <CardContent>
-        <ButtonGroup orientation='vertical' sx={{ alignItems: 'flex-start' }} color='inherit' disabled={disabled}>
+        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
           {sortList.map((sort) => (
-            <Button
+            <Link
               key={sort}
-              variant='text'
-              onClick={() => handleClick(sort)}
+              href={getLinkUrl(sort)}
               sx={{ fontWeight: sort === query.sort ? 'bold' : 'initial' }}
+              color='inherit'
             >
               {sort}
-            </Button>
+            </Link>
           ))}
-        </ButtonGroup>
+        </Box>
         <Divider sx={{ pt: '10px', mb: '10px' }} />
-        <ButtonGroup orientation='vertical' sx={{ alignItems: 'flex-start' }} color='inherit' disabled={disabled}>
+        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
           {categories?.map((category) => (
-            <Button
+            <Link
               key={category}
-              variant='text'
-              onClick={() => handleClick(category)}
-              disabled={disabled}
+              href={getLinkUrl(category)}
               sx={{ fontWeight: category === query.category ? 'bold' : 'initial' }}
+              color='inherit'
             >
               {category}
-            </Button>
+            </Link>
           ))}
-        </ButtonGroup>
+        </Box>
       </CardContent>
     </Card>
   );
