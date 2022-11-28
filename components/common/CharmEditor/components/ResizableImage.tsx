@@ -128,7 +128,15 @@ interface ResizableImageProps extends NodeViewProps {
   onResizeStop?: (view: EditorView) => void;
 }
 
-function ResizableImage({ readOnly = false, onResizeStop, node, updateAttrs, selected }: ResizableImageProps) {
+function ResizableImage({
+  readOnly = false,
+  getPos,
+  view,
+  onResizeStop,
+  node,
+  updateAttrs,
+  selected
+}: ResizableImageProps) {
   const imageSource = node.attrs.src;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
@@ -136,12 +144,11 @@ function ResizableImage({ readOnly = false, onResizeStop, node, updateAttrs, sel
 
   const [uploadFailed, setUploadFailed] = useState(false);
 
-  const onDelete = useCallback(() => {
-    updateAttrs({
-      src: null,
-      aspectRatio: 1
-    });
-  }, []);
+  function onDelete() {
+    const start = getPos();
+    const end = start + 1;
+    view.dispatch(view.state.tr.deleteRange(start, end));
+  }
 
   // If there are no source for the node, return the image select component
   if (!imageSource) {

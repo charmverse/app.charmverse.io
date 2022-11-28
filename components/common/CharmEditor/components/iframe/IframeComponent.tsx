@@ -207,9 +207,9 @@ function ResizableIframe({
   }
 
   function onDelete() {
-    updateAttrs({
-      src: null
-    });
+    const start = getPos();
+    const end = start + 1;
+    view.dispatch(view.state.tr.deleteRange(start, end));
   }
 
   if (readOnly) {
