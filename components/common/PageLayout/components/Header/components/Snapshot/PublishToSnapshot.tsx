@@ -66,10 +66,10 @@ export default function PublishToSnapshot({ pageId, renderContent, onPublish = (
           {renderContent({
             label: 'Publish to Snapshot',
             onClick: open,
-            icon: <PublishIcon fontSize="small" sx={{ mr: 1 }} />
+            icon: <PublishIcon fontSize='small' sx={{ mr: 1 }} />
           })}
           <Modal
-            size="large"
+            size='large'
             open={isOpen}
             onClose={close}
             title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}
@@ -87,14 +87,14 @@ export default function PublishToSnapshot({ pageId, renderContent, onPublish = (
       {!checkingProposal && proposal && (
         <Link
           sx={{ display: 'flex', verticalAlign: 'center' }}
-          color="textPrimary"
+          color='textPrimary'
           external
-          target="_blank"
+          target='_blank'
           href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}
         >
           {renderContent({
             label: 'View on Snapshot',
-            icon: <ExitToAppIcon fontSize="small" sx={{ m: 'auto', mr: 1 }} />
+            icon: <ExitToAppIcon fontSize='small' sx={{ m: 'auto', mr: 1 }} />
           })}
         </Link>
       )}

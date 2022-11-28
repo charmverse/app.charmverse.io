@@ -76,15 +76,15 @@ function ViewTitle(props: Props) {
   const intl = useIntl();
 
   return (
-    <div className="ViewTitle">
-      <div className="add-buttons add-visible">
+    <div className='ViewTitle'>
+      <div className='add-buttons add-visible'>
         {!props.readOnly && !board.fields.headerImage && (
-          <div className="add-buttons">
+          <div className='add-buttons'>
             <Button
               onClick={() => setRandomHeaderImage()}
-              icon={<ImageIcon fontSize="small" sx={{ marginRight: 1 }} />}
+              icon={<ImageIcon fontSize='small' sx={{ marginRight: 1 }} />}
             >
-              <FormattedMessage id="CardDetail.add-cover" defaultMessage="Add cover" />
+              <FormattedMessage id='CardDetail.add-cover' defaultMessage='Add cover' />
             </Button>
           </div>
         )}
@@ -95,14 +95,14 @@ function ViewTitle(props: Props) {
             }}
             icon={
               <EmojiEmotionsOutlinedIcon
-                fontSize="small"
+                fontSize='small'
                 sx={{
                   mr: 1
                 }}
               />
             }
           >
-            <FormattedMessage id="TableComponent.add-icon" defaultMessage="Add icon" />
+            <FormattedMessage id='TableComponent.add-icon' defaultMessage='Add icon' />
           </Button>
         )}
         {!props.readOnly && board.fields.showDescription && (
@@ -116,7 +116,7 @@ function ViewTitle(props: Props) {
               />
             }
           >
-            <FormattedMessage id="ViewTitle.hide-description" defaultMessage="hide description" />
+            <FormattedMessage id='ViewTitle.hide-description' defaultMessage='hide description' />
           </Button>
         )}
         {!props.readOnly && !board.fields.showDescription && (
@@ -130,15 +130,15 @@ function ViewTitle(props: Props) {
               />
             }
           >
-            <FormattedMessage id="ViewTitle.show-description" defaultMessage="show description" />
+            <FormattedMessage id='ViewTitle.show-description' defaultMessage='show description' />
           </Button>
         )}
       </div>
 
-      <div className="title" data-test="board-title">
+      <div className='title' data-test='board-title'>
         <BlockIconSelector readOnly={props.readOnly} block={board} setPage={props.setPage} />
         <Editable
-          className="title"
+          className='title'
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}
           onChange={(newTitle) => setTitle(newTitle)}
@@ -151,7 +151,7 @@ function ViewTitle(props: Props) {
       </div>
 
       {board.fields.showDescription && (
-        <div className="description">
+        <div className='description'>
           <CharmEditor
             disablePageSpecificFeatures
             isContentControlled={true}
@@ -184,9 +184,9 @@ export function InlineViewTitle(props: Props) {
   return (
     <div onKeyDown={cancelEvent}>
       <StyledEditable
-        className="title"
+        className='title'
         value={title}
-        placeholderText="Untitled"
+        placeholderText='Untitled'
         onChange={(newTitle) => setTitle(newTitle)}
         saveOnEsc={true}
         onSave={onEditTitleSave}

@@ -36,7 +36,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const CopyButton = styled((props: any) => <Button color="secondary" variant="outlined" size="small" {...props} />)`
+const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
   border-radius: 0;
   border-right-color: transparent;
   border-top-color: transparent;
@@ -115,11 +115,11 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" padding={1}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' padding={1}>
         <Box>
           <Typography>Share to web</Typography>
 
-          <Typography variant="body2" color="secondary">
+          <Typography variant='body2' color='secondary'>
             {publicPermission ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
           </Typography>
         </Box>
@@ -132,7 +132,7 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         >
           <Box>
             <Switch
-              data-test="toggle-public-page"
+              data-test='toggle-public-page'
               checked={!!publicPermission}
               disabled={disablePublicToggle}
               onChange={togglePublic}
@@ -141,19 +141,19 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         </Tooltip>
       </Box>
 
-      {shareAlertMessage && <Alert severity="info">{shareAlertMessage}</Alert>}
+      {shareAlertMessage && <Alert severity='info'>{shareAlertMessage}</Alert>}
 
       <Collapse in={!!publicPermission}>
         {shareLink && (
           <Box p={1}>
             <StyledInput
-              data-test="share-link"
+              data-test='share-link'
               fullWidth
               disabled
               value={shareLink}
               endAdornment={
-                <CopyToClipboard data-test="copy-button" text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position="end">
+                <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
+                  <InputAdornment position='end'>
                     <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
                   </InputAdornment>
                 </CopyToClipboard>
@@ -163,8 +163,8 @@ export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions
         )}
       </Collapse>
       {publicPermission?.sourcePermission && (
-        <Box display="block">
-          <Typography variant="caption" sx={{ ml: 1 }}>
+        <Box display='block'>
+          <Typography variant='caption' sx={{ ml: 1 }}>
             Inherited from
             <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
               {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}

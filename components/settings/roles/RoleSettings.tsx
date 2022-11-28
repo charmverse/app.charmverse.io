@@ -50,7 +50,7 @@ export default function RoleSettings() {
       {space?.permissionConfigurationMode === 'custom' && selectedPermissionMode === 'custom' && (
         <>
           <br />
-          <SpacePermissions targetGroup="space" id={space?.id as string} />
+          <SpacePermissions targetGroup='space' id={space?.id as string} />
 
           <br />
 
@@ -66,13 +66,13 @@ export default function RoleSettings() {
       <Legend sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Roles
         {isAdmin && (
-          <Box component="span" display="flex" gap={1}>
+          <Box component='span' display='flex' gap={1}>
             <Button
               onClick={() => {
                 setAnchorEl(buttonRef?.current);
               }}
               ref={buttonRef}
-              variant="outlined"
+              variant='outlined'
               endIcon={<KeyboardArrowDownIcon />}
               disabled={isValidating}
             >
@@ -85,9 +85,9 @@ export default function RoleSettings() {
         )}
       </Legend>
       {isValidating ? (
-        <Box display="flex" alignItems="center" gap={1}>
+        <Box display='flex' alignItems='center' gap={1}>
           <CircularProgress size={24} />
-          <Typography variant="subtitle1" color="secondary">
+          <Typography variant='subtitle1' color='secondary'>
             Importing roles from discord server
           </Typography>
         </Box>
@@ -104,15 +104,15 @@ export default function RoleSettings() {
           />
         ))
       )}
-      {roles?.length === 0 && <Typography color="secondary">No roles yet</Typography>}
+      {roles?.length === 0 && <Typography color='secondary'>No roles yet</Typography>}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
-      <Modal {...bindPopover(popupState)} title="Add a role">
+      <Modal {...bindPopover(popupState)} title='Add a role'>
         <RoleForm
-          mode="create"
+          mode='create'
           submitted={() => {
             popupState.close();
             refreshRoles();

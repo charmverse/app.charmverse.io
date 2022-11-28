@@ -27,9 +27,9 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
       }}
     >
       {/** This div is required to remove the weird hover style for menu item */}
-      <Box width="100%">
+      <Box width='100%'>
         <MenuItem
-          component="div"
+          component='div'
           sx={{
             '&:hover': {
               background: 'inherit'
@@ -38,7 +38,7 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
             justifyContent: 'space-around'
           }}
         >
-          <Box display="flex" flexGrow={1} gap={1} alignItems="center">
+          <Box display='flex' flexGrow={1} gap={1} alignItems='center'>
             <ListItemIcon>
               <Avatar
                 sx={{ width: 32, height: 32 }}
@@ -58,11 +58,11 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
               {guild.name}
             </ListItemText>
           </Box>
-          <Box display="flex" gap={1}>
-            <Typography variant="subtitle2" color="secondary">
+          <Box display='flex' gap={1}>
+            <Typography variant='subtitle2' color='secondary'>
               {guild.memberCount} Members(s)
             </Typography>
-            <Typography variant="subtitle2" color="secondary">
+            <Typography variant='subtitle2' color='secondary'>
               {guild.roles.length} Role(s)
             </Typography>
           </Box>
@@ -111,7 +111,7 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, { children: ItemData[]
             (itemCount > 8 ? LISTBOX_PADDING * itemSize : itemData.reduce((prev) => prev + itemSize, 0)) +
             2 * LISTBOX_PADDING
           }
-          width="100%"
+          width='100%'
           ref={gridRef}
           outerElementType={OuterElementType}
           itemSize={() => itemSize}
@@ -162,7 +162,7 @@ export default function GuildsAutocomplete({
       }}
       renderInput={(params) => (
         <TextField
-          variant="outlined"
+          variant='outlined'
           {...params}
           sx={{
             '& .MuiInputLabel-root': {
@@ -170,7 +170,7 @@ export default function GuildsAutocomplete({
               top: 5
             }
           }}
-          placeholder="Type Guild name..."
+          placeholder='Type Guild name...'
         />
       )}
       renderOption={(props, guildName) => [props, guildRecord[guildName]]}

@@ -31,7 +31,7 @@ function FilterEntry(props: Props): JSX.Element {
   const propertyName = template ? template.name : '(unknown)';
   const key = `${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`;
   return (
-    <div className="FilterEntry" key={key}>
+    <div className='FilterEntry' key={key}>
       <MenuWrapper>
         <Button>{propertyName}</Button>
         <Menu>
@@ -62,29 +62,29 @@ function FilterEntry(props: Props): JSX.Element {
         <Button>{OctoUtils.filterConditionDisplayString(filter.condition, intl)}</Button>
         <Menu>
           <Menu.Text
-            id="includes"
+            id='includes'
             name={intl.formatMessage({ id: 'Filter.includes', defaultMessage: 'includes' })}
             onClick={(id) => props.conditionClicked(id, filter)}
           />
           <Menu.Text
-            id="notIncludes"
+            id='notIncludes'
             name={intl.formatMessage({ id: 'Filter.not-includes', defaultMessage: "doesn't include" })}
             onClick={(id) => props.conditionClicked(id, filter)}
           />
           <Menu.Text
-            id="isEmpty"
+            id='isEmpty'
             name={intl.formatMessage({ id: 'Filter.is-empty', defaultMessage: 'is empty' })}
             onClick={(id) => props.conditionClicked(id, filter)}
           />
           <Menu.Text
-            id="isNotEmpty"
+            id='isNotEmpty'
             name={intl.formatMessage({ id: 'Filter.is-not-empty', defaultMessage: 'is not empty' })}
             onClick={(id) => props.conditionClicked(id, filter)}
           />
         </Menu>
       </MenuWrapper>
       {template && <FilterValue filter={filter} template={template} view={view} />}
-      <div className="octo-spacer" />
+      <div className='octo-spacer' />
       <Button
         onClick={() => {
           const filterGroup = createFilterGroup(view.fields.filter);
@@ -94,7 +94,7 @@ function FilterEntry(props: Props): JSX.Element {
           mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
         }}
       >
-        <DeleteOutlinedIcon fontSize="small" />
+        <DeleteOutlinedIcon fontSize='small' />
       </Button>
     </div>
   );

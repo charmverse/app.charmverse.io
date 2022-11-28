@@ -35,15 +35,15 @@ export function PageTemplateBanner({ page, parentPage }: { parentPage?: PageMeta
 
   return (
     <StyledPageTemplateBanner card={isShowingCard}>
-      <Grid container display="flex" gap={1} alignItems="center" fontSize={theme.palette.templateBanner.fontSize}>
+      <Grid container display='flex' gap={1} alignItems='center' fontSize={theme.palette.templateBanner.fontSize}>
         <Grid item xs={2}>
           {isShowingCard && (
             <Link href={boardPath as string} color={theme.palette.secondary.main}>
-              <BackIcon label="Back" iconSize="small" fontSize="14px" />
+              <BackIcon label='Back' iconSize='small' fontSize='14px' />
             </Link>
           )}
         </Grid>
-        <Grid item xs={8} display="flex" justifyContent="center">
+        <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
             <span>You're editing a {page.type.split('_template')[0]} template</span>
           ) : (
@@ -61,7 +61,7 @@ export function PageTemplateBanner({ page, parentPage }: { parentPage?: PageMeta
                 color={theme.palette.templateBanner.highlightedText}
               >
                 <DocumentPageIcon
-                  iconSize="small"
+                  iconSize='small'
                   fontSize={theme.palette.templateBanner.fontSize}
                   label={board?.title || 'Untitled'}
                 />

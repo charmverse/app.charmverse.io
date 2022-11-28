@@ -15,7 +15,7 @@ function TabPanel(props: TabPanelProps) {
 
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
@@ -23,7 +23,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography component="div">{children}</Typography>
+          <Typography component='div'>{children}</Typography>
         </Box>
       )}
     </div>
@@ -49,7 +49,7 @@ export default function MultiTabs(props: MultiTabsProps) {
           indicatorColor={disabled ? 'secondary' : 'primary'}
           value={value}
           onChange={handleChange}
-          aria-label="multi tabs"
+          aria-label='multi tabs'
         >
           {tabs.map(([tabLabel]) => (
             <Tab

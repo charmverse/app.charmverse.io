@@ -16,19 +16,19 @@ export function InputSearchCurrency({ onChange }: { onChange: (value: FiatCurren
       onChange={(event, value) => {
         emitValue(value as any);
       }}
-      size="small"
+      size='small'
       sx={{ minWidth: 150 }}
       options={currencyOptions}
       autoHighlight
       renderOption={(props, option) => (
-        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+        <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
           {option} {FiatCurrencyList[option as FiatCurrency]}
         </Box>
       )}
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Choose a currency"
+          label='Choose a currency'
           inputProps={{
             ...params.inputProps
           }}

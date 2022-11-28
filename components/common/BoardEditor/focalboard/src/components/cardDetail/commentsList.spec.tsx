@@ -47,7 +47,7 @@ describe('components/cardDetail/CommentsList', () => {
 
     const component = (
       <ReduxProvider store={store}>
-        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId="root_id" cardId="card_id" readOnly={false} />)}
+        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId='root_id' cardId='card_id' readOnly={false} />)}
       </ReduxProvider>
     );
 
@@ -79,7 +79,7 @@ describe('components/cardDetail/CommentsList', () => {
 
     const component = (
       <ReduxProvider store={store}>
-        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId="root_id" cardId="card_id" readOnly={true} />)}
+        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId='root_id' cardId='card_id' readOnly={true} />)}
       </ReduxProvider>
     );
 

@@ -27,18 +27,18 @@ function BountiesTasksListRow({ bountyTask }: { bountyTask: BountyTask }) {
   return (
     <TableRow>
       <TableCell>
-        <Link color="inherit" href={bountyLink}>
-          <Typography variant="body1" noWrap>
+        <Link color='inherit' href={bountyLink}>
+          <Typography variant='body1' noWrap>
             {pageTitle || 'Untitled'}
           </Typography>
         </Link>
       </TableCell>
       <TableCell>
-        <Link color="inherit" href={workspaceBounties}>
-          <Typography variant="body1">{spaceName}</Typography>
+        <Link color='inherit' href={workspaceBounties}>
+          <Typography variant='body1'>{spaceName}</Typography>
         </Link>
       </TableCell>
-      <TableCell align="center">{action ? <BountyStatusNexusChip action={action} /> : 'No action'}</TableCell>
+      <TableCell align='center'>{action ? <BountyStatusNexusChip action={action} /> : 'No action'}</TableCell>
       <TableCell>
         <Button
           sx={{
@@ -98,31 +98,31 @@ function BountiesTasksList({
   if (error) {
     return (
       <Box>
-        <Alert severity="error">There was an error. Please try again later!</Alert>
+        <Alert severity='error'>There was an error. Please try again later!</Alert>
       </Box>
     );
   } else if (!tasks?.bounties) {
-    return <LoadingComponent height="200px" isLoading={true} />;
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   const filteredBounties = bounties.filter((b) => !!b.action);
   const totalBounties = filteredBounties.length;
 
   if (totalBounties === 0) {
-    return <EmptyTaskState taskType="bounties" />;
+    return <EmptyTaskState taskType='bounties' />;
   }
 
   return (
-    <Box overflow="auto">
-      <Table size="medium" aria-label="Nexus bounty table">
+    <Box overflow='auto'>
+      <Table size='medium' aria-label='Nexus bounty table'>
         <TableHead>
           <TableRow>
             <TableCell>Bounty Name</TableCell>
             <TableCell>Workspace</TableCell>
-            <TableCell align="center" width={200}>
+            <TableCell align='center' width={200}>
               Status
             </TableCell>
-            <TableCell align="center" width={135}>
+            <TableCell align='center' width={135}>
               Action
             </TableCell>
           </TableRow>

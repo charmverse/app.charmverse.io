@@ -23,7 +23,7 @@ describe('components/properties/lastModifiedBy', () => {
 
     const component = (
       <ReduxProvider store={store}>
-        <LastModifiedBy updatedBy="user-id-1" />
+        <LastModifiedBy updatedBy='user-id-1' />
       </ReduxProvider>
     );
 

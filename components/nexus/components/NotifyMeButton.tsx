@@ -26,12 +26,12 @@ export default function NotifyMeButton() {
 
   return (
     <>
-      <Tooltip arrow placement="top" title={user?.email ? `Sending to: ${user?.email}` : ''}>
+      <Tooltip arrow placement='top' title={user?.email ? `Sending to: ${user?.email}` : ''}>
         <Button
-          color="secondary"
-          size="small"
-          variant="outlined"
-          startIcon={<EmailIcon fontSize="small" />}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          startIcon={<EmailIcon fontSize='small' />}
           // required to vertically align this button with its siblings
           sx={{ display: 'flex', fontSize: { xs: '12px', sm: '14px' } }}
           {...bindTrigger(popupState)}

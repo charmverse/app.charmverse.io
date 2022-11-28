@@ -11,15 +11,15 @@ export type EditMode = typeof EDIT_MODES[number];
 export const EDIT_MODE_CONFIG = {
   editing: {
     permission: 'edit_content',
-    icon: <EditOutlined fontSize="small" />
+    icon: <EditOutlined fontSize='small' />
   },
   suggesting: {
     permission: 'comment',
-    icon: <RateReviewOutlined fontSize="small" />
+    icon: <RateReviewOutlined fontSize='small' />
   },
   viewing: {
     permission: 'read',
-    icon: <VisibilityOutlined fontSize="small" />
+    icon: <VisibilityOutlined fontSize='small' />
   }
 } as const;
 

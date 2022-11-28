@@ -63,11 +63,11 @@ function Option(props: { data: OptionProps }): JSX.Element {
       }}
     >
       <span>
-        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize="small" />}
+        {props.data.label} {props.data.value !== 'count' && <ChevronRightIcon fontSize='small' />}
       </span>
 
       {submenu && props.data.value !== 'count' && (
-        <div className="dropdown-submenu" style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}>
+        <div className='dropdown-submenu' style={{ top: `${height - 10}px`, left: `${menuOptionRight}px` }}>
           {calculationToProperties.get(props.data.value) &&
             calculationToProperties.get(props.data.value)!.map((property) => (
               <div

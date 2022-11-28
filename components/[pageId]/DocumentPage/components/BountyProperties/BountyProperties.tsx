@@ -185,12 +185,12 @@ export default function BountyProperties(props: {
   const bountyProperties = (
     <>
       <div
-        className="octo-propertyrow"
+        className='octo-propertyrow'
         style={{
           height: 'fit-content'
         }}
       >
-        <div className="octo-propertyname octo-propertyname--readonly">
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Chain</Button>
         </div>
         <InputSearchBlockchain
@@ -211,12 +211,12 @@ export default function BountyProperties(props: {
       </div>
 
       <div
-        className="octo-propertyrow"
+        className='octo-propertyrow'
         style={{
           height: 'fit-content'
         }}
       >
-        <div className="octo-propertyname octo-propertyname--readonly">
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Reward token</Button>
         </div>
         <InputSearchCrypto
@@ -240,12 +240,12 @@ export default function BountyProperties(props: {
       </div>
 
       <div
-        className="octo-propertyrow"
+        className='octo-propertyrow'
         style={{
           height: 'fit-content'
         }}
       >
-        <div className="octo-propertyname octo-propertyname--readonly">
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Reward amount</Button>
         </div>
         <TextField
@@ -255,8 +255,8 @@ export default function BountyProperties(props: {
           }}
           disabled={readOnly}
           value={isAmountInputEmpty ? '' : currentBounty?.rewardAmount}
-          type="number"
-          size="small"
+          type='number'
+          size='small'
           onChange={updateBountyAmount}
           inputProps={{
             step: 0.01
@@ -267,29 +267,29 @@ export default function BountyProperties(props: {
       </div>
       <Stack
         gap={0.5}
-        flexDirection="row"
-        alignItems="center"
+        flexDirection='row'
+        alignItems='center'
         mt={2}
         onClick={() => {
           setIsShowingAdvancedSettings(!isShowingAdvancedSettings);
         }}
       >
-        <div className="octo-propertyname octo-propertyname--readonly">
+        <div className='octo-propertyname octo-propertyname--readonly'>
           <Button>Advanced settings</Button>
         </div>
         <Tooltip title={isShowingAdvancedSettings ? 'Hide advanced settings' : 'Expand advanced settings'}>
-          <IconButton size="small">
+          <IconButton size='small'>
             {isShowingAdvancedSettings ? (
-              <KeyboardArrowUpIcon fontSize="small" />
+              <KeyboardArrowUpIcon fontSize='small' />
             ) : (
-              <KeyboardArrowDownIcon fontSize="small" />
+              <KeyboardArrowDownIcon fontSize='small' />
             )}
           </IconButton>
         </Tooltip>
       </Stack>
-      <Collapse in={isShowingAdvancedSettings} timeout="auto" unmountOnExit>
-        <div className="octo-propertyrow">
-          <div className="octo-propertyname octo-propertyname--readonly">
+      <Collapse in={isShowingAdvancedSettings} timeout='auto' unmountOnExit>
+        <div className='octo-propertyrow'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Require applications</Button>
           </div>
           <Switch
@@ -304,13 +304,13 @@ export default function BountyProperties(props: {
           />
         </div>
         <div
-          className="octo-propertyrow"
+          className='octo-propertyrow'
           style={{
             height: 'fit-content'
           }}
         >
           <div
-            className="octo-propertyname octo-propertyname--readonly"
+            className='octo-propertyname octo-propertyname--readonly'
             style={{ alignSelf: 'baseline', paddingTop: 8 }}
           >
             <Button>Applicant role(s)</Button>
@@ -343,7 +343,7 @@ export default function BountyProperties(props: {
             />
             {bountyPagePermissions && bountyPermissions && (
               <MissingPagePermissions
-                target="submitter"
+                target='submitter'
                 bountyPermissions={bountyPermissions}
                 pagePermissions={bountyPagePermissions}
               />
@@ -351,12 +351,12 @@ export default function BountyProperties(props: {
           </div>
         </div>
         <div
-          className="octo-propertyrow"
+          className='octo-propertyrow'
           style={{
             height: 'fit-content'
           }}
         >
-          <div className="octo-propertyname octo-propertyname--readonly">
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Submission limit</Button>
           </div>
           <Switch
@@ -373,19 +373,19 @@ export default function BountyProperties(props: {
         </div>
         {capSubmissions && (
           <div
-            className="octo-propertyrow"
+            className='octo-propertyrow'
             style={{
               height: 'fit-content'
             }}
           >
-            <div className="octo-propertyname octo-propertyname--readonly">
+            <div className='octo-propertyname octo-propertyname--readonly'>
               <Button>Max submissions</Button>
             </div>
             <TextField
               required
               defaultValue={currentBounty?.maxSubmissions}
-              type="number"
-              size="small"
+              type='number'
+              size='small'
               inputProps={{ step: 1, min: 1 }}
               sx={{
                 width: '100%'
@@ -405,7 +405,7 @@ export default function BountyProperties(props: {
 
   return (
     <Box
-      className="octo-propertylist"
+      className='octo-propertylist'
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
@@ -420,10 +420,10 @@ export default function BountyProperties(props: {
         pagePermissions={bountyPagePermissions}
         pageId={pageId}
       />
-      <Box justifyContent="space-between" gap={2} alignItems="center">
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         {!readOnly && (
           <div
-            className="octo-propertyrow"
+            className='octo-propertyrow'
             style={{
               display: 'flex',
               height: 'fit-content',
@@ -431,7 +431,7 @@ export default function BountyProperties(props: {
             }}
           >
             <div
-              className="octo-propertyname octo-propertyname--readonly"
+              className='octo-propertyname octo-propertyname--readonly'
               style={{ alignSelf: 'baseline', paddingTop: 12 }}
             >
               <Button>Reviewer</Button>
@@ -464,7 +464,7 @@ export default function BountyProperties(props: {
               />
               {bountyPagePermissions && bountyPermissions && (
                 <MissingPagePermissions
-                  target="reviewer"
+                  target='reviewer'
                   bountyPermissions={bountyPermissions}
                   pagePermissions={bountyPagePermissions}
                 />
@@ -477,11 +477,11 @@ export default function BountyProperties(props: {
       {!readOnly && bountyProperties}
 
       {draftBounty && (
-        <Box display="flex" gap={2} my={2}>
-          <CharmButton color="primary" onClick={confirmNewBounty}>
+        <Box display='flex' gap={2} my={2}>
+          <CharmButton color='primary' onClick={confirmNewBounty}>
             Confirm new bounty
           </CharmButton>
-          <CharmButton color="secondary" variant="outlined" onClick={cancelDraftBounty}>
+          <CharmButton color='secondary' variant='outlined' onClick={cancelDraftBounty}>
             Cancel
           </CharmButton>
         </Box>

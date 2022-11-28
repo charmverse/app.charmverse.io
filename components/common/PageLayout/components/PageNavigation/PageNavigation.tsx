@@ -267,9 +267,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
       onNodeToggle={onNodeToggle}
-      aria-label="items navigator"
-      defaultCollapseIcon={<ExpandMoreIcon fontSize="large" />}
-      defaultExpandIcon={<ChevronRightIcon fontSize="large" />}
+      aria-label='items navigator'
+      defaultCollapseIcon={<ExpandMoreIcon fontSize='large' />}
+      defaultExpandIcon={<ChevronRightIcon fontSize='large' />}
       isFavorites={isFavorites}
     >
       {mappedItems.map((item) => (

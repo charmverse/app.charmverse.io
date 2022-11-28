@@ -68,19 +68,19 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
       }}
     >
       {(props.position === 'left' || props.position === 'left-bottom') && (
-        <ArrowDropDownOutlinedIcon fontSize="small" />
+        <ArrowDropDownOutlinedIcon fontSize='small' />
       )}
-      {props.icon ?? <div className="noicon" />}
-      <div className="menu-name">{props.name}</div>
-      {props.position !== 'left' && props.position !== 'left-bottom' && <ArrowDropDownOutlinedIcon fontSize="small" />}
-      <StyledPopper anchorEl={node.current} open={isOpen} placement="right-start">
-        <div ref={popperRef} style={{ maxHeight: maxHeight || 'none' }} className="SubMenu Menu noselect ">
-          <div className="menu-contents">
-            <div className="menu-options">{props.children}</div>
-            <div className="menu-spacer hideOnWidescreen" />
+      {props.icon ?? <div className='noicon' />}
+      <div className='menu-name'>{props.name}</div>
+      {props.position !== 'left' && props.position !== 'left-bottom' && <ArrowDropDownOutlinedIcon fontSize='small' />}
+      <StyledPopper anchorEl={node.current} open={isOpen} placement='right-start'>
+        <div ref={popperRef} style={{ maxHeight: maxHeight || 'none' }} className='SubMenu Menu noselect '>
+          <div className='menu-contents'>
+            <div className='menu-options'>{props.children}</div>
+            <div className='menu-spacer hideOnWidescreen' />
 
-            <div className="menu-options hideOnWidescreen">
-              <Menu.Text id="menu-cancel" name="Cancel" className="menu-cancel" onClick={() => undefined} />
+            <div className='menu-options hideOnWidescreen'>
+              <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
             </div>
           </div>
         </div>

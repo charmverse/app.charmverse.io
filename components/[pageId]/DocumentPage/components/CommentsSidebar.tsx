@@ -155,28 +155,28 @@ export default function CommentsSidebar({ inline }: BoxProps & { inline?: boolea
 
   return (
     <>
-      <Box display="flex" alignItems="center" gap={1}>
+      <Box display='flex' alignItems='center' gap={1}>
         <InputLabel>Sort</InputLabel>
-        <Select variant="outlined" value={threadSort} onChange={handleThreadListSortChange}>
-          <MenuItem value="position">Position</MenuItem>
-          <MenuItem value="latest">Latest</MenuItem>
-          <MenuItem value="earliest">Earliest</MenuItem>
+        <Select variant='outlined' value={threadSort} onChange={handleThreadListSortChange}>
+          <MenuItem value='position'>Position</MenuItem>
+          <MenuItem value='latest'>Latest</MenuItem>
+          <MenuItem value='earliest'>Earliest</MenuItem>
         </Select>
         <InputLabel>Filter</InputLabel>
-        <Select variant="outlined" value={threadFilter} onChange={handleThreadClassChange}>
-          <MenuItem value="open">Open</MenuItem>
-          <MenuItem value="resolved">Resolved</MenuItem>
-          <MenuItem value="you">For you</MenuItem>
-          <MenuItem value="all">All</MenuItem>
+        <Select variant='outlined' value={threadFilter} onChange={handleThreadClassChange}>
+          <MenuItem value='open'>Open</MenuItem>
+          <MenuItem value='resolved'>Resolved</MenuItem>
+          <MenuItem value='you'>For you</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className="charm-inline-comment-sidebar">
+      <StyledSidebar className='charm-inline-comment-sidebar'>
         {sortedThreadList.length === 0 ? (
           <NoCommentsMessage
             icon={
               <MessageOutlinedIcon
-                fontSize="large"
-                color="secondary"
+                fontSize='large'
+                color='secondary'
                 sx={{
                   height: '2em',
                   width: '2em'
@@ -203,7 +203,7 @@ export function NoCommentsMessage({ icon, message }: { icon: ReactNode; message:
     <EmptyThreadContainerBox>
       <Center>
         {icon}
-        <Typography variant="subtitle1" color="secondary">
+        <Typography variant='subtitle1' color='secondary'>
           {message}
         </Typography>
       </Center>

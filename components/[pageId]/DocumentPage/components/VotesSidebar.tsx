@@ -69,23 +69,23 @@ export default function VotesSidebar() {
 
   return (
     <>
-      <ViewOptions label="Sort">
+      <ViewOptions label='Sort'>
         <Select
-          variant="outlined"
+          variant='outlined'
           value={voteSort}
           onChange={(e) => setVoteSort(e.target.value as VoteSort)}
           sx={{ mr: 2 }}
         >
-          <MenuItem value="position">Position</MenuItem>
-          <MenuItem value="highest_votes">Most voted</MenuItem>
-          <MenuItem value="latest_deadline">Deadline</MenuItem>
-          <MenuItem value="latest_created">Created</MenuItem>
+          <MenuItem value='position'>Position</MenuItem>
+          <MenuItem value='highest_votes'>Most voted</MenuItem>
+          <MenuItem value='latest_deadline'>Deadline</MenuItem>
+          <MenuItem value='latest_created'>Created</MenuItem>
         </Select>
         <InputLabel>Filter</InputLabel>
-        <Select variant="outlined" value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as VoteFilter)}>
-          <MenuItem value="in_progress">In progress</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-          <MenuItem value="all">All</MenuItem>
+        <Select variant='outlined' value={voteFilter} onChange={(e) => setVoteFilter(e.target.value as VoteFilter)}>
+          <MenuItem value='in_progress'>In progress</MenuItem>
+          <MenuItem value='completed'>Completed</MenuItem>
+          <MenuItem value='all'>All</MenuItem>
         </Select>
       </ViewOptions>
 

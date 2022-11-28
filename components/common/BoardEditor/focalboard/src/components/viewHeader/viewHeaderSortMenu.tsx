@@ -57,15 +57,15 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button color={hasSort ? 'primary' : 'secondary'} variant="text" size="small" sx={{ minWidth: 0 }}>
-        <FormattedMessage id="ViewHeader.sort" defaultMessage="Sort" />
+      <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
+        <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
       </Button>
       <Menu>
         {activeView.fields.sortOptions?.length > 0 && (
           <>
-            <Menu.Text id="manual" name="Manual" onClick={onManualSort} />
+            <Menu.Text id='manual' name='Manual' onClick={onManualSort} />
 
-            <Menu.Text id="revert" name="Revert" onClick={onRevertSort} />
+            <Menu.Text id='revert' name='Revert' onClick={onRevertSort} />
 
             <Menu.Separator />
           </>
@@ -77,9 +77,9 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
             const sortOption = activeView.fields.sortOptions[0];
             if (sortOption.propertyId === option.id) {
               rightIcon = sortOption.reversed ? (
-                <ArrowDownwardOutlinedIcon fontSize="small" />
+                <ArrowDownwardOutlinedIcon fontSize='small' />
               ) : (
-                <ArrowUpwardOutlinedIcon fontSize="small" />
+                <ArrowUpwardOutlinedIcon fontSize='small' />
               );
             }
           }

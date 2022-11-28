@@ -68,7 +68,7 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
     //   );
     // }
 
-    return <div className="bangle-nv-child-container" ref={this.attachToContentDOM} />;
+    return <div className='bangle-nv-child-container' ref={this.attachToContentDOM} />;
   }
 
   render() {

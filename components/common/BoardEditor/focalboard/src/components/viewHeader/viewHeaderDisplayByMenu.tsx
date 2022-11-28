@@ -31,13 +31,13 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
 
   return (
     <MenuWrapper>
-      <Button color="secondary" size="small" variant="text">
+      <Button color='secondary' size='small' variant='text'>
         <FormattedMessage
-          id="ViewHeader.display-by"
-          defaultMessage="Display by: {property}"
+          id='ViewHeader.display-by'
+          defaultMessage='Display by: {property}'
           values={{
             property: (
-              <span style={{ color: 'rgb(var(--center-channel-color-rgb))' }} id="displayByLabel">
+              <span style={{ color: 'rgb(var(--center-channel-color-rgb))' }} id='displayByLabel'>
                 {dateDisplayPropertyName || createdDateName}
               </span>
             )
@@ -52,7 +52,7 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
               id={date.id}
               name={date.name}
               rightIcon={
-                activeView.fields.dateDisplayPropertyId === date.id ? <CheckOutlinedIcon fontSize="small" /> : undefined
+                activeView.fields.dateDisplayPropertyId === date.id ? <CheckOutlinedIcon fontSize='small' /> : undefined
               }
               onClick={(id) => {
                 if (activeView.fields.dateDisplayPropertyId === id) {
@@ -64,10 +64,10 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
           ))}
         {getDateProperties().length === 0 && (
           <Menu.Text
-            key="createdDate"
-            id="createdDate"
+            key='createdDate'
+            id='createdDate'
             name={createdDateName}
-            rightIcon={<CheckOutlinedIcon fontSize="small" />}
+            rightIcon={<CheckOutlinedIcon fontSize='small' />}
             onClick={() => {}}
           />
         )}

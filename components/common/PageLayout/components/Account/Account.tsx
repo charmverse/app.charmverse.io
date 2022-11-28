@@ -70,7 +70,7 @@ function Account(): JSX.Element {
   if (isLoaded && !user) {
     return (
       <AccountCard>
-        <AccountButton href="/">
+        <AccountButton href='/'>
           {
             // This is a quick fix for making the public pages and bounties an acquisition channel.
             // We would still show the "Join" in the classic Charmverse signup page.
@@ -86,7 +86,7 @@ function Account(): JSX.Element {
       <AccountCard>
         <AccountButton
           // leftIcon={<LinkBreak />}
-          colorScheme="red"
+          colorScheme='red'
           onClick={openNetworkModal}
         >
           Wrong Network
@@ -100,18 +100,18 @@ function Account(): JSX.Element {
 
   return (
     <AccountCard>
-      <StyledButtonGroup variant="contained" disableElevation>
+      <StyledButtonGroup variant='contained' disableElevation>
         {isConnectedWithWallet && (
           <Tooltip title={chain?.chainName ?? ''} arrow>
             <NetworkButton onClick={networkModalState.open}>
-              <SvgIcon component="object" sx={{ display: 'flex', justifyContent: 'center' }}>
-                <img alt="" src={chain?.iconUrl} style={{ height: '100%' }} />
+              <SvgIcon component='object' sx={{ display: 'flex', justifyContent: 'center' }}>
+                <img alt='' src={chain?.iconUrl} style={{ height: '100%' }} />
               </SvgIcon>
             </NetworkButton>
           </Tooltip>
         )}
         <AccountButton
-          href="/profile"
+          href='/profile'
           sx={
             isConnectedWithWallet
               ? {
@@ -120,7 +120,7 @@ function Account(): JSX.Element {
                 }
               : {}
           }
-          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size="small" />}
+          endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
         >
           {user?.username}
         </AccountButton>

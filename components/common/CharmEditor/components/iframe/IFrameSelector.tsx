@@ -34,7 +34,7 @@ export default function IFrameSelector(props: IFrameSelectorProps) {
               [
                 'Link',
                 <Box
-                  key="link"
+                  key='link'
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',

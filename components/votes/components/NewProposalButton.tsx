@@ -112,11 +112,11 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
     <>
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
-          <ButtonGroup variant="contained" ref={buttonRef}>
+          <ButtonGroup variant='contained' ref={buttonRef}>
             <Button disabled={!canCreateProposal} onClick={onClickCreate}>
               Create Proposal
             </Button>
-            <Button size="small" disabled={!canCreateProposal} onClick={popupState.open}>
+            <Button size='small' disabled={!canCreateProposal} onClick={popupState.open}>
               <KeyboardArrowDown />
             </Button>
           </ButtonGroup>
@@ -137,7 +137,7 @@ export default function NewProposalButton({ mutateProposals }: { mutateProposals
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}
         anchorEl={buttonRef.current as Element}
-        boardTitle="Proposals"
+        boardTitle='Proposals'
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}

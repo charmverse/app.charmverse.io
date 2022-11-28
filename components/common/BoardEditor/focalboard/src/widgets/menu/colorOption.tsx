@@ -13,19 +13,19 @@ function ColorOption(props: ColorOptionProps): JSX.Element {
   return (
     // eslint-disable-next-line jsx-a11y/interactive-supports-focus
     <div
-      role="button"
+      role='button'
       aria-label={intl.formatMessage(
         { id: 'ColorOption.selectColor', defaultMessage: 'Select {color} Color' },
         { color: name }
       )}
-      className="MenuOption ColorOption menu-option"
+      className='MenuOption ColorOption menu-option'
       onClick={(e: React.MouseEvent): void => {
         e.target.dispatchEvent(new Event('menuItemClicked'));
         props.onClick(props.id);
       }}
     >
-      {icon ?? <div className="noicon" />}
-      <div className="menu-name">{name}</div>
+      {icon ?? <div className='noicon' />}
+      <div className='menu-name'>{name}</div>
       <div className={`menu-colorbox ${id}`} />
     </div>
   );

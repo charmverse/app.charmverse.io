@@ -63,7 +63,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
 
   return (
     <Modal onClose={props.onClose}>
-      <div className="FilterComponent">
+      <div className='FilterComponent'>
         {filters.map((filter) => (
           <FilterEntry
             key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
@@ -75,7 +75,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
         ))}
 
         <Button onClick={() => addFilterClicked()}>
-          <FormattedMessage id="FilterComponent.add-filter" defaultMessage="+ Add filter" />
+          <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
         </Button>
       </div>
     </Modal>

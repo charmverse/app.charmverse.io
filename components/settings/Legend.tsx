@@ -36,7 +36,7 @@ function Legend({ children, helperText, noBorder, ...props }: LegendProps) {
     <StyledBox noBorder={noBorder}>
       <StyledTypography {...props}>{children}</StyledTypography>
       {helperText && (
-        <Typography color="secondary" mt={0.5} variant="caption" component="p">
+        <Typography color='secondary' mt={0.5} variant='caption' component='p'>
           {helperText}
         </Typography>
       )}

@@ -213,8 +213,8 @@ function Table(props: Props): JSX.Element {
   );
 
   return (
-    <div className="Table" ref={drop}>
-      <div className="octo-table-body">
+    <div className='Table' ref={drop}>
+      <div className='octo-table-body'>
         <TableHeaders
           board={board}
           cards={cards}
@@ -227,7 +227,7 @@ function Table(props: Props): JSX.Element {
         />
 
         {/* Table rows */}
-        <div className="table-row-container">
+        <div className='table-row-container'>
           {activeView.fields.groupById &&
             visibleGroups.map((group) => {
               return (
@@ -274,15 +274,15 @@ function Table(props: Props): JSX.Element {
         </div>
 
         {/* Add New row */}
-        <div className="octo-table-footer">
+        <div className='octo-table-footer'>
           {!props.readOnly && !activeView.fields.groupById && (
             <div
-              className="octo-table-cell"
+              className='octo-table-cell'
               onClick={() => {
                 props.addCard('');
               }}
             >
-              <FormattedMessage id="TableComponent.plus-new" defaultMessage="+ New" />
+              <FormattedMessage id='TableComponent.plus-new' defaultMessage='+ New' />
             </div>
           )}
         </div>

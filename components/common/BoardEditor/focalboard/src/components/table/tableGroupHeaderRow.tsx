@@ -61,11 +61,11 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
     >
-      <div className="octo-table-cell" style={{ width: columnWidth(Constants.titleColumnId) }}>
+      <div className='octo-table-cell' style={{ width: columnWidth(Constants.titleColumnId) }}>
         <IconButton
-          icon={<ArrowDropDownOutlinedIcon fontSize="small" />}
+          icon={<ArrowDropDownOutlinedIcon fontSize='small' />}
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
-          className="hello-world"
+          className='hello-world'
         />
 
         {!group.option.id && (
@@ -79,8 +79,8 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
             )}
           >
             <FormattedMessage
-              id="BoardComponent.no-property"
-              defaultMessage="No {property}"
+              id='BoardComponent.no-property'
+              defaultMessage='No {property}'
               values={{
                 property: groupByProperty?.name
               }}
@@ -91,7 +91,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
           <Label color={group.option.color}>
             <Editable
               value={groupTitle}
-              placeholderText="New Select"
+              placeholderText='New Select'
               onChange={setGroupTitle}
               onSave={() => {
                 if (groupTitle.trim() === '') {
@@ -112,19 +112,19 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
       {!props.readOnly && (
         <>
           <MenuWrapper>
-            <IconButton icon={<MoreHorizIcon fontSize="small" />} />
+            <IconButton icon={<MoreHorizIcon fontSize='small' />} />
             <Menu>
               <Menu.Text
-                id="hide"
-                icon={<VisibilityOffOutlinedIcon fontSize="small" />}
+                id='hide'
+                icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
               />
               {group.option.id && (
                 <>
                   <Menu.Text
-                    id="delete"
-                    icon={<DeleteOutlineIcon fontSize="small" color="secondary" />}
+                    id='delete'
+                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
                     name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
                     onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
                   />
@@ -141,7 +141,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               )}
             </Menu>
           </MenuWrapper>
-          <IconButton icon={<AddIcon fontSize="small" />} onClick={() => props.addCard(group.option.id)} />
+          <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
         </>
       )}
     </div>

@@ -45,38 +45,38 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight="bold">
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+        <Typography variant='h6' fontWeight='bold'>
           Snapshot votes on this proposal
         </Typography>
 
         <Button
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
-          size="small"
-          color="secondary"
-          variant="outlined"
+          size='small'
+          color='secondary'
+          variant='outlined'
           external
-          target="_blank"
+          target='_blank'
           disabled={!snapshotProposal}
         >
           View on snapshot
         </Button>
       </Box>
-      <Box display="flex" justifyContent="space-between">
-        <Typography color="secondary" variant="subtitle1">
+      <Box display='flex' justifyContent='space-between'>
+        <Typography color='secondary' variant='subtitle1'>
           {!snapshotProposal && loading && 'Loading...'}
           {snapshotProposal &&
             (hasPassedDeadline
               ? `Finished on ${humanFriendlyDate(proposalEndDate, { withYear: true })}`
               : `Finishes ${remainingTime}`)}
         </Typography>
-        {snapshotProposal && <VoteStatusChip size="small" status={hasPassedDeadline ? 'Complete' : 'InProgress'} />}
+        {snapshotProposal && <VoteStatusChip size='small' status={hasPassedDeadline ? 'Complete' : 'InProgress'} />}
       </Box>
 
       {!snapshotProposal && loading && <Loader isLoading={true} />}
 
-      {!snapshotProposal && !loading && <Alert severity="warning">Proposal not found on Snapshot</Alert>}
+      {!snapshotProposal && !loading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
 
       {snapshotProposal && (
         <StyledFormControl>
@@ -84,13 +84,13 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
             {voteChoices.map((voteOption, index) => (
               <FormControlLabel
                 key={voteOption}
-                control={<Radio size="small" />}
+                control={<Radio size='small' />}
                 disabled
                 value={voteOption}
                 label={
-                  <Box display="flex" justifyContent="space-between" flexGrow={1}>
+                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
                     <span>{voteOption}</span>
-                    <Typography variant="subtitle1" color="secondary">
+                    <Typography variant='subtitle1' color='secondary'>
                       {!voteScores[index]
                         ? 'No votes yet'
                         : percent({

@@ -30,28 +30,28 @@ function Integration(props: IntegrationProps) {
     <Grid container>
       <Grid item xs={10}>
         <Box py={2} px={1}>
-          <Box display="flex" gap={1} alignItems="flex-end" mb={1}>
+          <Box display='flex' gap={1} alignItems='flex-end' mb={1}>
             {icon}
             {/* use smaller font size fofr wallet addresses and larger strings */}
-            <Typography component="span" fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
+            <Typography component='span' fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
               {username}
               {action}
             </Typography>
           </Box>
-          <IntegrationName variant="caption">{name}</IntegrationName>
+          <IntegrationName variant='caption'>{name}</IntegrationName>
         </Box>
       </Grid>
-      <Grid item container direction="column" xs={2}>
-        <Box display="flex" alignItems="center" justifyContent="flex-end" height="100%">
+      <Grid item container direction='column' xs={2}>
+        <Box display='flex' alignItems='center' justifyContent='flex-end' height='100%'>
           {isInUse ? (
             <>
-              <CheckIcon fontSize="small" />
-              <Typography ml={1} variant="body2">
+              <CheckIcon fontSize='small' />
+              <Typography ml={1} variant='body2'>
                 Selected
               </Typography>
             </>
           ) : (
-            <Button size="small" onClick={() => useIntegration(username, identityType)}>
+            <Button size='small' onClick={() => useIntegration(username, identityType)}>
               Select
             </Button>
           )}

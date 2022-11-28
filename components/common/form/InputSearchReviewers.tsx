@@ -46,7 +46,7 @@ export default function InputSearchReviewers({
       disabled={!roles}
       loading={!roles || members.length === 0}
       disableCloseOnSelect={disableCloseOnSelect}
-      noOptionsText="No options available"
+      noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={options}
       autoHighlight
@@ -66,14 +66,14 @@ export default function InputSearchReviewers({
         if (option.group === 'role') {
           return <li {..._props}>{option.name}</li>;
         }
-        return <UserDisplay {...(_props as any)} user={option} avatarSize="small" />;
+        return <UserDisplay {...(_props as any)} user={option} avatarSize='small' />;
       }}
       multiple
       renderInput={(params) => (
         <TextField
           {...params}
-          size="small"
-          placeholder="Members or Roles"
+          size='small'
+          placeholder='Members or Roles'
           inputProps={{
             ...params.inputProps
           }}

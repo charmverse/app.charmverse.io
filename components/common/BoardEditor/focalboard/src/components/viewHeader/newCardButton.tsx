@@ -48,9 +48,9 @@ const NewCardButton = React.memo(
 
     return (
       <>
-        <ButtonGroup variant="contained" ref={buttonRef}>
+        <ButtonGroup variant='contained' ref={buttonRef}>
           <Button onClick={addCard}>New</Button>
-          <Button size="small" onClick={popupState.open}>
+          <Button size='small' onClick={popupState.open}>
             <KeyboardArrowDown />
           </Button>
         </ButtonGroup>

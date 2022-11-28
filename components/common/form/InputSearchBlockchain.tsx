@@ -63,11 +63,11 @@ export default function InputSearchBlockchain({
       options={RPCList}
       disableClearable
       autoHighlight
-      size="small"
+      size='small'
       getOptionLabel={(option) => `${option.chainName}`}
       renderOption={(props, option) => (
-        <Box component="li" sx={{ display: 'flex', gap: 1 }} {...props}>
-          <Box component="span">{option.chainName}</Box>
+        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+          <Box component='span'>{option.chainName}</Box>
         </Box>
       )}
       renderInput={(params) => (

@@ -47,7 +47,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
 
   return (
     <StyledPageDeleteBanner card={isShowingCard ? isShowingCard !== 'undefined' && isShowingCard.length !== 0 : false}>
-      <Box display="flex" gap={1} alignItems="center">
+      <Box display='flex' gap={1} alignItems='center'>
         <div
           style={{
             color: 'white',
@@ -64,7 +64,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             await restorePage();
             setIsMutating(false);
           }}
-          variant="outlined"
+          variant='outlined'
         >
           Restore Page
         </Button>
@@ -76,7 +76,7 @@ export default function PageDeleteBanner({ pageId }: { pageId: string }) {
             await deletePage();
             setIsMutating(false);
           }}
-          variant="outlined"
+          variant='outlined'
         >
           Delete permanently
         </Button>

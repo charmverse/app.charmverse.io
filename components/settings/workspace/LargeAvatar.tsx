@@ -40,7 +40,7 @@ function StyledIconButton({
         bgcolor: 'background.dark',
         '&:hover': { bgcolor: 'background.light' }
       }}
-      size="small"
+      size='small'
       {...props}
     >
       {children}
@@ -112,23 +112,23 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   if (!editable) {
-    return <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size="2xLarge" />;
+    return <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />;
   }
 
   const icons = getIcons(
-    <StyledIconButton key="edit-avatar" onClick={onEditClick}>
-      <EditIcon ref={editIconRef} fontSize="small" />
+    <StyledIconButton key='edit-avatar' onClick={onEditClick}>
+      <EditIcon ref={editIconRef} fontSize='small' />
     </StyledIconButton>,
-    <StyledIconButton key="delete-avatar" onClick={() => updateImageAvatar('')}>
-      <DeleteOutlinedIcon fontSize="small" />
+    <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar('')}>
+      <DeleteOutlinedIcon fontSize='small' />
     </StyledIconButton>,
     image
   );
 
   return (
     <StyledBox>
-      <input type="file" hidden accept="image/*" ref={inputRef} onChange={onFileChange} />
-      <StyledAvatarWithIcons avatar={image} name={name} variant={variant} icons={icons} isNft={isNft} size="2xLarge" />
+      <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
+      <StyledAvatarWithIcons avatar={image} name={name} variant={variant} icons={icons} isNft={isNft} size='2xLarge' />
       {canSetNft && (
         <>
           <AvatarEditMenu

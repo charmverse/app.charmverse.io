@@ -204,7 +204,7 @@ const styles = {
 const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator(props) {
   return (
     <components.DropdownIndicator {...props}>
-      <ExpandLessIcon fontSize="small" />
+      <ExpandLessIcon fontSize='small' />
     </components.DropdownIndicator>
   );
 };
@@ -232,11 +232,11 @@ function CalculationOptions(props: BaseCalculationOptionProps): JSX.Element {
       value={Options[props.value]}
       isMulti={false}
       isClearable={true}
-      name="calculation_options"
-      className="CalculationOptions"
-      classNamePrefix="CalculationOptions"
+      name='calculation_options'
+      className='CalculationOptions'
+      classNamePrefix='CalculationOptions'
       options={props.options}
-      menuPlacement="auto"
+      menuPlacement='auto'
       isSearchable={false}
       components={{ DropdownIndicator, ...(props.components || {}) }}
       defaultMenuIsOpen={props.menuOpen}

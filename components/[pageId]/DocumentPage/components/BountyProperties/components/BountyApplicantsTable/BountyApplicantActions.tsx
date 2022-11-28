@@ -37,11 +37,11 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
   }
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+    <Box display='flex' justifyContent='center' alignItems='center' width='100%'>
       {(submission.status === 'applied' || submission.status === 'review') && (
         <Button
-          color="primary"
-          size="small"
+          color='primary'
+          size='small'
           onClick={expandRow}
           sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}
         >
@@ -63,8 +63,8 @@ export default function BountyApplicantActions({ bounty, isExpanded, submission,
             />
           )}
           {!submission.walletAddress && (
-            <Tooltip title="Applicant must provide a wallet address">
-              <Button color="primary" disabled={true}>
+            <Tooltip title='Applicant must provide a wallet address'>
+              <Button color='primary' disabled={true}>
                 Send Payment
               </Button>
             </Tooltip>

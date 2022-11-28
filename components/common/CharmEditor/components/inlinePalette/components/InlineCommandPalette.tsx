@@ -174,7 +174,7 @@ export default function InlineCommandPalette({
     <Popper
       open={isInlineCommandVisible || isVisible}
       anchorEl={contentDOM || tooltipContentDOM}
-      placement="bottom-start"
+      placement='bottom-start'
       sx={{ zIndex: 1301 }}
     >
       <ClickAwayListener onClickAway={() => closePalette()}>

@@ -60,7 +60,7 @@ export function ProposalStatusChip({ status, size = 'small' }: { size?: ChipProp
       size={size}
       status={status}
       label={PROPOSAL_STATUS_LABELS[status]}
-      variant="filled"
+      variant='filled'
       icon={<span>{PROPOSAL_STATUS_ICONS[status]}</span>}
     />
   );

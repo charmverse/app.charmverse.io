@@ -98,15 +98,15 @@ export default function RoleRow({
     <Box mb={3}>
       <Accordion style={{ boxShadow: 'none' }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Box display="flex" justifyContent="space-between" sx={{ width: '100%' }}>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="h6" sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
+            <Box display='flex' justifyContent='space-between'>
+              <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {role.name}{' '}
                 {role.source === 'guild_xyz' ? (
                   <Tooltip
-                    placement="top"
+                    placement='top'
                     arrow
-                    title="This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role"
+                    title='This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role'
                   >
                     <span style={{ display: 'flex' }}>
                       <GuildXYZIcon
@@ -117,11 +117,11 @@ export default function RoleRow({
                     </span>
                   </Tooltip>
                 ) : null}{' '}
-                {role.spaceRolesToRole.length > 0 && <Chip size="small" label={role.spaceRolesToRole.length} />}
+                {role.spaceRolesToRole.length > 0 && <Chip size='small' label={role.spaceRolesToRole.length} />}
               </Typography>
             </Box>
             {isEditable && (
-              <IconButton size="small" {...bindTrigger(menuState)}>
+              <IconButton size='small' {...bindTrigger(menuState)}>
                 <MoreHorizIcon />
               </IconButton>
             )}
@@ -141,7 +141,7 @@ export default function RoleRow({
                 }}
               >
                 <DoneIcon sx={{ fontSize: '18px', mr: 0.5 }} />
-                <Typography variant="caption">{spaceOperationLabels[operation]}</Typography>
+                <Typography variant='caption'>{spaceOperationLabels[operation]}</Typography>
               </div>
             ))}
           </Box>
@@ -167,12 +167,12 @@ export default function RoleRow({
         {role.source !== 'guild_xyz' ? (
           assignedMembers.length < members.length ? (
             isEditable && (
-              <Button onClick={showMembersPopup} variant="text" color="secondary">
+              <Button onClick={showMembersPopup} variant='text' color='secondary'>
                 + Add members
               </Button>
             )
           ) : (
-            <Typography variant="caption">All space members have been added to this role</Typography>
+            <Typography variant='caption'>All space members have been added to this role</Typography>
           )
         ) : null}
       </Box>
@@ -195,7 +195,7 @@ export default function RoleRow({
             }}
           >
             <ListItemIcon>
-              <EditOutlinedIcon fontSize="small" />
+              <EditOutlinedIcon fontSize='small' />
             </ListItemIcon>
             <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
           </MenuItem>
@@ -209,7 +209,7 @@ export default function RoleRow({
           }}
         >
           <ListItemIcon>
-            <LockOpenIcon fontSize="small" />
+            <LockOpenIcon fontSize='small' />
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Manage permissions</Typography>
         </MenuItem>
@@ -223,14 +223,14 @@ export default function RoleRow({
           }}
         >
           <ListItemIcon>
-            <DeleteOutlinedIcon fontSize="small" />
+            <DeleteOutlinedIcon fontSize='small' />
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Delete</Typography>
         </MenuItem>
       </Menu>
 
-      <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title="Add members">
-        <Grid container direction="column" spacing={3}>
+      <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>
+        <Grid container direction='column' spacing={3}>
           <Grid item>
             <InputSearchMemberMultiple
               filter={{ mode: 'exclude', userIds: userIdsToHide }}
@@ -244,9 +244,9 @@ export default function RoleRow({
       </Modal>
 
       {rolePermissionsPopupState.isOpen && (
-        <Modal size="large" open onClose={rolePermissionsPopupState.close} title={`${role.name} permissions`}>
+        <Modal size='large' open onClose={rolePermissionsPopupState.close} title={`${role.name} permissions`}>
           <SpacePermissions
-            targetGroup="role"
+            targetGroup='role'
             id={role.id}
             callback={() => {
               refreshRoles();
@@ -256,9 +256,9 @@ export default function RoleRow({
         </Modal>
       )}
 
-      <Modal {...bindPopover(popupState)} title="Rename role">
+      <Modal {...bindPopover(popupState)} title='Rename role'>
         <RoleForm
-          mode="edit"
+          mode='edit'
           role={role}
           submitted={() => {
             popupState.close();
@@ -268,7 +268,7 @@ export default function RoleRow({
       </Modal>
 
       <ConfirmDeleteModal
-        title="Delete role"
+        title='Delete role'
         question={`Are you sure you want to delete the ${role.name} role?`}
         buttonText={`Delete ${role.name}`}
         onConfirm={() => {

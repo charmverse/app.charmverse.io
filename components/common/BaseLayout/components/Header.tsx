@@ -19,7 +19,7 @@ export default function Header() {
   const logo = theme.palette.mode === 'dark' ? whiteLogoImage : darkLogoImage;
   return (
     <HeaderBox>
-      <Image src={logo} alt="CharmVerse" />
+      <Image src={logo} alt='CharmVerse' />
     </HeaderBox>
   );
 }

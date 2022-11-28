@@ -112,7 +112,7 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
 
   return (
     <Box
-      className="octo-propertylist"
+      className='octo-propertylist'
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
@@ -131,18 +131,18 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
       )}
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Box display="flex" gap={1} alignItems="center">
-            <Typography fontWeight="bold">Proposal information</Typography>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Typography fontWeight='bold'>Proposal information</Typography>
           </Box>
         </Grid>
       </Grid>
 
-      <Box justifyContent="space-between" gap={2} alignItems="center" my="6px">
-        <Box display="flex" height="fit-content" flex={1} className="octo-propertyrow">
-          <div className="octo-propertyname octo-propertyname--readonly">
+      <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Category</Button>
           </div>
-          <Box display="flex" flex={1}>
+          <Box display='flex' flex={1}>
             <ProposalCategoryInput
               disabled={readOnly || !canUpdateProposalProperties || !proposal}
               options={categories || []}
@@ -156,23 +156,23 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
         </Box>
       </Box>
 
-      <Box justifyContent="space-between" gap={2} alignItems="center">
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
-          className="octo-propertyrow"
+          className='octo-propertyrow'
           style={{
             display: 'flex',
             height: 'fit-content',
             flexGrow: 1
           }}
         >
-          <div className="octo-propertyname octo-propertyname--readonly">
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Author</Button>
           </div>
           <div style={{ width: '100%' }}>
             <InputSearchMemberBase
               filterSelectedOptions
               multiple
-              placeholder="Select authors"
+              placeholder='Select authors'
               value={members.filter((member) => proposalAuthors.find((author) => member.id === author.userId))}
               disableCloseOnSelect
               onChange={async (_, _members) => {
@@ -199,21 +199,21 @@ export default function ProposalProperties({ pageId, proposalId, readOnly, isTem
           </div>
         </div>
       </Box>
-      <Box justifyContent="space-between" gap={2} alignItems="center">
+      <Box justifyContent='space-between' gap={2} alignItems='center'>
         <div
-          className="octo-propertyrow"
+          className='octo-propertyrow'
           style={{
             display: 'flex',
             height: 'fit-content',
             flexGrow: 1
           }}
         >
-          <div className="octo-propertyname octo-propertyname--readonly">
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Reviewer</Button>
           </div>
           <div style={{ width: '100%' }}>
             {proposalStatus === 'reviewed' && proposalReviewer ? (
-              <UserDisplay user={proposalReviewer} avatarSize="small" />
+              <UserDisplay user={proposalReviewer} avatarSize='small' />
             ) : (
               <InputSearchReviewers
                 disabled={readOnly || !canUpdateProposalProperties}

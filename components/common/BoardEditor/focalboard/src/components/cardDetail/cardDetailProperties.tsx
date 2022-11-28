@@ -174,17 +174,17 @@ const CardDetailProperties = React.memo((props: Props) => {
   }
 
   return (
-    <div className="octo-propertylist">
+    <div className='octo-propertylist'>
       {board.fields.cardProperties.map((propertyTemplate: IPropertyTemplate) => {
         const propertyValue = card.fields.properties[propertyTemplate.id];
         return (
-          <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className="octo-propertyrow">
+          <div key={`${propertyTemplate.id}-${propertyTemplate.type}-${propertyValue}`} className='octo-propertyrow'>
             {props.readOnly && (
-              <div className="octo-propertyname octo-propertyname--readonly">{propertyTemplate.name}</div>
+              <div className='octo-propertyname octo-propertyname--readonly'>{propertyTemplate.name}</div>
             )}
             {!props.readOnly && (
               <MenuWrapper isOpen={propertyTemplate.id === newTemplateId}>
-                <div className="octo-propertyname">
+                <div className='octo-propertyname'>
                   <Button>{propertyTemplate.name}</Button>
                 </div>
                 <PropertyMenu
@@ -206,7 +206,7 @@ const CardDetailProperties = React.memo((props: Props) => {
               updatedBy={pageUpdatedBy}
               propertyTemplate={propertyTemplate}
               showEmptyPlaceholder={true}
-              displayType="details"
+              displayType='details'
             />
           </div>
         );
@@ -215,12 +215,12 @@ const CardDetailProperties = React.memo((props: Props) => {
       {showConfirmationDialog && <ConfirmationDialogBox dialogBox={confirmationDialogBox} />}
 
       {!props.readOnly && props.activeView && (
-        <div className="octo-propertyname add-property">
+        <div className='octo-propertyname add-property'>
           <MenuWrapper>
             <Button>
-              <FormattedMessage id="CardDetail.add-property" defaultMessage="+ Add a property" />
+              <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
-            <Menu position="bottom-start">
+            <Menu position='bottom-start'>
               <PropertyTypes
                 label={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
                 onTypeSelected={async (type) => {

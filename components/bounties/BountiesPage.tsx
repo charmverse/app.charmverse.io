@@ -53,20 +53,20 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
   }, [bountiesSorted]);
 
   return (
-    <div className="focalboard-body full-page">
-      <div className="BoardComponent">
-        <div className="top-head">
-          <Grid container display="flex" justifyContent="space-between" alignContent="center" mb={3} mt={10}>
-            <Grid display="flex" justifyContent="space-between" item xs={12} mb={2}>
-              <Typography variant="h1" display="flex" alignItems="center" sx={{ height: '100%' }}>
+    <div className='focalboard-body full-page'>
+      <div className='BoardComponent'>
+        <div className='top-head'>
+          <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
+            <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+              <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
                 Bounties
               </Typography>
 
               {!publicMode && (
-                <Box width="fit-content" display="flex" gap={1}>
+                <Box width='fit-content' display='flex' gap={1}>
                   {!!csvData.length && (
-                    <CSVLink data={csvData} filename="Gnosis Safe Airdrop.csv" style={{ textDecoration: 'none' }}>
-                      <Button color="secondary" variant="outlined">
+                    <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                      <Button color='secondary' variant='outlined'>
                         Export to CSV
                       </Button>
                     </CSVLink>
@@ -78,12 +78,12 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
             </Grid>
           </Grid>
         </div>
-        <div className="container-container">
+        <div className='container-container'>
           {bounties.length === 0 ? (
             <EmptyStateVideo
-              description="Getting started with bounties"
-              videoTitle="Bounties | Getting started with Charmverse"
-              videoUrl="https://tiny.charmverse.io/bounties"
+              description='Getting started with bounties'
+              videoTitle='Bounties | Getting started with Charmverse'
+              videoUrl='https://tiny.charmverse.io/bounties'
             />
           ) : (
             <BountiesKanbanView publicMode={publicMode} bounties={bounties} />

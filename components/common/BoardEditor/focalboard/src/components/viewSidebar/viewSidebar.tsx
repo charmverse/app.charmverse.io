@@ -77,30 +77,30 @@ function ViewOptionsSidebar(props: Props) {
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
       <Collapse
         in={props.isOpen}
-        orientation="horizontal"
+        orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
         <StyledSidebar>
           {sidebarView === 'view-options' && (
             <>
-              <SidebarHeader title="View options" closeSidebar={props.closeSidebar} />
+              <SidebarHeader title='View options' closeSidebar={props.closeSidebar} />
               <MenuRow
                 onClick={() => setSidebarView('layout')}
-                icon={<PreviewIcon color="secondary" />}
-                title="Layout"
+                icon={<PreviewIcon color='secondary' />}
+                title='Layout'
                 value={capitalize(currentLayout)}
               />
               <MenuRow
                 onClick={() => setSidebarView('card-properties')}
-                icon={<FormatListBulletedIcon color="secondary" />}
-                title="Properties"
+                icon={<FormatListBulletedIcon color='secondary' />}
+                title='Properties'
                 value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
               />
               {withGroupBy && (
                 <MenuRow
                   onClick={() => setSidebarView('group-by')}
-                  icon={<GroupIcon color="secondary" />}
-                  title="Group"
+                  icon={<GroupIcon color='secondary' />}
+                  title='Group'
                   value={currentGroup ?? 'None'}
                 />
               )}
@@ -108,19 +108,19 @@ function ViewOptionsSidebar(props: Props) {
           )}
           {sidebarView === 'layout' && (
             <>
-              <SidebarHeader goBack={goBack} title="Layout" closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goBack} title='Layout' closeSidebar={props.closeSidebar} />
               <ViewLayoutOptions board={props.board} view={props.view} />
             </>
           )}
           {sidebarView === 'card-properties' && (
             <>
-              <SidebarHeader goBack={goBack} title="Properties" closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goBack} title='Properties' closeSidebar={props.closeSidebar} />
               <ViewPropertyOptions properties={props.board.fields.cardProperties} view={props.view} />
             </>
           )}
           {sidebarView === 'group-by' && (
             <>
-              <SidebarHeader goBack={goBack} title="Group by" closeSidebar={props.closeSidebar} />
+              <SidebarHeader goBack={goBack} title='Group by' closeSidebar={props.closeSidebar} />
               <GroupOptions
                 properties={props.board.fields.cardProperties}
                 view={props.view}
@@ -149,7 +149,7 @@ function MenuRow({
     <MenuItem dense onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText>{title}</ListItemText>
-      <Typography component="div" color="secondary" variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Typography component='div' color='secondary' variant='body2' sx={{ display: 'flex', alignItems: 'center' }}>
         {value}
         <ArrowRightIcon />
       </Typography>
@@ -167,19 +167,19 @@ export function SidebarHeader({
   title: string;
 }) {
   return (
-    <Box px={2} pt={1} pb={1} display="flex" justifyContent="space-between" alignItems="center">
-      <Box display="flex" alignItems="center" gap={1}>
+    <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
+      <Box display='flex' alignItems='center' gap={1}>
         {goBack && (
-          <IconButton size="small" onClick={goBack}>
-            <BackIcon fontSize="small" color="secondary" />
+          <IconButton size='small' onClick={goBack}>
+            <BackIcon fontSize='small' color='secondary' />
           </IconButton>
         )}
-        <Typography fontWeight="bold" variant="body2">
+        <Typography fontWeight='bold' variant='body2'>
           {title}
         </Typography>
       </Box>
-      <IconButton onClick={closeSidebar} size="small">
-        <CloseIcon fontSize="small" />
+      <IconButton onClick={closeSidebar} size='small'>
+        <CloseIcon fontSize='small' />
       </IconButton>
     </Box>
   );

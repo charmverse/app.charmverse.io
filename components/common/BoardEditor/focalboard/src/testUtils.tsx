@@ -9,7 +9,7 @@ import configureStore from 'redux-mock-store';
 import type { Block } from './blocks/block';
 
 export const wrapIntl = (children?: React.ReactNode): JSX.Element => (
-  <IntlProvider locale="en">{children}</IntlProvider>
+  <IntlProvider locale='en'>{children}</IntlProvider>
 );
 export const wrapDNDIntl = (children?: React.ReactNode): JSX.Element => {
   return <DndProvider backend={HTML5Backend}>{wrapIntl(children)}</DndProvider>;

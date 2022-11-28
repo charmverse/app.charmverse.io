@@ -89,25 +89,25 @@ const GalleryCard = React.memo((props: Props) => {
         />
       )}
       {galleryImageUrl && (
-        <div className="gallery-image">
-          <img className="ImageElement" src={galleryImageUrl} alt="Gallery item" />
+        <div className='gallery-image'>
+          <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
         </div>
       )}
-      {!galleryImageUrl && <div className="gallery-item" />}
+      {!galleryImageUrl && <div className='gallery-item' />}
       {props.visibleTitle && (
-        <div className="gallery-title">
+        <div className='gallery-title'>
           {cardPage?.icon ? (
-            <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType="card" icon={cardPage.icon} />
+            <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} />
           ) : undefined}
-          <div key="__title">
-            {cardPage?.title || <FormattedMessage id="KanbanCard.untitled" defaultMessage="Untitled" />}
+          <div key='__title'>
+            {cardPage?.title || <FormattedMessage id='KanbanCard.untitled' defaultMessage='Untitled' />}
           </div>
         </div>
       )}
       {visiblePropertyTemplates.length > 0 && (
-        <div className="gallery-props">
+        <div className='gallery-props'>
           {visiblePropertyTemplates.map((template) => (
-            <Tooltip key={template.id} title={template.name} placement="top">
+            <Tooltip key={template.id} title={template.name} placement='top'>
               <PropertyValueElement
                 updatedAt={cardPage?.updatedAt.toString() || ''}
                 updatedBy={cardPage?.updatedBy || ''}

@@ -435,10 +435,10 @@ function CenterPanel(props: Props) {
         backgroundClicked(e);
       }}
     >
-      <Hotkeys keyName="ctrl+d,del,esc,backspace" onKeyDown={keydownHandler} />
+      <Hotkeys keyName='ctrl+d,del,esc,backspace' onKeyDown={keydownHandler} />
       {!!boardPage?.deletedAt && <PageDeleteBanner pageId={board.id} />}
       {!props.hideBanner && board.fields.headerImage && (
-        <Box className="PageBanner" width="100%" mb={2}>
+        <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
             focalBoard
             headerImage={board.fields.headerImage}
@@ -447,7 +447,7 @@ function CenterPanel(props: Props) {
           />
         </Box>
       )}
-      <div className="top-head">
+      <div className='top-head'>
         {board && (boardPageType === 'board' || !isEmbedded) && (
           <ViewTitle key={board.id + board.title} board={board} readOnly={props.readOnly} setPage={props.setPage} />
         )}
@@ -485,8 +485,8 @@ function CenterPanel(props: Props) {
       </div>
 
       <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
-        <Box display="flex">
-          <Box width="100%">
+        <Box display='flex'>
+          <Box width='100%'>
             {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
               <InlineViewTitle
                 key={activePage.id + activePage.title}
@@ -497,10 +497,10 @@ function CenterPanel(props: Props) {
             )}
             {activePage && boardPageType === 'inline_linked_board' && (
               <Button
-                color="secondary"
+                color='secondary'
                 startIcon={<CallMadeIcon />}
-                variant="text"
-                size="large"
+                variant='text'
+                size='large'
                 href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${activePage?.path}`}
                 sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
               >

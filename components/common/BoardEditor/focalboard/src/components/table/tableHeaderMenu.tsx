@@ -24,7 +24,7 @@ function TableHeaderMenu(props: Props): JSX.Element {
   return (
     <Menu disablePortal={false}>
       <Menu.Text
-        id="sortAscending"
+        id='sortAscending'
         name={intl.formatMessage({ id: 'TableHeaderMenu.sort-ascending', defaultMessage: 'Sort ascending' })}
         onClick={() =>
           mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
@@ -33,7 +33,7 @@ function TableHeaderMenu(props: Props): JSX.Element {
         }
       />
       <Menu.Text
-        id="sortDescending"
+        id='sortDescending'
         name={intl.formatMessage({ id: 'TableHeaderMenu.sort-descending', defaultMessage: 'Sort descending' })}
         onClick={() =>
           mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
@@ -42,7 +42,7 @@ function TableHeaderMenu(props: Props): JSX.Element {
         }
       />
       <Menu.Text
-        id="insertLeft"
+        id='insertLeft'
         name={intl.formatMessage({ id: 'TableHeaderMenu.insert-left', defaultMessage: 'Insert left' })}
         onClick={() => {
           if (props.templateId === Constants.titleColumnId) {
@@ -57,7 +57,7 @@ function TableHeaderMenu(props: Props): JSX.Element {
         }}
       />
       <Menu.Text
-        id="insertRight"
+        id='insertRight'
         name={intl.formatMessage({ id: 'TableHeaderMenu.insert-right', defaultMessage: 'Insert right' })}
         onClick={() => {
           if (templateId === Constants.titleColumnId) {
@@ -74,7 +74,7 @@ function TableHeaderMenu(props: Props): JSX.Element {
       {props.templateId !== Constants.titleColumnId && (
         <>
           <Menu.Text
-            id="hide"
+            id='hide'
             name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
             onClick={() => {
               const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
@@ -82,12 +82,12 @@ function TableHeaderMenu(props: Props): JSX.Element {
             }}
           />
           <Menu.Text
-            id="duplicate"
+            id='duplicate'
             name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
             onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
           />
           <Menu.Text
-            id="delete"
+            id='delete'
             name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
             onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
           />

@@ -27,11 +27,11 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
 
   if (!spaceInfo) {
     return isValidating ? (
-      <LoadingComponent height="80px" isLoading={true} />
+      <LoadingComponent height='80px' isLoading={true} />
     ) : (
       <>
         <br />
-        <Alert severity="error">No workspace found</Alert>
+        <Alert severity='error'>No workspace found</Alert>
       </>
     );
   }
@@ -40,10 +40,10 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
     <>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
-          <WorkspaceAvatar image={spaceInfo.spaceImage} name={spaceInfo.name} variant="rounded" />
+          <WorkspaceAvatar image={spaceInfo.spaceImage} name={spaceInfo.name} variant='rounded' />
         </Box>
-        <Box display="flex" flexDirection="column" alignItems="center">
-          <Typography variant="h5">{spaceInfo.name}</Typography>
+        <Box display='flex' flexDirection='column' alignItems='center'>
+          <Typography variant='h5'>{spaceInfo.name}</Typography>
         </Box>
       </Card>
       <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />

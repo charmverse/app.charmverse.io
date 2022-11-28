@@ -72,8 +72,8 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
       >
         {((user?.id === member.id && currentSpace) || admin) && (
           <IconButton
-            size="small"
-            className="icons"
+            size='small'
+            className='icons'
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -87,7 +87,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                 : {}
             }
           >
-            <EditIcon fontSize="small" />
+            <EditIcon fontSize='small' />
           </IconButton>
         )}
       </TableCell>
@@ -103,18 +103,18 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                     p: 1
                   }}
                 >
-                  <Avatar avatar={member.avatar} name={member.username} variant="circular" size="large" />
+                  <Avatar avatar={member.avatar} name={member.username} variant='circular' size='large' />
                 </TableCell>
               );
             }
             case 'role': {
               return (
                 <TableCell key={property.id}>
-                  <Stack gap={1} flexDirection="row" flexWrap="wrap">
+                  <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                     {member.roles.length === 0
                       ? '-'
                       : member.roles.map((role) => (
-                          <Chip label={role.name} key={role.id} size="small" variant="outlined" />
+                          <Chip label={role.name} key={role.id} size='small' variant='outlined' />
                         ))}
                   </Stack>
                 </TableCell>
@@ -134,7 +134,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             case 'join_date': {
               return (
                 <TableCell>
-                  <Typography variant="body2">
+                  <Typography variant='body2'>
                     {humanFriendlyDate(member.joinDate, {
                       withYear: true
                     })}
@@ -146,7 +146,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               return (
                 <TableCell key={property.id}>
                   {twitterHandle ? (
-                    <Link target="_blank" href={`https://twitter.com/${twitterHandle}`}>
+                    <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>
                       @{twitterHandle}
                     </Link>
                   ) : (
@@ -178,10 +178,10 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               return (
                 <TableCell key={property.id}>
                   <Link
-                    color="inherit"
+                    color='inherit'
                     href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
                   >
-                    <Typography fontWeight="bold">{memberProperty.value ?? member.username}</Typography>
+                    <Typography fontWeight='bold'>{memberProperty.value ?? member.username}</Typography>
                   </Link>
                 </TableCell>
               );
@@ -207,7 +207,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             case 'number': {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant="body2">{memberProperty.value ?? '-'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
@@ -223,7 +223,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
                 >
                   {memberProperty.value ? (
                     <SelectPreview
-                      size="small"
+                      size='small'
                       options={property.options as SelectOptionType[]}
                       value={memberProperty.value as string | string[]}
                     />
@@ -236,7 +236,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             default: {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant="body2">{memberProperty.value ?? '-'}</Typography>
+                  <Typography variant='body2'>{memberProperty.value ?? '-'}</Typography>
                 </TableCell>
               );
             }
@@ -264,7 +264,7 @@ export function MemberDirectoryTableView({ members }: { members: Member[] }) {
   const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
   return (
     <Table
-      size="small"
+      size='small'
       sx={{
         my: 2,
         '& .MuiTableCell-root': {

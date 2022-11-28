@@ -39,7 +39,7 @@ type WrapperProps = {
 };
 
 function Wrapper({ children }: WrapperProps) {
-  return <IntlProvider locale="en">{children}</IntlProvider>;
+  return <IntlProvider locale='en'>{children}</IntlProvider>;
 }
 
 describe('components/properties/multiSelect', () => {
@@ -52,7 +52,7 @@ describe('components/properties/multiSelect', () => {
     const { container } = render(
       <MultiSelect
         isEditable={false}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={jest.fn()}
@@ -77,7 +77,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={[]}
         onChange={jest.fn()}
@@ -102,7 +102,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={onChange}
@@ -129,7 +129,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={jest.fn()}
@@ -161,7 +161,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={jest.fn()}
@@ -192,7 +192,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={jest.fn()}
@@ -225,7 +225,7 @@ describe('components/properties/multiSelect', () => {
     render(
       <MultiSelect
         isEditable={true}
-        emptyValue=""
+        emptyValue=''
         propertyTemplate={propertyTemplate}
         propertyValue={propertyValue}
         onChange={jest.fn()}

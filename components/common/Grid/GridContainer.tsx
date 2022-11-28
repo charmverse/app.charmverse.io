@@ -21,7 +21,7 @@ const StyledGrid = styled(Grid)`
 
 export default function GridContainer({ children, ...props }: ComponentProps<typeof Grid>) {
   return (
-    <StyledGrid container justifyContent="space-between" alignItems="center" {...props}>
+    <StyledGrid container justifyContent='space-between' alignItems='center' {...props}>
       {children}
     </StyledGrid>
   );

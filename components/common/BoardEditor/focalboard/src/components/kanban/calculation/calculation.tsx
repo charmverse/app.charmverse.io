@@ -23,7 +23,7 @@ function KanbanCalculation(props: Props): JSX.Element {
   const intl = useIntl();
 
   return (
-    <div className="KanbanCalculation">
+    <div className='KanbanCalculation'>
       <Button
         onClick={() => (props.menuOpen ? props.onMenuClose : props.onMenuOpen)()}
         onBlur={props.onMenuClose}

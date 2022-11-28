@@ -68,27 +68,27 @@ export default function RoleForm({ role = {}, mode = 'create', submitted = () =>
       })}
       style={{ margin: 'auto' }}
     >
-      <Grid container direction="column" spacing={3}>
+      <Grid container direction='column' spacing={3}>
         <Grid item>
           <InputLabel>Role name</InputLabel>
           <TextField
             {...register('name')}
             autoFocus
-            placeholder="Bounty manager"
-            variant="outlined"
-            type="text"
+            placeholder='Bounty manager'
+            variant='outlined'
+            type='text'
             fullWidth
           />
-          {errors?.name && <Alert severity="error">{errors.name.message}</Alert>}
+          {errors?.name && <Alert severity='error'>{errors.name.message}</Alert>}
         </Grid>
 
         {formError && (
           <Grid item>
-            <Alert severity="error">{formError.message ?? (formError as any).error}</Alert>
+            <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
           </Grid>
         )}
         <Grid item>
-          <Button disabled={!isValid} type="submit">
+          <Button disabled={!isValid} type='submit'>
             {mode === 'edit' ? 'Rename role' : 'Create role'}
           </Button>
         </Grid>

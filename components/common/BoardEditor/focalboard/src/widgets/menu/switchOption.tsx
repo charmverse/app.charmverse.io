@@ -15,16 +15,16 @@ function SwitchOption(props: SwitchOptionProps): JSX.Element {
   return (
     // eslint-disable-next-line jsx-a11y/interactive-supports-focus
     <div
-      className="MenuOption SwitchOption menu-option"
-      role="button"
+      className='MenuOption SwitchOption menu-option'
+      role='button'
       aria-label={name}
       onClick={(e: React.MouseEvent) => {
         e.target.dispatchEvent(new Event('menuItemClicked'));
         props.onClick(props.id);
       }}
     >
-      {icon ?? <div className="noicon" />}
-      <div className="menu-name">{name}</div>
+      {icon ?? <div className='noicon' />}
+      <div className='menu-name'>{name}</div>
       <Switch isOn={isOn} onChanged={() => {}} />
     </div>
   );

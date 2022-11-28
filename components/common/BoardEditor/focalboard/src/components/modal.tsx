@@ -18,8 +18,8 @@ const Modal = React.memo((props: Props): JSX.Element => {
   return (
     <ClickAwayListener onClickAway={onClose}>
       <div className={`Modal ${position || 'bottom'}`} ref={node}>
-        <div className="toolbar hideOnWidescreen">
-          <IconButton onClick={() => onClose()} icon={<CloseIcon fontSize="small" />} title="Close" />
+        <div className='toolbar hideOnWidescreen'>
+          <IconButton onClick={() => onClose()} icon={<CloseIcon fontSize='small' />} title='Close' />
         </div>
         {children}
       </div>

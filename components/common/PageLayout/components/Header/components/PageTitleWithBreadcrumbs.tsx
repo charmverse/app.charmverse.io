@@ -50,7 +50,7 @@ const StyledPageTitle = styled(Typography)`
 
 function PageTitle({ children, sx = {} }: { children: ReactNode; sx?: object }) {
   return (
-    <StyledPageTitle noWrap component="div" sx={sx}>
+    <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
     </StyledPageTitle>
   );
@@ -89,7 +89,7 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
     : breadcrumbs;
 
   return (
-    <Box display="flex">
+    <Box display='flex'>
       {displayedCrumbs.map((crumb) => (
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
@@ -111,9 +111,9 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
         </PageTitle>
       )}
       {isSaving && (
-        <Box display="inline-flex" alignItems="center" gap={1} ml={2}>
+        <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
           <CircularProgress size={12} />
-          <Typography variant="subtitle2">Saving</Typography>
+          <Typography variant='subtitle2'>Saving</Typography>
         </Box>
       )}
     </Box>
@@ -168,7 +168,7 @@ function NexusPageTitle({ route }: { route: string }) {
     <PageTitle>
       {showNexusParent && (
         <BreadCrumb>
-          <Link href="/nexus">My Nexus</Link>
+          <Link href='/nexus'>My Nexus</Link>
         </BreadCrumb>
       )}
       {pageTitle}

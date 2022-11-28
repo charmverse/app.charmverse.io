@@ -549,7 +549,7 @@ function CharmEditor({
           }
           case 'horizontalRule': {
             return (
-              <Box display="flex" alignItems="center" height={30} sx={{ overflow: 'auto' }}>
+              <Box display='flex' alignItems='center' height={30} sx={{ overflow: 'auto' }}>
                 <Divider sx={{ width: '100%' }} />
               </Box>
             );
@@ -599,7 +599,7 @@ function CharmEditor({
       {!disablePageSpecificFeatures && (
         <>
           <SidebarDrawer
-            id="page-action-sidebar"
+            id='page-action-sidebar'
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >

@@ -11,7 +11,7 @@ export default function Section({ title, titleRightElement, children, ...rest }:
   return (
     <Box padding={5} {...rest}>
       <Box padding={2}>
-        <Typography fontSize={{ base: 'md', sm: 'lg' }} component="h3">
+        <Typography fontSize={{ base: 'md', sm: 'lg' }} component='h3'>
           {title}
         </Typography>
         {titleRightElement}

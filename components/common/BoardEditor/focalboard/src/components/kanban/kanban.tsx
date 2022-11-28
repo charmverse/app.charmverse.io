@@ -40,7 +40,7 @@ function NewGroupTextField(props: NewGroupTextFieldProps) {
       }}
     >
       <TextField
-        placeholder="New group"
+        placeholder='New group'
         sx={{
           '& .MuiOutlinedInput-input': {
             padding: 1
@@ -253,8 +253,8 @@ function Kanban(props: Props) {
 
   const menuTriggerProps = !props.readOnly ? bindTrigger(popupState) : {};
   return (
-    <Box className="Kanban">
-      <div className="octo-board-header" id="mainBoardHeader">
+    <Box className='Kanban'>
+      <div className='octo-board-header' id='mainBoardHeader'>
         {/* Column headers */}
 
         {visibleGroups.map((group) => (
@@ -276,9 +276,9 @@ function Kanban(props: Props) {
         ))}
 
         {groupByProperty && (
-          <div className="octo-board-header-cell narrow" {...menuTriggerProps}>
-            <Button size="small" variant="text" color="secondary">
-              <FormattedMessage id="BoardComponent.add-a-group" defaultMessage="+ Add a group" />
+          <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
+            <Button size='small' variant='text' color='secondary'>
+              <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
             </Button>
           </div>
         )}
@@ -295,8 +295,8 @@ function Kanban(props: Props) {
         {/* Hidden column header */}
 
         {hiddenGroups.length > 0 && (
-          <div className="octo-board-header-cell narrow">
-            <FormattedMessage id="BoardComponent.hidden-columns" defaultMessage="Hidden columns" />
+          <div className='octo-board-header-cell narrow'>
+            <FormattedMessage id='BoardComponent.hidden-columns' defaultMessage='Hidden columns' />
           </div>
         )}
       </div>
@@ -304,7 +304,7 @@ function Kanban(props: Props) {
       {/* Main content */}
 
       <Box>
-        <div className="octo-board-body" id="mainBoardBody">
+        <div className='octo-board-body' id='mainBoardBody'>
           {/* Columns */}
 
           {visibleGroups.map((group) => (
@@ -327,15 +327,15 @@ function Kanban(props: Props) {
               ))}
               {!props.readOnly && (
                 <Button
-                  size="small"
-                  variant="text"
-                  color="secondary"
+                  size='small'
+                  variant='text'
+                  color='secondary'
                   sx={{ justifyContent: 'flex-start' }}
                   onClick={() => {
                     props.addCard(group.option.id, true, {}, true);
                   }}
                 >
-                  <FormattedMessage id="BoardComponent.new" defaultMessage="+ New" />
+                  <FormattedMessage id='BoardComponent.new' defaultMessage='+ New' />
                 </Button>
               )}
             </KanbanColumn>
@@ -343,12 +343,12 @@ function Kanban(props: Props) {
 
           {/* Add whitespace underneath "Add a group" button */}
 
-          {!props.readOnly && <div className="octo-board-header-cell narrow"></div>}
+          {!props.readOnly && <div className='octo-board-header-cell narrow'></div>}
 
           {/* Hidden columns */}
 
           {hiddenGroups.length > 0 && (
-            <div className="octo-board-column narrow">
+            <div className='octo-board-column narrow'>
               {hiddenGroups.map((group) => (
                 <KanbanHiddenColumnItem
                   key={group.option.id}

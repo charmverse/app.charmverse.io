@@ -117,15 +117,15 @@ export default function WorkspaceSettings({
   }
 
   return (
-    <form data-test="create-space-form" onSubmit={handleSubmit(onSubmit)}>
+    <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
       <DialogTitle onClose={onCancel}>Create a workspace</DialogTitle>
       <Divider />
       <br />
-      <Grid container direction="column" spacing={2}>
-        <Grid item display="flex" justifyContent="center">
+      <Grid container direction='column' spacing={2}>
+        <Grid item display='flex' justifyContent='center'>
           <Avatar
             name={watchName}
-            variant="rounded"
+            variant='rounded'
             image={watchSpaceImage}
             updateImage={(url) => setValue('spaceImage', url, { shouldDirty: true })}
             editable={true}
@@ -134,7 +134,7 @@ export default function WorkspaceSettings({
         <Grid item>
           <FieldLabel>Name</FieldLabel>
           <TextField
-            data-test="workspace-name-input"
+            data-test='workspace-name-input'
             {...register('name', {
               onChange: onChangeName
             })}
@@ -147,10 +147,10 @@ export default function WorkspaceSettings({
                 ? {}
                 : {
                     endAdornment: (
-                      <InputAdornment position="end">
-                        <Tooltip arrow placement="top" title="Regenerate random name">
-                          <IconButton size="small" onClick={randomizeName}>
-                            <RefreshIcon fontSize="small" />
+                      <InputAdornment position='end'>
+                        <Tooltip arrow placement='top' title='Regenerate random name'>
+                          <IconButton size='small' onClick={randomizeName}>
+                            <RefreshIcon fontSize='small' />
                           </IconButton>
                         </Tooltip>
                       </InputAdornment>
@@ -174,8 +174,8 @@ export default function WorkspaceSettings({
         <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
           <PrimaryButton
             disabled={!watchName || !watchDomain}
-            type="submit"
-            data-test="create-workspace"
+            type='submit'
+            data-test='create-workspace'
             loading={isSubmitting}
           >
             {submitText || 'Create Workspace'}
@@ -183,7 +183,7 @@ export default function WorkspaceSettings({
         </Grid>
         {saveError && (
           <Grid item>
-            <Alert severity="error">{saveError}</Alert>
+            <Alert severity='error'>{saveError}</Alert>
           </Grid>
         )}
       </Grid>

@@ -207,8 +207,8 @@ function DraggableTreeNode({
         ))
       ) : (
         <Typography
-          variant="caption"
-          className="MuiTreeItem-content"
+          variant='caption'
+          className='MuiTreeItem-content'
           sx={{ display: 'flex', alignItems: 'center', color: `${greyColor2} !important`, ml: 3 }}
         >
           No pages inside

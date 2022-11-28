@@ -80,8 +80,8 @@ export function PageActions({
   }
   return (
     <>
-      <IconButton size="small" className="icons" onClick={handleClick}>
-        <MoreHorizIcon color="secondary" fontSize="small" />
+      <IconButton size='small' className='icons' onClick={handleClick}>
+        <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -96,26 +96,26 @@ export function PageActions({
       >
         {onClickEdit && (
           <MenuItem dense onClick={onClickEdit}>
-            <EditOutlined fontSize="small" sx={{ mr: 1 }} />
+            <EditOutlined fontSize='small' sx={{ mr: 1 }} />
             <ListItemText>Edit</ListItemText>
           </MenuItem>
         )}
         <MenuItem dense onClick={onClickDelete} disabled={!onClickDelete}>
-          <DeleteOutlineIcon fontSize="small" sx={{ mr: 1 }} />
+          <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Delete</ListItemText>
         </MenuItem>
         {onClickDuplicate && (
           <MenuItem dense onClick={onClickDuplicate}>
-            <DuplicateIcon fontSize="small" sx={{ mr: 1 }} />
+            <DuplicateIcon fontSize='small' sx={{ mr: 1 }} />
             <ListItemText>Duplicate</ListItemText>
           </MenuItem>
         )}
         <MenuItem dense onClick={onClickCopyLink}>
-          <LinkIcon fontSize="small" sx={{ mr: 1 }} />
+          <LinkIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Copy link</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={onClickOpenInNewTab}>
-          <LaunchIcon fontSize="small" sx={{ mr: 1 }} />
+          <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
           <ListItemText>Open in new tab</ListItemText>
         </MenuItem>
         {children}
@@ -126,10 +126,10 @@ export function PageActions({
               px: 2
             }}
           >
-            <Typography variant="caption" color="secondary">
+            <Typography variant='caption' color='secondary'>
               Last edited by {pageCreator.username}
             </Typography>
-            <Typography variant="caption" color="secondary">
+            <Typography variant='caption' color='secondary'>
               Last edited at {humanFriendlyDate(page.updatedAt)}
             </Typography>
           </Stack>

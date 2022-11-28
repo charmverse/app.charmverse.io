@@ -32,12 +32,12 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
 
   return (
     <>
-      <Tooltip arrow title="Share or publish to the web">
+      <Tooltip arrow title='Share or publish to the web'>
         <Button
-          data-test="toggle-page-permissions-dialog"
-          color="secondary"
-          variant="text"
-          size="small"
+          data-test='toggle-page-permissions-dialog'
+          color='secondary'
+          variant='text'
+          size='small'
           onClick={() => {
             refreshPermissions();
             popupState.open();
@@ -52,7 +52,7 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           horizontal: 'right',
           vertical: 'bottom'
         }}
-        anchorReference="none"
+        anchorReference='none'
         transformOrigin={{
           vertical: 'top',
           horizontal: 'center'

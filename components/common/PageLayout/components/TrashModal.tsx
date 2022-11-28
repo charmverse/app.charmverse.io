@@ -47,20 +47,20 @@ const ArchivedPageItem = memo<{
 
   return (
     <Link href={`/${space?.domain}/${archivedPage.path}`} passHref key={archivedPage.id}>
-      <MenuItem component="a" dense disabled={disabled} sx={{ pl: 4 }}>
+      <MenuItem component='a' dense disabled={disabled} sx={{ pl: 4 }}>
         <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
           <PageIcon pageType={archivedPage.type} icon={archivedPage.icon} isEditorEmpty={!archivedPage.hasContent} />
         </ListItemIcon>
         <PageArchivedDate date={archivedPage.deletedAt as Date} title={archivedPage.title} />
         <div onClick={(e) => e.stopPropagation()}>
-          <IconButton disabled={disabled} size="small" onClick={(e) => onRestore(e as any, archivedPage.id)}>
-            <Tooltip arrow placement="top" title="Restore page">
-              <RestoreIcon color="info" fontSize="small" />
+          <IconButton disabled={disabled} size='small' onClick={(e) => onRestore(e as any, archivedPage.id)}>
+            <Tooltip arrow placement='top' title='Restore page'>
+              <RestoreIcon color='info' fontSize='small' />
             </Tooltip>
           </IconButton>
-          <IconButton disabled={disabled} size="small" onClick={(e) => onDelete(e as any, archivedPage.id)}>
-            <Tooltip arrow placement="top" title="Delete page permanently">
-              <DeleteOutlinedIcon color="error" fontSize="small" />
+          <IconButton disabled={disabled} size='small' onClick={(e) => onDelete(e as any, archivedPage.id)}>
+            <Tooltip arrow placement='top' title='Delete page permanently'>
+              <DeleteOutlinedIcon color='error' fontSize='small' />
             </Tooltip>
           </IconButton>
         </div>
@@ -179,16 +179,16 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
       open={isOpen}
       onClose={onClose}
       title={
-        <Box width="100%">
-          <Box mb={1} display="flex" justifyContent="space-between">
+        <Box width='100%'>
+          <Box mb={1} display='flex' justifyContent='space-between'>
             Trash
-            <Typography variant="body2" color="secondary">
+            <Typography variant='body2' color='secondary'>
               {Object.keys(archivedPages).length} pages
             </Typography>
           </Box>
           {archivedPagesExist && (
             <TextField
-              placeholder="Filter by page title..."
+              placeholder='Filter by page title...'
               fullWidth
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -198,7 +198,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
       }
     >
       {!archivedPagesExist ? (
-        <Typography sx={{ pl: 4 }} variant="subtitle1" color="secondary">
+        <Typography sx={{ pl: 4 }} variant='subtitle1' color='secondary'>
           No archived pages
         </Typography>
       ) : (

@@ -103,8 +103,8 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
           )}
         >
           <FormattedMessage
-            id="BoardComponent.no-property"
-            defaultMessage="No {property}"
+            id='BoardComponent.no-property'
+            defaultMessage='No {property}'
             values={{
               property: groupByProperty.name
             }}
@@ -115,7 +115,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
         <Label color={group.option.color}>
           <Editable
             value={groupTitle}
-            placeholderText="New Select"
+            placeholderText='New Select'
             onChange={setGroupTitle}
             onSave={() => {
               if (groupTitle.trim() === '') {
@@ -160,23 +160,23 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
           );
         }}
       />
-      <div className="octo-spacer" />
+      <div className='octo-spacer' />
       {!props.readOnly && (
         <>
           <MenuWrapper>
-            <IconButton icon={<MoreHorizIcon fontSize="small" />} />
+            <IconButton icon={<MoreHorizIcon fontSize='small' />} />
             <Menu>
               <Menu.Text
-                id="hide"
-                icon={<VisibilityOffOutlinedIcon fontSize="small" />}
+                id='hide'
+                icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
               />
               {group.option.id && (
                 <>
                   <Menu.Text
-                    id="delete"
-                    icon={<DeleteOutlineIcon fontSize="small" color="secondary" />}
+                    id='delete'
+                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
                     name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
                     onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
                   />
@@ -194,7 +194,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             </Menu>
           </MenuWrapper>
           <IconButton
-            icon={<AddIcon fontSize="small" />}
+            icon={<AddIcon fontSize='small' />}
             onClick={() => {
               props.addCard(group.option.id, true);
             }}

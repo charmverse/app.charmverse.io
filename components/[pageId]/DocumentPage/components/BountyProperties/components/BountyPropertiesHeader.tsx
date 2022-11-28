@@ -61,7 +61,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
       {/* Bounty price and status  */}
       <Grid container mb={2}>
         <Grid item xs={8}>
-          <Typography fontWeight="bold">Bounty information</Typography>
+          <Typography fontWeight='bold'>Bounty information</Typography>
         </Grid>
         <Grid item xs={4}>
           <Box
@@ -73,7 +73,7 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
             }}
           >
             {/* Provide the bounty menu options */}
-            <Box display="flex">
+            <Box display='flex'>
               <BountyStatusBadge bounty={bounty} truncate />
             </Box>
           </Box>
@@ -83,11 +83,11 @@ export default function BountyPropertiesHeader({ bounty, bountyPermissions, page
       {/* Warning for applicants */}
       {intersection.hasPermissions.length > 0 && (
         <Alert
-          severity="info"
+          severity='info'
           sx={{ mb: 2 }}
           action={
             <Tooltip title={"Update this bounty's page permissions to view-only (except for the bounty creator)."}>
-              <Button size="small" variant="outlined" onClick={restrictPermissions} loading={updatingPermissions}>
+              <Button size='small' variant='outlined' onClick={restrictPermissions} loading={updatingPermissions}>
                 Restrict editing
               </Button>
             </Tooltip>

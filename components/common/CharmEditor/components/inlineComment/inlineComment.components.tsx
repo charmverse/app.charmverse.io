@@ -66,7 +66,7 @@ export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKe
           }}
           timeout={250}
         >
-          <Box display="flex" flexDirection="column" gap={1}>
+          <Box display='flex' flexDirection='column' gap={1}>
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
@@ -114,7 +114,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   };
 
   return (
-    <Box display="flex" width="400px">
+    <Box display='flex' width='400px'>
       <Box flexGrow={1}>
         <InlineCharmEditor
           content={commentContent}
@@ -127,7 +127,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
         />
       </Box>
       <Button
-        size="small"
+        size='small'
         onClick={handleSubmit}
         sx={{
           alignSelf: 'flex-end',

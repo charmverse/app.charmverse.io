@@ -19,7 +19,7 @@ export function DocumentParticipants() {
 
   return (
     <Box mr={2}>
-      <Tooltip title={participantName} placement="bottom" PopperProps={{ anchorEl }} onClose={() => setAnchorEl(null)}>
+      <Tooltip title={participantName} placement='bottom' PopperProps={{ anchorEl }} onClose={() => setAnchorEl(null)}>
         <AvatarGroup max={6}>
           {otherParticipants.map((participant) => (
             <Avatar
@@ -30,7 +30,7 @@ export function DocumentParticipants() {
               }}
               avatar={participant.avatar}
               name={participant.name}
-              size="small"
+              size='small'
             />
           ))}
         </AvatarGroup>

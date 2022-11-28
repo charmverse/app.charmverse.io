@@ -34,7 +34,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const CopyButton = styled((props: any) => <Button color="secondary" variant="outlined" size="small" {...props} />)`
+const CopyButton = styled((props: any) => <Button color='secondary' variant='outlined' size='small' {...props} />)`
   border-radius: 0;
   border-right-color: transparent;
   border-top-color: transparent;
@@ -84,11 +84,11 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" padding={padding}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' padding={padding}>
         <Box>
           <Typography>Make bounties public</Typography>
 
-          <Typography variant="body2" color="secondary">
+          <Typography variant='body2' color='secondary'>
             {bountiesArePublic
               ? 'Anyone outside this space can view bounties, except for bounties restricted to certain roles.'
               : 'Bounties can only be seen by space members.'}
@@ -97,7 +97,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
         <Switch checked={bountiesArePublic} disabled={!isAdmin} onChange={togglePublic} />
       </Box>
       {space?.permissionConfigurationMode !== 'custom' && (
-        <Alert severity="info">
+        <Alert severity='info'>
           Your workspace is using the
           <b>{` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `}</b>
           preset.
@@ -115,7 +115,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
               value={shareLink}
               endAdornment={
                 <CopyToClipboard text={shareLink} onCopy={onCopy}>
-                  <InputAdornment position="end">
+                  <InputAdornment position='end'>
                     <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
                   </InputAdornment>
                 </CopyToClipboard>

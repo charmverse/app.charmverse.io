@@ -36,22 +36,22 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
-          <WorkspaceAvatar image={invite.space.spaceImage} name={invite.space.name} variant="rounded" />
+          <WorkspaceAvatar image={invite.space.spaceImage} name={invite.space.name} variant='rounded' />
         </Box>
-        <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+        <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
           <Typography gutterBottom>You've been invited to join</Typography>
-          <Typography variant="h5">{invite.space.name}</Typography>
+          <Typography variant='h5'>{invite.space.name}</Typography>
         </Box>
         {user ? (
-          <PrimaryButton data-test="accept-invite-button" fullWidth size="large" onClick={joinSpace}>
+          <PrimaryButton data-test='accept-invite-button' fullWidth size='large' onClick={joinSpace}>
             Accept Invite
           </PrimaryButton>
         ) : (
-          <Box display="flex" gap={2}>
+          <Box display='flex' gap={2}>
             <WalletSign signSuccess={loginFromWeb3Account} />
             <PrimaryButton
-              size="large"
-              variant="outlined"
+              size='large'
+              variant='outlined'
               href={`/api/discord/oauth?redirect=${encodeURIComponent(router.asPath.split('?')[0])}&type=login`}
             >
               Connect Discord

@@ -152,22 +152,22 @@ export default function PageDialog(props: Props) {
                       sx={{
                         mr: 1
                       }}
-                      fontSize="small"
+                      fontSize='small'
                     />
-                    <ListItemText primary="Mark complete" />
+                    <ListItemText primary='Mark complete' />
                   </MenuItem>
                 )}
               </PageActions>
             )
           }
           toolbar={
-            <Box display="flex" justifyContent="space-between">
+            <Box display='flex' justifyContent='space-between'>
               <Button
-                size="small"
-                color="secondary"
+                size='small'
+                color='secondary'
                 href={fullPageUrl}
-                variant="text"
-                startIcon={<OpenInFullIcon fontSize="small" />}
+                variant='text'
+                startIcon={<OpenInFullIcon fontSize='small' />}
               >
                 Open as Page
               </Button>

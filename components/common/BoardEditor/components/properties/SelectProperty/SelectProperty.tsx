@@ -143,9 +143,9 @@ export function SelectProperty({
         <SelectPreview
           value={selectValue}
           options={selectOptions}
-          size="small"
+          size='small'
           emptyComponent={
-            <Typography variant="subtitle2" sx={{ opacity: 0.4, pl: '2px', fontSize: '14px' }}>
+            <Typography variant='subtitle2' sx={{ opacity: 0.4, pl: '2px', fontSize: '14px' }}>
               Empty
             </Typography>
           }

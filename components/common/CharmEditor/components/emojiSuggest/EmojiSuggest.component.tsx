@@ -41,7 +41,7 @@ export default function EmojiSuggest({ pluginKey }: { pluginKey: PluginKey }) {
 
   return (
     <ClickAwayListener onClickAway={closeTooltip}>
-      <StyledPopper disablePortal open={isVisible} anchorEl={tooltipContentDOM} placement="bottom-start">
+      <StyledPopper disablePortal open={isVisible} anchorEl={tooltipContentDOM} placement='bottom-start'>
         <Picker
           theme={theme.palette.mode}
           onSelect={(emoji: BaseEmoji) => {

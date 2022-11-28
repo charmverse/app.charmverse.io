@@ -81,23 +81,23 @@ export default function DefaultSpacePagePermissions() {
   }
 
   return (
-    <Grid container direction="column" gap={2}>
+    <Grid container direction='column' gap={2}>
       <Grid item xs>
-        <Typography variant="body2" fontWeight="bold">
+        <Typography variant='body2' fontWeight='bold'>
           Default page permissions
         </Typography>
-        <Typography variant="caption">
+        <Typography variant='caption'>
           These apply only to new top-level pages. You can still control access to each page individually.
         </Typography>
       </Grid>
       <Grid item container xs>
         <Grid item xs={6}>
           <Button
-            color="secondary"
-            variant="outlined"
+            color='secondary'
+            variant='outlined'
             disabled={isUpdatingPagePermission || !isAdmin}
             loading={isUpdatingPagePermission}
-            endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize="small" />}
+            endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
             {...bindTrigger(popupState)}
           >
             {permissionLevels[selectedPagePermission]}
@@ -131,7 +131,7 @@ export default function DefaultSpacePagePermissions() {
         </Grid>
         <Grid item xs={6}>
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
           >
             {pagePermissionDescriptions[selectedPagePermission]}
@@ -153,13 +153,13 @@ export default function DefaultSpacePagePermissions() {
                 defaultChecked={defaultPublicPages}
               />
             }
-            label="Accessible to public"
+            label='Accessible to public'
           />
         </Grid>
         <Grid item xs={6}>
           <Typography
             sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
-            variant="body2"
+            variant='body2'
           >
             {defaultPublicPages === true && 'New top-level pages will be viewable by the public.'}
             {defaultPublicPages === false && 'New top-level pages can only be seen by workspace members.'}
@@ -172,9 +172,9 @@ export default function DefaultSpacePagePermissions() {
           <Button
             onClick={() => updateSpaceDefaults()}
             disabled={!settingsChanged || isUpdatingPagePermission}
-            type="submit"
-            variant="contained"
-            color="primary"
+            type='submit'
+            variant='contained'
+            color='primary'
             sx={{ mr: 1 }}
           >
             Save

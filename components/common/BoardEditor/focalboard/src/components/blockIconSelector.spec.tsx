@@ -21,16 +21,16 @@ describe('components/blockIconSelector', () => {
     jest.clearAllMocks();
   });
   test('return an icon correctly', () => {
-    const { container } = render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    const { container } = render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     expect(container).toMatchSnapshot();
   });
   test('return no element with no icon', () => {
     board.fields.icon = '';
-    const { container } = render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    const { container } = render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     expect(container).toMatchSnapshot();
   });
   test('return menu on click', () => {
-    const { container } = render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    const { container } = render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     userEvent.click(screen.getByRole('button', { name: 'menuwrapper' }));
     expect(container).toMatchSnapshot();
   });
@@ -40,7 +40,7 @@ describe('components/blockIconSelector', () => {
   });
 
   test('return a new icon after click on random menu', () => {
-    render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     userEvent.click(screen.getByRole('button', { name: 'menuwrapper' }));
     const buttonRandom = screen.queryByRole('button', { name: 'Random' });
     expect(buttonRandom).not.toBeNull();
@@ -49,7 +49,7 @@ describe('components/blockIconSelector', () => {
   });
 
   test('return a new icon after click on EmojiPicker', async () => {
-    const { container } = render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    const { container } = render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     userEvent.click(screen.getByRole('button', { name: 'menuwrapper' }));
     const menuPicker = container.querySelector('div#pick');
     expect(menuPicker).not.toBeNull();
@@ -62,7 +62,7 @@ describe('components/blockIconSelector', () => {
   });
 
   test('return no icon after click on remove menu', () => {
-    const { container, rerender } = render(wrapIntl(<BlockIconSelector block={board} size="l" />));
+    const { container, rerender } = render(wrapIntl(<BlockIconSelector block={board} size='l' />));
     userEvent.click(screen.getByRole('button', { name: 'menuwrapper' }));
     const buttonRemove = screen.queryByRole('button', { name: 'Remove icon' });
     expect(buttonRemove).not.toBeNull();

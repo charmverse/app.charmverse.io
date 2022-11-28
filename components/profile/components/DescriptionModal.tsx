@@ -51,7 +51,7 @@ function DescriptionModal(props: DescriptionModalProps) {
   const watchDescription = watch('description');
 
   return (
-    <Modal open={isOpen} onClose={close} size="large">
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
@@ -60,7 +60,7 @@ function DescriptionModal(props: DescriptionModalProps) {
             fullWidth
             error={!!errors.description}
             helperText={errors.description?.message}
-            placeholder="Tell the world a bit more about yourself ..."
+            placeholder='Tell the world a bit more about yourself ...'
             multiline
             minRows={10}
             onChange={(event) => {
@@ -71,11 +71,11 @@ function DescriptionModal(props: DescriptionModalProps) {
               }
             }}
           />
-          <Box justifyContent="end" sx={{ display: 'flex' }}>
+          <Box justifyContent='end' sx={{ display: 'flex' }}>
             {watchDescription.length}/500
           </Box>
           <Box sx={{ display: 'flex' }}>
-            <Button type="submit">Save</Button>
+            <Button type='submit'>Save</Button>
           </Box>
         </Stack>
       </form>

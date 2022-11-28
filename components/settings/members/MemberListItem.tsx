@@ -59,10 +59,10 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
   return (
     <TableRow>
       <TableCell>
-        <Box display="flex" alignItems="center">
+        <Box display='flex' alignItems='center'>
           <Avatar name={member.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
           <Box pl={2}>
-            <Typography variant="body1">
+            <Typography variant='body1'>
               <strong>{member.username}</strong>
             </Typography>
           </Box>
@@ -70,7 +70,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
         </Box>
       </TableCell>
       <TableCell>
-        <Typography minWidth={80} variant="body2">
+        <Typography minWidth={80} variant='body2'>
           {humanFriendlyDate(member.createdAt)}
         </Typography>
       </TableCell>
@@ -78,11 +78,11 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
         {actions.length > 0 ? (
           <>
             <Button
-              color="secondary"
-              size="small"
-              variant="outlined"
+              color='secondary'
+              size='small'
+              variant='outlined'
               {...bindTrigger(popupState)}
-              endIcon={<KeyboardArrowDownIcon fontSize="small" />}
+              endIcon={<KeyboardArrowDownIcon fontSize='small' />}
             >
               {member.isAdmin ? 'admin' : 'member'}
             </Button>
@@ -100,25 +100,25 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
                 >
                   {action === 'makeAdmin' && (
                     <StyledListItemText
-                      primary="Admin"
-                      secondary="Can access all settings and invite new members to the workspace"
+                      primary='Admin'
+                      secondary='Can access all settings and invite new members to the workspace'
                     />
                   )}
                   {action === 'makeMember' && (
                     <StyledListItemText
-                      primary="Member"
-                      secondary="Cannot change workspace settings or invite new members to the workspace"
+                      primary='Member'
+                      secondary='Cannot change workspace settings or invite new members to the workspace'
                     />
                   )}
                   {action === 'removeFromSpace' && (
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
-                      primary="Remove from team"
+                      primary='Remove from team'
                     />
                   )}
                   {action === activeRoleAction && (
                     <ListItemIcon>
-                      <CheckIcon fontSize="small" />
+                      <CheckIcon fontSize='small' />
                     </ListItemIcon>
                   )}
                 </MenuItem>
@@ -126,7 +126,7 @@ export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: P
             </Menu>
           </>
         ) : (
-          <Typography color="secondary">{member.isAdmin ? 'admin' : 'member'}</Typography>
+          <Typography color='secondary'>{member.isAdmin ? 'admin' : 'member'}</Typography>
         )}
       </TableCell>
     </TableRow>

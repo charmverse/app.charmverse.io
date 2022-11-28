@@ -49,12 +49,12 @@ export function InputSearchMemberBase({ filter, options, disableCloseOnSelect, p
       // user can also be a string if freeSolo=true
       getOptionLabel={(user) => (user as Member).username}
       renderOption={(_props, user) => <UserDisplay {...(_props as any)} user={user} />}
-      noOptionsText="No options available"
+      noOptionsText='No options available'
       renderInput={(params) => (
         <TextField
           {...params}
           placeholder={filteredOptions.length > 0 ? placeholder : ''}
-          size="small"
+          size='small'
           inputProps={{
             ...params.inputProps
           }}
@@ -95,7 +95,7 @@ export function InputSearchMember({ defaultValue, onChange, ...props }: IInputSe
     <InputSearchMemberBase
       options={members}
       onChange={(e, _value) => emitValue(_value as Member)}
-      placeholder="Select a user"
+      placeholder='Select a user'
       value={value}
       {...props}
     />
@@ -137,7 +137,7 @@ export function InputSearchMemberMultiple({
     <InputSearchMemberBase
       filterSelectedOptions
       multiple
-      placeholder="Select users"
+      placeholder='Select users'
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value) => emitValue(_value as Member[])}

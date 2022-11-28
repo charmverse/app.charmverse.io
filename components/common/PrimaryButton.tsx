@@ -39,7 +39,7 @@ function PimpedButton<C extends ElementType>(props: InputProps<C>) {
   return (
     <StyledButton disabled={loading} {...rest}>
       {loading && loadingMessage ? loadingMessage : children}
-      {loading && <StyledSpinner color="inherit" size={15} />}
+      {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
   );
 }

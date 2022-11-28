@@ -8,14 +8,14 @@ const logoImagePath = '/images/charmverse_logo_sm_black.png';
 export default function Header() {
   return (
     <MjmlImage
-      align="left"
+      align='left'
       href={domain}
       src={`${domain}${logoImagePath}`}
-      width="243px"
-      height="46px"
-      padding-bottom="20px"
-      padding-left="20px"
-      padding-top="20px"
+      width='243px'
+      height='46px'
+      padding-bottom='20px'
+      padding-left='20px'
+      padding-top='20px'
     />
   );
 }

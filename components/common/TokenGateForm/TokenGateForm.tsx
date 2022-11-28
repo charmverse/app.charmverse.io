@@ -149,21 +149,21 @@ export default function TokenGateForm({
   }
 
   if (isLoading) {
-    return <LoadingComponent height="80px" isLoading={true} />;
+    return <LoadingComponent height='80px' isLoading={true} />;
   }
 
   if (!isLoading && (!tokenGates || tokenGates?.length === 0)) {
     return (
-      <Alert data-test="token-gate-empty-state" severity="info" sx={{ my: 1 }}>
+      <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
         No token gates found for this workspace.
       </Alert>
     );
   }
 
   return (
-    <Grid container direction="column" spacing={2} sx={{ mt: 2 }} data-test="token-gate-form">
+    <Grid container direction='column' spacing={2} sx={{ mt: 2 }} data-test='token-gate-form'>
       <Grid item>
-        <Typography variant="body2">
+        <Typography variant='body2'>
           Verify your wallet to check if you can join this workspace and which roles you can receive.
         </Typography>
       </Grid>
@@ -176,7 +176,7 @@ export default function TokenGateForm({
             validGate={tokenGateResult ? tokenGateResult.gateTokens.some((g) => g.tokenGate.id === gate.id) : null}
           />
           {index < list.length - 1 && (
-            <Typography color="secondary" sx={{ mb: -1, mt: 2, textAlign: 'center' }}>
+            <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>
               OR
             </Typography>
           )}
@@ -186,11 +186,11 @@ export default function TokenGateForm({
       {tokenGateResult && (
         <Grid item xs>
           {!tokenGateResult.canJoinSpace ? (
-            <Alert severity="warning" data-test="token-gate-failure-alert">
+            <Alert severity='warning' data-test='token-gate-failure-alert'>
               Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
             </Alert>
           ) : (
-            <Alert severity="success">
+            <Alert severity='success'>
               You can join this workspace.{' '}
               {tokenGateResult.roles.length > 0
                 ? 'You will also receive the roles attached to each condition you passed'
@@ -205,9 +205,9 @@ export default function TokenGateForm({
           <WalletSign loading={verifyingGates} signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
         ) : (
           <PrimaryButton
-            size="large"
+            size='large'
             fullWidth
-            type="submit"
+            type='submit'
             loading={joiningSpace}
             disabled={joiningSpace}
             onClick={onSubmit}
@@ -217,9 +217,9 @@ export default function TokenGateForm({
         )}
       </Grid>
       <Grid item>
-        <Typography component="p" variant="caption" align="center">
+        <Typography component='p' variant='caption' align='center'>
           Powered by{' '}
-          <Link href="https://litprotocol.com/" external target="_blank">
+          <Link href='https://litprotocol.com/' external target='_blank'>
             Lit Protocol
           </Link>
         </Typography>

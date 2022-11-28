@@ -8,7 +8,7 @@ describe('components/properties/link', () => {
   test('returns link properties correctly', () => {
     const component = (
       <Link
-        value="https://github.com/mattermost/focalboard"
+        value='https://github.com/mattermost/focalboard'
         onChange={jest.fn()}
         onSave={jest.fn()}
         onCancel={jest.fn()}

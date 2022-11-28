@@ -19,7 +19,7 @@ function Favicon({ pageIcon }: { pageIcon?: string | null }) {
     }
   }
 
-  return <link rel="icon" type={favicon.type} href={favicon.url} />;
+  return <link rel='icon' type={favicon.type} href={favicon.url} />;
 }
 
 export default memo(Favicon);

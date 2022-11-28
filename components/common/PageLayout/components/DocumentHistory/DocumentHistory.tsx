@@ -35,7 +35,7 @@ function DocumentHistory({ page }: { page: PageMeta }) {
   return (
     <Tooltip
       arrow={false}
-      placement="bottom-start"
+      placement='bottom-start'
       componentsProps={{
         tooltip: {
           sx: {
@@ -47,16 +47,16 @@ function DocumentHistory({ page }: { page: PageMeta }) {
       onOpen={() => setTime(updateRelativeDatesCb())}
       title={
         <>
-          <StyledTypography variant="caption">Edited by</StyledTypography> {updatedBy}{' '}
-          <StyledTypography variant="caption">{updatedAt}</StyledTypography>
+          <StyledTypography variant='caption'>Edited by</StyledTypography> {updatedBy}{' '}
+          <StyledTypography variant='caption'>{updatedAt}</StyledTypography>
           <br />
-          <StyledTypography variant="caption">Created by</StyledTypography> {createdBy}{' '}
-          <StyledTypography variant="caption">{createdAt}</StyledTypography>
+          <StyledTypography variant='caption'>Created by</StyledTypography> {createdBy}{' '}
+          <StyledTypography variant='caption'>{createdAt}</StyledTypography>
         </>
       }
     >
       <Box display={{ xs: 'none', lg: 'block' }} mr={2}>
-        <Button color="secondary" size="small" variant="text" disabled>
+        <Button color='secondary' size='small' variant='text' disabled>
           Edited {updatedAt}
         </Button>
         {/* <Typography color='secondary' fontSize={12.8} variant='caption' fontWeight={500}>Edited {updatedAt}</Typography> */}

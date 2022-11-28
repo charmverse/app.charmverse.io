@@ -28,14 +28,14 @@ const SelectProperty = React.memo((props: Props) => {
   if (!isEditable || !open) {
     return (
       <div
-        className="octo-propertyvalue"
-        data-testid="select-non-editable"
+        className='octo-propertyvalue'
+        data-testid='select-non-editable'
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         onClick={() => setOpen(true)}
       >
         <Label color={displayValue ? propertyColorCssClassName : 'empty'}>
-          <span className="Label-text">{finalDisplayValue}</span>
+          <span className='Label-text'>{finalDisplayValue}</span>
         </Label>
       </div>
     );

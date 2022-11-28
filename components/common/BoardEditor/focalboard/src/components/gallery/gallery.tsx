@@ -53,7 +53,7 @@ function Gallery(props: Props): JSX.Element {
   const visibleTitle = activeView.fields.visiblePropertyIds.includes(Constants.titleColumnId);
 
   return (
-    <div className="Gallery">
+    <div className='Gallery'>
       {cards
         .filter((c) => c.parentId === board.id)
         .map((card) => {
@@ -77,12 +77,12 @@ function Gallery(props: Props): JSX.Element {
 
       {!props.readOnly && (
         <div
-          className="octo-gallery-new"
+          className='octo-gallery-new'
           onClick={() => {
             props.addCard(true);
           }}
         >
-          <FormattedMessage id="TableComponent.plus-new" defaultMessage="+ New" />
+          <FormattedMessage id='TableComponent.plus-new' defaultMessage='+ New' />
         </div>
       )}
     </div>

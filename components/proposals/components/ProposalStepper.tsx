@@ -182,8 +182,8 @@ function DesktopStepper({
 
         return (
           <Fragment key={status}>
-            <Grid item md={12 / 13} display="flex" position="relative" alignItems="center" justifyContent="center">
-              <Stack alignItems="center" height="100%" gap={1}>
+            <Grid item md={12 / 13} display='flex' position='relative' alignItems='center' justifyContent='center'>
+              <Stack alignItems='center' height='100%' gap={1}>
                 <Tooltip title={proposalStatusTooltips[status]}>
                   <StepperIcon
                     isComplete={currentStatusIndex > statusIndex}
@@ -200,17 +200,17 @@ function DesktopStepper({
                     }}
                   >
                     {currentStatusIndex > statusIndex ? (
-                      <CheckIcon fontSize="small" />
+                      <CheckIcon fontSize='small' />
                     ) : (
                       <Typography fontWeight={500}>{statusIndex + 1}</Typography>
                     )}
                   </StepperIcon>
                 </Tooltip>
                 <Typography
-                  textAlign="center"
+                  textAlign='center'
                   fontWeight={currentStatusIndex === statusIndex ? 600 : 400}
                   fontSize={14}
-                  whiteSpace="nowrap"
+                  whiteSpace='nowrap'
                 >
                   {PROPOSAL_STATUS_LABELS[status as ProposalStatus]}
                 </Typography>
@@ -242,18 +242,18 @@ function MobileStepper({
 }: StepperProps) {
   return (
     <Box
-      width="100%"
+      width='100%'
       display={{
         xs: 'flex',
         md: 'none'
       }}
     >
-      <Box width="100%" justifyContent="space-between" gap={2} alignItems="center" my="6px">
-        <Box display="flex" height="fit-content" flex={1} className="octo-propertyrow">
-          <div className="octo-propertyname octo-propertyname--readonly">
+      <Box width='100%' justifyContent='space-between' gap={2} alignItems='center' my='6px'>
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+          <div className='octo-propertyname octo-propertyname--readonly'>
             <Button>Status</Button>
           </div>
-          <Box display="flex" flex={1}>
+          <Box display='flex' flex={1}>
             <Select
               fullWidth
               value={currentStatus ?? ''}
@@ -302,7 +302,7 @@ function MobileStepper({
                     <Stack>
                       <Typography>{PROPOSAL_STATUS_LABELS[status as ProposalStatus]}</Typography>
                       <Typography
-                        variant="subtitle2"
+                        variant='subtitle2'
                         sx={{
                           whiteSpace: 'break-spaces'
                         }}

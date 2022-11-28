@@ -6,7 +6,7 @@ import IdentityProviders from './components/IdentityProviders';
 export default function MyIntegrations() {
   return (
     <>
-      <NexusPageTitle subPage="Integrations" />
+      <NexusPageTitle subPage='Integrations' />
       <IdentityProviders />
       <MultiSigList />
     </>

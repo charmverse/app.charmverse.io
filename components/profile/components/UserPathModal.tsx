@@ -80,30 +80,30 @@ export default function UserPathModal(props: Props) {
   let statusIcon = null;
   if (pathValue) {
     if (errors.path) {
-      statusIcon = <Close color="error" />;
+      statusIcon = <Close color='error' />;
     } else {
-      statusIcon = <Check color="success" />;
+      statusIcon = <Check color='success' />;
     }
   }
 
   return (
-    <Modal open={isOpen} onClose={close} size="large">
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Personalize your link</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
           <TextField
             {...register('path')}
             InputProps={{
-              startAdornment: <InputAdornment position="start">{hostname}/</InputAdornment>,
-              endAdornment: <InputAdornment position="end">{statusIcon}</InputAdornment>
+              startAdornment: <InputAdornment position='start'>{hostname}/</InputAdornment>,
+              endAdornment: <InputAdornment position='end'>{statusIcon}</InputAdornment>
             }}
             fullWidth
             error={!!errors.path}
             helperText={errors.path?.message || ' '}
-            placeholder="awesome-bot"
+            placeholder='awesome-bot'
           />
           <Box mt={2} sx={{ display: 'flex' }}>
-            <Button disabled={!!errors.path} type="submit">
+            <Button disabled={!!errors.path} type='submit'>
               Save
             </Button>
           </Box>

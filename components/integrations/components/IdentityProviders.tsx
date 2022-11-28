@@ -37,7 +37,7 @@ const GridContainer = styled.div`
 function ProviderRow({ children }: { children: ReactNode }) {
   return (
     <Card sx={{ height: '100%' }}>
-      <Stack direction="column" alignItems="center" justifyContent="space-between" spacing={3} my={3}>
+      <Stack direction='column' alignItems='center' justifyContent='space-between' spacing={3} my={3}>
         {children}
       </Stack>
     </Card>
@@ -99,8 +99,8 @@ export default function IdentityProviders() {
   return (
     <GridContainer>
       <ProviderRow>
-        <ImageIcon src="/images/walletLogos/metamask.png" />
-        <Typography color="secondary" variant="button">
+        <ImageIcon src='/images/walletLogos/metamask.png' />
+        <Typography color='secondary' variant='button'>
           {account ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
         </Typography>
         <WalletConnect onSuccess={() => null} />
@@ -112,12 +112,12 @@ export default function IdentityProviders() {
             <SvgIcon sx={{ color: '#5765f2', height: 48, width: 'auto' }}>
               <DiscordIcon />
             </SvgIcon>
-            <Typography color="secondary" variant="button">
+            <Typography color='secondary' variant='button'>
               {isConnected ? 'Connected with Discord' : 'Connect with Discord'}
             </Typography>
             <Tooltip
               arrow
-              placement="top"
+              placement='top'
               title={
                 user?.wallets.length === 0 ? 'You must have at least one wallet address to disconnect from discord' : ''
               }
@@ -125,7 +125,7 @@ export default function IdentityProviders() {
               {/** div is used to make sure the tooltip is rendered as disabled button doesn't allow tooltip */}
               <div>
                 <StyledButton
-                  variant="outlined"
+                  variant='outlined'
                   color={isConnected ? 'error' : 'primary'}
                   disabled={isLoggingOut || isLoading || user?.wallets.length === 0}
                   onClick={connect}
@@ -136,7 +136,7 @@ export default function IdentityProviders() {
               </div>
             </Tooltip>
 
-            {error && <Alert severity="error">{error}</Alert>}
+            {error && <Alert severity='error'>{error}</Alert>}
           </ProviderRow>
         )}
       </DiscordProvider>
@@ -145,11 +145,11 @@ export default function IdentityProviders() {
         <SvgIcon sx={{ height: 48, width: 'auto' }}>
           <TelegramIcon />
         </SvgIcon>
-        <Typography color="secondary" variant="button">
+        <Typography color='secondary' variant='button'>
           {connectedWithTelegram ? 'Connected with Telegram' : 'Connect with Telegram'}
         </Typography>
         <StyledButton
-          variant="outlined"
+          variant='outlined'
           sx={{ overflow: 'hidden' }}
           color={connectedWithTelegram ? 'error' : 'primary'}
           disabled={isLoggingOut || isConnectingTelegram}
@@ -160,7 +160,7 @@ export default function IdentityProviders() {
         </StyledButton>
         <TelegramLoginIframe />
 
-        {telegramError && <Alert severity="error">{telegramError}</Alert>}
+        {telegramError && <Alert severity='error'>{telegramError}</Alert>}
       </ProviderRow>
     </GridContainer>
   );

@@ -26,7 +26,7 @@ export function MemberOnboardingForm({
       memberId={userId}
       spaceId={spaceId}
       updateMemberPropertyValues={updateSpaceValues}
-      cancelButtonText="Set up later"
+      cancelButtonText='Set up later'
     >
       {user && (
         <>

@@ -20,7 +20,7 @@ function Switch(props: Props): JSX.Element {
       }}
       style={{}}
     >
-      <div className="octo-switch-inner" />
+      <div className='octo-switch-inner' />
     </div>
   );
 }

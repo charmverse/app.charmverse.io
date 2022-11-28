@@ -144,12 +144,12 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
   return (
     <div>
       <form onSubmit={handleSubmit((formValue) => submitted(formValue))} style={{ margin: 'auto' }}>
-        <Grid container direction="column" gap={2}>
+        <Grid container direction='column' gap={2}>
           <Grid item xs>
-            <Typography variant="body2" fontWeight="bold">
+            <Typography variant='body2' fontWeight='bold'>
               Workspace permissions
             </Typography>
-            <Typography variant="caption">
+            <Typography variant='caption'>
               {targetGroup === 'space' &&
                 'Enabling permissions here will allow every workspace member to perform the relevant action, whatever their roles and permissions.'}
 
@@ -186,7 +186,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
                 <Grid item xs={6}>
                   <Typography
                     sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
-                    variant="body2"
+                    variant='body2'
                   >
                     {targetGroup === 'space' &&
                       newValues[operation] === true &&
@@ -215,7 +215,7 @@ export default function SpacePermissions({ targetGroup, id, callback = () => nul
 
           {isAdmin && (
             <Grid item xs>
-              <Button disabled={!settingsChanged} type="submit" variant="contained" color="primary" sx={{ mr: 1 }}>
+              <Button disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>
                 Save
               </Button>
             </Grid>

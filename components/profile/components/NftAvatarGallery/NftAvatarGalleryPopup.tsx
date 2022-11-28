@@ -18,7 +18,7 @@ export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, is
   const { nfts, isLoading } = useMyNfts(user?.id || '');
 
   return (
-    <Dialog onClose={onClose} open={isVisible} scroll="paper">
+    <Dialog onClose={onClose} open={isVisible} scroll='paper'>
       <DialogTitle>Your NFTs gallery</DialogTitle>
 
       <DialogContent dividers>
@@ -27,7 +27,7 @@ export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, is
           isLoading={isLoading}
           onSelect={onSelect}
           isSaving={isSaving}
-          emptyMessage="You do not own any NFTs"
+          emptyMessage='You do not own any NFTs'
         />
       </DialogContent>
     </Dialog>

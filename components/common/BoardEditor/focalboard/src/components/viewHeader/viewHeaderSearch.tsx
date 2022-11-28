@@ -81,7 +81,7 @@ function ViewHeaderSearch(): JSX.Element {
   }
   return (
     <Button onClick={() => setIsSearching(true)}>
-      <FormattedMessage id="ViewHeader.search" defaultMessage="Search" />
+      <FormattedMessage id='ViewHeader.search' defaultMessage='Search' />
     </Button>
   );
 }

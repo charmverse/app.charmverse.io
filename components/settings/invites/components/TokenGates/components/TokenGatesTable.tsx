@@ -53,10 +53,10 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
       sx={{ width: 90 }}
       clickable={clickable}
       disabled={!clickable}
-      color="secondary"
-      size="small"
-      variant="outlined"
-      label="Copy Link"
+      color='secondary'
+      size='small'
+      variant='outlined'
+      label='Copy Link'
     />
   );
 }
@@ -154,19 +154,19 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
 
   return (
     <>
-      <Box overflow="auto">
-        <Table size="small" aria-label="Token gates table">
+      <Box overflow='auto'>
+        <Table size='small' aria-label='Token gates table'>
           <TableHead>
             <StyledTableRow>
               <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant="body1" fontWeight="600">
+                <Typography variant='body1' fontWeight='600'>
                   Token Gated Link
                 </Typography>
               </TableCell>
               <TableCell sx={{ width: 150 }}></TableCell>
-              <TableCell sx={{ width: 90 + padding }} align="center">
+              <TableCell sx={{ width: 90 + padding }} align='center'>
                 {sortedTokenGates.length === 0 ? (
-                  <Tooltip title="Add a token gate to use this link">
+                  <Tooltip title='Add a token gate to use this link'>
                     <span>
                       <CopyLinkButton />
                     </span>
@@ -185,7 +185,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           <TableBody>
             {sortedTokenGates.length === 0 && (
               <TableRow>
-                <TableCell align="center" colSpan={4} sx={{ padding: '20px 16px' }}>
+                <TableCell align='center' colSpan={4} sx={{ padding: '20px 16px' }}>
                   This Workspace has no Token Gates
                 </TableCell>
               </TableRow>
@@ -194,13 +194,13 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
               <TableRow key={tokenGate.id} sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
                 <TableCell>
                   <Typography
-                    variant="caption"
+                    variant='caption'
                     sx={{ my: 1, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}
                   >
                     {descriptions[tokenGateIndex]}
                   </Typography>
                   {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant="caption" sx={{ mt: 1 }}>
+                    <Typography variant='caption' sx={{ mt: 1 }}>
                       -- OR --
                     </Typography>
                   )}
@@ -217,10 +217,10 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                     }}
                   />
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align='center'>
                   <Tooltip
                     arrow
-                    placement="top"
+                    placement='top'
                     title={
                       litClient
                         ? !account
@@ -229,7 +229,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                         : 'Lit Protocol client has not initialized'
                     }
                   >
-                    <Box component="span">
+                    <Box component='span'>
                       <Chip
                         onClick={() => {
                           if (litClient) {
@@ -242,24 +242,24 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                         }}
                         sx={{ width: 90 }}
                         clickable={Boolean(account && litClient)}
-                        color="secondary"
-                        size="small"
-                        variant="outlined"
-                        label="Test"
+                        color='secondary'
+                        size='small'
+                        variant='outlined'
+                        label='Test'
                       />
                     </Box>
                   </Tooltip>
                 </TableCell>
                 <TableCell width={30}>
                   {isAdmin && (
-                    <Tooltip arrow placement="top" title="Delete">
+                    <Tooltip arrow placement='top' title='Delete'>
                       <ButtonChip
-                        className="row-actions"
+                        className='row-actions'
                         icon={<DeleteOutlinedIcon />}
                         clickable
-                        color="secondary"
-                        size="small"
-                        variant="outlined"
+                        color='secondary'
+                        size='small'
+                        variant='outlined'
                         onClick={() => onDelete(tokenGate)}
                       />
                     </Tooltip>

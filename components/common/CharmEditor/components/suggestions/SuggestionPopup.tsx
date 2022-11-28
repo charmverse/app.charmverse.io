@@ -52,7 +52,7 @@ export default function SuggestionsPopup({
           }}
           timeout={250}
         >
-          <Box display="flex" flexDirection="column" gap={1}>
+          <Box display='flex' flexDirection='column' gap={1}>
             {suggestions.map((suggestion) => (
               // dont show suggestion card as active when inside popup
               <ThreadContainer key={suggestion.pos + suggestion.type} elevation={4} sx={{ background: 'transparent' }}>

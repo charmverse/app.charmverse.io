@@ -153,19 +153,19 @@ export default function SnoozeButton() {
 
   return (
     <div>
-      <Box display="flex" alignItems="center" gap={0.5} justifyContent="flex-end" width="100%">
+      <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
         <Tooltip
           arrow
-          placement="top"
+          placement='top'
           title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}
         >
           <Button
             color={snoozedForDate ? 'warning' : dateInput.isOpen ? 'primary' : 'secondary'}
-            size="small"
+            size='small'
             disableElevation
             loading={showLoading}
-            variant="outlined"
-            startIcon={<SnoozeIcon fontSize="small" />}
+            variant='outlined'
+            startIcon={<SnoozeIcon fontSize='small' />}
             sx={{ fontSize: { xs: '12px', sm: '14px' } }}
             {...bindTrigger(dateInput)}
           >
@@ -174,8 +174,8 @@ export default function SnoozeButton() {
         </Tooltip>
         <Tooltip
           arrow
-          placement="top"
-          title="Let others know you are busy by snoozing"
+          placement='top'
+          title='Let others know you are busy by snoozing'
           sx={{
             display: {
               xs: 'none',
@@ -183,7 +183,7 @@ export default function SnoozeButton() {
             }
           }}
         >
-          <InfoOutlinedIcon color="secondary" fontSize="small" />
+          <InfoOutlinedIcon color='secondary' fontSize='small' />
         </Tooltip>
       </Box>
 
@@ -216,7 +216,7 @@ export default function SnoozeButton() {
           Snooze for 3 days
         </MenuItem>
         {showDatePicker ? (
-          <Box display="flex" gap={1}>
+          <Box display='flex' gap={1}>
             <DateTimePicker
               ref={dateTimePickerRef}
               minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
@@ -242,7 +242,7 @@ export default function SnoozeButton() {
               )}
             />
             <IconButton
-              color="error"
+              color='error'
               onClick={() => {
                 setShowDatePicker(false);
               }}
@@ -286,7 +286,7 @@ export default function SnoozeButton() {
           fullWidth
           multiline
           rows={3}
-          placeholder="Leave an optional message"
+          placeholder='Leave an optional message'
           onChange={(e) => setSnoozeMessage(e.target.value)}
           value={snoozeMessage}
         />

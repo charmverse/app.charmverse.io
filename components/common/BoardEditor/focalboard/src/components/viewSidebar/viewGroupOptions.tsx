@@ -40,12 +40,12 @@ function GroupByOptions(props: LayoutOptionsProps) {
           >
             <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
             <ListItemText>{property.name}</ListItemText>
-            {groupByProperty?.id === property.id ? <CheckOutlinedIcon fontSize="small" /> : null}
+            {groupByProperty?.id === property.id ? <CheckOutlinedIcon fontSize='small' /> : null}
           </MenuItem>
         ))}
       {!hasPropertiesToGroupBy && (
-        <div className="MenuOption TextOption menu-option disabled-option">
-          <div className="menu-name">Add a Select type property to group cards</div>
+        <div className='MenuOption TextOption menu-option disabled-option'>
+          <div className='menu-name'>Add a Select type property to group cards</div>
         </div>
       )}
       {showTableUngroup && (
@@ -64,9 +64,9 @@ function GroupByOptions(props: LayoutOptionsProps) {
             }}
           >
             <ListItemIcon>
-              <Delete color="secondary" />
+              <Delete color='secondary' />
             </ListItemIcon>
-            <ListItemText color="secondary">Remove grouping</ListItemText>
+            <ListItemText color='secondary'>Remove grouping</ListItemText>
           </MenuItem>
         </>
       )}

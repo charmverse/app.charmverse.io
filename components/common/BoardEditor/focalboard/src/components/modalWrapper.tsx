@@ -5,7 +5,7 @@ type Props = {
 };
 
 const ModalWrapper = React.memo((props: Props) => {
-  return <div className="ModalWrapper">{props.children}</div>;
+  return <div className='ModalWrapper'>{props.children}</div>;
 });
 
 export default ModalWrapper;

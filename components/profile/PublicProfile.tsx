@@ -225,7 +225,7 @@ export default function PublicProfile(props: UserDetailsProps) {
         />
         {allCommunities.length > 0 ? (
           <>
-            <SectionHeader title="Communities" count={allCommunities.length} />
+            <SectionHeader title='Communities' count={allCommunities.length} />
             <Stack gap={2} mb={2}>
               {allCommunities.map((community) => (
                 <CommunityRow
@@ -244,7 +244,7 @@ export default function PublicProfile(props: UserDetailsProps) {
 
         {collectables.length > 0 ? (
           <>
-            <SectionHeader title="NFTs & POAPs" count={collectables.length} />
+            <SectionHeader title='NFTs & POAPs' count={collectables.length} />
             <Stack gap={2} mb={2}>
               {collectables.map((collectable) => (
                 <CollectableRow
@@ -268,7 +268,7 @@ export default function PublicProfile(props: UserDetailsProps) {
 
 function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
-    <Stack flexDirection="row" justifyContent="space-between" alignItems="center" my={2}>
+    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' my={2}>
       <Typography
         sx={{
           fontSize: {

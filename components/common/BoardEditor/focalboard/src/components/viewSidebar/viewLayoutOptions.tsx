@@ -130,7 +130,7 @@ function LayoutOption({
   return (
     <Grid item xs={6} onClick={onClick}>
       <Card
-        variant="outlined"
+        variant='outlined'
         sx={{
           height: '100%',
           cursor: 'pointer',
@@ -138,8 +138,8 @@ function LayoutOption({
           '&:hover': { bgcolor: !active ? 'sidebar.background' : '' }
         }}
       >
-        <Typography variant="body2" color={active ? 'primary' : 'secondary'}>
-          <Box component="span" display="flex" p={1} alignItems="center" flexDirection="column" justifyContent="center">
+        <Typography variant='body2' color={active ? 'primary' : 'secondary'}>
+          <Box component='span' display='flex' p={1} alignItems='center' flexDirection='column' justifyContent='center'>
             {children}
           </Box>
         </Typography>

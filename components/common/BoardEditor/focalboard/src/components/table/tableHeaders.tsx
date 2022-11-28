@@ -141,10 +141,10 @@ function TableHeaders(props: Props): JSX.Element {
   }
 
   return (
-    <div className="octo-table-header TableHeaders" id="mainBoardHeader">
+    <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
       <TableHeader
-        type="text"
-        name="Title"
+        type='text'
+        name='Title'
         sorted={titleSorted}
         readOnly={props.readOnly}
         board={board}
@@ -183,11 +183,11 @@ function TableHeaders(props: Props): JSX.Element {
         );
       })}
       {/* empty column for actions */}
-      <div className="octo-table-cell header-cell" style={{ flexGrow: 1, borderRight: '0 none' }}>
+      <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
         {!props.readOnly && (
           <MenuWrapper>
             <Button>
-              <AddIcon fontSize="small" />
+              <AddIcon fontSize='small' />
             </Button>
             <Menu>
               <PropertyTypes

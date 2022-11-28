@@ -14,7 +14,7 @@ export function AddIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <MuiAddIcon fontSize={iconSize} />
-      <Box component="span" fontSize={fontSize}>
+      <Box component='span' fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

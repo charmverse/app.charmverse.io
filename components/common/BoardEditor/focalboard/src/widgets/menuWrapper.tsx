@@ -87,7 +87,7 @@ function MenuWrapper(props: Props) {
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
       {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
-      <div role="button" aria-label={props.label || 'menuwrapper'} className={className} onClick={toggle} ref={node}>
+      <div role='button' aria-label={props.label || 'menuwrapper'} className={className} onClick={toggle} ref={node}>
         {children ? Object.values(children)[0] : null}
         {children && !props.disabled && open ? Object.values(children)[1] : null}
       </div>

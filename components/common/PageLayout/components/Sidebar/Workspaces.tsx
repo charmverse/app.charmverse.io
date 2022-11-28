@@ -53,7 +53,7 @@ export default function Workspaces() {
 
   return (
     <WorkspacesContainer>
-      <Grid container spacing={2} flexDirection="column">
+      <Grid container spacing={2} flexDirection='column'>
         <Grid item>
           <NexusAvatar user={user} />
         </Grid>
@@ -64,7 +64,7 @@ export default function Workspaces() {
           <Grid item key={workspace.domain}>
             <AvatarLink href={`/${workspace.domain}`} passHref>
               <MuiLink>
-                <Tooltip title={workspace.name} placement="right" arrow>
+                <Tooltip title={workspace.name} placement='right' arrow>
                   <span>
                     <WorkspaceAvatar
                       active={space?.domain === workspace.domain}
@@ -78,8 +78,8 @@ export default function Workspaces() {
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title="Create or join a workspace" placement="top" arrow>
-            <IconButton data-test="sidebar-add-new-space" sx={{ borderRadius: '8px' }} onClick={showSpaceForm}>
+          <Tooltip title='Create or join a workspace' placement='top' arrow>
+            <IconButton data-test='sidebar-add-new-space' sx={{ borderRadius: '8px' }} onClick={showSpaceForm}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -87,8 +87,8 @@ export default function Workspaces() {
       </Grid>
       <Modal open={spaceFormOpen} onClose={closeSpaceForm}>
         <CreateWorkspaceForm onSubmit={createNewSpace} onCancel={closeSpaceForm} isSubmitting={isCreatingSpace} />
-        <Typography variant="body2" align="center" sx={{ pt: 2 }}>
-          <Button variant="text" href="/join" endIcon={<NavigateNextIcon />}>
+        <Typography variant='body2' align='center' sx={{ pt: 2 }}>
+          <Button variant='text' href='/join' endIcon={<NavigateNextIcon />}>
             Join an existing workspace
           </Button>
         </Typography>

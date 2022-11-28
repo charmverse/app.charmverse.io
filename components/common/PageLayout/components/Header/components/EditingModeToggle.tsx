@@ -36,17 +36,17 @@ function EditModeToggle() {
   const availableModes = availableEditModes.map((mode) => [mode, editModeConfig[mode]] as const);
 
   return (
-    <PopupState variant="popover" popupId="edit-mode-select">
+    <PopupState variant='popover' popupId='edit-mode-select'>
       {(popupState) => (
         <>
-          <Tooltip title="Toggle suggestion mode">
+          <Tooltip title='Toggle suggestion mode'>
             <Button
               {...bindTrigger(popupState)}
               startIcon={EDIT_MODE_CONFIG[editMode].icon}
               endIcon={<ArrowDropDown />}
-              size="small"
+              size='small'
               disableElevation
-              variant="outlined"
+              variant='outlined'
               color={editModeConfig[editMode].color}
             >
               {editModeConfig[editMode].label}

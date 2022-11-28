@@ -40,14 +40,14 @@ export function WalletConnect({ onSuccess }: Props) {
         buttonOutlined
         signSuccess={signSuccess}
         ButtonComponent={StyledButton as any}
-        buttonSize="medium"
+        buttonSize='medium'
         enableAutosign={false}
       />
     );
   }
 
   return (
-    <StyledButton onClick={connectWallet} variant="outlined" color="primary">
+    <StyledButton onClick={connectWallet} variant='outlined' color='primary'>
       Switch
     </StyledButton>
   );

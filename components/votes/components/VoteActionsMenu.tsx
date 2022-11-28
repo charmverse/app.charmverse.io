@@ -34,15 +34,15 @@ export default function VoteActionsMenu({ cancelVote, deleteVote, removeFromPage
   return vote.context === 'inline' ? (
     <>
       {vote.createdBy === user?.id && (
-        <IconButton size="small" onClick={actionsPopup.open}>
-          <MoreHorizIcon fontSize="small" />
+        <IconButton size='small' onClick={actionsPopup.open}>
+          <MoreHorizIcon fontSize='small' />
         </IconButton>
       )}
       <ConfirmDeleteModal
-        title="Delete vote"
+        title='Delete vote'
         onClose={popupState.close}
         open={popupState.isOpen}
-        buttonText="Delete"
+        buttonText='Delete'
         onConfirm={() => {
           removeFromPage?.(vote.id);
           deleteVote?.(vote.id);
@@ -66,13 +66,13 @@ export default function VoteActionsMenu({ cancelVote, deleteVote, removeFromPage
               cancelVote(vote.id);
             }}
           >
-            <DoNotDisturbIcon fontSize="small" sx={{ mr: 1 }} />
+            <DoNotDisturbIcon fontSize='small' sx={{ mr: 1 }} />
             <ListItemText>Cancel vote</ListItemText>
           </MenuItem>
         )}
         {deleteVote && (
           <MenuItem dense onClick={popupState.open}>
-            <DeleteOutlineIcon fontSize="small" sx={{ mr: 1 }} />
+            <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
             <ListItemText>Delete vote</ListItemText>
           </MenuItem>
         )}

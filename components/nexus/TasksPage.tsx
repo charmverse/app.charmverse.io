@@ -95,8 +95,8 @@ export default function TasksPage() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <Box
-            display="flex"
-            alignItems="center"
+            display='flex'
+            alignItems='center'
             justifyContent={{ sm: 'flex-end', xs: 'flex-start' }}
             gap={{ sm: 2, xs: 1 }}
           >
@@ -108,14 +108,14 @@ export default function TasksPage() {
       <Divider sx={{ mb: 2 }} />
       <Tabs
         sx={tabStyles}
-        indicatorColor="primary"
+        indicatorColor='primary'
         value={TASK_TABS.findIndex((taskTab) => taskTab.type === currentTaskType)}
       >
         {TASK_TABS.map((task) => (
           <Tab
-            component="div"
+            component='div'
             disableRipple
-            iconPosition="start"
+            iconPosition='start'
             icon={task.icon}
             key={task.label}
             sx={{
@@ -156,8 +156,8 @@ export default function TasksPage() {
                   }
                 }}
                 invisible={notificationCount[task.type] === 0}
-                color="error"
-                variant="dot"
+                color='error'
+                variant='dot'
               >
                 {task.label}
               </Badge>

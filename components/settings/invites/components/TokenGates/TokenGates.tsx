@@ -127,7 +127,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
   return (
     <>
       <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
-      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size="large">
+      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
         <ShareModalContainer>
           <LitShareModal
             darkMode={theme.palette.mode === 'dark'}
@@ -141,11 +141,11 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (
         <ConfirmDeleteModal
-          title="Delete token gate"
+          title='Delete token gate'
           onClose={closeTokenGateDeleteModal}
           open={deletePopupState.isOpen}
-          buttonText="Delete token gate"
-          question="Are you sure you want to delete this invite link?"
+          buttonText='Delete token gate'
+          question='Are you sure you want to delete this invite link?'
           onConfirm={async () => {
             await charmClient.deleteTokenGate(removedTokenGate.id);
             // update the list of links

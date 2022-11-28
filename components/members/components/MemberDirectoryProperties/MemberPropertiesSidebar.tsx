@@ -159,7 +159,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
   const isAdjacentActive = admin && canDrop && isOverCurrent;
 
   return (
-    <Stack height="fit-content" ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
+    <Stack height='fit-content' ref={admin ? mergeRefs([ref, drag, drop, dragPreview]) : null}>
       <MenuItem
         dense
         sx={{
@@ -198,9 +198,9 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
         <MemberPropertyItem type={property.type} name={property.name} />
         {admin && (
           <Box
-            display="flex"
+            display='flex'
             gap={0.5}
-            className="icons"
+            className='icons'
             sx={{
               opacity: 0,
               alignItems: 'center'
@@ -208,9 +208,9 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
           >
             <Tooltip title={`Edit ${property.name} property.`}>
               <EditIcon
-                cursor="pointer"
-                fontSize="small"
-                color="secondary"
+                cursor='pointer'
+                fontSize='small'
+                color='secondary'
                 onClick={(e) => {
                   e.stopPropagation();
                   propertyRenamePopupState.open();
@@ -220,9 +220,9 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
             {!MEMBER_PROPERTY_CONFIG[property.type]?.default && (
               <Tooltip title={`Delete ${property.name} property.`}>
                 <DeleteOutlinedIcon
-                  cursor="pointer"
-                  fontSize="small"
-                  color="secondary"
+                  cursor='pointer'
+                  fontSize='small'
+                  color='secondary'
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteConfirmation.open();
@@ -231,8 +231,8 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
               </Tooltip>
             )}
             <ConfirmDeleteModal
-              title="Delete property"
-              question="Are you sure you want to delete this property?"
+              title='Delete property'
+              question='Are you sure you want to delete this property?'
               onConfirm={() => {
                 deleteProperty(property.id);
               }}
@@ -250,7 +250,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
         removePermission={removePropertyPermission}
       />
       <Modal
-        size="large"
+        size='large'
         open={propertyRenamePopupState.isOpen}
         onClose={propertyRenamePopupState.close}
         title={`Update ${property.name}`}
@@ -265,15 +265,15 @@ export function MemberPropertiesSidebar({ isOpen, onClose }: { isOpen: boolean; 
   const { properties } = useMemberProperties();
 
   return properties ? (
-    <ClickAwayListener mouseEvent="onClick" onClickAway={onClose}>
+    <ClickAwayListener mouseEvent='onClick' onClickAway={onClose}>
       <Collapse
         in={isOpen}
-        orientation="horizontal"
+        orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000, height: 'fit-content', marginBottom: 1 }}
       >
         <StyledSidebar>
-          <SidebarHeader closeSidebar={onClose} title="Properties" />
-          <Stack height="fit-content">
+          <SidebarHeader closeSidebar={onClose} title='Properties' />
+          <Stack height='fit-content'>
             {properties.map((property) => (
               <MemberPropertySidebarItem property={property} key={property.id} />
             ))}

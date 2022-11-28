@@ -94,9 +94,9 @@ function InviteActions({
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
-            id="add-invites-menu"
+            id='add-invites-menu'
             aria-controls={open ? 'demo-customized-menu' : undefined}
-            aria-haspopup="true"
+            aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
             disableElevation
             onClick={handleAddClick}
@@ -108,7 +108,7 @@ function InviteActions({
         </span>
       </Tooltip>
       <StyledMenu
-        id="demo-customized-menu"
+        id='demo-customized-menu'
         MenuListProps={{
           'aria-labelledby': 'add-invites-menu'
         }}
@@ -117,22 +117,22 @@ function InviteActions({
         onClose={handleClose}
       >
         <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
-          <AddIcon fontSize="small" />
+          <AddIcon fontSize='small' />
           <Box>
             <ListItemText
-              primary="Add a Private Link"
-              secondary="Anyone with this link can join your workspace"
+              primary='Add a Private Link'
+              secondary='Anyone with this link can join your workspace'
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />
           </Box>
         </MenuItem>
         <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
-          <AddIcon fontSize="small" />
+          <AddIcon fontSize='small' />
           <Box>
             <ListItemText
-              primary="Add a Token Gate"
-              secondary="Control access to your workspace with tokens & NFTS (Wallet Required)"
+              primary='Add a Token Gate'
+              secondary='Control access to your workspace with tokens & NFTS (Wallet Required)'
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />

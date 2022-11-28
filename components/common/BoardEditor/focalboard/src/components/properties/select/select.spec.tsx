@@ -55,7 +55,7 @@ describe('components/properties/select', () => {
     const { container } = render(
       wrapIntl(
         <Select
-          emptyValue=""
+          emptyValue=''
           propertyTemplate={propertyTemplate}
           propertyValue={option.id}
           isEditable={false}
@@ -79,7 +79,7 @@ describe('components/properties/select', () => {
         <Select
           emptyValue={emptyValue}
           propertyTemplate={propertyTemplate}
-          propertyValue=""
+          propertyValue=''
           isEditable={false}
           {...selectCallbacks()}
         />
@@ -99,7 +99,7 @@ describe('components/properties/select', () => {
     render(
       wrapIntl(
         <Select
-          emptyValue=""
+          emptyValue=''
           propertyTemplate={propertyTemplate}
           propertyValue={selected.id}
           isEditable={true}
@@ -130,9 +130,9 @@ describe('components/properties/select', () => {
     render(
       wrapIntl(
         <Select
-          emptyValue="Empty"
+          emptyValue='Empty'
           propertyTemplate={propertyTemplate}
-          propertyValue=""
+          propertyValue=''
           isEditable={true}
           {...selectCallbacks()}
           onChange={onChange}
@@ -155,7 +155,7 @@ describe('components/properties/select', () => {
     render(
       wrapIntl(
         <Select
-          emptyValue="Empty"
+          emptyValue='Empty'
           propertyTemplate={propertyTemplate}
           propertyValue={selected.id}
           isEditable={true}
@@ -183,7 +183,7 @@ describe('components/properties/select', () => {
     render(
       wrapIntl(
         <Select
-          emptyValue="Empty"
+          emptyValue='Empty'
           propertyTemplate={propertyTemplate}
           propertyValue={initialOption.id}
           isEditable={true}

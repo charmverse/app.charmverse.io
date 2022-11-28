@@ -39,15 +39,15 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
           <ListItemText>{property.name}</ListItemText>
           <IconButton
-            size="small"
+            size='small'
             onClick={() => {
               toggleVisibility(property.id);
             }}
           >
             {visiblePropertyIds.includes(property.id) ? (
-              <VisibilityIcon fontSize="small" />
+              <VisibilityIcon fontSize='small' />
             ) : (
-              <VisibilityOffIcon fontSize="small" color="secondary" />
+              <VisibilityOffIcon fontSize='small' color='secondary' />
             )}
           </IconButton>
         </MenuItem>

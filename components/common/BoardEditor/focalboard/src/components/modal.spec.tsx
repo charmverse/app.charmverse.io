@@ -13,7 +13,7 @@ describe('components/modal', () => {
     const { container } = render(
       wrapDNDIntl(
         <Modal onClose={jest.fn()}>
-          <div id="test" />
+          <div id='test' />
         </Modal>
       )
     );
@@ -24,7 +24,7 @@ describe('components/modal', () => {
     render(
       wrapDNDIntl(
         <Modal onClose={onMockedClose}>
-          <div id="test" />
+          <div id='test' />
         </Modal>
       )
     );
@@ -35,8 +35,8 @@ describe('components/modal', () => {
   test('return Modal on position top', () => {
     const { container } = render(
       wrapDNDIntl(
-        <Modal position="top" onClose={jest.fn()}>
-          <div id="test" />
+        <Modal position='top' onClose={jest.fn()}>
+          <div id='test' />
         </Modal>
       )
     );
@@ -46,8 +46,8 @@ describe('components/modal', () => {
   test('return Modal on position bottom', () => {
     const { container } = render(
       wrapDNDIntl(
-        <Modal position="bottom" onClose={jest.fn()}>
-          <div id="test" />
+        <Modal position='bottom' onClose={jest.fn()}>
+          <div id='test' />
         </Modal>
       )
     );
@@ -57,8 +57,8 @@ describe('components/modal', () => {
   test('return Modal on position bottom-right', () => {
     const { container } = render(
       wrapDNDIntl(
-        <Modal position="bottom-right" onClose={jest.fn()}>
-          <div id="test" />
+        <Modal position='bottom-right' onClose={jest.fn()}>
+          <div id='test' />
         </Modal>
       )
     );

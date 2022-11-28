@@ -115,9 +115,9 @@ function ViewHeader(props: Props) {
 
       {!props.readOnly && views.length <= maxTabsShown && props.addViewButton}
 
-      <div className="octo-spacer" />
+      <div className='octo-spacer' />
 
-      <div className="view-actions">
+      <div className='view-actions'>
         {!props.readOnly && activeView && activeBoard && (
           <>
             {/* Display by */}
@@ -135,12 +135,12 @@ function ViewHeader(props: Props) {
             <ModalWrapper>
               <Button
                 color={hasFilter ? 'primary' : 'secondary'}
-                variant="text"
-                size="small"
+                variant='text'
+                size='small'
                 sx={{ minWidth: 0 }}
                 onClick={() => setShowFilter(true)}
               >
-                <FormattedMessage id="ViewHeader.filter" defaultMessage="Filter" />
+                <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
               </Button>
               {showFilter && (
                 <FilterComponent board={activeBoard} activeView={activeView} onClose={() => setShowFilter(false)} />
@@ -172,9 +172,9 @@ function ViewHeader(props: Props) {
                 : `/${router.query.domain}/${props.embeddedBoardPath}`
             }
           >
-            <Tooltip title="Open as full page" placement="top">
+            <Tooltip title='Open as full page' placement='top'>
               <IconButton style={{ width: '32px' }}>
-                <OpenInFullIcon color="secondary" sx={{ fontSize: 14 }} />
+                <OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
           </Link>

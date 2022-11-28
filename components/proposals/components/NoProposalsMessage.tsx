@@ -25,14 +25,14 @@ export default function NoProposalsMessage({ message }: { message: string }) {
     <EmptyProposalContainerBox>
       <Center>
         <TaskOutlinedIcon
-          fontSize="large"
-          color="secondary"
+          fontSize='large'
+          color='secondary'
           sx={{
             height: '2em',
             width: '2em'
           }}
         />
-        <Typography variant="subtitle1" color="secondary">
+        <Typography variant='subtitle1' color='secondary'>
           {message}
         </Typography>
       </Center>

@@ -78,12 +78,12 @@ function TableHeader(props: Props): JSX.Element {
               })}
             </div>
           </div>
-          <Typography component="span" variant="subtitle1">
+          <Typography component='span' variant='subtitle1'>
             {props.name}
           </Typography>
-          <IconButton size="small" sx={{ ml: 1 }} onClick={reverseSort}>
-            {props.sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize="small" />}
-            {props.sorted === 'down' && <ArrowDownwardOutlinedIcon fontSize="small" />}
+          <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>
+            {props.sorted === 'up' && <ArrowUpwardOutlinedIcon fontSize='small' />}
+            {props.sorted === 'down' && <ArrowDownwardOutlinedIcon fontSize='small' />}
           </IconButton>
         </Label>
         <TableHeaderMenu
@@ -95,7 +95,7 @@ function TableHeader(props: Props): JSX.Element {
         />
       </MenuWrapper>
 
-      <div className="octo-spacer" />
+      <div className='octo-spacer' />
 
       {!props.readOnly && <HorizontalGrip templateId={props.template.id} onAutoSizeColumn={onAutoSizeColumn} />}
     </div>

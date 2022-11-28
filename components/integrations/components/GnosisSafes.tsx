@@ -85,12 +85,12 @@ export default function GnosisSafesList() {
   return (
     <>
       <Legend sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box component="span" display="flex" alignItems="center" gap={1}>
-          <KeyIcon fontSize="large" /> Multisig
+        <Box component='span' display='flex' alignItems='center' gap={1}>
+          <KeyIcon fontSize='large' /> Multisig
         </Box>
 
         {sortedSafes.length > 0 && (
-          <Button loading={isLoadingSafes} onClick={importSafes} variant="outlined" sx={{ float: 'right' }}>
+          <Button loading={isLoadingSafes} onClick={importSafes} variant='outlined' sx={{ float: 'right' }}>
             Sync Gnosis Safes
           </Button>
         )}
@@ -101,7 +101,7 @@ export default function GnosisSafesList() {
       )}
 
       {sortedSafes.length > 0 && (
-        <Table size="small" aria-label="simple table">
+        <Table size='small' aria-label='simple table'>
           <TableHead>
             <TableRow>
               <StyledTableCell sx={{ pl: 0 }}>Wallet Name</StyledTableCell>
@@ -125,14 +125,14 @@ export function GnosisConnectCard({ loading, onClick }: { loading: boolean; onCl
   const router = useRouter();
   const isTasksPage = router.pathname.includes('/tasks');
   return (
-    <Card variant="outlined">
-      <Box p={3} textAlign="center">
-        <Typography color="secondary">
+    <Card variant='outlined'>
+      <Box p={3} textAlign='center'>
+        <Typography color='secondary'>
           Import your Gnosis safes to view your transaction queue
           {!isTasksPage && (
             <>
               {' '}
-              under <Link href="/nexus">My Tasks</Link>
+              under <Link href='/nexus'>My Tasks</Link>
             </>
           )}
         </Typography>
@@ -182,13 +182,13 @@ function SafeRow({ safe, updateWallets }: { safe: Safe; updateWallets: () => voi
     <TableRow key={safe.id}>
       <TableCell sx={{ pl: 0 }}>
         <Controller
-          name="name"
+          name='name'
           control={control}
           render={({ field: { onChange, value } }) => (
             <OutlinedInput
               value={value}
               onChange={onChange}
-              placeholder="Untitled"
+              placeholder='Untitled'
               onBlur={handleSubmit(saveSafeName)}
               endAdornment={<CircularProgress size={14} sx={{ opacity: isSubmitting ? 1 : 0 }} />}
             />
@@ -197,21 +197,21 @@ function SafeRow({ safe, updateWallets }: { safe: Safe; updateWallets: () => voi
       </TableCell>
       <TableCell>{getChainById(safe.chainId)?.chainName}</TableCell>
       <TableCell>
-        <Tooltip placement="top" title={safe.address}>
+        <Tooltip placement='top' title={safe.address}>
           <span>
-            <Link external href={gnosisUrl(safe.address, safe.chainId)} target="_blank">
+            <Link external href={gnosisUrl(safe.address, safe.chainId)} target='_blank'>
               {shortenHex(safe.address)}
             </Link>
           </span>
         </Tooltip>
       </TableCell>
-      <TableCell sx={{ pr: 0 }} align="right">
+      <TableCell sx={{ pr: 0 }} align='right'>
         <ElementDeleteIcon onClick={deleteConfirmation.open} />
 
         <ConfirmDeleteModal
           key={safe.id}
-          title="Delete Wallet"
-          question="Are you sure you want to delete this wallet?"
+          title='Delete Wallet'
+          question='Are you sure you want to delete this wallet?'
           onConfirm={() => deleteSafe(safe)}
           onClose={deleteConfirmation.close}
           open={deleteConfirmation.isOpen}

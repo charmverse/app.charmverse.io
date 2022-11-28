@@ -63,21 +63,21 @@ export default function ProposalsTable({
         <Grid item xs={6} md={5}>
           Title
         </Grid>
-        <Grid item xs={4} md={2} display="flex" justifyContent="center">
+        <Grid item xs={4} md={2} display='flex' justifyContent='center'>
           Status
         </Grid>
-        <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent="center">
+        <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
           Category
         </Grid>
-        <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent="center">
+        <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} justifyContent='center'>
           Created
         </Grid>
-        <Grid item xs={1} display="flex" justifyContent="center"></Grid>
+        <Grid item xs={1} display='flex' justifyContent='center'></Grid>
       </GridHeader>
-      {!proposals && <LoadingComponent height="250px" isLoading={true} />}
+      {!proposals && <LoadingComponent height='250px' isLoading={true} />}
       {proposals?.length === 0 && (
-        <Box height="250px" mt={2}>
-          <NoProposalsMessage message="There are no proposals yet. Create a proposal page to get started!" />
+        <Box height='250px' mt={2}>
+          <NoProposalsMessage message='There are no proposals yet. Create a proposal page to get started!' />
         </Box>
       )}
       {proposals?.map((proposal) => {
@@ -87,14 +87,14 @@ export default function ProposalsTable({
           <GridContainer key={proposal.id}>
             <Grid item xs={6} md={5} sx={{ cursor: 'pointer' }}>
               <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
+                display='flex'
+                alignItems='center'
+                justifyContent='space-between'
                 onClick={() => openPage(proposal.id)}
               >
-                <Box display="flex" alignItems="flex-start" gap={1}>
-                  <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
-                    <TaskOutlinedIcon color="secondary" />
+                <Box display='flex' alignItems='flex-start' gap={1}>
+                  <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
+                    <TaskOutlinedIcon color='secondary' />
                   </Box>
                   <div>
                     <Typography>
@@ -102,34 +102,34 @@ export default function ProposalsTable({
                     </Typography>
                   </div>
                 </Box>
-                <Button className="show-on-hover" color="secondary" variant="outlined" size="small">
+                <Button className='show-on-hover' color='secondary' variant='outlined' size='small'>
                   Open
                 </Button>
               </Box>
             </Grid>
-            <Grid item xs={4} md={2} display="flex" justifyContent="center">
+            <Grid item xs={4} md={2} display='flex' justifyContent='center'>
               <ProposalStatusChip status={proposal.status} />
             </Grid>
             <Grid
               item
               xs={2}
               md={2}
-              display="flex"
-              justifyContent="center"
+              display='flex'
+              justifyContent='center'
               sx={{ display: { xs: 'none', md: 'flex' } }}
             >
-              {category ? <Chip size="small" color={category.color as BrandColor} label={category.title} /> : '-'}
+              {category ? <Chip size='small' color={category.color as BrandColor} label={category.title} /> : '-'}
             </Grid>
-            <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display="flex" justifyContent="center">
+            <Grid item xs={2} sx={{ display: { xs: 'none', md: 'flex' } }} display='flex' justifyContent='center'>
               <Tooltip
                 arrow
-                placement="top"
+                placement='top'
                 title={`Created on ${humanFriendlyDate(proposalPage.createdAt, { withTime: true })}`}
               >
                 <span>{toMonthDate(proposalPage.createdAt)}</span>
               </Tooltip>
             </Grid>
-            <Grid item xs={1} display="flex" justifyContent="flex-end">
+            <Grid item xs={1} display='flex' justifyContent='flex-end'>
               <ProposalActionsMenu
                 page={proposalPage}
                 deleteProposal={deleteProposal}

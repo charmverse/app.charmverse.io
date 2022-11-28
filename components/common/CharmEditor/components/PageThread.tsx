@@ -91,12 +91,12 @@ function ThreadHeaderButton({
       disabled={disabled}
       onClick={onClick}
       startIcon={startIcon}
-      variant="outlined"
-      color="secondary"
-      size="small"
+      variant='outlined'
+      color='secondary'
+      size='small'
       {...props}
     >
-      <span className="label">{text}</span>
+      <span className='label'>{text}</span>
     </Button>
   );
 }
@@ -124,13 +124,13 @@ function AddCommentCharmEditor({
   usePreventReload(touched.current);
 
   return (
-    <Box display="flex" px={1} pb={1} sx={sx} flexDirection="column" gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
+    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
       <InlineCharmEditor
         style={{
           backgroundColor: 'var(--input-bg)',
           border: '1px solid var(--input-border)'
         }}
-        placeholderText="Reply..."
+        placeholderText='Reply...'
         key={thread.comments[thread.comments.length - 1]?.id}
         content={commentContent}
         onContentChange={({ doc }) => {
@@ -139,10 +139,10 @@ function AddCommentCharmEditor({
         }}
         readOnly={readOnly || disabled}
       />
-      <Box display="flex" gap={1}>
+      <Box display='flex' gap={1}>
         <Button
           disabled={disabled || isEmpty}
-          size="small"
+          size='small'
           onClick={() => {
             onClick(() => {
               if (commentContent) {
@@ -183,7 +183,7 @@ function EditCommentCharmEditor({
 
   return (
     <>
-      <Box onClick={onContainerClick} flex={1} width="100%">
+      <Box onClick={onContainerClick} flex={1} width='100%'>
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}
@@ -206,10 +206,10 @@ function EditCommentCharmEditor({
         }}
         in={isEditable}
       >
-        <Box display="flex" gap={1} pt={1}>
+        <Box display='flex' gap={1} pt={1}>
           <Button
             disabled={disabled || isEmpty}
-            size="small"
+            size='small'
             onClick={async () => {
               onSave(async () => {
                 if (commentContent) {
@@ -220,7 +220,7 @@ function EditCommentCharmEditor({
           >
             Save
           </Button>
-          <Button onClick={onCancel} variant="outlined" color="secondary" size="small">
+          <Button onClick={onCancel} variant='outlined' color='secondary' size='small'>
             Cancel
           </Button>
         </Box>
@@ -257,14 +257,14 @@ export const RelativeDate = memo<{ createdAt: string; prefix?: string; updatedAt
           display: 'flex',
           alignItems: 'center'
         }}
-        color="secondary"
-        variant="subtitle1"
+        color='secondary'
+        variant='subtitle1'
       >
-        <Tooltip arrow placement="top" title={new Date(createdAt).toLocaleString()}>
+        <Tooltip arrow placement='top' title={new Date(createdAt).toLocaleString()}>
           <span>{dateTime.toRelative({ style: 'short' })}</span>
         </Tooltip>
         {updatedAt && (
-          <Tooltip arrow placement="top" title={new Date(updatedAt).toLocaleString()}>
+          <Tooltip arrow placement='top' title={new Date(updatedAt).toLocaleString()}>
             <span style={{ marginLeft: '4px' }}>(edited)</span>
           </Tooltip>
         )}
@@ -337,7 +337,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     }
 
     return (
-      <StyledPageThread inline={inline.toString()} variant="outlined" id={`thread.${threadId}`} ref={ref}>
+      <StyledPageThread inline={inline.toString()} variant='outlined' id={`thread.${threadId}`} ref={ref}>
         <div>
           {thread.comments.map((comment, commentIndex) => {
             const isEditable = comment.id === editedCommentId;
@@ -347,9 +347,9 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                 highlighted={(editedCommentId === comment.id).toString()}
                 id={`comment.${comment.id}`}
               >
-                <Box display="flex" width="100%" alignItems="center" justifyContent="space-between">
+                <Box display='flex' width='100%' alignItems='center' justifyContent='space-between'>
                   <Box
-                    display="flex"
+                    display='flex'
                     gap={1}
                     onClick={() => {
                       if (showFindButton) {
@@ -358,9 +358,9 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     }}
                   >
                     <UserDisplay
-                      component="div"
+                      component='div'
                       user={comment.user}
-                      avatarSize="small"
+                      avatarSize='small'
                       sx={{
                         '& .MuiTypography-root': {
                           maxWidth: commentIndex === 0 && thread.resolved ? 100 : 150,
@@ -374,7 +374,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     <RelativeDate createdAt={comment.createdAt.toString()} updatedAt={comment.updatedAt?.toString()} />
                   </Box>
                   <div>
-                    <Box display="flex" alignItems="center" gap={1}>
+                    <Box display='flex' alignItems='center' gap={1}>
                       {commentIndex === 0 && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
@@ -387,12 +387,12 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                         <IconButton
                           // Show the context menu next to resolve
                           className={commentIndex === 0 ? '' : 'comment-actions'}
-                          size="small"
+                          size='small'
                           onClick={(e: any) => {
                             onClickCommentActions(e, comment);
                           }}
                         >
-                          <MoreHorizIcon fontSize="small" />
+                          <MoreHorizIcon fontSize='small' />
                         </IconButton>
                       )}
                     </Box>
@@ -402,7 +402,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                   <Box
                     pl={4}
                     pb={1}
-                    display="flex"
+                    display='flex'
                     onClick={() => {
                       if (showFindButton) {
                         scrollToThread(threadId);
@@ -417,7 +417,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       }}
                       fontSize={14}
                       fontWeight={600}
-                      color="secondary"
+                      color='secondary'
                     >
                       {thread.context}
                     </Typography>

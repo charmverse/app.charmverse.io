@@ -123,7 +123,7 @@ export function BountyStatusChip({ status, size = 'small' }: { size?: ChipProps[
       size={size}
       status={status}
       label={BOUNTY_STATUS_LABELS[status]}
-      variant="filled"
+      variant='filled'
       icon={<span>{BOUNTY_STATUS_ICONS[status]}</span>}
     />
   );
@@ -141,7 +141,7 @@ export function BountyStatusNexusChip({
       size={size}
       status={action}
       label={BOUNTY_ACTION_LABELS[action]}
-      variant="filled"
+      variant='filled'
       icon={<span>{BOUNTY_ACTION_ICONS[action]}</span>}
     />
   );
@@ -159,8 +159,8 @@ export default function BountyStatusBadgeWrapper({
 
   if (layout === 'row') {
     return (
-      <Grid container direction="column" alignItems="center">
-        <Grid item xs width="100%">
+      <Grid container direction='column' alignItems='center'>
+        <Grid item xs width='100%'>
           <Box
             sx={{
               display: 'flex',
@@ -181,11 +181,11 @@ export default function BountyStatusBadgeWrapper({
   } else {
     return (
       <Box sx={{ textAlign: 'right' }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Box display='flex' alignItems='center' justifyContent='space-between'>
           <BountyAmount bounty={bounty} truncate={truncate} />
           <Link href={bountyLink} passHref={true}>
             <IconButton>
-              <LaunchIcon fontSize="small" />
+              <LaunchIcon fontSize='small' />
             </IconButton>
           </Link>
         </Box>
@@ -223,17 +223,17 @@ export function BountyAmount({
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
-    <Tooltip arrow placement="top" title={bounty.rewardAmount === 0 ? '' : tooltip}>
+    <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
         {bounty.rewardAmount === 0 ? (
           <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
             <Typography
-              component="span"
+              component='span'
               sx={{
                 fontWeight: 600
               }}
               mr={0.5}
-              variant="caption"
+              variant='caption'
             >
               Reward not set
             </Typography>
@@ -241,7 +241,7 @@ export function BountyAmount({
         ) : (
           <>
             <Box
-              component="span"
+              component='span'
               sx={{
                 width: 25,
                 display: 'flex',
@@ -251,11 +251,11 @@ export function BountyAmount({
               <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
             </Box>
             <Typography
-              component="span"
+              component='span'
               sx={{
                 fontWeight: 600
               }}
-              variant="h6"
+              variant='h6'
               fontSize={18}
             >
               {truncate ? truncatedAmount() : bounty.rewardAmount}

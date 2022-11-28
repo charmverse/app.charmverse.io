@@ -83,7 +83,7 @@ function WalletSelectorModal({
                 ? () => handleConnect(injected)
                 : handleOnboarding
             }
-            iconUrl="metamask.png"
+            iconUrl='metamask.png'
             disabled={connector === injected || !!activatingConnector}
             isActive={connector === injected}
             isLoading={activatingConnector === injected}
@@ -91,9 +91,9 @@ function WalletSelectorModal({
         </Grid>
         <Grid item xs={12}>
           <ConnectorButton
-            name="WalletConnect"
+            name='WalletConnect'
             onClick={() => handleConnect(walletConnect)}
-            iconUrl="walletconnect.svg"
+            iconUrl='walletconnect.svg'
             disabled={connector === walletConnect || !!activatingConnector}
             isActive={connector === walletConnect}
             isLoading={activatingConnector === walletConnect}
@@ -101,21 +101,21 @@ function WalletSelectorModal({
         </Grid>
         <Grid item xs={12}>
           <ConnectorButton
-            name="Coinbase Wallet"
+            name='Coinbase Wallet'
             onClick={() => handleConnect(walletLink)}
-            iconUrl="coinbasewallet.png"
+            iconUrl='coinbasewallet.png'
             disabled={connector === walletLink || !!activatingConnector}
             isActive={connector === walletLink}
             isLoading={activatingConnector === walletLink}
           />
         </Grid>
         <Grid item>
-          <Typography variant="caption" align="center">
+          <Typography variant='caption' align='center'>
             New to Ethereum wallets?{' '}
-            <Link color="primay" href="https://ethereum.org/en/wallets/" external target="_blank">
+            <Link color='primay' href='https://ethereum.org/en/wallets/' external target='_blank'>
               Learn more
-              <IconButton size="small" sx={{ color: 'inherit' }}>
-                <ArrowSquareOut fontSize="small" />
+              <IconButton size='small' sx={{ color: 'inherit' }}>
+                <ArrowSquareOut fontSize='small' />
               </IconButton>
             </Link>
           </Typography>

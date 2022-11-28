@@ -60,7 +60,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
     <>
       <Tooltip
         arrow
-        placement="top"
+        placement='top'
         title={
           isDisabled
             ? `Batch payment requires at least one Completed bounty on the ${
@@ -70,19 +70,19 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
         }
       >
         <div>
-          <Button {...bindTrigger(popupState)} variant="outlined" color="secondary" disabled={isDisabled}>
+          <Button {...bindTrigger(popupState)} variant='outlined' color='secondary' disabled={isDisabled}>
             Batch Payment ({transactions.length})
           </Button>
         </div>
       </Tooltip>
       {!isDisabled && (
-        <Modal {...modalProps} size="large" onClose={modalProps.onClose}>
+        <Modal {...modalProps} size='large' onClose={modalProps.onClose}>
           <DialogTitle onClose={popupState.close}>Pay Bount{transactions.length > 1 ? 'ies' : 'y'}</DialogTitle>
           <Box mt={2}>
             {gnosisSafes && (
-              <Box justifyContent="space-between" gap={2} alignItems="center" display="flex">
+              <Box justifyContent='space-between' gap={2} alignItems='center' display='flex'>
                 <Typography
-                  variant="subtitle1"
+                  variant='subtitle1'
                   sx={{
                     whiteSpace: 'nowrap'
                   }}
@@ -99,7 +99,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
                   fullWidth
                   renderValue={(safeAddress) => {
                     if (safeAddress.length === 0) {
-                      return <Typography color="secondary">Please select your wallet</Typography>;
+                      return <Typography color='secondary'>Please select your wallet</Typography>;
                     }
                     return userGnosisSafeRecord[safeAddress]?.name ?? safeAddress;
                   }}
@@ -130,7 +130,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
                           p: 0,
                           pr: 1
                         }}
-                        size="medium"
+                        size='medium'
                         checked={isChecked}
                         onChange={(event) => {
                           if (!event.target.checked) {
@@ -143,10 +143,10 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
                           }
                         }}
                       />
-                      <Box display="flex" justifyContent="space-between" sx={{ width: '100%' }}>
-                        <Box display="flex" gap={2} alignItems="center">
-                          <UserDisplay avatarSize="small" user={user} />
-                          <Typography variant="body2" color="secondary">
+                      <Box display='flex' justifyContent='space-between' sx={{ width: '100%' }}>
+                        <Box display='flex' gap={2} alignItems='center'>
+                          <UserDisplay avatarSize='small' user={user} />
+                          <Typography variant='body2' color='secondary'>
                             {title}
                           </Typography>
                         </Box>
@@ -165,7 +165,7 @@ export default function MultiPaymentModal({ bounties }: { bounties: BountyWithDe
               })}
             </List>
           </Box>
-          <Box display="flex" gap={2} alignItems="center">
+          <Box display='flex' gap={2} alignItems='center'>
             {gnosisSafeChainId && gnosisSafeAddress && (
               <MultiPaymentButton
                 chainId={gnosisSafeChainId}

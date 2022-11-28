@@ -29,19 +29,19 @@ export default function NftGalleryItem({ nft, isSelected, onClick }: Props) {
     >
       <Stack>
         <Box sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
-          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size="xLarge" />
+          <Avatar avatar={nft.image ?? nft.imageThumb} isNft size='xLarge' />
         </Box>
 
-        <Typography noWrap variant="subtitle1">
+        <Typography noWrap variant='subtitle1'>
           {nft.title}
         </Typography>
-        <Typography noWrap variant="subtitle2">
+        <Typography noWrap variant='subtitle2'>
           {nft.tokenIdInt ? `#${nft.tokenIdInt}` : ''}
         </Typography>
       </Stack>
 
       {isSelected && (
-        <Box position="absolute" top={3} right={3}>
+        <Box position='absolute' top={3} right={3}>
           <CheckBoxIcon />
         </Box>
       )}

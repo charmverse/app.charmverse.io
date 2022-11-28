@@ -194,12 +194,12 @@ function AddViewMenu(props: AddViewProps) {
   return (
     <>
       {props.showLabel ? (
-        <Button {...triggers} color="secondary" size="small" startIcon={<Add />} variant="text">
+        <Button {...triggers} color='secondary' size='small' startIcon={<Add />} variant='text'>
           Add view
         </Button>
       ) : (
-        <IconButton {...triggers} color="secondary" size="small">
-          <Add fontSize="small" />
+        <IconButton {...triggers} color='secondary' size='small'>
+          <Add fontSize='small' />
         </IconButton>
       )}
       <Menu {...bindMenu(popupState)}>

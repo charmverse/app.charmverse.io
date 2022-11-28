@@ -46,13 +46,13 @@ export function SpaceDetailsAccordion({
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
         <WorkspaceAvatar name={spaceName} image={spaceImage} />
-        <Box display="flex" flex={1} alignItems="center" justifyContent="space-between">
-          <Typography ml={2} variant="h6">
+        <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
+          <Typography ml={2} variant='h6'>
             {spaceName}
           </Typography>
           {!readOnly && (
             <IconButton
-              className="icons"
+              className='icons'
               sx={{ mx: 1, opacity: touchScreen ? (expanded ? 1 : 0) : 'inherit' }}
               onClick={(e) => {
                 e.preventDefault();
@@ -60,7 +60,7 @@ export function SpaceDetailsAccordion({
                 onEdit();
               }}
             >
-              <EditIcon fontSize="small" />
+              <EditIcon fontSize='small' />
             </IconButton>
           )}
         </Box>
@@ -82,7 +82,7 @@ export function SpaceDetailsAccordion({
                 return (
                   property.value && (
                     <Stack key={property.memberPropertyId}>
-                      <Typography fontWeight="bold">{property.name}</Typography>
+                      <Typography fontWeight='bold'>{property.name}</Typography>
                       <Typography
                         sx={{
                           wordBreak: 'break-word'
@@ -106,7 +106,7 @@ export function SpaceDetailsAccordion({
               case 'join_date': {
                 return (
                   <Stack key={property.memberPropertyId}>
-                    <Typography fontWeight="bold">{property.name}</Typography>
+                    <Typography fontWeight='bold'>{property.name}</Typography>
                     <Typography>
                       {humanFriendlyDate(property.value as string, {
                         withYear: true
@@ -120,10 +120,10 @@ export function SpaceDetailsAccordion({
                 return (
                   roles.length !== 0 && (
                     <Stack key={property.memberPropertyId}>
-                      <Typography fontWeight="bold">{property.name}</Typography>
-                      <Stack gap={1} flexDirection="row" flexWrap="wrap">
+                      <Typography fontWeight='bold'>{property.name}</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                         {roles.map((role) => (
-                          <Chip label={role} key={role} size="small" variant="outlined" />
+                          <Chip label={role} key={role} size='small' variant='outlined' />
                         ))}
                       </Stack>
                     </Stack>

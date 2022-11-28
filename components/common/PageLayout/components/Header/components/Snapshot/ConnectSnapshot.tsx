@@ -78,7 +78,7 @@ export default function ConnectSnapshot() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container direction="column" spacing={3}>
+      <Grid container direction='column' spacing={3}>
         <Grid item>
           <FieldLabel>Snapshot domain</FieldLabel>
 
@@ -117,13 +117,13 @@ export default function ConnectSnapshot() {
 
         {formError && (
           <Grid item>
-            <Alert severity="error">{formError.message ?? (formError as any).error}</Alert>
+            <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
           </Grid>
         )}
 
         {isAdmin && (
-          <Grid item display="flex" justifyContent="space-between">
-            <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type="submit">
+          <Grid item display='flex' justifyContent='space-between'>
+            <PrimaryButton disabled={!isValid || snapshotDomainUnchanged} type='submit'>
               Save
             </PrimaryButton>
           </Grid>

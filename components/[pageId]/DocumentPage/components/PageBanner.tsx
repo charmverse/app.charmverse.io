@@ -88,7 +88,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
             gap: theme.spacing(0.25),
             boxShadow: theme.shadows[2]
           }}
-          className="page-cover-controls"
+          className='page-cover-controls'
         >
           <ImageSelector galleryImages={bannerImageGroups} onImageSelect={setImage}>
             <ListItem
@@ -101,7 +101,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
                 padding: theme.spacing(0.5, 1.5)
               }}
             >
-              <Typography variant="subtitle1" whiteSpace="nowrap">
+              <Typography variant='subtitle1' whiteSpace='nowrap'>
                 Change Cover
               </Typography>
             </ListItem>
@@ -116,7 +116,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
               padding: theme.spacing(0.5, 1.5)
             }}
           >
-            <Typography variant="subtitle1" onClick={() => setImage(null)}>
+            <Typography variant='subtitle1' onClick={() => setImage(null)}>
               Remove
             </Typography>
           </ListItem>

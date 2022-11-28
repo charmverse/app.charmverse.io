@@ -53,19 +53,19 @@ export default function SourceSelection(props: Props) {
   }
 
   return (
-    <Box display="flex">
-      <Box flexGrow={1} display="flex" justifyContent="center" alignItems="center">
-        <Stack alignItems="center" spacing={0}>
-          <HelpOutlineIcon color="secondary" fontSize="large" />
-          <Typography color="secondary">
+    <Box display='flex'>
+      <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
+        <Stack alignItems='center' spacing={0}>
+          <HelpOutlineIcon color='secondary' fontSize='large' />
+          <Typography color='secondary'>
             <strong>No data source</strong>
           </Typography>
-          <Typography display="flex" alignItems="center" color="secondary" variant="body2">
+          <Typography display='flex' alignItems='center' color='secondary' variant='body2'>
             <Button
-              color="secondary"
-              component="span"
+              color='secondary'
+              component='span'
               onClick={openSidebar}
-              variant="text"
+              variant='text'
               sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
               disabled={props.readOnly}
             >
@@ -75,12 +75,12 @@ export default function SourceSelection(props: Props) {
           </Typography>
         </Stack>
       </Box>
-      <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation="horizontal">
+      <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
         <StyledSidebar>
-          <Box px={2} pt={1} pb={1} display="flex" justifyContent="space-between" alignItems="center">
-            <Typography fontWeight="bold">Select data source</Typography>
-            <IconButton onClick={closeSidebar} size="small">
-              <CloseIcon fontSize="small" />
+          <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
+            <Typography fontWeight='bold'>Select data source</Typography>
+            <IconButton onClick={closeSidebar} size='small'>
+              <CloseIcon fontSize='small' />
             </IconButton>
           </Box>
           <SidebarContent>
@@ -89,9 +89,9 @@ export default function SourceSelection(props: Props) {
           {props.showCreateDatabase && (
             <MenuItem onClick={props.onCreateDatabase}>
               <ListItemIcon>
-                <AddIcon color="secondary" />
+                <AddIcon color='secondary' />
               </ListItemIcon>
-              <Typography variant="body2" color="secondary">
+              <Typography variant='body2' color='secondary'>
                 New database
               </Typography>
             </MenuItem>

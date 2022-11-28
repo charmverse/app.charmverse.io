@@ -161,7 +161,7 @@ function DateRange(props: Props): JSX.Element {
           <Modal onClose={() => onClose()}>
             <div className={`${className}-overlayWrapper`}>
               <div className={`${className}-overlay`}>
-                <div className="inputContainer">
+                <div className='inputContainer'>
                   <Editable
                     value={fromInput}
                     placeholderText={DateTime.local().setLocale(locale).toFormat('DD/MM/YYYY')}
@@ -234,14 +234,14 @@ function DateRange(props: Props): JSX.Element {
                 />
                 <hr />
                 <SwitchOption
-                  key="EndDateOn"
-                  id="EndDateOn"
+                  key='EndDateOn'
+                  id='EndDateOn'
                   name={intl.formatMessage({ id: 'DateRange.endDate', defaultMessage: 'End date' })}
                   isOn={isRange}
                   onClick={onRangeClick}
                 />
                 <hr />
-                <div className="MenuOption menu-option">
+                <div className='MenuOption menu-option'>
                   <Button onClick={onClear}>
                     {intl.formatMessage({ id: 'DateRange.clear', defaultMessage: 'Clear' })}
                   </Button>

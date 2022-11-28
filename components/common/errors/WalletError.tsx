@@ -36,7 +36,7 @@ export default function Error<ErrorType>({ error, processError }: Props<ErrorTyp
 
   return (
     <Collapse in={delayedShow}>
-      <Alert severity="error" sx={{ mb: 3 }}>
+      <Alert severity='error' sx={{ mb: 3 }}>
         <Box>
           <AlertTitle>{state.title}</AlertTitle>
           {state.description}

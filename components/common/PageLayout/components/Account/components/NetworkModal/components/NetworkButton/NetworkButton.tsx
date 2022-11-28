@@ -35,12 +35,12 @@ function NetworkButton({ chain, requestNetworkChange }: Props) {
             // @ts-ignore
             <ImageIcon src={RPC[chain]?.iconUrl} />
           }
-          color="secondary"
-          variant="outlined"
+          color='secondary'
+          variant='outlined'
           disabled={isCurrentChain}
           onClick={requestNetworkChange}
           fullWidth
-          size="large"
+          size='large'
           sx={{ color: isCurrentChain ? `${greyColor2} !important` : 'inherit', justifyContent: 'flex-start' }}
         >
           {/* @ts-ignore */}

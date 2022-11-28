@@ -31,8 +31,8 @@ function UserProperty(props: Props): JSX.Element | null {
   if (props.readOnly) {
     if (memberMap[props.value]) {
       return (
-        <div className="UserProperty octo-propertyvalue">
-          <UserDisplay user={memberMap[props.value]} avatarSize="xSmall" fontSize="small" />
+        <div className='UserProperty octo-propertyvalue'>
+          <UserDisplay user={memberMap[props.value]} avatarSize='xSmall' fontSize='small' />
         </div>
       );
     }
@@ -45,12 +45,12 @@ function UserProperty(props: Props): JSX.Element | null {
       isSearchable={true}
       isClearable={true}
       backspaceRemovesValue={true}
-      className="UserProperty octo-propertyvalue"
-      classNamePrefix="react-select"
+      className='UserProperty octo-propertyvalue'
+      classNamePrefix='react-select'
       // eslint-disable-next-line react/no-unstable-nested-components
-      formatOptionLabel={(u) => <UserDisplay user={u} avatarSize="small" fontSize="small" />}
+      formatOptionLabel={(u) => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
       styles={selectStyles}
-      placeholder="Empty"
+      placeholder='Empty'
       getOptionLabel={(o: Member) => o.username}
       getOptionValue={(a: Member) => a.id}
       value={memberMap[props.value] || null}

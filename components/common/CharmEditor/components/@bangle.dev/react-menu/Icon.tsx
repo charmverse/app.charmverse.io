@@ -62,12 +62,12 @@ export function MenuButton({
         </div>
       }
       arrow
-      placement="top"
+      placement='top'
     >
       <ListItem
         disabled={isDisabled}
         button={!disableButton as any}
-        component="div"
+        component='div'
         sx={{ py: 0, px: 0, mx: 0.25, my: 0, borderRadius: 0.5 }}
       >
         <StyledMenuButton

@@ -55,16 +55,16 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
                 setOptions([...options]);
               }}
             />
-            <Tooltip arrow placement="top" title={index < 2 ? 'At least two options are required' : ''}>
+            <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
               <div>
                 <IconButton
                   disabled={options.length <= 2}
-                  size="small"
+                  size='small'
                   onClick={() => {
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
                   }}
                 >
-                  <DeleteOutlinedIcon fontSize="small" />
+                  <DeleteOutlinedIcon fontSize='small' />
                 </IconButton>
               </div>
             </Tooltip>
@@ -72,9 +72,9 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
         );
       })}
       <Button
-        variant="outlined"
-        color="secondary"
-        size="small"
+        variant='outlined'
+        color='secondary'
+        size='small'
         onClick={() => {
           setOptions([
             ...options,
@@ -84,8 +84,8 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           ]);
         }}
       >
-        <AddCircle fontSize="small" sx={{ mr: 1 }} />
-        <Typography variant="subtitle1">Add Option</Typography>
+        <AddCircle fontSize='small' sx={{ mr: 1 }} />
+        <Typography variant='subtitle1'>Add Option</Typography>
       </Button>
     </div>
   );
@@ -175,13 +175,13 @@ export default function CreateVoteModal({
   return (
     <Modal
       title={proposal ? 'Create a vote' : 'Create a poll'}
-      size="large"
+      size='large'
       open={open}
       onClose={onClose ?? (() => {})}
     >
-      <Box flexDirection="column" gap={1.5} m={1} display="flex">
+      <Box flexDirection='column' gap={1.5} m={1} display='flex'>
         {!proposal && (
-          <Box flexDirection="column" display="flex">
+          <Box flexDirection='column' display='flex'>
             <FieldLabel>Title</FieldLabel>
             <TextField
               autoFocus
@@ -195,9 +195,9 @@ export default function CreateVoteModal({
         )}
 
         {!proposal && (
-          <Box flexDirection="column" display="flex">
+          <Box flexDirection='column' display='flex'>
             <TextField
-              placeholder="Details (Optional)"
+              placeholder='Details (Optional)'
               multiline
               rows={3}
               value={voteDescription}
@@ -207,8 +207,8 @@ export default function CreateVoteModal({
             />
           </Box>
         )}
-        <Box display="flex" gap={1}>
-          <Box flexDirection="column" display="flex" flexGrow={1}>
+        <Box display='flex' gap={1}>
+          <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Deadline</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <DateTimePicker
@@ -241,11 +241,11 @@ export default function CreateVoteModal({
               open={isDateTimePickerOpen}
             />
           </Box>
-          <Box flexDirection="column" display="flex" flexGrow={1}>
+          <Box flexDirection='column' display='flex' flexGrow={1}>
             <FieldLabel>Pass Threshold (%)</FieldLabel>
             <TextField
               fullWidth
-              type="number"
+              type='number'
               value={passThreshold}
               onChange={(e) => {
                 setPassThreshold(Number(e.target.value as any));
@@ -260,8 +260,8 @@ export default function CreateVoteModal({
             />
           </Box>
         </Box>
-        <Box display="flex" gap={2} alignItems="center">
-          <Typography fontWeight="bold">Options: </Typography>
+        <Box display='flex' gap={2} alignItems='center'>
+          <Typography fontWeight='bold'>Options: </Typography>
           <RadioGroup
             row
             defaultValue={VoteType.Approval}
@@ -270,12 +270,12 @@ export default function CreateVoteModal({
               setVoteType(e.target.value as VoteType);
             }}
           >
-            <FormControlLabel value={VoteType.Approval} control={<Radio />} label="Yes / No / Abstain" />
-            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label="Custom Options" />
+            <FormControlLabel value={VoteType.Approval} control={<Radio />} label='Yes / No / Abstain' />
+            <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='Custom Options' />
           </RadioGroup>
         </Box>
         {voteType === VoteType.SingleChoice && <InlineVoteOptions options={options} setOptions={setOptions} />}
-        <Stack gap={2} flexDirection="row" alignItems="center">
+        <Stack gap={2} flexDirection='row' alignItems='center'>
           <Button
             onClick={handleSubmit}
             sx={{

@@ -10,7 +10,7 @@ export default function GlobalComponents() {
 
   return (
     <>
-      <HexagonalAvatarMask id="hexagon-avatar" />
+      <HexagonalAvatarMask id='hexagon-avatar' />
       <MemberOnboardingModal />
       <Snackbar />
     </>

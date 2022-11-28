@@ -57,13 +57,13 @@ function Menu({ position, children, disablePortal = true }: Props) {
         style={{ maxHeight: maxHeight || 'none' }}
         className={`Menu noselect ${position || 'bottom-start'}`}
       >
-        <div className="menu-contents">
-          <div className="menu-options">{children}</div>
+        <div className='menu-contents'>
+          <div className='menu-options'>{children}</div>
 
-          <div className="menu-spacer hideOnWidescreen" />
+          <div className='menu-spacer hideOnWidescreen' />
 
-          <div className="menu-options hideOnWidescreen">
-            <Menu.Text id="menu-cancel" name="Cancel" className="menu-cancel" onClick={() => undefined} />
+          <div className='menu-options hideOnWidescreen'>
+            <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
           </div>
         </div>
       </div>

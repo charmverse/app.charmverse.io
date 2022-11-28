@@ -199,22 +199,22 @@ function ViewTabs(props: ViewTabsProps) {
   return (
     <>
       <Tabs
-        textColor="primary"
-        indicatorColor="secondary"
+        textColor='primary'
+        indicatorColor='secondary'
         value={activeView?.id ?? false}
         sx={{ minHeight: 0, mb: '-4px' }}
       >
         {shownViews.map((view) => (
           <Tab
-            component="div"
+            component='div'
             disableRipple
             key={view.id}
             label={
               <StyledButton
                 startIcon={iconForViewType(view.fields.viewType)}
                 onClick={handleViewClick}
-                variant="text"
-                size="small"
+                variant='text'
+                size='small'
                 color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
                 href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
@@ -228,11 +228,11 @@ function ViewTabs(props: ViewTabsProps) {
         ))}
         {restViews.length !== 0 && (
           <Tab
-            component="div"
+            component='div'
             disableRipple
             sx={{ p: 0, mb: 0.5 }}
             label={
-              <Button variant="text" size="small" color="secondary" {...showViewsTriggerState}>
+              <Button variant='text' size='small' color='secondary' {...showViewsTriggerState}>
                 {restViews.length} more...
               </Button>
             }
@@ -242,13 +242,13 @@ function ViewTabs(props: ViewTabsProps) {
       <Menu anchorEl={anchorEl} disablePortal open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem dense onClick={handleRenameView}>
           <ListItemIcon>
-            <EditIcon fontSize="small" />
+            <EditIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleViewOptions}>
           <ListItemIcon>
-            <TuneIcon fontSize="small" />
+            <TuneIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Edit View</ListItemText>
         </MenuItem>
@@ -262,7 +262,7 @@ function ViewTabs(props: ViewTabsProps) {
         {views.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>
-              <DeleteOutlineIcon fontSize="small" />
+              <DeleteOutlineIcon fontSize='small' />
             </ListItemIcon>
             <ListItemText>{deleteViewText}</ListItemText>
           </MenuItem>
@@ -285,7 +285,7 @@ function ViewTabs(props: ViewTabsProps) {
                   onViewTabClick?.(view.id);
                   showViewsMenuState.onClose();
                 }}
-                component="a"
+                component='a'
                 key={view.id}
                 dense
               >
@@ -307,10 +307,10 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       {/* Form to rename views */}
-      <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title="Rename the view">
+      <Modal open={renameViewPopupState.isOpen} onClose={renameViewPopupState.close} title='Rename the view'>
         <form onSubmit={handleSubmit(saveViewTitle)}>
           <TextField {...register('title')} autoFocus />
-          <Button type="submit">Save</Button>
+          <Button type='submit'>Save</Button>
         </form>
       </Modal>
     </>

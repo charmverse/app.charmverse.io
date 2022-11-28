@@ -93,11 +93,11 @@ export default function WorkspaceSettings() {
     <>
       <Legend>Space Details</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container direction="column" spacing={3}>
+        <Grid container direction='column' spacing={3}>
           <Grid item>
             <Avatar
               name={watchName}
-              variant="rounded"
+              variant='rounded'
               image={watchSpaceImage}
               updateImage={(url: string) => setValue('spaceImage', url, { shouldDirty: true })}
               editable={isAdmin}
@@ -127,19 +127,19 @@ export default function WorkspaceSettings() {
             {error && <FormHelperText error>{error}</FormHelperText>}
           </Grid>
           {isAdmin ? (
-            <Grid item display="flex" justifyContent="space-between">
-              <PrimaryButton disabled={!isDirty} type="submit">
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton disabled={!isDirty} type='submit'>
                 Save
               </PrimaryButton>
-              <Button variant="outlined" color="error" onClick={deleteWorkspace}>
+              <Button variant='outlined' color='error' onClick={deleteWorkspace}>
                 Delete Workspace
               </Button>
             </Grid>
           ) : (
-            <Grid item display="flex">
+            <Grid item display='flex'>
               <Button
-                variant="outlined"
-                color="error"
+                variant='outlined'
+                color='error'
                 onClick={() => {
                   workspaceLeaveModalState.open();
                 }}
@@ -151,25 +151,25 @@ export default function WorkspaceSettings() {
         </Grid>
       </form>
       <Legend>API Key</Legend>
-      <Typography variant="body1">
+      <Typography variant='body1'>
         Request access to the charmverse API in our{' '}
-        <Link href="https://discord.gg/ACYCzBGC2M" external target="_blank">
-          Discord Channel <LaunchIcon fontSize="small" />
+        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
+          Discord Channel <LaunchIcon fontSize='small' />
         </Link>
       </Typography>
 
       <Legend>Import Content</Legend>
-      <Box sx={{ ml: 1 }} display="flex" flexDirection="column" gap={1}>
+      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ImportNotionWorkspace />
       </Box>
 
       <Legend>Snapshot.org Integration</Legend>
-      <Box sx={{ ml: 1 }} display="flex" flexDirection="column" gap={1}>
+      <Box sx={{ ml: 1 }} display='flex' flexDirection='column' gap={1}>
         <ConnectSnapshot />
       </Box>
       {space && (
         <ConfirmDeleteModal
-          title="Delete workspace"
+          title='Delete workspace'
           onClose={closeInviteLinkDeleteModal}
           open={workspaceRemoveModalState.isOpen}
           buttonText={`Delete ${space.name}`}
@@ -186,7 +186,7 @@ export default function WorkspaceSettings() {
       )}
       {space && (
         <ConfirmDeleteModal
-          title="Leave workspace"
+          title='Leave workspace'
           onClose={() => {
             workspaceLeaveModalState.close();
           }}
@@ -203,13 +203,13 @@ export default function WorkspaceSettings() {
       )}
       <ConfirmDeleteModal
         open={unsavedChangesModalState.isOpen}
-        title="You have unsaved changes"
+        title='You have unsaved changes'
         onClose={() => {
           // discard
           unsavedChangesModalState.close();
         }}
-        buttonText="Save changes"
-        question="Are you sure you want to discard unsaved changes"
+        buttonText='Save changes'
+        question='Are you sure you want to discard unsaved changes'
         onConfirm={() => {
           // save
           unsavedChangesModalState.close();

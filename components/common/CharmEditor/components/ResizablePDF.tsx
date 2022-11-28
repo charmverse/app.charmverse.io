@@ -82,7 +82,7 @@ function EmptyPDFContainer({
       {...props}
     >
       <StyledEmptyPDFContainer>
-        <PictureAsPdfIcon fontSize="small" />
+        <PictureAsPdfIcon fontSize='small' />
         <Typography>Add a PDF</Typography>
       </StyledEmptyPDFContainer>
     </ListItem>
@@ -154,10 +154,10 @@ const PDF = memo((props: PDFViewerProps) => {
           Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
         </p>
         <IconButton onClick={previousPage} disabled={pageNumber <= 1}>
-          <NavigateBeforeIcon fontSize="small" />
+          <NavigateBeforeIcon fontSize='small' />
         </IconButton>
         <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount}>
-          <NavigateNextIcon fontSize="small" />
+          <NavigateNextIcon fontSize='small' />
         </IconButton>
       </div>
     </Box>

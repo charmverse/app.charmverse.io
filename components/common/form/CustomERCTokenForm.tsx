@@ -155,7 +155,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
         }}
         style={{ margin: 'auto' }}
       >
-        <Grid container direction="column" spacing={3}>
+        <Grid container direction='column' spacing={3}>
           <Grid item xs>
             <InputLabel>Blockchain</InputLabel>
             <InputSearchBlockchain defaultChainId={defaultChainId} onChange={setChainId} />
@@ -165,17 +165,17 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             <InputLabel>Contract address</InputLabel>
             <TextField
               {...register('contractAddress')}
-              type="text"
-              size="small"
+              type='text'
+              size='small'
               fullWidth
               error={!!errors.contractAddress?.message}
               helperText={errors.contractAddress?.message}
               InputProps={{
-                endAdornment: loadingToken && <Progress color="inherit" size="1em" />
+                endAdornment: loadingToken && <Progress color='inherit' size='1em' />
               }}
             />
             {!errors?.contractAddress && allowManualInput && !loadingToken && (
-              <Alert severity="info">
+              <Alert severity='info'>
                 We couldn't find data about this token. Enter its details below, or select a different blockchain.
               </Alert>
             )}
@@ -191,8 +191,8 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                       readOnly: !allowManualInput
                     }}
                     {...register('tokenSymbol')}
-                    size="small"
-                    type="text"
+                    size='small'
+                    type='text'
                     error={!!errors.tokenSymbol?.message}
                     helperText={errors.tokenSymbol?.message}
                   />
@@ -204,9 +204,9 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                     {...register('tokenDecimals', {
                       valueAsNumber: true
                     })}
-                    type="number"
-                    size="small"
-                    inputMode="numeric"
+                    type='number'
+                    size='small'
+                    inputMode='numeric'
                     inputProps={{
                       step: 1,
                       min: 1,
@@ -220,8 +220,8 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 <InputLabel>Token name</InputLabel>
                 <TextField
                   {...register('tokenName')}
-                  type="text"
-                  size="small"
+                  type='text'
+                  size='small'
                   fullWidth
                   InputProps={{
                     readOnly: !allowManualInput
@@ -236,15 +236,15 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                   <InputLabel>Token logo URL</InputLabel>
                   <TextField
                     {...register('tokenLogo')}
-                    type="text"
-                    size="small"
+                    type='text'
+                    size='small'
                     fullWidth
                     error={!!errors.tokenLogo?.message}
                     helperText={errors.tokenLogo?.message}
-                    placeholder="https://app.charmverse.io/favicon.png"
+                    placeholder='https://app.charmverse.io/favicon.png'
                   />
                   {(errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
-                    <Alert severity="error">Invalid token logo url</Alert>
+                    <Alert severity='error'>Invalid token logo url</Alert>
                   )}
                 </Grid>
                 {validTokenLogoAddressFormat && (
@@ -254,7 +254,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                     sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}
                   >
                     <img
-                      alt=""
+                      alt=''
                       style={{ maxHeight: '50px' }}
                       src={values.tokenLogo || ''}
                       onError={(error) => {
@@ -275,7 +275,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             </Grid>
           )}
           <Grid item>
-            <Button type="submit" disabled={!isValid || values.contractAddress === ''}>
+            <Button type='submit' disabled={!isValid || values.contractAddress === ''}>
               Create payment method
             </Button>
           </Grid>

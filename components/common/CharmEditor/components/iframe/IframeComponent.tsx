@@ -120,9 +120,9 @@ function EmptyIframeContainer(
         {(() => {
           switch (type) {
             case 'embed':
-              return <PreviewIcon fontSize="small" />;
+              return <PreviewIcon fontSize='small' />;
             case 'video':
-              return <VideoLibraryIcon fontSize="small" />;
+              return <VideoLibraryIcon fontSize='small' />;
             case 'figma':
               return <FiFigma style={{ fontSize: 'small' }} />;
 
@@ -218,14 +218,14 @@ function ResizableIframe({
         {node.attrs.type === 'figma' ? (
           <iframe
             allowFullScreen
-            title="iframe"
+            title='iframe'
             src={figmaSrc}
             style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
           />
         ) : (
           <iframe
             allowFullScreen
-            title="iframe"
+            title='iframe'
             src={node.attrs.src}
             style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
           />
@@ -257,7 +257,7 @@ function ResizableIframe({
           <StyledIFrame>
             <iframe
               allowFullScreen
-              title="iframe"
+              title='iframe'
               src={node.attrs.src}
               style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
             />
@@ -288,7 +288,7 @@ function ResizableIframe({
           <StyledIFrame>
             <iframe
               allowFullScreen
-              title="iframe"
+              title='iframe'
               src={figmaSrc}
               style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
             />
@@ -311,7 +311,7 @@ function ResizableIframe({
         <StyledIFrame>
           <iframe
             allowFullScreen
-            title="iframe"
+            title='iframe'
             src={node.attrs.src}
             style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
           />

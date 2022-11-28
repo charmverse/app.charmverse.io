@@ -34,10 +34,10 @@ export default function Mention({ node }: NodeViewProps) {
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
     value = page && (
-      <MentionContainer color="inherit" href={`/${space?.domain}/${page.path}`}>
-        <Box display="flex" alignItems="center">
+      <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
+        <Box display='flex' alignItems='center'>
           <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
-          <Typography component="span" fontWeight={600}>
+          <Typography component='span' fontWeight={600}>
             {page.title || 'Untitled'}
           </Typography>
         </Box>
@@ -45,8 +45,8 @@ export default function Mention({ node }: NodeViewProps) {
     );
   } else if (attrs.type === 'user') {
     value = (
-      <MentionContainer color="secondary" href={`/u/${member?.path || member?.id}`}>
-        <Typography component="span" fontWeight={600}>
+      <MentionContainer color='secondary' href={`/u/${member?.path || member?.id}`}>
+        <Typography component='span' fontWeight={600}>
           <span style={{ opacity: 0.5 }}>@</span>
           {member?.username}
         </Typography>

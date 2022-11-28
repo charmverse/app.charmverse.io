@@ -14,7 +14,7 @@ export function DownIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <KeyboardArrowDownIcon fontSize={iconSize} />
-      <Box component="span" fontSize={fontSize}>
+      <Box component='span' fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

@@ -29,7 +29,7 @@ export default function ImageSelector({
   const [isUploading, setIsUploading] = useState(false);
 
   if (galleryImages) {
-    tabs.push(['Gallery', <ImageSelectorGallery key="gallery" onImageClick={onImageSelect} items={galleryImages} />]);
+    tabs.push(['Gallery', <ImageSelectorGallery key='gallery' onImageClick={onImageSelect} items={galleryImages} />]);
   }
 
   return (
@@ -48,7 +48,7 @@ export default function ImageSelector({
               [
                 'Upload',
                 <Box
-                  key="upload"
+                  key='upload'
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -57,16 +57,16 @@ export default function ImageSelector({
                 >
                   <PimpedButton
                     loading={isUploading}
-                    loadingMessage="Uploading image"
+                    loadingMessage='Uploading image'
                     disabled={isUploading}
-                    component="label"
-                    variant="contained"
+                    component='label'
+                    variant='contained'
                   >
                     Choose an image
                     <input
-                      type="file"
+                      type='file'
                       hidden
-                      accept="image/*"
+                      accept='image/*'
                       onChange={async (e) => {
                         setIsUploading(true);
                         const firstFile = e.target.files?.[0];
@@ -83,7 +83,7 @@ export default function ImageSelector({
               [
                 'Link',
                 <Box
-                  key="link"
+                  key='link'
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -93,7 +93,7 @@ export default function ImageSelector({
                 >
                   <TextField
                     autoFocus
-                    placeholder="Paste the image link..."
+                    placeholder='Paste the image link...'
                     value={embedLink}
                     onChange={(e) => setEmbedLink(e.target.value)}
                   />

@@ -348,16 +348,16 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   const labelComponent = useMemo(
     () => (
       <PageLink href={href} label={label} labelIcon={icon} pageId={pageId} pageType={pageType} onClick={onClick}>
-        <div className="page-actions">
-          <MemoizedIconButton size="small" onClick={showMenu}>
-            <MoreHorizIcon color="secondary" fontSize="small" />
+        <div className='page-actions'>
+          <MemoizedIconButton size='small' onClick={showMenu}>
+            <MoreHorizIcon color='secondary' fontSize='small' />
           </MemoizedIconButton>
 
           {userSpacePermissions?.createPage &&
             (pageType === 'board' ? (
               <AddNewCard pageId={pageId} />
             ) : (
-              <NewPageMenu tooltip="Add a page inside" addPage={addSubPage} />
+              <NewPageMenu tooltip='Add a page inside' addPage={addSubPage} />
             ))}
         </div>
       </PageLink>
@@ -436,7 +436,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
 
   return (
     <>
-      <Tooltip arrow placement="top" title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
+      <Tooltip arrow placement='top' title={deletePageDisabled ? 'You do not have permission to delete this page' : ''}>
         <div>
           <PageMenuItem dense disabled={deletePageDisabled} onClick={deletePageWithBoard}>
             <ListItemIcon>
@@ -449,7 +449,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
       <CopyToClipboard text={getAbsolutePath()} onCopy={() => onCopy()}>
         <PageMenuItem dense>
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <ContentCopyIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
         </PageMenuItem>

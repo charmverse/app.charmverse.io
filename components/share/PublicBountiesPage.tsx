@@ -21,7 +21,7 @@ export default function PublicBountiesPage() {
   }, [space?.id]);
 
   if (!space || !bounties) {
-    return <LoadingComponent height="200px" isLoading={true} />;
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   return space.publicBountyBoard ? (

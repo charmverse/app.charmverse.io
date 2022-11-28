@@ -78,7 +78,7 @@ describe('components/flashMessages', () => {
     const { container } = render(wrapIntl(<FlashMessages milliseconds={200} />));
 
     act(() => {
-      sendFlashMessage({ content: <div data-testid="mock-test-id">Mock Content</div>, severity: 'low' });
+      sendFlashMessage({ content: <div data-testid='mock-test-id'>Mock Content</div>, severity: 'low' });
     });
 
     expect(screen.getByTestId('mock-test-id')).toBeVisible();

@@ -31,7 +31,7 @@ export const PimpedButton = forwardRef<HTMLButtonElement, InputProps<ElementType
   const buttonComponent = (
     <StyledButton ref={ref} disabled={loading} {...props}>
       {loading && loadingMessage ? loadingMessage : children}
-      {loading && <StyledSpinner color="inherit" size={15} />}
+      {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
   );
 

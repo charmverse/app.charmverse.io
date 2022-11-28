@@ -48,8 +48,8 @@ export default function KanbanHiddenColumnItem(props: Props): JSX.Element {
         </Label>
         <Menu>
           <Menu.Text
-            id="show"
-            icon={<VisibilityOutlinedIcon fontSize="small" />}
+            id='show'
+            icon={<VisibilityOutlinedIcon fontSize='small' />}
             name={intl.formatMessage({ id: 'BoardComponent.show', defaultMessage: 'Show' })}
             onClick={() => mutator.unhideViewColumn(activeView, group.option.id)}
           />

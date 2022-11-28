@@ -64,12 +64,12 @@ export function MemberPropertySidebarDetails({
             {property?.permissions.length ? (
               <Stack>
                 <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                  <Typography pl={4} variant="overline">
+                  <Typography pl={4} variant='overline'>
                     Restricted to roles:
                   </Typography>
                 </Tooltip>
                 {property?.permissions.map((permission) => (
-                  <Stack key={permission.id} flexDirection="row" justifyContent="space-between" alignItems="center">
+                  <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
                     <MenuItem
                       dense
                       sx={{
@@ -86,11 +86,11 @@ export function MemberPropertySidebarDetails({
                         }
                       }}
                     >
-                      <Typography variant="subtitle2">{permission.role?.name || '-'}</Typography>
+                      <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
                       {!readOnly && (
-                        <IconButton size="small" color="secondary" sx={{ opacity: 0 }} className="icons">
+                        <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
                           <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                            <DeleteOutlinedIcon fontSize="small" onClick={() => removePermission(permission)} />
+                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
                           </Tooltip>
                         </IconButton>
                       )}
@@ -100,9 +100,9 @@ export function MemberPropertySidebarDetails({
               </Stack>
             ) : (
               <Tooltip title={`Everyone in workspace can see ${property.name} property`}>
-                <Typography pl={4} variant="overline" alignItems="center" display="flex">
+                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                   Everyone in workspace
-                  <VisibilityOutlinedIcon fontSize="small" color="secondary" sx={{ ml: 1 }} />
+                  <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                 </Typography>
               </Tooltip>
             )}
@@ -110,9 +110,9 @@ export function MemberPropertySidebarDetails({
 
           {!readOnly && (
             <Button
-              variant="text"
-              size="small"
-              color="secondary"
+              variant='text'
+              size='small'
+              color='secondary'
               startIcon={<AddOutlinedIcon />}
               onClick={memberPropertySidebarItemPopupState.open}
               sx={{
@@ -129,10 +129,10 @@ export function MemberPropertySidebarDetails({
       </Collapse>
 
       <Modal
-        size="large"
+        size='large'
         open={memberPropertySidebarItemPopupState.isOpen}
         onClose={memberPropertySidebarItemPopupState.close}
-        title="Add roles"
+        title='Add roles'
       >
         <Stack gap={0.5}>
           <InputLabel>Role</InputLabel>

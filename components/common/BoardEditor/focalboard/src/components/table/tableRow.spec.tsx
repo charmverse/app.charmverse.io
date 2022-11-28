@@ -52,7 +52,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
-          resizingColumn=""
+          resizingColumn=''
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />
@@ -76,7 +76,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={true}
           offset={0}
-          resizingColumn=""
+          resizingColumn=''
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />
@@ -100,7 +100,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
-          resizingColumn=""
+          resizingColumn=''
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />
@@ -127,7 +127,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
-          resizingColumn=""
+          resizingColumn=''
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />
@@ -153,7 +153,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
-          resizingColumn=""
+          resizingColumn=''
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />
@@ -179,7 +179,7 @@ describe('components/table/TableRow', () => {
           showCard={jest.fn()}
           readOnly={false}
           offset={0}
-          resizingColumn="property1"
+          resizingColumn='property1'
           columnRefs={new Map()}
           onDrop={jest.fn()}
         />

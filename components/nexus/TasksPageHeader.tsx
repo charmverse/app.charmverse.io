@@ -39,9 +39,9 @@ export default function TasksPageHeader() {
       <TasksPageHeaderContainer>
         <Grid container spacing={{ sm: 2, xs: 1 }}>
           <Grid item xs>
-            <Link passHref href="/integrations">
+            <Link passHref href='/integrations'>
               <Paper
-                component="a"
+                component='a'
                 elevation={1}
                 sx={{
                   height: '100%',
@@ -61,14 +61,14 @@ export default function TasksPageHeader() {
                 }}
               >
                 <Box
-                  display="flex"
-                  alignItems="center"
+                  display='flex'
+                  alignItems='center'
                   gap={{
                     xs: 1,
                     sm: 2
                   }}
                 >
-                  <Box display="flex" alignItems="center">
+                  <Box display='flex' alignItems='center'>
                     <Typography
                       sx={{
                         fontSize: {
@@ -82,7 +82,7 @@ export default function TasksPageHeader() {
                       {totalIntegrations}
                     </Typography>
                     <Typography
-                      color="secondary"
+                      color='secondary'
                       sx={{
                         fontWeight: 500
                       }}
@@ -99,16 +99,16 @@ export default function TasksPageHeader() {
                       xs: 1,
                       sm: 2
                     }}
-                    height="100%"
-                    alignItems="center"
+                    height='100%'
+                    alignItems='center'
                   >
                     <Tooltip
                       title={metamaskConnected ? 'Metamask connected' : 'Metamask not connected'}
                       arrow
-                      placement="top"
+                      placement='top'
                     >
                       <img
-                        className="logo-image"
+                        className='logo-image'
                         width={20}
                         height={20}
                         src={
@@ -121,10 +121,10 @@ export default function TasksPageHeader() {
                     <Tooltip
                       title={discordConnected ? 'Discord connected' : 'Discord not connected'}
                       arrow
-                      placement="top"
+                      placement='top'
                     >
                       <img
-                        className="logo-image"
+                        className='logo-image'
                         width={25}
                         height={20}
                         src={
@@ -135,10 +135,10 @@ export default function TasksPageHeader() {
                     <Tooltip
                       title={telegramConnected ? 'Telegram connected' : 'Telegram not connected'}
                       arrow
-                      placement="top"
+                      placement='top'
                     >
                       <img
-                        className="logo-image"
+                        className='logo-image'
                         width={22.5}
                         height={22.5}
                         src={telegramConnected ? '/images/telegram-logo.png' : '/images/telegram-logo-greyscale.png'}
@@ -147,14 +147,14 @@ export default function TasksPageHeader() {
                   </Box>
                   <Divider
                     sx={{ borderRightWidth: 2, display: { xs: 'none', lg: 'initial' } }}
-                    orientation="vertical"
-                    variant="middle"
+                    orientation='vertical'
+                    variant='middle'
                     flexItem
                   />
-                  <Box gap={1} height="100%" alignItems="center" display={{ xs: 'none', lg: 'flex' }}>
-                    <KeyIcon color="secondary" />
+                  <Box gap={1} height='100%' alignItems='center' display={{ xs: 'none', lg: 'flex' }}>
+                    <KeyIcon color='secondary' />
                     <Typography
-                      color="secondary"
+                      color='secondary'
                       fontWeight={500}
                       sx={{
                         fontSize: {
@@ -166,7 +166,7 @@ export default function TasksPageHeader() {
                       {safes?.length}
                     </Typography>
                     <Typography
-                      color="secondary"
+                      color='secondary'
                       sx={{
                         fontWeight: 500,
                         fontSize: {
@@ -180,15 +180,15 @@ export default function TasksPageHeader() {
                   </Box>
                 </Box>
                 <IconButton>
-                  <ArrowForwardIosIcon color="secondary" fontSize="small" />
+                  <ArrowForwardIosIcon color='secondary' fontSize='small' />
                 </IconButton>
               </Paper>
             </Link>
           </Grid>
           <Grid item xs sx={{ maxWidth: '300px !important' }}>
-            <Link passHref href="/profile">
+            <Link passHref href='/profile'>
               <Paper
-                component="a"
+                component='a'
                 elevation={1}
                 sx={{
                   textDecoration: 'none',
@@ -198,10 +198,10 @@ export default function TasksPageHeader() {
                   cursor: 'pointer'
                 }}
               >
-                <Box height="100%" display="flex" justifyContent="space-between" alignItems="center">
+                <Box height='100%' display='flex' justifyContent='space-between' alignItems='center'>
                   <Box
-                    display="flex"
-                    alignItems="center"
+                    display='flex'
+                    alignItems='center'
                     gap={1.5}
                     sx={{
                       '.MuiAvatar-root': {
@@ -211,13 +211,13 @@ export default function TasksPageHeader() {
                       }
                     }}
                   >
-                    <Avatar size="large" variant="circular" name={user.username} avatar={user.avatar} />
-                    <Typography fontWeight={500} color="secondary">
+                    <Avatar size='large' variant='circular' name={user.username} avatar={user.avatar} />
+                    <Typography fontWeight={500} color='secondary'>
                       My Profile
                     </Typography>
                   </Box>
                   <IconButton>
-                    <ArrowForwardIosIcon color="secondary" fontSize="small" />
+                    <ArrowForwardIosIcon color='secondary' fontSize='small' />
                   </IconButton>
                 </Box>
               </Paper>

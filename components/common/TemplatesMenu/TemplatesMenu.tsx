@@ -100,9 +100,9 @@ export function TemplatesMenu({
         );
       })}
       {enableNewTemplates && [
-        <Divider key="templates-menu-divider" />,
+        <Divider key='templates-menu-divider' />,
         <MenuItem
-          key="templates-menu-new-item"
+          key='templates-menu-new-item'
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
           onClick={createTemplate}

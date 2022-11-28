@@ -51,32 +51,32 @@ export default function Footer() {
         <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
             <LinkHeader>Links</LinkHeader>
-            <StyledLink href="https://charmverse.io/privacy-policy" target="_blank">
+            <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
               Privacy Policy
             </StyledLink>
-            <StyledLink href="https://charmverse.io/terms" target="_blank">
+            <StyledLink href='https://charmverse.io/terms' target='_blank'>
               Terms
             </StyledLink>
           </Grid>
           <Grid item xs={12} sm={4}>
             <LinkHeader>About</LinkHeader>
-            <StyledLink href="mailto:hello@charmverse.io">hello@charmverse.io</StyledLink>
-            <Typography color="secondary">New York, NY</Typography>
+            <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
+            <Typography color='secondary'>New York, NY</Typography>
           </Grid>
-          <Grid item xs={12} sm={4} alignItems="center">
+          <Grid item xs={12} sm={4} alignItems='center'>
             <LinkHeader>Social</LinkHeader>
-            <Box display="flex" alignItems="center" sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
-              <StyledIconButton href="https://www.linkedin.com/company/charmverse" target="_blank">
+            <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
+              <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
                 <LinkedInIcon />
               </StyledIconButton>
-              <StyledIconButton href="https://twitter.com/charmverse" target="_blank">
+              <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
                 <TwitterIcon />
               </StyledIconButton>
-              <StyledIconButton href="https://www.facebook.com/charmverse.io" target="_blank">
+              <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
                 <FacebookIcon />
               </StyledIconButton>
-              <StyledIconButton href="https://discord.gg/ACYCzBGC2M" target="_blank">
-                <SvgIcon viewBox="0 -5 70 70">
+              <StyledIconButton href='https://discord.gg/ACYCzBGC2M' target='_blank'>
+                <SvgIcon viewBox='0 -5 70 70'>
                   <DiscordIcon />
                 </SvgIcon>
               </StyledIconButton>

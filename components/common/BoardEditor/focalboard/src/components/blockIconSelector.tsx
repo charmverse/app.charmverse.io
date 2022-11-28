@@ -51,17 +51,17 @@ const BlockIconSelector = React.memo((props: Props) => {
   if (props.readOnly) {
     className += ' readonly';
   }
-  const iconElement = <PageIcon size="large" icon={block.fields.icon} />;
+  const iconElement = <PageIcon size='large' icon={block.fields.icon} />;
 
   return (
-    <div className="BlockIconSelector">
+    <div className='BlockIconSelector'>
       {props.readOnly && iconElement}
       {!props.readOnly && (
         <MenuWrapper>
           {iconElement}
           <Menu>
             <Menu.Text
-              id="random"
+              id='random'
               icon={<EmojiEmotionsOutlinedIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
               onClick={() => {
@@ -69,7 +69,7 @@ const BlockIconSelector = React.memo((props: Props) => {
               }}
             />
             <Menu.SubMenu
-              id="pick"
+              id='pick'
               icon={<EmojiEmotionsOutlinedIcon />}
               name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
             >
@@ -81,8 +81,8 @@ const BlockIconSelector = React.memo((props: Props) => {
               />
             </Menu.SubMenu>
             <Menu.Text
-              id="remove"
-              icon={<DeleteOutlineIcon fontSize="small" />}
+              id='remove'
+              icon={<DeleteOutlineIcon fontSize='small' />}
               name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
               onClick={() => {
                 onRemoveIcon();

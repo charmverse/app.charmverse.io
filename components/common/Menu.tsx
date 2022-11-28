@@ -36,18 +36,18 @@ export default function SelectMenu({
   const selectedLabel = options.find((opt) => opt.value === selectedValue)?.primary;
 
   return (
-    <Box display="block">
+    <Box display='block'>
       {title && (
-        <Typography display="block" variant="caption">
+        <Typography display='block' variant='caption'>
           {title}
         </Typography>
       )}
       <Button
-        color="secondary"
-        variant="outlined"
+        color='secondary'
+        variant='outlined'
         disabled={loading}
         loading={loading}
-        endIcon={!loading && <KeyboardArrowDownIcon fontSize="small" />}
+        endIcon={!loading && <KeyboardArrowDownIcon fontSize='small' />}
         {...bindTrigger(popupState)}
       >
         {selectedLabel}

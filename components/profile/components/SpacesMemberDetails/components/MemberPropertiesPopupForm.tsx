@@ -93,7 +93,7 @@ export function MemberPropertiesPopupForm({
           <DialogContent dividers>
             {children}
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Box display="flex" flexDirection="column">
+              <Box display='flex' flexDirection='column'>
                 {data.map((property) => {
                   const fieldRendererConfig = getFieldRendererConfig({
                     type: property.type,
@@ -120,10 +120,10 @@ export function MemberPropertiesPopupForm({
             </form>
             <DialogActions>
               <Button
-                data-test="close-member-properties-modal"
+                data-test='close-member-properties-modal'
                 onClick={onClose}
-                variant="text"
-                color="secondary"
+                variant='text'
+                color='secondary'
                 sx={{ px: 4 }}
               >
                 {cancelButtonText}

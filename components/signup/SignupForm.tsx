@@ -47,33 +47,33 @@ export default function SignupPageContent() {
   return (
     <Content px={3}>
       <Box mb={6}>
-        <Typography gutterBottom variant="h1" sx={{ fontSize: '2.5rem' }} align="center">
+        <Typography gutterBottom variant='h1' sx={{ fontSize: '2.5rem' }} align='center'>
           {welcomeMessage}
         </Typography>
         {/* <Typography variant='h2' align='center'>
           Choose your adventure:
         </Typography> */}
       </Box>
-      <Grid container spacing={6} alignItems="stretch" sx={{ mb: 6 }}>
+      <Grid container spacing={6} alignItems='stretch' sx={{ mb: 6 }}>
         <Grid item xs sx={{ height: '100%', margin: 'auto' }}>
-          <Link href="/createWorkspace">
+          <Link href='/createWorkspace'>
             <AdventureCard>
               <ImageContainer>
                 <Image src={rocketImage} />
               </ImageContainer>
-              <PrimaryButton size="large" data-test="goto-create-workspace">
+              <PrimaryButton size='large' data-test='goto-create-workspace'>
                 Create a new workspace
               </PrimaryButton>
             </AdventureCard>
           </Link>
         </Grid>
         <Grid item xs>
-          <Link href="/join">
+          <Link href='/join'>
             <AdventureCard>
               <ImageContainer>
                 <Image src={gatesImage} />
               </ImageContainer>
-              <PrimaryButton size="large">Join an existing workspace</PrimaryButton>
+              <PrimaryButton size='large'>Join an existing workspace</PrimaryButton>
             </AdventureCard>
           </Link>
         </Grid>

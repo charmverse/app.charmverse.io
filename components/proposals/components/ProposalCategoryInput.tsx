@@ -35,9 +35,9 @@ function ProposalCategoryOption({ props, category, onDelete }: ProposalCategoryO
 
   return (
     <Box {...(props as unknown as HTMLAttributes<HTMLDivElement>)}>
-      <Box justifyContent="space-between" alignItems="center" display="flex" flex={1}>
+      <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
         <Chip
-          variant="filled"
+          variant='filled'
           color={category.color as BrandColor}
           label={category.title}
           sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
@@ -45,8 +45,8 @@ function ProposalCategoryOption({ props, category, onDelete }: ProposalCategoryO
 
         {!!onDelete && (
           <IconButton
-            color="secondary"
-            size="small"
+            color='secondary'
+            size='small'
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -135,12 +135,12 @@ export default function ProposalCategoryInput({
         />
       )}
       ChipProps={{ color: (tempValue?.color || value?.color || 'gray') as BrandColor }}
-      noOptionsText="No categories available"
+      noOptionsText='No categories available'
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder="Select category"
-          size="small"
+          placeholder='Select category'
+          size='small'
           inputProps={{
             ...params.inputProps,
             // Hack hiding input for single-value tag input

@@ -107,14 +107,14 @@ export default function InlinePaletteRow({
       style={style}
       size={size}
     >
-      <StyledPaper elevation={0} variant="outlined" size={size}>
+      <StyledPaper elevation={0} variant='outlined' size={size}>
         {icon}
       </StyledPaper>
-      <Box padding="0 12px 0 6px" display="flex" flexDirection="column">
-        <Typography variant="body2" noWrap whiteSpace="normal">
+      <Box padding='0 12px 0 6px' display='flex' flexDirection='column'>
+        <Typography variant='body2' noWrap whiteSpace='normal'>
           {title}
         </Typography>
-        <Typography variant="caption" noWrap whiteSpace="normal" color="secondary.light">
+        <Typography variant='caption' noWrap whiteSpace='normal' color='secondary.light'>
           {description}
         </Typography>
       </Box>

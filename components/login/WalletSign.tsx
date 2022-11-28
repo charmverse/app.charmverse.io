@@ -76,7 +76,7 @@ export function WalletSign({
   if (!verifiableWalletDetected) {
     return (
       <ButtonComponent
-        data-test="connect-wallet-button"
+        data-test='connect-wallet-button'
         sx={buttonStyle}
         size={buttonSize ?? 'large'}
         loading={connectWalletModalIsOpen}
@@ -93,7 +93,7 @@ export function WalletSign({
 
   return (
     <ButtonComponent
-      data-test="verify-wallet-button"
+      data-test='verify-wallet-button'
       sx={buttonStyle}
       size={buttonSize ?? 'large'}
       onClick={generateWalletAuth}

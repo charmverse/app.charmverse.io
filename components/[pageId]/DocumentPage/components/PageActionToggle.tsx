@@ -12,7 +12,7 @@ export default function PageActionToggle() {
       onClick={() => {
         setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'polls' : null);
       }}
-      size="small"
+      size='small'
       sx={{
         '&.MuiIconButton-root': {
           borderRadius: '4px',

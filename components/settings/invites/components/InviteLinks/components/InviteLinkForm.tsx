@@ -78,7 +78,7 @@ export default function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: Form
       <DialogTitle onClose={onClose}>Create an invite link</DialogTitle>
       <Divider />
       <br />
-      <Grid container direction="column" spacing={3}>
+      <Grid container direction='column' spacing={3}>
         <Grid item>
           <FieldLabel>Expire after</FieldLabel>
           <Select {...register('maxAgeMinutes')} fullWidth defaultValue={defaultMaxAge}>
@@ -99,15 +99,15 @@ export default function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: Form
             ))}
           </Select>
         </Grid>
-        <Grid item container justifyContent="space-between">
-          <Button variant="outlined" color="secondary" onClick={onClose}>
+        <Grid item container justifyContent='space-between'>
+          <Button variant='outlined' color='secondary' onClick={onClose}>
             Cancel
           </Button>
-          <PrimaryButton type="submit">Generate a New Link</PrimaryButton>
+          <PrimaryButton type='submit'>Generate a New Link</PrimaryButton>
         </Grid>
         {errors.apiError && (
           <Grid item>
-            <Typography color="danger">{errors.apiError.message}</Typography>
+            <Typography color='danger'>{errors.apiError.message}</Typography>
           </Grid>
         )}
       </Grid>

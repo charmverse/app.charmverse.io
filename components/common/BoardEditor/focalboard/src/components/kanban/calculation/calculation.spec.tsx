@@ -23,7 +23,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
         onChange={() => {}}
-        value="count"
+        value='count'
         property={board.fields.cardProperties[0]}
         readOnly={false}
       />
@@ -42,7 +42,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
         onChange={() => {}}
-        value="count"
+        value='count'
         property={board.fields.cardProperties[0]}
         readOnly={false}
       />
@@ -61,7 +61,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         onMenuClose={() => {}}
         onMenuOpen={() => {}}
         onChange={() => {}}
-        value="count"
+        value='count'
         property={board.fields.cardProperties[0]}
         readOnly={true}
       />

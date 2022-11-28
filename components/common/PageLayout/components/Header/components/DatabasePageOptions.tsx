@@ -133,35 +133,35 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       </ListItemButton>
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="Copy link" />
+        <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
       <Tooltip title={!pagePermissions?.delete ? "You don't have permission to delete this page" : ''}>
         <div>
           <ListItemButton disabled={!pagePermissions?.delete} onClick={onDeletePage}>
             <DeleteOutlinedIcon
-              fontSize="small"
+              fontSize='small'
               sx={{
                 mr: 1
               }}
             />
-            <ListItemText primary="Delete" />
+            <ListItemText primary='Delete' />
           </ListItemButton>
         </div>
       </Tooltip>
       <ListItemButton onClick={exportCsv}>
         <FormatListBulletedIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="Export to CSV" />
+        <ListItemText primary='Export to CSV' />
       </ListItemButton>
     </List>
   );

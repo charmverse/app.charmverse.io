@@ -47,7 +47,7 @@ function CalculationRow(props: Props): JSX.Element {
 
   return (
     <div
-      className="CalculationRow octo-table-row"
+      className='CalculationRow octo-table-row'
       onMouseEnter={() => setHovered(!props.readOnly)}
       onMouseLeave={() => setHovered(false)}
     >

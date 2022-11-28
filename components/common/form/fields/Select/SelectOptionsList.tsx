@@ -72,21 +72,21 @@ export function SelectOptionsList({ options, readOnly, onChange }: Props) {
 
   return (
     <Stack>
-      <Stack direction="row" alignItems="center" gap={0.5}>
-        <Typography variant="subtitle1">Options</Typography>
+      <Stack direction='row' alignItems='center' gap={0.5}>
+        <Typography variant='subtitle1'>Options</Typography>
         {!!options.length && !isEditing && !readOnly && (
-          <IconButton size="small" onClick={() => setIsEditing(true)}>
-            <AddOutlinedIcon fontSize="small" />
+          <IconButton size='small' onClick={() => setIsEditing(true)}>
+            <AddOutlinedIcon fontSize='small' />
           </IconButton>
         )}
       </Stack>
-      {!options.length && readOnly && <Typography variant="overline">No options available.</Typography>}
+      {!options.length && readOnly && <Typography variant='overline'>No options available.</Typography>}
       {!readOnly &&
         (isEditing ? (
-          <Stack flexDirection="row" alignItems="center" gap={0.5} mb={1}>
+          <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
             <TextField
-              placeholder="Type option name.."
-              size="small"
+              placeholder='Type option name..'
+              size='small'
               sx={{ width: '100%' }}
               onBlur={() => setIsEditing(false)}
               autoFocus
@@ -100,8 +100,8 @@ export function SelectOptionsList({ options, readOnly, onChange }: Props) {
               }}
             />
             <Button
-              variant="outlined"
-              color="primary"
+              variant='outlined'
+              color='primary'
               sx={{
                 width: 'fit-content',
                 py: 0.8,
@@ -119,9 +119,9 @@ export function SelectOptionsList({ options, readOnly, onChange }: Props) {
           </Stack>
         ) : !options.length ? (
           <Button
-            variant="text"
-            size="small"
-            color="secondary"
+            variant='text'
+            size='small'
+            color='secondary'
             sx={{
               width: 'fit-content',
               my: 0.5,
@@ -146,7 +146,7 @@ export function SelectOptionsList({ options, readOnly, onChange }: Props) {
           <DialogContentText>{listError}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color="error" onClick={() => setListError('')}>
+          <Button color='error' onClick={() => setListError('')}>
             Ok
           </Button>
         </DialogActions>

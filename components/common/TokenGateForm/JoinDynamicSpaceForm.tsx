@@ -67,7 +67,7 @@ export function JoinDynamicSpaceForm() {
       <Autocomplete<Space>
         disablePortal
         options={spacesInfo}
-        placeholder="my-space"
+        placeholder='my-space'
         value={selectedSpace}
         onChange={(e, _space) => {
           setSelectedSpace(_space);
@@ -81,22 +81,22 @@ export function JoinDynamicSpaceForm() {
         renderOption={(props, space) => (
           <Box
             data-test={`join-workspace-autocomplete-${space.domain}`}
-            component="li"
+            component='li'
             sx={{ display: 'flex', gap: 1 }}
             {...props}
           >
-            <AvatarWithIcons avatar={space.spaceImage} icons={[]} name={space.name} variant="rounded" size="small" />
+            <AvatarWithIcons avatar={space.spaceImage} icons={[]} name={space.name} variant='rounded' size='small' />
             <Stack>
-              <Typography component="span">{space.name}</Typography>
-              <Typography variant="subtitle2">{space.domain}</Typography>
+              <Typography component='span'>{space.name}</Typography>
+              <Typography variant='subtitle2'>{space.domain}</Typography>
             </Stack>
           </Box>
         )}
-        noOptionsText="No spaces found"
+        noOptionsText='No spaces found'
         renderInput={(params) => (
           <TextField
-            data-test="join-workspace-textfield"
-            placeholder="my-space"
+            data-test='join-workspace-textfield'
+            placeholder='my-space'
             {...params}
             value={spaceDomain}
             onChange={onChangeDomainName}

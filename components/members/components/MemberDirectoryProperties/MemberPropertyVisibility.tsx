@@ -76,27 +76,27 @@ export function MemberPropertyVisibility({ property }: { property: MemberPropert
 
   const admin = isAdmin();
   return (
-    <Stack flexDirection="row" justifyContent="space-between" mr={2}>
-      <Typography variant="overline" alignItems="center" display="flex">
+    <Stack flexDirection='row' justifyContent='space-between' mr={2}>
+      <Typography variant='overline' alignItems='center' display='flex'>
         Views
       </Typography>
-      <Stack gap={1} flexDirection="row">
+      <Stack gap={1} flexDirection='row'>
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}
-          view="gallery"
+          view='gallery'
           disabled={!admin}
         />
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}
-          view="table"
+          view='table'
           disabled={!admin}
         />
         <MemberPropertyVisibilityView
           enabledViews={enabledViews}
           memberPropertyId={property.id}
-          view="profile"
+          view='profile'
           disabled={!admin}
         />
       </Stack>

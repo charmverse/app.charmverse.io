@@ -162,13 +162,13 @@ const KanbanCard = React.memo((props: Props) => {
             />
           )}
 
-          <div className="octo-icontitle">
+          <div className='octo-icontitle'>
             <div>
               {cardPage?.icon ? (
-                <PageIcon isEditorEmpty={!cardPage.hasContent} pageType="page" icon={cardPage.icon} />
+                <PageIcon isEditorEmpty={!cardPage.hasContent} pageType='page' icon={cardPage.icon} />
               ) : undefined}
             </div>
-            <div key="__title" className="octo-titletext">
+            <div key='__title' className='octo-titletext'>
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
@@ -182,7 +182,7 @@ const KanbanCard = React.memo((props: Props) => {
                 updatedBy={cardPage?.updatedBy || ''}
                 propertyTemplate={template}
                 showEmptyPlaceholder={false}
-                displayType="kanban"
+                displayType='kanban'
               />
             </Tooltip>
           ))}
@@ -196,7 +196,7 @@ const KanbanCard = React.memo((props: Props) => {
               >
                 <CurrencyIcon>
                   {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-                    <img loading="lazy" height={20} src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]} />
+                    <img loading='lazy' height={20} src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]} />
                   )}
                 </CurrencyIcon>
                 <Box
@@ -205,7 +205,7 @@ const KanbanCard = React.memo((props: Props) => {
                     gap: 0.25
                   }}
                 >
-                  <Box component="span">{linkedBounty.rewardAmount}</Box>
+                  <Box component='span'>{linkedBounty.rewardAmount}</Box>
                 </Box>
               </Box>
               <BountyStatusChip status={linkedBounty.status} />

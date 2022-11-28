@@ -17,9 +17,9 @@ describe('widgets/PropertyMenu', () => {
     const callback = jest.fn();
     const component = wrapIntl(
       <PropertyMenu
-        propertyId="id"
-        propertyName="email of a person"
-        propertyType="email"
+        propertyId='id'
+        propertyName='email of a person'
+        propertyType='email'
         onTypeAndNameChanged={callback}
         onDelete={callback}
       />
@@ -32,9 +32,9 @@ describe('widgets/PropertyMenu', () => {
     const callback = jest.fn();
     const component = wrapIntl(
       <PropertyMenu
-        propertyId="id"
-        propertyName="email of a person"
-        propertyType="email"
+        propertyId='id'
+        propertyName='email of a person'
+        propertyType='email'
         onTypeAndNameChanged={callback}
         onDelete={callback}
       />
@@ -48,9 +48,9 @@ describe('widgets/PropertyMenu', () => {
     const callback = jest.fn();
     const component = wrapIntl(
       <PropertyMenu
-        propertyId="id"
-        propertyName="test-property"
-        propertyType="text"
+        propertyId='id'
+        propertyName='test-property'
+        propertyType='text'
         onTypeAndNameChanged={callback}
         onDelete={callback}
       />
@@ -66,9 +66,9 @@ describe('widgets/PropertyMenu', () => {
     const callback = jest.fn();
     const component = wrapIntl(
       <PropertyMenu
-        propertyId="id"
-        propertyName="test-property"
-        propertyType="text"
+        propertyId='id'
+        propertyName='test-property'
+        propertyType='text'
         onTypeAndNameChanged={callback}
         onDelete={callback}
       />
@@ -84,9 +84,9 @@ describe('widgets/PropertyMenu', () => {
     const callback = jest.fn();
     const component = wrapIntl(
       <PropertyMenu
-        propertyId="id"
-        propertyName="test-property"
-        propertyType="text"
+        propertyId='id'
+        propertyName='test-property'
+        propertyType='text'
         onTypeAndNameChanged={callback}
         onDelete={callback}
       />

@@ -59,16 +59,16 @@ export function BountySignupButton({ bountyPage }: Props) {
 
   return (
     <>
-      <Box display="flex" justifyContent="center" sx={{ my: 2 }} data-test="public-bounty-space-action">
+      <Box display='flex' justifyContent='center' sx={{ my: 2 }} data-test='public-bounty-space-action'>
         {showSignup && (
-          <Button color="primary" onClick={loginViaTokenGateModal.open}>
+          <Button color='primary' onClick={loginViaTokenGateModal.open}>
             Join this workspace to apply
           </Button>
         )}
 
         {showSpaceRedirect && (
           <Button
-            color="primary"
+            color='primary'
             onClick={() => {
               router.push(`/${space?.domain}/${bountyPage.path}`);
             }}
@@ -79,13 +79,13 @@ export function BountySignupButton({ bountyPage }: Props) {
       </Box>
 
       <Modal
-        size="large"
+        size='large'
         open={loginViaTokenGateModal.isOpen}
         onClose={loginViaTokenGateModal.close}
         title={`Join the ${space?.name} workspace to apply`}
       >
         {!account ? (
-          <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <Box display='flex' justifyContent='center' sx={{ mt: 3 }}>
             <PrimaryButton onClick={openWalletSelectorModal} loading={loggingIn}>
               Connect wallet
             </PrimaryButton>
@@ -96,7 +96,7 @@ export function BountySignupButton({ bountyPage }: Props) {
               window.location.href = `${window.location.origin}/${space?.domain}/${bountyPage.path}`;
             }}
             spaceDomain={space?.domain ?? ''}
-            joinType="public_bounty_token_gate"
+            joinType='public_bounty_token_gate'
           />
         )}
       </Modal>

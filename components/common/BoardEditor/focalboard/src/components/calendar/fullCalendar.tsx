@@ -146,9 +146,9 @@ function CalendarFullView(props: Props): JSX.Element | null {
 
     return (
       <div>
-        <div className="octo-icontitle">
-          <PageIcon isEditorEmpty={!page?.hasContent} pageType="page" icon={event.extendedProps.icon} />
-          <div className="fc-event-title" key="__title">
+        <div className='octo-icontitle'>
+          <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
+          <div className='fc-event-title' key='__title'>
             {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
           </div>
         </div>
@@ -241,11 +241,11 @@ function CalendarFullView(props: Props): JSX.Element | null {
   const dayCellContent = useCallback(
     (args: DayCellContentArg): JSX.Element | null => {
       return (
-        <div className="dateContainer">
-          <div className="addEvent" onClick={() => onNewEvent({ start: args.date, end: args.date })}>
+        <div className='dateContainer'>
+          <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
             +
           </div>
-          <div className="dateDisplay">{args.dayNumberText}</div>
+          <div className='dateDisplay'>{args.dayNumberText}</div>
         </div>
       );
     },
@@ -253,13 +253,13 @@ function CalendarFullView(props: Props): JSX.Element | null {
   );
 
   return (
-    <div className="CalendarContainer">
+    <div className='CalendarContainer'>
       <FullCalendar
         dayCellContent={dayCellContent}
         dayMaxEventRows={5}
         initialDate={initialDate}
         plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
+        initialView='dayGridMonth'
         events={myEventsList}
         editable={isEditable()}
         eventResizableFromStart={isEditable()}

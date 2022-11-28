@@ -97,10 +97,10 @@ export default function ImportNotionWorkspace() {
     <div>
       <Button
         disabled={!isAdmin}
-        disabledTooltip="Only admins can import content from Notion"
+        disabledTooltip='Only admins can import content from Notion'
         loading={notionState.loading}
         href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
-        variant="outlined"
+        variant='outlined'
         startIcon={
           <SvgIcon sx={{ color: 'text.primary' }}>
             <NotionIcon />
@@ -109,8 +109,8 @@ export default function ImportNotionWorkspace() {
       >
         {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
       </Button>
-      <Modal open={modalOpen} onClose={closeModal} size="fluid">
-        <Box display="flex" alignItems="center" gap={2} flexDirection="column">
+      <Modal open={modalOpen} onClose={closeModal} size='fluid'>
+        <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
           {notionState.loading && (
             <>
               <CircularProgress size={30} />
@@ -119,7 +119,7 @@ export default function ImportNotionWorkspace() {
           )}
           {!notionState.loading && notionState.failedImports?.length && (
             <>
-              <CompleteIcon color="success" fontSize="large" />
+              <CompleteIcon color='success' fontSize='large' />
               <Typography sx={{ mb: 0 }}>
                 Import complete! Pages where we encountered issues are highlighted below.
               </Typography>
@@ -127,23 +127,23 @@ export default function ImportNotionWorkspace() {
           )}
           {notionState.warning && (
             <>
-              <WarningIcon color="orange" fontSize="large" />
-              <Typography sx={{ mb: 0 }} align="center">
+              <WarningIcon color='orange' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
                 {notionState.warning}
               </Typography>
             </>
           )}
           {notionState.error && (
             <>
-              <ErrorIcon color="error" fontSize="large" />
-              <Typography sx={{ mb: 0 }} align="center">
+              <ErrorIcon color='error' fontSize='large' />
+              <Typography sx={{ mb: 0 }} align='center'>
                 {notionState.error}
               </Typography>
             </>
           )}
         </Box>
         {notionState.failedImports && notionState.failedImports?.length > 0 && (
-          <Alert severity="warning" sx={{ mt: 2 }}>
+          <Alert severity='warning' sx={{ mt: 2 }}>
             <Box
               sx={{
                 display: 'flex',

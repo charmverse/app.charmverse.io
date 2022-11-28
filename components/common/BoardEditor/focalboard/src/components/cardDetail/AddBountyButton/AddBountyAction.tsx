@@ -48,9 +48,9 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
     user;
 
   return canAddBounty ? (
-    <div className="octo-propertyname add-property">
+    <div className='octo-propertyname add-property'>
       <Button onClick={() => createDraftBounty({ pageId: cardId, userId: user.id, spaceId: space.id })}>
-        <FormattedMessage id="CardDetail.add-bounty" defaultMessage="+ Add a bounty" />
+        <FormattedMessage id='CardDetail.add-bounty' defaultMessage='+ Add a bounty' />
       </Button>
     </div>
   ) : null;

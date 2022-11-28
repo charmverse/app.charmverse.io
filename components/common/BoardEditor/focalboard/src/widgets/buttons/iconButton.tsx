@@ -16,7 +16,7 @@ function IconButton(props: Props): JSX.Element {
   }
   return (
     <button
-      type="button"
+      type='button'
       onClick={props.onClick}
       onMouseDown={props.onMouseDown}
       className={className}

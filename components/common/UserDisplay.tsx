@@ -33,10 +33,10 @@ function BaseComponent({
   ...props
 }: BaseComponentProps) {
   return (
-    <Box display="flex" alignItems="center" gap={1} {...props}>
+    <Box display='flex' alignItems='center' gap={1} {...props}>
       <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       {!hideName && (
-        <Typography whiteSpace="nowrap" fontSize={fontSize} fontWeight={fontWeight}>
+        <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
           {username}
         </Typography>
       )}
@@ -73,7 +73,7 @@ function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps
 
   if (linkToProfile) {
     return (
-      <Link color="inherit" href={userLink} key={user?.id} external={false}>
+      <Link color='inherit' href={userLink} key={user?.id} external={false}>
         <BaseComponent username={user.username} avatar={user.avatar} isNft={isNft} {...props} />
       </Link>
     );

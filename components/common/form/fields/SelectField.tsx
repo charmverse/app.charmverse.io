@@ -139,15 +139,15 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               // eslint-disable-next-line react/jsx-key
-              <Chip {...getTagProps({ index })} size="small" label={option.name} color={option.color} />
+              <Chip {...getTagProps({ index })} size='small' label={option.name} color={option.color} />
             ))
           }
-          noOptionsText="No options available"
+          noOptionsText='No options available'
           renderInput={(params) => (
             <TextField
               inputRef={inputRef}
               {...params}
-              size="small"
+              size='small'
               placeholder={!selectedOptions.length ? placeholder : undefined}
             />
           )}

@@ -9,9 +9,9 @@ export default function ErrorModal({
   ...props
 }: { message: string; title?: string } & Omit<ComponentProps<typeof Modal>, 'children'>) {
   return (
-    <Modal size="fluid" {...props}>
+    <Modal size='fluid' {...props}>
       <DialogTitle onClose={props.onClose}>{typeof title === 'undefined' ? 'An error occurred' : title}</DialogTitle>
-      <Alert severity="error">{message}</Alert>
+      <Alert severity='error'>{message}</Alert>
     </Modal>
   );
 }

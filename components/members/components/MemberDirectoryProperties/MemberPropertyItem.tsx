@@ -21,22 +21,22 @@ import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import DiscordIcon from 'public/images/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
-  text: <TextIcon fontSize="small" />,
-  text_multiline: <SubjectIcon fontSize="small" />,
-  number: <NumbersIcon fontSize="small" />,
-  phone: <PhoneIcon fontSize="small" />,
-  url: <LinkIcon fontSize="small" />,
-  email: <AlternateEmailIcon fontSize="small" />,
-  select: <ArrowDropDownCircleIcon fontSize="small" />,
-  multiselect: <ListIcon fontSize="small" />,
-  role: <MilitaryTechIcon fontSize="small" />,
-  profile_pic: <InsertPhotoIcon fontSize="small" />,
-  timezone: <AccessTimeIcon fontSize="small" />,
+  text: <TextIcon fontSize='small' />,
+  text_multiline: <SubjectIcon fontSize='small' />,
+  number: <NumbersIcon fontSize='small' />,
+  phone: <PhoneIcon fontSize='small' />,
+  url: <LinkIcon fontSize='small' />,
+  email: <AlternateEmailIcon fontSize='small' />,
+  select: <ArrowDropDownCircleIcon fontSize='small' />,
+  multiselect: <ListIcon fontSize='small' />,
+  role: <MilitaryTechIcon fontSize='small' />,
+  profile_pic: <InsertPhotoIcon fontSize='small' />,
+  timezone: <AccessTimeIcon fontSize='small' />,
   discord: <DiscordIcon width={18.5} height={18.5} />,
-  twitter: <TwitterIcon fontSize="small" />,
-  name: <DriveFileRenameOutlineIcon fontSize="small" />,
-  bio: <PersonIcon fontSize="small" />,
-  join_date: <CalendarMonthIcon fontSize="small" />
+  twitter: <TwitterIcon fontSize='small' />,
+  name: <DriveFileRenameOutlineIcon fontSize='small' />,
+  bio: <PersonIcon fontSize='small' />,
+  join_date: <CalendarMonthIcon fontSize='small' />
 };
 
 export function MemberPropertyItem({ type, name }: { type: MemberPropertyType; name?: string }) {

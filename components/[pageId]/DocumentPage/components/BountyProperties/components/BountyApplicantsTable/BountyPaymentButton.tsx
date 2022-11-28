@@ -235,9 +235,9 @@ export default function BountyPaymentButton({
   return (
     <>
       <Button
-        color="primary"
+        color='primary'
         endIcon={hasSafes ? <KeyboardArrowDownIcon /> : null}
-        size="small"
+        size='small'
         onClick={(e) => {
           if (!hasSafes) {
             onClick();
@@ -250,7 +250,7 @@ export default function BountyPaymentButton({
         Send Payment
       </Button>
       {hasSafes && (
-        <Menu id="bounty-payment" anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <Menu id='bounty-payment' anchorEl={anchorEl} open={open} onClose={handleClose}>
           <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
             Connected wallet
           </MenuItem>

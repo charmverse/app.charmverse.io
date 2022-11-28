@@ -68,12 +68,12 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
   const secondGridSmallColumnWidth = templateExplanation[0].length === 0 ? 12 : 6;
 
   return (
-    <Grid container direction="column" gap={2}>
+    <Grid container direction='column' gap={2}>
       <Grid item xs>
-        <Typography variant="body2" fontWeight="bold">
+        <Typography variant='body2' fontWeight='bold'>
           Configuration mode
         </Typography>
-        <Typography variant="caption">
+        <Typography variant='caption'>
           Use a preset workspace permissions mode, or choose "custom" to configure individual settings manually.
         </Typography>
       </Grid>
@@ -81,11 +81,11 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
       <Grid item container xs>
         <Grid item xs={12} sm={6}>
           <Button
-            color="secondary"
-            variant="outlined"
+            color='secondary'
+            variant='outlined'
             disabled={isUpdatingPermissionMode || !isAdmin}
             loading={isUpdatingPermissionMode}
-            endIcon={!isUpdatingPermissionMode && <KeyboardArrowDownIcon fontSize="small" />}
+            endIcon={!isUpdatingPermissionMode && <KeyboardArrowDownIcon fontSize='small' />}
             {...bindTrigger(popupState)}
           >
             {configurationModeName[selectedConfigurationMode]}
@@ -120,7 +120,7 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
         </Grid>
         <Grid item xs={12} sm={6}>
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{
               height: '100%',
               justifyContent: 'center',
@@ -140,17 +140,17 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
         <Grid container item xs>
           <Grid item sm={firstGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
             {templateExplanation[0].map((canDo) => (
-              <Grid key={canDo} item xs={12} display="flex">
-                <DoneIcon color="success" sx={{ fontSize: '18px', mr: 0.5 }} />
-                <Typography variant="caption">{canDo}</Typography>
+              <Grid key={canDo} item xs={12} display='flex'>
+                <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
+                <Typography variant='caption'>{canDo}</Typography>
               </Grid>
             ))}
           </Grid>
           <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
             {templateExplanation[1].map((cannotDo) => (
-              <Grid key={cannotDo} item xs={12} display="flex">
-                <CloseIcon color="error" sx={{ fontSize: '18px', mr: 0.5 }} />
-                <Typography variant="caption">{cannotDo}</Typography>
+              <Grid key={cannotDo} item xs={12} display='flex'>
+                <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
+                <Typography variant='caption'>{cannotDo}</Typography>
               </Grid>
             ))}
           </Grid>
@@ -162,9 +162,9 @@ export default function PermissionConfigurationMode({ permissionModeSelected = (
           <Button
             onClick={() => updateSettings()}
             disabled={!settingsChanged}
-            type="submit"
-            variant="contained"
-            color="primary"
+            type='submit'
+            variant='contained'
+            color='primary'
             sx={{ mr: 1 }}
           >
             Save

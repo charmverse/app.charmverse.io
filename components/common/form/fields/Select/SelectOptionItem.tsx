@@ -18,11 +18,11 @@ export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdi
 
   return (
     <MenuItem {...menuItemProps} sx={{ display: 'flex' }}>
-      <Stack flexDirection="row" justifyContent="space-between" alignItems="center" flex={1}>
-        <Chip label={option.name} color={option.color} size="small" sx={{ px: 0.5, zIndex: 0, position: 'relative' }} />
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1}>
+        <Chip label={option.name} color={option.color} size='small' sx={{ px: 0.5, zIndex: 0, position: 'relative' }} />
 
         {!readOnly && (
-          <Box position="absolute" right="5px">
+          <Box position='absolute' right='5px'>
             <SelectOptionEdit
               option={option}
               onChange={onChange}

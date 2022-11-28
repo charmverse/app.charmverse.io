@@ -223,8 +223,8 @@ export default function PendingTasks(props: PendingTasksProps) {
     ) : null;
 
   return (
-    <EmailWrapper title="Your open tasks">
-      <MjmlSection backgroundColor="#fff" paddingTop={0} paddingBottom={0}>
+    <EmailWrapper title='Your open tasks'>
+      <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
           <Header />
 

@@ -10,7 +10,7 @@ export default function BountyShareButton({ headerHeight }: { headerHeight: numb
 
   return (
     <>
-      <Button color="secondary" variant="text" size="small" onClick={popupState.open}>
+      <Button color='secondary' variant='text' size='small' onClick={popupState.open}>
         Share
       </Button>
       <Popover
@@ -19,7 +19,7 @@ export default function BountyShareButton({ headerHeight }: { headerHeight: numb
           horizontal: 'right',
           vertical: 'bottom'
         }}
-        anchorReference="none"
+        anchorReference='none'
         transformOrigin={{
           vertical: 'top',
           horizontal: 'center'

@@ -234,14 +234,14 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                                 <ErrorBoundary>
                                   <Snackbar
                                     isOpen={isOldBuild}
-                                    message="New CharmVerse platform update available. Please refresh."
+                                    message='New CharmVerse platform update available. Please refresh.'
                                     actions={[
-                                      <IconButton key="reload" onClick={() => window.location.reload()} color="inherit">
-                                        <RefreshIcon fontSize="small" />
+                                      <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                        <RefreshIcon fontSize='small' />
                                       </IconButton>
                                     ]}
                                     origin={{ vertical: 'top', horizontal: 'center' }}
-                                    severity="warning"
+                                    severity='warning'
                                     handleClose={() => setIsOldBuild(false)}
                                   />
                                   {getLayout(<Component {...pageProps} />)}
@@ -296,7 +296,7 @@ function PageMetaTags() {
         {title ? `${prefix}${title} | CharmVerse` : `${prefix}CharmVerse - the all-in-one web3 workspace'}`}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
-      <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+      <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
     </Head>
   );
 }

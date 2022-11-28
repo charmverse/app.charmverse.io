@@ -99,9 +99,9 @@ export default function ApplicationInput({
   return (
     <Stack my={1} gap={1}>
       <Box
-        display="flex"
-        justifyContent="space-between"
-        flexDirection="row"
+        display='flex'
+        justifyContent='space-between'
+        flexDirection='row'
         gap={0.5}
         sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
@@ -110,7 +110,7 @@ export default function ApplicationInput({
           }
         }}
       >
-        <Box display="flex" gap={0.5}>
+        <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold' }}>
             {proposal?.createdBy === user?.id ? 'Your application' : 'Application'}
           </FormLabel>
@@ -121,9 +121,9 @@ export default function ApplicationInput({
                 top: -2.5,
                 position: 'relative'
               }}
-              size="small"
+              size='small'
             >
-              {isVisible ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
             </IconButton>
           )}
         </Box>
@@ -131,12 +131,12 @@ export default function ApplicationInput({
           <BountyApplicantStatus submission={proposal} />
         )}
       </Box>
-      <Collapse in={isVisible} timeout="auto" unmountOnExit>
+      <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form
           onSubmit={handleSubmit((formValue) => submitted(formValue as Application))}
           style={{ margin: 'auto', width: '100%' }}
         >
-          <Grid container direction="column" spacing={3}>
+          <Grid container direction='column' spacing={3}>
             <Grid item>
               <TextField
                 {...register('message')}
@@ -144,8 +144,8 @@ export default function ApplicationInput({
                 placeholder={applicationExample}
                 minRows={5}
                 multiline
-                variant="outlined"
-                type="text"
+                variant='outlined'
+                type='text'
                 fullWidth
                 disabled={readOnly}
                 onChange={(ev) => {
@@ -160,12 +160,12 @@ export default function ApplicationInput({
                   });
                 }}
               />
-              {errors?.message && <Alert severity="error">{errors.message.message}</Alert>}
+              {errors?.message && <Alert severity='error'>{errors.message.message}</Alert>}
             </Grid>
 
             {!readOnly && (
-              <Grid item display="flex" gap={1}>
-                <Button disabled={!isValid} type="submit">
+              <Grid item display='flex' gap={1}>
+                <Button disabled={!isValid} type='submit'>
                   {mode === 'create' ? ' Submit' : 'Update'}
                 </Button>
                 <Button
@@ -173,8 +173,8 @@ export default function ApplicationInput({
                     onCancel?.();
                     setIsVisible(false);
                   }}
-                  variant="outlined"
-                  color="secondary"
+                  variant='outlined'
+                  color='secondary'
                 >
                   Cancel
                 </Button>

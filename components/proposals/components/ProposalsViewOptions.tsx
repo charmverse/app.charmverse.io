@@ -29,18 +29,18 @@ export default function ProposalsViewOptions({
   setCategoryIdFilter
 }: Props) {
   return (
-    <ViewOptions label="Sort">
+    <ViewOptions label='Sort'>
       <Select
-        variant="outlined"
+        variant='outlined'
         value={proposalSort}
         onChange={(e) => setProposalSort(e.target.value as ProposalSort)}
         sx={{ mr: 2 }}
       >
-        <MenuItem value="latest_created">Created</MenuItem>
+        <MenuItem value='latest_created'>Created</MenuItem>
       </Select>
       <InputLabel>Filter</InputLabel>
       <Select
-        variant="outlined"
+        variant='outlined'
         value={proposalFilter}
         onChange={(e) => setProposalFilter(e.target.value as ProposalFilter)}
       >
@@ -49,11 +49,11 @@ export default function ProposalsViewOptions({
             {proposalStatusLabel}
           </MenuItem>
         ))}
-        <MenuItem value="all">All</MenuItem>
+        <MenuItem value='all'>All</MenuItem>
       </Select>
 
-      <Select variant="outlined" value={categoryIdFilter || ''} onChange={(e) => setCategoryIdFilter(e.target.value)}>
-        <MenuItem value="all">All categories</MenuItem>
+      <Select variant='outlined' value={categoryIdFilter || ''} onChange={(e) => setCategoryIdFilter(e.target.value)}>
+        <MenuItem value='all'>All categories</MenuItem>
         {categories.map(({ id, title, color }) => (
           <MenuItem key={id} value={id}>
             <Chip sx={{ cursor: 'pointer' }} color={color as BrandColor} label={title} />

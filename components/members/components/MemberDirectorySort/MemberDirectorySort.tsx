@@ -23,9 +23,9 @@ export function MemberDirectorySort({
   );
 
   return (
-    <ViewOptions label="Sort">
+    <ViewOptions label='Sort'>
       <Select
-        variant="outlined"
+        variant='outlined'
         value={sortedProperty}
         onChange={(e) => {
           setSortedProperty(e.target.value);

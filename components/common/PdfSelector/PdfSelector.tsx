@@ -30,19 +30,19 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
               [
                 'Upload',
                 <Box
-                  key="upload"
+                  key='upload'
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
                     width: '100%'
                   }}
                 >
-                  <Button component="label" variant="contained">
+                  <Button component='label' variant='contained'>
                     Choose a PDF
                     <input
-                      type="file"
+                      type='file'
                       hidden
-                      accept="application/pdf"
+                      accept='application/pdf'
                       onChange={async (e) => {
                         const firstFile = e.target.files?.[0];
                         if (firstFile) {

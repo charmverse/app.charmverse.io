@@ -56,23 +56,23 @@ export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; sta
   return (
     <>
       {!readOnly && suggestions.length > 0 && (
-        <Box display="flex" gap={1} flexDirection="row">
+        <Box display='flex' gap={1} flexDirection='row'>
           <Button
-            size="small"
+            size='small'
             startIcon={<Check />}
             disableElevation
-            variant="text"
-            color="secondary"
+            variant='text'
+            color='secondary'
             onClick={clickAcceptAll}
           >
             Accept All
           </Button>
           <Button
-            size="small"
+            size='small'
             startIcon={<Close />}
             disableElevation
-            variant="text"
-            color="secondary"
+            variant='text'
+            color='secondary'
             onClick={clickRejectAll}
           >
             Reject All
@@ -95,15 +95,15 @@ export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; sta
         <NoCommentsMessage
           icon={
             <RateReviewOutlined
-              fontSize="large"
-              color="secondary"
+              fontSize='large'
+              color='secondary'
               sx={{
                 height: '2em',
                 width: '2em'
               }}
             />
           }
-          message="No suggestions yet"
+          message='No suggestions yet'
         />
       )}
     </>

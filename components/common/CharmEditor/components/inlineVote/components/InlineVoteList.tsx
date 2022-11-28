@@ -67,8 +67,8 @@ export default function InlineVoteList({ pluginKey }: { pluginKey: PluginKey<Inl
   if ((currentPageActionDisplay !== 'polls' || cardId) && show && inProgressVoteIds.length !== 0) {
     return (
       <Modal
-        title="Poll details"
-        size="large"
+        title='Poll details'
+        size='large'
         open={true}
         onClose={() => {
           hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);

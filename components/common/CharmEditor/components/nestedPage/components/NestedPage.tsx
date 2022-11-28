@@ -48,7 +48,7 @@ export default function NestedPage({ node }: NodeViewProps) {
     <NestedPageContainer
       data-test={`nested-page-${nestedPage?.id}`}
       href={nestedPage ? `/${appPath}` : ''}
-      color="inherit"
+      color='inherit'
       data-id={`page-${nestedPage?.id}`}
       data-title={nestedPage?.title}
       data-path={fullPath}

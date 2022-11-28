@@ -44,7 +44,7 @@ export function TimezoneModal({
   }
 
   return (
-    <Modal open={isOpen} onClose={onClose} size="large">
+    <Modal open={isOpen} onClose={onClose} size='large'>
       <DialogTitle onClose={onClose}>Set up your timezone</DialogTitle>
       <form
         onSubmit={(e) => {
@@ -57,7 +57,7 @@ export function TimezoneModal({
           <TimezoneAutocomplete setTimezone={setTimezone} timezone={timezone} />
           <Button
             fullWidth
-            type="submit"
+            type='submit'
             sx={{
               width: 'fit-content'
             }}

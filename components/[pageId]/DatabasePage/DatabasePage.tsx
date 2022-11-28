@@ -124,7 +124,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     return (
       <>
         <FlashMessages milliseconds={2000} />
-        <div className="focalboard-body full-page">
+        <div className='focalboard-body full-page'>
           <CenterPanel
             readOnly={Boolean(readOnlyBoard)}
             board={board}

@@ -7,10 +7,10 @@ type LabelOptionProps = {
 
 function LabelOption(props: LabelOptionProps): JSX.Element {
   return (
-    <div className="MenuOption LabelOption menu-option">
-      {props.icon ?? <div className="noicon" />}
-      <div className="menu-name">{props.children}</div>
-      <div className="noicon" />
+    <div className='MenuOption LabelOption menu-option'>
+      {props.icon ?? <div className='noicon' />}
+      <div className='menu-name'>{props.children}</div>
+      <div className='noicon' />
     </div>
   );
 }

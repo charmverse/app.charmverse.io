@@ -23,17 +23,17 @@ const PageActionListBox = styled.div`
 
 export const SIDEBAR_VIEWS = {
   comments: {
-    icon: <MessageOutlined fontSize="small" />,
+    icon: <MessageOutlined fontSize='small' />,
     tooltip: 'View comments',
     title: 'Comments'
   },
   suggestions: {
-    icon: <RateReviewOutlined fontSize="small" />,
+    icon: <RateReviewOutlined fontSize='small' />,
     tooltip: 'View suggestions',
     title: 'Suggestions'
   },
   polls: {
-    icon: <FormatListBulleted fontSize="small" />,
+    icon: <FormatListBulleted fontSize='small' />,
     tooltip: 'View polls',
     title: 'Polls'
   }
@@ -53,7 +53,7 @@ function SidebarDrawerComponent({
   return (
     <Slide
       appear={false}
-      direction="left"
+      direction='left'
       in={open}
       style={{
         transformOrigin: 'left top'
@@ -73,15 +73,15 @@ function SidebarDrawerComponent({
             flexDirection: 'column'
           }}
         >
-          <Box display="flex" gap={1} alignItems="center">
+          <Box display='flex' gap={1} alignItems='center'>
             <PageActionToggle />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
               {title}
             </Typography>
-            <Box display="flex" alignItems="center" pr={1} justifyContent="flex-end">
-              <PageActionIcon view="comments" />
-              <PageActionIcon view="suggestions" />
-              <PageActionIcon view="polls" />
+            <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+              <PageActionIcon view='comments' />
+              <PageActionIcon view='suggestions' />
+              <PageActionIcon view='polls' />
             </Box>
           </Box>
           {children}
@@ -100,7 +100,7 @@ function PageActionIcon({ view }: { view: PageAction }) {
 
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size="small" onClick={setView}>
+      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size='small' onClick={setView}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>

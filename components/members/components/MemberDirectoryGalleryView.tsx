@@ -62,13 +62,13 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
     <>
       <StyledLink
         href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-        color="primary"
+        color='primary'
       >
         <Card sx={{ width: '100%' }}>
           {((user?.id === member.id && currentSpace) || admin) && (
             <IconButton
-              size="small"
-              className="icons"
+              size='small'
+              className='icons'
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -82,7 +82,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                   : {}
               }
             >
-              <EditIcon fontSize="small" />
+              <EditIcon fontSize='small' />
             </IconButton>
           )}
           <Avatar
@@ -91,12 +91,12 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
             }}
             avatar={member.avatar}
             name={member.username}
-            size="2xLarge"
-            variant="square"
+            size='2xLarge'
+            variant='square'
           />
           <Stack p={2} gap={1}>
             {!isNameHidden && (
-              <Typography gutterBottom variant="h6" mb={0} component="div">
+              <Typography gutterBottom variant='h6' mb={0} component='div'>
                 {member.properties.find(
                   (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
                 )?.value ?? member.username}
@@ -114,14 +114,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                   return (
                     member.profile?.description && (
                       <Stack key={property.id}>
-                        <Typography fontWeight="bold" variant="subtitle2">
+                        <Typography fontWeight='bold' variant='subtitle2'>
                           Bio
                         </Typography>
                         <Typography
                           sx={{
                             wordBreak: 'break-word'
                           }}
-                          variant="body2"
+                          variant='body2'
                         >
                           {member.profile?.description}
                         </Typography>
@@ -133,10 +133,10 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                 case 'join_date': {
                   return (
                     <Stack key={property.id}>
-                      <Typography fontWeight="bold" variant="subtitle2">
+                      <Typography fontWeight='bold' variant='subtitle2'>
                         {property.name}
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant='body2'>
                         {humanFriendlyDate(member.joinDate, {
                           withYear: true
                         })}
@@ -148,12 +148,12 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                   return (
                     member.roles.length !== 0 && (
                       <Stack gap={0.5} key={property.id}>
-                        <Typography fontWeight="bold" variant="subtitle2">
+                        <Typography fontWeight='bold' variant='subtitle2'>
                           Role
                         </Typography>
-                        <Stack gap={1} flexDirection="row" flexWrap="wrap">
+                        <Stack gap={1} flexDirection='row' flexWrap='wrap'>
                           {member.roles.map((role) => (
-                            <Chip label={role.name} key={role.id} size="small" variant="outlined" />
+                            <Chip label={role.name} key={role.id} size='small' variant='outlined' />
                           ))}
                         </Stack>
                       </Stack>
@@ -163,7 +163,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                 case 'timezone': {
                   return (
                     member.profile?.timezone && (
-                      <Stack flexDirection="row" gap={1} key={property.id}>
+                      <Stack flexDirection='row' gap={1} key={property.id}>
                         <TimezoneDisplay showTimezone timezone={member.profile.timezone} />
                       </Stack>
                     )
@@ -193,10 +193,10 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                           wordBreak: 'break-word'
                         }}
                       >
-                        <Typography fontWeight="bold" variant="subtitle2">
+                        <Typography fontWeight='bold' variant='subtitle2'>
                           {property.name}
                         </Typography>
-                        <Typography variant="body2">{memberProperty.value}</Typography>
+                        <Typography variant='body2'>{memberProperty.value}</Typography>
                       </Stack>
                     )
                   );
@@ -205,7 +205,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
                 case 'multiselect': {
                   return memberProperty ? (
                     <SelectPreview
-                      size="small"
+                      size='small'
                       options={property.options as SelectOptionType[]}
                       value={memberProperty.value as string | string[]}
                       name={property.name}

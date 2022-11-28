@@ -27,14 +27,14 @@ type Props = {
 function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
   return (
     <Button
-      color="secondary"
-      variant="outlined"
+      color='secondary'
+      variant='outlined'
       onClick={onClick}
       disabled={disabled}
       loading={isLoading}
       loadingMessage={`${name} - connecting...`}
       fullWidth
-      size="large"
+      size='large'
       sx={{
         color: disabled ? `${greyColor2} !important` : 'inherit',
         px: 4,

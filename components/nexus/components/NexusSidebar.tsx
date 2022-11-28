@@ -41,10 +41,10 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
     <SidebarContainer>
       <Box
         sx={{ height: headerHeight, display: { xs: 'flex', sm: 'none' } }}
-        justifyContent="center"
-        alignItems="center"
+        justifyContent='center'
+        alignItems='center'
       >
-        <IconButton onClick={closeSidebar} size="small">
+        <IconButton onClick={closeSidebar} size='small'>
           <ChevronLeftIcon />
         </IconButton>
       </Box>

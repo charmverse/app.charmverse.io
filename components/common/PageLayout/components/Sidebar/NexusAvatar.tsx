@@ -27,8 +27,8 @@ export default function NexusAvatar({ user }: { user: Pick<LoggedInUser, 'avatar
   const isNexusActive = nexusRoutes.some((route) => router.pathname === route);
 
   return (
-    <AvatarLink href="/nexus">
-      <Tooltip title="My Nexus" placement="right" arrow>
+    <AvatarLink href='/nexus'>
+      <Tooltip title='My Nexus' placement='right' arrow>
         <span>
           <NotificationsBadge>
             <MyAvatar active={isNexusActive} avatar={user?.avatar} name={user?.username} />

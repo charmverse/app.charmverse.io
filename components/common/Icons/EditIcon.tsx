@@ -14,7 +14,7 @@ export function EditIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <ModeEditOutlineOutlinedIcon fontSize={iconSize} />
-      <Box component="span" fontSize={fontSize}>
+      <Box component='span' fontSize={fontSize}>
         {label}
       </Box>
     </IconWrapper>

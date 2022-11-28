@@ -60,8 +60,8 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
 
   return (
     <>
-      <Box width="100%" display="flex" mb={1} justifyContent="space-between">
-        <Box display="flex" gap={1} alignItems="center">
+      <Box width='100%' display='flex' mb={1} justifyContent='space-between'>
+        <Box display='flex' gap={1} alignItems='center'>
           <Chip
             sx={{
               my: 1
@@ -72,23 +72,23 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
           />
           {permissions?.userPermissions?.lock && isBountyLockable(bounty) && (
             <Tooltip
-              key="stop-new"
+              key='stop-new'
               arrow
-              placement="top"
+              placement='top'
               title={`${bounty.submissionsLocked ? 'Enable' : 'Prevent'} new ${
                 bounty.approveSubmitters ? 'applications' : 'submissions'
               } from being made.`}
             >
               <IconButton
-                size="small"
+                size='small'
                 onClick={() => {
                   lockBountySubmissions();
                 }}
               >
                 {!bounty.submissionsLocked ? (
-                  <LockOpen color="secondary" fontSize="small" />
+                  <LockOpen color='secondary' fontSize='small' />
                 ) : (
-                  <LockIcon color="secondary" fontSize="small" />
+                  <LockIcon color='secondary' fontSize='small' />
                 )}
               </IconButton>
             </Tooltip>
@@ -96,7 +96,7 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
         </Box>
       </Box>
 
-      <Table stickyHeader aria-label="bounty applicant table">
+      <Table stickyHeader aria-label='bounty applicant table'>
         <TableHead
           sx={{
             background: theme.palette.background.dark,
@@ -129,14 +129,14 @@ export default function BountySubmissionsTable({ bounty, permissions }: Props) {
       {filteredApplications.length === 0 && (
         <>
           <Box
-            display="flex"
-            justifyContent="center"
+            display='flex'
+            justifyContent='center'
             my={3}
             sx={{
               opacity: 0.5
             }}
           >
-            <Typography variant="h6">No submissions to review</Typography>
+            <Typography variant='h6'>No submissions to review</Typography>
           </Box>
           <Divider
             sx={{

@@ -54,32 +54,32 @@ const ValueSelectorLabel = React.memo((props: LabelProps): JSX.Element => {
     }
     return (
       <Label color={option.color} className={className}>
-        <span className="Label-text">{option.value}</span>
+        <span className='Label-text'>{option.value}</span>
         {onDeleteValue && (
           <IconButton
             onClick={() => onDeleteValue(option)}
-            icon={<CloseOutlinedIcon fontSize="small" />}
-            title="Clear"
-            className="margin-left delete-value"
+            icon={<CloseOutlinedIcon fontSize='small' />}
+            title='Clear'
+            className='margin-left delete-value'
           />
         )}
       </Label>
     );
   }
   return (
-    <div className="value-menu-option">
-      <div className="label-container">
+    <div className='value-menu-option'>
+      <div className='label-container'>
         <Label color={option.color}>{option.value}</Label>
       </div>
       <MenuWrapper stopPropagationOnToggle={true}>
         <IconButton
           title={intl.formatMessage({ id: 'ValueSelectorLabel.openMenu', defaultMessage: 'Open menu' })}
-          icon={<MoreHorizOutlinedIcon fontSize="small" />}
+          icon={<MoreHorizOutlinedIcon fontSize='small' />}
         />
-        <Menu position="bottom">
+        <Menu position='bottom'>
           <Menu.Text
-            id="delete"
-            icon={<DeleteOutlinedIcon fontSize="small" />}
+            id='delete'
+            icon={<DeleteOutlinedIcon fontSize='small' />}
             name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
             onClick={() => props.onDeleteOption(option)}
           />
@@ -175,7 +175,7 @@ function ValueSelector(props: Props): JSX.Element {
           onDeleteValue={props.onDeleteValue}
         />
       )}
-      className="ValueSelector"
+      className='ValueSelector'
       options={props.options}
       getOptionLabel={(o: IPropertyOption) => o.value}
       getOptionValue={(o: IPropertyOption) => o.id}

@@ -38,18 +38,18 @@ function EditableArea(props: EditableProps, ref: React.Ref<Focusable>): JSX.Elem
   };
 
   return (
-    <div className="EditableAreaWrap">
+    <div className='EditableAreaWrap'>
       <textarea
         {...elementProps}
         {...heightProps}
         ref={elementRef}
         className={`EditableArea ${elementProps.className}`}
       />
-      <div className="EditableAreaContainer">
+      <div className='EditableAreaContainer'>
         <textarea
           ref={referenceRef}
           className={`EditableAreaReference ${elementProps.className}`}
-          dir="auto"
+          dir='auto'
           disabled={true}
           rows={1}
           value={elementProps.value}

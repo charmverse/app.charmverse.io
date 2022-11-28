@@ -18,10 +18,10 @@ export function SelectPreview({ value, options = [], name, size, emptyComponent 
 
   return (
     <Stack gap={name ? 0.5 : 0}>
-      <Typography fontWeight="bold" variant={size === 'small' ? 'subtitle2' : 'body1'}>
+      <Typography fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
         {name}
       </Typography>
-      <Stack gap={0.5} flexDirection="row" flexWrap="wrap">
+      <Stack gap={0.5} flexDirection='row' flexWrap='wrap'>
         {valueOptions.length !== 0
           ? valueOptions.map((valueOption) => (
               <Chip
@@ -29,7 +29,7 @@ export function SelectPreview({ value, options = [], name, size, emptyComponent 
                 label={valueOption.name}
                 color={valueOption.color}
                 key={valueOption.name}
-                size="small"
+                size='small'
               />
             ))
           : emptyComponent || 'N/A'}

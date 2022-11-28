@@ -27,10 +27,10 @@ export default function CopyableAddress({ address, decimals = 3, ...rest }: Prop
   }
 
   return (
-    <Tooltip placement="top" title={copied ? 'Copied' : `Click to copy: ${address}`} disableInteractive arrow>
+    <Tooltip placement='top' title={copied ? 'Copied' : `Click to copy: ${address}`} disableInteractive arrow>
       <span>
         <CopyToClipboard text={address} onCopy={onCopy}>
-          <StyledButton onClick={onCopy} variant="text" {...rest}>
+          <StyledButton onClick={onCopy} variant='text' {...rest}>
             {shortenHex(address, decimals)}
           </StyledButton>
         </CopyToClipboard>

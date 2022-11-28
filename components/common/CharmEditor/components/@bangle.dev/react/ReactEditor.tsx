@@ -153,10 +153,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
 
     return (
       <EditorViewContext.Provider value={editor?.view as any}>
-        <div ref={editorRef} className="bangle-editor-core">
+        <div ref={editorRef} className='bangle-editor-core'>
           {editor ? children : null}
           <div ref={renderRef} id={pageId} className={className} style={style} />
-          <LoadingComponent height="400px" isLoading={isLoading} />
+          <LoadingComponent height='400px' isLoading={isLoading} />
         </div>
         {nodeViews.map((nodeView) => {
           return reactDOM.createPortal(

@@ -109,8 +109,8 @@ function TableRow(props: Props) {
     >
       {/* Name / title */}
       <div
-        className="octo-table-cell title-cell"
-        id="mainBoardHeader"
+        className='octo-table-cell title-cell'
+        id='mainBoardHeader'
         style={{
           width: columnWidth(
             props.resizingColumn,
@@ -121,13 +121,13 @@ function TableRow(props: Props) {
         }}
         ref={columnRefs.get(Constants.titleColumnId)}
       >
-        <div className="octo-icontitle">
-          <PageIcon isEditorEmpty={!hasContent} pageType="page" icon={pageIcon} />
+        <div className='octo-icontitle'>
+          <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
 
           <Editable
             ref={titleRef}
             value={title}
-            placeholderText="Untitled"
+            placeholderText='Untitled'
             onChange={(newTitle: string) => setTitle(newTitle)}
             onSave={(saveType) => saveTitle(saveType, card.id, title)}
             onCancel={() => setTitle(card.title || '')}
@@ -136,9 +136,9 @@ function TableRow(props: Props) {
           />
         </div>
 
-        <div className="open-button">
+        <div className='open-button'>
           <Button onClick={() => props.showCard(props.card.id || '')}>
-            <FormattedMessage id="TableRow.open" defaultMessage="Open" />
+            <FormattedMessage id='TableRow.open' defaultMessage='Open' />
           </Button>
         </div>
       </div>
@@ -147,7 +147,7 @@ function TableRow(props: Props) {
       {visiblePropertyTemplates.map((template) => {
         return (
           <div
-            className="octo-table-cell"
+            className='octo-table-cell'
             key={template.id}
             style={{
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
@@ -167,7 +167,7 @@ function TableRow(props: Props) {
         );
       })}
       {/* empty column for actions on header row */}
-      <div className="octo-table-cell" style={{ flexGrow: 1, borderRight: '0 none' }}></div>
+      <div className='octo-table-cell' style={{ flexGrow: 1, borderRight: '0 none' }}></div>
     </div>
   );
 }

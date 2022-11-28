@@ -12,14 +12,14 @@ export function TimezoneDisplay({
   showTimezone?: boolean;
 }) {
   return (
-    <Stack flexDirection="row" gap={1}>
-      <AccessTimeIcon fontSize="small" />
-      <Stack flexDirection="row" gap={0.5}>
-        <Typography variant="body2">
+    <Stack flexDirection='row' gap={1}>
+      <AccessTimeIcon fontSize='small' />
+      <Stack flexDirection='row' gap={0.5}>
+        <Typography variant='body2'>
           {timezone ? DateTime.local().setZone(timezone).toFormat('hh:mm a') : defaultValue}
         </Typography>
         {showTimezone && timezone && (
-          <Typography color="secondary" fontWeight="bold" variant="body2">
+          <Typography color='secondary' fontWeight='bold' variant='body2'>
             ({timezone})
           </Typography>
         )}

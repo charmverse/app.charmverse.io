@@ -21,21 +21,21 @@ function URLProperty(props: Props): JSX.Element {
   if (hasValue) {
     link = (
       <a
-        className="Link__button"
+        className='Link__button'
         href={Utils.ensureProtocol(props.value.trim())}
-        target="_blank"
-        rel="noreferrer"
+        target='_blank'
+        rel='noreferrer'
         onClick={(event) => event.stopPropagation()}
       >
-        <LinkIcon fontSize="small" />
+        <LinkIcon fontSize='small' />
       </a>
     );
   }
   return (
-    <div className="URLProperty property-link url">
+    <div className='URLProperty property-link url'>
       {(hasValue || props.placeholder) && (
         <Editable
-          className="octo-propertyvalue"
+          className='octo-propertyvalue'
           placeholderText={props.placeholder}
           value={props.value}
           autoExpand={false}

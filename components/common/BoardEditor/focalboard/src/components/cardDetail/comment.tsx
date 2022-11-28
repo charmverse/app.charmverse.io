@@ -30,21 +30,21 @@ function Comment(props: Props) {
   const date = new Date(comment.createdAt);
 
   return (
-    <div key={comment.id} className="Comment comment">
-      <div className="comment-header">
-        <Avatar size="xSmall" name={member?.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
-        <div className="comment-username">{member?.username}</div>
+    <div key={comment.id} className='Comment comment'>
+      <div className='comment-header'>
+        <Avatar size='xSmall' name={member?.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
+        <div className='comment-username'>{member?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
-          <div className="comment-date">{Utils.relativeDisplayDateTime(date, intl)}</div>
+          <div className='comment-date'>{Utils.relativeDisplayDateTime(date, intl)}</div>
         </Tooltip>
 
         {!props.readOnly && (
           <MenuWrapper>
             <IconButton icon={<MoreHorizIcon />} />
-            <Menu position="left">
+            <Menu position='left'>
               <Menu.Text
                 icon={<DeleteOutlineIcon />}
-                id="delete"
+                id='delete'
                 name={intl.formatMessage({ id: 'Comment.delete', defaultMessage: 'Delete' })}
                 onClick={() => mutator.deleteBlock(comment)}
               />

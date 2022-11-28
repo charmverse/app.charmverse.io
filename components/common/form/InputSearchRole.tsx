@@ -53,7 +53,7 @@ function InputSearchRoleBase({
 
   if (roles?.length === 0 && showWarningOnNoRoles) {
     return (
-      <Alert severity="warning">
+      <Alert severity='warning'>
         There are no roles in this space. Workspace admins can create roles in the{' '}
         <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>
           workspace settings page
@@ -70,7 +70,7 @@ function InputSearchRoleBase({
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
       placeholder={filteredRoles.length > 0 || roles?.length === 0 ? placeholder : ''}
-      noOptionsText="No options available"
+      noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={filteredRoles}
       autoHighlight
@@ -133,7 +133,7 @@ export function InputSearchRoleMultiple({
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, value) => emitValue(value as ReducedRole[])}
       multiple
-      placeholder="Select roles"
+      placeholder='Select roles'
       filter={filter}
       defaultValue={defaultValue}
       {...props}

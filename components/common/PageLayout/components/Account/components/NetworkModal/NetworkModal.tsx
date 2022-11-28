@@ -21,7 +21,7 @@ function NetworkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   // });
 
   return (
-    <Modal open={isOpen} onClose={onClose} size="large">
+    <Modal open={isOpen} onClose={onClose} size='large'>
       <DialogTitle onClose={onClose}>{active ? 'Supported networks' : 'Select network'}</DialogTitle>
       <Typography mb={4}>
         It doesn't matter which supported chain you're connected to, it's only used to know your address and sign

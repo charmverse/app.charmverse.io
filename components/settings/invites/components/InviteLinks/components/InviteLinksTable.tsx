@@ -57,15 +57,15 @@ export default function InvitesTable(props: Props) {
   const padding = 32;
 
   return (
-    <Box overflow="auto">
-      <Table size="small" aria-label="Invite links table">
+    <Box overflow='auto'>
+      <Table size='small' aria-label='Invite links table'>
         <TableHead>
           <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
             <TableCell sx={{ padding: '10px 16px' }}>Description</TableCell>
             <TableCell>Uses</TableCell>
             <TableCell>Expires</TableCell>
             <TableCell sx={{ width: 150 }}>Assigned Role</TableCell>
-            <TableCell sx={{ width: 90 + padding }} align="center">
+            <TableCell sx={{ width: 90 + padding }} align='center'>
               Link
             </TableCell>
             <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
@@ -74,7 +74,7 @@ export default function InvitesTable(props: Props) {
         <TableBody>
           {invites.length === 0 && (
             <TableRow>
-              <TableCell align="center" colSpan={6} sx={{ padding: '20px 16px' }}>
+              <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>
                 This Workspace has no Invite Links
               </TableCell>
             </TableRow>
@@ -104,18 +104,18 @@ export default function InvitesTable(props: Props) {
               <TableCell width={90}>
                 <Tooltip
                   arrow
-                  placement="top"
+                  placement='top'
                   title={copied[invite.id] ? 'Copied!' : 'Click to copy link'}
                   disableInteractive
                 >
-                  <Box component="span">
+                  <Box component='span'>
                     <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
                       <Chip
                         sx={{ width: 90 }}
                         clickable
-                        color="secondary"
-                        size="small"
-                        variant="outlined"
+                        color='secondary'
+                        size='small'
+                        variant='outlined'
                         label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
                       />
                     </CopyToClipboard>
@@ -124,14 +124,14 @@ export default function InvitesTable(props: Props) {
               </TableCell>
               <TableCell width={30}>
                 {isAdmin && (
-                  <Tooltip arrow placement="top" title="Delete">
+                  <Tooltip arrow placement='top' title='Delete'>
                     <ButtonChip
-                      className="row-actions"
+                      className='row-actions'
                       icon={<CloseIcon />}
                       clickable
-                      color="secondary"
-                      size="small"
-                      variant="outlined"
+                      color='secondary'
+                      size='small'
+                      variant='outlined'
                       onClick={() => onDelete(invite)}
                     />
                   </Tooltip>
@@ -154,18 +154,18 @@ function getExpires(invite: InviteLinkPopulated) {
     const expireDate = new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000;
     if (expireDate < Date.now()) {
       return (
-        <Tooltip arrow placement="top" title={`Expired on ${new Date(expireDate).toDateString()}`}>
-          <Typography component="span">Expired</Typography>
+        <Tooltip arrow placement='top' title={`Expired on ${new Date(expireDate).toDateString()}`}>
+          <Typography component='span'>Expired</Typography>
         </Tooltip>
       );
     }
     return (
-      <Tooltip arrow placement="top" title={`Expires on ${new Date(expireDate).toDateString()}`}>
+      <Tooltip arrow placement='top' title={`Expires on ${new Date(expireDate).toDateString()}`}>
         <span>
           <Countdown date={expireDate} />
         </span>
       </Tooltip>
     );
   }
-  return <AllInclusiveIcon fontSize="small" />;
+  return <AllInclusiveIcon fontSize='small' />;
 }

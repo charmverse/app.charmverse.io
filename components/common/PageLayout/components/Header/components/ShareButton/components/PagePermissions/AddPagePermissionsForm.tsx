@@ -131,8 +131,8 @@ export default function AddPagePermissionsForm({
   return (
     <div>
       <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto' }}>
-        <Grid container direction="column" spacing={3}>
-          <Grid container item direction="row" justifyContent="space-between" alignItems="center">
+        <Grid container direction='column' spacing={3}>
+          <Grid container item direction='row' justifyContent='space-between' alignItems='center'>
             <Grid item xs={8}>
               <InputEnumToOptions
                 onChange={(newAccessLevel) => setPermissionLevelToAssign(newAccessLevel as PagePermissionLevelType)}
@@ -145,7 +145,7 @@ export default function AddPagePermissionsForm({
                 disableElevation
                 fullWidth
                 sx={{ height: '100%', py: '10px', borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' }}
-                type="submit"
+                type='submit'
                 disabled={
                   !permissionLevelToAssign ||
                   (selectedUserIds.length === 0 && selectedRoleIds.length === 0) ||
@@ -159,9 +159,9 @@ export default function AddPagePermissionsForm({
 
           {permissionBeingAdded && (
             <Grid item>
-              <Alert severity="info">
+              <Alert severity='info'>
                 <Loader
-                  position="right"
+                  position='right'
                   sx={{ display: 'inline', ' & span': { ml: 2 }, '& div': { width: '100%', display: 'flex' } }}
                   size={20}
                   message={`Adding permission ${permissionBeingAdded.index} / ${permissionBeingAdded.total}`}

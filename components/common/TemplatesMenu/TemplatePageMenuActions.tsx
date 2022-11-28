@@ -27,7 +27,7 @@ export function TemplatePageMenuActions({
 
   return (
     <>
-      <IconButton size="small" {...bindTrigger(popupState)}>
+      <IconButton size='small' {...bindTrigger(popupState)}>
         <MoreHorizIcon />
       </IconButton>
 
@@ -40,8 +40,8 @@ export function TemplatePageMenuActions({
             editTemplate(pageId);
           }}
         >
-          <EditIcon fontSize="small" />
-          <Typography variant="body2" color="text.secondary">
+          <EditIcon fontSize='small' />
+          <Typography variant='body2' color='text.secondary'>
             Edit
           </Typography>
         </MenuItem>
@@ -53,8 +53,8 @@ export function TemplatePageMenuActions({
             deleteTemplate(pageId);
           }}
         >
-          <DeleteIcon fontSize="small" />
-          <Typography variant="body2" color="text.secondary">
+          <DeleteIcon fontSize='small' />
+          <Typography variant='body2' color='text.secondary'>
             Delete
           </Typography>
         </MenuItem>

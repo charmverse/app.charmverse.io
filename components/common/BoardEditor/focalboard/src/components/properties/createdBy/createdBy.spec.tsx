@@ -24,7 +24,7 @@ describe('components/properties/createdBy', () => {
 
     const component = (
       <ReduxProvider store={store}>
-        <CreatedBy userID="user-id-1" />
+        <CreatedBy userID='user-id-1' />
       </ReduxProvider>
     );
 

@@ -91,30 +91,30 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
       variant={active ? undefined : 'outlined'}
     >
       <Stack gap={1}>
-        <Box display="flex" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={1}>
+        <Box display='flex' justifyContent='space-between'>
+          <Box display='flex' alignItems='center' gap={1}>
             <SidebarUser user={members.find((member) => member.id === data.user)} />
             <RelativeDate createdAt={data.date} />
           </Box>
-          <Box display="flex" gap={1}>
+          <Box display='flex' gap={1}>
             {!readOnly && (
-              <Tooltip title="Accept suggestion">
+              <Tooltip title='Accept suggestion'>
                 <IconButton
-                  color="primary"
+                  color='primary'
                   onClick={() => {
                     acceptOne(type, pos);
                   }}
-                  size="small"
+                  size='small'
                 >
                   <Check />
                 </IconButton>
               </Tooltip>
             )}
             {(!readOnly || isOwner) && (
-              <Tooltip title="Reject suggestion">
+              <Tooltip title='Reject suggestion'>
                 <IconButton
-                  color="primary"
-                  size="small"
+                  color='primary'
+                  size='small'
                   onClick={() => {
                     rejectOne(type, pos);
                   }}
@@ -125,7 +125,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
             )}
           </Box>
         </Box>
-        <Typography variant="body2">
+        <Typography variant='body2'>
           {type === 'format_change' && data.before instanceof Array && data.after instanceof Array && (
             <FormatChangeDisplay before={data.before} after={data.after} />
           )}
@@ -187,5 +187,5 @@ function FormatChangeDisplay({ before, after }: { before: string[]; after: strin
 
 function SidebarUser({ user }: { user?: Member }) {
   if (!user) return null;
-  return <UserDisplay component="div" user={user} avatarSize="small" fontSize={14} fontWeight={500} />;
+  return <UserDisplay component='div' user={user} avatarSize='small' fontSize={14} fontWeight={500} />;
 }

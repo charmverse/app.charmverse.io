@@ -28,10 +28,10 @@ export function TimezoneAutocomplete({
         setTimezone(selectOption);
       }}
       options={timezoneOptions}
-      size="small"
+      size='small'
       renderOption={(props, option) => (
-        <Box component="li" sx={{ display: 'flex', gap: 1 }} {...props}>
-          <Box component="span">
+        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+          <Box component='span'>
             {option.tz} (GMT {option.offset})
           </Box>
         </Box>

@@ -55,12 +55,12 @@ function Calculation(props: Props): JSX.Element {
     >
       {props.menuOpen && <div>{option}</div>}
 
-      <span className="calculationLabel">{optionDisplayNameString(valueOption!, intl)}</span>
+      <span className='calculationLabel'>{optionDisplayNameString(valueOption!, intl)}</span>
 
-      {value === Options.none.value && <ExpandLessIcon fontSize="small" />}
+      {value === Options.none.value && <ExpandLessIcon fontSize='small' />}
 
       {value !== Options.none.value && (
-        <span className="calculationValue">
+        <span className='calculationValue'>
           {Calculations[value] ? Calculations[value](props.cards, props.property, intl) : ''}
         </span>
       )}

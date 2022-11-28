@@ -18,8 +18,8 @@ export default function PagesList({ activeItemIndex = -1, pages, onSelectPage }:
         marginLeft: 16,
         marginBottom: 8
       }}
-      variant="subtitle2"
-      color="secondary"
+      variant='subtitle2'
+      color='secondary'
     >
       No pages found
     </Typography>
@@ -29,7 +29,7 @@ export default function PagesList({ activeItemIndex = -1, pages, onSelectPage }:
         return (
           <MenuItem
             data-value={page.id}
-            data-type="page"
+            data-type='page'
             className={pageIndex === activeItemIndex ? 'mention-selected' : ''}
             onClick={() => onSelectPage(page)}
             key={page.id}

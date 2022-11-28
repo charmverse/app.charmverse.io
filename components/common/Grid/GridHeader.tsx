@@ -15,7 +15,7 @@ const StyledGrid = styled(Grid)`
 
 export default function GridContainer({ children, ...props }: ComponentProps<typeof Grid>) {
   return (
-    <StyledGrid container alignItems="flex-end" {...props}>
+    <StyledGrid container alignItems='flex-end' {...props}>
       {children}
     </StyledGrid>
   );

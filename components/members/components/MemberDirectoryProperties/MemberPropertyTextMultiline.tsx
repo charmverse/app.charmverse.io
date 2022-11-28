@@ -20,11 +20,11 @@ export function MemberPropertyTextMultiline({ label, value }: { value?: string; 
   return (
     <Stack>
       {label && (
-        <Typography fontWeight="bold" variant="subtitle2">
+        <Typography fontWeight='bold' variant='subtitle2'>
           {label}
         </Typography>
       )}
-      <Typography whiteSpace="normal" variant="body2">
+      <Typography whiteSpace='normal' variant='body2'>
         {!showingFullValue && isOverflowing ? `${textContent.slice(0, MAX_CHAR)}...` : textContent}
         {isOverflowing && (
           <ReadMoreTypography
@@ -33,8 +33,8 @@ export function MemberPropertyTextMultiline({ label, value }: { value?: string; 
               e.stopPropagation();
               setShowingFullValue(!showingFullValue);
             }}
-            variant="body2"
-            fontWeight="bold"
+            variant='body2'
+            fontWeight='bold'
           >
             {!showingFullValue ? 'Read more' : 'Read less'}
           </ReadMoreTypography>

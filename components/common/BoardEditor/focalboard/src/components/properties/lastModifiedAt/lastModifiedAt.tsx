@@ -15,7 +15,7 @@ function LastModifiedAt(props: Props): JSX.Element {
   const intl = useIntl();
 
   return (
-    <div className="LastModifiedAt octo-propertyvalue readonly">
+    <div className='LastModifiedAt octo-propertyvalue readonly'>
       {Utils.displayDateTime(new Date(props.updatedAt), intl)}
     </div>
   );

@@ -39,7 +39,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
   return (
     <StyledBlockAligner draggable={false}>
       {children}
-      <Controls className="controls">
+      <Controls className='controls'>
         <ListItem
           button
           disableRipple

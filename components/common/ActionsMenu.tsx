@@ -31,8 +31,8 @@ interface ActionsMenuProps {
 
 export default function ActionsMenu({ onClick, children }: ActionsMenuProps) {
   return (
-    <StyledActionsMenu className="actions-menu" onClick={onClick}>
-      <MoreHorizIcon color="secondary" fontSize="small" />
+    <StyledActionsMenu className='actions-menu' onClick={onClick}>
+      <MoreHorizIcon color='secondary' fontSize='small' />
       {children}
     </StyledActionsMenu>
   );

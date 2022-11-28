@@ -142,11 +142,11 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   }, [!!space, inputValue]);
 
   return (
-    <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size="large">
+    <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
       <DialogTitle onClose={close}>Quick Find</DialogTitle>
       <StyledAutocomplete
         options={options}
-        noOptionsText="No search results"
+        noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
         fullWidth
@@ -172,11 +172,11 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
 
           return (
             <StyledListItem {...listItemProps} key={option.id}>
-              <Stack direction="row" spacing={1}>
+              <Stack direction='row' spacing={1}>
                 {option.type === ResultType.page ? (
-                  <InsertDriveFileOutlinedIcon fontSize="small" style={{ marginTop: '2px' }} />
+                  <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
                 ) : (
-                  <BountyIcon fontSize="small" style={{ marginTop: '2px' }} />
+                  <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
                 )}
                 <Stack>
                   <StyledTypographyPage>
@@ -202,9 +202,9 @@ function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder="Search inside the workspace"
-            variant="standard"
-            size="small"
+            placeholder='Search inside the workspace'
+            variant='standard'
+            size='small'
             autoFocus={true}
             InputProps={{
               ...params.InputProps,

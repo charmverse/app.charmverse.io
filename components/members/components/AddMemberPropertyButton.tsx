@@ -61,9 +61,9 @@ export function AddMemberPropertyButton() {
   return (
     <>
       <Button
-        variant="text"
-        size="small"
-        color="secondary"
+        variant='text'
+        size='small'
+        color='secondary'
         startIcon={<AddIcon />}
         sx={{
           py: 1,
@@ -98,17 +98,17 @@ export function AddMemberPropertyButton() {
         ))}
       </Menu>
       <Modal
-        size="large"
+        size='large'
         open={propertyNamePopupState.isOpen}
         onClose={propertyNamePopupState.close}
-        title="Name your property"
+        title='Name your property'
       >
         <Stack gap={1}>
           <TextField
             fullWidth
             error={!propertyName || !selectedPropertyType}
             value={propertyName}
-            placeholder="Name"
+            placeholder='Name'
             onChange={(e) => setPropertyName(e.target.value)}
             autoFocus
             sx={{

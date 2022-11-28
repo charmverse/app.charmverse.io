@@ -78,15 +78,15 @@ export default function FloatingMenuComponent({
           return (
             <Menu type={type}>
               <MenuGroup>
-                <Tooltip title={<Typography component="div">Turn into</Typography>}>
+                <Tooltip title={<Typography component='div'>Turn into</Typography>}>
                   <Button
                     {...bindTrigger(popupState)}
                     endIcon={<ArrowDropDown />}
-                    size="small"
+                    size='small'
                     disableElevation
-                    variant="text"
-                    color="inherit"
-                    padding="0"
+                    variant='text'
+                    color='inherit'
+                    padding='0'
                     sx={{ padding: 0 }}
                   >
                     {activeItem}
@@ -96,7 +96,7 @@ export default function FloatingMenuComponent({
                   nestedPagePluginKey={nestedPagePluginKey}
                   disableNestedPage={disableNestedPage}
                   externalPopupState={popupState}
-                  size="small"
+                  size='small'
                   handleActiveItem={handleActiveItem}
                 />
               </MenuGroup>

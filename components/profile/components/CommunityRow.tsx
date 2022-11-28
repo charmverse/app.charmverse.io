@@ -49,7 +49,7 @@ function CountIcon({ label, icon, count }: { label: string; icon: ReactNode; cou
   }
   return (
     <Tooltip title={label}>
-      <Typography variant="subtitle2" sx={{ pr: 1, gap: 0.5, display: 'inline-flex', alignItems: 'center' }}>
+      <Typography variant='subtitle2' sx={{ pr: 1, gap: 0.5, display: 'inline-flex', alignItems: 'center' }}>
         <Box mt={0.5} sx={{ svg: { fontSize: '16px' } }}>
           {icon}
         </Box>{' '}
@@ -62,7 +62,7 @@ function CountIcon({ label, icon, count }: { label: string; icon: ReactNode; cou
 function TaskTab({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void }) {
   return (
     <Tab
-      iconPosition="start"
+      iconPosition='start'
       icon={task.icon}
       key={task.label}
       sx={{
@@ -89,10 +89,10 @@ interface EventRowProps {
 
 function EventRow(event: EventRowProps) {
   return (
-    <Stack flexDirection="row" gap={1}>
-      <Stack flexDirection="row" gap={1} alignItems="center" alignSelf="flex-start">
+    <Stack flexDirection='row' gap={1}>
+      <Stack flexDirection='row' gap={1} alignItems='center' alignSelf='flex-start'>
         {event.icon}
-        <Typography variant="body2" color="secondary">
+        <Typography variant='body2' color='secondary'>
           {event.eventNumber || ' '}.
         </Typography>
       </Stack>
@@ -107,10 +107,10 @@ function EventRow(event: EventRowProps) {
           alignItems: 'flex-start'
         }}
       >
-        <Typography variant="body2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Typography variant='body2' sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {event.title}
         </Typography>
-        <Typography variant="subtitle1" color="secondary" textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>
+        <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>
           {showDateWithMonthAndYear(event.createdAt, true)}
         </Typography>
       </Stack>
@@ -130,9 +130,9 @@ function VotesPanel({ events }: { events: DeepDaoVote[] }) {
             title={event.title}
             icon={
               event.successful ? (
-                <ThumbUpIcon color="success" sx={{ fontSize: '16px' }} />
+                <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
               ) : (
-                <ThumbDownIcon color="error" sx={{ fontSize: '16px' }} />
+                <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />
               )
             }
             eventNumber={index + 1}
@@ -154,9 +154,9 @@ function ProposalsPanel({ events }: { events: DeepDaoProposal[] }) {
             title={event.title}
             icon={
               event.outcome === event.voteChoice ? (
-                <ThumbUpIcon color="success" sx={{ fontSize: '16px' }} />
+                <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
               ) : (
-                <ThumbDownIcon color="error" sx={{ fontSize: '16px' }} />
+                <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />
               )
             }
             eventNumber={index + 1}
@@ -178,12 +178,12 @@ function BountyEventsPanel({ events }: { events: ProfileBountyEvent[] }) {
             title={
               <>
                 {bountyStatus(event.eventName)}:&nbsp;
-                <Link href={event.bountyPath} color="inherit">
+                <Link href={event.bountyPath} color='inherit'>
                   <strong>{event.bountyTitle || 'Untitled'}</strong>
                 </Link>
                 {event.hasCredential && (
-                  <Tooltip color="success" title="Verified with Collab.land">
-                    <CheckIcon fontSize="small" />
+                  <Tooltip color='success' title='Verified with Collab.land'>
+                    <CheckIcon fontSize='small' />
                   </Tooltip>
                 )}
               </>
@@ -233,16 +233,16 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
 
   return (
     <ProfileItemContainer visible={visible}>
-      <Box display="flex" gap={2} flexDirection="row" alignItems="center" onClick={toggleCollapse}>
+      <Box display='flex' gap={2} flexDirection='row' alignItems='center' onClick={toggleCollapse}>
         <Avatar
-          className="hidden-on-visible"
+          className='hidden-on-visible'
           avatar={community.logo}
           name={community.name}
-          variant="rounded"
-          size="large"
+          variant='rounded'
+          size='large'
         />
-        <Box align-items="center" display="flex" justifyContent="space-between" flexGrow={1}>
-          <Box className="hidden-on-visible">
+        <Box align-items='center' display='flex' justifyContent='space-between' flexGrow={1}>
+          <Box className='hidden-on-visible'>
             <Typography
               sx={{
                 fontSize: {
@@ -255,21 +255,21 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
               {community.name}
             </Typography>
             {community.joinDate && (
-              <Typography variant="subtitle2">
+              <Typography variant='subtitle2'>
                 {showDateWithMonthAndYear(community.joinDate)} -{' '}
                 {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
               </Typography>
             )}
-            <CountIcon icon={<HowToVoteIcon />} label="Votes" count={community.votes.length} />
-            <CountIcon icon={<ForumIcon />} label="Proposals" count={community.proposals.length} />
-            <CountIcon icon={<BountyIcon />} label="Bounties" count={community.bounties.length} />
+            <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />
+            <CountIcon icon={<ForumIcon />} label='Proposals' count={community.proposals.length} />
+            <CountIcon icon={<BountyIcon />} label='Bounties' count={community.bounties.length} />
           </Box>
-          <Box display="flex" alignItems="center" gap={0.5}>
+          <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
               <Tooltip title={`${visible ? 'Hide' : 'Show'} Community from profile`}>
                 <IconButton
-                  className="action"
-                  size="small"
+                  className='action'
+                  size='small'
                   onClick={(e) => {
                     // Don't want visibility icon to toggle the proposal and votes list
                     e.stopPropagation();
@@ -282,13 +282,13 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
                     }
                   }}
                 >
-                  {visible ? <VisibilityIcon fontSize="small" /> : <VisibilityOffIcon fontSize="small" />}
+                  {visible ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' />}
                 </IconButton>
               </Tooltip>
             )}
             {isCollapsible && (
-              <IconButton className="hidden-on-visible" size="small">
-                {isCollapsed ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
+              <IconButton className='hidden-on-visible' size='small'>
+                {isCollapsed ? <ExpandMoreIcon fontSize='small' /> : <ExpandLessIcon fontSize='small' />}
               </IconButton>
             )}
           </Box>
@@ -296,12 +296,12 @@ export default function CommunityRow({ community, showVisibilityIcon, visible, o
       </Box>
 
       <Collapse in={!isCollapsed}>
-        <Box className="hidden-on-visible">
+        <Box className='hidden-on-visible'>
           <Tabs
             sx={{
               mb: 2
             }}
-            indicatorColor="primary"
+            indicatorColor='primary'
             value={currentTab}
           >
             {hasVotes && <TaskTab task={TASK_TABS[0]} value={0} onClick={() => setCurrentTab(0)} />}

@@ -7,7 +7,7 @@ type Props = {
 function LastModifiedBy(props: Props): JSX.Element {
   const { members } = useMembers();
   const member = members.find((user) => user.id === props.updatedBy);
-  return <div className="LastModifiedBy octo-propertyvalue readonly">{member?.username ?? props.updatedBy}</div>;
+  return <div className='LastModifiedBy octo-propertyvalue readonly'>{member?.username ?? props.updatedBy}</div>;
 }
 
 export default LastModifiedBy;

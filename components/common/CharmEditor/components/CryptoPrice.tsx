@@ -147,8 +147,8 @@ export function CryptoPrice({
   return (
     <Card
       draggable={false}
-      className="cryptoPrice"
-      component="div"
+      className='cryptoPrice'
+      component='div'
       raised={true}
       // disable propagation for bangle.dev
       onMouseUp={(e) => e.stopPropagation()}
@@ -167,14 +167,14 @@ export function CryptoPrice({
             <StyledButton active={selectionList === 'base'} onClick={() => toggleSelectionList('base')}>
               <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
             </StyledButton>
-            <Typography component="span" color="secondary">
+            <Typography component='span' color='secondary'>
               /
             </Typography>
             <StyledButton active={selectionList === 'quote'} onClick={() => toggleSelectionList('quote')}>
               {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
             </StyledButton>
-            <IconButton size="small" onClick={() => refreshPrice()} sx={{ float: 'right' }}>
-              <Autorenew color="secondary" fontSize="small" />
+            <IconButton size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
+              <Autorenew color='secondary' fontSize='small' />
             </IconButton>
           </div>
 
@@ -190,7 +190,7 @@ export function CryptoPrice({
             </Box>
           )}
 
-          <Typography component="div" align="center" sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
+          <Typography component='div' align='center' sx={{ fontSize: 36, lineHeight: 1, mt: 2 }}>
             {loading === false &&
               !error &&
               formatMoney(lastQuote.amount ?? 0, quoteCurrency, window.navigator.language)}
@@ -202,15 +202,15 @@ export function CryptoPrice({
 
       {loading === true && (
         <CardActions sx={{ justifyContent: 'center' }}>
-          <Typography variant="caption" color="secondary">
-            <CircularProgress size={10} color="inherit" sx={{ mr: 1 }} />
+          <Typography variant='caption' color='secondary'>
+            <CircularProgress size={10} color='inherit' sx={{ mr: 1 }} />
             Loading price...
           </Typography>
         </CardActions>
       )}
       {loading === false && baseCurrency !== null && (
         <CardActions sx={{ justifyContent: 'center' }}>
-          <Typography variant="caption" color="secondary">
+          <Typography variant='caption' color='secondary'>
             Updated:{' '}
             <RelativeTime
               timestamp={lastQuote?.receivedOn && lastQuote?.receivedOn > 0 ? lastQuote.receivedOn : Date.now()}
@@ -227,10 +227,10 @@ type ButtonProps = { children: React.ReactNode; active: boolean; onClick: () => 
 function StyledButton({ children, active, onClick }: ButtonProps) {
   return (
     <Button
-      color="secondary"
+      color='secondary'
       endIcon={<ArrowDropDown />}
-      component="span"
-      variant="text"
+      component='span'
+      variant='text'
       sx={{ color: active ? 'text.primary' : undefined, p: 0, px: 0.5 }}
       onClick={onClick}
     >

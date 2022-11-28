@@ -17,7 +17,7 @@ export function AggregatedDataItem({ value, label }: { value: number; label: str
       }}
     >
       <Typography
-        color="secondary"
+        color='secondary'
         sx={{
           fontWeight: 500
         }}
@@ -52,7 +52,7 @@ export default function AggregatedData({
   totalBounties: number;
 }) {
   return (
-    <Grid container display="flex" gap={2} flexDirection="column">
+    <Grid container display='flex' gap={2} flexDirection='column'>
       <Box
         gap={1}
         sx={{
@@ -63,10 +63,10 @@ export default function AggregatedData({
           }
         }}
       >
-        <AggregatedDataItem label="Communities" value={totalCommunities} />
-        <AggregatedDataItem label="Proposals" value={totalProposals} />
-        <AggregatedDataItem label="Votes" value={totalVotes} />
-        <AggregatedDataItem label="Bounties" value={totalBounties} />
+        <AggregatedDataItem label='Communities' value={totalCommunities} />
+        <AggregatedDataItem label='Proposals' value={totalProposals} />
+        <AggregatedDataItem label='Votes' value={totalVotes} />
+        <AggregatedDataItem label='Bounties' value={totalBounties} />
       </Box>
     </Grid>
   );

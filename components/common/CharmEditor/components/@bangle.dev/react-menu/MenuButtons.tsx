@@ -156,7 +156,7 @@ export function InlineCommentButton({
       enable={enableComments}
       menuKey={menuKey}
       hints={['Comment']}
-      subMenu="inlineCommentSubMenu"
+      subMenu='inlineCommentSubMenu'
     >
       {children}
     </InlineActionButton>
@@ -185,7 +185,7 @@ export function InlineVoteButton({
       enable={enableVotes}
       menuKey={menuKey}
       hints={['Poll']}
-      subMenu="inlineVoteSubMenu"
+      subMenu='inlineVoteSubMenu'
     >
       {children}
     </InlineActionButton>
@@ -498,14 +498,14 @@ export function HeadingButton({
   hints = [`Heading ${level}`, headingKeys[`toH${level}`] ?? '1'],
   hintPos = 'top',
   children = (
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fontSize={16}>
+    <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fontSize={16}>
       <text
-        x="12"
-        y="12"
-        stroke="currentColor"
-        textAnchor="middle"
-        alignmentBaseline="central"
-        dominantBaseline="middle"
+        x='12'
+        y='12'
+        stroke='currentColor'
+        textAnchor='middle'
+        alignmentBaseline='central'
+        dominantBaseline='middle'
       >
         H{level}
       </text>

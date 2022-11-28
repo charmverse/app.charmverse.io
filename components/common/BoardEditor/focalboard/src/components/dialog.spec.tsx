@@ -15,7 +15,7 @@ describe('components/dialog', () => {
     const { container } = render(
       wrapDNDIntl(
         <Dialog onClose={jest.fn()}>
-          <div id="test" />
+          <div id='test' />
         </Dialog>
       )
     );
@@ -26,7 +26,7 @@ describe('components/dialog', () => {
     render(
       wrapDNDIntl(
         <Dialog onClose={onCloseMethod}>
-          <div id="test" />
+          <div id='test' />
         </Dialog>
       )
     );
@@ -39,11 +39,11 @@ describe('components/dialog', () => {
     const { container } = render(
       wrapDNDIntl(
         <Dialog onClose={onCloseMethod}>
-          <Menu position="left">
+          <Menu position='left'>
             <Menu.Text
-              id="test"
-              icon={<MoreHorizIcon fontSize="small" />}
-              name="Test"
+              id='test'
+              icon={<MoreHorizIcon fontSize='small' />}
+              name='Test'
               onClick={async () => {
                 jest.fn();
               }}
@@ -64,11 +64,11 @@ describe('components/dialog', () => {
         <Dialog
           onClose={jest.fn()}
           toolsMenu={
-            <Menu position="left">
+            <Menu position='left'>
               <Menu.Text
-                id="test"
-                icon={<MoreHorizIcon fontSize="small" />}
-                name="Test"
+                id='test'
+                icon={<MoreHorizIcon fontSize='small' />}
+                name='Test'
                 onClick={async () => {
                   onTest();
                 }}
@@ -76,7 +76,7 @@ describe('components/dialog', () => {
             </Menu>
           }
         >
-          <div id="test" />
+          <div id='test' />
         </Dialog>
       )
     );
@@ -92,11 +92,11 @@ describe('components/dialog', () => {
         <Dialog
           onClose={jest.fn()}
           toolsMenu={
-            <Menu position="left">
+            <Menu position='left'>
               <Menu.Text
-                id="test"
-                icon={<MoreHorizIcon fontSize="small" />}
-                name="Test"
+                id='test'
+                icon={<MoreHorizIcon fontSize='small' />}
+                name='Test'
                 onClick={async () => {
                   jest.fn();
                 }}
@@ -104,7 +104,7 @@ describe('components/dialog', () => {
             </Menu>
           }
         >
-          <div id="test" />
+          <div id='test' />
         </Dialog>
       )
     );

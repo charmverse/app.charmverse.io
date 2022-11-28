@@ -135,22 +135,22 @@ function Component({ menuState }: { menuState: PluginState }) {
 
   return (
     <>
-      <span className="charm-drag-handle" draggable="true">
-        <DragIndicatorIcon color="secondary" {...bindTrigger(popupState)} />
+      <span className='charm-drag-handle' draggable='true'>
+        <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
       </span>
 
       <Menu {...bindMenu(popupState)} {...menuPosition}>
         <ListItemButton onClick={deleteRow} dense>
           <ListItemIcon>
-            <DeleteOutlined color="secondary" />
+            <DeleteOutlined color='secondary' />
           </ListItemIcon>
-          <ListItemText primary="Delete" />
+          <ListItemText primary='Delete' />
         </ListItemButton>
         <ListItemButton onClick={duplicateRow} dense>
           <ListItemIcon>
-            <DuplicateIcon color="secondary" />
+            <DuplicateIcon color='secondary' />
           </ListItemIcon>
-          <ListItemText primary="Duplicate" />
+          <ListItemText primary='Duplicate' />
         </ListItemButton>
       </Menu>
     </>

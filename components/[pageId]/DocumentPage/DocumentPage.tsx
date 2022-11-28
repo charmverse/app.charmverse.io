@@ -156,7 +156,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
         }
       }}
     >
-      <ScrollContainer id="document-scroll-container" showPageActionSidebar={showPageActionSidebar}>
+      <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
         <div ref={containerRef}>
           {page.deletedAt && <PageDeleteBanner pageId={page.id} />}
           <PageTemplateBanner parentPage={page.parentId ? pages[page.parentId] : null} page={page} />
@@ -208,8 +208,8 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                   />
                 </Box>
               )}
-              <div className="focalboard-body">
-                <div className="CardDetail content">
+              <div className='focalboard-body'>
+                <div className='CardDetail content'>
                   {/* Property list */}
                   {card && board && (
                     <>

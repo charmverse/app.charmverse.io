@@ -31,24 +31,24 @@ const Dialog = React.memo((props: Props) => {
     <Modal open={true}>
       <div className={`Dialog dialog-back ${props.className}`}>
         <div
-          className="wrapper"
+          className='wrapper'
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               props.onClose();
             }
           }}
         >
-          <div role="dialog" className="dialog">
-            <div className="toolbar">
+          <div role='dialog' className='dialog'>
+            <div className='toolbar'>
               {!props.hideCloseButton && (
                 <IconButton
                   onClick={props.onClose}
                   icon={<CloseIcon />}
                   title={closeDialogText}
-                  className="IconButton--large"
+                  className='IconButton--large'
                 />
               )}
-              {toolbar && <div className="cardToolbar">{toolbar}</div>}
+              {toolbar && <div className='cardToolbar'>{toolbar}</div>}
               {toolsMenu}
             </div>
             {props.children}

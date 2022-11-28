@@ -30,7 +30,7 @@ export function MemberDirectorySearchBar({ onChange }: { onChange: Dispatch<SetS
 
   return (
     <TextField
-      placeholder="Search for members, roles, skills, interests, etc"
+      placeholder='Search for members, roles, skills, interests, etc'
       fullWidth
       sx={{
         my: 2
@@ -45,8 +45,8 @@ export function MemberDirectorySearchBar({ onChange }: { onChange: Dispatch<SetS
       }}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="end">
-            <SearchIcon color="secondary" />
+          <InputAdornment position='end'>
+            <SearchIcon color='secondary' />
           </InputAdornment>
         )
       }}

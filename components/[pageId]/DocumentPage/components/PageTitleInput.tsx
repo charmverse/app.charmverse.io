@@ -69,18 +69,18 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
   }
 
   if (readOnly) {
-    return <StyledReadOnlyTitle data-test="editor-page-title">{value || 'Untitled'}</StyledReadOnlyTitle>;
+    return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
     <StyledPageTitle
-      data-test="editor-page-title"
+      data-test='editor-page-title'
       inputRef={titleInput}
       value={title}
       onChange={_onChange}
-      placeholder="Untitled"
+      placeholder='Untitled'
       autoFocus={!readOnly && !isTouchScreen()}
       multiline
-      variant="standard"
+      variant='standard'
       onKeyDown={(e) => {
         if (e.code === 'Enter') {
           // prevent inserting a new line into the editor

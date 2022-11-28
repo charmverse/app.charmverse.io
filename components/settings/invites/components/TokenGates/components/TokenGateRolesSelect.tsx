@@ -60,18 +60,18 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
 
   if (roles?.length === 0) {
     return (
-      <Box display="flex" justifyContent="center">
-        <Tooltip title="Add roles to enable this feature">
-          <InfoOutlinedIcon color="secondary" fontSize="small" />
+      <Box display='flex' justifyContent='center'>
+        <Tooltip title='Add roles to enable this feature'>
+          <InfoOutlinedIcon color='secondary' fontSize='small' />
         </Tooltip>
       </Box>
     );
   }
 
   return (
-    <StyledFormControl size="small">
+    <StyledFormControl size='small'>
       <Select<string[]>
-        variant="standard"
+        variant='standard'
         value={selectedRoleIds}
         fullWidth
         multiple
@@ -80,11 +80,11 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
         disabled={!isAdmin || roles?.length === 0}
         renderValue={(roleIds) =>
           roleIds.length === 0 ? (
-            <Typography color="secondary" fontSize="small">
+            <Typography color='secondary' fontSize='small'>
               + Assign role
             </Typography>
           ) : (
-            <Box display="flex" flexWrap="wrap" gap={0.5} maxWidth={400}>
+            <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
               {roleIds
                 .map((roleId) => rolesRecord[roleId])
                 .filter(isTruthy)
@@ -92,7 +92,7 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
                   <Chip
                     key={role.id}
                     label={role.name}
-                    size="small"
+                    size='small'
                     onMouseDown={(event) => {
                       event.stopPropagation();
                     }}

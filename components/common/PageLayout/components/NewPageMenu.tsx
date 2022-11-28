@@ -53,22 +53,22 @@ function NewPageMenu({ addPage, tooltip, ...props }: Props) {
 
   return (
     <>
-      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement="top" arrow>
+      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
         <StyledIconButton onClick={handleClick} {...props}>
-          <AddIcon color="secondary" />
+          <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={() => createPage({ type: 'page' })}>
           <ListItemIcon>
-            <StyledArticleIcon fontSize="small" />
+            <StyledArticleIcon fontSize='small' />
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
         <MenuItem onClick={() => createPage({ type: 'board' })}>
           <ListItemIcon>
-            <StyledDatabaseIcon fontSize="small" />
+            <StyledDatabaseIcon fontSize='small' />
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Database</Typography>
         </MenuItem>

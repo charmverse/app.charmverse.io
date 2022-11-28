@@ -118,8 +118,8 @@ const PropertyMenu = React.memo((props: Props) => {
     <Menu>
       <input
         ref={nameTextbox}
-        type="text"
-        className="PropertyMenu menu-textbox"
+        type='text'
+        className='PropertyMenu menu-textbox'
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           setName(e.target.value);
@@ -138,13 +138,13 @@ const PropertyMenu = React.memo((props: Props) => {
         }}
         spellCheck={true}
       />
-      <Menu.SubMenu id="type" name={typeMenuTitle(intl, props.propertyType)}>
+      <Menu.SubMenu id='type' name={typeMenuTitle(intl, props.propertyType)}>
         <PropertyTypes
           label={intl.formatMessage({ id: 'PropertyMenu.changeType', defaultMessage: 'Change property type' })}
           onTypeSelected={(type: PropertyType) => props.onTypeAndNameChanged(type, name)}
         />
       </Menu.SubMenu>
-      <Menu.Text id="delete" name={deleteText} onClick={() => props.onDelete(props.propertyId)} />
+      <Menu.Text id='delete' name={deleteText} onClick={() => props.onDelete(props.propertyId)} />
     </Menu>
   );
 });

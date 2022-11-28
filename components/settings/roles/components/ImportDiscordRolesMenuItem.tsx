@@ -21,7 +21,7 @@ export default function ImportDiscordRolesMenuItem() {
         );
       }}
     >
-      <SvgIcon viewBox="0 -10 70 70" sx={{ transform: 'scale(0.85)', mr: 1 }}>
+      <SvgIcon viewBox='0 -10 70 70' sx={{ transform: 'scale(0.85)', mr: 1 }}>
         <DiscordIcon />
       </SvgIcon>
       Discord

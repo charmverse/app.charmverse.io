@@ -7,8 +7,8 @@ type Props = Pick<Vote, 'context'>;
 
 export default function VoteIcon({ context }: Props) {
   return (
-    <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
-      {context === 'proposal' ? <TaskIcon color="secondary" /> : <MuiVoteIcon color="secondary" />}
+    <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
+      {context === 'proposal' ? <TaskIcon color='secondary' /> : <MuiVoteIcon color='secondary' />}
     </Box>
   );
 }

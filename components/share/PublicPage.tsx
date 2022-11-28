@@ -140,7 +140,7 @@ export default function PublicPage() {
   }, []);
 
   if (!router.query || loadingSpace) {
-    return <LoadingComponent height="200px" isLoading={true} />;
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   if (isBountiesPage && !currentSpace) {
@@ -161,8 +161,8 @@ export default function PublicPage() {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-        <AppBar sidebarWidth={0} position="fixed" open={false}>
-          <StyledToolbar variant="dense">
+        <AppBar sidebarWidth={0} position='fixed' open={false}>
+          <StyledToolbar variant='dense'>
             <Box
               sx={{
                 display: 'flex',
@@ -173,22 +173,22 @@ export default function PublicPage() {
               }}
             >
               <PageTitleWithBreadcrumbs pageId={basePageId} />
-              <Box display="flex" alignItems="center">
+              <Box display='flex' alignItems='center'>
                 {/** Link to editable page */}
                 {userCanEdit && hasShareInPath && (
-                  <Tooltip title="Edit" arrow placement="top">
-                    <Button href={editString} color="secondary" size="small" variant="text" sx={{ minWidth: 50 }}>
-                      <EditIcon color="secondary" fontSize="small" />
+                  <Tooltip title='Edit' arrow placement='top'>
+                    <Button href={editString} color='secondary' size='small' variant='text' sx={{ minWidth: 50 }}>
+                      <EditIcon color='secondary' fontSize='small' />
                     </Button>
                   </Tooltip>
                 )}
                 {/** dark mode toggle */}
-                <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement="top">
-                  <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+                <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>
+                  <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
                     {theme.palette.mode === 'dark' ? (
-                      <SunIcon color="secondary" fontSize="small" />
+                      <SunIcon color='secondary' fontSize='small' />
                     ) : (
-                      <MoonIcon color="secondary" fontSize="small" />
+                      <MoonIcon color='secondary' fontSize='small' />
                     )}
                   </IconButton>
                 </Tooltip>

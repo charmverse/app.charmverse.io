@@ -49,8 +49,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
 
   if (!userApplication && bounty.approveSubmitters) {
     return !showApplication ? (
-      <Box display="flex" justifyContent="center" my={3}>
-        <Tooltip placement="top" title={newSubmissionTooltip} arrow>
+      <Box display='flex' justifyContent='center' my={3}>
+        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
           <span>
             <Button
               disabled={!canCreateApplication}
@@ -66,7 +66,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
     ) : (
       <ApplicationInput
         bountyId={bounty.id}
-        mode="create"
+        mode='create'
         onSubmit={submitApplication}
         onCancel={() => {
           setShowApplication(false);
@@ -80,7 +80,7 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
         <ApplicationInput
           bountyId={bounty.id}
           proposal={userApplication}
-          mode="update"
+          mode='update'
           readOnly={userApplication?.status !== 'applied'}
           onSubmit={() => {
             setShowApplication(false);
@@ -105,8 +105,8 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
     // When we don't need to apply
   } else if (!bounty.approveSubmitters) {
     return !showApplication && !userApplication ? (
-      <Box display="flex" justifyContent="center" my={3}>
-        <Tooltip placement="top" title={newSubmissionTooltip} arrow>
+      <Box display='flex' justifyContent='center' my={3}>
+        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
           <span>
             <Button
               disabled={!canCreateApplication}

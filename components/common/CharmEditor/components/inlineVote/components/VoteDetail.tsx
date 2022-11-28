@@ -82,7 +82,7 @@ export default function VoteDetail({
         gap: 1
       }}
     >
-      <span>Polls</span> <Chip size="small" label={totalVotes} />
+      <span>Polls</span> <Chip size='small' label={totalVotes} />
     </Box>
   );
 
@@ -101,17 +101,17 @@ export default function VoteDetail({
 
   return (
     <VotesWrapper detailed={detailed} id={`vote.${vote.id}`}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" fontWeight="bold">
+      <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Typography variant='h6' fontWeight='bold'>
           {!isProposal ? title : 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
-      <Box display="flex" justifyContent="space-between">
-        <Typography color="secondary" variant="subtitle1">
+      <Box display='flex' justifyContent='space-between'>
+        <Typography color='secondary' variant='subtitle1'>
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
-        <VoteStatusChip size="small" status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
+        <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
       </Box>
       {description && (
         <Box my={1} mb={2}>
@@ -119,7 +119,7 @@ export default function VoteDetail({
             <span>
               {description.slice(0, 200)}...
               <Typography
-                component="span"
+                component='span'
                 onClick={voteDetailsPopup.open}
                 sx={{
                   ml: 0.5,
@@ -128,8 +128,8 @@ export default function VoteDetail({
                     textDecoration: 'underline'
                   }
                 }}
-                variant="subtitle1"
-                fontWeight="bold"
+                variant='subtitle1'
+                fontWeight='bold'
               >
                 (More)
               </Typography>
@@ -145,13 +145,13 @@ export default function VoteDetail({
           {voteOptions.map((voteOption) => (
             <FormControlLabel
               key={voteOption.name}
-              control={<Radio size="small" />}
+              control={<Radio size='small' />}
               disabled={isVotingClosed(vote) || !user}
               value={voteOption.name}
               label={
-                <Box display="flex" justifyContent="space-between" flexGrow={1}>
+                <Box display='flex' justifyContent='space-between' flexGrow={1}>
                   <span>{voteOption.name}</span>
-                  <Typography variant="subtitle1" color="secondary">
+                  <Typography variant='subtitle1' color='secondary'>
                     {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
                       2
                     )}
@@ -194,8 +194,8 @@ export default function VoteDetail({
         </RadioGroup>
       </StyledFormControl>
       {!detailed && (
-        <Box display="flex" justifyContent="flex-end">
-          <Button disabled={!user} color="secondary" variant="outlined" size="small" onClick={voteDetailsPopup.open}>
+        <Box display='flex' justifyContent='flex-end'>
+          <Button disabled={!user} color='secondary' variant='outlined' size='small' onClick={voteDetailsPopup.open}>
             View details
           </Button>
         </Box>
@@ -204,10 +204,10 @@ export default function VoteDetail({
         (totalVotes !== 0 ? (
           voteCountLabel
         ) : (
-          <Card variant="outlined">
-            <Box p={3} textAlign="center">
-              <HowToVoteOutlinedIcon fontSize="large" color="secondary" />
-              <Typography color="secondary">No votes casted yet. Be the first to vote !!!</Typography>
+          <Card variant='outlined'>
+            <Box p={3} textAlign='center'>
+              <HowToVoteOutlinedIcon fontSize='large' color='secondary' />
+              <Typography color='secondary'>No votes casted yet. Be the first to vote !!!</Typography>
             </Box>
           </Card>
         ))}
@@ -228,12 +228,12 @@ export default function VoteDetail({
                 <ListItemText
                   primary={<Typography>{userVote.user.username}</Typography>}
                   secondary={
-                    <Typography variant="subtitle1" color="secondary">
+                    <Typography variant='subtitle1' color='secondary'>
                       {DateTime.fromJSDate(new Date(userVote.updatedAt)).toRelative({ base: DateTime.now() })}
                     </Typography>
                   }
                 />
-                <Typography fontWeight={500} color="secondary">
+                <Typography fontWeight={500} color='secondary'>
                   {userVote.choice}
                 </Typography>
               </ListItem>
@@ -242,7 +242,7 @@ export default function VoteDetail({
           ))}
         </List>
       )}
-      <Modal title="Poll details" size="large" open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
+      <Modal title='Poll details' size='large' open={voteDetailsPopup.isOpen} onClose={voteDetailsPopup.close}>
         <VoteDetail vote={vote} detailed={true} cancelVote={cancelVote} castVote={castVote} deleteVote={deleteVote} />
       </Modal>
     </VotesWrapper>

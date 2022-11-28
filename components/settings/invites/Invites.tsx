@@ -55,12 +55,12 @@ function Invites({ space }: InvitesProps) {
       <InviteIntro />
       <Legend
         noBorder
-        variant="inherit"
+        variant='inherit'
         variantMapping={{ inherit: 'div' }}
-        display="flex"
-        justifyContent="space-between"
+        display='flex'
+        justifyContent='space-between'
       >
-        <Typography variant="h2" fontSize="inherit" fontWeight={700}>
+        <Typography variant='h2' fontSize='inherit' fontWeight={700}>
           Invite Links
         </Typography>
         <InviteActions

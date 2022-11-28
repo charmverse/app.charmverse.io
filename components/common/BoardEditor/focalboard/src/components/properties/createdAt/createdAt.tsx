@@ -10,7 +10,7 @@ type Props = {
 function CreatedAt(props: Props): JSX.Element {
   const intl = useIntl();
   return (
-    <div className="CreatedAt octo-propertyvalue readonly">
+    <div className='CreatedAt octo-propertyvalue readonly'>
       {Utils.displayDateTime(new Date(props.createdAt), intl)}
     </div>
   );

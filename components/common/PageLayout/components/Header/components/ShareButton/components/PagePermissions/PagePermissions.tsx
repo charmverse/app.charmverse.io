@@ -163,11 +163,11 @@ export default function PagePermissions({
       {canEdit && (
         <Box mb={1} onClick={() => popupState.open()}>
           <StyledInput
-            placeholder="Add people and roles"
+            placeholder='Add people and roles'
             fullWidth
             readOnly
             endAdornment={
-              <InputAdornment position="end">
+              <InputAdornment position='end'>
                 <Button disableElevation>Invite</Button>
               </InputAdornment>
             }
@@ -175,9 +175,9 @@ export default function PagePermissions({
         </Box>
       )}
 
-      <Box display="block" py={0.5}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="body2">Everyone at {space?.name}</Typography>
+      <Box display='block' py={0.5}>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Typography variant='body2'>Everyone at {space?.name}</Typography>
           <div style={{ width: '160px', textAlign: 'right' }}>
             {canEdit ? (
               <SmallSelect
@@ -194,7 +194,7 @@ export default function PagePermissions({
                     : ''
                 }
               >
-                <Typography color="secondary" variant="caption">
+                <Typography color='secondary' variant='caption'>
                   {spaceLevelPermission ? permissionsWithoutCustom[spaceLevelPermission.permissionLevel] : 'No access'}
                 </Typography>
               </Tooltip>
@@ -202,8 +202,8 @@ export default function PagePermissions({
           </div>
         </Box>
         {spaceLevelPermission?.sourcePermission && (
-          <Box display="block">
-            <Typography variant="caption">
+          <Box display='block'>
+            <Typography variant='caption'>
               Inherited from
               <Link
                 sx={{ ml: 0.5 }}
@@ -218,9 +218,9 @@ export default function PagePermissions({
 
       {sortedPermissions.map((permission) => {
         return (
-          <Box display="block" py={0.5} key={permission.id}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" key={permission.displayName}>
-              <Typography variant="body2">{permission.displayName}</Typography>
+          <Box display='block' py={0.5} key={permission.id}>
+            <Box display='flex' justifyContent='space-between' alignItems='center' key={permission.displayName}>
+              <Typography variant='body2'>{permission.displayName}</Typography>
               <div style={{ width: '160px', textAlign: 'right' }}>
                 {canEdit ? (
                   <SmallSelect
@@ -237,7 +237,7 @@ export default function PagePermissions({
                         : ''
                     }
                   >
-                    <Typography color="secondary" variant="caption">
+                    <Typography color='secondary' variant='caption'>
                       {permissionLevels[permission.permissionLevel]}
                     </Typography>
                   </Tooltip>
@@ -245,8 +245,8 @@ export default function PagePermissions({
               </div>
             </Box>
             {permission.sourcePermission && (
-              <Box display="block">
-                <Typography variant="caption">
+              <Box display='block'>
+                <Typography variant='caption'>
                   Inherited from
                   <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[permission.sourcePermission.pageId]?.path}`}>
                     {pages[permission.sourcePermission.pageId]?.title || 'Untitled'}
@@ -258,7 +258,7 @@ export default function PagePermissions({
         );
       })}
 
-      <Modal {...bindPopover(popupState)} title="Invite people to this page">
+      <Modal {...bindPopover(popupState)} title='Invite people to this page'>
         <AddPagePermissionsForm
           existingPermissions={pagePermissions}
           pageId={pageId}

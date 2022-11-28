@@ -30,7 +30,7 @@ function BountyCard({ onDelete, bounty, getPagePermissions, page, onClick }: Pro
   return (
     <StyledBox
       onClick={onClick}
-      className="KanbanCard"
+      className='KanbanCard'
       sx={{
         height: 'fit-content',
         display: 'grid' // make child full height,
@@ -51,7 +51,7 @@ function BountyCard({ onDelete, bounty, getPagePermissions, page, onClick }: Pro
           sx={{ p: 0 }}
           titleTypographyProps={{ sx: { fontSize: '1rem', fontWeight: 'bold' } }}
         />
-        <Box width="100%" display="flex" flex={1} flexDirection="column" justifyContent="space-between">
+        <Box width='100%' display='flex' flex={1} flexDirection='column' justifyContent='space-between'>
           <Typography paragraph={true}>{fancyTrim(pageDetails?.contentText, 50)}</Typography>
           <BountyStatusBadge bounty={bounty} hideStatus={true} truncate />
         </Box>

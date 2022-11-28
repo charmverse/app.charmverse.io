@@ -62,11 +62,11 @@ function EditIconContainer({
   ...props
 }: { children: ReactNode; readOnly?: boolean; onClick: IconButtonProps['onClick'] } & IconButtonProps) {
   return (
-    <StyledStack direction="row" spacing={1} alignItems="center">
+    <StyledStack direction='row' spacing={1} alignItems='center'>
       {children}
       {!readOnly && (
-        <IconButton onClick={onClick} {...props} className="icons">
-          <EditIcon fontSize="small" />
+        <IconButton onClick={onClick} {...props} className='icons'>
+          <EditIcon fontSize='small' />
         </IconButton>
       )}
     </StyledStack>
@@ -162,16 +162,16 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           image={user?.avatar}
           updateAvatar={updateProfileAvatar}
           editable={!readOnly}
-          variant="circular"
+          variant='circular'
           canSetNft
           isSaving={isSavingAvatar}
           isNft={hasNftAvatar(user)}
         />
-        <Grid container direction="column" spacing={0.5}>
+        <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <EditIconContainer data-testid="edit-identity" readOnly={readOnly} onClick={identityModalState.open}>
+            <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
-              <Typography variant="h1">{user?.username}</Typography>
+              <Typography variant='h1'>{user?.username}</Typography>
             </EditIconContainer>
           </Grid>
           {!readOnly && (
@@ -179,15 +179,15 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
               <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
                 <Typography>
                   {hostname}/u/
-                  <Link external href={userLink} target="_blank">
+                  <Link external href={userLink} target='_blank'>
                     {userPath}
                   </Link>
                 </Typography>
-                <Tooltip placement="top" title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
+                <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
                   <Box sx={{ display: 'grid' }}>
                     <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
                       <IconButton>
-                        <ContentCopyIcon fontSize="small" />
+                        <ContentCopyIcon fontSize='small' />
                       </IconButton>
                     </CopyToClipboard>
                   </Box>
@@ -196,20 +196,20 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             </Grid>
           )}
           <Grid item mt={1} height={40}>
-            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid="edit-social">
+            <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
               <SocialIcons social={socialDetails} />
-              {!readOnly && <StyledDivider orientation="vertical" flexItem />}
+              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
             </EditIconContainer>
           </Grid>
-          <Grid item container alignItems="center" sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid="edit-description">
+          <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+            <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
                 {userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
               </span>
             </EditIconContainer>
           </Grid>
-          <Grid item container alignItems="center" sx={{ width: 'fit-content', flexWrap: 'initial' }}>
-            <EditIconContainer readOnly={readOnly} onClick={timezoneModalState.open} data-testid="edit-timezone">
+          <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+            <EditIconContainer readOnly={readOnly} onClick={timezoneModalState.open} data-testid='edit-timezone'>
               <TimezoneDisplay
                 timezone={userDetails?.timezone}
                 defaultValue={readOnly ? 'N/A' : 'Update your timezone'}

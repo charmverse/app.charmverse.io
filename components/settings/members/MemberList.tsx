@@ -73,8 +73,8 @@ export default function MemberList({ isAdmin, spaceId, spaceOwner }: Props) {
   return (
     <>
       <Legend>Current Members</Legend>
-      <Box overflow="auto">
-        <Table size="small" aria-label="Current members table">
+      <Box overflow='auto'>
+        <Table size='small' aria-label='Current members table'>
           <TableHead>
             <TableRow>
               <TableCell>Username</TableCell>
@@ -99,7 +99,7 @@ export default function MemberList({ isAdmin, spaceId, spaceOwner }: Props) {
       </Box>
       {removedMember && (
         <ConfirmDeleteModal
-          title="Remove member"
+          title='Remove member'
           onClose={popupState.close}
           open={menuState.open}
           buttonText={`Remove ${removedMember.username}`}

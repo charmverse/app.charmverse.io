@@ -85,7 +85,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
         />
         Guild.xyz
       </MenuItem>
-      <ScrollableModal size="large" title="Import Guild roles" onClose={resetState} open={showImportedRolesModal}>
+      <ScrollableModal size='large' title='Import Guild roles' onClose={resetState} open={showImportedRolesModal}>
         <Box
           sx={{
             px: 4,
@@ -95,7 +95,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
           {fetchingGuilds ? (
             <StyledSpinner />
           ) : guilds.length === 0 ? (
-            <Typography variant="subtitle1" color="secondary">
+            <Typography variant='subtitle1' color='secondary'>
               You are not part of any guild(s)
             </Typography>
           ) : (

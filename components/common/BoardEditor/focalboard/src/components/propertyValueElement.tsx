@@ -115,11 +115,11 @@ function PropertyValueElement(props: Props): JSX.Element {
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
-      return <div className="octo-propertyvalue">{displayValue}</div>;
+      return <div className='octo-propertyvalue'>{displayValue}</div>;
     }
     return (
       <DateRange
-        className="octo-propertyvalue"
+        className='octo-propertyvalue'
         value={value.toString()}
         showEmptyPlaceholder={showEmptyPlaceholder}
         onChange={(newValue) => {
@@ -166,7 +166,7 @@ function PropertyValueElement(props: Props): JSX.Element {
     if (!readOnly) {
       return (
         <Editable
-          className="octo-propertyvalue"
+          className='octo-propertyvalue'
           placeholderText={emptyDisplayValue}
           value={value.toString()}
           autoExpand={false}
@@ -180,9 +180,9 @@ function PropertyValueElement(props: Props): JSX.Element {
         />
       );
     }
-    return <div className="octo-propertyvalue octo-propertyvalue--readonly">{displayValue}</div>;
+    return <div className='octo-propertyvalue octo-propertyvalue--readonly'>{displayValue}</div>;
   }
-  return <div className="octo-propertyvalue">{finalDisplayValue}</div>;
+  return <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
 }
 
 export default PropertyValueElement;

@@ -51,7 +51,7 @@ export default function NotifyMeModal(props: Props) {
   }
 
   return (
-    <Modal open={isOpen} onClose={close} title="Receive daily notifications (beta)">
+    <Modal open={isOpen} onClose={close} title='Receive daily notifications (beta)'>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHelperText sx={{ mb: 1 }}>
           Input your email to receive daily notifications.
@@ -65,13 +65,13 @@ export default function NotifyMeModal(props: Props) {
           fullWidth
           error={!!errors.email}
           helperText={errors.email?.message}
-          placeholder="me@gmail.com"
+          placeholder='me@gmail.com'
           sx={{ mb: 2 }}
         />
-        <Box display="flex" gap={1}>
-          <Button type="submit">Save</Button>
+        <Box display='flex' gap={1}>
+          <Button type='submit'>Save</Button>
           {currentValue && (
-            <Button onClick={removeNotifications} color="secondary" variant="outlined">
+            <Button onClick={removeNotifications} color='secondary' variant='outlined'>
               Remove
             </Button>
           )}

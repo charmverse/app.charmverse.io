@@ -57,25 +57,25 @@ export function VoteTasksListRow({
   return (
     <TableRow>
       <TableCell>
-        <Box alignItems="center" display="flex">
+        <Box alignItems='center' display='flex'>
           <VoteIcon {...voteTask} />
-          <Typography variant="body1" variantMapping={{ body1: 'span' }} marginLeft="5px">
+          <Typography variant='body1' variantMapping={{ body1: 'span' }} marginLeft='5px'>
             {voteTitle}
           </Typography>
         </Box>
       </TableCell>
       <TableCell>
-        <Link href={voteLink} variant="body1" color="inherit">
+        <Link href={voteLink} variant='body1' color='inherit'>
           {voteLocation}
         </Link>
       </TableCell>
       <TableCell>
         <Typography>{spaceName}</Typography>
       </TableCell>
-      <TableCell align="center">
+      <TableCell align='center'>
         <Typography>{isDeadlineOverdue ? 'Complete' : `due ${dueText}`}</Typography>
       </TableCell>
-      <TableCell align="center">
+      <TableCell align='center'>
         <Button
           sx={{
             borderRadius: '18px',
@@ -137,31 +137,31 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
   if (error) {
     return (
       <Box>
-        <Alert severity="error">There was an error. Please try again later!</Alert>
+        <Alert severity='error'>There was an error. Please try again later!</Alert>
       </Box>
     );
   } else if (!tasks?.votes) {
-    return <LoadingComponent height="200px" isLoading={true} />;
+    return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   const totalVotes = tasks?.votes.length ?? 0;
 
   if (totalVotes === 0) {
-    return <EmptyTaskState taskType="votes" />;
+    return <EmptyTaskState taskType='votes' />;
   }
 
   const voteTask = tasks.votes.find((v) => v.id === selectedVoteId);
 
   return (
-    <Box overflow="auto">
-      <Table size="medium" aria-label="Nexus polls table">
+    <Box overflow='auto'>
+      <Table size='medium' aria-label='Nexus polls table'>
         <TableHead>
           <TableRow>
             <TableCell>Poll</TableCell>
             <TableCell width={300}>Page</TableCell>
             <TableCell width={200}>Workspace</TableCell>
-            <TableCell align="center">Due</TableCell>
-            <TableCell width="135" align="center">
+            <TableCell align='center'>Due</TableCell>
+            <TableCell width='135' align='center'>
               Action
             </TableCell>
           </TableRow>
@@ -172,7 +172,7 @@ export function VoteTasksList({ error, tasks, mutateTasks }: VoteTasksListProps)
           ))}
         </TableBody>
       </Table>
-      <Modal title="Poll details" size="large" open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
+      <Modal title='Poll details' size='large' open={!!selectedVoteId && !!voteTask} onClose={closeModal}>
         {voteTask && (
           <VoteDetail vote={voteTask} detailed castVote={castVote} deleteVote={deleteVote} cancelVote={cancelVote} />
         )}

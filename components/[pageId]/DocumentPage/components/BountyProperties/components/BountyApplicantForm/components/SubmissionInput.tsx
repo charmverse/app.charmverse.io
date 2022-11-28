@@ -109,9 +109,9 @@ export default function SubmissionInput({
   return (
     <Stack my={2} gap={1}>
       <Box
-        display="flex"
-        justifyContent="space-between"
-        flexDirection="row"
+        display='flex'
+        justifyContent='space-between'
+        flexDirection='row'
         gap={0.5}
         sx={{ cursor: !alwaysExpanded ? 'pointer' : 'inherit' }}
         onClick={() => {
@@ -120,7 +120,7 @@ export default function SubmissionInput({
           }
         }}
       >
-        <Box display="flex" gap={0.5}>
+        <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold' }}>
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
           </FormLabel>
@@ -130,9 +130,9 @@ export default function SubmissionInput({
                 top: -2.5,
                 position: 'relative'
               }}
-              size="small"
+              size='small'
             >
-              {isVisible ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
             </IconButton>
           )}
         </Box>
@@ -140,9 +140,9 @@ export default function SubmissionInput({
           <BountyApplicantStatus submission={submission} />
         )}
       </Box>
-      <Collapse in={isVisible} timeout="auto" unmountOnExit>
+      <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
-          <Grid container direction="column" spacing={2}>
+          <Grid container direction='column' spacing={2}>
             <Grid item>
               <InlineCharmEditor
                 content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
@@ -174,7 +174,7 @@ export default function SubmissionInput({
                 <InputLabel>Address to get paid for this bounty</InputLabel>
                 <TextField
                   {...register('walletAddress')}
-                  type="text"
+                  type='text'
                   fullWidth
                   error={!!errors.walletAddress}
                   helperText={errors.walletAddress?.message}
@@ -184,8 +184,8 @@ export default function SubmissionInput({
             )}
 
             {!readOnly && (
-              <Grid item display="flex" gap={1}>
-                <Button disabled={!isValid && submission?.status === 'inProgress'} type="submit">
+              <Grid item display='flex' gap={1}>
+                <Button disabled={!isValid && submission?.status === 'inProgress'} type='submit'>
                   {submission?.submission ? 'Update' : 'Submit'}
                 </Button>
                 {!submission?.submission && !alwaysExpanded && (
@@ -194,8 +194,8 @@ export default function SubmissionInput({
                       setIsVisible(false);
                       onCancel();
                     }}
-                    variant="outlined"
-                    color="secondary"
+                    variant='outlined'
+                    color='secondary'
                   >
                     Cancel
                   </Button>

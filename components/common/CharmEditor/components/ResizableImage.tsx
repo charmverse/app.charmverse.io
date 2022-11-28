@@ -46,7 +46,7 @@ function EmptyImageContainer({
       {...props}
     >
       <StyledEmptyImageContainer>
-        <ImageIcon fontSize="small" />
+        <ImageIcon fontSize='small' />
         <Typography>Add an image</Typography>
       </StyledEmptyImageContainer>
     </ListItem>
@@ -200,9 +200,9 @@ function ResizableImage({ readOnly = false, onResizeStop, node, updateAttrs, sel
       });
   }
   if (uploadFailed) {
-    return <Alert severity="warning">Image upload failed</Alert>;
+    return <Alert severity='warning'>Image upload failed</Alert>;
   } else if (uploadingImage) {
-    return <LoadingComponent isLoading label="Uploading" />;
+    return <LoadingComponent isLoading label='Uploading' />;
   } else if (readOnly) {
     return (
       <StyledImageContainer size={node.attrs.size}>

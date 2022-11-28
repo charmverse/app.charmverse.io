@@ -24,7 +24,7 @@ export default function MultiPaymentButton({ isLoading, chainId, safeAddress, tr
   });
 
   return (
-    <Tooltip arrow placement="top" title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
+    <Tooltip arrow placement='top' title={!safe ? `Connect your wallet to the Gnosis safe: ${safeAddress}` : ''}>
       <span>
         <Button disabled={isLoading || !safe || transactions.length === 0} onClick={makePayment}>
           Make Payment ({transactions.length})

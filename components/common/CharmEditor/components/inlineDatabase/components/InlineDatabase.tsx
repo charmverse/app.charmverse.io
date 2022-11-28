@@ -155,7 +155,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
 
   return (
     <>
-      <StylesContainer className="focalboard-body" containerWidth={containerWidth}>
+      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
         <CenterPanel
           // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl

@@ -45,7 +45,7 @@ const CommentsList = React.memo((props: Props) => {
   const { comments } = props;
 
   return (
-    <div className="CommentsList">
+    <div className='CommentsList'>
       {/* New comment */}
       {!props.readOnly && (
         <NewCommentInput
@@ -70,7 +70,7 @@ const CommentsList = React.memo((props: Props) => {
         ))}
 
       {/* horizontal divider below comments */}
-      {!(comments.length === 0 && props.readOnly) && <hr className="CommentsList__divider" />}
+      {!(comments.length === 0 && props.readOnly) && <hr className='CommentsList__divider' />}
     </div>
   );
 });
@@ -88,8 +88,8 @@ export function NewCommentInput({ initialValue = null, $key, username, avatar, o
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
 
   return (
-    <div className="CommentsList__new">
-      <Avatar size="xSmall" name={username} avatar={avatar} />
+    <div className='CommentsList__new'>
+      <Avatar size='xSmall' name={username} avatar={avatar} />
       <InlineCharmEditor
         content={newComment?.content}
         key={$key} // use the size of comments so it resets when the new one is added
@@ -106,7 +106,7 @@ export function NewCommentInput({ initialValue = null, $key, username, avatar, o
 
       {newComment && (
         <Button filled={true} onClick={() => onSubmit(newComment)}>
-          <FormattedMessage id="CommentsList.send" defaultMessage="Send" />
+          <FormattedMessage id='CommentsList.send' defaultMessage='Send' />
         </Button>
       )}
     </div>

@@ -234,12 +234,12 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     <SidebarContainer>
       <Workspaces />
       {space && (
-        <Box display="flex" flexDirection="column" sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-          <SidebarHeader className="sidebar-header">
+        <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
+          <SidebarHeader className='sidebar-header'>
             <Typography>
-              <strong data-test="sidebar-space-name">{space.name}</strong>
+              <strong data-test='sidebar-space-name'>{space.name}</strong>
             </Typography>
-            <IconButton onClick={closeSidebar} size="small">
+            <IconButton onClick={closeSidebar} size='small'>
               <ChevronLeftIcon />
             </IconButton>
           </SidebarHeader>
@@ -248,22 +248,22 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             <SidebarLink
               href={`/${space.domain}/members`}
               active={router.pathname.startsWith('/[domain]/members')}
-              icon={<AccountCircleIcon fontSize="small" />}
-              label="Member Directory"
+              icon={<AccountCircleIcon fontSize='small' />}
+              label='Member Directory'
               onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               href={`/${space.domain}/proposals`}
               active={router.pathname.startsWith('/[domain]/proposals')}
-              icon={<TaskOutlinedIcon fontSize="small" />}
-              label="Proposals"
+              icon={<TaskOutlinedIcon fontSize='small' />}
+              label='Proposals'
               onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               href={`/${space.domain}/bounties`}
               active={router.pathname.startsWith('/[domain]/bounties')}
-              icon={<BountyIcon fontSize="small" />}
-              label="Bounties"
+              icon={<BountyIcon fontSize='small' />}
+              label='Bounties'
               onClick={closeSidebarIfIsMobile}
             />
             <Divider sx={{ mx: 2, my: 1 }} />
@@ -274,21 +274,21 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
                   {openSearchLabel}
                 </>
               }
-              placement="right"
+              placement='right'
             >
               <div>
                 <SidebarBox
                   onClick={searchInWorkspaceModalState.open}
-                  icon={<SearchIcon color="secondary" fontSize="small" />}
-                  label="Quick Find"
+                  icon={<SearchIcon color='secondary' fontSize='small' />}
+                  label='Quick Find'
                 />
               </div>
             </Tooltip>
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings/invites')}
               href={`/${space.domain}/settings/invites`}
-              icon={<GroupAddOutlinedIcon color="secondary" fontSize="small" />}
-              label="Invite Members"
+              icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+              label='Invite Members'
               onClick={closeSidebarIfIsMobile}
             />
             <SearchInWorkspaceModal
@@ -298,20 +298,20 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             <SidebarLink
               active={router.pathname.startsWith('/[domain]/settings/workspace')}
               href={`/${space.domain}/settings/workspace`}
-              icon={<SettingsIcon color="secondary" fontSize="small" />}
-              label="Settings"
+              icon={<SettingsIcon color='secondary' fontSize='small' />}
+              label='Settings'
               onClick={closeSidebarIfIsMobile}
             />
             <SidebarLink
               active={false}
-              href="https://discord.gg/ACYCzBGC2M"
-              icon={<QuestionMarkIcon color="secondary" fontSize="small" />}
-              label="Support & Feedback"
-              target="_blank"
+              href='https://discord.gg/ACYCzBGC2M'
+              icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
+              label='Support & Feedback'
+              target='_blank'
               onClick={closeSidebarIfIsMobile}
             />
           </Box>
-          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className="page-navigation">
+          <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
               <Box mb={2}>
                 <SectionName>FAVORITES</SectionName>
@@ -321,8 +321,8 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             <WorkspaceLabel>
               <SectionName>WORKSPACE</SectionName>
               {userSpacePermissions?.createPage && (
-                <div className="add-a-page">
-                  <NewPageMenu tooltip="Add a page" addPage={addPage} />
+                <div className='add-a-page'>
+                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
                 </div>
               )}
             </WorkspaceLabel>
@@ -334,8 +334,8 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
                 onClick={() => {
                   setShowingTrash(true);
                 }}
-                icon={<DeleteOutlinedIcon fontSize="small" />}
-                label="Trash"
+                icon={<DeleteOutlinedIcon fontSize='small' />}
+                label='Trash'
               />
             </Box>
           </ScrollingContainer>

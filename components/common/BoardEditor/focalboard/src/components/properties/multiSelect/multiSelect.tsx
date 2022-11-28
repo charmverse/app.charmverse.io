@@ -40,10 +40,10 @@ function MultiSelectProperty(props: Props): JSX.Element {
   if (!isEditable || !open) {
     return (
       <div
-        className="octo-propertyvalue"
+        className='octo-propertyvalue'
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        data-testid="multiselect-non-editable"
+        data-testid='multiselect-non-editable'
         onClick={() => setOpen(true)}
       >
         {values.map((v) => (
@@ -51,7 +51,7 @@ function MultiSelectProperty(props: Props): JSX.Element {
             {v.value}
           </Label>
         ))}
-        {values.length === 0 && <Label color="empty">{emptyValue}</Label>}
+        {values.length === 0 && <Label color='empty'>{emptyValue}</Label>}
       </div>
     );
   }

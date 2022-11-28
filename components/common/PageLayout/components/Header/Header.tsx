@@ -162,12 +162,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         }}
       >
         <MessageOutlinedIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="View comments" />
+        <ListItemText primary='View comments' />
       </ListItemButton>
 
       <ListItemButton
@@ -177,12 +177,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         }}
       >
         <RateReviewOutlinedIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="View suggestions" />
+        <ListItemText primary='View suggestions' />
       </ListItemButton>
       <ListItemButton
         onClick={() => {
@@ -191,12 +191,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         }}
       >
         <FormatListBulletedOutlinedIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="View polls" />
+        <ListItemText primary='View polls' />
       </ListItemButton>
       <Divider />
       <ListItemButton
@@ -220,12 +220,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       </ListItemButton>
       <ListItemButton onClick={onCopyLink}>
         <ContentCopyIcon
-          fontSize="small"
+          fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary="Copy link" />
+        <ListItemText primary='Copy link' />
       </ListItemButton>
       <Divider />
       {(basePage?.type === 'card' || basePage?.type === 'page') && (
@@ -234,12 +234,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             <div>
               <ListItemButton onClick={() => convertToProposal(basePage.id)} disabled={!canCreateProposal}>
                 <TaskOutlinedIcon
-                  fontSize="small"
+                  fontSize='small'
                   sx={{
                     mr: 1
                   }}
                 />
-                <ListItemText primary="Convert to proposal" />
+                <ListItemText primary='Convert to proposal' />
               </ListItemButton>
             </div>
           </Tooltip>
@@ -250,12 +250,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         <div>
           <ListItemButton disabled={!pagePermissions?.delete || basePage?.deletedAt !== null} onClick={onDeletePage}>
             <DeleteOutlineOutlinedIcon
-              fontSize="small"
+              fontSize='small'
               sx={{
                 mr: 1
               }}
             />
-            <ListItemText primary="Delete" />
+            <ListItemText primary='Delete' />
           </ListItemButton>
         </div>
       </Tooltip>
@@ -281,12 +281,12 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             }}
           >
             <GetAppOutlinedIcon
-              fontSize="small"
+              fontSize='small'
               sx={{
                 mr: 1
               }}
             />
-            <ListItemText primary="Export to markdown" />
+            <ListItemText primary='Export to markdown' />
           </ListItemButton>
         </div>
       </Tooltip>
@@ -299,9 +299,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
             display: 'flex',
             justifyContent: 'space-between'
           }}
-          labelPlacement="start"
-          control={<Switch size="small" checked={isFullWidth} onChange={onSwitchChange} />}
-          label={<Typography variant="body2">Full Width</Typography>}
+          labelPlacement='start'
+          control={<Switch size='small' checked={isFullWidth} onChange={onSwitchChange} />}
+          label={<Typography variant='body2'>Full Width</Typography>}
         />
       </ListItemButton>
       {pageCreator && basePage && (
@@ -313,8 +313,8 @@ export default function Header({ open, openSidebar }: HeaderProps) {
               my: 1
             }}
           >
-            <Typography variant="subtitle2">Last edited by {pageCreator.username}</Typography>
-            <Typography variant="subtitle2">Last edited at {humanFriendlyDate(basePage.updatedAt)}</Typography>
+            <Typography variant='subtitle2'>Last edited by {pageCreator.username}</Typography>
+            <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(basePage.updatedAt)}</Typography>
           </Stack>
         </>
       )}
@@ -336,11 +336,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   }
 
   return (
-    <StyledToolbar variant="dense">
+    <StyledToolbar variant='dense'>
       <IconButton
-        color="inherit"
+        color='inherit'
         onClick={openSidebar}
-        edge="start"
+        edge='start'
         sx={{
           display: 'inline-flex',
           mr: 2,
@@ -361,7 +361,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
         }}
       >
         <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
-        <Box display="flex" alignItems="center" alignSelf="stretch" mr={-1}>
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
 
           {basePage && (
@@ -374,17 +374,17 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           )}
 
           {pageOptionsList && (
-            <Box ref={pageMenuAnchor} display="flex" alignSelf="stretch" alignItems="center">
+            <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
               <div>
                 <IconButton
-                  size="small"
+                  size='small'
                   onClick={() => {
                     setPageMenuOpen(!pageMenuOpen);
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title="View comments, polls, export content and more" arrow>
-                    <MoreHorizIcon color="secondary" />
+                  <Tooltip title='View comments, polls, export content and more' arrow>
+                    <MoreHorizIcon color='secondary' />
                   </Tooltip>
                 </IconButton>
               </div>
@@ -406,20 +406,20 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           {/** dark mode toggle */}
           {user && (
             <IconButton
-              size="small"
+              size='small'
               sx={{ display: { xs: 'none', md: 'inline-flex' }, mx: 1 }}
               onClick={colorMode.toggleColorMode}
-              color="inherit"
+              color='inherit'
             >
               <Tooltip
                 title={`Enable ${theme.palette.mode === 'dark' ? 'light mode' : 'dark mode'}`}
                 arrow
-                placement="top"
+                placement='top'
               >
                 {theme.palette.mode === 'dark' ? (
-                  <SunIcon fontSize="small" color="secondary" />
+                  <SunIcon fontSize='small' color='secondary' />
                 ) : (
-                  <MoonIcon fontSize="small" color="secondary" />
+                  <MoonIcon fontSize='small' color='secondary' />
                 )}
               </Tooltip>
             </IconButton>

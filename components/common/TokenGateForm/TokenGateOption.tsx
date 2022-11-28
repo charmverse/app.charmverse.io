@@ -43,7 +43,7 @@ export default function TokenGateOption({ tokenGate, validGate, isVerifying }: P
 
   return (
     <Card
-      variant="outlined"
+      variant='outlined'
       raised={validGate === true}
       color={validGate === true ? 'success' : 'default'}
       sx={{ my: 1, ...validGateBorderProps }}
@@ -53,19 +53,19 @@ export default function TokenGateOption({ tokenGate, validGate, isVerifying }: P
           <Grid item xs={10}>
             <Typography>{description}</Typography>
           </Grid>
-          <Grid item xs={2} display="flex" justifyContent="center" alignItems="center">
-            {isVerifying && <LoadingComponent isLoading height="20px" size={25} />}
-            {!isVerifying && validGate && <CheckCircleIcon color="success" />}
-            {!isVerifying && validGate === false && <CancelIcon color="error" />}
+          <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
+            {isVerifying && <LoadingComponent isLoading height='20px' size={25} />}
+            {!isVerifying && validGate && <CheckCircleIcon color='success' />}
+            {!isVerifying && validGate === false && <CancelIcon color='error' />}
           </Grid>
           {tokenGate.tokenGateToRoles.length > 0 && (
             <Grid item xs spacing={1}>
-              <Typography sx={{ mr: 1 }} variant="caption">
+              <Typography sx={{ mr: 1 }} variant='caption'>
                 Roles
               </Typography>
               {tokenGate.tokenGateToRoles.map((role) => (
                 <Chip
-                  variant="outlined"
+                  variant='outlined'
                   sx={{ mr: 2, fontWeight: validGate ? 'bold' : undefined }}
                   color={validGate ? 'success' : 'secondary'}
                   key={role.id}

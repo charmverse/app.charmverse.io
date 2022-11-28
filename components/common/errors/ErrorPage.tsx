@@ -25,7 +25,7 @@ const Text = styled(Typography)`
 export default function ErrorPage({ message = 'Sorry! there was an error' }: { message?: string }) {
   return (
     <Container>
-      <Box sx={{ textAlign: 'center' }} data-test="error-title">
+      <Box sx={{ textAlign: 'center' }} data-test='error-title'>
         <StyledBolt />
         <Text sx={{ mt: 3 }}>{message}</Text>
       </Box>

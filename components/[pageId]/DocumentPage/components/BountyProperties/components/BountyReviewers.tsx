@@ -92,22 +92,22 @@ export default function BountyReviewers({ bounty, permissions }: BountyReviewers
   const hasMultipleReviewers = reviewerNames.users.length > 1 || reviewerNames.roles.length > 0;
 
   return (
-    <Box className="octo-propertyrow" display="flex" alignItems="center" gap={2}>
-      <div className="octo-propertyname octo-propertyname--readonly">
+    <Box className='octo-propertyrow' display='flex' alignItems='center' gap={2}>
+      <div className='octo-propertyname octo-propertyname--readonly'>
         <Button>Reviewer{hasMultipleReviewers ? 's' : ''}</Button>
       </div>
 
       {reviewerNames.roles.length > 0 && (
-        <Box display="flex" alignItems="center">
+        <Box display='flex' alignItems='center'>
           {reviewerNames.roles.map((reviewer) => {
-            return <Chip size="small" key={reviewer.id} label={reviewer.name} color="purple" sx={{ mr: 1 }} />;
+            return <Chip size='small' key={reviewer.id} label={reviewer.name} color='purple' sx={{ mr: 1 }} />;
           })}
-          {reviewerNames.users.length > 0 && <Typography variant="subtitle2">(Roles)</Typography>}
+          {reviewerNames.users.length > 0 && <Typography variant='subtitle2'>(Roles)</Typography>}
         </Box>
       )}
 
       {reviewerNames.users.length > 0 && (
-        <Box display="flex" alignItems="center">
+        <Box display='flex' alignItems='center'>
           <AvatarGroup
             max={maxVisibleUsers}
             sx={{ mr: 1 }}
@@ -121,10 +121,10 @@ export default function BountyReviewers({ bounty, permissions }: BountyReviewers
                 : reviewer.name.slice(0, 1).toUpperCase();
 
               return (
-                <Tooltip placement="top" key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
+                <Tooltip placement='top' key={reviewer.id} title={!reviewer.name ? userName : reviewer.name}>
                   <Box>
                     <Avatar
-                      size="small"
+                      size='small'
                       name={userName.slice(0, 1)}
                       avatar={reviewer.profilePic as string}
                       isNft={reviewer.hasNftAvatar}
@@ -134,7 +134,7 @@ export default function BountyReviewers({ bounty, permissions }: BountyReviewers
               );
             })}
           </AvatarGroup>
-          {reviewerNames.roles.length > 0 && <Typography variant="subtitle2">(Users)</Typography>}
+          {reviewerNames.roles.length > 0 && <Typography variant='subtitle2'>(Users)</Typography>}
         </Box>
       )}
     </Box>

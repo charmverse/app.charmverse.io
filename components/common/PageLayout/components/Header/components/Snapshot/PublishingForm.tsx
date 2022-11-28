@@ -268,12 +268,12 @@ export default function PublishingForm({ onSubmit, page }: Props) {
     <Box>
       {checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
-          <Grid container direction="column" spacing={3}>
+          <Grid container direction='column' spacing={3}>
             <Grid item>
               <FieldLabel>Voting type</FieldLabel>
               <InputEnumToOption
                 keyAndLabel={SnapshotVotingMode}
-                defaultValue="single-choice"
+                defaultValue='single-choice'
                 onChange={(voteMode) => setSnapshotVoteMode(voteMode as SnapshotVotingModeType)}
               />
             </Grid>
@@ -288,7 +288,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
             <Grid item>
               <InputGeneratorText
                 defaultOptions={votingOptions}
-                title="Voting options"
+                title='Voting options'
                 minimumOptions={MIN_VOTING_OPTIONS}
                 onChange={(options) => setVotingOptions(options)}
               />
@@ -304,7 +304,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
               ) : (
                 <TextField
                   defaultValue={snapshotBlockNumber}
-                  type="number"
+                  type='number'
                   onInput={(input: any) => {
                     setSnapshotBlockNumber(parseInt(input.target.value));
                   }}
@@ -317,7 +317,7 @@ export default function PublishingForm({ onSubmit, page }: Props) {
               )}
             </Grid>
 
-            <Grid item display="flex" gap={1} justifyContent="space-between">
+            <Grid item display='flex' gap={1} justifyContent='space-between'>
               <div
                 style={{
                   flexGrow: 1
@@ -376,8 +376,8 @@ export default function PublishingForm({ onSubmit, page }: Props) {
               </Grid>
             )}
 
-            <Grid item display="flex" justifyContent="space-between">
-              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type="submit">
+            <Grid item display='flex' justifyContent='space-between'>
+              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type='submit'>
                 {publishing ? (
                   <>
                     <LoadingIcon size={18} sx={{ mr: 1 }} />

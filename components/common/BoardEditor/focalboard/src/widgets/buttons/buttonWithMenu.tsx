@@ -14,11 +14,11 @@ type Props = {
 
 function ButtonWithMenu(props: Props): JSX.Element {
   return (
-    <Button disableElevation size="small" onClick={props.onClick}>
+    <Button disableElevation size='small' onClick={props.onClick}>
       {props.text}
       <MenuWrapper stopPropagationOnToggle={true}>
-        <Box sx={{ pl: 1 }} className="button-dropdown">
-          <ArrowDropDownOutlinedIcon fontSize="small" />
+        <Box sx={{ pl: 1 }} className='button-dropdown'>
+          <ArrowDropDownOutlinedIcon fontSize='small' />
         </Box>
         {props.children}
       </MenuWrapper>

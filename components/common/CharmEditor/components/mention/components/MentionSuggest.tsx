@@ -65,7 +65,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   return (
     <PopoverMenu
       container={tooltipContentDOM}
-      maxHeight="300px"
+      maxHeight='300px'
       isOpen={isVisible}
       onClose={() => {
         hideSuggestionsTooltip(suggestTooltipKey)(view.state, view.dispatch, view);
@@ -79,7 +79,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
       >
         <GroupLabel>Members</GroupLabel>
         {filteredMembers.length === 0 ? (
-          <Typography sx={{ ml: 2 }} variant="subtitle2" color="secondary">
+          <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>
             No members found
           </Typography>
         ) : (
@@ -88,15 +88,15 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
               const isSelected = selectedGroup === 'members' ? activeItemIndex === memberIndex : false;
               return (
                 <MenuItem
-                  component="div"
+                  component='div'
                   onClick={() => onSelectMention(member.id, 'user')}
                   key={member.id}
                   selected={isSelected}
                   data-value={member.id}
-                  data-type="user"
+                  data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <UserDisplay fontSize={14} user={member} avatarSize="small" />
+                  <UserDisplay fontSize={14} user={member} avatarSize='small' />
                 </MenuItem>
               );
             })}

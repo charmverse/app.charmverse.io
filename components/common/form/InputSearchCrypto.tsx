@@ -97,16 +97,16 @@ export function InputSearchCrypto({
         options={cryptoOptions}
         disableClearable={true}
         autoHighlight
-        size="small"
+        size='small'
         getOptionLabel={(option) => {
           return getTokenInfo(paymentMethods, option).tokenSymbol;
         }}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
-              <Box component="li" {...props}>
-                <AddIcon color="secondary" sx={{ mr: '5px' }} />
-                <Typography variant="body2">Add a custom token</Typography>
+              <Box component='li' {...props}>
+                <AddIcon color='secondary' sx={{ mr: '5px' }} />
+                <Typography variant='body2'>Add a custom token</Typography>
               </Box>
             );
           }
@@ -118,15 +118,15 @@ export function InputSearchCrypto({
 
           return (
             <Box
-              component="li"
+              component='li'
               sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }}
               {...props}
             >
-              <Box display="inline-block" width={20}>
+              <Box display='inline-block' width={20}>
                 <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
               </Box>
-              <Box component="span">{tokenInfo.tokenSymbol}</Box>
-              <Box component="span">{tokenInfo.tokenName}</Box>
+              <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+              <Box component='span'>{tokenInfo.tokenName}</Box>
             </Box>
           );
         }}
@@ -136,11 +136,11 @@ export function InputSearchCrypto({
       />
 
       <Modal
-        title="Add a custom ERC20 token"
+        title='Add a custom ERC20 token'
         hideBackdrop={hideBackdrop}
         open={ERC20PopupState.isOpen}
         onClose={ERC20PopupState.close}
-        size="500px"
+        size='500px'
       >
         <CustomERCTokenForm defaultChainId={chainId} onSubmit={onNewPaymentMethod} />
       </Modal>

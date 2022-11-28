@@ -19,7 +19,7 @@ function AddNewCard({ pageId }: { pageId: string }) {
   const dispatch = useAppDispatch();
 
   return (
-    <Tooltip disableInteractive title="Add a page inside" leaveDelay={0} placement="top" arrow>
+    <Tooltip disableInteractive title='Add a page inside' leaveDelay={0} placement='top' arrow>
       <StyledIconButton
         onClick={async () => {
           const card = createCard();
@@ -36,7 +36,7 @@ function AddNewCard({ pageId }: { pageId: string }) {
           }
         }}
       >
-        <AddIcon color="secondary" />
+        <AddIcon color='secondary' />
       </StyledIconButton>
     </Tooltip>
   );

@@ -24,7 +24,7 @@ export default function PageTitle({ subPage }: { subPage?: string }) {
 
   return (
     <Typography
-      variant="h1"
+      variant='h1'
       sx={{
         display: 'flex',
         alignItems: 'flex-end',
@@ -37,17 +37,17 @@ export default function PageTitle({ subPage }: { subPage?: string }) {
       }}
     >
       {subPage ? (
-        <Box component="span" alignItems="center">
+        <Box component='span' alignItems='center'>
           <strong>{subPage}</strong>
         </Box>
       ) : (
-        <Box display="flex" justifyContent="space-between" width="100%" alignItems="center">
+        <Box display='flex' justifyContent='space-between' width='100%' alignItems='center'>
           <strong>{MyNexus}</strong>
-          <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Box display='flex' justifyContent='flex-end' mt={2}>
             <Button
-              data-test="logout-button"
-              variant="outlined"
-              color="secondary"
+              data-test='logout-button'
+              variant='outlined'
+              color='secondary'
               loading={isLoggingOut}
               onClick={logoutUser}
             >

@@ -75,14 +75,14 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
   }
 
   return (
-    <Grid container direction="column" xs spacing={1}>
+    <Grid container direction='column' xs spacing={1}>
       <Grid item>
         <FieldLabel>{title}</FieldLabel>
       </Grid>
 
       {keys.map((key) => {
         return (
-          <Grid key={key} item display="flex" alignItems="center" gap={1}>
+          <Grid key={key} item display='flex' alignItems='center' gap={1}>
             <TextField
               defaultValue={options[key]}
               fullWidth
@@ -92,7 +92,7 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
               }}
             />
             {keys.length > 1 && (
-              <IconButton size="small" onClick={() => removeRow(key)}>
+              <IconButton size='small' onClick={() => removeRow(key)}>
                 <DeleteOutlinedIcon />
               </IconButton>
             )}
@@ -101,17 +101,17 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
       })}
 
       <Grid item>
-        <Typography display="flex" alignItems="center" gap={0.5}>
+        <Typography display='flex' alignItems='center' gap={0.5}>
           Add row{' '}
-          <IconButton size="small" onClick={addRow}>
-            <AddBoxIcon fontSize="small" />
+          <IconButton size='small' onClick={addRow}>
+            <AddBoxIcon fontSize='small' />
           </IconButton>
         </Typography>
       </Grid>
 
       {!hasEnoughOptions && (
         <Grid item>
-          <Alert severity="info">
+          <Alert severity='info'>
             Please at at least {minimumOptions} non empty option{minimumOptions !== 1 ? 's' : ''}
           </Alert>
         </Grid>
