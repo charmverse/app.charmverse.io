@@ -59,7 +59,6 @@ const SidebarContainer = styled.div`
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-
     .add-a-page {
       opacity: 0;
       transition: opacity 0.2s ease-in-out;
@@ -84,7 +83,6 @@ const SidebarContainer = styled.div`
       }
     }
   }
-
 `;
 
 const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
@@ -117,12 +115,15 @@ const SectionName = styled(Typography)`
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
-const StyledSidebarLink = styled(Link, { shouldForwardProp: prop => prop !== 'active' })<{ active: boolean }>`
+const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{ active: boolean }>`
   ${sidebarItemStyles}
-  ${({ active, theme }) => active ? `
+  ${({ active, theme }) =>
+    active
+      ? `
     background-color: ${theme.palette.action.selected};
     color: ${theme.palette.text.primary};
-  ` : ''}
+  `
+      : ''}
 `;
 
 const StyledSidebarBox = styled(Box)`
@@ -130,7 +131,8 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const SidebarHeader = styled.div(({ theme }) => `
+const SidebarHeader = styled.div(
+  ({ theme }) => `
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -138,24 +140,38 @@ const SidebarHeader = styled.div(({ theme }) => `
   & .MuiIconButton-root {
     border-radius: 4px;
     transition: ${theme.transitions.create('opacity', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen
-  })};
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })};
   }
   // necessary for content to be below app bar
   min-height: ${headerHeight}px;
-`);
+`
+);
 
 const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
   flex-grow: 1;
   overflow-y: auto;
   transition: border-color 0.2s ease-out;
   border-top: 1px solid transparent;
-  ${({ isScrolled, theme }) => isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : ''};
+  ${({ isScrolled, theme }) => (isScrolled ? `border-top: 1px solid ${theme.palette.divider}` : '')};
 `;
 
-function SidebarLink ({ active, href, icon, label, target, onClick }:
-  { active: boolean, href: string, icon: any, label: string, target?: string, onClick?: () => void }) {
+function SidebarLink({
+  active,
+  href,
+  icon,
+  label,
+  target,
+  onClick
+}: {
+  active: boolean;
+  href: string;
+  icon: any;
+  label: string;
+  target?: string;
+  onClick?: () => void;
+}) {
   return (
     <StyledSidebarLink href={href} active={active} target={target} onClick={onClick}>
       {icon}
@@ -164,7 +180,7 @@ function SidebarLink ({ active, href, icon, label, target, onClick }:
   );
 }
 
-function SidebarBox ({ icon, label, ...props }: { icon: any, label: string } & BoxProps) {
+function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & BoxProps) {
   return (
     <StyledSidebarBox {...props}>
       {icon}
@@ -178,7 +194,7 @@ interface SidebarProps {
   favorites: LoggedInUser['favorites'];
 }
 
-export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
+export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
   const router = useRouter();
   const { user } = useUser();
   const space = useCurrentSpace();
@@ -189,11 +205,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
 
-  const favoritePageIds = favorites.map(f => f.pageId);
+  const favoritePageIds = favorites.map((f) => f.pageId);
 
   const isMobile = isSmallScreen();
 
-  function onScroll (e: React.UIEvent<HTMLDivElement>) {
+  function onScroll(e: React.UIEvent<HTMLDivElement>) {
     setIsScrolled(e.currentTarget?.scrollTop > 0);
   }
 
@@ -204,12 +220,11 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
         createdBy: user.id,
         spaceId: space.id
       };
-      addPageAndRedirect(newPage, router)
-        .then();
+      addPageAndRedirect(newPage, router).then();
     }
   }, []);
 
-  function closeSidebarIfIsMobile () {
+  function closeSidebarIfIsMobile() {
     if (isMobile) {
       closeSidebar();
     }
@@ -221,13 +236,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
       {space && (
         <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
           <SidebarHeader className='sidebar-header'>
-            <Typography><strong data-test='sidebar-space-name'>{space.name}</strong></Typography>
+            <Typography>
+              <strong data-test='sidebar-space-name'>{space.name}</strong>
+            </Typography>
             <IconButton onClick={closeSidebar} size='small'>
               <ChevronLeftIcon />
             </IconButton>
           </SidebarHeader>
           <Box mb={2}>
-            { /** New navigation order: 1. Member Director, 2. Proposals, 3. Bounties */}
+            {/** New navigation order: 1. Member Director, 2. Proposals, 3. Bounties */}
             <SidebarLink
               href={`/${space.domain}/members`}
               active={router.pathname.startsWith('/[domain]/members')}
@@ -250,7 +267,15 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
               onClick={closeSidebarIfIsMobile}
             />
             <Divider sx={{ mx: 2, my: 1 }} />
-            <Tooltip title={<>Search and jump to a page <br />{openSearchLabel}</>} placement='right'>
+            <Tooltip
+              title={
+                <>
+                  Search and jump to a page <br />
+                  {openSearchLabel}
+                </>
+              }
+              placement='right'
+            >
               <div>
                 <SidebarBox
                   onClick={searchInWorkspaceModalState.open}
@@ -289,27 +314,17 @@ export default function Sidebar ({ closeSidebar, favorites }: SidebarProps) {
           <ScrollingContainer isScrolled={isScrolled} onScroll={onScroll} className='page-navigation'>
             {favoritePageIds.length > 0 && (
               <Box mb={2}>
-                <SectionName>
-                  FAVORITES
-                </SectionName>
-                <PageNavigation
-                  isFavorites={true}
-                  rootPageIds={favoritePageIds}
-                />
+                <SectionName>FAVORITES</SectionName>
+                <PageNavigation isFavorites={true} rootPageIds={favoritePageIds} />
               </Box>
             )}
             <WorkspaceLabel>
-              <SectionName>
-                WORKSPACE
-              </SectionName>
-              {
-                userSpacePermissions?.createPage && (
-                  <div className='add-a-page'>
-                    <NewPageMenu tooltip='Add a page' addPage={addPage} />
-                  </div>
-                )
-              }
-
+              <SectionName>WORKSPACE</SectionName>
+              {userSpacePermissions?.createPage && (
+                <div className='add-a-page'>
+                  <NewPageMenu tooltip='Add a page' addPage={addPage} />
+                </div>
+              )}
             </WorkspaceLabel>
             <Box mb={6}>
               <PageNavigation onClick={closeSidebarIfIsMobile} />

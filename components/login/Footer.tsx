@@ -25,7 +25,7 @@ const LinkHeader = styled(Typography)`
   font-weight: bold;
   margin-bottom: 1em;
   border-top: 3px solid ${({ theme }) => theme.palette.divider};
-  padding-top: .5em;
+  padding-top: 0.5em;
 `;
 
 const StyledLink = styled(Link)`
@@ -44,29 +44,27 @@ const StyledIconButton = styled(IconButton)`
   }
 ` as typeof IconButton;
 
-export default function Footer () {
+export default function Footer() {
   return (
     <Background mt={6} sx={{ flexGrow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
       <Container py={9} px={3}>
         <Grid container spacing={6}>
           <Grid item xs={12} sm={4}>
-            <LinkHeader>
-              Links
-            </LinkHeader>
-            <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>Privacy Policy</StyledLink>
-            <StyledLink href='https://charmverse.io/terms' target='_blank'>Terms</StyledLink>
+            <LinkHeader>Links</LinkHeader>
+            <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
+              Privacy Policy
+            </StyledLink>
+            <StyledLink href='https://charmverse.io/terms' target='_blank'>
+              Terms
+            </StyledLink>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <LinkHeader>
-              About
-            </LinkHeader>
+            <LinkHeader>About</LinkHeader>
             <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
             <Typography color='secondary'>New York, NY</Typography>
           </Grid>
           <Grid item xs={12} sm={4} alignItems='center'>
-            <LinkHeader>
-              Social
-            </LinkHeader>
+            <LinkHeader>Social</LinkHeader>
             <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
               <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
                 <LinkedInIcon />
@@ -78,7 +76,9 @@ export default function Footer () {
                 <FacebookIcon />
               </StyledIconButton>
               <StyledIconButton href='https://discord.gg/ACYCzBGC2M' target='_blank'>
-                <SvgIcon viewBox='0 -5 70 70'><DiscordIcon /></SvgIcon>
+                <SvgIcon viewBox='0 -5 70 70'>
+                  <DiscordIcon />
+                </SvgIcon>
               </StyledIconButton>
             </Box>
           </Grid>

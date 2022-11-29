@@ -11,11 +11,23 @@ import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
 import { IDENTITY_TYPES } from 'models';
 
-export default async function loginByDiscord ({ code, hostName, discordApiUrl, userId = v4() }:
-{ code: string, hostName?: string, discordApiUrl?: string, userId?: string }) {
-
+export default async function loginByDiscord({
+  code,
+  hostName,
+  discordApiUrl,
+  userId = v4()
+}: {
+  code: string;
+  hostName?: string;
+  discordApiUrl?: string;
+  userId?: string;
+}) {
   const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
-  const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
+  const discordAccount = await getDiscordAccount({
+    code,
+    discordApiUrl,
+    redirectUrl: `${domain}/api/discord/callback`
+  });
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id
@@ -30,17 +42,19 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl, u
   if (discordUser) {
     trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
-  }
-  else {
-
+  } else {
     const { id, ...rest } = discordAccount;
-    const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+    const avatarUrl = discordAccount.avatar
+      ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      : undefined;
     let avatar: string | null = null;
     if (avatarUrl) {
       try {
-        ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
-      }
-      catch (error) {
+        ({ url: avatar } = await uploadUrlToS3({
+          pathInS3: getUserS3FilePath({ userId, url: avatarUrl }),
+          url: avatarUrl
+        }));
+      } catch (error) {
         log.warn('Error while uploading avatar to S3', error);
       }
     }
@@ -68,4 +82,3 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl, u
     return newUser;
   }
 }
-

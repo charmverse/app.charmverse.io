@@ -11,8 +11,7 @@ export type Web3LoginRequest = {
   walletSignature: AuthSig;
 };
 
-export function requireWalletSignature (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-
+export function requireWalletSignature(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const { address, walletSignature } = req.body as Web3LoginRequest;
 
   if (!address || !walletSignature) {
@@ -21,8 +20,7 @@ export function requireWalletSignature (req: NextApiRequest, res: NextApiRespons
 
   if (!isValidWalletSignature({ address, signature: walletSignature, host: req.headers.origin as string })) {
     throw new MissingDataError('Invalid wallet signature');
-  }
-  else {
+  } else {
     next();
   }
 }

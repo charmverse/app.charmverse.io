@@ -1,10 +1,8 @@
-
 import { prisma } from 'db';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
 
 const updateVoteStatus = async () => {
-
   const votesPassedDeadline = await prisma.vote.findMany({
     where: {
       status: VOTE_STATUS[0],
@@ -20,16 +18,14 @@ const updateVoteStatus = async () => {
 
   const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
 
-  const proposalPageIds = votesPassedDeadline
-    .filter(v => v.context === 'proposal')
-    .map(v => v.pageId);
+  const proposalPageIds = votesPassedDeadline.filter((v) => v.context === 'proposal').map((v) => v.pageId);
 
   await prisma.$transaction([
     // update passed votes
     prisma.vote.updateMany({
       where: {
         id: {
-          in: passedVotes.map(v => v.id)
+          in: passedVotes.map((v) => v.id)
         }
       },
       data: {
@@ -40,7 +36,7 @@ const updateVoteStatus = async () => {
     prisma.vote.updateMany({
       where: {
         id: {
-          in: rejectedVotes.map(v => v.id)
+          in: rejectedVotes.map((v) => v.id)
         }
       },
       data: {

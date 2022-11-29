@@ -10,7 +10,6 @@ import type { IPagePermissionFlags, PageOperationType } from './page-permission-
  * Permissions can be added, but not removed.
  */
 export class AllowedPagePermissions extends Permissions<PageOperationType> {
-
   read: boolean = false;
 
   delete: boolean = false;
@@ -29,13 +28,11 @@ export class AllowedPagePermissions extends Permissions<PageOperationType> {
 
   grant_permissions: boolean = false;
 
-  constructor (initialPermissions: PageOperationType [] | Partial<IPagePermissionFlags> = []) {
-
+  constructor(initialPermissions: PageOperationType[] | Partial<IPagePermissionFlags> = []) {
     super({
       allowedOperations: Object.keys(PageOperations) as PageOperationType[]
     });
 
     this.addPermissions(initialPermissions);
   }
-
 }

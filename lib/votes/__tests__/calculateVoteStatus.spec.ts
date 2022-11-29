@@ -15,30 +15,38 @@ describe('calculateVoteStatus', () => {
       status: 'Cancelled',
       type: 'Approval',
       deadline: new Date(),
-      userVotes: [{
-        choice: '1'
-      }, {
-        choice: '1'
-      }, {
-        choice: '2'
-      }]
+      userVotes: [
+        {
+          choice: '1'
+        },
+        {
+          choice: '1'
+        },
+        {
+          choice: '2'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.Cancelled);
   });
 
-  it('should return the same status for vote that hasn\'t passed the deadline', async () => {
+  it("should return the same status for vote that hasn't passed the deadline", async () => {
     const voteStatus = calculateVoteStatus({
       threshold: 50,
       status: 'InProgress',
       type: 'Approval',
       deadline: nonExpiredDeadline,
-      userVotes: [{
-        choice: '1'
-      }, {
-        choice: '1'
-      }, {
-        choice: '2'
-      }]
+      userVotes: [
+        {
+          choice: '1'
+        },
+        {
+          choice: '1'
+        },
+        {
+          choice: '2'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.InProgress);
   });
@@ -49,30 +57,38 @@ describe('calculateVoteStatus', () => {
       status: 'InProgress',
       type: 'Approval',
       deadline: expiredDeadline,
-      userVotes: [{
-        choice: 'Yes'
-      }, {
-        choice: 'Yes'
-      }, {
-        choice: 'No'
-      }]
+      userVotes: [
+        {
+          choice: 'Yes'
+        },
+        {
+          choice: 'Yes'
+        },
+        {
+          choice: 'No'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.Passed);
   });
 
-  it('should return rejected for approval type vote when percentage of yes votes doesn\'t cross threshold', async () => {
+  it("should return rejected for approval type vote when percentage of yes votes doesn't cross threshold", async () => {
     const voteStatus = calculateVoteStatus({
       threshold: 50,
       status: 'InProgress',
       type: 'Approval',
       deadline: expiredDeadline,
-      userVotes: [{
-        choice: 'Yes'
-      }, {
-        choice: 'No'
-      }, {
-        choice: 'No'
-      }]
+      userVotes: [
+        {
+          choice: 'Yes'
+        },
+        {
+          choice: 'No'
+        },
+        {
+          choice: 'No'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.Rejected);
   });
@@ -83,13 +99,17 @@ describe('calculateVoteStatus', () => {
       status: 'InProgress',
       type: 'SingleChoice',
       deadline: expiredDeadline,
-      userVotes: [{
-        choice: '1'
-      }, {
-        choice: '1'
-      }, {
-        choice: '2'
-      }]
+      userVotes: [
+        {
+          choice: '1'
+        },
+        {
+          choice: '1'
+        },
+        {
+          choice: '2'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.Passed);
   });
@@ -100,13 +120,17 @@ describe('calculateVoteStatus', () => {
       status: 'InProgress',
       type: 'SingleChoice',
       deadline: expiredDeadline,
-      userVotes: [{
-        choice: '1'
-      }, {
-        choice: '1'
-      }, {
-        choice: '2'
-      }]
+      userVotes: [
+        {
+          choice: '1'
+        },
+        {
+          choice: '1'
+        },
+        {
+          choice: '2'
+        }
+      ]
     });
     expect(voteStatus).toBe(VoteStatus.Rejected);
   });

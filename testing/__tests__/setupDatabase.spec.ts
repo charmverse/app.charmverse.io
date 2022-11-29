@@ -1,12 +1,10 @@
 import { generateUserAndSpaceWithApiToken } from '../setupDatabase';
 
 describe('generateUserAndSpaceWithApiToken', () => {
-
   // Random key format - Ensures no conflicts if this is run against an existing database
   const walletAddress = Math.random().toString();
 
   it('should return a user and space', async () => {
-
     const generated = await generateUserAndSpaceWithApiToken(walletAddress);
 
     expect(generated.user).toBeInstanceOf(Object);
@@ -14,7 +12,6 @@ describe('generateUserAndSpaceWithApiToken', () => {
   });
 
   it('should always return the same user and space for the same wallet address', async () => {
-
     const generated = await generateUserAndSpaceWithApiToken(walletAddress);
     const generated2 = await generateUserAndSpaceWithApiToken(walletAddress);
 
@@ -23,7 +20,6 @@ describe('generateUserAndSpaceWithApiToken', () => {
   });
 
   it('should return the API token object for the space', async () => {
-
     const generated = await generateUserAndSpaceWithApiToken(walletAddress);
 
     expect(generated.apiToken).toBeDefined();
@@ -33,7 +29,6 @@ describe('generateUserAndSpaceWithApiToken', () => {
   });
 
   it('should always return the same api token for that space', async () => {
-
     const generated = await generateUserAndSpaceWithApiToken(walletAddress);
     const generated2 = await generateUserAndSpaceWithApiToken(walletAddress);
 
@@ -41,7 +36,6 @@ describe('generateUserAndSpaceWithApiToken', () => {
   });
 
   it('should always generate a different wallet address, space and user if no address is provided', async () => {
-
     const generated = await generateUserAndSpaceWithApiToken();
     const generated2 = await generateUserAndSpaceWithApiToken();
 
@@ -51,5 +45,4 @@ describe('generateUserAndSpaceWithApiToken', () => {
 
     expect(generated.user.wallets[0].address).not.toEqual(generated2.user.wallets[0].address);
   });
-
 });

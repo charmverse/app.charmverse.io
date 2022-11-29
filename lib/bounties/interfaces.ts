@@ -9,20 +9,23 @@ import type { Resource } from '../permissions/interfaces';
 // Re-export bounty permissions interfaces for convenience
 export * from 'lib/permissions/bounties/interfaces';
 
-export type BountyWithDetails = Bounty & { applications: Application [], page: IPageWithPermissions };
+export type BountyWithDetails = Bounty & { applications: Application[]; page: IPageWithPermissions };
 
-export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'>
-  & Partial<Pick<Bounty, 'status'| 'chainId'| 'approveSubmitters'| 'maxSubmissions'| 'rewardAmount'| 'rewardToken'>>
-  & { permissions?: Partial<BountyPermissions>, pageType?: PageType, linkedPageId?: string };
+export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> &
+  Partial<
+    Pick<Bounty, 'status' | 'chainId' | 'approveSubmitters' | 'maxSubmissions' | 'rewardAmount' | 'rewardToken'>
+  > & { permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string };
 
-export type UpdateableBountyFields = Partial<Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>> & { permissions?: Partial<BountyPermissions> }
+export type UpdateableBountyFields = Partial<
+  Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions'>
+> & { permissions?: Partial<BountyPermissions> };
 
 export interface BountyUpdate {
   bountyId: string;
   updateContent: UpdateableBountyFields;
 }
 
-export type SuggestionDecision = 'approve' | 'reject'
+export type SuggestionDecision = 'approve' | 'reject';
 
 export interface SuggestionApproveAction {
   bountyId: string;
@@ -33,12 +36,12 @@ export interface SuggestionRejectAction {
   decision: Extract<SuggestionDecision, 'reject'>;
 }
 
-export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction
+export type SuggestionAction = SuggestionApproveAction | SuggestionRejectAction;
 
 /**
  * Calculate pool for resource permissions as is, or pass simulated permissions to calculate pool
  */
-export type BountySubmitterPoolCalculation = Partial<Resource & { permissions: Partial<BountyPermissions> }>
+export type BountySubmitterPoolCalculation = Partial<Resource & { permissions: Partial<BountyPermissions> }>;
 
 /**
  * Used to represent how many potential applicants exist.

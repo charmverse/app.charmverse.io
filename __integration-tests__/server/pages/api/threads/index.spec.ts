@@ -31,9 +31,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/threads - create a thread', () => {
-
   it('should succeed if the user has a comment permission, and respond 201', async () => {
-
     const page = await createPage({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id
@@ -51,11 +49,9 @@ describe('POST /api/threads - create a thread', () => {
       pageId: page.id
     };
 
-    const createdThread = (await request(baseUrl)
-      .post('/api/threads')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(201)).body as ThreadWithCommentsAndAuthors;
+    const createdThread = (
+      await request(baseUrl).post('/api/threads').set('Cookie', nonAdminCookie).send(creationContent).expect(201)
+    ).body as ThreadWithCommentsAndAuthors;
 
     expect(createdThread).toEqual(
       expect.objectContaining<Partial<Thread>>({
@@ -67,7 +63,6 @@ describe('POST /api/threads - create a thread', () => {
     expect(createdThread.comments).toBeDefined();
     expect(createdThread.comments[0].content).toBe(creationContent.comment);
     expect(createdThread.comments[0].user.id).toBe(nonAdminUser.id);
-
   });
 
   it('should fail if the user does not have a comment permission, and respond 401', async () => {
@@ -82,12 +77,6 @@ describe('POST /api/threads - create a thread', () => {
       pageId: page.id
     };
 
-    await request(baseUrl)
-      .post('/api/threads')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(401);
-
+    await request(baseUrl).post('/api/threads').set('Cookie', nonAdminCookie).send(creationContent).expect(401);
   });
-
 });

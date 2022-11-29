@@ -1,10 +1,6 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
 import ArrowSquareOut from '@mui/icons-material/Launch';
-import {
-  Grid,
-  IconButton,
-  Typography
-} from '@mui/material';
+import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -25,9 +21,9 @@ type Props = {
   isModalOpen: boolean;
   closeModal: () => void;
   openNetworkModal: () => void;
-}
+};
 
-function WalletSelectorModal ({
+function WalletSelectorModal({
   activatingConnector,
   setActivatingConnector,
   isModalOpen,
@@ -78,14 +74,12 @@ function WalletSelectorModal ({
         <Grid item xs={12}>
           <ConnectorButton
             name={
-              typeof window !== 'undefined'
-                && MetaMaskOnboarding.isMetaMaskInstalled()
+              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
                 ? 'MetaMask'
                 : 'Install MetaMask'
             }
             onClick={
-              typeof window !== 'undefined'
-                && MetaMaskOnboarding.isMetaMaskInstalled()
+              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
                 ? () => handleConnect(injected)
                 : handleOnboarding
             }
@@ -117,16 +111,12 @@ function WalletSelectorModal ({
         </Grid>
         <Grid item>
           <Typography variant='caption' align='center'>
-            New to Ethereum wallets?
-            {' '}
-            <Link
-              color='primay'
-              href='https://ethereum.org/en/wallets/'
-              external
-              target='_blank'
-            >
+            New to Ethereum wallets?{' '}
+            <Link color='primay' href='https://ethereum.org/en/wallets/' external target='_blank'>
               Learn more
-              <IconButton size='small' sx={{ color: 'inherit' }}><ArrowSquareOut fontSize='small' /></IconButton>
+              <IconButton size='small' sx={{ color: 'inherit' }}>
+                <ArrowSquareOut fontSize='small' />
+              </IconButton>
             </Link>
           </Typography>
         </Grid>
@@ -135,7 +125,7 @@ function WalletSelectorModal ({
   );
 }
 
-function resetWalletConnector (connector: AbstractConnector) {
+function resetWalletConnector(connector: AbstractConnector) {
   if (connector && connector instanceof WalletConnectConnector) {
     connector.walletConnectProvider = undefined;
   }

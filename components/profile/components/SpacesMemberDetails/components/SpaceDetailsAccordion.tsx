@@ -24,7 +24,14 @@ const StyledAccordionSummary = styled(AccordionSummary)`
   ${!isTouchScreen() && hoverIconsStyle()}
 `;
 
-export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, readOnly, onEdit, expanded: defaultExpanded = false }: Props) {
+export function SpaceDetailsAccordion({
+  spaceName,
+  properties,
+  spaceImage,
+  readOnly,
+  onEdit,
+  expanded: defaultExpanded = false
+}: Props) {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
   const touchScreen = isTouchScreen();
   useEffect(() => {
@@ -38,12 +45,11 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
       }}
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <WorkspaceAvatar
-          name={spaceName}
-          image={spaceImage}
-        />
+        <WorkspaceAvatar name={spaceName} image={spaceImage} />
         <Box display='flex' flex={1} alignItems='center' justifyContent='space-between'>
-          <Typography ml={2} variant='h6'>{spaceName}</Typography>
+          <Typography ml={2} variant='h6'>
+            {spaceName}
+          </Typography>
           {!readOnly && (
             <IconButton
               className='icons'
@@ -61,7 +67,7 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
       </StyledAccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
-          {properties.map(property => {
+          {properties.map((property) => {
             if (!property.enabledViews.includes('profile')) {
               return null;
             }
@@ -73,17 +79,20 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
               case 'url':
               case 'email':
               case 'number': {
-                return property.value && (
-                  <Stack key={property.memberPropertyId}>
-                    <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography
-                      sx={{
-                        wordBreak: 'break-word'
-                      }}
-                      whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}
-                    >{property.value}
-                    </Typography>
-                  </Stack>
+                return (
+                  property.value && (
+                    <Stack key={property.memberPropertyId}>
+                      <Typography fontWeight='bold'>{property.name}</Typography>
+                      <Typography
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                        whiteSpace={property.type === 'text_multiline' ? 'pre-wrap' : 'initial'}
+                      >
+                        {property.value}
+                      </Typography>
+                    </Stack>
+                  )
                 );
               }
               case 'multiselect':
@@ -92,34 +101,33 @@ export function SpaceDetailsAccordion ({ spaceName, properties, spaceImage, read
                 if (!propertyValue || propertyValue?.length === 0) {
                   return null;
                 }
-                return (
-                  <SelectPreview
-                    value={propertyValue}
-                    name={property.name}
-                    options={property.options}
-                  />
-                );
+                return <SelectPreview value={propertyValue} name={property.name} options={property.options} />;
               }
               case 'join_date': {
                 return (
                   <Stack key={property.memberPropertyId}>
                     <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Typography>{humanFriendlyDate(property.value as string, {
-                      withYear: true
-                    })}
+                    <Typography>
+                      {humanFriendlyDate(property.value as string, {
+                        withYear: true
+                      })}
                     </Typography>
                   </Stack>
                 );
               }
               case 'role': {
                 const roles = property.value as string[];
-                return roles.length !== 0 && (
-                  <Stack key={property.memberPropertyId}>
-                    <Typography fontWeight='bold'>{property.name}</Typography>
-                    <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                      {roles.map(role => <Chip label={role} key={role} size='small' variant='outlined' />)}
+                return (
+                  roles.length !== 0 && (
+                    <Stack key={property.memberPropertyId}>
+                      <Typography fontWeight='bold'>{property.name}</Typography>
+                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                        {roles.map((role) => (
+                          <Chip label={role} key={role} size='small' variant='outlined' />
+                        ))}
+                      </Stack>
                     </Stack>
-                  </Stack>
+                  )
                 );
               }
               default: {

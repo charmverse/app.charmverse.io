@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,11 +9,9 @@ import { createThread } from 'lib/threads';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
+handler.use(requireUser).post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
 
-async function startThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
-
+async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
   const { comment, context, pageId } = req.body as ThreadCreate;
 
   const userId = req.session.user.id;

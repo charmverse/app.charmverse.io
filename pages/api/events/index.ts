@@ -9,10 +9,9 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .post(trackHandler);
+handler.post(trackHandler);
 
-async function trackHandler (req: NextApiRequest, res: NextApiResponse<{ success: 'ok' } | { error: string }>) {
+async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success: 'ok' } | { error: string }>) {
   const eventName = req.query.event as MixpanelEventName;
   const eventPayload: MixpanelEventMap[typeof eventName] = req.body ? { ...req.body } : {};
   const userId = req.session.user?.id ?? req.session.anonymousUserId;

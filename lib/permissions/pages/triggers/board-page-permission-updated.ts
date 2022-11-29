@@ -14,10 +14,15 @@ import type { BoardPagePermissionUpdated } from '../interfaces';
  * @param param0
  * @returns
  */
-export async function generateboardPagePermissionUpdated ({ boardId, permissionId, tx = prisma }: BoardPagePermissionUpdated & OptionalTransaction):
- Promise<{ updateManyArgs?: Prisma.PagePermissionUpdateManyArgs, createManyArgs?: Prisma.PagePermissionCreateManyArgs }> {
-
-  const permissionUpdates: Prisma.PagePermissionUpdateArgs [] = [];
+export async function generateboardPagePermissionUpdated({
+  boardId,
+  permissionId,
+  tx = prisma
+}: BoardPagePermissionUpdated & OptionalTransaction): Promise<{
+  updateManyArgs?: Prisma.PagePermissionUpdateManyArgs;
+  createManyArgs?: Prisma.PagePermissionCreateManyArgs;
+}> {
+  const permissionUpdates: Prisma.PagePermissionUpdateArgs[] = [];
 
   // Child page permission IDs that we will need to update
   const permissionUpdateManyIds: string[] = [];
@@ -27,7 +32,7 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
   const { parents: boardParents, targetPage: board } = await resolvePageTree({ pageId: boardId, tx });
   const boardChildren = flattenTree(board);
 
-  const targetPermission = board.permissions.find(permission => permission.id === permissionId);
+  const targetPermission = board.permissions.find((permission) => permission.id === permissionId);
 
   if (!targetPermission) {
     throw new DataNotFoundError(`Permission not found: ${permissionId}`);
@@ -56,18 +61,23 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
   // The permission ID we should inherit from
   const targetPermissionId = targetPermission.sourcePermission?.id ?? targetPermission.id;
 
-  const targetGroupKey = targetPermission.roleId ? 'roleId' : targetPermission.userId ? 'userId' : targetPermission.spaceId ? 'spaceId' : 'public';
+  const targetGroupKey = targetPermission.roleId
+    ? 'roleId'
+    : targetPermission.userId
+    ? 'userId'
+    : targetPermission.spaceId
+    ? 'spaceId'
+    : 'public';
   const targetGroupValue = targetPermission[targetGroupKey];
 
-  boardChildren.forEach(childPage => {
-    const matchingChildPagePermission = childPage.permissions.find(p => {
-      return (p[targetGroupKey] === targetPermission[targetGroupKey]);
+  boardChildren.forEach((childPage) => {
+    const matchingChildPagePermission = childPage.permissions.find((p) => {
+      return p[targetGroupKey] === targetPermission[targetGroupKey];
     });
 
     if (matchingChildPagePermission) {
       permissionUpdateManyIds.push(matchingChildPagePermission.id);
-    }
-    else {
+    } else {
       permissionCreateMany.push({
         pageId: childPage.id,
         [targetGroupKey]: targetGroupValue,
@@ -75,7 +85,6 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
         inheritedFromPermission: targetPermissionId
       });
     }
-
   });
 
   /**
@@ -85,7 +94,7 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
 
   const updateOperation: Prisma.PagePermissionUpdateManyArgs = {
     where: {
-      OR: permissionUpdateManyIds.map(id => {
+      OR: permissionUpdateManyIds.map((id) => {
         return {
           id
         };
@@ -107,8 +116,11 @@ export async function generateboardPagePermissionUpdated ({ boardId, permissionI
   };
 }
 
-export async function boardPagePermissionUpdated ({ boardId, permissionId, tx }: BoardPagePermissionUpdated & OptionalTransaction):
- Promise<true> {
+export async function boardPagePermissionUpdated({
+  boardId,
+  permissionId,
+  tx
+}: BoardPagePermissionUpdated & OptionalTransaction): Promise<true> {
   const args = await generateboardPagePermissionUpdated({ boardId, permissionId, tx });
 
   if (tx) {
@@ -119,12 +131,13 @@ export async function boardPagePermissionUpdated ({ boardId, permissionId, tx }:
     if (args.createManyArgs) {
       await tx.pagePermission.createMany(args.createManyArgs);
     }
-  }
-  else {
-    await prisma.$transaction([
-      args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
-      args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
-    ].filter(a => isTruthy(a)) as PrismaPromise<any>[]);
+  } else {
+    await prisma.$transaction(
+      [
+        args.updateManyArgs ? prisma.pagePermission.updateMany(args.updateManyArgs) : null,
+        args.createManyArgs ? prisma.pagePermission.createMany(args.createManyArgs) : null
+      ].filter((a) => isTruthy(a)) as PrismaPromise<any>[]
+    );
   }
 
   return true;

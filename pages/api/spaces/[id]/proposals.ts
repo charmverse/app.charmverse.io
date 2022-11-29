@@ -8,11 +8,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
-  .get(getProposals);
+handler.use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' })).get(getProposals);
 
-async function getProposals (req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
+async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
   const spaceId = req.query.id as string;
   const { id: userId } = req.session.user;
 

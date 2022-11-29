@@ -1,12 +1,6 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type {
-  Command,
-  EditorState,
-  Schema } from '@bangle.dev/pm';
-import {
-  keymap,
-  wrappingInputRule
-} from '@bangle.dev/pm';
+import type { Command, EditorState, Schema } from '@bangle.dev/pm';
+import { keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
@@ -27,7 +21,7 @@ export const defaultKeys = {
 const name = 'orderedList';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
-function specFactory (): RawSpecs {
+function specFactory(): RawSpecs {
   return {
     type: 'node',
     name,
@@ -57,12 +51,10 @@ function specFactory (): RawSpecs {
           })
         }
       ],
-      toDOM: (node) => node.attrs.order === 1
-        ? ['ol', 0]
-        : ['ol', { start: node.attrs.order }, 0]
+      toDOM: (node) => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
     },
     markdown: {
-      toMarkdown (state, node) {
+      toMarkdown(state, node) {
         const start = node.attrs.order || 1;
         const maxW = String(start + node.childCount - 1).length;
         const space = state.repeat(' ', maxW + 2);
@@ -86,7 +78,7 @@ function specFactory (): RawSpecs {
   };
 }
 
-function pluginsFactory ({ keybindings = defaultKeys } = {}): RawPlugins {
+function pluginsFactory({ keybindings = defaultKeys } = {}): RawPlugins {
   return ({ schema }) => {
     const type = getTypeFromSchema(schema);
 
@@ -97,26 +89,20 @@ function pluginsFactory ({ keybindings = defaultKeys } = {}): RawPlugins {
         (match) => ({ order: +match[1] }),
         (match, node) => node.childCount + node.attrs.order === +match[1]
       ),
-      keybindings
-        && keymap(createObject([[keybindings.toggle, toggleList(type)]]))
+      keybindings && keymap(createObject([[keybindings.toggle, toggleList(type)]]))
     ];
   };
 }
 
-export function toggleOrderedList (): Command {
+export function toggleOrderedList(): Command {
   return (state, dispatch, view) => {
-    return toggleList(
-      state.schema.nodes.orderedList,
-      state.schema.nodes.listItem
-    )(state, dispatch, view);
+    return toggleList(state.schema.nodes.orderedList, state.schema.nodes.listItem)(state, dispatch, view);
   };
 }
 
-export function queryIsOrderedListActive () {
+export function queryIsOrderedListActive() {
   return (state: EditorState) => {
     const { schema } = state;
-    return parentHasDirectParentOfType(schema.nodes.listItem, [
-      schema.nodes[name]
-    ])(state);
+    return parentHasDirectParentOfType(schema.nodes.listItem, [schema.nodes[name]])(state);
   };
 }

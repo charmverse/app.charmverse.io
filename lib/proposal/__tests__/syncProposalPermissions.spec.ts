@@ -5,7 +5,13 @@ import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
 import { typedKeys } from 'lib/utilities/objects';
-import { createPage, generateProposal, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createPage,
+  generateProposal,
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import type { ProposalReviewerInput } from '../interface';
 import { proposalPermissionMapping, syncProposalPermissions } from '../syncProposalPermissions';
@@ -17,7 +23,6 @@ let reviewerUser: User;
 let reviewerRole: Role;
 
 beforeAll(async () => {
-
   const result = await generateUserAndSpaceWithApiToken();
 
   space = result.space;
@@ -37,18 +42,18 @@ beforeAll(async () => {
     createdBy: user.id,
     spaceId: space.id
   });
-
 });
 
 jest.setTimeout(1200000);
 
 describe('syncProposalPagePermissions', () => {
-
   it('should set permissions for a proposal and its children to the target state for that proposal status', async () => {
-
     const authors = [user.id, secondAuthor.id];
 
-    const reviewers: ProposalReviewerInput[] = [{ group: 'user', id: reviewerUser.id }, { group: 'role', id: reviewerRole.id }];
+    const reviewers: ProposalReviewerInput[] = [
+      { group: 'user', id: reviewerUser.id },
+      { group: 'role', id: reviewerRole.id }
+    ];
 
     let { proposal } = await generateProposal({
       proposalStatus: 'private_draft',
@@ -100,44 +105,53 @@ describe('syncProposalPagePermissions', () => {
       const reviewerSetting = proposalPermissionMapping[proposalStatus].reviewer;
       const communitySetting = proposalPermissionMapping[proposalStatus].community;
 
-      ([proposalPage, childPage, subChildPage] as IPageWithPermissions[]).map(page => page.permissions).forEach(permissions => {
-        if (authorSetting !== null) {
-          authors.forEach(a => {
-            expect(permissions.some(p => p.userId === a && p.permissionLevel === authorSetting)).toBe(true);
-          });
-        }
-        else {
-          authors.forEach(a => {
-            expect(permissions.every(p => p.userId !== a)).toBe(true);
-          });
-        }
+      ([proposalPage, childPage, subChildPage] as IPageWithPermissions[])
+        .map((page) => page.permissions)
+        .forEach((permissions) => {
+          if (authorSetting !== null) {
+            authors.forEach((a) => {
+              expect(permissions.some((p) => p.userId === a && p.permissionLevel === authorSetting)).toBe(true);
+            });
+          } else {
+            authors.forEach((a) => {
+              expect(permissions.every((p) => p.userId !== a)).toBe(true);
+            });
+          }
 
-        if (reviewerSetting !== null) {
-          reviewers.forEach(r => {
-            expect(permissions.some(p => (r.group === 'user' ? p.userId === r.id : p.roleId === r.id) && p.permissionLevel === reviewerSetting)).toBe(true);
-          });
-        }
-        else {
-          reviewers.forEach(r => {
-            expect(permissions.every(p => (r.group === 'user' ? p.userId !== r.id : p.roleId !== r.id))).toBe(true);
-          });
-        }
+          if (reviewerSetting !== null) {
+            reviewers.forEach((r) => {
+              expect(
+                permissions.some(
+                  (p) =>
+                    (r.group === 'user' ? p.userId === r.id : p.roleId === r.id) &&
+                    p.permissionLevel === reviewerSetting
+                )
+              ).toBe(true);
+            });
+          } else {
+            reviewers.forEach((r) => {
+              expect(permissions.every((p) => (r.group === 'user' ? p.userId !== r.id : p.roleId !== r.id))).toBe(true);
+            });
+          }
 
-        if (communitySetting !== null) {
-          expect(permissions.some(p => p.spaceId === space.id && p.permissionLevel === communitySetting)).toBe(true);
-        }
-        else {
-          expect(permissions.every(p => p.spaceId !== space.id)).toBe(true);
-        }
-      });
+          if (communitySetting !== null) {
+            expect(permissions.some((p) => p.spaceId === space.id && p.permissionLevel === communitySetting)).toBe(
+              true
+            );
+          } else {
+            expect(permissions.every((p) => p.spaceId !== space.id)).toBe(true);
+          }
+        });
     }
-
   });
 
   it('should not impact any public permissions for a page', async () => {
     const authors = [user.id, secondAuthor.id];
 
-    const reviewers: ProposalReviewerInput[] = [{ group: 'user', id: reviewerUser.id }, { group: 'role', id: reviewerRole.id }];
+    const reviewers: ProposalReviewerInput[] = [
+      { group: 'user', id: reviewerUser.id },
+      { group: 'role', id: reviewerRole.id }
+    ];
 
     const { proposal } = await generateProposal({
       proposalStatus: 'private_draft',
@@ -185,9 +199,8 @@ describe('syncProposalPagePermissions', () => {
 
     const subChildPage = await getPage(proposalSubChild.id);
 
-    ([proposalPage, childPage, subChildPage] as IPageWithPermissions[]).forEach(page => {
-      expect(page.permissions.some(p => p.public)).toBe(true);
+    ([proposalPage, childPage, subChildPage] as IPageWithPermissions[]).forEach((page) => {
+      expect(page.permissions.some((p) => p.public)).toBe(true);
     });
-
   });
 });

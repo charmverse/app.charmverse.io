@@ -28,8 +28,13 @@ interface Props {
   autoVerify?: boolean;
 }
 
-export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel, joinType = 'token_gate', autoVerify }: Props) {
-
+export default function TokenGateForm({
+  onSuccess,
+  spaceDomain,
+  joinButtonLabel,
+  joinType = 'token_gate',
+  autoVerify
+}: Props) {
   const renders = useRef(0);
   renders.current += 1;
   //  console.log('Renders', renders.current);
@@ -51,11 +56,10 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     if (autoVerify) {
       const signature = getStoredSignature();
 
-      if (user && !!signature && user.wallets.some(wallet => lowerCaseEqual(wallet.address, signature.address))) {
+      if (user && !!signature && user.wallets.some((wallet) => lowerCaseEqual(wallet.address, signature.address))) {
         evaluateEligibility(signature);
       }
     }
-
   }, [user]);
 
   useEffect(() => {
@@ -63,12 +67,12 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
       setTokenGates(null);
       setTokenGateResult(null);
       setIsLoading(false);
-    }
-    else {
+    } else {
       setIsLoading(true);
 
-      charmClient.getTokenGatesForSpace({ spaceDomain })
-        .then(gates => {
+      charmClient
+        .getTokenGatesForSpace({ spaceDomain })
+        .then((gates) => {
           setTokenGates(gates);
           setIsLoading(false);
         })
@@ -79,8 +83,7 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     }
   }, [spaceDomain]);
 
-  async function evaluateEligibility (authSig: AuthSig) {
-
+  async function evaluateEligibility(authSig: AuthSig) {
     // Reset the current state
     setTokenGateResult(null);
     setIsVerifyingGates(true);
@@ -88,41 +91,42 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
     if (!user) {
       try {
         await loginFromWeb3Account(authSig);
-      }
-      catch {
+      } catch {
         setIsVerifyingGates(false);
         return;
       }
     }
 
-    charmClient.evalueTokenGateEligibility({
-      authSig,
-      spaceIdOrDomain: spaceDomain
-    }).then(verifyResult => {
-      setTokenGateResult(verifyResult);
-      if (verifyResult.canJoinSpace) {
-        showMessage('Verification succeeded.', 'success');
-      }
-      else {
-        showMessage('Verification failed.', 'warning');
-      }
-    })
+    charmClient
+      .evalueTokenGateEligibility({
+        authSig,
+        spaceIdOrDomain: spaceDomain
+      })
+      .then((verifyResult) => {
+        setTokenGateResult(verifyResult);
+        if (verifyResult.canJoinSpace) {
+          showMessage('Verification succeeded.', 'success');
+        } else {
+          showMessage('Verification failed.', 'warning');
+        }
+      })
       .finally(() => setIsVerifyingGates(false));
   }
 
-  async function onSubmit () {
+  async function onSubmit() {
     setJoiningSpace(true);
 
     try {
       await charmClient.verifyTokenGate({
         commit: true,
         spaceId: tokenGateResult?.space.id as string,
-        tokens: tokenGateResult?.gateTokens.map(tk => {
-          return {
-            signedToken: tk.signedToken,
-            tokenGateId: tk.tokenGate.id
-          };
-        }) ?? [],
+        tokens:
+          tokenGateResult?.gateTokens.map((tk) => {
+            return {
+              signedToken: tk.signedToken,
+              tokenGateId: tk.tokenGate.id
+            };
+          }) ?? [],
         joinType
       });
 
@@ -130,20 +134,18 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
 
       await refreshUserWithWeb3Account();
 
-      const spaceExists = spaces.some(s => s.id === tokenGateResult?.space.id);
+      const spaceExists = spaces.some((s) => s.id === tokenGateResult?.space.id);
 
       // Refresh spaces as otherwise the redirect will not work
       if (!spaceExists) {
         setSpaces([...spaces, tokenGateResult?.space as Space]);
       }
       onSuccess(tokenGateResult?.space as Space);
-    }
-    catch (err: any) {
-      showMessage(err?.message ?? (err ?? 'An unknown error occurred'), 'error');
+    } catch (err: any) {
+      showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
     }
 
     setJoiningSpace(false);
-
   }
 
   if (isLoading) {
@@ -166,69 +168,62 @@ export default function TokenGateForm ({ onSuccess, spaceDomain, joinButtonLabel
         </Typography>
       </Grid>
 
-      {
-        tokenGates?.map((gate, index, list) => (
-          <Grid item xs key={gate.id}>
-            <TokenGateOption
-              tokenGate={gate}
-              isVerifying={verifyingGates}
-              validGate={tokenGateResult ? (tokenGateResult.gateTokens.some(g => g.tokenGate.id === gate.id)) : null}
-            />
-            {
-              index < list.length - 1 && (
-                <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>OR</Typography>
-              )
-            }
-          </Grid>
-        ))
-      }
+      {tokenGates?.map((gate, index, list) => (
+        <Grid item xs key={gate.id}>
+          <TokenGateOption
+            tokenGate={gate}
+            isVerifying={verifyingGates}
+            validGate={tokenGateResult ? tokenGateResult.gateTokens.some((g) => g.tokenGate.id === gate.id) : null}
+          />
+          {index < list.length - 1 && (
+            <Typography color='secondary' sx={{ mb: -1, mt: 2, textAlign: 'center' }}>
+              OR
+            </Typography>
+          )}
+        </Grid>
+      ))}
 
-      {
-        tokenGateResult && (
-          <Grid item xs>
-            {
-              !tokenGateResult.canJoinSpace ? (
-                <Alert severity='warning' data-test='token-gate-failure-alert'>
-                  Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
-                </Alert>
-              ) : (
-                <Alert severity='success'>
-                  You can join this workspace. {tokenGateResult.roles.length > 0 ? 'You will also receive the roles attached to each condition you passed' : ''}
-                </Alert>
-              )
-            }
-          </Grid>
-        )
-      }
+      {tokenGateResult && (
+        <Grid item xs>
+          {!tokenGateResult.canJoinSpace ? (
+            <Alert severity='warning' data-test='token-gate-failure-alert'>
+              Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
+            </Alert>
+          ) : (
+            <Alert severity='success'>
+              You can join this workspace.{' '}
+              {tokenGateResult.roles.length > 0
+                ? 'You will also receive the roles attached to each condition you passed'
+                : ''}
+            </Alert>
+          )}
+        </Grid>
+      )}
 
       <Grid item>
-        {
-          !tokenGateResult?.canJoinSpace ? (
-            <WalletSign loading={verifyingGates} signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
-          ) : (
-            <PrimaryButton
-              size='large'
-              fullWidth
-              type='submit'
-              loading={joiningSpace}
-              disabled={joiningSpace}
-              onClick={onSubmit}
-            >
-              {joinButtonLabel || 'Join workspace'}
-            </PrimaryButton>
-          )
-        }
-
+        {!tokenGateResult?.canJoinSpace ? (
+          <WalletSign loading={verifyingGates} signSuccess={evaluateEligibility} buttonStyle={{ width: '100%' }} />
+        ) : (
+          <PrimaryButton
+            size='large'
+            fullWidth
+            type='submit'
+            loading={joiningSpace}
+            disabled={joiningSpace}
+            onClick={onSubmit}
+          >
+            {joinButtonLabel || 'Join workspace'}
+          </PrimaryButton>
+        )}
       </Grid>
       <Grid item>
         <Typography component='p' variant='caption' align='center'>
-          Powered by
-          {' '}
-          <Link href='https://litprotocol.com/' external target='_blank'>Lit Protocol</Link>
+          Powered by{' '}
+          <Link href='https://litprotocol.com/' external target='_blank'>
+            Lit Protocol
+          </Link>
         </Typography>
       </Grid>
-
     </Grid>
   );
 }
-

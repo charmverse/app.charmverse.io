@@ -13,7 +13,7 @@ import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
 const iconSize = 30;
 
-export function items (): PaletteItemTypeNoGroup[] {
+export function items(): PaletteItemTypeNoGroup[] {
   return [
     {
       uid: 'embed',
@@ -25,15 +25,18 @@ export function items (): PaletteItemTypeNoGroup[] {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
-
               // let the node view know to show the tooltip by default
               const tooltipMark = _state.schema.mark('tooltip-marker');
-              const node = _state.schema.nodes.iframe.create({
-                src: null,
-                type: 'embed',
-                width: MAX_EMBED_WIDTH,
-                height: MIN_EMBED_HEIGHT
-              }, undefined, [tooltipMark]);
+              const node = _state.schema.nodes.iframe.create(
+                {
+                  src: null,
+                  type: 'embed',
+                  width: MAX_EMBED_WIDTH,
+                  height: MIN_EMBED_HEIGHT
+                },
+                undefined,
+                [tooltipMark]
+              );
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node, false));
@@ -41,11 +44,7 @@ export function items (): PaletteItemTypeNoGroup[] {
               }
               return insertNode(_state, _dispatch, node);
             });
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
+            return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
           }
           return false;
         };
@@ -61,7 +60,6 @@ export function items (): PaletteItemTypeNoGroup[] {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
-
               const node = _state.schema.nodes.iframe.create({
                 src: null,
                 type: 'figma',
@@ -75,11 +73,7 @@ export function items (): PaletteItemTypeNoGroup[] {
               }
               return insertNode(_state, _dispatch, node);
             });
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
+            return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
           }
           return false;
         };
@@ -95,7 +89,6 @@ export function items (): PaletteItemTypeNoGroup[] {
           if (view) {
             // Execute the animation
             rafCommandExec(view!, (_state, _dispatch) => {
-
               const node = _state.schema.nodes.cryptoPrice.create();
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
@@ -105,11 +98,7 @@ export function items (): PaletteItemTypeNoGroup[] {
               return insertNode(_state, _dispatch, node);
             });
           }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     },
@@ -124,7 +113,6 @@ export function items (): PaletteItemTypeNoGroup[] {
           if (view) {
             // Execute the animation
             rafCommandExec(view!, (_state, _dispatch) => {
-
               // let the node view know to show the tooltip by default
               const tooltipMark = _state.schema.mark('tooltip-marker');
               const node = _state.schema.nodes.tweet.create(undefined, undefined, [tooltipMark]);
@@ -136,11 +124,7 @@ export function items (): PaletteItemTypeNoGroup[] {
               return insertNode(_state, _dispatch, node);
             });
           }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     }

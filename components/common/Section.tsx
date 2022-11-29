@@ -5,14 +5,9 @@ import type { PropsWithChildren, ReactNode } from 'react';
 type Props = {
   title: string | ReactNode;
   titleRightElement?: ReactNode;
-}
+};
 
-export default function Section ({
-  title,
-  titleRightElement,
-  children,
-  ...rest
-}: PropsWithChildren<Props>) {
+export default function Section({ title, titleRightElement, children, ...rest }: PropsWithChildren<Props>) {
   return (
     <Box padding={5} {...rest}>
       <Box padding={2}>

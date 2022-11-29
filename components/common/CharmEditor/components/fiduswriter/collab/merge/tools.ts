@@ -29,12 +29,14 @@ export const simplifyTransform = function (tr: Transform) {
     for (let index = 0; index < tr.steps.length; index++) {
       const step = tr.steps[index];
       if (step instanceof ReplaceStep && step.from !== step.to) {
-        const modifiedStep = step.slice.size ? new ReplaceStep(
-          step.to, // We insert all the same steps, but with "from"/"to" both set to "to" in order not to delete content. Mapped as needed.
-          step.to,
-          step.slice,
-          (step as any).structure
-        ) : false;
+        const modifiedStep = step.slice.size
+          ? new ReplaceStep(
+              step.to, // We insert all the same steps, but with "from"/"to" both set to "to" in order not to delete content. Mapped as needed.
+              step.to,
+              step.slice,
+              (step as any).structure
+            )
+          : false;
         if (modifiedStep) {
           // If while breaking down any step the step fails , we return the original tr (we just split steps containing both insertions and deletions into simple steps which does just insertion/deletion. should not make a big difference.)
           if (newTr.maybeStep(modifiedStep).failed) {
@@ -43,40 +45,31 @@ export const simplifyTransform = function (tr: Transform) {
           if (newTr.maybeStep(new ReplaceStep(step.from, step.to, Slice.empty, (step as any).structure)).failed) {
             return tr;
           }
-        }
-        else if (newTr.maybeStep(step).failed) {
+        } else if (newTr.maybeStep(step).failed) {
           return tr;
         }
-
-      }
-      else if (newTr.maybeStep(step).failed) {
+      } else if (newTr.maybeStep(step).failed) {
         return tr;
       }
     }
     return newTr;
-  }
-  else {
+  } else {
     return tr;
   }
 };
 
 export const removeDiffdata = function (tr: Transaction, from: number, to: number) {
   /* Adds steps to a tr to remove all the diff marks in the given range. */
-  tr.doc.nodesBetween(
-    from,
-    to,
-    (node, pos) => {
-      if (pos < from || ['bullet_list', 'ordered_list'].includes(node.type.name)) {
-        return true;
-      }
-      else if (node.isInline) {
-        return false;
-      }
-      if (node.attrs.diffdata && node.attrs.diffdata.length > 0) {
-        tr.setNodeMarkup(pos, undefined, { ...node.attrs, diffdata: [] }, node.marks);
-      }
+  tr.doc.nodesBetween(from, to, (node, pos) => {
+    if (pos < from || ['bullet_list', 'ordered_list'].includes(node.type.name)) {
+      return true;
+    } else if (node.isInline) {
+      return false;
     }
-  );
+    if (node.attrs.diffdata && node.attrs.diffdata.length > 0) {
+      tr.setNodeMarkup(pos, undefined, { ...node.attrs, diffdata: [] }, node.marks);
+    }
+  });
   tr.removeMark(from, to, tr.doc.type.schema.marks.diffdata);
   return tr;
 };
@@ -94,53 +87,61 @@ export const updateMarkData = function (tr: Transaction, newTr: Transaction) {
     update its attrs */
   const initialdiffMap = tr.getMeta('initialDiffMap');
   if (!initialdiffMap && (tr.steps.length > 0 || tr.docChanged)) {
-    tr.doc.nodesBetween(
-      0,
-      tr.doc.content.size,
-      (node, pos) => {
-        if (['bullet_list', 'ordered_list'].includes(node.type.name)) {
-          return true;
-        }
-        else if (node.isInline) {
-          const diffMark = node.marks.find(mark => mark.type.name === 'diffdata');
-          if (diffMark !== undefined) {
-            const diffAttrs = diffMark.attrs;
-            newTr.removeMark(pos, pos + node.nodeSize, tr.doc.type.schema.marks.diffdata);
-            const from = tr.mapping.map(diffAttrs.from);
-            const to = tr.mapping.map(diffAttrs.to, -1);
-            const mark = tr.doc.type.schema.marks.diffdata.create({
-              diff: diffAttrs.diff, steps: diffAttrs.steps, from, to, markOnly: diffAttrs.markOnly
-            });
-            newTr.addMark(pos, pos + node.nodeSize, mark);
-          }
-        }
-        if (node.attrs.diffdata && node.attrs.diffdata.length > 0) {
-          const diffdata = node.attrs.diffdata;
-          diffdata[0].from = tr.mapping.map(diffdata[0].from);
-          diffdata[0].to = tr.mapping.map(diffdata[0].to);
-          newTr.setNodeMarkup(pos, undefined, { ...node.attrs, diffdata }, node.marks);
+    tr.doc.nodesBetween(0, tr.doc.content.size, (node, pos) => {
+      if (['bullet_list', 'ordered_list'].includes(node.type.name)) {
+        return true;
+      } else if (node.isInline) {
+        const diffMark = node.marks.find((mark) => mark.type.name === 'diffdata');
+        if (diffMark !== undefined) {
+          const diffAttrs = diffMark.attrs;
+          newTr.removeMark(pos, pos + node.nodeSize, tr.doc.type.schema.marks.diffdata);
+          const from = tr.mapping.map(diffAttrs.from);
+          const to = tr.mapping.map(diffAttrs.to, -1);
+          const mark = tr.doc.type.schema.marks.diffdata.create({
+            diff: diffAttrs.diff,
+            steps: diffAttrs.steps,
+            from,
+            to,
+            markOnly: diffAttrs.markOnly
+          });
+          newTr.addMark(pos, pos + node.nodeSize, mark);
         }
       }
-    );
+      if (node.attrs.diffdata && node.attrs.diffdata.length > 0) {
+        const diffdata = node.attrs.diffdata;
+        diffdata[0].from = tr.mapping.map(diffdata[0].from);
+        diffdata[0].to = tr.mapping.map(diffdata[0].to);
+        newTr.setNodeMarkup(pos, undefined, { ...node.attrs, diffdata }, node.marks);
+      }
+    });
   }
   return newTr;
 };
 
-export const removeDiffFromJson = function (object: { attrs?: { diffdata?: string }, content?: any[], marks?: { type: string }[] }) {
+export const removeDiffFromJson = function (object: {
+  attrs?: { diffdata?: string };
+  content?: any[];
+  marks?: { type: string }[];
+}) {
   /* Used to convert a document from the merge editor to a doc that complies with the schema of the main editor */
   if (object.attrs && object.attrs.diffdata) {
     delete object.attrs.diffdata;
   }
   if (object.marks) {
-    object.marks = object.marks.filter(mark => mark.type !== 'diffdata');
+    object.marks = object.marks.filter((mark) => mark.type !== 'diffdata');
   }
   if (object.content) {
-    object.content.forEach(child => removeDiffFromJson(child));
+    object.content.forEach((child) => removeDiffFromJson(child));
   }
   return object;
 };
 
-function mapFragment (fragment: Fragment<any>, f: (node: Node, parent: Node, index: number) => Node, parent: Node, mark: Mark) {
+function mapFragment(
+  fragment: Fragment<any>,
+  f: (node: Node, parent: Node, index: number) => Node,
+  parent: Node,
+  mark: Mark
+) {
   const mapped = [];
   for (let i = 0; i < fragment.childCount; i++) {
     let child = fragment.child(i);
@@ -163,14 +164,19 @@ function mapFragment (fragment: Fragment<any>, f: (node: Node, parent: Node, ind
 }
 
 export const addDeletionMarks = function (slice: Slice, mark: Mark, parent: Node) {
-  const content = mapFragment(slice.content, (node, _parent) => {
-    if (_parent.type && !_parent.type.allowsMarkType(mark.type)) {
+  const content = mapFragment(
+    slice.content,
+    (node, _parent) => {
+      if (_parent.type && !_parent.type.allowsMarkType(mark.type)) {
+        return node;
+      }
+      if (node.isInline) {
+        return node.mark(mark.addToSet(node.marks));
+      }
       return node;
-    }
-    if (node.isInline) {
-      return node.mark(mark.addToSet(node.marks));
-    }
-    return node;
-  }, parent, mark);
+    },
+    parent,
+    mark
+  );
   return content;
 };

@@ -1,4 +1,3 @@
-
 import type { SpaceRole, SpaceRoleToRole } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -12,12 +11,13 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<SpaceRoleToRole & SpaceRole>(['roleId', 'userId'], 'body'))
   .post(assignRoleController)
   .delete(unassignRoleController);
 
-async function unassignRoleController (req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
+async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
   const { roleId, userId } = req.body as RoleAssignment;
 
   const { id: requestingUserId } = req.session.user;
@@ -53,7 +53,7 @@ async function unassignRoleController (req: NextApiRequest, res: NextApiResponse
   return res.status(200).json(roleAfterUpdate);
 }
 
-async function assignRoleController (req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
+async function assignRoleController(req: NextApiRequest, res: NextApiResponse<RoleWithMembers>) {
   const { roleId, userId } = req.body as RoleAssignment;
 
   const { id: requestingUserId } = req.session.user;
@@ -87,7 +87,6 @@ async function assignRoleController (req: NextApiRequest, res: NextApiResponse<R
   });
 
   return res.status(201).json(roleAfterUpdate);
-
 }
 
 export default withSessionRoute(handler);

@@ -1,4 +1,3 @@
-
 class Constants {
   static readonly menuColors: { [key: string]: string } = {
     propColorDefault: 'Default',

@@ -3,7 +3,7 @@ import type { DOMOutputSpec } from '@bangle.dev/pm';
 
 import { markName } from './inlineVote.constants';
 
-export function spec (): RawSpecs {
+export function spec(): RawSpecs {
   return {
     type: 'mark',
     name: markName,
@@ -22,7 +22,13 @@ export function spec (): RawSpecs {
           tag: 'span.charm-inline-vote'
         }
       ],
-      toDOM: (mark): DOMOutputSpec => ['span', { class: `charm-inline-vote ${mark.attrs.resolved ? 'resolved' : 'active'}`, id: `inline-vote.${mark.attrs.id}` }]
+      toDOM: (mark): DOMOutputSpec => [
+        'span',
+        {
+          class: `charm-inline-vote ${mark.attrs.resolved ? 'resolved' : 'active'}`,
+          id: `inline-vote.${mark.attrs.id}`
+        }
+      ]
     },
     markdown: {
       // TODO: Fix convert to markdown

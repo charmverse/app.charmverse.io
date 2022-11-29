@@ -56,8 +56,7 @@ export const Web3Context = createContext<Readonly<IContext>>({
 });
 
 // a wrapper around account and library from web3react
-export function Web3AccountProvider ({ children }: { children: ReactNode }) {
-
+export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { account, library, chainId, connector } = useWeb3React();
 
   const [isSigning, setIsSigning] = useState(false);
@@ -75,8 +74,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
 
-  function getStoredSignature (): AuthSig | null {
-
+  function getStoredSignature(): AuthSig | null {
     if (!account) {
       return null;
     }
@@ -88,14 +86,11 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
         const parsed = JSON.parse(stored) as AuthSig;
 
         return parsed;
-
-      }
-      catch (e) {
+      } catch (e) {
         log.error('Error parsing stored signature', e);
         return null;
       }
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -104,8 +99,7 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     setLoggedInUser(updatedUser);
   }, []);
 
-  function setSignature (signature: AuthSig | null, writeToLocalStorage?: boolean) {
-
+  function setSignature(signature: AuthSig | null, writeToLocalStorage?: boolean) {
     if (writeToLocalStorage) {
       window.localStorage.setItem(`${PREFIX}.wallet-auth-sig-${account}`, JSON.stringify(signature));
     }
@@ -114,27 +108,22 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
     setLitAuthSignature(signature);
     setLitProvider('metamask');
     setWalletAuthSignature(signature);
-
   }
 
   // Only expose account if current user and account match up
   useEffect(() => {
-
-    if (account && user?.wallets.some(w => lowerCaseEqual(w.address, account))) {
+    if (account && user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
       setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature();
       setSignature(storedWalletSignature);
-
-    }
-    else {
+    } else {
       setSignature(null);
       setStoredAccount(null);
     }
   }, [account, user]);
 
-  async function sign (): Promise<AuthSig> {
-
+  async function sign(): Promise<AuthSig> {
     if (!account) {
       throw new MissingWeb3AccountError();
     }
@@ -182,49 +171,54 @@ export function Web3AccountProvider ({ children }: { children: ReactNode }) {
       setIsSigning(false);
 
       return generated;
-    }
-    catch (err) {
+    } catch (err) {
       setIsSigning(false);
       throw err;
     }
-
   }
 
-  function disconnectWallet () {
+  function disconnectWallet() {
     if (account) {
       window.localStorage.removeItem(`${PREFIX}.wallet-auth-sig-${account}`);
       setWalletAuthSignature(null);
     }
   }
 
-  function connectWallet () {
-
+  function connectWallet() {
     openWalletSelectorModal();
   }
 
-  const value = useMemo<IContext>(() => ({
-    account: storedAccount,
-    walletAuthSignature,
-    triedEager,
-    sign,
-    getStoredSignature,
-    disconnectWallet,
-    library,
-    chainId,
-    setLoggedInUser: setCurrentUser,
-    connector,
-    verifiableWalletDetected,
-    connectWallet,
-    connectWalletModalIsOpen: isWalletSelectorModalOpen,
-    isSigning
-  }), [account, walletAuthSignature, triedEager, storedAccount, connector, isWalletSelectorModalOpen, isSigning, chainId, library]);
-
-  return (
-    <Web3Context.Provider value={value}>
-      {children}
-    </Web3Context.Provider>
+  const value = useMemo<IContext>(
+    () => ({
+      account: storedAccount,
+      walletAuthSignature,
+      triedEager,
+      sign,
+      getStoredSignature,
+      disconnectWallet,
+      library,
+      chainId,
+      setLoggedInUser: setCurrentUser,
+      connector,
+      verifiableWalletDetected,
+      connectWallet,
+      connectWalletModalIsOpen: isWalletSelectorModalOpen,
+      isSigning
+    }),
+    [
+      account,
+      walletAuthSignature,
+      triedEager,
+      storedAccount,
+      connector,
+      isWalletSelectorModalOpen,
+      isSigning,
+      chainId,
+      library
+    ]
   );
 
+  return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
 }
 
 export const useWeb3AuthSig = () => useContext(Web3Context);

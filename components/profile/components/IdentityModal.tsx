@@ -56,51 +56,43 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
 };
 
 type IdentityModalProps = {
-    save: (id: string, identityType: IdentityType) => void;
-    close: () => void;
-    isOpen: boolean;
-    identityTypes: IntegrationModel[];
-    identityType: IdentityType;
-    username: string;
+  save: (id: string, identityType: IdentityType) => void;
+  close: () => void;
+  isOpen: boolean;
+  identityTypes: IntegrationModel[];
+  identityType: IdentityType;
+  username: string;
 };
 
-function IdentityModal (props: IdentityModalProps) {
+function IdentityModal(props: IdentityModalProps) {
   const { close, isOpen, save, identityTypes, identityType, username } = props;
-  const [generatedName, setGeneratedName] = useState(
-    identityType === IDENTITY_TYPES[3] ? username : randomName()
-  );
+  const [generatedName, setGeneratedName] = useState(identityType === IDENTITY_TYPES[3] ? username : randomName());
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={close}
-      size='large'
-    >
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Select a public identity</DialogTitle>
       <Typography>Select which integration you want to show as your username</Typography>
       <Box mb={2}>
-        {
-          identityTypes.map((item: IntegrationModel) => (
-            <Integration
-              isInUse={item.type === IDENTITY_TYPES[3] && generatedName !== item.username ? false : item.isInUse}
-              icon={item.icon}
-              identityType={item.type}
-              name={item.type === IDENTITY_TYPES[3] ? 'Anonymous' : item.type}
-              username={item.type === IDENTITY_TYPES[3] ? generatedName : item.username}
-              useIntegration={save}
-              action={
-                item.type === IDENTITY_TYPES[3] ? (
-                  <Tooltip arrow placement='top' title='Generate a new name'>
-                    <IconButton onClick={() => setGeneratedName(randomName())}>
-                      <RefreshIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
-                ) : null
-              }
-              key={item.type}
-            />
-          ))
-        }
+        {identityTypes.map((item: IntegrationModel) => (
+          <Integration
+            isInUse={item.type === IDENTITY_TYPES[3] && generatedName !== item.username ? false : item.isInUse}
+            icon={item.icon}
+            identityType={item.type}
+            name={item.type === IDENTITY_TYPES[3] ? 'Anonymous' : item.type}
+            username={item.type === IDENTITY_TYPES[3] ? generatedName : item.username}
+            useIntegration={save}
+            action={
+              item.type === IDENTITY_TYPES[3] ? (
+                <Tooltip arrow placement='top' title='Generate a new name'>
+                  <IconButton onClick={() => setGeneratedName(randomName())}>
+                    <RefreshIcon fontSize='small' />
+                  </IconButton>
+                </Tooltip>
+              ) : null
+            }
+            key={item.type}
+          />
+        ))}
       </Box>
       <Link href='/integrations'>
         <Button variant='text' color='secondary' endIcon={<NavigateNextIcon />}>

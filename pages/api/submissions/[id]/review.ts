@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -20,7 +19,7 @@ handler
   .use(requireKeys<Pick<SubmissionReview, 'decision'>>(['decision'], 'body'))
   .post(reviewSubmissionController);
 
-async function reviewSubmissionController (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function reviewSubmissionController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: submissionId } = req.query;
   const { decision } = req.body as { decision: ReviewDecision };
 
@@ -65,10 +64,16 @@ async function reviewSubmissionController (req: NextApiRequest, res: NextApiResp
   const { spaceId, rewardAmount, rewardToken, id, page } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
-  }
-  else {
+  } else {
     if (submission.status === 'applied') {
-      trackUserAction('bounty_application_rejected', { userId, spaceId, pageId: page?.id || '', rewardToken, rewardAmount, resourceId: id });
+      trackUserAction('bounty_application_rejected', {
+        userId,
+        spaceId,
+        pageId: page?.id || '',
+        rewardToken,
+        rewardAmount,
+        resourceId: id
+      });
     }
 
     if (submission.status === 'review') {

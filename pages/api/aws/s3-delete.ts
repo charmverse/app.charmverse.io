@@ -12,8 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).delete(deleteImage);
 
-async function deleteImage (req: NextApiRequest, res: NextApiResponse) {
-
+async function deleteImage(req: NextApiRequest, res: NextApiResponse) {
   const imageSrc = req.body.src;
   if (typeof imageSrc !== 'string') {
     return res.status(400).json({ error: 'src is required' });

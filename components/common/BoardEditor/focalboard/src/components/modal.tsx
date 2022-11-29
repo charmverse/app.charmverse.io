@@ -5,10 +5,10 @@ import React, { useRef, useEffect } from 'react';
 import IconButton from '../widgets/buttons/iconButton';
 
 type Props = {
-    onClose: () => void;
-    position?: 'top'|'bottom'|'bottom-right';
-    children: React.ReactNode;
-}
+  onClose: () => void;
+  position?: 'top' | 'bottom' | 'bottom-right';
+  children: React.ReactNode;
+};
 
 const Modal = React.memo((props: Props): JSX.Element => {
   const node = useRef<HTMLDivElement>(null);
@@ -17,16 +17,9 @@ const Modal = React.memo((props: Props): JSX.Element => {
 
   return (
     <ClickAwayListener onClickAway={onClose}>
-      <div
-        className={`Modal ${position || 'bottom'}`}
-        ref={node}
-      >
+      <div className={`Modal ${position || 'bottom'}`} ref={node}>
         <div className='toolbar hideOnWidescreen'>
-          <IconButton
-            onClick={() => onClose()}
-            icon={<CloseIcon fontSize='small' />}
-            title='Close'
-          />
+          <IconButton onClick={() => onClose()} icon={<CloseIcon fontSize='small' />} title='Close' />
         </div>
         {children}
       </div>

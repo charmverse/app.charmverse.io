@@ -24,7 +24,7 @@ export interface TelegramAccount {
   username: string;
 }
 
-async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | { error: string }>) {
+async function connectTelegram(req: NextApiRequest, res: NextApiResponse<TelegramUser | { error: string }>) {
   const telegramAccount = req.body as TelegramAccount;
 
   const { id, ...rest } = telegramAccount;
@@ -43,12 +43,12 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
         }
       }
     });
-  }
-  catch (error) {
+  } catch (error) {
     log.warn('Error while connecting to Telegram', error);
     // If the telegram user is already connected to a charmverse account this code will be run
     res.status(400).json({
-      error: 'Connection to Telegram failed. Another CharmVerse account is already associated with this Telegram account.'
+      error:
+        'Connection to Telegram failed. Another CharmVerse account is already associated with this Telegram account.'
     });
     return;
   }

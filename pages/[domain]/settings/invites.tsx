@@ -5,7 +5,7 @@ import SettingsLayout from 'components/settings/Layout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function Pageinvites () {
+export default function Pageinvites() {
   setTitle('Invites');
   const space = useCurrentSpace();
 
@@ -13,15 +13,9 @@ export default function Pageinvites () {
     return null;
   }
 
-  return (
-    <Invites space={space} />
-  );
+  return <Invites space={space} />;
 }
 
 Pageinvites.getLayout = (page: ReactElement) => {
-  return (
-    <SettingsLayout>
-      {page}
-    </SettingsLayout>
-  );
+  return <SettingsLayout>{page}</SettingsLayout>;
 };

@@ -1,4 +1,3 @@
-
 import type { CSSObject } from '@emotion/serialize';
 import Select from 'react-select';
 
@@ -12,7 +11,7 @@ type Props = {
   value: string;
   readOnly: boolean;
   onChange: (value: string) => void;
-}
+};
 
 const selectStyles = {
   ...getSelectBaseStyle(),
@@ -22,7 +21,7 @@ const selectStyles = {
   })
 };
 
-function UserProperty (props: Props): JSX.Element | null {
+function UserProperty(props: Props): JSX.Element | null {
   const { members } = useMembers();
   const memberMap = members.reduce<Record<string, Member>>((acc, member) => {
     acc[member.id] = member;
@@ -49,7 +48,7 @@ function UserProperty (props: Props): JSX.Element | null {
       className='UserProperty octo-propertyvalue'
       classNamePrefix='react-select'
       // eslint-disable-next-line react/no-unstable-nested-components
-      formatOptionLabel={u => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
+      formatOptionLabel={(u) => <UserDisplay user={u} avatarSize='small' fontSize='small' />}
       styles={selectStyles}
       placeholder='Empty'
       getOptionLabel={(o: Member) => o.username}
@@ -58,8 +57,7 @@ function UserProperty (props: Props): JSX.Element | null {
       onChange={(item, action) => {
         if (action.action === 'select-option') {
           props.onChange(item?.id || '');
-        }
-        else if (action.action === 'clear') {
+        } else if (action.action === 'clear') {
           props.onChange('');
         }
       }}

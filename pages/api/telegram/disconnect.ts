@@ -17,7 +17,7 @@ const handler = nc({
 
 handler.use(requireUser).post(disconnectTelegram);
 
-async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
+async function disconnectTelegram(req: NextApiRequest, res: NextApiResponse) {
   await prisma.telegramUser.delete({
     where: {
       userId: req.session.user.id
@@ -57,20 +57,15 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
     newUserName = ens;
     newIdentityProvider = IDENTITY_TYPES[0];
   }
-  if (user.discordUser
-    && user.discordUser.account
-    && (user.discordUser.account as Partial<DiscordAccount>).username
-  ) {
+  if (user.discordUser && user.discordUser.account && (user.discordUser.account as Partial<DiscordAccount>).username) {
     const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
     // Already checked that there is a username
     newUserName = discordAccount.username || '';
     newIdentityProvider = IDENTITY_TYPES[1];
-  }
-  else if (user.wallets.length) {
+  } else if (user.wallets.length) {
     newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
-  }
-  else {
+  } else {
     throw new InvalidStateError();
   }
 

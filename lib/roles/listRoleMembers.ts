@@ -3,7 +3,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { RoleMembersQuery, RoleWithMembers } from './interfaces';
 
-export async function listRoleMembers ({ roleId }: RoleMembersQuery): Promise<RoleWithMembers> {
+export async function listRoleMembers({ roleId }: RoleMembersQuery): Promise<RoleWithMembers> {
   const role = await prisma.role.findFirst({
     where: {
       id: roleId
@@ -27,7 +27,7 @@ export async function listRoleMembers ({ roleId }: RoleMembersQuery): Promise<Ro
 
   const roleWithAssignedUsers: RoleWithMembers = {
     ...role,
-    users: role.spaceRolesToRole.map(_ => {
+    users: role.spaceRolesToRole.map((_) => {
       return _.spaceRole.user;
     })
   };

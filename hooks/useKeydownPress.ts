@@ -8,14 +8,14 @@ type KeyConfig = {
   ctrl?: boolean;
 };
 
-export default function useKeydownPress (callback: VoidFunction, { key, ctrl, shift }: KeyConfig = {}) {
+export default function useKeydownPress(callback: VoidFunction, { key, ctrl, shift }: KeyConfig = {}) {
   const keyMap = {
     shift: '⇧',
     ctrl: isMac() ? '⌘' : 'Ctrl'
   };
 
   useEffect(() => {
-    function onKeydown (event: globalThis.KeyboardEvent) {
+    function onKeydown(event: globalThis.KeyboardEvent) {
       if (key && event.key?.toLowerCase() !== key.toLowerCase()) {
         return;
       }

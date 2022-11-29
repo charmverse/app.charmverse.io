@@ -17,7 +17,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createMemberPropertyHandler);
 
-async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty[]>) {
+async function getMemberPropertiesHandler(req: NextApiRequest, res: NextApiResponse<MemberProperty[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -26,7 +26,7 @@ async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResp
   return res.status(200).json(properties);
 }
 
-async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
+async function createMemberPropertyHandler(req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
   const propertyData = req.body as CreateMemberPropertyPayload;

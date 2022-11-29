@@ -21,8 +21,7 @@ interface LayoutOptionsProps {
   intl: IntlShape;
 }
 
-function LayoutOptions (props: LayoutOptionsProps) {
-
+function LayoutOptions(props: LayoutOptionsProps) {
   const dispatch = useAppDispatch();
 
   const intl = props.intl;
@@ -48,8 +47,7 @@ function LayoutOptions (props: LayoutOptionsProps) {
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');
-    }
-    catch {
+    } catch {
       dispatch(updateView(activeView));
     }
   }, [activeView]);
@@ -65,8 +63,7 @@ function LayoutOptions (props: LayoutOptionsProps) {
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');
-    }
-    catch {
+    } catch {
       dispatch(updateView(activeView));
     }
   }, [activeView]);
@@ -79,8 +76,7 @@ function LayoutOptions (props: LayoutOptionsProps) {
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');
-    }
-    catch {
+    } catch {
       dispatch(updateView(activeView));
     }
   }, [activeView]);
@@ -93,14 +89,13 @@ function LayoutOptions (props: LayoutOptionsProps) {
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');
-    }
-    catch {
+    } catch {
       dispatch(updateView(activeView));
     }
   }, [activeView]);
 
   return (
-    <Box onClick={e => e.stopPropagation()}>
+    <Box onClick={(e) => e.stopPropagation()}>
       <Grid container spacing={1} px={1}>
         <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
           <BoardIcon />
@@ -123,10 +118,26 @@ function LayoutOptions (props: LayoutOptionsProps) {
   );
 }
 
-function LayoutOption ({ active, onClick, children }: { active?: boolean, onClick: () => void, children: React.ReactNode }) {
+function LayoutOption({
+  active,
+  onClick,
+  children
+}: {
+  active?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <Grid item xs={6} onClick={onClick}>
-      <Card variant='outlined' sx={{ height: '100%', cursor: 'pointer', borderColor: active ? 'var(--primary-color)' : '', '&:hover': { bgcolor: !active ? 'sidebar.background' : '' } }}>
+      <Card
+        variant='outlined'
+        sx={{
+          height: '100%',
+          cursor: 'pointer',
+          borderColor: active ? 'var(--primary-color)' : '',
+          '&:hover': { bgcolor: !active ? 'sidebar.background' : '' }
+        }}
+      >
         <Typography variant='body2' color={active ? 'primary' : 'secondary'}>
           <Box component='span' display='flex' p={1} alignItems='center' flexDirection='column' justifyContent='center'>
             {children}
@@ -135,7 +146,6 @@ function LayoutOption ({ active, onClick, children }: { active?: boolean, onClic
       </Card>
     </Grid>
   );
-
 }
 
 export default injectIntl(LayoutOptions);

@@ -1,4 +1,3 @@
-
 import type { Role } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,13 +10,14 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   // Delete role performs the check for whether the user can delete it
   .delete(deleteRole)
   .use(requireSpaceMembership({ adminOnly: true }))
   .put(updateRole);
 
-async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
+async function deleteRole(req: NextApiRequest, res: NextApiResponse) {
   const roleId = req.query.id as string;
 
   if (!roleId) {
@@ -58,7 +58,7 @@ async function deleteRole (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({ success: true });
 }
 
-async function updateRole (req: NextApiRequest, res: NextApiResponse) {
+async function updateRole(req: NextApiRequest, res: NextApiResponse) {
   const { name } = req.body as Role;
 
   const { id } = req.query;

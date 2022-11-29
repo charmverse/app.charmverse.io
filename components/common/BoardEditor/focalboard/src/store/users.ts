@@ -1,4 +1,3 @@
-
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -10,7 +9,7 @@ import type { RootState } from './index';
 
 type UsersStatus = {
   workspaceUsers: { [key: string]: IUser };
-}
+};
 
 const initialState = {
   workspaceUsers: {},
@@ -43,8 +42,8 @@ export const { reducer } = usersSlice;
 
 export const getWorkspaceUsers = (state: RootState): { [key: string]: IUser } => state.users.workspaceUsers;
 
-export const getUser = (userId: string): (state: RootState) => IUser|undefined => {
-  return (state: RootState): IUser|undefined => {
+export const getUser = (userId: string): ((state: RootState) => IUser | undefined) => {
+  return (state: RootState): IUser | undefined => {
     const users = getWorkspaceUsers(state);
     return users[userId];
   };

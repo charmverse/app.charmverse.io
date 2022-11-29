@@ -35,12 +35,11 @@ beforeAll(async () => {
 });
 
 describe('setupPermissionsAfterPageCreated', () => {
-  it('should fail if the page doesn\'t exist', async () => {
+  it("should fail if the page doesn't exist", async () => {
     try {
       await setupPermissionsAfterPageCreated(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(PageNotFoundError);
     }
   });
@@ -53,11 +52,10 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
-    expect(pageWithPermissions.permissions.some(p => p.userId === user1.id && p.permissionLevel === 'full_access'));
+    expect(pageWithPermissions.permissions.some((p) => p.userId === user1.id && p.permissionLevel === 'full_access'));
   });
 
   it('should assign the space default page permission to a root page', async () => {
-
     const page = await createPage({
       createdBy: user1.id,
       spaceId: spaceWithDefaultPagePermissionGroup.id
@@ -66,7 +64,7 @@ describe('setupPermissionsAfterPageCreated', () => {
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
     expect(pageWithPermissions?.permissions.length).toBe(2);
-    expect(pageWithPermissions?.permissions.find(p => p.spaceId === spaceWithDefaultPagePermissionGroup.id)).toEqual(
+    expect(pageWithPermissions?.permissions.find((p) => p.spaceId === spaceWithDefaultPagePermissionGroup.id)).toEqual(
       expect.objectContaining<Partial<PagePermission>>({
         inheritedFromPermission: null,
         spaceId: expect.stringContaining(spaceWithDefaultPagePermissionGroup.id),
@@ -77,7 +75,6 @@ describe('setupPermissionsAfterPageCreated', () => {
   });
 
   it('should assign full_access to a root page if the space has no default permission', async () => {
-
     const page = await createPage({
       createdBy: user2.id,
       spaceId: spaceWithoutDefaultPagePermissionGroup.id
@@ -86,7 +83,9 @@ describe('setupPermissionsAfterPageCreated', () => {
     const pageWithPermissions = await setupPermissionsAfterPageCreated(page.id);
 
     expect(pageWithPermissions?.permissions.length).toBe(2);
-    expect(pageWithPermissions?.permissions.find(p => p.spaceId === spaceWithoutDefaultPagePermissionGroup.id)).toEqual(
+    expect(
+      pageWithPermissions?.permissions.find((p) => p.spaceId === spaceWithoutDefaultPagePermissionGroup.id)
+    ).toEqual(
       expect.objectContaining<Partial<PagePermission>>({
         inheritedFromPermission: null,
         spaceId: spaceWithoutDefaultPagePermissionGroup.id,
@@ -119,20 +118,31 @@ describe('setupPermissionsAfterPageCreated', () => {
       parentId: page.id
     });
 
-    const childWithPermissions = await setupPermissionsAfterPageCreated(childPage.id) as IPageWithPermissions;
+    const childWithPermissions = (await setupPermissionsAfterPageCreated(childPage.id)) as IPageWithPermissions;
 
     expect(childWithPermissions?.permissions.length).toBe(assignedPermissions.length);
 
-    const childInheritedUserPermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'full_access' && permission.userId === user1.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[0].id);
+    const childInheritedUserPermission = childWithPermissions?.permissions.some(
+      (permission) =>
+        permission.permissionLevel === 'full_access' &&
+        permission.userId === user1.id &&
+        permission.pageId === childWithPermissions.id &&
+        permission.inheritedFromPermission === assignedPermissions[0].id
+    );
 
-    const childInheritedSpacePermission = childWithPermissions?.permissions.some(permission => permission.permissionLevel === 'view' && permission.spaceId === spaceWithDefaultPagePermissionGroup.id && permission.pageId === childWithPermissions.id && permission.inheritedFromPermission === assignedPermissions[1].id);
+    const childInheritedSpacePermission = childWithPermissions?.permissions.some(
+      (permission) =>
+        permission.permissionLevel === 'view' &&
+        permission.spaceId === spaceWithDefaultPagePermissionGroup.id &&
+        permission.pageId === childWithPermissions.id &&
+        permission.inheritedFromPermission === assignedPermissions[1].id
+    );
 
     expect(childInheritedUserPermission).toBe(true);
     expect(childInheritedSpacePermission).toBe(true);
   });
 
   it('should insert a public:true page permission to a new root page if spaceDefaultPublic is true for that space', async () => {
-
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await toggleSpaceDefaultPublicPage({
@@ -150,13 +160,12 @@ describe('setupPermissionsAfterPageCreated', () => {
     // Default space full access + creating user full access + public page permission
     expect(pageWithPermissions?.permissions.length).toBe(3);
 
-    const publicPermission = pageWithPermissions.permissions.find(p => p.public === true);
+    const publicPermission = pageWithPermissions.permissions.find((p) => p.public === true);
 
     expect(publicPermission).toBeDefined();
   });
 
   it('should not insert a public page permission to a new root page if spaceDefaultPublic is not true for that space', async () => {
-
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await toggleSpaceDefaultPublicPage({
@@ -174,14 +183,13 @@ describe('setupPermissionsAfterPageCreated', () => {
     // Default space full access + creating user full access
     expect(pageWithPermissions?.permissions.length).toBe(2);
 
-    const publicPermission = pageWithPermissions.permissions.find(p => p.public === true);
+    const publicPermission = pageWithPermissions.permissions.find((p) => p.public === true);
 
     expect(publicPermission).not.toBeDefined();
   });
 
   // Here permissions inheritance should come into play
   it('should not insert a public page permission to a new child page if spaceDefaultPublic is true for that space', async () => {
-
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await toggleSpaceDefaultPublicPage({
@@ -196,7 +204,7 @@ describe('setupPermissionsAfterPageCreated', () => {
 
     rootPage = await setupPermissionsAfterPageCreated(rootPage.id);
 
-    const publicPermissionId = rootPage.permissions.find(p => p.public === true)?.id as string;
+    const publicPermissionId = rootPage.permissions.find((p) => p.public === true)?.id as string;
 
     await deletePagePermission(publicPermissionId);
 
@@ -211,9 +219,8 @@ describe('setupPermissionsAfterPageCreated', () => {
     // Default space full access + creating user full access
     expect(childPage.permissions.length).toBe(2);
 
-    const publicPermission = childPage.permissions.find(p => p.public === true);
+    const publicPermission = childPage.permissions.find((p) => p.public === true);
 
     expect(publicPermission).not.toBeDefined();
   });
-
 });

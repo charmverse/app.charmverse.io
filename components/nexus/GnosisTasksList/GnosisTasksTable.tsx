@@ -18,36 +18,41 @@ import Typography from '@mui/material/Typography';
 import type { UserGnosisSafe } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Fragment, useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
 import Link from 'components/common/Link';
-import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay, { AnonUserDisplay } from 'components/common/UserDisplay';
-import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import useGnosisSigner from 'hooks/useWeb3Signer';
-import { importSafesFromWallet } from 'lib/gnosis/gnosis.importSafes';
-import type { GnosisSafeTasks, GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
+import type { GnosisTask, GnosisTransactionPopulated } from 'lib/gnosis/gnosis.tasks';
 import { getGnosisSafeUrl } from 'lib/gnosis/utils';
 import { shortenHex } from 'lib/utilities/strings';
 
-import { GnosisConnectCard } from '../../integrations/components/GnosisSafes';
 import { EmptyTaskState } from '../components/EmptyTaskState';
 import Table from '../components/NexusTable';
-import useTasksState from '../hooks/useTasksState';
 
-function TransactionRow (
-  { firstNonce, isSnoozed, transaction, showNonce, isLastTransaction }:
-  { firstNonce: number, isSnoozed: boolean, transaction: GnosisTransactionPopulated, showNonce: boolean, isLastTransaction: boolean }
-) {
+function TransactionRow({
+  firstNonce,
+  isSnoozed,
+  transaction,
+  showNonce,
+  isLastTransaction
+}: {
+  firstNonce: number;
+  isSnoozed: boolean;
+  transaction: GnosisTransactionPopulated;
+  showNonce: boolean;
+  isLastTransaction: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
   const isReadyToExecute = transaction.confirmations?.length === transaction.threshold;
   const isFirstTask = transaction.nonce === firstNonce;
 
   return (
     <>
-      <TableRow onClick={() => setExpanded(prevState => !prevState)} role='button' aria-pressed={expanded} sx={{ ...(!isLastTransaction && { '& > .MuiTableCell-root': { borderBottom: 0 } }) }}>
+      <TableRow
+        onClick={() => setExpanded((prevState) => !prevState)}
+        role='button'
+        aria-pressed={expanded}
+        sx={{ ...(!isLastTransaction && { '& > .MuiTableCell-root': { borderBottom: 0 } }) }}
+      >
         <TableCell align='center'>
           <strong>{!!showNonce && transaction.nonce}</strong>
         </TableCell>
@@ -58,13 +63,27 @@ function TransactionRow (
           <Typography>{DateTime.fromISO(transaction.date).toRelative({ base: DateTime.now() })}</Typography>
         </TableCell>
         <TableCell>
-          <Typography variant='caption' sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}>
-            <PeopleIcon color='secondary' fontSize='small' /> {transaction.confirmations?.length || 0} out of {transaction.threshold}
+          <Typography
+            variant='caption'
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: isReadyToExecute ? 'bold' : '' }}
+          >
+            <PeopleIcon color='secondary' fontSize='small' /> {transaction.confirmations?.length || 0} out of{' '}
+            {transaction.threshold}
           </Typography>
         </TableCell>
         <TableCell>
           <Box gap={1} display='flex' alignItems='center'>
-            <Tooltip arrow placement='top' title={isSnoozed ? 'Transactions snoozed' : !isFirstTask ? `Transaction with nonce ${firstNonce} needs to be executed first` : ''}>
+            <Tooltip
+              arrow
+              placement='top'
+              title={
+                isSnoozed
+                  ? 'Transactions snoozed'
+                  : !isFirstTask
+                  ? `Transaction with nonce ${firstNonce} needs to be executed first`
+                  : ''
+              }
+            >
               <div>
                 <Chip
                   clickable={!!transaction.myAction}
@@ -89,11 +108,9 @@ function TransactionRow (
             <Box py={1} pl={1} sx={{ bgcolor: 'background.light' }}>
               <Grid container spacing={1}>
                 <Grid item xs={5}>
-                  {transaction.actions.map(action => (
+                  {transaction.actions.map((action) => (
                     <Box py={1} key={action.to.address}>
-                      <Typography
-                        gutterBottom
-                      >
+                      <Typography gutterBottom>
                         Sending <strong>{action.friendlyValue}</strong> to:
                       </Typography>
                       {action.to.user ? (
@@ -130,8 +147,10 @@ function TransactionRow (
                   <Divider orientation='vertical' />
                 </Grid>
                 <Grid item xs={5} pr={1}>
-                  <Typography color='secondary' gutterBottom variant='body2'>Confirmations</Typography>
-                  {transaction.confirmations.map(confirmation => (
+                  <Typography color='secondary' gutterBottom variant='body2'>
+                    Confirmations
+                  </Typography>
+                  {transaction.confirmations.map((confirmation) => (
                     <Box py={1} key={confirmation.address}>
                       {confirmation.user ? (
                         <UserDisplay
@@ -162,22 +181,25 @@ function TransactionRow (
                       )}
                     </Box>
                   ))}
-                  {transaction.snoozedUsers.length !== 0 ? <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>Snoozed</Typography> : null}
-                  {transaction.snoozedUsers.map(snoozedUser => (
+                  {transaction.snoozedUsers.length !== 0 ? (
+                    <Typography sx={{ mt: 2 }} color='secondary' gutterBottom variant='body2'>
+                      Snoozed
+                    </Typography>
+                  ) : null}
+                  {transaction.snoozedUsers.map((snoozedUser) => (
                     <Box key={snoozedUser.id} py={1} display='flex' justifyContent='space-between'>
                       <UserDisplay avatarSize='small' user={snoozedUser} />
                       <Box display='flex' gap={1} alignItems='center'>
                         {snoozedUser.notificationState?.snoozeMessage && (
                           <Tooltip arrow placement='top' title={snoozedUser.notificationState.snoozeMessage}>
-                            <EmailIcon
-                              fontSize='small'
-                              color='secondary'
-                            />
+                            <EmailIcon fontSize='small' color='secondary' />
                           </Tooltip>
                         )}
                         <Typography variant='subtitle1' color='secondary'>
-                          for {DateTime.fromJSDate(new Date(snoozedUser.notificationState?.snoozedUntil as Date))
-                          .toRelative({ base: (DateTime.now()) })?.slice(3)}
+                          for{' '}
+                          {DateTime.fromJSDate(new Date(snoozedUser.notificationState?.snoozedUntil as Date))
+                            .toRelative({ base: DateTime.now() })
+                            ?.slice(3)}
                         </Typography>
                       </Box>
                     </Box>
@@ -192,7 +214,7 @@ function TransactionRow (
   );
 }
 
-function GnosisTasksTable ({ tasks, isSnoozed }: { tasks: GnosisTask[], isSnoozed: boolean }) {
+function GnosisTasksTable({ tasks, isSnoozed }: { tasks: GnosisTask[]; isSnoozed: boolean }) {
   return (
     <Table size='medium' aria-label='Nexus multisign table'>
       <TableHead>
@@ -202,7 +224,9 @@ function GnosisTasksTable ({ tasks, isSnoozed }: { tasks: GnosisTask[], isSnooze
           <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Date</TableCell>
           <TableCell sx={{ minWidth: { xs: 130, sm: 'inherit' } }}>Required Signers</TableCell>
           <TableCell width='100'>
-            <Typography variant='body2' fontWeight='500' marginLeft='12px' variantMapping={{ body2: 'span' }}>Action</Typography>
+            <Typography variant='body2' fontWeight='500' marginLeft='12px' variantMapping={{ body2: 'span' }}>
+              Action
+            </Typography>
           </TableCell>
         </TableRow>
       </TableHead>
@@ -216,7 +240,8 @@ function GnosisTasksTable ({ tasks, isSnoozed }: { tasks: GnosisTask[], isSnooze
                 </TableCell>
                 <TableCell colSpan={4}>
                   <Alert color='info' icon={false} sx={{ py: 0, width: '100%', fontSize: { sm: '14px', xs: '12px' } }}>
-                    These transactions conflict as they use the same nonce. Executing one will automatically replace the other(s).
+                    These transactions conflict as they use the same nonce. Executing one will automatically replace the
+                    other(s).
                   </Alert>
                 </TableCell>
               </TableRow>
@@ -238,20 +263,18 @@ function GnosisTasksTable ({ tasks, isSnoozed }: { tasks: GnosisTask[], isSnooze
   );
 }
 
-export function SafeTasks (
-  { isSnoozed, safe, tasks }:
-  { isSnoozed: boolean, safe: UserGnosisSafe, tasks: GnosisTask[] }
-) {
+export function SafeTasks({
+  isSnoozed,
+  safe,
+  tasks
+}: {
+  isSnoozed: boolean;
+  safe: UserGnosisSafe;
+  tasks: GnosisTask[];
+}) {
   return (
     <Box margin='40px 0'>
-      <Typography
-        variant='body2'
-        color='inherit'
-        display='flex'
-        alignItems='center'
-        gap={1}
-        marginBottom='20px'
-      >
+      <Typography variant='body2' color='inherit' display='flex' alignItems='center' gap={1} marginBottom='20px'>
         <strong>Gnosis Safe:</strong>
         <Link
           href={getGnosisSafeUrl(safe.address, safe.chainId)}
@@ -265,7 +288,11 @@ export function SafeTasks (
         </Link>
       </Typography>
       <Box overflow='auto'>
-        {tasks.length === 0 ? <EmptyTaskState key={safe.address} taskType='transactions' /> : <GnosisTasksTable tasks={tasks} isSnoozed={isSnoozed} />}
+        {tasks.length === 0 ? (
+          <EmptyTaskState key={safe.address} taskType='transactions' />
+        ) : (
+          <GnosisTasksTable tasks={tasks} isSnoozed={isSnoozed} />
+        )}
       </Box>
     </Box>
   );

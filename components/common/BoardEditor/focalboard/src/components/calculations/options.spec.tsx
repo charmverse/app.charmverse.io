@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import React from 'react';
 
@@ -19,11 +18,13 @@ describe('components/calculations/Options', () => {
         onChange={() => {}}
         property={property}
         menuOpen={false}
-        options={[{
-          label: 'Count',
-          value: 'count',
-          displayName: 'Count'
-        }]}
+        options={[
+          {
+            label: 'Count',
+            value: 'count',
+            displayName: 'Count'
+          }
+        ]}
       />
     );
 

@@ -1,4 +1,3 @@
-
 import { Box, Divider, Popover, Tooltip } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
@@ -14,11 +13,13 @@ import { findParentOfType } from 'lib/pages/findParentOfType';
 import PagePermissions from './components/PagePermissions';
 import ShareToWeb from './components/ShareToWeb';
 
-function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: string }) {
-
+function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: string }) {
   const { refreshPage, pages } = usePages();
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(pageId ? `/api/pages/${pageId}/permissions` : null, () => charmClient.listPagePermissions(pageId));
+  const { data: pagePermissions, mutate: refreshPermissions } = useSWRImmutable(
+    pageId ? `/api/pages/${pageId}/permissions` : null,
+    () => charmClient.listPagePermissions(pageId)
+  );
 
   const proposalParentId = findParentOfType({ pageId, pageType: 'proposal', pageMap: pages });
 
@@ -64,28 +65,28 @@ function ShareButton ({ headerHeight, pageId }: { headerHeight: number, pageId: 
           }
         }}
       >
-        {
-          !pagePermissions
-            ? (<Box sx={{ height: 100 }}><Loader size={20} sx={{ height: 600 }} /></Box>)
-            : (
-              <>
-                <ShareToWeb
-                  pageId={pageId}
-                  pagePermissions={pagePermissions}
-                  refreshPermissions={refreshPermissions}
-                  proposalParentId={proposalParentId}
-                />
-                <Divider />
-                <PagePermissions
-                  pageId={pageId}
-                  refreshPermissions={refreshPermissions}
-                  pagePermissions={pagePermissions}
-                  pageType={pages[pageId]?.type as PageType}
-                  proposalParentId={proposalParentId}
-                />
-              </>
-            )
-        }
+        {!pagePermissions ? (
+          <Box sx={{ height: 100 }}>
+            <Loader size={20} sx={{ height: 600 }} />
+          </Box>
+        ) : (
+          <>
+            <ShareToWeb
+              pageId={pageId}
+              pagePermissions={pagePermissions}
+              refreshPermissions={refreshPermissions}
+              proposalParentId={proposalParentId}
+            />
+            <Divider />
+            <PagePermissions
+              pageId={pageId}
+              refreshPermissions={refreshPermissions}
+              pagePermissions={pagePermissions}
+              pageType={pages[pageId]?.type as PageType}
+              proposalParentId={proposalParentId}
+            />
+          </>
+        )}
       </Popover>
     </>
   );

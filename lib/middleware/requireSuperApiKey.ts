@@ -13,7 +13,7 @@ declare module 'http' {
   }
 }
 
-export async function provisionSuperApiKey (name: string): Promise<SuperApiToken> {
+export async function provisionSuperApiKey(name: string): Promise<SuperApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
 
   const superToken = await prisma.superApiToken.create({
@@ -31,15 +31,14 @@ export async function provisionSuperApiKey (name: string): Promise<SuperApiToken
  *
  * assigns superApiToken so follow-on endpoints can use it
  */
-export async function requireSuperApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-  const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
+export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+  const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
 
   const superApiToken: SuperApiToken | null = apiKey ? await getVerifiedSuperApiToken(apiKey) : null;
 
   if (superApiToken) {
     req.superApiToken = superApiToken;
-  }
-  else {
+  } else {
     throw new ApiError({
       message: 'Invalid API key',
       errorType: 'Access denied'
@@ -49,11 +48,10 @@ export async function requireSuperApiKey (req: NextApiRequest, res: NextApiRespo
   next();
 }
 
-export function getVerifiedSuperApiToken (token: string): Promise<SuperApiToken | null> {
+export function getVerifiedSuperApiToken(token: string): Promise<SuperApiToken | null> {
   return prisma.superApiToken.findFirst({
     where: {
       token
     }
   });
 }
-

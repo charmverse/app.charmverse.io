@@ -7,4 +7,3 @@ export type SelectOptionType = {
   index?: number;
   temp?: boolean;
 };
-

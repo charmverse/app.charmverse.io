@@ -24,28 +24,26 @@ const ContextElement = createContext<Readonly<Context>>({
 
 export const usePageDialog = () => useContext(ContextElement);
 
-export function PageDialogProvider ({ children }: { children: ReactNode }) {
-
+export function PageDialogProvider({ children }: { children: ReactNode }) {
   const [props, setProps] = useState<PageDialogContext>({});
 
-  function hidePage () {
+  function hidePage() {
     props?.onClose?.();
     setProps({});
   }
 
-  function showPage (_context: PageDialogContext) {
+  function showPage(_context: PageDialogContext) {
     setProps(_context);
   }
 
-  const value = useMemo(() => ({
-    props,
-    hidePage,
-    showPage
-  }), [props]);
-
-  return (
-    <ContextElement.Provider value={value}>
-      {children}
-    </ContextElement.Provider>
+  const value = useMemo(
+    () => ({
+      props,
+      hidePage,
+      showPage
+    }),
+    [props]
   );
+
+  return <ContextElement.Provider value={value}>{children}</ContextElement.Provider>;
 }

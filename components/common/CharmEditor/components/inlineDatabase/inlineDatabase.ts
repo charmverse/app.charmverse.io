@@ -1,13 +1,11 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 
-export function spec () {
-  return [
-    databaseSpec()
-  ];
+export function spec() {
+  return [databaseSpec()];
 }
 
-function databaseSpec (): BaseRawNodeSpec {
+function databaseSpec(): BaseRawNodeSpec {
   return {
     name: 'inlineDatabase',
     type: 'node',

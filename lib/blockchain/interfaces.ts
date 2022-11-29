@@ -34,4 +34,3 @@ export interface AuthSig {
   signedMessage: string;
   address: string;
 }
-

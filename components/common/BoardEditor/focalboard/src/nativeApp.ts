@@ -1,15 +1,14 @@
-
 import type { IAppWindow } from './types';
 import { exportUserSettingsBlob, importUserSettingsBlob } from './userSettings';
 
 declare interface INativeApp {
-    settingsBlob: string | null;
+  settingsBlob: string | null;
 }
 
 declare const NativeApp: INativeApp;
 declare let window: IAppWindow;
 
-export function importNativeAppSettings (): void {
+export function importNativeAppSettings(): void {
   if (typeof NativeApp === 'undefined' || !NativeApp.settingsBlob) {
     return;
   }
@@ -19,10 +18,10 @@ export function importNativeAppSettings (): void {
   NativeApp.settingsBlob = null;
 }
 
-export function notifySettingsChanged (key: string): void {
+export function notifySettingsChanged(key: string): void {
   postWebKitMessage({ type: 'didChangeUserSettings', settingsBlob: exportUserSettingsBlob(), key });
 }
 
-function postWebKitMessage<T> (message: T) {
+function postWebKitMessage<T>(message: T) {
   window.webkit?.messageHandlers.nativeApp?.postMessage(message);
 }

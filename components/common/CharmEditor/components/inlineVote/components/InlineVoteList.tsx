@@ -16,17 +16,14 @@ import type { InlineVotePluginState } from '../inlineVote.plugins';
 
 import VoteDetail from './VoteDetail';
 
-export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<InlineVotePluginState> }) {
+export default function InlineVoteList({ pluginKey }: { pluginKey: PluginKey<InlineVotePluginState> }) {
   const view = useEditorViewContext();
-  const {
-    ids,
-    show
-  } = usePluginState(pluginKey) as InlineVotePluginState;
-  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+  const { ids, show } = usePluginState(pluginKey) as InlineVotePluginState;
+  const cardId = new URLSearchParams(window.location.href).get('cardId');
   const { currentPageActionDisplay } = usePageActionDisplay();
   const inlineVoteDetailModal = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
   const { votes, isLoading, isValidating, cancelVote, castVote, deleteVote } = useVotes();
-  const inProgressVoteIds = ids.filter(voteId => votes[voteId]?.status === 'InProgress');
+  const inProgressVoteIds = ids.filter((voteId) => votes[voteId]?.status === 'InProgress');
 
   // Using a ref so that its done only once
   const hasRemovedCompletedVoteMarks = useRef(false);
@@ -34,14 +31,14 @@ export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<In
   useEffect(() => {
     if (!hasRemovedCompletedVoteMarks.current) {
       const votesList = Object.keys(votes);
-      const notIsProgressVotes = new Set(votesList.filter(voteId => votes[voteId].status !== 'InProgress'));
+      const notIsProgressVotes = new Set(votesList.filter((voteId) => votes[voteId].status !== 'InProgress'));
       const completedVoteNodeWithMarks: (NodeWithPos & { mark: Mark })[] = [];
       if (!isValidating && votesList.length !== 0 && !isLoading) {
         const inlineVoteMarkSchema = view.state.schema.marks[markName] as MarkType;
         const inlineVoteNodes = findChildrenByMark(view.state.doc, inlineVoteMarkSchema);
         for (const inlineVoteNode of inlineVoteNodes) {
           // Find the inline vote mark for the node
-          const inlineVoteMark = inlineVoteNode.node.marks.find(mark => mark.type.name === inlineVoteMarkSchema.name);
+          const inlineVoteMark = inlineVoteNode.node.marks.find((mark) => mark.type.name === inlineVoteMarkSchema.name);
           // If the mark point to a vote that is not in progress, remove it from document
           if (inlineVoteMark && notIsProgressVotes.has(inlineVoteMark.attrs.id)) {
             completedVoteNodeWithMarks.push({
@@ -53,7 +50,7 @@ export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<In
         if (completedVoteNodeWithMarks.length !== 0) {
           let tr = view.state.tr;
           // Automatically remove marks for votes that are not in progress anymore
-          completedVoteNodeWithMarks.forEach(inlineVoteNodeWithMark => {
+          completedVoteNodeWithMarks.forEach((inlineVoteNodeWithMark) => {
             const from = inlineVoteNodeWithMark.pos;
             const to = from + inlineVoteNodeWithMark.node.nodeSize;
             tr = tr.removeMark(from, to, inlineVoteMarkSchema);
@@ -78,7 +75,7 @@ export default function InlineVoteList ({ pluginKey }: { pluginKey: PluginKey<In
           inlineVoteDetailModal.close();
         }}
       >
-        {inProgressVoteIds.map(inProgressVoteId => (
+        {inProgressVoteIds.map((inProgressVoteId) => (
           <Box mb={2} key={inProgressVoteId}>
             <VoteDetail
               cancelVote={cancelVote}

@@ -1,8 +1,7 @@
-
 const isMac = typeof navigator !== 'undefined' ? /Mac/.test(navigator.platform) : false;
 const altInMac = '⌥'; // option
 
-export function keyDisplayValue (key: string) {
+export function keyDisplayValue(key: string) {
   if (key.includes('Mod')) {
     key = key.split('Mod').join(isMac ? '⌘' : 'Ctrl');
   }
@@ -26,11 +25,11 @@ export function keyDisplayValue (key: string) {
 class KeyBinding {
   key: string;
 
-  constructor ({ key }: { key: string }) {
+  constructor({ key }: { key: string }) {
     this.key = key;
   }
 
-  get displayValue () {
+  get displayValue() {
     return keyDisplayValue(this.key);
   }
 }

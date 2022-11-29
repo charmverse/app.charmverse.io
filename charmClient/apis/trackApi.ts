@@ -1,14 +1,11 @@
-
 import * as http from 'adapters/http';
 import log from 'lib/log';
 import type { MixpanelEventMap, MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 
 export class TrackApi {
+  private lastEvent: { payload: string; timestamp: number } | null = null;
 
-  private lastEvent: { payload: string, timestamp: number } | null = null;
-
-  trackAction<T extends MixpanelEventName> (event: T, payload: Omit<MixpanelEventMap[T], 'userId'>) {
-
+  trackAction<T extends MixpanelEventName>(event: T, payload: Omit<MixpanelEventMap[T], 'userId'>) {
     const payloadAsString = JSON.stringify(payload);
     const now = Date.now();
 
@@ -21,7 +18,9 @@ export class TrackApi {
       };
 
       if (process.env.NODE_ENV === 'development') {
-        log.warn('Dropping duplicate track event because it occurred less than 1 second after the previous event, which was identical');
+        log.warn(
+          'Dropping duplicate track event because it occurred less than 1 second after the previous event, which was identical'
+        );
       }
 
       return Promise.resolve({ success: 'ignored' });
@@ -35,4 +34,3 @@ export class TrackApi {
     return http.POST<{ success: 'ok' }>(`/api/events?event=${event}`, payload);
   }
 }
-

@@ -1,4 +1,3 @@
-
 import 'isomorphic-fetch';
 import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
@@ -65,13 +64,7 @@ describe('components/table/TableHeaderMenu', () => {
 
   test('should match snapshot, other column', async () => {
     const component = wrapIntl(
-      <TableHeaderMenu
-        templateId='property 1'
-        board={board}
-        activeView={view}
-        views={[view, view2]}
-        cards={[]}
-      />
+      <TableHeaderMenu templateId='property 1' board={board} activeView={view} views={[view, view2]} cards={[]} />
     );
     const { container, getByText } = render(component);
 

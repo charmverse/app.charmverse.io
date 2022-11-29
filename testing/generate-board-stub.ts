@@ -16,10 +16,19 @@ import { pageContentStub } from './generate-page-stub';
  * All spaceId, createdBy, updatedBy, id, parentId, rootId parameters are generated in the body of the stub, except for the cardIds which are generated at the end, to ensure the cardBlock corresponds to the pageId
  *
  */
-export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 2, addPageContent }:
-  { createdBy: string, spaceId: string, parentId?: string, cardCount? : number, addPageContent?: boolean }):
-{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs } {
-
+export function boardWithCardsArgs({
+  createdBy,
+  spaceId,
+  parentId,
+  cardCount = 2,
+  addPageContent
+}: {
+  createdBy: string;
+  spaceId: string;
+  parentId?: string;
+  cardCount?: number;
+  addPageContent?: boolean;
+}): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
   // Skip to the bottom of this file to find the implementation that converts this stub to Prisma arguments
@@ -269,10 +278,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
             collapsedOptionIds: [],
             columnCalculations: {},
             kanbanCalculations: {},
-            visiblePropertyIds: [
-              '__title',
-              '01221ad0-94d5-4d88-9ceb-c517573ad765'
-            ]
+            visiblePropertyIds: ['__title', '01221ad0-94d5-4d88-9ceb-c517573ad765']
           }
         }
       ]
@@ -289,21 +295,22 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
   for (let i = 3; i <= cardCount; i++) {
     if (i % 2 === 0) {
       cardPages.push(cardPages[0]);
-    }
-    else {
+    } else {
       cardPages.push(cardPages[1]);
     }
   }
 
-  const pageContent: Pick<Prisma.PageCreateInput, 'content' | 'contentText'> = addPageContent ? pageContentStub() : {
-    contentText: '',
-    content: {
-      type: 'doc',
-      content: []
-    }
-  };
+  const pageContent: Pick<Prisma.PageCreateInput, 'content' | 'contentText'> = addPageContent
+    ? pageContentStub()
+    : {
+        contentText: '',
+        content: {
+          type: 'doc',
+          content: []
+        }
+      };
 
-  [rootBoardNode, ...rootBoardNode.children].forEach(page => {
+  [rootBoardNode, ...rootBoardNode.children].forEach((page) => {
     // Handle the root board node ------------------
     const {
       bountyId: droppedBountyId,
@@ -318,7 +325,7 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
     } = page as any as Page & PageWithBlocks & { children: any };
 
     // Prisma throws if passing null creation values
-    typedKeys(pageWithoutExtraProps).forEach(key => {
+    typedKeys(pageWithoutExtraProps).forEach((key) => {
       if (pageWithoutExtraProps[key] === null) {
         delete pageWithoutExtraProps[key];
       }
@@ -353,16 +360,14 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
       const viewBlocks = (page as any as PageWithBlocks).blocks.views!;
 
       blocks.push(boardBlock, ...viewBlocks);
-
-    }
-    else if (page.type === 'card') {
+    } else if (page.type === 'card') {
       const cardBlock = (page as any as PageWithBlocks).blocks.card!;
       cardBlock.id = pageCreateInput.id as string;
       blocks.push(cardBlock);
     }
 
-    blocks.forEach(block => {
-      typedKeys(block).forEach(key => {
+    blocks.forEach((block) => {
+      typedKeys(block).forEach((key) => {
         if (block[key] === null) {
           delete block[key];
         }
@@ -373,7 +378,6 @@ export function boardWithCardsArgs ({ createdBy, spaceId, parentId, cardCount = 
         fields: block.fields as Prisma.InputJsonValue
       });
     });
-
   });
 
   return {

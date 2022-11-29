@@ -4,7 +4,6 @@ import { createProposalTemplate } from '../createProposalTemplate';
 
 describe('createProposalTemplate', () => {
   it('should create a proposal template', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
     const role = await generateRole({
       spaceId: space.id,
@@ -25,13 +24,16 @@ describe('createProposalTemplate', () => {
         content: pageContentNodes,
         title
       },
-      reviewers: [{
-        group: 'role',
-        id: role.id
-      }, {
-        group: 'user',
-        id: user.id
-      }]
+      reviewers: [
+        {
+          group: 'role',
+          id: role.id
+        },
+        {
+          group: 'user',
+          id: user.id
+        }
+      ]
     });
 
     expect(template.type).toBe('proposal_template');
@@ -39,8 +41,7 @@ describe('createProposalTemplate', () => {
     expect(template.title).toBe(title);
     expect(template.content?.toString()).toBe(pageContentNodes.toString());
     expect(template.proposal?.reviewers.length).toBe(2);
-    expect(template.proposal?.reviewers.some(r => r.roleId === role.id && !r.userId)).toBe(true);
-    expect(template.proposal?.reviewers.some(r => r.userId === user.id && !r.roleId)).toBe(true);
+    expect(template.proposal?.reviewers.some((r) => r.roleId === role.id && !r.userId)).toBe(true);
+    expect(template.proposal?.reviewers.some((r) => r.userId === user.id && !r.roleId)).toBe(true);
   });
-
 });

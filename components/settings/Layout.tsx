@@ -29,8 +29,7 @@ const NavigationContainer = styled(Box)`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-export default function SettingsLayout ({ children }: { children: ReactNode }) {
-
+export default function SettingsLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [tab, setTab] = useState(getCurrentTabValue(router.pathname));
   const { domain } = router.query;
@@ -39,8 +38,8 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
     setTab(getCurrentTabValue(router.pathname));
   }, [router.pathname]);
 
-  function getCurrentTabValue (pathname: string) {
-    const tabConfig = SETTINGS_TABS.find(t => pathname.includes(t.path)) || SETTINGS_TABS[0];
+  function getCurrentTabValue(pathname: string) {
+    const tabConfig = SETTINGS_TABS.find((t) => pathname.includes(t.path)) || SETTINGS_TABS[0];
     return SETTINGS_TABS.indexOf(tabConfig);
   }
 
@@ -60,15 +59,20 @@ export default function SettingsLayout ({ children }: { children: ReactNode }) {
               {/* combining next links with MUI tabs - https://stackoverflow.com/questions/65471275/material-ui-tabs-with-nextjs */}
               {SETTINGS_TABS.map(({ icon, path, label }) => (
                 <Link href={`/${domain}/settings/${path}`} passHref key={label}>
-                  <Tab icon={icon} iconPosition='start' component='a' disableRipple label={label} sx={{ px: 1.5, fontSize: 14, minHeight: 0 }} />
+                  <Tab
+                    icon={icon}
+                    iconPosition='start'
+                    component='a'
+                    disableRipple
+                    label={label}
+                    sx={{ px: 1.5, fontSize: 14, minHeight: 0 }}
+                  />
                 </Link>
               ))}
             </Tabs>
           </Container>
         </NavigationContainer>
-        <Container>
-          {children}
-        </Container>
+        <Container>{children}</Container>
         <Box pb={8} />
       </ScrollableWindow>
     </PageLayout>

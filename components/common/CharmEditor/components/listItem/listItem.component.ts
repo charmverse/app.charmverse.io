@@ -1,27 +1,9 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type {
-  Command,
-  EditorState,
-  Node,
-  Schema } from '@bangle.dev/pm';
-import {
-  chainCommands,
-  keymap
-} from '@bangle.dev/pm';
+import type { Command, EditorState, Node, Schema } from '@bangle.dev/pm';
+import { chainCommands, keymap } from '@bangle.dev/pm';
 import type { MoveDirection } from '@bangle.dev/pm-commands';
-import {
-  copyEmptyCommand,
-  cutEmptyCommand,
-  moveNode,
-  parentHasDirectParentOfType
-} from '@bangle.dev/pm-commands';
-import {
-  browser,
-  domSerializationHelpers,
-  filter,
-  insertEmpty,
-  createObject
-} from '@bangle.dev/utils';
+import { copyEmptyCommand, cutEmptyCommand, moveNode, parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
+import { browser, domSerializationHelpers, filter, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
@@ -60,13 +42,10 @@ const name = 'listItem';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 const isValidList = (state: EditorState) => {
   const type = getTypeFromSchema(state.schema);
-  return parentHasDirectParentOfType(type, [
-    state.schema.nodes.bulletList,
-    state.schema.nodes.orderedList
-  ]);
+  return parentHasDirectParentOfType(type, [state.schema.nodes.bulletList, state.schema.nodes.orderedList]);
 };
 
-function specFactory (): RawSpecs {
+function specFactory(): RawSpecs {
   const { toDOM, parseDOM } = domSerializationHelpers(name, {
     tag: 'li',
     // @ts-ignore DOMOutputSpec in @types is buggy
@@ -98,7 +77,7 @@ function specFactory (): RawSpecs {
       parseDOM
     },
     markdown: {
-      toMarkdown (state: MarkdownSerializerState, node: Node) {
+      toMarkdown(state: MarkdownSerializerState, node: Node) {
         if (node.attrs.todoChecked != null) {
           state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
         }
@@ -112,8 +91,7 @@ function specFactory (): RawSpecs {
             const todoIsDone = tok.attrGet('isDone');
             if (todoIsDone === 'yes') {
               todoChecked = true;
-            }
-            else if (todoIsDone === 'no') {
+            } else if (todoIsDone === 'no') {
               todoChecked = false;
             }
             return {
@@ -126,22 +104,18 @@ function specFactory (): RawSpecs {
   };
 }
 
-function pluginsFactory ({
-  keybindings = defaultKeys,
-  nodeView = true
-} = {}): RawPlugins {
+function pluginsFactory({ keybindings = defaultKeys, nodeView = true } = {}): RawPlugins {
   return ({ schema }: { schema: Schema }) => {
     const type = getTypeFromSchema(schema);
 
     return [
-      keybindings
-        && keymap({
+      keybindings &&
+        keymap({
           [keybindings.toggleDone]: filter(
             isValidList,
             updateNodeAttrs(schema.nodes.listItem, (attrs) => ({
               ...attrs,
-              todoChecked:
-                attrs.todoChecked == null ? false : !attrs.todoChecked
+              todoChecked: attrs.todoChecked == null ? false : !attrs.todoChecked
             }))
           ),
 
@@ -153,10 +127,7 @@ function pluginsFactory ({
             [keybindings.moveUp, moveListItemUp()],
             [keybindings.moveDown, moveListItemDown()],
             [keybindings.emptyCut, filter(isValidList, cutEmptyCommand(type))],
-            [
-              keybindings.emptyCopy,
-              filter(isValidList, copyEmptyCommand(type))
-            ],
+            [keybindings.emptyCopy, filter(isValidList, copyEmptyCommand(type))],
             [keybindings.insertEmptyListAbove, insertEmptySiblingListAbove()],
             [keybindings.insertEmptyListBelow, insertEmptySiblingListBelow()]
           ])
@@ -167,14 +138,14 @@ function pluginsFactory ({
   };
 }
 
-export function indentListItem (): Command {
+export function indentListItem(): Command {
   return (state, dispatch) => {
     const type = getTypeFromSchema(state.schema);
     return indentList(type)(state, dispatch);
   };
 }
 
-export function outdentListItem (): Command {
+export function outdentListItem(): Command {
   return (state, dispatch, view) => {
     const type = getTypeFromSchema(state.schema);
     return outdentList(type)(state, dispatch, view);
@@ -185,55 +156,48 @@ const isSelectionInsideTodo = (state: EditorState) => {
   return isNodeTodo(state.selection.$from.node(-1), state.schema);
 };
 
-function moveListItem (dir: MoveDirection): Command {
+function moveListItem(dir: MoveDirection): Command {
   return (state, dispatch, view) => {
     const { schema } = state;
     const type = getTypeFromSchema(schema);
 
-    const isBulletList = parentHasDirectParentOfType(type, [
-      schema.nodes.bulletList,
-      schema.nodes.orderedList
-    ]);
+    const isBulletList = parentHasDirectParentOfType(type, [schema.nodes.bulletList, schema.nodes.orderedList]);
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    const move = (_dir: MoveDirection) => chainCommands(moveNode(type, _dir), (state, dispatch, view) => {
-      const node = state.selection.$from.node(-3);
-      const isParentTodo = isNodeTodo(node, state.schema);
-      const result = moveEdgeListItem(type, dir)(state, dispatch, view);
+    const move = (_dir: MoveDirection) =>
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      chainCommands(moveNode(type, _dir), (state, dispatch, view) => {
+        const node = state.selection.$from.node(-3);
+        const isParentTodo = isNodeTodo(node, state.schema);
+        const result = moveEdgeListItem(type, dir)(state, dispatch, view);
 
-      if (!result) {
-        return false;
-      }
+        if (!result) {
+          return false;
+        }
 
-      // if parent was a todo convert the moved edge node
-      // to todo bullet item
-      if (isParentTodo && dispatch) {
-        const _state = view!.state;
-        let { tr } = _state;
-        const { schema: _schema } = _state;
-        tr = setTodoCheckedAttr(
-          tr,
-          _schema,
-          state.selection.$from.node(-1),
-          state.selection.$from.before(-1)
-        );
-        dispatch(tr);
-      }
-      return true;
-    });
+        // if parent was a todo convert the moved edge node
+        // to todo bullet item
+        if (isParentTodo && dispatch) {
+          const _state = view!.state;
+          let { tr } = _state;
+          const { schema: _schema } = _state;
+          tr = setTodoCheckedAttr(tr, _schema, state.selection.$from.node(-1), state.selection.$from.before(-1));
+          dispatch(tr);
+        }
+        return true;
+      });
 
     return filter(isBulletList, move(dir))(state, dispatch, view);
   };
 }
 
-export function moveListItemUp () {
+export function moveListItemUp() {
   return moveListItem('UP');
 }
-export function moveListItemDown () {
+export function moveListItemDown() {
   return moveListItem('DOWN');
 }
 
-export function insertEmptySiblingList (isAbove = true): Command {
+export function insertEmptySiblingList(isAbove = true): Command {
   return (state, dispatch, view) => {
     const type = getTypeFromSchema(state.schema);
     return chainCommands(
@@ -248,10 +212,10 @@ export function insertEmptySiblingList (isAbove = true): Command {
   };
 }
 
-export function insertEmptySiblingListAbove () {
+export function insertEmptySiblingListAbove() {
   return insertEmptySiblingList(true);
 }
 
-export function insertEmptySiblingListBelow () {
+export function insertEmptySiblingListBelow() {
   return insertEmptySiblingList(false);
 }

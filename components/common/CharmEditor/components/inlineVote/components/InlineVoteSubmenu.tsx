@@ -7,7 +7,7 @@ import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 
 import { updateInlineVote } from '../inlineVote.utils';
 
-export default function InlineVoteSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
+export default function InlineVoteSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
 
   return (

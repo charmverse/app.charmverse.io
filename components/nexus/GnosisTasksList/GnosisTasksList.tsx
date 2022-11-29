@@ -22,7 +22,7 @@ interface GnosisTasksSectionProps {
   mutateTasks: KeyedMutator<GnosisSafeTasks[]>;
 }
 
-export function GnosisTasksList ({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
+export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectionProps) {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { snoozedForDate } = useTasksState();
   const { user } = useUser();
@@ -36,24 +36,22 @@ export function GnosisTasksList ({ error, mutateTasks, tasks }: GnosisTasksSecti
 
   const { showMessage } = useSnackbar();
 
-  async function importSafes () {
+  async function importSafes() {
     if (gnosisSigner && user) {
       setIsRefreshingSafes(true);
       try {
         await importSafesFromWallet({
           signer: gnosisSigner,
-          addresses: user.wallets.map(wallet => wallet.address)
+          addresses: user.wallets.map((wallet) => wallet.address)
         });
         const safes = await mutate();
         await mutateTasks();
         if (!safes || safes.length === 0) {
-          showMessage('You don\'t have any gnosis safes connected to your wallet');
-        }
-        else {
+          showMessage("You don't have any gnosis safes connected to your wallet");
+        } else {
           showMessage(`Successfully connected ${safes.length} safes`, 'success');
         }
-      }
-      finally {
+      } finally {
         setIsRefreshingSafes(false);
       }
     }
@@ -62,34 +60,23 @@ export function GnosisTasksList ({ error, mutateTasks, tasks }: GnosisTasksSecti
   if (error) {
     return (
       <Box>
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
+        <Alert severity='error'>There was an error. Please try again later!</Alert>
       </Box>
     );
-  }
-  else if (isLoadingSafeTasks) {
+  } else if (isLoadingSafeTasks) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   return (
     <>
-      {safeData.length === 0 && (
-        <GnosisConnectCard loading={isRefreshingSafes} onClick={importSafes} />
-      )}
-      {safeData.map(safe => {
-        const safeTasks = tasks.filter(taskGroup => taskGroup.safeAddress === safe.address).map(taskGroup => taskGroup.tasks).flat();
-        return (
-          <SafeTasks
-            key={safe.address}
-            isSnoozed={isSnoozed}
-            safe={safe}
-            tasks={safeTasks}
-          />
-        );
-
+      {safeData.length === 0 && <GnosisConnectCard loading={isRefreshingSafes} onClick={importSafes} />}
+      {safeData.map((safe) => {
+        const safeTasks = tasks
+          .filter((taskGroup) => taskGroup.safeAddress === safe.address)
+          .map((taskGroup) => taskGroup.tasks)
+          .flat();
+        return <SafeTasks key={safe.address} isSnoozed={isSnoozed} safe={safe} tasks={safeTasks} />;
       })}
-
     </>
   );
 }

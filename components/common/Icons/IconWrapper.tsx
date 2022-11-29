@@ -5,7 +5,7 @@ interface Props {
   onClick?: () => void;
 }
 
-export function IconWrapper ({ children, onClick = () => null }: Props) {
+export function IconWrapper({ children, onClick = () => null }: Props) {
   return (
     <Typography onClick={onClick} display='inline-flex' sx={{ verticalAlign: 'middle' }} gap={1}>
       {children}

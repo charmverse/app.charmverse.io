@@ -34,17 +34,24 @@ const StyledFormControl = styled(FormControl)`
   }
 `;
 
-export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
+export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
   const { roles } = useRoles();
 
-  const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(() => roles ? roles.reduce((obj, role) => (
-    {
-      ...obj,
-      [role.id]: role
-    }
-  ), {}) : {}, [roles]);
+  const rolesRecord: Record<string, ListSpaceRolesResponse> = useMemo(
+    () =>
+      roles
+        ? roles.reduce(
+            (obj, role) => ({
+              ...obj,
+              [role.id]: role
+            }),
+            {}
+          )
+        : {},
+    [roles]
+  );
 
-  async function selectOption (ev: SelectChangeEvent<string[]>) {
+  async function selectOption(ev: SelectChangeEvent<string[]>) {
     ev.preventDefault();
     if (Array.isArray(ev.target.value)) {
       onChange(ev.target.value);
@@ -55,10 +62,7 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
     return (
       <Box display='flex' justifyContent='center'>
         <Tooltip title='Add roles to enable this feature'>
-          <InfoOutlinedIcon
-            color='secondary'
-            fontSize='small'
-          />
+          <InfoOutlinedIcon color='secondary' fontSize='small' />
         </Tooltip>
       </Box>
     );
@@ -74,37 +78,42 @@ export default function TokenGateRolesSelect ({ onDelete, selectedRoleIds, onCha
         onChange={selectOption}
         displayEmpty={true}
         disabled={!isAdmin || roles?.length === 0}
-        renderValue={(roleIds) => (
-          (roleIds.length === 0) ? (
-            <Typography color='secondary' fontSize='small'>+ Assign role</Typography>
+        renderValue={(roleIds) =>
+          roleIds.length === 0 ? (
+            <Typography color='secondary' fontSize='small'>
+              + Assign role
+            </Typography>
           ) : (
             <Box display='flex' flexWrap='wrap' gap={0.5} maxWidth={400}>
-              {
-                roleIds.map(roleId => rolesRecord[roleId]).filter(isTruthy)
-                  .map(role => (
-                    <Chip
-                      key={role.id}
-                      label={role.name}
-                      size='small'
-                      onMouseDown={(event) => {
-                        event.stopPropagation();
-                      }}
-                      disabled={!isAdmin}
-                      onDelete={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onDelete(role.id);
-                      }}
-                    />
-                  ))
-              }
+              {roleIds
+                .map((roleId) => rolesRecord[roleId])
+                .filter(isTruthy)
+                .map((role) => (
+                  <Chip
+                    key={role.id}
+                    label={role.name}
+                    size='small'
+                    onMouseDown={(event) => {
+                      event.stopPropagation();
+                    }}
+                    disabled={!isAdmin}
+                    onDelete={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(role.id);
+                    }}
+                  />
+                ))}
             </Box>
           )
-        )}
+        }
       >
-        {roles?.map(role => <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>)}
+        {roles?.map((role) => (
+          <MenuItem key={role.id} value={role.id}>
+            {role.name}
+          </MenuItem>
+        ))}
       </Select>
     </StyledFormControl>
   );
 }
-

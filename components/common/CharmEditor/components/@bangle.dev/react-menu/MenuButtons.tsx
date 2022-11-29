@@ -1,20 +1,20 @@
-import {
-  blockquote,
-  bold,
-  code,
-  history,
-  italic,
-  link,
-  strike,
-  underline
-} from '@bangle.dev/base-components';
+import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { BoldIcon, BulletListIcon, CodeIcon, ItalicIcon, LinkIcon, OrderedListIcon, ParagraphIcon, RedoIcon, TodoListIcon, UndoIcon } from '@bangle.dev/react-menu';
-import type { HintPos } from '@bangle.dev/react-menu/dist/types';
 import {
-  defaultKeys as floatingMenuKeys, focusFloatingMenuInput
-} from '@bangle.dev/react-menu/floating-menu';
+  BoldIcon,
+  BulletListIcon,
+  CodeIcon,
+  ItalicIcon,
+  LinkIcon,
+  OrderedListIcon,
+  ParagraphIcon,
+  RedoIcon,
+  TodoListIcon,
+  UndoIcon
+} from '@bangle.dev/react-menu';
+import type { HintPos } from '@bangle.dev/react-menu/dist/types';
+import { defaultKeys as floatingMenuKeys, focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -32,11 +32,7 @@ import type { SubMenu } from './floating-menu';
 import { toggleSubMenu } from './floating-menu';
 import { MenuButton } from './Icon';
 
-const {
-  defaultKeys: orderedListKeys,
-  queryIsOrderedListActive,
-  toggleOrderedList
-} = orderedList;
+const { defaultKeys: orderedListKeys, queryIsOrderedListActive, toggleOrderedList } = orderedList;
 const { defaultKeys: italicKeys, queryIsItalicActive, toggleItalic } = italic;
 const { defaultKeys: historyKeys, undo, redo } = history;
 
@@ -44,16 +40,8 @@ const { defaultKeys: boldKeys, queryIsBoldActive, toggleBold } = bold;
 const { defaultKeys: codeKeys, queryIsCodeActive, toggleCode } = code;
 const { defaultKeys: underlineKeys, queryIsUnderlineActive, toggleUnderline } = underline;
 const { defaultKeys: strikeKeys, queryIsStrikeActive, toggleStrike } = strike;
-const {
-  defaultKeys: paragraphKeys,
-  queryIsTopLevelParagraph,
-  convertToParagraph
-} = paragraph;
-const {
-  defaultKeys: headingKeys,
-  queryIsHeadingActive,
-  toggleHeading
-} = heading;
+const { defaultKeys: paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } = paragraph;
+const { defaultKeys: headingKeys, queryIsHeadingActive, toggleHeading } = heading;
 
 const { createLink, queryIsLinkActive } = link;
 const {
@@ -70,7 +58,7 @@ interface ButtonProps {
   children?: React.ReactNode;
 }
 
-export function BoldButton ({
+export function BoldButton({
   hints = ['Bold', boldKeys.toggleBold],
   hintPos = 'top',
   children = <BoldIcon fontSize={16} />,
@@ -99,7 +87,7 @@ export function BoldButton ({
   );
 }
 
-export function InlineActionButton ({
+export function InlineActionButton({
   hints = [],
   hintPos = 'top',
   children,
@@ -108,7 +96,7 @@ export function InlineActionButton ({
   subMenu,
   commandFn,
   ...props
-}: ButtonProps & { commandFn: () => Command, subMenu: SubMenu, menuKey: PluginKey, enable: boolean }) {
+}: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey; enable: boolean }) {
   const view = useEditorViewContext();
 
   const onMouseDown = useCallback(
@@ -146,19 +134,21 @@ export function InlineActionButton ({
   );
 }
 
-export function InlineCommentButton ({
+export function InlineCommentButton({
   hints = ['Comment'],
   hintPos = 'top',
-  children = <MessageOutlinedIcon sx={{
-    fontSize: 12,
-    position: 'relative'
-  }}
-  />,
+  children = (
+    <MessageOutlinedIcon
+      sx={{
+        fontSize: 12,
+        position: 'relative'
+      }}
+    />
+  ),
   menuKey,
   enableComments,
   ...props
-}: ButtonProps & { menuKey: PluginKey, enableComments: boolean }) {
-
+}: ButtonProps & { menuKey: PluginKey; enableComments: boolean }) {
   return (
     <InlineActionButton
       {...props}
@@ -173,18 +163,21 @@ export function InlineCommentButton ({
   );
 }
 
-export function InlineVoteButton ({
+export function InlineVoteButton({
   hints = ['Poll'],
   hintPos = 'top',
-  children = <HowToVoteIcon sx={{
-    fontSize: 12,
-    position: 'relative'
-  }}
-  />,
+  children = (
+    <HowToVoteIcon
+      sx={{
+        fontSize: 12,
+        position: 'relative'
+      }}
+    />
+  ),
   menuKey,
   enableVotes,
   ...props
-}: ButtonProps & { menuKey: PluginKey, enableVotes: boolean }) {
+}: ButtonProps & { menuKey: PluginKey; enableVotes: boolean }) {
   return (
     <InlineActionButton
       {...props}
@@ -199,7 +192,7 @@ export function InlineVoteButton ({
   );
 }
 
-export function StrikeButton ({
+export function StrikeButton({
   hints = ['Strike', strikeKeys.toggleStrike],
   hintPos = 'top',
   children = <span style={{ textDecoration: 'line-through', fontSize: 18, marginLeft: 5, marginRight: 5 }}>S</span>,
@@ -228,7 +221,7 @@ export function StrikeButton ({
   );
 }
 
-export function UnderlineButton ({
+export function UnderlineButton({
   hints = ['Underline', underlineKeys.toggleUnderline],
   hintPos = 'top',
   children = <span style={{ textDecoration: 'underline', fontSize: 18, marginLeft: 5, marginRight: 5 }}>U</span>,
@@ -257,24 +250,25 @@ export function UnderlineButton ({
   );
 }
 
-export function CalloutButton ({
+export function CalloutButton({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
   hintPos = 'top',
-  children = <ChatBubbleIcon sx={{
-    fontSize: 12,
-    top: 2,
-    position: 'relative'
-  }}
-  />,
+  children = (
+    <ChatBubbleIcon
+      sx={{
+        fontSize: 12,
+        top: 2,
+        position: 'relative'
+      }}
+    />
+  ),
   ...props
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
     (e) => {
       e.preventDefault();
-      if (
-        blockquote.commands.wrapInBlockquote()(view.state, view.dispatch, view)
-      ) {
+      if (blockquote.commands.wrapInBlockquote()(view.state, view.dispatch, view)) {
         view.focus();
       }
     },
@@ -286,16 +280,14 @@ export function CalloutButton ({
       onMouseDown={onSelect}
       hints={hints}
       isActive={blockquote.commands.queryIsBlockquoteActive()(view.state)}
-      isDisabled={
-        !view.editable || !blockquote.commands.wrapInBlockquote()(view.state)
-      }
+      isDisabled={!view.editable || !blockquote.commands.wrapInBlockquote()(view.state)}
     >
       {children}
     </MenuButton>
   );
 }
 
-export function ItalicButton ({
+export function ItalicButton({
   hints = ['Italic', italicKeys.toggleItalic],
   hintPos = 'top',
   children = <ItalicIcon fontSize={16} />,
@@ -326,7 +318,7 @@ export function ItalicButton ({
   );
 }
 
-export function UndoButton ({
+export function UndoButton({
   hints = ['Undo', historyKeys.undo],
   hintPos = 'top',
   children = <UndoIcon />,
@@ -345,18 +337,13 @@ export function UndoButton ({
     [view]
   );
   return (
-    <MenuButton
-      {...props}
-      onMouseDown={onSelect}
-      hints={hints}
-      isDisabled={!view.editable || !undo()(view.state)}
-    >
+    <MenuButton {...props} onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !undo()(view.state)}>
       {children}
     </MenuButton>
   );
 }
 
-export function RedoButton ({
+export function RedoButton({
   hints = ['Redo', historyKeys.redo],
   hintPos = 'top',
   children = <RedoIcon />,
@@ -375,18 +362,13 @@ export function RedoButton ({
     [view]
   );
   return (
-    <MenuButton
-      {...props}
-      onMouseDown={onSelect}
-      hints={hints}
-      isDisabled={!view.editable || !redo()(view.state)}
-    >
+    <MenuButton {...props} onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !redo()(view.state)}>
       {children}
     </MenuButton>
   );
 }
 
-export function CodeButton ({
+export function CodeButton({
   hints = ['Code', codeKeys.toggleCode],
   hintPos = 'top',
   children = <CodeIcon fontSize={16} />,
@@ -417,7 +399,7 @@ export function CodeButton ({
   );
 }
 
-export function BulletListButton ({
+export function BulletListButton({
   hints = ['BulletList', bulletListKeys.toggle],
   hintPos = 'top',
   children = <BulletListIcon />,
@@ -441,17 +423,14 @@ export function BulletListButton ({
       onMouseDown={onSelect}
       hints={hints}
       isDisabled={!view.editable}
-      isActive={
-        queryIsBulletListActive()(view.state)
-        && !queryIsTodoListActive()(view.state)
-      }
+      isActive={queryIsBulletListActive()(view.state) && !queryIsTodoListActive()(view.state)}
     >
       {children}
     </MenuButton>
   );
 }
 
-export function OrderedListButton ({
+export function OrderedListButton({
   hints = ['Ordered list', orderedListKeys.toggle],
   hintPos = 'top',
   children = <OrderedListIcon />,
@@ -482,7 +461,7 @@ export function OrderedListButton ({
   );
 }
 
-export function TodoListButton ({
+export function TodoListButton({
   hints = ['Todo list', bulletListKeys.toggleTodo],
   hintPos = 'top',
   children = <TodoListIcon />,
@@ -514,11 +493,11 @@ export function TodoListButton ({
   );
 }
 
-export function HeadingButton ({
+export function HeadingButton({
   level,
   hints = [`Heading ${level}`, headingKeys[`toH${level}`] ?? '1'],
   hintPos = 'top',
-  children =
+  children = (
     <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fontSize={16}>
       <text
         x='12'
@@ -530,7 +509,8 @@ export function HeadingButton ({
       >
         H{level}
       </text>
-    </svg>,
+    </svg>
+  ),
   ...props
 }: ButtonProps & { level: number }) {
   const view = useEditorViewContext();
@@ -559,7 +539,7 @@ export function HeadingButton ({
   );
 }
 
-export function ParagraphButton ({
+export function ParagraphButton({
   hints = ['Paragraph', paragraphKeys.convertToParagraph],
   hintPos = 'top',
   children = <ParagraphIcon fontSize={16} />,
@@ -591,7 +571,7 @@ export function ParagraphButton ({
   );
 }
 
-export function FloatingLinkButton ({
+export function FloatingLinkButton({
   hints = ['Create a link', floatingMenuKeys.toggleLink],
   hintPos = 'top',
   children = <LinkIcon />,

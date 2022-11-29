@@ -21,22 +21,20 @@ import type { GetTasksResponse } from 'pages/api/tasks/list';
 import { EmptyTaskState } from './components/EmptyTaskState';
 import Table from './components/NexusTable';
 
-function DiscussionTaskRow (
-  {
-    createdAt,
-    marked,
-    pagePath,
-    spaceDomain,
-    spaceName,
-    pageTitle,
-    mentionId,
-    createdBy,
-    text,
-    bountyId,
-    type,
-    commentId
-  }: DiscussionTask & { marked: boolean }
-) {
+function DiscussionTaskRow({
+  createdAt,
+  marked,
+  pagePath,
+  spaceDomain,
+  spaceName,
+  pageTitle,
+  mentionId,
+  createdBy,
+  text,
+  bountyId,
+  type,
+  commentId
+}: DiscussionTask & { marked: boolean }) {
   const { discussionLink, discussionTitle } = useMemo(() => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
 
@@ -45,10 +43,11 @@ function DiscussionTaskRow (
         discussionLink: `${baseUrl}/${spaceDomain}/bounties?bountyId=${bountyId}`,
         discussionTitle: `${pageTitle}`
       };
-    }
-    else {
+    } else {
       return {
-        discussionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`}`,
+        discussionLink: `${baseUrl}/${spaceDomain}/${pagePath}?${
+          commentId ? `commentId=${commentId}` : `mentionId=${mentionId}`
+        }`,
         discussionTitle: `${pageTitle}`
       };
     }
@@ -115,12 +114,16 @@ interface DiscussionTasksListProps {
   mutateTasks: KeyedMutator<GetTasksResponse>;
 }
 
-export default function DiscussionTasksList ({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
-
+export default function DiscussionTasksList({ tasks, error, mutateTasks }: DiscussionTasksListProps) {
   useEffect(() => {
-    async function main () {
+    async function main() {
       if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
-        await charmClient.tasks.markTasks(tasks.discussions.unmarked.map(unmarkedDiscussion => ({ id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '', type: 'mention' })));
+        await charmClient.tasks.markTasks(
+          tasks.discussions.unmarked.map((unmarkedDiscussion) => ({
+            id: unmarkedDiscussion.mentionId ?? unmarkedDiscussion.commentId ?? '',
+            type: 'mention'
+          }))
+        );
       }
     }
 
@@ -128,18 +131,23 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
 
     return () => {
       if (tasks?.discussions && tasks.discussions.unmarked.length !== 0) {
-        mutateTasks((_tasks) => {
-          const unmarked = _tasks?.discussions.unmarked ?? [];
-          return _tasks ? {
-            ..._tasks,
-            discussions: {
-              marked: [...unmarked, ..._tasks.discussions.marked],
-              unmarked: []
-            }
-          } : undefined;
-        }, {
-          revalidate: false
-        });
+        mutateTasks(
+          (_tasks) => {
+            const unmarked = _tasks?.discussions.unmarked ?? [];
+            return _tasks
+              ? {
+                  ..._tasks,
+                  discussions: {
+                    marked: [...unmarked, ..._tasks.discussions.marked],
+                    unmarked: []
+                  }
+                }
+              : undefined;
+          },
+          {
+            revalidate: false
+          }
+        );
       }
     };
   }, [tasks]);
@@ -147,22 +155,17 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
   if (error) {
     return (
       <Box>
-        <Alert severity='error'>
-          There was an error. Please try again later!
-        </Alert>
+        <Alert severity='error'>There was an error. Please try again later!</Alert>
       </Box>
     );
-  }
-  else if (!tasks?.discussions) {
+  } else if (!tasks?.discussions) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   const totalMentions = (tasks.discussions.unmarked.length ?? 0) + (tasks.discussions.marked.length ?? 0);
 
   if (totalMentions === 0) {
-    return (
-      <EmptyTaskState taskType='discussions' />
-    );
+    return <EmptyTaskState taskType='discussions' />;
   }
 
   return (
@@ -173,12 +176,26 @@ export default function DiscussionTasksList ({ tasks, error, mutateTasks }: Disc
             <TableCell>Comment</TableCell>
             <TableCell width={200}>Workspace</TableCell>
             <TableCell width={200}>Page</TableCell>
-            <TableCell width={140} align='center'>Date</TableCell>
+            <TableCell width={140} align='center'>
+              Date
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.discussions.unmarked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked={false} />)}
-          {tasks.discussions.marked.map((discussionTask) => <DiscussionTaskRow key={discussionTask.commentId ?? discussionTask.mentionId ?? ''} {...discussionTask} marked />)}
+          {tasks.discussions.unmarked.map((discussionTask) => (
+            <DiscussionTaskRow
+              key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
+              {...discussionTask}
+              marked={false}
+            />
+          ))}
+          {tasks.discussions.marked.map((discussionTask) => (
+            <DiscussionTaskRow
+              key={discussionTask.commentId ?? discussionTask.mentionId ?? ''}
+              {...discussionTask}
+              marked
+            />
+          ))}
         </TableBody>
       </Table>
     </Box>

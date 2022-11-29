@@ -1,4 +1,3 @@
-
 import type { PaymentMethod } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,11 +9,12 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<PaymentMethod>(['id'], 'query'))
   .delete(deletePaymentMethod);
 
-async function deletePaymentMethod (req: NextApiRequest, res: NextApiResponse) {
+async function deletePaymentMethod(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as any as PaymentMethod;
 
   const paymentMethod = await prisma.paymentMethod.findUnique({

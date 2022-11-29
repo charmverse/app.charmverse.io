@@ -13,16 +13,15 @@ import { columnWidth } from '../tableRow';
 import { TableCalculationOptions } from './tableCalculationOptions';
 
 type Props = {
-    board: Board;
-    cards: Card[];
-    activeView: BoardView;
-    resizingColumn: string;
-    offset: number;
-    readOnly: boolean;
-}
+  board: Board;
+  cards: Card[];
+  activeView: BoardView;
+  resizingColumn: string;
+  offset: number;
+  readOnly: boolean;
+};
 
-function CalculationRow (props: Props): JSX.Element {
-
+function CalculationRow(props: Props): JSX.Element {
   const [showOptions, setShowOptions] = useState<Map<string, boolean>>(new Map<string, boolean>());
 
   const toggleOptions = (templateId: string, show: boolean) => {
@@ -37,7 +36,9 @@ function CalculationRow (props: Props): JSX.Element {
 
   const templates: IPropertyTemplate[] = [
     titleTemplate,
-    ...props.board.fields.cardProperties.filter((template) => props.activeView.fields.visiblePropertyIds.includes(template.id))
+    ...props.board.fields.cardProperties.filter((template) =>
+      props.activeView.fields.visiblePropertyIds.includes(template.id)
+    )
   ];
 
   const selectedCalculations = props.board.fields.columnCalculations || [];
@@ -50,37 +51,37 @@ function CalculationRow (props: Props): JSX.Element {
       onMouseEnter={() => setHovered(!props.readOnly)}
       onMouseLeave={() => setHovered(false)}
     >
-      {
-                templates.map((template) => {
-                  const style = { width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id) };
-                  const defaultValue = template.id === Constants.titleColumnId ? Options.count.value : Options.none.value;
-                  const value = selectedCalculations[template.id] || defaultValue;
+      {templates.map((template) => {
+        const style = {
+          width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
+        };
+        const defaultValue = template.id === Constants.titleColumnId ? Options.count.value : Options.none.value;
+        const value = selectedCalculations[template.id] || defaultValue;
 
-                  return (
-                    <Calculation
-                      key={template.id}
-                      style={style}
-                      class={`octo-table-cell ${props.readOnly ? 'disabled' : ''}`}
-                      value={value}
-                      menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id))}
-                      onMenuClose={() => toggleOptions(template.id, false)}
-                      onMenuOpen={() => toggleOptions(template.id, true)}
-                      onChange={(v: string) => {
-                        const calculations = { ...selectedCalculations };
-                        calculations[template.id] = v;
-                        const newBoard = createBoard({ block: props.board });
-                        newBoard.fields.columnCalculations = calculations;
-                        mutator.updateBlock(newBoard, props.board, 'update_calculation');
-                        setHovered(false);
-                      }}
-                      cards={props.cards}
-                      hovered={hovered}
-                      optionsComponent={TableCalculationOptions}
-                      property={template}
-                    />
-                  );
-                })
-            }
+        return (
+          <Calculation
+            key={template.id}
+            style={style}
+            class={`octo-table-cell ${props.readOnly ? 'disabled' : ''}`}
+            value={value}
+            menuOpen={Boolean(props.readOnly ? false : showOptions.get(template.id))}
+            onMenuClose={() => toggleOptions(template.id, false)}
+            onMenuOpen={() => toggleOptions(template.id, true)}
+            onChange={(v: string) => {
+              const calculations = { ...selectedCalculations };
+              calculations[template.id] = v;
+              const newBoard = createBoard({ block: props.board });
+              newBoard.fields.columnCalculations = calculations;
+              mutator.updateBlock(newBoard, props.board, 'update_calculation');
+              setHovered(false);
+            }}
+            cards={props.cards}
+            hovered={hovered}
+            optionsComponent={TableCalculationOptions}
+            property={template}
+          />
+        );
+      })}
     </div>
   );
 }

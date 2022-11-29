@@ -16,21 +16,37 @@ import type { PropertyType } from '../../blocks/board';
 
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
   switch (propertyType) {
-    case 'checkbox': return <CheckBoxIcon fontSize='small' {...props} />;
-    case 'createdBy': return <PersonIcon fontSize='small' {...props} />;
-    case 'createdTime': return <AccessTimeIcon fontSize='small' {...props} />;
-    case 'date': return <EventNoteIcon fontSize='small' {...props} />;
-    case 'email': return <AlternateEmailIcon fontSize='small' {...props} />;
-    case 'file': return <AttachFileIcon fontSize='small' {...props} />;
-    case 'multiSelect': return <ListIcon fontSize='small' {...props} />;
-    case 'number': return <NumbersIcon fontSize='small' {...props} />;
-    case 'person': return <PersonIcon fontSize='small' {...props} />;
-    case 'phone': return <PhoneIcon fontSize='small' {...props} />;
-    case 'select': return <FormatListBulletedIcon fontSize='small' {...props} />;
-    case 'text': return <SubjectIcon fontSize='small' {...props} />;
-    case 'updatedBy': return <PersonIcon fontSize='small' {...props} />;
-    case 'updatedTime': return <AccessTimeIcon fontSize='small' {...props} />;
-    case 'url': return <LinkIcon fontSize='small' {...props} />;
-    default: return null;
+    case 'checkbox':
+      return <CheckBoxIcon fontSize='small' {...props} />;
+    case 'createdBy':
+      return <PersonIcon fontSize='small' {...props} />;
+    case 'createdTime':
+      return <AccessTimeIcon fontSize='small' {...props} />;
+    case 'date':
+      return <EventNoteIcon fontSize='small' {...props} />;
+    case 'email':
+      return <AlternateEmailIcon fontSize='small' {...props} />;
+    case 'file':
+      return <AttachFileIcon fontSize='small' {...props} />;
+    case 'multiSelect':
+      return <ListIcon fontSize='small' {...props} />;
+    case 'number':
+      return <NumbersIcon fontSize='small' {...props} />;
+    case 'person':
+      return <PersonIcon fontSize='small' {...props} />;
+    case 'phone':
+      return <PhoneIcon fontSize='small' {...props} />;
+    case 'select':
+      return <FormatListBulletedIcon fontSize='small' {...props} />;
+    case 'text':
+      return <SubjectIcon fontSize='small' {...props} />;
+    case 'updatedBy':
+      return <PersonIcon fontSize='small' {...props} />;
+    case 'updatedTime':
+      return <AccessTimeIcon fontSize='small' {...props} />;
+    case 'url':
+      return <LinkIcon fontSize='small' {...props} />;
+    default:
+      return null;
   }
 };

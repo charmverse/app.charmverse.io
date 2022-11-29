@@ -1,4 +1,3 @@
-
 import type { Prisma, Page as PrismaPage } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -7,14 +6,18 @@ import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/pages';
 import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
-import { DatabasePageNotFoundError, mapProperties, PageFromBlock, validatePageQuery, validatePaginationQuery } from 'lib/public-api';
+import {
+  DatabasePageNotFoundError,
+  mapProperties,
+  PageFromBlock,
+  validatePageQuery,
+  validatePaginationQuery
+} from 'lib/public-api';
 import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireApiKey)
-  .post(searchDatabase);
+handler.use(requireApiKey).post(searchDatabase);
 
 // Limit the maximum size of a search query's results
 const maxRecordsPerQuery = 100;
@@ -61,8 +64,7 @@ const maxRecordsPerQuery = 100;
  *                    items:
  *                      $ref: '#/components/schemas/Page'
  */
-async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
-
+async function searchDatabase(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -90,11 +92,11 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   const cardProperties = searchQuery.query?.properties ?? {};
 
-  const nestedJsonQuery: Prisma.NestedJsonFilter [] = [];
+  const nestedJsonQuery: Prisma.NestedJsonFilter[] = [];
 
   const queryProperties: Record<string, string | number> = mapProperties(cardProperties, boardSchema);
 
-  Object.entries(queryProperties).forEach(queryItem => {
+  Object.entries(queryProperties).forEach((queryItem) => {
     nestedJsonQuery.push({
       path: ['properties', queryItem[0]],
       equals: queryItem[1]
@@ -104,7 +106,7 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   const prismaQueryContent: Prisma.BlockWhereInput = {
     rootId: id as string,
     type: 'card',
-    AND: nestedJsonQuery.map(nestedJson => {
+    AND: nestedJsonQuery.map((nestedJson) => {
       return {
         fields: nestedJson
       };
@@ -134,37 +136,35 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
 
   if (searchQuery.limit) {
     prismaQueryWithCursor.take = Math.min(maxRecordsPerQuery, searchQuery.limit);
-  }
-  else {
+  } else {
     prismaQueryWithCursor.take = maxRecordsPerQuery;
   }
 
-  const cardBlocks = (await prisma.block.findMany(prismaQueryWithCursor));
+  const cardBlocks = await prisma.block.findMany(prismaQueryWithCursor);
 
   // Object that holds the page content for each card
   const cardPagesRecord: Record<string, PrismaPage> = {};
 
-  const cardPages = (await prisma.page.findMany({
+  const cardPages = await prisma.page.findMany({
     where: {
-      OR: cardBlocks.map(cardBlock => {
+      OR: cardBlocks.map((cardBlock) => {
         return {
           id: cardBlock.id
         };
       })
     }
-  }));
+  });
 
-  cardPages.forEach(cardPage => {
+  cardPages.forEach((cardPage) => {
     cardPagesRecord[cardPage.id] = cardPage;
   });
 
-  const cardsWithContent = cardBlocks.map(cardBlock => new PageFromBlock(cardBlock, boardSchema));
+  const cardsWithContent = cardBlocks.map((cardBlock) => new PageFromBlock(cardBlock, boardSchema));
 
   let hasNext = false;
   let cursor: string | undefined;
 
   if (cardBlocks.length > 0) {
-
     const lastPageId = cardBlocks[cardBlocks.length - 1].id;
     const remainingRecords = await prisma.block.count({
       cursor: {
@@ -190,6 +190,5 @@ async function searchDatabase (req: NextApiRequest, res: NextApiResponse) {
   };
 
   return res.status(200).send(paginatedResponse);
-
 }
 export default handler;

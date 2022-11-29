@@ -6,7 +6,15 @@ import type { LoggedInUser } from 'models';
 /**
  * Utility to add existing user to existing space
  */
-export async function addUserToSpace ({ spaceId, isAdmin, userId }: { spaceId: string, isAdmin: boolean, userId: string }): Promise<LoggedInUser> {
+export async function addUserToSpace({
+  spaceId,
+  isAdmin,
+  userId
+}: {
+  spaceId: string;
+  isAdmin: boolean;
+  userId: string;
+}): Promise<LoggedInUser> {
   return prisma.user.update({
     where: {
       id: userId
@@ -42,13 +50,16 @@ export async function addUserToSpace ({ spaceId, isAdmin, userId }: { spaceId: s
 /**
  * Utility to create a space by existing user
  */
-export async function generateSpaceForUser (user: LoggedInUser, isAdmin = true, spaceName = 'Example space') {
+export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, spaceName = 'Example space') {
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space = null;
 
   if (existingSpaceId) {
-    space = await prisma.space.findUnique({ where: { id: user.spaceRoles?.[0]?.spaceId }, include: { apiToken: true, spaceRoles: true } });
+    space = await prisma.space.findUnique({
+      where: { id: user.spaceRoles?.[0]?.spaceId },
+      include: { apiToken: true, spaceRoles: true }
+    });
   }
 
   if (!space) {
@@ -63,7 +74,7 @@ export async function generateSpaceForUser (user: LoggedInUser, isAdmin = true, 
           }
         },
         updatedBy: user.id,
-        updatedAt: (new Date()).toISOString(),
+        updatedAt: new Date().toISOString(),
         spaceRoles: {
           create: {
             userId: user.id,
@@ -80,4 +91,3 @@ export async function generateSpaceForUser (user: LoggedInUser, isAdmin = true, 
 
   return space;
 }
-

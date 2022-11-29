@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,10 +10,9 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .delete(deleteThreadController);
+handler.use(requireUser).delete(deleteThreadController);
 
-async function deleteThreadController (req: NextApiRequest, res: NextApiResponse) {
+async function deleteThreadController(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id as string;
   const threadId = req.query.id as string;
   const thread = await prisma.thread.findUnique({

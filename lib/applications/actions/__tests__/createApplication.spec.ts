@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -20,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('createApplication', () => {
-
   it('should create an application in applied status', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -35,11 +32,9 @@ describe('createApplication', () => {
     });
 
     expect(application.status).toBe('applied');
-
   });
 
   it('should fail if the bounty does not exist', async () => {
-
     try {
       await createApplication({
         bountyId: v4(),
@@ -47,15 +42,12 @@ describe('createApplication', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
 
   it('should fail if the user already has an application for this bounty', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -74,15 +66,12 @@ describe('createApplication', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DuplicateDataError);
     }
-
   });
 
   it(`should fail if the application message has less than ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters`, async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -95,15 +84,12 @@ describe('createApplication', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(StringTooShortError);
     }
-
   });
 
   it('should fail if the cap of applications for the bounty has been reached', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
@@ -118,12 +104,8 @@ describe('createApplication', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(LimitReachedError);
     }
-
   });
-
 });
-

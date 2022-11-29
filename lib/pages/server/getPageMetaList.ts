@@ -2,7 +2,7 @@ import { prisma } from 'db';
 
 import type { PageMeta } from '../interfaces';
 
-export function getPageMetaList (pageIds: string[]): Promise<PageMeta[]> {
+export function getPageMetaList(pageIds: string[]): Promise<PageMeta[]> {
   return prisma.page.findMany({
     where: {
       id: {

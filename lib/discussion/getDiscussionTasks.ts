@@ -10,7 +10,7 @@ import type { DiscussionTask } from './interfaces';
 export type DiscussionTasksGroup = {
   marked: DiscussionTask[];
   unmarked: DiscussionTask[];
-}
+};
 
 type Discussion = Omit<DiscussionTask, 'createdBy'> & { userId: string };
 type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
@@ -28,7 +28,7 @@ interface GetDiscussionsResponse {
   comments: Discussion[];
 }
 
-export async function getDiscussionTasks (userId: string): Promise<DiscussionTasksGroup> {
+export async function getDiscussionTasks(userId: string): Promise<DiscussionTasksGroup> {
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -52,7 +52,7 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
   const username = user?.username ?? shortenHex(userId);
 
   // Array of space ids the user is part of
-  const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
+  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
 
   const notifications = await prisma.userNotification.findMany({
     where: {
@@ -79,12 +79,12 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
 
   const spaceRecord: SpaceRecord = {};
 
-  spaces.forEach(space => {
+  spaces.forEach((space) => {
     spaceRecord[space.id] = space;
   });
 
   // Get the marked comment/mention task ids (all the discussion type tasks that exist in the db)
-  const notifiedTaskIds = new Set(notifications.map(notification => notification.taskId));
+  const notifiedTaskIds = new Set(notifications.map((notification) => notification.taskId));
 
   const context: GetDiscussionsInput = { userId, username, spaceRecord, spaceIds };
 
@@ -93,21 +93,26 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
     getMentionsFromComments(context),
     getMentionsFromPages(context),
     getMentionsFromCommentBlocks(context)
-  ]).then(results => {
+  ]).then((results) => {
     // aggregate the results
-    return results.reduce((acc, result) => {
-      return {
-        mentions: { ...acc.mentions, ...result.mentions },
-        discussionUserIds: [...acc.discussionUserIds, ...result.discussionUserIds],
-        comments: [...acc.comments, ...result.comments]
-      };
-    }, { mentions: {}, discussionUserIds: [], comments: [] });
+    return results.reduce(
+      (acc, result) => {
+        return {
+          mentions: { ...acc.mentions, ...result.mentions },
+          discussionUserIds: [...acc.discussionUserIds, ...result.discussionUserIds],
+          comments: [...acc.comments, ...result.comments]
+        };
+      },
+      { mentions: {}, discussionUserIds: [], comments: [] }
+    );
   });
 
-  const commentIdsFromMentions = Object.values(mentions).map(item => item.commentId).filter((item: string | null): item is string => !!item);
+  const commentIdsFromMentions = Object.values(mentions)
+    .map((item) => item.commentId)
+    .filter((item: string | null): item is string => !!item);
 
   // Filter already added comments from mentions
-  const uniqueComments = comments.filter(item => item.commentId && !commentIdsFromMentions.includes(item.commentId));
+  const uniqueComments = comments.filter((item) => item.commentId && !commentIdsFromMentions.includes(item.commentId));
 
   // Only fetch the users that created the mentions
   const users = await prisma.user.findMany({
@@ -122,32 +127,36 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
   const usersRecord = users.reduce<Record<string, User>>((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
 
   // Loop through each mentioned task and attach the user data using usersRecord
-  const mentionedTasks = Object.values(mentions).reduce<DiscussionTasksGroup>((acc, mentionedTaskWithoutUser) => {
+  const mentionedTasks = Object.values(mentions).reduce<DiscussionTasksGroup>(
+    (acc, mentionedTaskWithoutUser) => {
+      const mentionedTask = {
+        ...mentionedTaskWithoutUser,
+        createdBy: usersRecord[mentionedTaskWithoutUser.userId]
+      } as DiscussionTask;
 
-    const mentionedTask = {
-      ...mentionedTaskWithoutUser,
-      createdBy: usersRecord[mentionedTaskWithoutUser.userId]
-    } as DiscussionTask;
+      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
+      taskList.push(mentionedTask);
 
-    const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? '') ? acc.marked : acc.unmarked;
-    taskList.push(mentionedTask);
-
-    return acc;
-  }, { marked: [], unmarked: [] });
+      return acc;
+    },
+    { marked: [], unmarked: [] }
+  );
 
   // Loop through each comment task and attach the user data using usersRecord
-  const commentTasks = uniqueComments.reduce<DiscussionTasksGroup>((acc, commentTaskWithoutUser) => {
+  const commentTasks = uniqueComments.reduce<DiscussionTasksGroup>(
+    (acc, commentTaskWithoutUser) => {
+      const commentTask = {
+        ...commentTaskWithoutUser,
+        createdBy: usersRecord[commentTaskWithoutUser.userId]
+      } as DiscussionTask;
 
-    const commentTask = {
-      ...commentTaskWithoutUser,
-      createdBy: usersRecord[commentTaskWithoutUser.userId]
-    } as DiscussionTask;
+      const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
+      taskList.push(commentTask);
 
-    const taskList = notifiedTaskIds.has(commentTask.commentId ?? '') ? acc.marked : acc.unmarked;
-    taskList.push(commentTask);
-
-    return acc;
-  }, { marked: [], unmarked: [] });
+      return acc;
+    },
+    { marked: [], unmarked: [] }
+  );
 
   const allTasks = {
     marked: [...mentionedTasks.marked, ...commentTasks.marked],
@@ -160,8 +169,12 @@ export async function getDiscussionTasks (userId: string): Promise<DiscussionTas
   };
 }
 
-async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-
+async function getMentionsFromCommentBlocks({
+  userId,
+  username,
+  spaceRecord,
+  spaceIds
+}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   const blockComments = await prisma.block.findMany({
     where: {
       type: 'comment',
@@ -182,7 +195,7 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
   const pages = await prisma.page.findMany({
     where: {
       id: {
-        in: blockComments.map(block => block.parentId)
+        in: blockComments.map((block) => block.parentId)
       }
     }
   });
@@ -191,11 +204,11 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
   const discussionUserIds: string[] = [];
 
   for (const comment of blockComments) {
-    const page = pages.find(p => p.id === comment.parentId);
+    const page = pages.find((p) => p.id === comment.parentId);
     const content = (comment.fields as any)?.content as PageContent;
     if (page && content) {
       const mentions = extractMentions(content, username);
-      mentions.forEach(mention => {
+      mentions.forEach((mention) => {
         if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
@@ -222,7 +235,7 @@ async function getMentionsFromCommentBlocks ({ userId, username, spaceRecord, sp
  * 1. My page, but not my comments
  * 2. Not my page, just comments that are replies after my comment
  */
-async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+async function getComments({ userId, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   const threads = await prisma.thread.findMany({
     where: {
       spaceId: {
@@ -243,7 +256,8 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
               }
             }
           }
-        }, {
+        },
+        {
           page: {
             createdBy: {
               not: userId
@@ -256,7 +270,8 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
                   userId
                 }
               }
-            }, {
+            },
+            {
               comments: {
                 some: {
                   userId: {
@@ -299,22 +314,24 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
 
   // All comments that are not created by the user and are on a page created by the user
   const myPageComments = threads
-    .filter(thread => thread.page.createdBy === userId)
-    .map(t => t.comments)
+    .filter((thread) => thread.page.createdBy === userId)
+    .map((t) => t.comments)
     .flat()
-    .filter(c => c.userId !== userId);
+    .filter((c) => c.userId !== userId);
 
   // All comments that are not created by the user, are replies of a comment created by the user and page is not created by the user.
   const repliesFromThreads = threads
-    .filter(thread => thread.page.createdBy !== userId)
-    .map(thread => thread.comments)
-    .filter(_comments => {
+    .filter((thread) => thread.page.createdBy !== userId)
+    .map((thread) => thread.comments)
+    .filter((_comments) => {
       // Find the first user comment
-      const userCommentIndex = _comments.findIndex(_comment => _comment.userId === userId);
+      const userCommentIndex = _comments.findIndex((_comment) => _comment.userId === userId);
 
       if (userCommentIndex > -1) {
         // Start searching after the first user comment to check if there is a reply to it
-        const otherUserCommentIndex = _comments.slice(userCommentIndex).findIndex(_comment => _comment.userId !== userId);
+        const otherUserCommentIndex = _comments
+          .slice(userCommentIndex)
+          .findIndex((_comment) => _comment.userId !== userId);
 
         if (otherUserCommentIndex > 0) {
           return true;
@@ -324,12 +341,12 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
       return false;
     })
     .map((_comments) => {
-      const userCommentIndex = _comments.findIndex(_comment => _comment.userId === userId);
+      const userCommentIndex = _comments.findIndex((_comment) => _comment.userId === userId);
       // Return all replies after the user comment
       return _comments.slice(userCommentIndex + 1);
     })
     .flat()
-    .filter(_comment => _comment.userId !== userId);
+    .filter((_comment) => _comment.userId !== userId);
 
   const allComments = [...myPageComments, ...repliesFromThreads];
 
@@ -357,13 +374,17 @@ async function getComments ({ userId, spaceRecord, spaceIds }: GetDiscussionsInp
 
   return {
     mentions: {},
-    discussionUserIds: textComments.map(comm => comm.userId).concat([userId]),
+    discussionUserIds: textComments.map((comm) => comm.userId).concat([userId]),
     comments: textComments
   };
 }
 
-async function getMentionsFromComments ({ userId, username, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-
+async function getMentionsFromComments({
+  userId,
+  username,
+  spaceRecord,
+  spaceIds
+}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   const comments = await prisma.comment.findMany({
     where: {
       spaceId: {
@@ -397,7 +418,7 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
     const content = comment.content as PageContent;
     if (content) {
       const mentions = extractMentions(content, username);
-      mentions.forEach(mention => {
+      mentions.forEach((mention) => {
         if (mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
           discussionUserIds.push(mention.createdBy);
           mentionsMap[mention.id] = {
@@ -419,8 +440,12 @@ async function getMentionsFromComments ({ userId, username, spaceRecord, spaceId
   };
 }
 
-async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-
+async function getMentionsFromPages({
+  userId,
+  username,
+  spaceRecord,
+  spaceIds
+}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
   // Get all the pages of all the spaces this user is part of
   const pages = await prisma.page.findMany({
     where: {
@@ -447,7 +472,7 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
     const content = page.content as PageContent;
     if (content) {
       const mentions = extractMentions(content, username);
-      mentions.forEach(mention => {
+      mentions.forEach((mention) => {
         // Skip mentions not for the user, self mentions and inside user created pages
         if (mention.value === userId && mention.createdBy !== userId) {
           discussionUserIds.push(mention.createdBy);
@@ -473,11 +498,14 @@ async function getMentionsFromPages ({ userId, username, spaceRecord, spaceIds }
 
 // utils
 
-function sortByDate <T extends { createdAt: string }> (a: T, b: T): number {
+function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
 
-function getPropertiesFromPage (page: Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>, spaceRecord: SpaceRecord) {
+function getPropertiesFromPage(
+  page: Pick<Page, 'bountyId' | 'spaceId' | 'title' | 'id' | 'path'>,
+  spaceRecord: SpaceRecord
+) {
   return {
     pageId: page.id,
     spaceId: page.spaceId,

@@ -4,7 +4,9 @@ import type { DragLayerMonitor } from 'react-dnd';
 import { useDragLayer } from 'react-dnd';
 
 // more efficient than useDragLayer, only updating on animation frame: https://github.com/react-dnd/react-dnd/issues/2414
-export default function useEfficientDragLayer<CollectedProps> (collect: (monitor: DragLayerMonitor<any>) => CollectedProps): CollectedProps {
+export default function useEfficientDragLayer<CollectedProps>(
+  collect: (monitor: DragLayerMonitor<any>) => CollectedProps
+): CollectedProps {
   const collected = useDragLayer(collect);
   const [previousCollected, setPreviousCollected] = useState<CollectedProps>(collected);
   const [requestID, setRequestID] = useState<number>();

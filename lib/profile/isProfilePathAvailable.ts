@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-export async function isProfilePathAvailable (path: string, id?: string | null): Promise<boolean> {
+export async function isProfilePathAvailable(path: string, id?: string | null): Promise<boolean> {
   const existing = await prisma.user.findUnique({
     where: {
       path

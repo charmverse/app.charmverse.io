@@ -19,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('toggleSpaceDefaultPublicPage', () => {
-
   it('should update the default public page value and return the space', async () => {
-
     const updatedSpace = await toggleSpaceDefaultPublicPage({
       defaultPublicPages: true,
       spaceId: space.id
@@ -38,8 +36,7 @@ describe('toggleSpaceDefaultPublicPage', () => {
       });
 
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
@@ -52,8 +49,7 @@ describe('toggleSpaceDefaultPublicPage', () => {
       });
 
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });

@@ -1,6 +1,6 @@
 import type { PageContent } from 'models';
 
-export function getPreviewImageFromContent (content: PageContent) {
+export function getPreviewImageFromContent(content: PageContent) {
   let galleryImageUrl = '';
 
   if (content?.content) {
@@ -15,8 +15,7 @@ export function getPreviewImageFromContent (content: PageContent) {
             break;
           }
         }
-      }
-      else if (item.type === 'image') {
+      } else if (item.type === 'image') {
         if (item.attrs?.src) {
           galleryImageUrl = item.attrs.src;
           break;

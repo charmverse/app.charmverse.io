@@ -17,7 +17,7 @@ import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
-export default function LoginPage () {
+export default function LoginPage() {
   const { account, walletAuthSignature, verifiableWalletDetected, getStoredSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
@@ -36,24 +36,20 @@ export default function LoginPage () {
   const walletNeedsVerification = !!account && !walletIsVerified;
   const returnUrl = router.query.returnUrl as string | undefined;
 
-  function redirectToDefaultPage () {
-
+  function redirectToDefaultPage() {
     // Send the user in priority to the invites page if they logged in looking to join a space
     if (returnUrl?.match('join') || returnUrl?.match('invite')) {
       log.info('Redirect user to given url');
       router.push(returnUrl);
-    }
-    else if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
+    } else if (spaces.length === 0 && !isSpaceDomain(returnUrl?.replaceAll('/', ''))) {
       // Note that a user logging in will be redirected to /signup, because the 'user' and 'spaces' are loaded async after the wallet address appears.
       log.info('Redirect user to signup');
       router.push('/signup');
-    // send to signup for users without a workspace unless they are being redirected to an existing workspace
-    }
-    else if (returnUrl) {
+      // send to signup for users without a workspace unless they are being redirected to an existing workspace
+    } else if (returnUrl) {
       log.info('Redirect user to given url');
       router.push(returnUrl);
-    }
-    else {
+    } else {
       const defaultWorkspace = getDefaultWorkspaceUrl(spaces);
       log.info('Redirect user to default workspace');
       router.push(defaultWorkspace);
@@ -72,8 +68,7 @@ export default function LoginPage () {
       // redirect once user is logged in unless we are verifying their wallet
       if (isLoggedIn && (!walletNeedsVerification || !!user?.discordUser)) {
         redirectToDefaultPage();
-      }
-      else {
+      } else {
         setShowLogin(true);
       }
     }
@@ -84,8 +79,7 @@ export default function LoginPage () {
   useEffect(() => {
     if (verifiableWalletDetected && signature && !user) {
       setLoggingIn(true);
-      loginFromWeb3Account(signature)
-        .finally(() => setLoggingIn(false));
+      loginFromWeb3Account(signature).finally(() => setLoggingIn(false));
     }
   }, [verifiableWalletDetected]);
 
@@ -93,25 +87,27 @@ export default function LoginPage () {
     return null;
   }
 
-  return (
-    isLogInWithDiscord ? null : getLayout(
-      <>
-        <LoginPageContent walletSigned={(authSig) => {
-          // console.log('Received authSig', authSig);
-          loginFromWeb3Account(authSig);
-        }}
-        />
-        <Footer />
-      </>
-    )
-  );
+  return isLogInWithDiscord
+    ? null
+    : getLayout(
+        <>
+          <LoginPageContent
+            walletSigned={(authSig) => {
+              // console.log('Received authSig', authSig);
+              loginFromWeb3Account(authSig);
+            }}
+          />
+          <Footer />
+        </>
+      );
 }
 
-export function getDefaultWorkspaceUrl (spaces: Space[]) {
+export function getDefaultWorkspaceUrl(spaces: Space[]) {
   const defaultWorkspace = typeof window !== 'undefined' && localStorage.getItem(getKey('last-workspace'));
   if (defaultWorkspace === '/nexus') {
     return defaultWorkspace;
   }
-  const isValidDefaultWorkspace = !!defaultWorkspace && spaces.some(space => defaultWorkspace.startsWith(`/${space.domain}`));
+  const isValidDefaultWorkspace =
+    !!defaultWorkspace && spaces.some((space) => defaultWorkspace.startsWith(`/${space.domain}`));
   return isValidDefaultWorkspace ? defaultWorkspace : `/${spaces[0].domain}`;
 }

@@ -6,18 +6,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import Menu from '.';
 
 type SubMenuOptionProps = {
-    id: string;
-    name: string;
-    position?: 'bottom' | 'top' | 'left' | 'left-bottom';
-    icon?: React.ReactNode;
-    children: React.ReactNode;
-}
+  id: string;
+  name: string;
+  position?: 'bottom' | 'top' | 'left' | 'left-bottom';
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+};
 
 const StyledPopper = styled(Popper)`
-    z-index: var(--z-index-modal);
+  z-index: var(--z-index-modal);
 `;
 
-function SubMenuOption (props: SubMenuOptionProps): JSX.Element {
+function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const node = useRef<HTMLDivElement>(null);
 
@@ -34,8 +34,7 @@ function SubMenuOption (props: SubMenuOptionProps): JSX.Element {
       if (box) {
         if (box.top + box.bottom + padding > windowHeight) {
           setMaxHeight(windowHeight - box.top - padding);
-        }
-        else {
+        } else {
           setMaxHeight(0);
         }
       }
@@ -68,32 +67,22 @@ function SubMenuOption (props: SubMenuOptionProps): JSX.Element {
         setIsOpen(true);
       }}
     >
-      {(props.position === 'left' || props.position === 'left-bottom') && <ArrowDropDownOutlinedIcon fontSize='small' />}
+      {(props.position === 'left' || props.position === 'left-bottom') && (
+        <ArrowDropDownOutlinedIcon fontSize='small' />
+      )}
       {props.icon ?? <div className='noicon' />}
       <div className='menu-name'>{props.name}</div>
       {props.position !== 'left' && props.position !== 'left-bottom' && <ArrowDropDownOutlinedIcon fontSize='small' />}
       <StyledPopper anchorEl={node.current} open={isOpen} placement='right-start'>
-        <div
-          ref={popperRef}
-          style={{ maxHeight: maxHeight || 'none' }}
-          className='SubMenu Menu noselect '
-        >
+        <div ref={popperRef} style={{ maxHeight: maxHeight || 'none' }} className='SubMenu Menu noselect '>
           <div className='menu-contents'>
-            <div className='menu-options'>
-              {props.children}
-            </div>
+            <div className='menu-options'>{props.children}</div>
             <div className='menu-spacer hideOnWidescreen' />
 
             <div className='menu-options hideOnWidescreen'>
-              <Menu.Text
-                id='menu-cancel'
-                name='Cancel'
-                className='menu-cancel'
-                onClick={() => undefined}
-              />
+              <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
             </div>
           </div>
-
         </div>
       </StyledPopper>
     </div>

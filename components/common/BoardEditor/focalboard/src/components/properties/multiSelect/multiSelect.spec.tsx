@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +8,7 @@ import type { IPropertyOption, IPropertyTemplate } from '../../../blocks/board';
 
 import MultiSelect from './multiSelect';
 
-function buildMultiSelectPropertyTemplate (options: IPropertyOption[] = []) : IPropertyTemplate {
+function buildMultiSelectPropertyTemplate(options: IPropertyOption[] = []): IPropertyTemplate {
   return {
     id: 'multiselect-template-1',
     name: 'Multi',
@@ -36,10 +35,10 @@ function buildMultiSelectPropertyTemplate (options: IPropertyOption[] = []) : IP
 }
 
 type WrapperProps = {
-    children?: React.ReactNode;
-}
+  children?: React.ReactNode;
+};
 
-function Wrapper ({ children }: WrapperProps) {
+function Wrapper({ children }: WrapperProps) {
   return <IntlProvider locale='en'>{children}</IntlProvider>;
 }
 
@@ -147,7 +146,9 @@ describe('components/properties/multiSelect', () => {
     userEvent.click(screen.getAllByRole('button', { name: /clear/i })[0]);
 
     const valueToRemove = propertyTemplate.options.find((option: IPropertyOption) => option.id === propertyValue[0]);
-    const selectedValues = propertyTemplate.options.filter((option: IPropertyOption) => propertyValue.includes(option.id));
+    const selectedValues = propertyTemplate.options.filter((option: IPropertyOption) =>
+      propertyValue.includes(option.id)
+    );
 
     expect(onDeleteValue).toHaveBeenCalledWith(valueToRemove, selectedValues);
   });
@@ -176,7 +177,9 @@ describe('components/properties/multiSelect', () => {
 
     userEvent.type(screen.getByRole('textbox', { name: /value selector/i }), 'new-value{enter}');
 
-    const selectedValues = propertyTemplate.options.filter((option: IPropertyOption) => propertyValue.includes(option.id));
+    const selectedValues = propertyTemplate.options.filter((option: IPropertyOption) =>
+      propertyValue.includes(option.id)
+    );
 
     expect(onCreate).toHaveBeenCalledWith('new-value', selectedValues);
   });

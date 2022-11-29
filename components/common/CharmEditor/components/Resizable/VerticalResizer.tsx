@@ -15,9 +15,8 @@ interface ResizerProps {
   onResizeStop?: ResizableProps['onResizeStop'];
 }
 
-function VerticalResizer (props: ResizerProps) {
-  const { width, height, onResizeStop, onResize, minConstraints,
-    maxConstraints, children } = props;
+function VerticalResizer(props: ResizerProps) {
+  const { width, height, onResizeStop, onResize, minConstraints, maxConstraints, children } = props;
 
   return (
     <ResizableContainer>

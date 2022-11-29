@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -18,9 +17,7 @@ beforeAll(async () => {
 });
 
 describe('deleteComment', () => {
-
   it('should delete a comment and return true', async () => {
-
     const { comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: space.id,
@@ -36,11 +33,8 @@ describe('deleteComment', () => {
     try {
       await deleteComment(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
-
 });
-

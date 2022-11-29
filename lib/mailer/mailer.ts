@@ -13,13 +13,11 @@ interface EmailProps {
   html: string;
   subject: string;
   to: EmailRecipient;
-  attachment?: { data: Buffer, name: string };
+  attachment?: { data: Buffer; name: string };
 }
 
-export async function sendEmail ({ html, subject, to, attachment }: EmailProps) {
-  const recipientAddress = to.displayName
-    ? `${to.displayName} <${to.email}>`
-    : to.email;
+export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
+  const recipientAddress = to.displayName ? `${to.displayName} <${to.email}>` : to.email;
 
   if (!client) {
     log.debug('No mailgun client, not sending email');

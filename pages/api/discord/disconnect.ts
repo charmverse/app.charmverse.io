@@ -17,7 +17,7 @@ const handler = nc({
 
 handler.use(requireUser).post(disconnectDiscord);
 
-async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
+async function disconnectDiscord(req: NextApiRequest, res: NextApiResponse) {
   const user = await prisma.user.findUnique({
     where: {
       id: req.session.user.id
@@ -62,17 +62,14 @@ async function disconnectDiscord (req: NextApiRequest, res: NextApiResponse) {
   if (ens) {
     newUserName = ens;
     newIdentityProvider = IDENTITY_TYPES[0];
-  }
-  else if (user.telegramUser) {
+  } else if (user.telegramUser) {
     const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
     newUserName = telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`;
     newIdentityProvider = IDENTITY_TYPES[2];
-  }
-  else if (user.wallets.length) {
+  } else if (user.wallets.length) {
     newUserName = shortenHex(user.wallets[0].address);
     newIdentityProvider = IDENTITY_TYPES[0];
-  }
-  else {
+  } else {
     throw new InvalidStateError();
   }
 

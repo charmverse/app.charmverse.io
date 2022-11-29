@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -64,8 +63,8 @@ describe('components/cardDetail/CardDetailProperties', () => {
 
   const cards = [card];
 
-  function renderComponent () {
-    const component = wrapIntl((
+  function renderComponent() {
+    const component = wrapIntl(
       <CardDetailProperties
         board={board!}
         card={card}
@@ -76,7 +75,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
         views={views}
         readOnly={false}
       />
-    ));
+    );
 
     return render(component);
   }
@@ -131,7 +130,13 @@ describe('components/cardDetail/CardDetailProperties', () => {
 
     // should be called once on confirming renaming the property
     expect(mockedMutator.changePropertyTypeAndName).toBeCalledTimes(1);
-    expect(mockedMutator.changePropertyTypeAndName).toHaveBeenCalledWith(board, cards, propertyTemplate, 'select', 'Owner - Renamed');
+    expect(mockedMutator.changePropertyTypeAndName).toHaveBeenCalledWith(
+      board,
+      cards,
+      propertyTemplate,
+      'select',
+      'Owner - Renamed'
+    );
   });
 
   it('should add new number property', async () => {
@@ -199,7 +204,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
     expect(container).toMatchSnapshot();
   });
 
-  function openDeleteConfirmationDialog (container:HTMLElement) {
+  function openDeleteConfirmationDialog(container: HTMLElement) {
     const propertyLabel = container.querySelector('.MenuWrapper');
     expect(propertyLabel).toBeDefined();
     userEvent.click(propertyLabel!);
@@ -212,7 +217,7 @@ describe('components/cardDetail/CardDetailProperties', () => {
     expect(confirmDialog).toBeDefined();
   }
 
-  function onPropertyRenameOpenConfirmationDialog (container:HTMLElement) {
+  function onPropertyRenameOpenConfirmationDialog(container: HTMLElement) {
     const propertyLabel = container.querySelector('.MenuWrapper');
     expect(propertyLabel).toBeDefined();
     userEvent.click(propertyLabel!);
@@ -227,4 +232,3 @@ describe('components/cardDetail/CardDetailProperties', () => {
     expect(confirmDialog).toBeDefined();
   }
 });
-

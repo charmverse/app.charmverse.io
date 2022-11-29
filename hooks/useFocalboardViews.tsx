@@ -15,13 +15,16 @@ export const FocalboardViewsContext = createContext<Readonly<IContext>>({
   setFocalboardViewsRecord: () => null
 });
 
-export function FocalboardViewsProvider ({ children }: { children: ReactNode }) {
+export function FocalboardViewsProvider({ children }: { children: ReactNode }) {
   const [focalboardViewsRecord, setFocalboardViewsRecord] = useLocalStorage<FocalboardViewsRecord>('default-views', {});
 
-  const value = useMemo(() => ({
-    focalboardViewsRecord,
-    setFocalboardViewsRecord
-  }), [focalboardViewsRecord]);
+  const value = useMemo(
+    () => ({
+      focalboardViewsRecord,
+      setFocalboardViewsRecord
+    }),
+    [focalboardViewsRecord]
+  );
 
   return (
     // eslint-disable-next-line

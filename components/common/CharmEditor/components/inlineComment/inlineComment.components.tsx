@@ -32,30 +32,29 @@ export const ThreadContainer = styled(Paper)`
   overflow: auto;
 `;
 
-export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
+export default function InlineCommentThread({ pluginKey }: { pluginKey: PluginKey<InlineCommentPluginState> }) {
   const view = useEditorViewContext();
-  const {
-    tooltipContentDOM,
-    show: isVisible,
-    ids
-  } = usePluginState(pluginKey) as InlineCommentPluginState;
+  const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-  const cardId = (new URLSearchParams(window.location.href)).get('cardId');
+  const cardId = new URLSearchParams(window.location.href).get('cardId');
 
   const { currentPageActionDisplay } = usePageActionDisplay();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
-    .map(threadId => threads[threadId])
-    .filter(thread => thread && !thread?.resolved)
+    .map((threadId) => threads[threadId])
+    .filter((thread) => thread && !thread?.resolved)
     .filter(isTruthy)
-    .sort((threadA, threadB) => threadA && threadB ? (new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime()) : 0);
+    .sort((threadA, threadB) =>
+      threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
+    );
 
   if ((currentPageActionDisplay !== 'comments' || cardId) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
-      <ClickAwayListener onClickAway={() => {
-        hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
-      }}
+      <ClickAwayListener
+        onClickAway={() => {
+          hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+        }}
       >
         <Grow
           in
@@ -68,8 +67,7 @@ export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginK
           timeout={250}
         >
           <Box display='flex' flexDirection='column' gap={1}>
-
-            {unResolvedThreads.map(resolvedThread => (
+            {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread inline={ids.length === 1} key={resolvedThread.id} threadId={resolvedThread?.id} />
               </ThreadContainer>
@@ -83,7 +81,7 @@ export default function InlineCommentThread ({ pluginKey }: { pluginKey: PluginK
   return null;
 }
 
-export function InlineCommentSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
+export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -98,9 +96,8 @@ export function InlineCommentSubMenu ({ pluginKey }: { pluginKey: PluginKey }) {
   const { currentPageId } = usePages();
   const isEmpty = checkIsContentEmpty(commentContent);
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-
     if (!isEmpty) {
-      const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
+      const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
       e.preventDefault();
       const threadWithComment = await charmClient.startThread({
         comment: commentContent,

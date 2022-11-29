@@ -20,9 +20,7 @@ beforeAll(async () => {
 });
 
 describe('addBountyPermissionGroup', () => {
-
   it('should return the current mapping of permissions for a bounty', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -40,22 +38,18 @@ describe('addBountyPermissionGroup', () => {
       resourceId: bounty.id
     });
 
-    typedKeys(BountyPermissionLevel).forEach(level => {
+    typedKeys(BountyPermissionLevel).forEach((level) => {
       expect(newPermissionSet[level]).toBeInstanceOf(Array);
 
       if (level !== 'creator') {
         expect(newPermissionSet[level].length).toBe(0);
-      }
-      else {
+      } else {
         expect(newPermissionSet[level].length).toBe(1);
       }
-
     });
-
   });
 
   it('should not create a duplicate permission for the same combination of permission level and assignee', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -82,21 +76,19 @@ describe('addBountyPermissionGroup', () => {
       resourceId: bounty.id
     });
 
-    const updatedBounty = await prisma.bounty.findUnique({
+    const updatedBounty = (await prisma.bounty.findUnique({
       where: {
         id: bounty.id
       },
       select: {
         permissions: true
       }
-    }) as { permissions: BountyPermission[] };
+    })) as { permissions: BountyPermission[] };
 
     expect(updatedBounty.permissions.length).toBe(1);
-
   });
 
   it('should fail if assigning to a space outside the space the bounty belongs to', async () => {
-
     const { space: extraSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const bounty = await generateBounty({
@@ -117,15 +109,12 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
-
   });
 
   it('should fail if assigning to a role outside the space the bounty belongs to', async () => {
-
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const externalRole = await generateRole({
@@ -151,11 +140,9 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
-
   });
 
   it('should fail if assigning to a user who is not a member of the space the bounty belongs to', async () => {
@@ -179,14 +166,12 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
   });
 
   it('should fail if an invalid assignee group is provided', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -205,15 +190,12 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail if an empty assignee id is provided for groups other than public', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -232,15 +214,12 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail if an invalid permission level is provided', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -259,15 +238,12 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail if any other level than viewer is assigned to the public', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -287,11 +263,9 @@ describe('addBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InsecureOperationError);
     }
-
   });
 
   it('should fail if the bounty does not exist', async () => {
@@ -305,10 +279,8 @@ describe('addBountyPermissionGroup', () => {
         resourceId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
-
 });

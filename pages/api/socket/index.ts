@@ -23,27 +23,28 @@ type NextApiReponseWithSocketServer<T = any> = NextApiResponse<T> & {
       io?: Server;
     };
   };
-}
+};
 
 // set a ttl that allows sockets to reuse in the same session
 const sevenDaysInSeconds = 7 * 24 * 60 * 60;
 
 // Subscribe user to messages
-async function socketHandler (req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
-
+async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketServer<SocketAuthReponse>) {
   // capture value of userId on connect
   const userId = req.session.user.id;
 
-  const sealedUserId = await sealData({
-    userId
-  } as SealedUserId, {
-    password: authSecret,
-    ttl: sevenDaysInSeconds
-  });
+  const sealedUserId = await sealData(
+    {
+      userId
+    } as SealedUserId,
+    {
+      password: authSecret,
+      ttl: sevenDaysInSeconds
+    }
+  );
 
   // It means that socket server was already initialised
   if (res.socket?.server?.io) {
-
     res.send({ authToken: sealedUserId });
     return;
   }

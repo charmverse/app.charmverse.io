@@ -9,19 +9,17 @@ import { ActionNotPermittedError } from 'lib/middleware';
 import { authSecret, ironOptions } from 'lib/session/config';
 import type { SealedUserId } from 'lib/websockets/interfaces';
 
-export type SocketUser = { id: string, avatar: string | null, name: string };
+export type SocketUser = { id: string; avatar: string | null; name: string };
 export type AuthenticatedSocketData = { user: SocketUser };
 
 type AuthenticatedSocket = Socket<any, any, any, AuthenticatedSocketData>;
 
-export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: Error) => void) {
-
+export async function authOnConnect(socket: AuthenticatedSocket, next: (err?: Error) => void) {
   try {
     let userId: string;
     if (socket.handshake.auth.authToken) {
       ({ userId } = await getUserIdFromToken(socket.handshake.auth.authToken));
-    }
-    else {
+    } else {
       // use cookie session locally /// TODO: maybe delete this?
       const session = await getSessionFromSocket(socket);
       if (!session.user) {
@@ -42,20 +40,19 @@ export async function authOnConnect (socket: AuthenticatedSocket, next: (err?: E
     };
 
     next();
-  }
-  catch (error) {
+  } catch (error) {
     log.warn('Unable to authorize socket', error);
     next(error as Error);
   }
 }
 
-async function getUserIdFromToken (authToken: string) {
+async function getUserIdFromToken(authToken: string) {
   return unsealData<SealedUserId>(authToken, {
     password: authSecret
   });
 }
 
-function getSessionFromSocket (socket: Socket) {
+function getSessionFromSocket(socket: Socket) {
   // @ts-ignore IncomingMessage doesn't require an argument
   const req = new IncomingMessage();
   req.headers = socket.handshake.headers;

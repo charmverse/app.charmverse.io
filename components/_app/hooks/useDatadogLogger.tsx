@@ -9,7 +9,7 @@ import { useUser } from '../../../hooks/useUser';
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'charmverseapp';
 
-export default function useDatadogLogger () {
+export default function useDatadogLogger() {
   const { user } = useUser();
 
   // Load DD_LOGS

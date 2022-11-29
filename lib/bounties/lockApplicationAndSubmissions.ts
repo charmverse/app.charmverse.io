@@ -1,12 +1,10 @@
-
 import { prisma } from 'db';
 import type { BountyWithDetails } from 'lib/bounties';
 
 import { getBountyOrThrow } from './getBounty';
 import { rollupBountyStatus } from './rollupBountyStatus';
 
-export async function lockApplicationAndSubmissions (bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
-
+export async function lockApplicationAndSubmissions(bountyId: string, lock?: boolean): Promise<BountyWithDetails> {
   await getBountyOrThrow(bountyId);
 
   await prisma.bounty.update({
@@ -21,5 +19,4 @@ export async function lockApplicationAndSubmissions (bountyId: string, lock?: bo
   const rollup = await rollupBountyStatus(bountyId);
 
   return rollup;
-
 }

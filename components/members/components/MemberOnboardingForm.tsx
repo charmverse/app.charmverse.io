@@ -1,19 +1,26 @@
 import { Divider, Typography } from '@mui/material';
 
 import { UserDetails } from 'components/profile/components';
-import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
+import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 
-export function MemberOnboardingForm (
-  { userId, spaceId, spaceName, onClose }:
-  { onClose: () => void, spaceName: string, spaceId: string, userId: string }
-) {
+export function MemberOnboardingForm({
+  userId,
+  spaceId,
+  spaceName,
+  onClose
+}: {
+  onClose: () => void;
+  spaceName: string;
+  spaceId: string;
+  userId: string;
+}) {
   const { updateSpaceValues } = useMemberPropertyValues(userId);
   const { setUser, user } = useUser();
 
   return (
-    <MemberPropertiesPopupForm
+    <MemberPropertiesPopup
       title={`Welcome to ${spaceName}. Set up your profile`}
       onClose={onClose}
       memberId={userId}
@@ -30,13 +37,14 @@ export function MemberOnboardingForm (
             user={user}
             updateUser={setUser}
           />
-          <Divider sx={{
-            my: 1
-          }}
+          <Divider
+            sx={{
+              my: 1
+            }}
           />
         </>
       )}
       <Typography fontWeight={600}>{spaceName} Member details</Typography>
-    </MemberPropertiesPopupForm>
+    </MemberPropertiesPopup>
   );
 }

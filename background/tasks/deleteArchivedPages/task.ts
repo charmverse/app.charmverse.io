@@ -1,12 +1,10 @@
-
 import log from 'lib/log';
 import { count } from 'lib/metrics';
 import { deleteArchivedPages } from 'lib/pages/server/deleteArchivedPages';
 
 const MAX_ARCHIVE_DAYS = process.env.MAX_ARCHIVE_DAYS ? parseInt(process.env.MAX_ARCHIVE_DAYS) : 30;
 
-export async function task () {
-
+export async function task() {
   log.debug('Running delete-archived cron job');
 
   try {
@@ -27,8 +25,7 @@ export async function task () {
     count('cron.delete-archived.deleted-blocks', deletedBlocksCount);
     count('cron.delete-archived.archived-pages', archivedPagesCount);
     count('cron.delete-archived.archived-blocks', archivedBlocksCount);
-  }
-  catch (error: any) {
+  } catch (error: any) {
     log.error(`Error deleting archived pages: ${error.stack || error.message || error}`, { error });
   }
 }

@@ -15,8 +15,7 @@ if (process.env.REDIS_URI) {
   try {
     redisClientInstance = global.redisClient ?? createClient({ url: process.env.REDIS_URI });
     redisClientInstance.on('error', (error) => log.error('Redis Client Error', error));
-  }
-  catch (error) {
+  } catch (error) {
     log.error('Could not instantiate Redis. Error occurred', error);
   }
 }

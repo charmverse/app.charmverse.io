@@ -1,7 +1,6 @@
-
 import type { SVGProps } from 'react';
 
-export default function GalleryIcon (props: SVGProps<any>): JSX.Element {
+export default function GalleryIcon(props: SVGProps<any>): JSX.Element {
   return (
     <svg
       width='24'
@@ -21,6 +20,5 @@ export default function GalleryIcon (props: SVGProps<any>): JSX.Element {
         />
       </g>
     </svg>
-
   );
 }

@@ -12,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(loadTokenMetaData);
 
-async function loadTokenMetaData (req: NextApiRequest, res: NextApiResponse<ITokenMetadata>) {
+async function loadTokenMetaData(req: NextApiRequest, res: NextApiResponse<ITokenMetadata>) {
   const { chainId, contractAddress } = req.query;
 
   const parsedChainId = parseInt(chainId as string);

@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,8 +16,7 @@ handler
   .use(requireKeys(['isAdmin'], 'body'))
   .put(updateMember);
 
-async function updateMember (req: NextApiRequest, res: NextApiResponse) {
-
+async function updateMember(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.userId as string;
   const spaceId = req.query.id as string;
 
@@ -55,8 +53,7 @@ async function updateMember (req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json({ ok: true });
 }
 
-async function deleteMember (req: NextApiRequest, res: NextApiResponse) {
-
+async function deleteMember(req: NextApiRequest, res: NextApiResponse) {
   const requestingUserId = req.session.user.id;
 
   const userId = req.query.userId as string;
@@ -78,8 +75,7 @@ async function deleteMember (req: NextApiRequest, res: NextApiResponse) {
   // Non admin user trying to delete another user
   if (requesterRole.isAdmin !== true && userId !== requestingUserId) {
     throw new AdministratorOnlyError();
-  }
-  else if (requesterRole.isAdmin && userId === requestingUserId) {
+  } else if (requesterRole.isAdmin && userId === requestingUserId) {
     const otherAdmins = await prisma.spaceRole.count({
       where: {
         isAdmin: true,

@@ -16,9 +16,11 @@ export interface DiscordGuildMember {
   permissions?: string;
 }
 
-export async function assignRolesFromDiscord (rolesRecord: Record<string,
-  Role | null>, discordGuildMembers: DiscordGuildMember[], spaceId: string) {
-
+export async function assignRolesFromDiscord(
+  rolesRecord: Record<string, Role | null>,
+  discordGuildMembers: DiscordGuildMember[],
+  spaceId: string
+) {
   for (const discordGuildMember of discordGuildMembers) {
     // No need to add role for a bot
     if (discordGuildMember.user && !discordGuildMember.user.bot) {

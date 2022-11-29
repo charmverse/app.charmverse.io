@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getThreads);
 
-async function getThreads (req: NextApiRequest, res: NextApiResponse) {
+async function getThreads(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const computed = await computeUserPagePermissions({
     pageId,

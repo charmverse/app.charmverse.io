@@ -3,7 +3,14 @@ import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
 import log from 'lib/log';
-import type { ClientMessage, ClientRestartMessage, ClientSubscribeMessage, ServerMessage, RequestResendMessage, WrappedSocketMessage } from 'lib/websockets/documentEvents/interfaces';
+import type {
+  ClientMessage,
+  ClientRestartMessage,
+  ClientSubscribeMessage,
+  ServerMessage,
+  RequestResendMessage,
+  WrappedSocketMessage
+} from 'lib/websockets/documentEvents/interfaces';
 
 const gettext = (text: string) => text;
 
@@ -24,18 +31,17 @@ type WebSocketConnectorProps = {
   restartMessage: () => ClientRestartMessage; // Too many messages have been lost and we need to restart
   receiveData: (data: WrappedServerMessage) => void;
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
-}
+};
 
 export interface WebSocketConnector extends WebSocketConnectorProps {}
 
 /* Sets up communicating with server (retrieving document, saving, collaboration, etc.).
  */
 export class WebSocketConnector {
-
   socket: Socket<{ message: (message: WrappedMessage | RequestResendMessage) => void }>;
 
   // Messages object used to ensure that data is received in right order.
-  messages: { server: number, client: number, lastTen: WrappedMessage[] } = {
+  messages: { server: number; client: number; lastTen: WrappedMessage[] } = {
     server: 0,
     client: 0,
     lastTen: []
@@ -59,11 +65,13 @@ export class WebSocketConnector {
 
   // listeners: { onOffline?: () => any } = {};
 
-  warningNotAllSent = gettext('Warning! Not all your changes have been saved! You could suffer data loss. Attempting to reconnect...'); // Info to show while disconnected WITH unsaved data
+  warningNotAllSent = gettext(
+    'Warning! Not all your changes have been saved! You could suffer data loss. Attempting to reconnect...'
+  ); // Info to show while disconnected WITH unsaved data
 
-  infoDisconnected = gettext('Disconnected. Attempting to reconnect...');// Info to show while disconnected WITHOUT unsaved data
+  infoDisconnected = gettext('Disconnected. Attempting to reconnect...'); // Info to show while disconnected WITHOUT unsaved data
 
-  constructor ({
+  constructor({
     anythingToSend,
     authToken,
     sendMessage,
@@ -90,8 +98,7 @@ export class WebSocketConnector {
     this.createWSConnection();
   }
 
-  init () {
-
+  init() {
     // Close the socket manually for now when the connection is lost. Sometimes the socket isn't closed on disconnection.
     // const onOffline = () => this.ws?.close();
     // this.listeners.onOffline = onOffline;
@@ -112,14 +119,13 @@ export class WebSocketConnector {
   //   this.online = true;
   // }
 
-  close () {
+  close() {
     this.socket.disconnect();
     log.debug('Page socket closed');
     // window.removeEventListener('offline', this.listeners.onOffline);
   }
 
-  createWSConnection () {
-
+  createWSConnection() {
     this.messages = {
       server: 0,
       client: 0,
@@ -128,7 +134,7 @@ export class WebSocketConnector {
 
     // this.open()//;
 
-    this.socket.on('message', _data => {
+    this.socket.on('message', (_data) => {
       const data = _data as WrappedServerMessage;
 
       // console.log('ws - on socket events', data);
@@ -136,28 +142,26 @@ export class WebSocketConnector {
       // console.log('[charm ws] socket message', data, expectedServer);
       if (data.type === 'request_resend') {
         this.resendMessages(data.from);
-      }
-      else if (data.s < expectedServer) {
+      } else if (data.s < expectedServer) {
         log.debug('[charm ws] ignore old message');
         // Receive a message already received at least once. Ignore.
-      }
-      else if (data.s > expectedServer) {
+      } else if (data.s > expectedServer) {
         // console.log('[charm ws] resend messages');
         // Messages from the server have been lost.
         // Request resend.
-        this.waitForWS().then(() => this.socket.emit(socketEvent, {
-          type: 'request_resend',
-          from: this.messages.server
-        }));
-      }
-      else {
+        this.waitForWS().then(() =>
+          this.socket.emit(socketEvent, {
+            type: 'request_resend',
+            from: this.messages.server
+          })
+        );
+      } else {
         this.messages.server = expectedServer;
         // console.log('handle server message', expectedServer, data, this.messages.client);
         if (data.c === this.messages.client) {
           // console.log('[charm] receive messages');
           this.receive(data);
-        }
-        else if (data.c < this.messages.client) {
+        } else if (data.c < this.messages.client) {
           // console.log('received all messages but server is missing client messages');
           // We have received all server messages, but the server seems
           // to have missed some of the client's messages. They could
@@ -171,7 +175,7 @@ export class WebSocketConnector {
               this.send(this.restartMessage);
               return;
             }
-            this.messages.lastTen.slice(0 - clientDifference).forEach(__data => {
+            this.messages.lastTen.slice(0 - clientDifference).forEach((__data) => {
               this.messages.client += 1;
               const wrappedMessage = {
                 ...__data,
@@ -217,42 +221,36 @@ export class WebSocketConnector {
       //   }
 
       // }
-
     });
 
-    this.socket.on('connect_error', error => {
+    this.socket.on('connect_error', (error) => {
       const errorType = (error as any).type as string;
       if (errorType === 'TransportError') {
         // server is probably restarting
-      }
-      else if ((error as any).code === 'parser error') {
+      } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
-      }
-      else {
+      } else {
         log.warn(`[ws${namespace}] Connection error`, { error });
         this.onError(error);
       }
     });
   }
 
-  waitForWS () {
-    return new Promise<void>(resolve => {
+  waitForWS() {
+    return new Promise<void>((resolve) => {
       if (this.socket.connected) {
         resolve();
-      }
-      else {
-        new Promise<void>(resolveTimer => {
+      } else {
+        new Promise<void>((resolveTimer) => {
           setTimeout(resolveTimer, 100);
-        }).then(
-          () => this.waitForWS()
-        ).then(
-          () => resolve()
-        );
+        })
+          .then(() => this.waitForWS())
+          .then(() => resolve());
       }
     });
   }
 
-  open () {
+  open() {
     const message = this.initialMessage();
     this.oldMessages = this.messagesToSend;
     this.messagesToSend = [];
@@ -265,7 +263,7 @@ export class WebSocketConnector {
     this.send(() => message);
   }
 
-  subscribed () {
+  subscribed() {
     this.connectionCount += 1;
     if (this.connectionCount > 1) {
       this.resubscribed();
@@ -279,7 +277,7 @@ export class WebSocketConnector {
   }
 
   /** Sends data to server or keeps it in a list if currently offline. */
-  send (getData: () => ClientMessage | false, timer = 80) {
+  send(getData: () => ClientMessage | false, timer = 80) {
     // logic from original source: reconnect if not connected anymore
     // if (this.connected && socket.readyState !== socket.OPEN) {
     //   // @ts-ignore
@@ -304,13 +302,12 @@ export class WebSocketConnector {
         this.socket.emit(socketEvent, wrappedMessage);
         this.setRecentlySentTimer(timer);
       });
-    }
-    else {
+    } else {
       this.messagesToSend.push(getData);
     }
   }
 
-  setRecentlySentTimer (timer: number) {
+  setRecentlySentTimer(timer: number) {
     this.recentlySent = true;
     window.setTimeout(() => {
       this.recentlySent = false;
@@ -325,7 +322,7 @@ export class WebSocketConnector {
     }, timer);
   }
 
-  resendMessages (from: number) {
+  resendMessages(from: number) {
     const toSend = this.messages.client - from;
     this.messages.client = from;
     if (toSend > this.messages.lastTen.length) {
@@ -333,7 +330,7 @@ export class WebSocketConnector {
       this.send(this.restartMessage);
       return;
     }
-    this.messages.lastTen.slice(0 - toSend).forEach(data => {
+    this.messages.lastTen.slice(0 - toSend).forEach((data) => {
       this.messages.client += 1;
       data.c = this.messages.client;
       data.s = this.messages.server;
@@ -341,10 +338,9 @@ export class WebSocketConnector {
     });
   }
 
-  receive (data: WrappedServerMessage) {
+  receive(data: WrappedServerMessage) {
     log.debug(`[ws${namespace}] Received event`, data);
     switch (data.type) {
-
       case 'welcome':
         // this.open();
         break;
@@ -359,5 +355,4 @@ export class WebSocketConnector {
         break;
     }
   }
-
 }

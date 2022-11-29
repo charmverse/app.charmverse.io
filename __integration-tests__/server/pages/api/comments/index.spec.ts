@@ -31,9 +31,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/comments - create a comment', () => {
-
   it('should succeed if the user has a comment permission, returning the comment and author, and respond 201', async () => {
-
     const { thread, page } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
@@ -51,11 +49,9 @@ describe('POST /api/comments - create a comment', () => {
       threadId: thread.id
     };
 
-    const createdComment = (await request(baseUrl)
-      .post('/api/comments')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(201)).body as CommentWithUser;
+    const createdComment = (
+      await request(baseUrl).post('/api/comments').set('Cookie', nonAdminCookie).send(creationContent).expect(201)
+    ).body as CommentWithUser;
 
     expect(createdComment).toEqual(
       expect.objectContaining<Partial<CommentWithUser>>({
@@ -66,7 +62,6 @@ describe('POST /api/comments - create a comment', () => {
 
     expect(createdComment.user).toBeDefined();
     expect(createdComment.user.id).toBe(nonAdminUser.id);
-
   });
 
   it('should fail if the user does not have a comment permission, even if they are an admin, and respond 401', async () => {
@@ -81,12 +76,6 @@ describe('POST /api/comments - create a comment', () => {
       threadId: thread.id
     };
 
-    await request(baseUrl)
-      .post('/api/comments')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(401);
-
+    await request(baseUrl).post('/api/comments').set('Cookie', nonAdminCookie).send(creationContent).expect(401);
   });
-
 });

@@ -11,7 +11,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getVotes);
 
-async function getVotes (req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
+async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const pageId = req.query.id as string;
 
   const computed = await computeUserPagePermissions({

@@ -12,8 +12,7 @@ export interface TweetNodeAttrs {
 }
 
 // a function to extract user screen name and tweet id from a tweet url
-export function extractTweetAttrs (url: string): TweetNodeAttrs | null {
-
+export function extractTweetAttrs(url: string): TweetNodeAttrs | null {
   if (!url) {
     return null;
   }
@@ -30,7 +29,7 @@ export function extractTweetAttrs (url: string): TweetNodeAttrs | null {
 
 // inject a tweet node when pasting twitter url
 
-export function plugins () {
+export function plugins() {
   return [
     NodeView.createPlugin({
       name: 'tweet',
@@ -53,17 +52,15 @@ export function plugins () {
   ];
 }
 
-export function spec (): RawSpecs {
+export function spec(): RawSpecs {
   return {
     type: 'node',
     name,
     markdown: {
       toMarkdown: (state, node) => {
-
         const { screenName, id } = node.attrs as TweetNodeAttrs;
 
         if (screenName && id) {
-
           const toRender = `Embedded Twitter Url: https://twitter.com/${screenName}/status/${id}`;
 
           // Ensure markdown html will be separated by newlines

@@ -1,15 +1,11 @@
-
-import {
-  MjmlText,
-  MjmlImage
-} from 'mjml-react';
+import { MjmlText, MjmlImage } from 'mjml-react';
 import React from 'react';
-import { } from 'theme/colors';
+import {} from 'theme/colors';
 
 const domain = process.env.DOMAIN;
 const logoImagePath = '/images/charmverse_logo_sm_black.png';
 
-export default function Header () {
+export default function Header() {
   return (
     <MjmlImage
       align='left'

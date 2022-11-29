@@ -8,8 +8,13 @@ import { getApplication } from '../getApplication';
 import type { ApplicationActionRequest } from '../interfaces';
 import { submissionsCapReached } from '../shared';
 
-export async function approveApplication ({ applicationOrApplicationId, userId }: ApplicationActionRequest): Promise<Application> {
-  const application = await getApplication(typeof applicationOrApplicationId === 'string' ? applicationOrApplicationId : applicationOrApplicationId.id);
+export async function approveApplication({
+  applicationOrApplicationId,
+  userId
+}: ApplicationActionRequest): Promise<Application> {
+  const application = await getApplication(
+    typeof applicationOrApplicationId === 'string' ? applicationOrApplicationId : applicationOrApplicationId.id
+  );
 
   if (!application) {
     throw new DataNotFoundError(`Application with id ${applicationOrApplicationId} was not found`);
@@ -24,10 +29,12 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
   }
 
   if (capReached) {
-    throw new LimitReachedError(`This application cannot be approved as the limit of active submissions of ${bounty.maxSubmissions} has been reached.`);
+    throw new LimitReachedError(
+      `This application cannot be approved as the limit of active submissions of ${bounty.maxSubmissions} has been reached.`
+    );
   }
 
-  const updated = await prisma.application.update({
+  const updated = (await prisma.application.update({
     where: {
       id: application.id
     },
@@ -35,7 +42,7 @@ export async function approveApplication ({ applicationOrApplicationId, userId }
       status: 'inProgress',
       acceptedBy: userId
     }
-  }) as Application;
+  })) as Application;
 
   return updated;
 }

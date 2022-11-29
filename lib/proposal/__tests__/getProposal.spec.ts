@@ -20,7 +20,6 @@ describe('getProposal', () => {
     });
 
     expect(proposal).toMatchObject(pageWithProposal);
-
   });
 
   it('should throw an error if the proposal does not exist', async () => {

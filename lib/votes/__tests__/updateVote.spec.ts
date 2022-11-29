@@ -7,7 +7,7 @@ import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testin
 
 import { updateVote } from '../updateVote';
 
-async function setupVoteData (params?: { context?: VoteContext, status?: VoteStatus }) {
+async function setupVoteData(params?: { context?: VoteContext; status?: VoteStatus }) {
   const { status = 'InProgress', context = 'inline' } = params ?? {};
   const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -48,7 +48,7 @@ describe('updateVote', () => {
     expect(updatedVote.status).toBe('Cancelled');
   });
 
-  it('should throw error if vote doesn\'t exist', async () => {
+  it("should throw error if vote doesn't exist", async () => {
     await expect(updateVote(v4(), v4(), 'Cancelled')).rejects.toBeInstanceOf(DataNotFoundError);
   });
 

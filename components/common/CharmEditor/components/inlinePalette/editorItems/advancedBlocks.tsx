@@ -12,32 +12,27 @@ import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
 const iconSize = 30;
 
-function createColumnPaletteItem (colCount: number): PaletteItemTypeNoGroup {
+function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
   return {
     uid: `column ${colCount}`,
     title: `${colCount} Columns`,
-    icon: <ViewColumnIcon
-      sx={{ fontSize: iconSize }}
-    />,
+    icon: <ViewColumnIcon sx={{ fontSize: iconSize }} />,
     description: `${colCount} Column Layout`,
     editorExecuteCommand: () => {
       return (state, dispatch, view) => {
         if (view) {
           rafCommandExec(view!, (_state, _dispatch) => {
-
             const columnBlocks: Node[] = [];
             for (let index = 0; index < colCount; index++) {
               columnBlocks.push(
-                _state.schema.nodes.columnBlock.create(undefined, Fragment.fromArray([
-                  _state.schema.nodes.paragraph.create()
-                ]))
+                _state.schema.nodes.columnBlock.create(
+                  undefined,
+                  Fragment.fromArray([_state.schema.nodes.paragraph.create()])
+                )
               );
             }
 
-            const node = _state.schema.nodes.columnLayout.create(
-              undefined,
-              Fragment.fromArray(columnBlocks)
-            );
+            const node = _state.schema.nodes.columnLayout.create(undefined, Fragment.fromArray(columnBlocks));
 
             if (_dispatch && isAtBeginningOfLine(_state)) {
               let tr = _state.tr;
@@ -54,27 +49,26 @@ function createColumnPaletteItem (colCount: number): PaletteItemTypeNoGroup {
             return insertNode(_state, _dispatch, node);
           });
         }
-        return replaceSuggestionMarkWith(palettePluginKey, '')(
-          state,
-          dispatch,
-          view
-        );
+        return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
       };
     }
   };
 }
 
-export function items (): PaletteItemTypeNoGroup[] {
+export function items(): PaletteItemTypeNoGroup[] {
   return [
     createColumnPaletteItem(2),
     createColumnPaletteItem(3),
     {
       uid: 'code',
       title: 'Code',
-      icon: <CodeIcon sx={{
-        fontSize: iconSize
-      }}
-      />,
+      icon: (
+        <CodeIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
       description: 'Insert a code block in the line below',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
@@ -83,17 +77,14 @@ export function items (): PaletteItemTypeNoGroup[] {
               if (isAtBeginningOfLine(_state)) {
                 return setBlockType(_state.schema.nodes.codeBlock, { language: 'Javascript' })(_state, _dispatch);
               }
-              return insertNode(_state, _dispatch, state.schema.nodes.codeBlock.create(
-                { language: 'Javascript' },
-                Fragment.fromArray([])
-              ));
+              return insertNode(
+                _state,
+                _dispatch,
+                state.schema.nodes.codeBlock.create({ language: 'Javascript' }, Fragment.fromArray([]))
+              );
             });
           }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
     }

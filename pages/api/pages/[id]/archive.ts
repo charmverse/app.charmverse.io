@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,21 +13,24 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys(['archive'], 'body'))
   .put(togglePageArchiveStatus);
 
-async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
+async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
   const { archive } = req.body as { archive: boolean };
   const userId = req.session.user.id;
 
-  const pageSpaceId = await prisma.page.findUnique({ where: {
-    id: pageId
-  },
-  select: {
-    spaceId: true
-  } });
+  const pageSpaceId = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      spaceId: true
+    }
+  });
 
   if (!pageSpaceId) {
     throw new PageNotFoundError(pageId);
@@ -90,10 +92,13 @@ async function togglePageArchiveStatus (req: NextApiRequest, res: NextApiRespons
 
   const deletedAt = archive ? new Date() : null;
 
-  relay.broadcast({
-    type: 'pages_meta_updated',
-    payload: modifiedChildPageIds.map(id => ({ id, deletedAt, spaceId: pageSpaceId.spaceId }))
-  }, pageSpaceId.spaceId);
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId }))
+    },
+    pageSpaceId.spaceId
+  );
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
 }

@@ -16,23 +16,18 @@ type Props = {
   address: string;
   decimals?: number;
   sx?: any;
-}
+};
 
-export default function CopyableAddress ({ address, decimals = 3, ...rest }: Props) {
+export default function CopyableAddress({ address, decimals = 3, ...rest }: Props) {
   const [copied, setCopied] = useState(false);
 
-  function onCopy () {
+  function onCopy() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
   return (
-    <Tooltip
-      placement='top'
-      title={copied ? 'Copied' : `Click to copy: ${address}`}
-      disableInteractive
-      arrow
-    >
+    <Tooltip placement='top' title={copied ? 'Copied' : `Click to copy: ${address}`} disableInteractive arrow>
       <span>
         <CopyToClipboard text={address} onCopy={onCopy}>
           <StyledButton onClick={onCopy} variant='text' {...rest}>

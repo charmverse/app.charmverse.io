@@ -1,7 +1,4 @@
 import Mention from './Mention';
 import MentionSuggest from './MentionSuggest';
 
-export {
-  Mention,
-  MentionSuggest
-};
+export { Mention, MentionSuggest };

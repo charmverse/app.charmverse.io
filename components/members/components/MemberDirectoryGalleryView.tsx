@@ -10,7 +10,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
+import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SocialIcons } from 'components/profile/components/UserDetails/SocialIcons';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -35,11 +35,7 @@ const StyledLink = styled(Link)`
   position: relative;
 `;
 
-function MemberDirectoryGalleryCard ({
-  member
-}: {
-  member: Member;
-}) {
+function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { properties = [] } = useMemberProperties();
   const propertiesRecord = properties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
@@ -61,7 +57,7 @@ function MemberDirectoryGalleryCard ({
     mutateMembers();
   };
 
-  const social = member.profile?.social as Social ?? {};
+  const social = (member.profile?.social as Social) ?? {};
   return (
     <>
       <StyledLink
@@ -78,9 +74,13 @@ function MemberDirectoryGalleryCard ({
                 e.stopPropagation();
                 setIsModalOpen(true);
               }}
-              style={!admin ? {
-                opacity: 1
-              } : {}}
+              style={
+                !admin
+                  ? {
+                      opacity: 1
+                    }
+                  : {}
+              }
             >
               <EditIcon fontSize='small' />
             </IconButton>
@@ -97,75 +97,87 @@ function MemberDirectoryGalleryCard ({
           <Stack p={2} gap={1}>
             {!isNameHidden && (
               <Typography gutterBottom variant='h6' mb={0} component='div'>
-                {member.properties.find(memberProperty => memberProperty.memberPropertyId === propertiesRecord.name?.id)?.value ?? member.username}
+                {member.properties.find(
+                  (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
+                )?.value ?? member.username}
               </Typography>
             )}
-            <SocialIcons
-              gap={1}
-              social={social}
-              showDiscord={!isDiscordHidden}
-              showTwitter={!isTwitterHidden}
-            />
-            {properties.map(property => {
-              const memberProperty = member.properties.find(mp => mp.memberPropertyId === property.id);
+            <SocialIcons gap={1} social={social} showDiscord={!isDiscordHidden} showTwitter={!isTwitterHidden} />
+            {properties.map((property) => {
+              const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);
               const hiddenInGallery = !property.enabledViews.includes('gallery');
               if (hiddenInGallery) {
                 return null;
               }
               switch (property.type) {
                 case 'bio': {
-                  return member.profile?.description && (
-                    <Stack key={property.id}>
-                      <Typography fontWeight='bold' variant='subtitle2'>Bio</Typography>
-                      <Typography
-                        sx={{
-                          wordBreak: 'break-word'
-                        }}
-                        variant='body2'
-                      >{member.profile?.description}
-                      </Typography>
-                    </Stack>
+                  return (
+                    member.profile?.description && (
+                      <Stack key={property.id}>
+                        <Typography fontWeight='bold' variant='subtitle2'>
+                          Bio
+                        </Typography>
+                        <Typography
+                          sx={{
+                            wordBreak: 'break-word'
+                          }}
+                          variant='body2'
+                        >
+                          {member.profile?.description}
+                        </Typography>
+                      </Stack>
+                    )
                   );
                 }
 
                 case 'join_date': {
                   return (
                     <Stack key={property.id}>
-                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{humanFriendlyDate(member.joinDate, {
-                        withYear: true
-                      })}
+                      <Typography fontWeight='bold' variant='subtitle2'>
+                        {property.name}
+                      </Typography>
+                      <Typography variant='body2'>
+                        {humanFriendlyDate(member.joinDate, {
+                          withYear: true
+                        })}
                       </Typography>
                     </Stack>
                   );
                 }
                 case 'role': {
-                  return member.roles.length !== 0 && (
-                    <Stack gap={0.5} key={property.id}>
-                      <Typography fontWeight='bold' variant='subtitle2'>Role</Typography>
-                      <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                        {member.roles.map(role => <Chip label={role.name} key={role.id} size='small' variant='outlined' />)}
+                  return (
+                    member.roles.length !== 0 && (
+                      <Stack gap={0.5} key={property.id}>
+                        <Typography fontWeight='bold' variant='subtitle2'>
+                          Role
+                        </Typography>
+                        <Stack gap={1} flexDirection='row' flexWrap='wrap'>
+                          {member.roles.map((role) => (
+                            <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                          ))}
+                        </Stack>
                       </Stack>
-                    </Stack>
+                    )
                   );
                 }
                 case 'timezone': {
-                  return member.profile?.timezone && (
-                    <Stack flexDirection='row' gap={1} key={property.id}>
-                      <TimezoneDisplay
-                        showTimezone
-                        timezone={member.profile.timezone}
-                      />
-                    </Stack>
+                  return (
+                    member.profile?.timezone && (
+                      <Stack flexDirection='row' gap={1} key={property.id}>
+                        <TimezoneDisplay showTimezone timezone={member.profile.timezone} />
+                      </Stack>
+                    )
                   );
                 }
                 case 'text_multiline': {
-                  return memberProperty?.value && (
-                    <MemberPropertyTextMultiline
-                      key={property.id}
-                      label={property.name}
-                      value={memberProperty.value as string}
-                    />
+                  return (
+                    memberProperty?.value && (
+                      <MemberPropertyTextMultiline
+                        key={property.id}
+                        label={property.name}
+                        value={memberProperty.value as string}
+                      />
+                    )
                   );
                 }
                 case 'text':
@@ -173,31 +185,33 @@ function MemberDirectoryGalleryCard ({
                 case 'email':
                 case 'url':
                 case 'number': {
-                  return memberProperty?.value && (
-                    <Stack
-                      key={property.id}
-                      sx={{
-                        wordBreak: 'break-word'
-                      }}
-                    >
-                      <Typography fontWeight='bold' variant='subtitle2'>{property.name}</Typography>
-                      <Typography variant='body2'>{memberProperty.value}</Typography>
-                    </Stack>
+                  return (
+                    memberProperty?.value && (
+                      <Stack
+                        key={property.id}
+                        sx={{
+                          wordBreak: 'break-word'
+                        }}
+                      >
+                        <Typography fontWeight='bold' variant='subtitle2'>
+                          {property.name}
+                        </Typography>
+                        <Typography variant='body2'>{memberProperty.value}</Typography>
+                      </Stack>
+                    )
                   );
                 }
                 case 'select':
                 case 'multiselect': {
-                  return memberProperty
-                    ? (
-                      <SelectPreview
-                        size='small'
-                        options={property.options as SelectOptionType[]}
-                        value={memberProperty.value as (string | string[])}
-                        name={property.name}
-                        key={property.id}
-                      />
-                    )
-                    : null;
+                  return memberProperty ? (
+                    <SelectPreview
+                      size='small'
+                      options={property.options as SelectOptionType[]}
+                      value={memberProperty.value as string | string[]}
+                      name={property.name}
+                      key={property.id}
+                    />
+                  ) : null;
                 }
 
                 default: {
@@ -209,7 +223,7 @@ function MemberDirectoryGalleryCard ({
         </Card>
       </StyledLink>
       {isModalOpen && user && currentSpace && (
-        <MemberPropertiesPopupForm
+        <MemberPropertiesPopup
           onClose={() => {
             setIsModalOpen(false);
           }}
@@ -222,14 +236,10 @@ function MemberDirectoryGalleryCard ({
   );
 }
 
-export function MemberDirectoryGalleryView ({
-  members
-}: {
-  members: Member[];
-}) {
+export function MemberDirectoryGalleryView({ members }: { members: Member[] }) {
   return (
     <Grid container gap={2.5}>
-      {members.map(member => (
+      {members.map((member) => (
         <Grid item xs={12} sm={5} md={3.75} key={member.id}>
           <MemberDirectoryGalleryCard member={member} />
         </Grid>

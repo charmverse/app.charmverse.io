@@ -1,4 +1,3 @@
-
 import type { Role, Space, SpaceRole, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -27,7 +26,7 @@ beforeAll(async () => {
         }
       },
       updatedBy: user.id,
-      updatedAt: (new Date()).toISOString()
+      updatedAt: new Date().toISOString()
     }
   });
 
@@ -41,23 +40,23 @@ beforeAll(async () => {
         }
       },
       updatedBy: user.id,
-      updatedAt: (new Date()).toISOString()
+      updatedAt: new Date().toISOString()
     }
   });
 
-  userSpaceRole1 = await prisma.spaceRole.create({
+  userSpaceRole1 = (await prisma.spaceRole.create({
     data: {
       userId: user.id,
       spaceId: space1.id
     }
-  }) as SpaceRole;
+  })) as SpaceRole;
 
-  userSpaceRole2 = await prisma.spaceRole.create({
+  userSpaceRole2 = (await prisma.spaceRole.create({
     data: {
       userId: user.id,
       spaceId: space2.id
     }
-  }) as SpaceRole;
+  })) as SpaceRole;
 
   space1guildRole1 = await prisma.role.create({
     data: {
@@ -136,11 +135,14 @@ it('Should correctly update guild roles for space', async () => {
   jest.mock('@guildxyz/sdk', () => ({
     user: {
       getMemberships: () => {
-        return [{
-          roleids: ['S1GR1']
-        }, {
-          roleids: ['S2GR1', 'S2GR2']
-        }];
+        return [
+          {
+            roleids: ['S1GR1']
+          },
+          {
+            roleids: ['S2GR1', 'S2GR2']
+          }
+        ];
       }
     }
   }));
@@ -166,7 +168,10 @@ it('Should correctly update guild roles for space', async () => {
   });
 
   if (profile) {
-    await updateGuildRolesForUser(profile.wallets.map(w => w.address), profile.spaceRoles);
+    await updateGuildRolesForUser(
+      profile.wallets.map((w) => w.address),
+      profile.spaceRoles
+    );
   }
 
   // Check if the roles were created correctly mapped

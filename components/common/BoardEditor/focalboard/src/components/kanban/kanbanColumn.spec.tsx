@@ -7,14 +7,7 @@ import KanbanColumn from './kanbanColumn';
 
 describe('src/components/kanban/kanbanColumn', () => {
   test('should match snapshot', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanColumn
-        onDrop={jest.fn()}
-      >
-        {}
-      </KanbanColumn>
-    ));
+    const { container } = render(wrapDNDIntl(<KanbanColumn onDrop={jest.fn()}>{}</KanbanColumn>));
     expect(container).toMatchSnapshot();
   });
 });
-

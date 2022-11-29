@@ -1,23 +1,23 @@
 import type { Block } from './block';
 
 interface ArchiveHeader {
-    version: number;
-    date: number;
+  version: number;
+  date: number;
 }
 
 interface ArchiveLine {
-    type: string;
-    data: unknown;
+  type: string;
+  data: unknown;
 }
 
 // This schema allows the expansion of additional line types in the future
 interface BlockArchiveLine extends ArchiveLine {
-    type: 'block';
-    data: Block;
+  type: 'block';
+  data: Block;
 }
 
 class ArchiveUtils {
-  static buildBlockArchive (blocks: readonly Block[]): string {
+  static buildBlockArchive(blocks: readonly Block[]): string {
     const header: ArchiveHeader = {
       version: 1,
       date: Date.now()
@@ -38,7 +38,7 @@ class ArchiveUtils {
     return content;
   }
 
-  static parseBlockArchive (contents: string): Block[] {
+  static parseBlockArchive(contents: string): Block[] {
     const blocks: Block[] = [];
     const allLineStrings = contents.split('\n');
     if (allLineStrings.length >= 2) {
@@ -65,13 +65,12 @@ class ArchiveUtils {
               break;
             }
             default:
-              // do nothing
+            // do nothing
           }
 
           lineNum += 1;
         }
-      }
-      else {
+      } else {
         throw new Error('ERROR parsing header');
       }
     }
