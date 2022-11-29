@@ -1,1 +1,1 @@
-export {} from './GnosisTasksList';
+export { GnosisTasksList } from './GnosisTasksList';
