@@ -34,6 +34,7 @@ type SearchResultItem = {
   id: string;
 };
 
+// eslint-disable-next-line prettier/prettier
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
     margintop: 0px;
