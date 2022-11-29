@@ -40,7 +40,7 @@ export default function FilterList() {
               sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
               color='inherit'
             >
-              {category}
+              {category.name}
             </Link>
           ))}
         </Box>
