@@ -35,9 +35,9 @@ export default function FilterList() {
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
           {categories?.map((category) => (
             <Link
-              key={category}
-              href={getLinkUrl(category)}
-              sx={{ fontWeight: category === query.category ? 'bold' : 'initial' }}
+              key={category.name}
+              href={getLinkUrl(category.name)}
+              sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
               color='inherit'
             >
               {category}

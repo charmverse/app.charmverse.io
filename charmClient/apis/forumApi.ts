@@ -17,11 +17,11 @@ export class ForumApi {
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
-    return http.GET(`/api/space/${spaceId}/post-categories`);
+    return http.GET(`/api/spaces/${spaceId}/post-categories`);
   }
 
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
-    return http.POST(`/api/space/${spaceId}/post-categories`, category);
+    return http.POST(`/api/spaces/${spaceId}/post-categories`, category);
   }
 
   updatePostCategory({
@@ -30,10 +30,10 @@ export class ForumApi {
     color,
     name
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
-    return http.PUT(`/api/space/${spaceId}/post-categories/${id}`, { color, name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
   }
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
-    return http.GET(`/api/space/${spaceId}/post-categories/${id}`);
+    return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 }
