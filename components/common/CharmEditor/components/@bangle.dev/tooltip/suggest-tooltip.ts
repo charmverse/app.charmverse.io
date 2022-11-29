@@ -269,8 +269,9 @@ function tooltipController({ key, trigger, markName }: { key: PluginKey; trigger
           }
 
           if (!isMarkActive) {
+            const keyState = key.getState(state);
             // performance optimization to prevent unnecessary dispatches
-            if (key.getState(state).show === true) {
+            if (keyState?.show === true) {
               hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
             }
             return;
@@ -365,14 +366,22 @@ function getTriggerText(state: EditorState, markName: string, trigger?: string) 
 
 export function queryTriggerText(key: PluginKey) {
   return (state: EditorState) => {
-    const { trigger, markName } = key.getState(state);
+    const keyState = key.getState(state);
+    if (!keyState) {
+      return '';
+    }
+    const { trigger, markName } = keyState;
     return getTriggerText(state, markName, trigger);
   };
 }
 
 export function queryIsSuggestTooltipActive(key: PluginKey) {
   return (state: EditorState) => {
-    return key.getState(state) && key.getState(state).show;
+    const keyState = key.getState(state);
+    if (keyState) {
+      return keyState.show;
+    }
+    return false;
   };
 }
 
