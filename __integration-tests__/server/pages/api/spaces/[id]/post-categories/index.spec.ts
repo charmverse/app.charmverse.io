@@ -71,7 +71,7 @@ describe('POST /api/spaces/[id]/post-categories - Create a post category', () =>
     expect(postCategory.color).toBeDefined();
   });
 
-  it('should fail to create the post category if the user is not a space admin, responding with 200', async () => {
+  it('should fail to create the post category if the user is not a space admin, responding with 401', async () => {
     const userCookie = await loginUser(firstSpaceUser.id);
 
     const createInput: Partial<CreatePostCategoryInput> = {
