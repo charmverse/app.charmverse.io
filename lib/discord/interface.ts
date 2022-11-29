@@ -13,3 +13,8 @@ export interface DiscordServerRole {
     integration_id?: string;
   }[];
 }
+
+export type CheckDiscordGateResult = {
+  hasDiscordServer: boolean;
+  isEligible: boolean;
+};

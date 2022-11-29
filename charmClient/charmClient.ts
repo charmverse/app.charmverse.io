@@ -17,6 +17,7 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
+import { DiscordApi } from 'charmClient/apis/discordApi';
 import { PagesApi } from 'charmClient/apis/pagesApi';
 import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -52,8 +53,6 @@ import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser, PageContent } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
-import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
-import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -96,6 +95,8 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  discord = new DiscordApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
@@ -279,18 +280,6 @@ class CharmClient {
 
   disconnectTelegram() {
     return http.POST<User>('/api/telegram/disconnect');
-  }
-
-  disconnectDiscord() {
-    return http.POST<User>('/api/discord/disconnect');
-  }
-
-  connectDiscord(payload: ConnectDiscordPayload) {
-    return http.POST<ConnectDiscordResponse>('/api/discord/connect', payload);
-  }
-
-  importRolesFromDiscordServer(payload: ImportDiscordRolesPayload) {
-    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   importRolesFromGuild(payload: ImportGuildRolesPayload) {

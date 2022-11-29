@@ -92,3 +92,16 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
     body: JSON.stringify({ credentialSubjects: [subject] })
   });
 }
+
+export function canJoinSpaceViaDiscord({
+  discordServerId,
+  discordUserId
+}: {
+  discordServerId: string;
+  discordUserId: string;
+}) {
+  // TODO: collabland api call to check if user can join space
+  // eslint-disable-next-line no-console
+  console.log('🔥 verify discord:', discordServerId, discordUserId);
+  return true;
+}

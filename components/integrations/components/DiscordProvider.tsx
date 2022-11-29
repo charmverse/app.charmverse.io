@@ -46,7 +46,7 @@ export default function DiscordProvider({ children }: Props) {
   function disconnect() {
     setIsDisconnectingDiscord(true);
 
-    return charmClient
+    return charmClient.discord
       .disconnectDiscord()
       .then(() => {
         setUser({ ...user, discordUser: null });
@@ -73,7 +73,7 @@ export default function DiscordProvider({ children }: Props) {
       deleteCookie(AUTH_CODE_COOKIE);
       setIsConnectDiscordLoading(true);
 
-      charmClient
+      charmClient.discord
         .connectDiscord({
           code: authCode
         })
