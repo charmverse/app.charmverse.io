@@ -267,13 +267,15 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               label='Bounties'
               onClick={closeSidebarIfIsMobile}
             />
-            <SidebarLink
+            {/**
+                         <SidebarLink
               href={`/${space.domain}/forum`}
               active={router.pathname.startsWith('/[domain]/forum')}
               icon={<MessageOutlinedIcon fontSize='small' />}
               label='Forum'
               onClick={closeSidebarIfIsMobile}
-            />
+            />  
+                */}
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip
               title={
