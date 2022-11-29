@@ -59,8 +59,8 @@ export default function FilterSelect() {
         <Select value={categoryValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
           <MenuItem value='none'>Select a category</MenuItem>
           {categories?.map((category) => (
-            <MenuItem key={category} value={category}>
-              <Typography>{category}</Typography>
+            <MenuItem key={category.name} value={category.name}>
+              <Typography>{category.name}</Typography>
             </MenuItem>
           ))}
         </Select>

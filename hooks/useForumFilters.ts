@@ -18,8 +18,8 @@ export function useForumFilters() {
   } = useSWR(currentSpace ? '/forum/categories' : null, () => charmClient.forum.listPostCategories(currentSpace!.id));
 
   const getLinkUrl = (value: string) => {
-    const isValidSort = value && sortList.some((btn) => btn === value);
-    const isValidCategory = value && categories?.some((btn) => btn === value);
+    const isValidSort = value && sortList.some((sortOption) => sortOption === value);
+    const isValidCategory = value && categories?.some((category) => category.name === value);
 
     if (isValidSort) {
       return `/${query.domain}/forum/?sort=${value}`;
@@ -33,7 +33,7 @@ export function useForumFilters() {
 
   const handleClick = (value: string) => {
     const isValidSort = value && sortList.some((btn) => btn === value);
-    const isValidCategory = value && categories?.some((btn) => btn === value);
+    const isValidCategory = value && categories?.some((category) => category.name === value);
 
     push(
       {
