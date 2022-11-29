@@ -63,7 +63,11 @@ function getScrollContainer(view: EditorView) {
 
 export function getSuggestTooltipKey(key: PluginKey) {
   return (state: EditorState) => {
-    return key.getState(state).suggestTooltipKey as PluginKey;
+    const pluginState = key.getState(state);
+    if (pluginState) {
+      return pluginState.suggestTooltipKey as PluginKey;
+    }
+    return '';
   };
 }
 
@@ -71,7 +75,10 @@ export function getSuggestTooltipKey(key: PluginKey) {
 export function queryTriggerText(key: PluginKey) {
   return (state: EditorState) => {
     const suggestKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.queryTriggerText(suggestKey)(state);
+    if (suggestKey) {
+      return suggestTooltip.queryTriggerText(suggestKey)(state);
+    }
+    return '';
   };
 }
 
@@ -82,7 +89,9 @@ export function selectEmoji(key: PluginKey, emoji: string): Command {
     });
 
     const suggestKey = getSuggestTooltipKey(key)(state);
-
-    return suggestTooltip.replaceSuggestMarkWith(suggestKey, emojiNode)(state, dispatch, view);
+    if (suggestKey) {
+      return suggestTooltip.replaceSuggestMarkWith(suggestKey, emojiNode)(state, dispatch, view);
+    }
+    return false;
   };
 }
