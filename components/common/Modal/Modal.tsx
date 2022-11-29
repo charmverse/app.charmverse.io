@@ -38,7 +38,6 @@ const ScrollableModalContainer = styled(ModalContainer)`
 `;
 
 const StyledDialogTitle = styled(MuiDialogTitle)`
-  font-weight: 700;
   padding-left: 0;
   padding-right: 0;
   padding-top: 0;

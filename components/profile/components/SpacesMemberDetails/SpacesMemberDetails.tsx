@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
+import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { SpaceDetailsAccordion } from 'components/profile/components/SpacesMemberDetails/components/SpaceDetailsAccordion';
 import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 
@@ -50,7 +50,7 @@ export function SpacesMemberDetails({ memberId }: Props) {
         />
       ))}
 
-      <MemberPropertiesPopupForm
+      <MemberPropertiesPopup
         onClose={() => setEditSpaceId(null)}
         memberId={memberId}
         spaceId={editSpaceId}
