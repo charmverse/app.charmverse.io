@@ -2,6 +2,7 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
@@ -21,6 +22,7 @@ type Props = {
   isModalOpen: boolean;
   closeModal: () => void;
   openNetworkModal: () => void;
+  setIsConnectingIdentity: (isConnectingIdentity: boolean) => void;
 };
 
 function WalletSelectorModal({
@@ -28,7 +30,8 @@ function WalletSelectorModal({
   setActivatingConnector,
   isModalOpen,
   closeModal,
-  openNetworkModal // Passing as prop to avoid dependency cycle
+  openNetworkModal, // Passing as prop to avoid dependency cycle
+  setIsConnectingIdentity
 }: Props) {
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
@@ -65,6 +68,25 @@ function WalletSelectorModal({
       openNetworkModal();
     }
   }, [error, openNetworkModal, closeModal]);
+
+  const uauth = new UAuth({
+    clientID: '0e8c724d-bbb8-4876-9dc7-ddfb466a3a0f',
+    redirectUri: 'http://localhost:3000',
+    scope: 'openid wallet'
+  });
+
+  async function handleAuth() {
+    setIsConnectingIdentity(true);
+    try {
+      const auth = await uauth.loginWithPopup();
+      closeModal();
+    } catch (err) {
+      // console.log('UD Error', err);
+    } finally {
+      // console.log('Set not connecting identity');
+      setIsConnectingIdentity(false);
+    }
+  }
 
   return (
     <Modal open={isModalOpen} onClose={closeModal}>
@@ -104,6 +126,16 @@ function WalletSelectorModal({
             name='Coinbase Wallet'
             onClick={() => handleConnect(walletLink)}
             iconUrl='coinbasewallet.png'
+            disabled={connector === walletLink || !!activatingConnector}
+            isActive={connector === walletLink}
+            isLoading={activatingConnector === walletLink}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <ConnectorButton
+            name='Unstoppable Domains'
+            onClick={handleAuth}
+            iconUrl='unstoppable-domains.png'
             disabled={connector === walletLink || !!activatingConnector}
             isActive={connector === walletLink}
             isLoading={activatingConnector === walletLink}

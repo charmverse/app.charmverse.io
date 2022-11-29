@@ -112,6 +112,7 @@
     "@types/cookies": "^0.7.7",
     "@types/node": "^17.0.13",
     "@types/uuid": "^8.3.4",
+    "@uauth/js": "^2.4.0",
     "@web3-react/abstract-connector": "^6.0.7",
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
