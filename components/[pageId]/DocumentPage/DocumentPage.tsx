@@ -29,6 +29,7 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
+import PostProperties from './components/PostProperties';
 import { ProposalProperties } from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
@@ -243,6 +244,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
                   )}
+                  {page.postId && <PostProperties pageId={page.id} postId={page.postId} readOnly={readOnly} />}
                   {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}

@@ -48,9 +48,9 @@ export default function FilterSelect() {
     <Box justifyContent='flex-start' flexWrap='wrap'>
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
         <Select disabled={disabled} value={sortValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
-          {sortList.map((property) => (
-            <MenuItem key={property} value={property}>
-              <Typography>{property}</Typography>
+          {sortList.map((sort) => (
+            <MenuItem key={sort} value={sort}>
+              <Typography>{sort}</Typography>
             </MenuItem>
           ))}
         </Select>
@@ -59,7 +59,7 @@ export default function FilterSelect() {
         <Select value={categoryValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
           <MenuItem value='none'>Select a category</MenuItem>
           {categories?.map((category) => (
-            <MenuItem key={category.name} value={category.name}>
+            <MenuItem key={category.id} value={category.name}>
               <Typography>{category.name}</Typography>
             </MenuItem>
           ))}

@@ -22,11 +22,10 @@ const count = 15;
 export default function ForumPosts({ search }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
+  const isVisible = useOnScreen(ref);
   const { query } = useRouter();
   const querySort = query.sort;
   const queryCategory = query.category;
-
-  const isVisible = useOnScreen(ref);
 
   const sortValue = useMemo(() => {
     const defaultValue = 'Most popular';

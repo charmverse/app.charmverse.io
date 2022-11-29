@@ -19,7 +19,7 @@ export default function FilterList() {
   return (
     <Card variant='outlined'>
       <CardContent>
-        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {sortList.map((sort) => (
             <Link
               key={sort}
@@ -32,10 +32,10 @@ export default function FilterList() {
           ))}
         </Box>
         <Divider sx={{ pt: '10px', mb: '10px' }} />
-        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {categories?.map((category) => (
             <Link
-              key={category.name}
+              key={category.id}
               href={getLinkUrl(category.name)}
               sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
               color='inherit'
