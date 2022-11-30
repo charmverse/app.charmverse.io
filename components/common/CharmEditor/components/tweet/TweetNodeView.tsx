@@ -1,17 +1,20 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import TwitterIcon from '@mui/icons-material/Twitter';
 import Script from 'next/script';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import log from 'lib/log';
 
-import BlockAligner from '../../BlockAligner';
-import type { TweetNodeAttrs } from '../tweet';
-import { extractTweetAttrs } from '../tweet';
-import { twitterWidgetJs } from '../twitterJSUrl';
+import BlockAligner from '../BlockAligner';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-import { TweetInput } from './TweetInput';
+import type { TweetNodeAttrs } from './tweetSpec';
+import { extractTweetAttrs } from './tweetSpec';
+
+export const twitterWidgetJs = 'https://platform.twitter.com/widgets.js';
 
 type TweetOptions = {
   theme?: 'dark' | 'light';
@@ -56,22 +59,15 @@ function render(tweetId: string, el: HTMLElement, options: TweetOptions) {
   window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
-export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
+export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
-  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   function onLoadScript() {
     if (ref.current && attrs.id) {
       render(attrs.id, ref.current, { theme: theme.palette.mode });
     }
-  }
-
-  function onDelete() {
-    const start = getPos();
-    const end = start + 1;
-    view.dispatch(view.state.tr.deleteRange(start, end));
   }
 
   // If there are no source for the node, return the image select component
@@ -81,16 +77,19 @@ export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: No
       return <div />;
     } else {
       return (
-        <TweetInput
-          autoOpen={autoOpen}
-          isValid={(url) => extractTweetAttrs(url) !== null}
-          onSubmit={(urlInput) => {
-            const _attrs = extractTweetAttrs(urlInput);
-            if (_attrs) {
-              updateAttrs(_attrs);
-            }
-          }}
-        />
+        <MediaSelectionPopup node={node} icon={<TwitterIcon fontSize='small' />} buttonText='Embed a Tweet'>
+          <MediaUrlInput
+            helperText='Works with links to Tweets'
+            isValid={(url) => extractTweetAttrs(url) !== null}
+            onSubmit={(url) => {
+              const _attrs = extractTweetAttrs(url);
+              if (_attrs) {
+                updateAttrs(_attrs);
+              }
+            }}
+            placeholder='https://twitter.com...'
+          />
+        </MediaSelectionPopup>
       );
     }
   }
@@ -98,7 +97,7 @@ export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: No
   return (
     <>
       <Script src={twitterWidgetJs} onReady={onLoadScript} />
-      <BlockAligner onDelete={onDelete}>
+      <BlockAligner onDelete={deleteNode}>
         <StyledTweet ref={ref} />
       </BlockAligner>
     </>

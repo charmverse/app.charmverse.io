@@ -54,21 +54,26 @@ export function items(): PaletteItemTypeNoGroup[] {
       uid: 'figma',
       title: 'Figma',
       icon: <FiFigma style={{ fontSize: iconSize }} />,
-      keywords: ['iframe'],
       description: 'Embed Figma',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
-              const node = _state.schema.nodes.iframe.create({
-                src: null,
-                type: 'figma',
-                width: MAX_EMBED_WIDTH,
-                height: MIN_EMBED_HEIGHT
-              });
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.iframe.create(
+                {
+                  src: null,
+                  type: 'figma',
+                  width: MAX_EMBED_WIDTH,
+                  height: MIN_EMBED_HEIGHT
+                },
+                undefined,
+                [tooltipMark]
+              );
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);

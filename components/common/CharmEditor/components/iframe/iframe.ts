@@ -40,7 +40,7 @@ export function spec(): RawSpecs {
         height: {
           default: MIN_EMBED_HEIGHT
         },
-        // Type of iframe, it could either be video or embed
+        // Type of iframe, it could either be figma or embed
         type: {
           default: 'embed'
         },
