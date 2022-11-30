@@ -1,7 +1,7 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import * as React from 'react';
 
-import { VIDEO_ASPECT_RATIO, MIN_EMBED_WIDTH } from 'lib/embed/constants';
+import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
 import BlockAligner from '../BlockAligner';
 import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
@@ -10,13 +10,13 @@ import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
+import { extractYoutubeEmbedLink, VIDEO_ASPECT_RATIO } from './videoSpec';
 import type { VideoNodeAttrs } from './videoSpec';
 
 export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
-  const attrs = node.attrs as Partial<VideoNodeAttrs>;
-
+  const attrs = node.attrs as VideoNodeAttrs;
   // If there are no source for the node, return the image select component
-  if (!attrs.url && !attrs.muxId) {
+  if (!attrs.src && !attrs.muxId) {
     if (readOnly) {
       // hide the row completely
       return <div />;
@@ -26,7 +26,7 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
           <EmbeddedUrl
             onSubmit={(videoUrl) => {
               updateAttrs({
-                url: videoUrl
+                src: videoUrl
               });
             }}
             placeholder='https://youtube.com...'
@@ -35,11 +35,12 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       );
     }
   }
-  if (attrs.url) {
+  if (attrs.src) {
+    const embedUrl = extractYoutubeEmbedLink(attrs.src) || attrs.src;
     return (
       <Resizable
         aspectRatio={VIDEO_ASPECT_RATIO}
-        initialSize={node.attrs.width}
+        initialSize={attrs.width}
         minWidth={MIN_EMBED_WIDTH}
         updateAttrs={(args) => {
           updateAttrs({ width: args.size });
@@ -51,7 +52,7 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
           <iframe
             allowFullScreen
             title='iframe'
-            src={node.attrs.src}
+            src={embedUrl}
             style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
           />
         </IframeContainer>

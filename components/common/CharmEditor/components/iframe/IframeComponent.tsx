@@ -2,7 +2,6 @@ import type { RawSpecs } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
 import type { Node } from 'prosemirror-model';
 import type { HTMLAttributes } from 'react';
@@ -17,6 +16,7 @@ import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweet';
+import { extractYoutubeLinkType } from '../video/videoSpec';
 
 import type { IFrameSelectorProps } from './IFrameSelector';
 import IFrameSelector from './IFrameSelector';
@@ -116,8 +116,6 @@ function EmptyIframeContainer(
           switch (type) {
             case 'embed':
               return <PreviewIcon fontSize='small' />;
-            case 'video':
-              return <VideoLibraryIcon fontSize='small' />;
             case 'figma':
               return <FiFigma style={{ fontSize: 'small' }} />;
 
@@ -130,8 +128,6 @@ function EmptyIframeContainer(
             switch (type) {
               case 'embed':
                 return 'Insert an embed';
-              case 'video':
-                return 'Insert a video';
               case 'figma':
                 return 'Insert a Figma';
 
@@ -159,14 +155,19 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
       <IFrameSelector
         autoOpen={autoOpen}
         type={node.attrs.type}
-        onIFrameSelect={(videoLink) => {
-          const tweetAttrs = extractTweetAttrs(videoLink);
-          if (tweetAttrs) {
+        onIFrameSelect={(urlToEmbed) => {
+          const tweetAttrs = extractTweetAttrs(urlToEmbed);
+          const isYoutube = extractYoutubeLinkType(urlToEmbed);
+          if (isYoutube) {
             const pos = getPos();
-            const tweetNode = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, tweetNode));
+            const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
+            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+          } else if (tweetAttrs) {
+            const pos = getPos();
+            const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
+            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           } else {
-            const attrs = extractEmbedLink(videoLink);
+            const attrs = extractEmbedLink(urlToEmbed);
             updateAttrs({
               src: attrs.url,
               type: attrs.type

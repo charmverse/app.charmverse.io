@@ -169,8 +169,7 @@ function ResizablePDF({
   onResizeStop,
   node,
   updateAttrs,
-  selected,
-  view
+  selected
 }: NodeViewProps & { readOnly?: boolean; onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 

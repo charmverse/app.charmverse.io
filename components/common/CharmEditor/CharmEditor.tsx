@@ -75,6 +75,7 @@ import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
 import { TweetComponent } from './components/tweet/components/Tweet';
 import * as tweet from './components/tweet/tweet';
+import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
@@ -221,7 +222,8 @@ export function charmEditorPlugins({
     table.TableFiltersMenu(),
     disclosure.plugins(),
     tweet.plugins(),
-    trailingNode.plugins()
+    trailingNode.plugins(),
+    videoPlugins()
   ];
 
   if (!readOnly) {
@@ -571,6 +573,10 @@ function CharmEditor({
             return <ResizableImage {...allProps} />;
           }
           case 'iframe': {
+            // support old video nodes which piggybacked on iframe type
+            if (props.node.attrs.type === 'video') {
+              return <VideoNodeView {...allProps} />;
+            }
             return <iframe.Component {...allProps} />;
           }
           case 'mention': {
