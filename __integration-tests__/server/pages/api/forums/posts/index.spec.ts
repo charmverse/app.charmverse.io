@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Post, PostCategory, Prisma, Space, User } from '@prisma/client';
+import type { Post, PostCategory, Space, User } from '@prisma/client';
 import request from 'supertest';
 
-import { prisma } from 'db';
-import type { ForumPostPage } from 'lib/forum/interfaces';
+import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
-import { createPostCategory } from 'lib/posts/createPostCategory';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -35,7 +32,7 @@ beforeAll(async () => {
   });
 });
 
-describe('POST /api/forums/posts - Create a post category', () => {
+describe('POST /api/forums/posts - Create a post', () => {
   it('should create a draft post if the user is a space member (even if no space permissions to create pages exist), and return the post, responding with 201', async () => {
     const userCookie = await loginUser(firstSpaceUser.id);
 
