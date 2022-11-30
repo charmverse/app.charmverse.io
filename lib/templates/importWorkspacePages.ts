@@ -115,6 +115,7 @@ export async function generateImportWorkspacePages({
       parentId,
       bountyId,
       blocks,
+      postId,
       ...pageWithoutJoins
     } = node;
 

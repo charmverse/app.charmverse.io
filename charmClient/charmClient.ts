@@ -65,6 +65,7 @@ import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
+import { ForumApi } from './apis/forumApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
@@ -96,6 +97,8 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  forum = new ForumApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
