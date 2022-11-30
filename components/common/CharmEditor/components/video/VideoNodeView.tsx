@@ -1,4 +1,5 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import MuxVideo from '@mux/mux-video-react';
 import * as React from 'react';
 
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
@@ -35,6 +36,23 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
         </MediaSelectionPopup>
       );
     }
+  }
+  if (true) {
+    return (
+      <MuxVideo
+        style={{ height: '100%', maxWidth: '100%' }}
+        playbackId='DS00Spx1CV902MCtPj5WknGlR102V5HFkDe'
+        metadata={{
+          video_id: 'video-id-123456'
+          // video_title: 'Super Interesting Video',
+          // viewer_user_id: 'user-id-bc-789'
+        }}
+        streamType='on-demand'
+        controls
+        autoPlay
+        muted
+      />
+    );
   }
   if (attrs.src) {
     const embedUrl = extractYoutubeEmbedLink(attrs.src) || attrs.src;
