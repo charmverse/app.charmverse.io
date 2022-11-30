@@ -1,4 +1,3 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItem } from '@mui/material';
