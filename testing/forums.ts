@@ -9,13 +9,17 @@ export async function generateForumPosts({
   spaceId,
   createdBy,
   categoryId,
-  content
+  content = { type: 'doc', content: [] },
+  contentText = '',
+  galleryImage
 }: {
   spaceId: string;
   createdBy: string;
   count: number;
   categoryId?: string;
   content?: any;
+  contentText?: string;
+  galleryImage?: string;
 }): Promise<ForumPostPage[]> {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
@@ -32,14 +36,15 @@ export async function generateForumPosts({
     pageCreateInputs.push({
       id: postInput.id,
       spaceId,
-      contentText: '',
+      contentText,
       content,
       title: `Post ${i}`,
       createdBy,
       updatedBy: createdBy,
       type: 'post',
-      path: `-${v4()}`,
-      postId: postInput.id
+      path: `path-${v4()}`,
+      postId: postInput.id,
+      galleryImage
     });
   }
 

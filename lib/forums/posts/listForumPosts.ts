@@ -1,22 +1,24 @@
 import type { Prisma } from '@prisma/client';
-import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
-import type { PaginatedQuery, PaginatedResponse } from 'lib/public-api';
+import type { PaginatedResponse } from 'lib/public-api';
 
 import type { ForumPostPage } from './interfaces';
 
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList = Required<PaginatedResponse<ForumPostPage> & { cursor: number }>;
+export type PaginatedPostList<T = Record<string, unknown>> = Required<
+  PaginatedResponse<ForumPostPage> & { cursor: number }
+> &
+  T;
 
 /**
  * @sort ignored for now - the server sorts posts by most recent
  */
 export interface ListForumPostsRequest {
   spaceId: string;
-  categoryIds?: string[] | null;
+  categoryIds?: string | string[] | null;
   page?: number;
   count?: number;
   sort?: string;
@@ -30,6 +32,14 @@ export async function listForumPosts({
   count = defaultPostsPerResult,
   categoryIds
 }: ListForumPostsRequest): Promise<PaginatedPostList> {
+  // Fix string input values
+  page = typeof page === 'string' ? parseInt(page) : page;
+  count = typeof count === 'string' ? parseInt(count) : count;
+
+  if (typeof categoryIds === 'string') {
+    categoryIds = [categoryIds];
+  }
+
   // Avoid page being less than 0
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
