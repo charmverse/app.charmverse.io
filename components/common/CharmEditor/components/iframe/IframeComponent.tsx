@@ -13,7 +13,7 @@ import { EmbeddedUrl } from '../common/EmbeddedUrl';
 import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
-import { extractTweetAttrs } from '../tweet/tweet';
+import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/videoSpec';
 
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
