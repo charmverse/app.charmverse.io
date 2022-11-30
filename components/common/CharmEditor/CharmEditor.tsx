@@ -523,6 +523,7 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           onResizeStop,
+          pageId,
           readOnly,
           deleteNode: () => {
             const view = props.view;

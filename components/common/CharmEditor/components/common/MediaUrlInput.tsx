@@ -14,7 +14,7 @@ export function MediaUrlInput(props: InputProps) {
   const [embedUrl, setEmbedUrl] = useState('');
 
   return (
-    <Box display='flex' flexDirection='column' gap={2} py={2} alignItems='center'>
+    <Box display='flex' flexDirection='column' gap={2} alignItems='center'>
       <TextField
         autoFocus
         placeholder={props.placeholder}

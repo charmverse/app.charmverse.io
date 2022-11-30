@@ -1,6 +1,10 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
+import { useEffect, useState } from 'react';
+import useSwr from 'swr';
 
+import charmClient from 'charmClient';
+import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
@@ -14,12 +18,33 @@ import Resizable from '../Resizable';
 import { extractYoutubeEmbedLink } from './utils';
 import { VIDEO_ASPECT_RATIO } from './videoSpec';
 import type { VideoNodeAttrs } from './videoSpec';
+import { VideoUploadForm } from './VideoUploadForm';
 
-export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
+export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
 
-  // for testing
-  // attrs.muxId = 'DS00Spx1CV902MCtPj5WknGlR102V5HFkDe';
+  const [playbackId, setPlaybackId] = useState<string | null>(null);
+
+  // poll endpoint until video is ready
+  const { data: asset, error } = useSwr(
+    () => (attrs.muxId && !playbackId ? `/api/mux/asset/${attrs.muxId}` : null),
+    () => {
+      return charmClient.mux.getAsset({ id: attrs.muxId!, pageId });
+    },
+    {
+      refreshInterval: 5000
+    }
+  );
+
+  useEffect(() => {
+    if (asset && asset.playbackId && asset.status === 'ready') {
+      setPlaybackId(asset.playbackId);
+    }
+  }, [asset]);
+
+  async function onUploadComplete(muxId: string) {
+    updateAttrs({ muxId });
+  }
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxId) {
@@ -48,18 +73,7 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
                   placeholder='https://youtube.com...'
                 />
               ],
-              [
-                'Upload',
-                <MediaUrlInput
-                  key='upload'
-                  onSubmit={(videoUrl) => {
-                    updateAttrs({
-                      src: videoUrl
-                    });
-                  }}
-                  placeholder='https://youtube.com...'
-                />
-              ]
+              ['Upload', <VideoUploadForm key='upload' onComplete={onUploadComplete} pageId={pageId} />]
             ]}
           />
         </MediaSelectionPopup>
@@ -67,22 +81,26 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
     }
   }
   if (attrs.muxId) {
-    return (
-      <BlockAligner onDelete={deleteNode}>
-        <MuxVideo
-          style={{ height: '100%', maxWidth: '100%' }}
-          playbackId={attrs.muxId}
-          // for analytics
-          // metadata={{
-          //   video_id: 'video-id-123456'
-          //   video_title: 'Super Interesting Video',
-          //   viewer_user_id: 'user-id-bc-789'
-          // }}
-          streamType='on-demand'
-          controls
-        />
-      </BlockAligner>
-    );
+    if (playbackId) {
+      return (
+        <BlockAligner onDelete={deleteNode}>
+          <MuxVideo
+            style={{ height: '100%', maxWidth: '100%' }}
+            playbackId={playbackId}
+            // for analytics
+            // metadata={{
+            //   video_id: 'video-id-123456'
+            //   video_title: 'Super Interesting Video',
+            //   viewer_user_id: 'user-id-bc-789'
+            // }}
+            streamType='on-demand'
+            controls
+          />
+        </BlockAligner>
+      );
+    } else {
+      return <LoadingComponent minHeight={200} isLoading={true} label='Video is processing...' />;
+    }
   } else if (attrs.src) {
     const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (

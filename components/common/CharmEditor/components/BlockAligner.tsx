@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItem } from '@mui/material';
+import { ListItemButton } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo, forwardRef } from 'react';
 
@@ -41,9 +41,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
     <StyledBlockAligner draggable={false}>
       {children}
       <Controls className='controls'>
-        <ListItem
-          button
-          disableRipple
+        <ListItemButton
           onClick={onDelete}
           sx={{
             padding: 1,
@@ -51,7 +49,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
           }}
         >
           <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
-        </ListItem>
+        </ListItemButton>
       </Controls>
     </StyledBlockAligner>
   );

@@ -77,7 +77,12 @@ export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: Charm
       return <div />;
     } else {
       return (
-        <MediaSelectionPopup node={node} icon={<TwitterIcon fontSize='small' />} buttonText='Embed a Tweet'>
+        <MediaSelectionPopup
+          node={node}
+          icon={<TwitterIcon fontSize='small' />}
+          buttonText='Embed a Tweet'
+          onDelete={deleteNode}
+        >
           <MediaUrlInput
             helperText='Works with links to Tweets'
             isValid={(url) => extractTweetAttrs(url) !== null}
