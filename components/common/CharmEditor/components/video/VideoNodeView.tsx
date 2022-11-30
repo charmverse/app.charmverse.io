@@ -1,6 +1,5 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
-import * as React from 'react';
 
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
@@ -57,8 +56,8 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
         />
       </BlockAligner>
     );
-  } else {
-    const embedUrl = extractYoutubeEmbedLink(attrs.src) || attrs.src;
+  } else if (attrs.src) {
+    const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (
       <Resizable
         aspectRatio={VIDEO_ASPECT_RATIO}
@@ -81,4 +80,5 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       </Resizable>
     );
   }
+  return null;
 }
