@@ -1,4 +1,5 @@
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { useTheme } from '@emotion/react';
+import { Box, Dialog, DialogActions, DialogContent, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -8,6 +9,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { getFieldRendererConfig } from 'components/common/form/fields/getFieldRendererConfig';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { DialogTitle } from 'components/common/Modal';
 import { useMutateMemberPropertyValues } from 'components/profile/components/SpacesMemberDetails/components/useMutateMemberPropertyValues';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
@@ -22,7 +24,7 @@ type Props = {
   children?: ReactNode;
 };
 
-export function MemberPropertiesPopupForm({
+export function MemberPropertiesPopup({
   cancelButtonText = 'Cancel',
   children,
   memberId,
@@ -36,6 +38,9 @@ export function MemberPropertiesPopupForm({
     () => charmClient.members.getSpacePropertyValues(memberId, spaceId || ''),
     { revalidateOnMount: true }
   );
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(mutate);
   const { showMessage } = useSnackbar();
@@ -73,6 +78,11 @@ export function MemberPropertiesPopupForm({
     onClose();
   };
 
+  function onClickClose() {
+    reset();
+    onClose();
+  }
+
   useEffect(() => {
     if (defaultValues && isDirty) {
       return;
@@ -82,14 +92,16 @@ export function MemberPropertiesPopupForm({
   }, [defaultValues, isDirty]);
 
   return (
-    <Dialog open={!!spaceId} onClose={onClose} fullWidth>
+    <Dialog open={!!spaceId} onClose={onClose} fullScreen={fullScreen} fullWidth>
       {!data ? (
         <DialogContent>
           <LoadingComponent isLoading />
         </DialogContent>
       ) : (
         <>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle sx={{ '&&': { px: 2, py: 2 } }} onClose={onClickClose}>
+            {title}
+          </DialogTitle>
           <DialogContent dividers>
             {children}
             <form onSubmit={handleSubmit(onSubmit)}>

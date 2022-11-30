@@ -20,7 +20,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberPropertiesPopupForm } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopupForm';
+import { MemberPropertiesPopup } from 'components/profile/components/SpacesMemberDetails/components/MemberPropertiesPopup';
 import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
 import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -245,7 +245,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
         return null;
       })}
       {isModalOpen && user && currentSpace && (
-        <MemberPropertiesPopupForm
+        <MemberPropertiesPopup
           onClose={() => {
             setIsModalOpen(false);
           }}

@@ -17,7 +17,7 @@ import NexusPageTitle from './components/NexusPageTitle';
 import NotifyMeButton from './components/NotifyMeButton';
 import SnoozeButton from './components/SnoozeButton';
 import DiscussionTasksList from './DiscussionTasksList';
-import GnosisTasksList from './GnosisTasksList';
+import { GnosisTasksList } from './GnosisTasksList';
 import useTasks from './hooks/useTasks';
 import ProposalTasksList from './ProposalTasksList';
 import TasksPageHeader from './TasksPageHeader';

@@ -46,8 +46,8 @@ export async function updateGuildRolesForUser(
           spaceRoleId: spaceRole.id
         });
       }
-    } catch (err) {
-      log.warn('[guild.xyz]: Failed to import guild.xyz roles', err);
+    } catch (error) {
+      log.warn('[guild.xyz]: Failed to import guild.xyz roles', { error: (error as Error).stack || error });
     }
   }
 }
