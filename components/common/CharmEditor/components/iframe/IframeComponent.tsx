@@ -28,7 +28,7 @@ export function iframeSpec(): RawSpecs {
     type: 'node',
     name,
     markdown: {
-      toMarkdown: (state, node, parent, index) => {
+      toMarkdown: (state, node) => {
         // eslint-disable-next-line prefer-const
         let { height, width, src } = node.attrs;
 
@@ -181,23 +181,15 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
   }
 
   if (readOnly) {
+    const src = node.attrs.type === 'figma' ? figmaSrc : node.attrs.src;
     return (
       <IframeContainer>
-        {node.attrs.type === 'figma' ? (
-          <iframe
-            allowFullScreen
-            title='iframe'
-            src={figmaSrc}
-            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
-          />
-        ) : (
-          <iframe
-            allowFullScreen
-            title='iframe'
-            src={node.attrs.src}
-            style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
-          />
-        )}
+        <iframe
+          allowFullScreen
+          title='iframe'
+          src={src}
+          style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
+        />
       </IframeContainer>
     );
   }

@@ -1,4 +1,4 @@
-export type LinkType = 'embed' | 'video' | 'figma';
+export type LinkType = 'embed' | 'figma';
 
 export function extractEmbedLink(url: string): { type: LinkType; url: string } {
   let embedUrl = url;
