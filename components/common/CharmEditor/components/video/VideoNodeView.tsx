@@ -1,7 +1,7 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
-import * as React from 'react';
 
+import MultiTabs from 'components/common/MultiTabs';
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
 import BlockAligner from '../BlockAligner';
@@ -19,7 +19,7 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
   const attrs = node.attrs as VideoNodeAttrs;
 
   // for testing
-  attrs.muxId = 'DS00Spx1CV902MCtPj5WknGlR102V5HFkDe';
+  // attrs.muxId = 'DS00Spx1CV902MCtPj5WknGlR102V5HFkDe';
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxId) {
@@ -28,14 +28,39 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       return <div />;
     } else {
       return (
-        <MediaSelectionPopup node={node} icon={<VideoLibraryIcon fontSize='small' />} buttonText='Embed a Video'>
-          <MediaUrlInput
-            onSubmit={(videoUrl) => {
-              updateAttrs({
-                src: videoUrl
-              });
-            }}
-            placeholder='https://youtube.com...'
+        <MediaSelectionPopup
+          onDelete={deleteNode}
+          node={node}
+          icon={<VideoLibraryIcon fontSize='small' />}
+          buttonText='Embed a Video'
+        >
+          <MultiTabs
+            tabs={[
+              [
+                'Link',
+                <MediaUrlInput
+                  key='link'
+                  onSubmit={(videoUrl) => {
+                    updateAttrs({
+                      src: videoUrl
+                    });
+                  }}
+                  placeholder='https://youtube.com...'
+                />
+              ],
+              [
+                'Upload',
+                <MediaUrlInput
+                  key='upload'
+                  onSubmit={(videoUrl) => {
+                    updateAttrs({
+                      src: videoUrl
+                    });
+                  }}
+                  placeholder='https://youtube.com...'
+                />
+              ]
+            ]}
           />
         </MediaSelectionPopup>
       );
