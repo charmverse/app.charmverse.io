@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import type { GetForumPostsRequest } from 'pages/api/forum/posts';
+import type { GetForumPostsRequest } from 'pages/api/forums/posts';
 
 import type { ForumPost } from './interfaces';
 

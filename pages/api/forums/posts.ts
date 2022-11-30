@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createForumPost } from 'lib/forum/createForumPost';
 import { getForumPosts } from 'lib/forum/getForumPosts';
-import type { ForumPost } from 'lib/forum/interfaces';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { ForumPost, ForumPostPage } from 'lib/forum/interfaces';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export interface GetForumPostsRequest {
@@ -15,8 +16,12 @@ export interface GetForumPostsRequest {
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPosts).use(requireUser);
+handler
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
+  .get(getPosts)
+  .post(createForumPostController);
 
+// TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<ForumPost[]>) {
   const { spaceId, count, page, sort } = req.query as any as GetForumPostsRequest;
 
@@ -28,6 +33,12 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<ForumPost[]>) 
   });
 
   return res.status(200).json(posts);
+}
+
+async function createForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
+  const newPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
+
+  return res.status(201).json(newPost);
 }
 
 export default withSessionRoute(handler);

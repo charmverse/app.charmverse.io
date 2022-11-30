@@ -51,7 +51,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/spaces/[id]/post-categories - Create a post category', () => {
-  it('should create the post category if the user is a space admin, and return the post category, responding with 200', async () => {
+  it('should create the post category if the user is a space admin, and return the post category, responding with 201', async () => {
     const adminUserCookie = await loginUser(firstSpaceAdminUser.id);
 
     const createInput: Partial<CreatePostCategoryInput> = {
