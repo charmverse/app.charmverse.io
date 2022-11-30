@@ -2,17 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { getForumPosts } from 'lib/forums/posts/getForumPosts';
-import type { ForumPost, ForumPostPage } from 'lib/forums/posts/interfaces';
-import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import { listForumPosts } from 'lib/forums/posts/listForumPosts';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-export interface GetForumPostsRequest {
-  spaceId: string;
-  page?: number;
-  count?: number;
-  sort?: string;
-}
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,15 +16,10 @@ handler
   .post(createForumPostController);
 
 // TODO - Update posts
-async function getPosts(req: NextApiRequest, res: NextApiResponse<ForumPost[]>) {
-  const { spaceId, count, page, sort } = req.query as any as GetForumPostsRequest;
+async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
+  const postQuery = req.query as any as ListForumPostsRequest;
 
-  const posts = await getForumPosts({
-    spaceId,
-    count,
-    page,
-    sort
-  });
+  const posts = await listForumPosts(postQuery);
 
   return res.status(200).json(posts);
 }
