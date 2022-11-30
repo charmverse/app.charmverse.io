@@ -299,7 +299,7 @@ model Page {
   bountyId           String?                 @unique @db.Uuid
   bounty             Bounty?                 @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  post               Post?                   @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  post               Post?                   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]

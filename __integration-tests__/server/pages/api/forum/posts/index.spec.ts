@@ -3,8 +3,8 @@ import type { Post, PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
-import type { CreateForumPostInput } from 'lib/forum/createForumPost';
 import type { ForumPostPage } from 'lib/forum/interfaces';
+import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
 import { createPostCategory } from 'lib/posts/createPostCategory';

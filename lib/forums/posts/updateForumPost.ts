@@ -1,14 +1,16 @@
 import type { Page, Post, PostCategory, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
 import { getForumPost } from './getForumPost';
 import type { ForumPostPage } from './interfaces';
 
-export type UpdateForumPostInput = Pick<Page, 'content' | 'contentText' | 'title'> & {
-  categoryId?: Post['categoryId'] | null;
-};
+export type UpdateForumPostInput = Partial<
+  Pick<Page, 'content' | 'contentText' | 'title'> & {
+    categoryId?: Post['categoryId'] | null;
+  }
+>;
 
 export async function updateForumPost(
   postId: string,
@@ -37,6 +39,18 @@ export async function updateForumPost(
     if (page?.spaceId !== category?.spaceId) {
       throw new InsecureOperationError('Cannot update post with a category from another space');
     }
+  }
+
+  const post = await prisma.post.findUnique({
+    where: {
+      id: postId
+    }
+  });
+
+  if (!post) {
+    throw new DataNotFoundError(`Post with id ${postId} not found`);
+  } else if (post.locked) {
+    throw new UndesirableOperationError('Cannot update a locked post');
   }
 
   await prisma.$transaction(async (tx) => {

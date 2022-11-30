@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createForumPost } from 'lib/forum/createForumPost';
 import { getForumPosts } from 'lib/forum/getForumPosts';
 import type { ForumPost, ForumPostPage } from 'lib/forum/interfaces';
+import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

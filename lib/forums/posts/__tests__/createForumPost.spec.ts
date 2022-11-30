@@ -1,6 +1,6 @@
 import type { Post, Space, User } from '@prisma/client';
 
-import { createPostCategory } from 'lib/posts/createPostCategory';
+import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
