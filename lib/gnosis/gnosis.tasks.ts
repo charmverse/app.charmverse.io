@@ -76,9 +76,11 @@ function getTaskDescription(transaction: GnosisTransaction): string {
         break;
       }
 
-      case 'swapOwner': {
+      case 'swapOwner':
         return 'Swap Owner';
-      }
+
+      case 'signMessage':
+        return 'Sign a message';
 
       case 'addOwnerWithThreshold': {
         // this is the JSON type in case we want it for something
