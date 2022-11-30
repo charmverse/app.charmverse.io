@@ -18,7 +18,7 @@ interface Props {
   children: (state: State) => JSX.Element;
 }
 
-export default function DiscordProvider({ children }: Props) {
+export function DiscordProvider({ children }: Props) {
   const { user, setUser } = useUser();
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);

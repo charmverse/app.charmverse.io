@@ -56,6 +56,7 @@ declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
+    discord: PaletteOptions['primary'];
     textPrimary: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
@@ -64,6 +65,7 @@ declare module '@mui/material/styles/createPalette' {
   interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
+    discord: Palette['primary'];
     textPrimary: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
@@ -161,6 +163,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         contrastText,
         dark: darken('#3b5998', 0.1),
         main: '#3b5998'
+      },
+      discord: {
+        contrastText,
+        dark: darken('#5765f2', 0.1),
+        main: '#5765f2'
       },
       primary: {
         main: blueColor // '#010101',

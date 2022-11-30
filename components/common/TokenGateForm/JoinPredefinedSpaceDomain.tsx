@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { DiscordGate } from 'components/common/DiscordGate/DiscordGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 
 import LoadingComponent from '../LoadingComponent';
@@ -46,6 +47,8 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
           <Typography variant='h5'>{spaceInfo.name}</Typography>
         </Box>
       </Card>
+
+      <DiscordGate spaceDomain={spaceDomain} />
       <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
     </>
   );

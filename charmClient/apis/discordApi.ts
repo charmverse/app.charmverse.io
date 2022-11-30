@@ -18,7 +18,7 @@ export class DiscordApi {
     return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
-  checkDiscordGateway(spaceDomain: string) {
+  checkDiscordGate(spaceDomain: string) {
     return http.GET<CheckDiscordGateResult>(`/api/discord/gate?spaceDomain=${spaceDomain}`);
   }
 }
