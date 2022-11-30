@@ -1,3 +1,5 @@
+import type { Page, Post } from '@prisma/client';
+
 export type ForumPostContent = {
   type: 'text' | 'image';
   content: string;
@@ -14,3 +16,5 @@ export type ForumPost = {
   updatedAt: Date;
   createdAt: Date;
 };
+
+export type ForumPostPage = Page & { post: Post };
