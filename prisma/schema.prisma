@@ -1020,6 +1020,8 @@ enum PostStatus {
 model Post {
   id         String        @id @default(uuid()) @db.Uuid
   categoryId String?       @db.Uuid
+  pinned     Boolean?      @default(false)
+  locked     Boolean?      @default(false)
   category   PostCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   status     PostStatus
   page       Page?
