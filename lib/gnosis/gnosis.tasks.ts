@@ -108,7 +108,7 @@ function getTaskDescription(transaction: GnosisTransaction): string {
   } else if (transaction.to && transaction.value) {
     return `Send ${getFriendlyEthValue(transaction.value)} ETH`;
   }
-  return 'N/A';
+  return 'Unknown transaction type';
 }
 
 type PaymentAction = { decodedValue: { to: string; value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
