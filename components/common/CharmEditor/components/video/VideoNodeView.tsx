@@ -17,6 +17,9 @@ import type { VideoNodeAttrs } from './videoSpec';
 
 export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
+  // for testing
+  attrs.muxId = 'DS00Spx1CV902MCtPj5WknGlR102V5HFkDe';
+
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxId) {
     if (readOnly) {
@@ -37,24 +40,24 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       );
     }
   }
-  if (true) {
+  if (attrs.muxId) {
     return (
-      <MuxVideo
-        style={{ height: '100%', maxWidth: '100%' }}
-        playbackId='DS00Spx1CV902MCtPj5WknGlR102V5HFkDe'
-        metadata={{
-          video_id: 'video-id-123456'
-          // video_title: 'Super Interesting Video',
-          // viewer_user_id: 'user-id-bc-789'
-        }}
-        streamType='on-demand'
-        controls
-        autoPlay
-        muted
-      />
+      <BlockAligner onDelete={deleteNode}>
+        <MuxVideo
+          style={{ height: '100%', maxWidth: '100%' }}
+          playbackId={attrs.muxId}
+          // for analytics
+          // metadata={{
+          //   video_id: 'video-id-123456'
+          //   video_title: 'Super Interesting Video',
+          //   viewer_user_id: 'user-id-bc-789'
+          // }}
+          streamType='on-demand'
+          controls
+        />
+      </BlockAligner>
     );
-  }
-  if (attrs.src) {
+  } else {
     const embedUrl = extractYoutubeEmbedLink(attrs.src) || attrs.src;
     return (
       <Resizable
@@ -78,5 +81,4 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       </Resizable>
     );
   }
-  return <BlockAligner onDelete={deleteNode}>Hello world</BlockAligner>;
 }
