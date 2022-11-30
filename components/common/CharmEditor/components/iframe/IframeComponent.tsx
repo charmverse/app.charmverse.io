@@ -12,7 +12,7 @@ import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
-import { extractYoutubeLinkType } from '../video/videoSpec';
+import { extractYoutubeLinkType } from '../video/utils';
 
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const [height, setHeight] = useState(node.attrs.height);

@@ -10,7 +10,8 @@ import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
-import { extractYoutubeEmbedLink, VIDEO_ASPECT_RATIO } from './videoSpec';
+import { extractYoutubeEmbedLink } from './utils';
+import { VIDEO_ASPECT_RATIO } from './videoSpec';
 import type { VideoNodeAttrs } from './videoSpec';
 
 export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {

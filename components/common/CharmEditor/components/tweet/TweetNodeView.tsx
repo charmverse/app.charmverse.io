@@ -13,7 +13,8 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { TweetNodeAttrs } from './tweetSpec';
 import { extractTweetAttrs } from './tweetSpec';
-import { twitterWidgetJs } from './twitterJSUrl';
+
+export const twitterWidgetJs = 'https://platform.twitter.com/widgets.js';
 
 type TweetOptions = {
   theme?: 'dark' | 'light';
