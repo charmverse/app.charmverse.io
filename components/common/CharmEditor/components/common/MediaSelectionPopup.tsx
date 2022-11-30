@@ -5,12 +5,12 @@ import PopperPopup from 'components/common/PopperPopup';
 
 interface InputProps {
   node: NodeViewProps['node'];
-  embedText: string;
+  buttonText: string;
   children: React.ReactNode;
-  embedIcon: JSX.Element;
+  icon: JSX.Element;
 }
 
-export function EmbeddedInputPopup(props: InputProps) {
+export function MediaSelectionPopup(props: InputProps) {
   const autoOpen = props.node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   return (
@@ -26,8 +26,8 @@ export function EmbeddedInputPopup(props: InputProps) {
         }}
       >
         <Typography color='secondary' display='flex' gap={1.5} width='100%' alignItems='center'>
-          {props.embedIcon}
-          <Typography>{props.embedText}</Typography>
+          {props.icon}
+          <Typography>{props.buttonText}</Typography>
         </Typography>
       </ListItem>
     </PopperPopup>

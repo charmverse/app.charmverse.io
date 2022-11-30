@@ -6,9 +6,9 @@ import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from 'lib/embed/c
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 
 import BlockAligner from '../BlockAligner';
-import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
-import { EmbeddedUrl } from '../common/EmbeddedUrl';
 import { IframeContainer } from '../common/IframeContainer';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
@@ -29,8 +29,8 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
       embedText = 'Insert a Figma embed';
     }
     return (
-      <EmbeddedInputPopup node={node} embedIcon={embedIcon} embedText={embedText}>
-        <EmbeddedUrl
+      <MediaSelectionPopup node={node} icon={embedIcon} buttonText={embedText}>
+        <MediaUrlInput
           onSubmit={(urlToEmbed) => {
             const tweetAttrs = extractTweetAttrs(urlToEmbed);
             const isYoutube = extractYoutubeLinkType(urlToEmbed);
@@ -52,7 +52,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
           }}
           placeholder={node.attrs.type === 'figma' ? 'https://www.figma.com/file...' : 'https://...'}
         />
-      </EmbeddedInputPopup>
+      </MediaSelectionPopup>
     );
   }
 

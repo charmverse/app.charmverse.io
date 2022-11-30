@@ -7,8 +7,8 @@ import React, { useRef } from 'react';
 import log from 'lib/log';
 
 import BlockAligner from '../BlockAligner';
-import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
-import { EmbeddedUrl } from '../common/EmbeddedUrl';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { TweetNodeAttrs } from './tweetSpec';
@@ -77,8 +77,8 @@ export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: Charm
       return <div />;
     } else {
       return (
-        <EmbeddedInputPopup node={node} embedIcon={<TwitterIcon fontSize='small' />} embedText='Embed a Tweet'>
-          <EmbeddedUrl
+        <MediaSelectionPopup node={node} icon={<TwitterIcon fontSize='small' />} buttonText='Embed a Tweet'>
+          <MediaUrlInput
             helperText='Works with links to Tweets'
             isValid={(url) => extractTweetAttrs(url) !== null}
             onSubmit={(url) => {
@@ -89,7 +89,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: Charm
             }}
             placeholder='https://twitter.com...'
           />
-        </EmbeddedInputPopup>
+        </MediaSelectionPopup>
       );
     }
   }

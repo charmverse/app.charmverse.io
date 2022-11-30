@@ -4,9 +4,9 @@ import * as React from 'react';
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
 import BlockAligner from '../BlockAligner';
-import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
-import { EmbeddedUrl } from '../common/EmbeddedUrl';
 import { IframeContainer } from '../common/IframeContainer';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
@@ -23,8 +23,8 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
       return <div />;
     } else {
       return (
-        <EmbeddedInputPopup node={node} embedIcon={<VideoLibraryIcon fontSize='small' />} embedText='Embed a Video'>
-          <EmbeddedUrl
+        <MediaSelectionPopup node={node} icon={<VideoLibraryIcon fontSize='small' />} buttonText='Embed a Video'>
+          <MediaUrlInput
             onSubmit={(videoUrl) => {
               updateAttrs({
                 src: videoUrl
@@ -32,7 +32,7 @@ export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, update
             }}
             placeholder='https://youtube.com...'
           />
-        </EmbeddedInputPopup>
+        </MediaSelectionPopup>
       );
     }
   }

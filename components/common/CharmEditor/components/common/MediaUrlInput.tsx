@@ -10,7 +10,7 @@ type InputProps = {
   onSubmit: (url: string) => void;
 };
 
-export function EmbeddedUrl(props: InputProps) {
+export function MediaUrlInput(props: InputProps) {
   const [embedUrl, setEmbedUrl] = useState('');
 
   return (
