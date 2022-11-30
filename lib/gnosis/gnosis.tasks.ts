@@ -75,6 +75,11 @@ function getTaskDescription(transaction: GnosisTransaction): string {
         }
         break;
       }
+
+      case 'swapOwner': {
+        return 'Swap Owner';
+      }
+
       case 'addOwnerWithThreshold': {
         // this is the JSON type in case we want it for something
         // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];
