@@ -9,7 +9,7 @@ import type { LinkType } from 'lib/embed/extractEmbedLink';
 
 export interface IFrameSelectorProps {
   autoOpen?: boolean;
-  onIFrameSelect: (videoSrc: string) => void;
+  onIFrameSelect: (url: string) => void;
   children: ReactNode;
   tabs?: [string, ReactNode][];
   type: LinkType;
@@ -62,8 +62,6 @@ export default function IFrameSelector(props: IFrameSelectorProps) {
                       switch (type) {
                         case 'embed':
                           return 'Embed Link';
-                        case 'video':
-                          return 'Insert Video';
                         case 'figma':
                           return 'Insert Figma';
 
