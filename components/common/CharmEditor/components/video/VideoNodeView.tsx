@@ -1,5 +1,6 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
+import * as React from 'react';
 
 import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
@@ -16,6 +17,7 @@ import type { VideoNodeAttrs } from './videoSpec';
 
 export function VideoNodeView({ deleteNode, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
+
   // for testing
   attrs.muxId = 'DS00Spx1CV902MCtPj5WknGlR102V5HFkDe';
 
