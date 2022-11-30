@@ -102,13 +102,12 @@ function getTaskDescription(transaction: GnosisTransaction): string {
       }
 
       default:
-        log.warn('Unknown transaction method', data.method);
+        log.warn(`Unknown transaction method: ${data.method}`, transaction);
     }
   } else if (transaction.to && transaction.value) {
     return `Send ${getFriendlyEthValue(transaction.value)} ETH`;
   }
-  log.warn('Unknown transaction', transaction);
-  return 'N/A';
+  return 'Unknown method';
 }
 
 type PaymentAction = { decodedValue: { to: string; value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
