@@ -1,4 +1,3 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import Script from 'next/script';
@@ -7,6 +6,7 @@ import { useRef } from 'react';
 import log from 'lib/log';
 
 import BlockAligner from '../../BlockAligner';
+import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 import type { TweetNodeAttrs } from '../tweet';
 import { extractTweetAttrs } from '../tweet';
 import { twitterWidgetJs } from '../twitterJSUrl';
@@ -56,7 +56,7 @@ function render(tweetId: string, el: HTMLElement, options: TweetOptions) {
   window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
-export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: NodeViewProps & { readOnly: boolean }) {
+export function TweetComponent({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
@@ -66,12 +66,6 @@ export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: No
     if (ref.current && attrs.id) {
       render(attrs.id, ref.current, { theme: theme.palette.mode });
     }
-  }
-
-  function onDelete() {
-    const start = getPos();
-    const end = start + 1;
-    view.dispatch(view.state.tr.deleteRange(start, end));
   }
 
   // If there are no source for the node, return the image select component
@@ -98,7 +92,7 @@ export function TweetComponent({ readOnly, node, view, getPos, updateAttrs }: No
   return (
     <>
       <Script src={twitterWidgetJs} onReady={onLoadScript} />
-      <BlockAligner onDelete={onDelete}>
+      <BlockAligner onDelete={deleteNode}>
         <StyledTweet ref={ref} />
       </BlockAligner>
     </>

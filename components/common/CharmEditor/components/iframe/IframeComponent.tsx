@@ -1,25 +1,20 @@
-import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import type { EditorView, Node } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ListItem, Typography } from '@mui/material';
+import type { Node } from 'prosemirror-model';
 import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
 import { FiFigma } from 'react-icons/fi';
 
-import {
-  MAX_EMBED_WIDTH,
-  MIN_EMBED_HEIGHT,
-  MAX_EMBED_HEIGHT,
-  VIDEO_ASPECT_RATIO,
-  MIN_EMBED_WIDTH
-} from 'lib/embed/constants';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from 'lib/embed/constants';
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 
 import BlockAligner from '../BlockAligner';
-import Resizable from '../Resizable';
+import { IframeContainer } from '../common/IframeContainer';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweet';
 
@@ -150,29 +145,7 @@ function EmptyIframeContainer(
   );
 }
 
-const StyledIFrame = styled.div`
-  line-height: 0; // hide margin that appears underneath
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-  // disable hover UX on ios which converts first click to a hover event
-  @media (pointer: fine) {
-    &:hover {
-      cursor: initial;
-    }
-  }
-  border-radius: ${({ theme }) => theme.spacing(1)};
-`;
-
-function ResizableIframe({
-  readOnly,
-  node,
-  getPos,
-  view,
-  updateAttrs,
-  onResizeStop
-}: NodeViewProps & { readOnly: boolean; onResizeStop?: (view: EditorView) => void }) {
+function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const [height, setHeight] = useState(node.attrs.height);
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
@@ -206,15 +179,9 @@ function ResizableIframe({
     );
   }
 
-  function onDelete() {
-    const start = getPos();
-    const end = start + 1;
-    view.dispatch(view.state.tr.deleteRange(start, end));
-  }
-
   if (readOnly) {
     return (
-      <StyledIFrame>
+      <IframeContainer>
         {node.attrs.type === 'figma' ? (
           <iframe
             allowFullScreen
@@ -230,13 +197,13 @@ function ResizableIframe({
             style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
           />
         )}
-      </StyledIFrame>
+      </IframeContainer>
     );
   }
 
-  if (node.attrs.type === 'embed') {
+  if (node.attrs.type === 'figma') {
     return (
-      <BlockAligner onDelete={onDelete}>
+      <BlockAligner onDelete={deleteNode}>
         <VerticalResizer
           onResizeStop={(_, data) => {
             updateAttrs({
@@ -254,69 +221,47 @@ function ResizableIframe({
           maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
           minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
         >
-          <StyledIFrame>
-            <iframe
-              allowFullScreen
-              title='iframe'
-              src={node.attrs.src}
-              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
-            />
-          </StyledIFrame>
-        </VerticalResizer>
-      </BlockAligner>
-    );
-  } else if (node.attrs.type === 'figma') {
-    return (
-      <BlockAligner onDelete={onDelete}>
-        <VerticalResizer
-          onResizeStop={(_, data) => {
-            updateAttrs({
-              height: data.size.height
-            });
-            if (onResizeStop) {
-              onResizeStop(view);
-            }
-          }}
-          width={node.attrs.width}
-          height={height}
-          onResize={(_, data) => {
-            setHeight(data.size.height);
-          }}
-          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
-        >
-          <StyledIFrame>
+          <IframeContainer>
             <iframe
               allowFullScreen
               title='iframe'
               src={figmaSrc}
               style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
             />
-          </StyledIFrame>
+          </IframeContainer>
         </VerticalResizer>
       </BlockAligner>
     );
   } else {
     return (
-      <Resizable
-        aspectRatio={VIDEO_ASPECT_RATIO}
-        initialSize={node.attrs.width}
-        minWidth={MIN_EMBED_WIDTH}
-        updateAttrs={(args) => {
-          updateAttrs({ width: args.size });
-        }}
-        onDelete={onDelete}
-        onResizeStop={onResizeStop}
-      >
-        <StyledIFrame>
-          <iframe
-            allowFullScreen
-            title='iframe'
-            src={node.attrs.src}
-            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
-          />
-        </StyledIFrame>
-      </Resizable>
+      <BlockAligner onDelete={deleteNode}>
+        <VerticalResizer
+          onResizeStop={(_, data) => {
+            updateAttrs({
+              height: data.size.height
+            });
+            if (onResizeStop) {
+              onResizeStop(view);
+            }
+          }}
+          width={node.attrs.width}
+          height={height}
+          onResize={(_, data) => {
+            setHeight(data.size.height);
+          }}
+          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+        >
+          <IframeContainer>
+            <iframe
+              allowFullScreen
+              title='iframe'
+              src={node.attrs.src}
+              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+            />
+          </IframeContainer>
+        </VerticalResizer>
+      </BlockAligner>
     );
   }
 }

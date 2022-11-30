@@ -1,3 +1,4 @@
+import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItem } from '@mui/material';
@@ -36,6 +37,7 @@ const Controls = styled.div`
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete } = props;
+
   return (
     <StyledBlockAligner draggable={false}>
       {children}
@@ -43,9 +45,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
         <ListItem
           button
           disableRipple
-          onClick={() => {
-            onDelete();
-          }}
+          onClick={onDelete}
           sx={{
             padding: 1,
             backgroundColor: 'inherit'

@@ -54,7 +54,6 @@ export function items(): PaletteItemTypeNoGroup[] {
       uid: 'figma',
       title: 'Figma',
       icon: <FiFigma style={{ fontSize: iconSize }} />,
-      keywords: ['iframe'],
       description: 'Embed Figma',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {

@@ -30,6 +30,7 @@ import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as tweet from './components/tweet/tweet';
+import * as video from './components/video/videoSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -79,5 +80,6 @@ export const specRegistry = new SpecRegistry([
   inlineDatabase.spec(),
   deletion,
   insertion,
-  formatChange
+  formatChange,
+  video.spec()
 ]);

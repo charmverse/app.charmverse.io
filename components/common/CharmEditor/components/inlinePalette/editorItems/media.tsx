@@ -55,7 +55,7 @@ export function items(): PaletteItemTypeNoGroup[] {
             rafCommandExec(view, (_state, _dispatch) => {
               // let the node view know to show the tooltip by default
               const tooltipMark = _state.schema.mark('tooltip-marker');
-              const node = _state.schema.nodes.iframe.create(
+              const node = _state.schema.nodes.video.create(
                 {
                   src: null,
                   type: 'video',
