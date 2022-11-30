@@ -73,8 +73,8 @@ import { plugins as trackPlugins } from './components/suggestions/suggestions.pl
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import { TweetComponent } from './components/tweet/components/Tweet';
 import * as tweet from './components/tweet/tweet';
+import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { plugins as videoPlugins } from './components/video/video';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import DevTools from './DevTools';
@@ -592,7 +592,7 @@ function CharmEditor({
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
           }
           case 'tweet': {
-            return <TweetComponent {...allProps} />;
+            return <TweetNodeView {...allProps} />;
           }
           case 'video': {
             return <VideoNodeView {...allProps} />;

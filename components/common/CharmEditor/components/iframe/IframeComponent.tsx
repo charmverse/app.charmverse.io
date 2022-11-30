@@ -16,69 +16,6 @@ import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweet';
 import { extractYoutubeLinkType } from '../video/videoSpec';
 
-const name = 'iframe';
-
-export function iframeSpec(): RawSpecs {
-  return {
-    type: 'node',
-    name,
-    markdown: {
-      toMarkdown: (state, node) => {
-        // eslint-disable-next-line prefer-const
-        let { height, width, src } = node.attrs;
-
-        if (height && width && src) {
-          height = parseInt(height);
-          width = parseInt(width);
-
-          const attributesToWrite = ` width=${width}px height=${height}px src=${src} `;
-
-          const toRender = `\r\n<iframe ${attributesToWrite}></iframe>\r\n\r\n\r\n`;
-
-          // Ensure markdown html will be separated by newlines
-          state.ensureNewLine();
-          state.text(toRender);
-          state.ensureNewLine();
-        }
-      }
-    },
-    schema: {
-      attrs: {
-        src: {
-          default: ''
-        },
-        width: {
-          default: MAX_EMBED_WIDTH
-        },
-        height: {
-          default: MIN_EMBED_HEIGHT
-        },
-        // Type of iframe, it could either be video or embed
-        type: {
-          default: 'embed'
-        }
-      },
-      group: 'block',
-      inline: false,
-      draggable: false,
-      isolating: true, // dont allow backspace to delete
-      parseDOM: [
-        {
-          tag: 'iframe',
-          getAttrs: (dom: any) => {
-            return {
-              src: dom.getAttribute('src')
-            };
-          }
-        }
-      ],
-      toDOM: (node: Node) => {
-        return ['iframe', { class: 'ns-embed', style: `height: ${node.attrs.height};`, ...node.attrs }];
-      }
-    }
-  };
-}
-
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const [height, setHeight] = useState(node.attrs.height);
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
@@ -88,9 +25,12 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     if (readOnly) {
       return <div />;
     }
-    const embedIcon =
-      node.attrs.type === 'figma' ? <FiFigma style={{ fontSize: 'small' }} /> : <PreviewIcon fontSize='small' />;
-    const embedText = node.attrs.type === 'figma' ? 'Embed a Figma' : 'Insert an embed';
+    let embedIcon = <PreviewIcon fontSize='small' />;
+    let embedText = 'Insert an embed';
+    if (node.attrs.type === 'figma') {
+      embedIcon = <FiFigma fontSize='small' />;
+      embedText = 'Insert a Figma embed';
+    }
     return (
       <EmbeddedInputPopup node={node} embedIcon={embedIcon} embedText={embedText}>
         <EmbeddedUrl

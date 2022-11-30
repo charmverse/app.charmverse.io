@@ -1,17 +1,19 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
+import TwitterIcon from '@mui/icons-material/Twitter';
 import Script from 'next/script';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import log from 'lib/log';
 
-import BlockAligner from '../../BlockAligner';
-import type { CharmNodeViewProps } from '../../nodeView/nodeView';
-import type { TweetNodeAttrs } from '../tweet';
-import { extractTweetAttrs } from '../tweet';
-import { twitterWidgetJs } from '../twitterJSUrl';
+import BlockAligner from '../BlockAligner';
+import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
+import { EmbeddedUrl } from '../common/EmbeddedUrl';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-import { TweetInput } from './TweetInput';
+import type { TweetNodeAttrs } from './tweetSpec';
+import { extractTweetAttrs } from './tweetSpec';
+import { twitterWidgetJs } from './twitterJSUrl';
 
 type TweetOptions = {
   theme?: 'dark' | 'light';
@@ -56,11 +58,10 @@ function render(tweetId: string, el: HTMLElement, options: TweetOptions) {
   window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
-export function TweetComponent({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
+export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
-  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   function onLoadScript() {
     if (ref.current && attrs.id) {
@@ -75,16 +76,19 @@ export function TweetComponent({ deleteNode, readOnly, node, updateAttrs }: Char
       return <div />;
     } else {
       return (
-        <TweetInput
-          autoOpen={autoOpen}
-          isValid={(url) => extractTweetAttrs(url) !== null}
-          onSubmit={(urlInput) => {
-            const _attrs = extractTweetAttrs(urlInput);
-            if (_attrs) {
-              updateAttrs(_attrs);
-            }
-          }}
-        />
+        <EmbeddedInputPopup node={node} embedIcon={<TwitterIcon fontSize='small' />} embedText='Embed a Tweet'>
+          <EmbeddedUrl
+            helperText='Works with links to Tweets'
+            isValid={(url) => extractTweetAttrs(url) !== null}
+            onSubmit={(url) => {
+              const _attrs = extractTweetAttrs(url);
+              if (_attrs) {
+                updateAttrs(_attrs);
+              }
+            }}
+            placeholder='https://twitter.com...'
+          />
+        </EmbeddedInputPopup>
       );
     }
   }

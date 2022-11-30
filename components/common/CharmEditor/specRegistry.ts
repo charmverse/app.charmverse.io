@@ -29,7 +29,7 @@ import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import * as tweet from './components/tweet/tweet';
+import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
 
 export interface ICharmEditorOutput {

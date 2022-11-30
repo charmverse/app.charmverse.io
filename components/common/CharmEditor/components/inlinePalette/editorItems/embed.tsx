@@ -69,12 +69,11 @@ export function items(): PaletteItemTypeNoGroup[] {
                   height: MIN_EMBED_HEIGHT
                 },
                 undefined,
-                undefined,
                 [tooltipMark]
               );
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);
