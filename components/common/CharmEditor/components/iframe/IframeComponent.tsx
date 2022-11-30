@@ -1,10 +1,6 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import PreviewIcon from '@mui/icons-material/Preview';
-import { ListItem, Typography } from '@mui/material';
 import type { Node } from 'prosemirror-model';
-import type { HTMLAttributes } from 'react';
 import { useState, memo } from 'react';
 import { FiFigma } from 'react-icons/fi';
 
@@ -12,14 +8,13 @@ import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from 'lib/embed/c
 import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 
 import BlockAligner from '../BlockAligner';
+import { EmbeddedInputPopup } from '../common/EmbeddedInputPopup';
+import { EmbeddedUrl } from '../common/EmbeddedUrl';
 import { IframeContainer } from '../common/IframeContainer';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweet';
 import { extractYoutubeLinkType } from '../video/videoSpec';
-
-import type { IFrameSelectorProps } from './IFrameSelector';
-import IFrameSelector from './IFrameSelector';
 
 const name = 'iframe';
 
@@ -84,99 +79,43 @@ export function iframeSpec(): RawSpecs {
   };
 }
 
-const StyledEmptyIframeContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1.5)};
-  width: 100%;
-  align-items: center;
-  opacity: 0.5;
-`;
-
-function EmptyIframeContainer(
-  props: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; type: IFrameSelectorProps['type'] }
-) {
-  const theme = useTheme();
-  const { type, readOnly, ...rest } = props;
-  return (
-    <ListItem
-      button
-      disableRipple
-      disabled={readOnly}
-      sx={{
-        backgroundColor: theme.palette.background.light,
-        p: 2,
-        display: 'flex',
-        borderRadius: theme.spacing(0.5),
-        my: 0.5
-      }}
-      {...rest}
-    >
-      <StyledEmptyIframeContainer>
-        {(() => {
-          switch (type) {
-            case 'embed':
-              return <PreviewIcon fontSize='small' />;
-            case 'figma':
-              return <FiFigma style={{ fontSize: 'small' }} />;
-
-            default:
-              return null;
-          }
-        })()}
-        <Typography>
-          {(() => {
-            switch (type) {
-              case 'embed':
-                return 'Insert an embed';
-              case 'figma':
-                return 'Insert a Figma';
-
-              default:
-                return null;
-            }
-          })()}
-        </Typography>
-      </StyledEmptyIframeContainer>
-    </ListItem>
-  );
-}
-
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const [height, setHeight] = useState(node.attrs.height);
   const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
-  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
-
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
-    return readOnly ? (
-      <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} />
-    ) : (
-      <IFrameSelector
-        autoOpen={autoOpen}
-        type={node.attrs.type}
-        onIFrameSelect={(urlToEmbed) => {
-          const tweetAttrs = extractTweetAttrs(urlToEmbed);
-          const isYoutube = extractYoutubeLinkType(urlToEmbed);
-          if (isYoutube) {
-            const pos = getPos();
-            const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
-            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-          } else if (tweetAttrs) {
-            const pos = getPos();
-            const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-            view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-          } else {
-            const attrs = extractEmbedLink(urlToEmbed);
-            updateAttrs({
-              src: attrs.url,
-              type: attrs.type
-            });
-          }
-        }}
-      >
-        <EmptyIframeContainer type={node.attrs.type} readOnly={readOnly} />
-      </IFrameSelector>
+    if (readOnly) {
+      return <div />;
+    }
+    const embedIcon =
+      node.attrs.type === 'figma' ? <FiFigma style={{ fontSize: 'small' }} /> : <PreviewIcon fontSize='small' />;
+    const embedText = node.attrs.type === 'figma' ? 'Embed a Figma' : 'Insert an embed';
+    return (
+      <EmbeddedInputPopup node={node} embedIcon={embedIcon} embedText={embedText}>
+        <EmbeddedUrl
+          onSubmit={(urlToEmbed) => {
+            const tweetAttrs = extractTweetAttrs(urlToEmbed);
+            const isYoutube = extractYoutubeLinkType(urlToEmbed);
+            if (isYoutube) {
+              const pos = getPos();
+              const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
+              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+            } else if (tweetAttrs) {
+              const pos = getPos();
+              const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
+              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+            } else {
+              const attrs = extractEmbedLink(urlToEmbed);
+              updateAttrs({
+                src: attrs.url,
+                type: attrs.type
+              });
+            }
+          }}
+          placeholder={node.attrs.type === 'figma' ? 'https://www.figma.com/file...' : 'https://...'}
+        />
+      </EmbeddedInputPopup>
     );
   }
 
