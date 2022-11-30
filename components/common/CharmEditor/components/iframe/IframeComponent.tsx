@@ -1,6 +1,4 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import PreviewIcon from '@mui/icons-material/Preview';
-import type { Node } from 'prosemirror-model';
 import { useState, memo } from 'react';
 import { FiFigma } from 'react-icons/fi';
 
@@ -18,7 +16,6 @@ import { extractYoutubeLinkType } from '../video/videoSpec';
 
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const [height, setHeight] = useState(node.attrs.height);
-  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
 
   // If there are no source for the node, return the image select component
   if (!node.attrs.src) {
@@ -59,8 +56,10 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     );
   }
 
+  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
+  const src = node.attrs.type === 'figma' ? figmaSrc : node.attrs.src;
+
   if (readOnly) {
-    const src = node.attrs.type === 'figma' ? figmaSrc : node.attrs.src;
     return (
       <IframeContainer>
         <iframe
@@ -73,69 +72,36 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     );
   }
 
-  if (node.attrs.type === 'figma') {
-    return (
-      <BlockAligner onDelete={deleteNode}>
-        <VerticalResizer
-          onResizeStop={(_, data) => {
-            updateAttrs({
-              height: data.size.height
-            });
-            if (onResizeStop) {
-              onResizeStop(view);
-            }
-          }}
-          width={node.attrs.width}
-          height={height}
-          onResize={(_, data) => {
-            setHeight(data.size.height);
-          }}
-          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
-        >
-          <IframeContainer>
-            <iframe
-              allowFullScreen
-              title='iframe'
-              src={figmaSrc}
-              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
-            />
-          </IframeContainer>
-        </VerticalResizer>
-      </BlockAligner>
-    );
-  } else {
-    return (
-      <BlockAligner onDelete={deleteNode}>
-        <VerticalResizer
-          onResizeStop={(_, data) => {
-            updateAttrs({
-              height: data.size.height
-            });
-            if (onResizeStop) {
-              onResizeStop(view);
-            }
-          }}
-          width={node.attrs.width}
-          height={height}
-          onResize={(_, data) => {
-            setHeight(data.size.height);
-          }}
-          maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
-          minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
-        >
-          <IframeContainer>
-            <iframe
-              allowFullScreen
-              title='iframe'
-              src={node.attrs.src}
-              style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
-            />
-          </IframeContainer>
-        </VerticalResizer>
-      </BlockAligner>
-    );
-  }
+  return (
+    <BlockAligner onDelete={deleteNode}>
+      <VerticalResizer
+        onResizeStop={(_, data) => {
+          updateAttrs({
+            height: data.size.height
+          });
+          if (onResizeStop) {
+            onResizeStop(view);
+          }
+        }}
+        width={node.attrs.width}
+        height={height}
+        onResize={(_, data) => {
+          setHeight(data.size.height);
+        }}
+        maxConstraints={[MAX_EMBED_WIDTH, MAX_EMBED_HEIGHT]}
+        minConstraints={[MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT]}
+      >
+        <IframeContainer>
+          <iframe
+            allowFullScreen
+            title='iframe'
+            src={src}
+            style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
+          />
+        </IframeContainer>
+      </VerticalResizer>
+    </BlockAligner>
+  );
 }
 
 export default memo(ResizableIframe);
