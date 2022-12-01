@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { VariableSizeList } from 'react-window';
 
-const LISTBOX_PADDING = 8; // px
+const LISTBOX_PADDING = 8;
 
 type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildsResponse[0]];
 

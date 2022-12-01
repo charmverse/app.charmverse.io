@@ -8,10 +8,11 @@ export async function getGuildRoleIds(addresses: string[]) {
   const guildMembershipsResponses = await Promise.all(addresses.map((address) => user.getMemberships(address)));
   guildMembershipsResponses.forEach((guildMembershipsResponse) => {
     guildMembershipsResponse?.forEach((guildMemberships) => {
-      if (!guildMemberships.roleids) {
-        log.warn('Guild.xyz response is mossing roleids', { addresses, guildMemberships });
+      const { roleIds } = guildMemberships as unknown as { roleIds: string[] };
+      if (roleIds) {
+        guildRoleIds.push(...roleIds.map(String));
       } else {
-        guildRoleIds.push(...guildMemberships.roleids.map(String));
+        log.warn('Guild.xyz response is missing roleIds', { addresses, guildMemberships });
       }
     });
   });
