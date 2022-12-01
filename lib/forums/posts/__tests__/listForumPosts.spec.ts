@@ -31,6 +31,35 @@ describe('listForumPosts', () => {
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
 
+  it(`should return posts from all cateogories (including uncategorised) if no category is provided`, async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const category = await createPostCategory({
+      spaceId: extraSpace.id,
+      name: 'Test Category'
+    });
+
+    const posts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 2
+    });
+
+    const categoryPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: 2,
+      categoryId: category.id
+    });
+
+    const foundPosts = await listForumPosts({ spaceId: extraSpace.id, count: 10 });
+
+    expect(foundPosts.data).toHaveLength(posts.length + categoryPosts.length);
+
+    expect(foundPosts.data.some((p) => p.post.categoryId === null)).toBe(true);
+    expect(foundPosts.data.some((p) => p.post.categoryId === category.id)).toBe(true);
+  });
+
   it(`should support paginated queries and return 0 as the next page once there are no more results`, async () => {
     // With 40 posts, we should have 3 pages
     const resultsPerQuery = 19;
