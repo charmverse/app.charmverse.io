@@ -28,7 +28,8 @@ export default function FilterList() {
     if (currentSpace) {
       await charmClient.forum.createPostCategory(currentSpace.id, {
         name: forumCategoryName,
-        spaceId: currentSpace.id
+        spaceId: currentSpace.id,
+        color: 'default'
       });
       refetchForumCategories();
       setForumCategoryName('');
@@ -124,7 +125,14 @@ export default function FilterList() {
             }
           }}
         />
-        <Button onClick={createForumCategory}>Add</Button>
+        <Button
+          disabled={
+            forumCategoryName.length === 0 || categories?.find((category) => category.name === forumCategoryName)
+          }
+          onClick={createForumCategory}
+        >
+          Add
+        </Button>
       </Modal>
     </Card>
   );
