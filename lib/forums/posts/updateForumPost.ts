@@ -1,4 +1,4 @@
-import type { Page, Post, PostCategory, Prisma } from '@prisma/client';
+import type { Page, Post, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
@@ -7,14 +7,14 @@ import { getForumPost } from './getForumPost';
 import type { ForumPostPage } from './interfaces';
 
 export type UpdateForumPostInput = Partial<
-  Pick<Page, 'content' | 'contentText' | 'title'> & {
+  Pick<Page, 'content' | 'contentText' | 'title' | 'galleryImage' | 'headerImage'> & {
     categoryId?: Post['categoryId'] | null;
   }
 >;
 
 export async function updateForumPost(
   postId: string,
-  { content, contentText, categoryId, title }: UpdateForumPostInput
+  { content, contentText, categoryId, title, galleryImage, headerImage }: UpdateForumPostInput
 ): Promise<ForumPostPage> {
   if (categoryId) {
     const [page, category] = await Promise.all([
@@ -59,7 +59,9 @@ export async function updateForumPost(
       data: {
         content: content as Prisma.InputJsonObject,
         contentText,
-        title
+        title,
+        galleryImage,
+        headerImage
       }
     });
 

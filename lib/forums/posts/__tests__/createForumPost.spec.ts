@@ -15,7 +15,6 @@ beforeAll(async () => {
   space = generated.space;
   user = generated.user;
 });
-
 describe('createForumPost', () => {
   it('should create a page with a draft post', async () => {
     const createdPage = await createForumPost({
@@ -24,7 +23,9 @@ describe('createForumPost', () => {
       createdBy: user.id,
       spaceId: space.id,
       title: 'Test',
-      categoryId: null
+      categoryId: null,
+      galleryImage: 'image-url-1',
+      headerImage: 'image-url-2'
     });
 
     expect(createdPage).toMatchObject(
@@ -37,7 +38,9 @@ describe('createForumPost', () => {
           locked: false,
           pinned: false,
           status: 'draft'
-        })
+        }),
+        galleryImage: 'image-url-1',
+        headerImage: 'image-url-2'
       })
     );
   });
