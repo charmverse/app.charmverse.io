@@ -1,8 +1,8 @@
-import type { Upload } from '@mux/mux-node';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
+import type { Upload } from 'lib/mux/getUpload';
 import { getUpload } from 'lib/mux/getUpload';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';

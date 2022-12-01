@@ -3,7 +3,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
 import type { Asset } from 'lib/mux/getAsset';
-import { getAsset } from 'lib/mux/getAsset';
+import { getPrivateAsset } from 'lib/mux/getAsset';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -29,7 +29,7 @@ async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<Asset
     throw new ActionNotPermittedError();
   }
 
-  const asset = await getAsset(query.id);
+  const asset = await getPrivateAsset(query.id);
 
   res.status(200).json(asset);
 }

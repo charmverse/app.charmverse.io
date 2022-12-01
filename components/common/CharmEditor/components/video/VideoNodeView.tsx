@@ -23,13 +23,13 @@ import { VideoUploadForm } from './VideoUploadForm';
 export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
 
-  const [playbackId, setPlaybackId] = useState<string | null>(null);
+  const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready
   const { data: asset, error } = useSwr(
-    () => (attrs.muxId && !playbackId ? `/api/mux/asset/${attrs.muxId}` : null),
+    () => (attrs.muxAssetId && !playbackIdWithToken ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
-      return charmClient.mux.getAsset({ id: attrs.muxId!, pageId });
+      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId });
     },
     {
       refreshInterval: 5000
@@ -37,17 +37,20 @@ export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop
   );
 
   useEffect(() => {
-    if (asset && asset.playbackId && asset.status === 'ready') {
-      setPlaybackId(asset.playbackId);
+    if (asset && asset.status === 'ready') {
+      setPlaybackIdWithToken(asset.playbackId);
     }
   }, [asset]);
 
-  async function onUploadComplete(muxId: string) {
-    updateAttrs({ muxId });
+  async function onUploadComplete(uploadAttrs: { assetId: string; playbackId: string }) {
+    updateAttrs({
+      muxPlaybackId: uploadAttrs.playbackId,
+      muxAssetId: uploadAttrs.assetId
+    });
   }
 
   // If there are no source for the node, return the image select component
-  if (!attrs.src && !attrs.muxId) {
+  if (!attrs.src && !attrs.muxAssetId) {
     if (readOnly) {
       // hide the row completely
       return <div />;
@@ -80,19 +83,21 @@ export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop
       );
     }
   }
-  if (attrs.muxId) {
-    if (playbackId) {
+
+  if (attrs.muxAssetId) {
+    if (playbackIdWithToken) {
       return (
         <BlockAligner onDelete={deleteNode}>
           <MuxVideo
             style={{ height: '100%', maxWidth: '100%' }}
-            playbackId={playbackId}
+            playbackId={playbackIdWithToken} // asset.playbackId includes signed token
             // for analytics
-            // metadata={{
-            //   video_id: 'video-id-123456'
-            //   video_title: 'Super Interesting Video',
-            //   viewer_user_id: 'user-id-bc-789'
-            // }}
+            metadata={{
+              page_id: pageId
+              // video_id: 'video-id-123456'
+              // video_title: 'Super Interesting Video',
+              // viewer_user_id: 'user-id-bc-789'
+            }}
             streamType='on-demand'
             controls
           />

@@ -11,7 +11,8 @@ export const VIDEO_ASPECT_RATIO = 1.77;
 
 export type VideoNodeAttrs = {
   src?: string;
-  muxId?: string;
+  muxAssetId?: string; // we may not need this, but it's used to get the status while video is being processed
+  muxPlaybackId?: string; // this is the id we need to embed the video
   width: number;
 };
 
@@ -20,10 +21,10 @@ export function spec(): RawSpecs {
     name,
     markdown: {
       toMarkdown: (state, node) => {
-        const { muxId, src } = node.attrs as VideoNodeAttrs;
+        const { muxPlaybackId, src } = node.attrs as VideoNodeAttrs;
         let toRender = '';
-        if (muxId) {
-          toRender = `Embedded Private Video: https://stream.mux.com/${muxId}`;
+        if (muxPlaybackId) {
+          toRender = `Embedded Private Video: https://stream.mux.com/${muxPlaybackId}`;
         } else if (src) {
           toRender = `Embedded Video: ${src}`;
         }
@@ -40,7 +41,10 @@ export function spec(): RawSpecs {
         src: {
           default: ''
         },
-        muxId: {
+        muxAssetId: {
+          default: ''
+        },
+        muxPlaybackId: {
           default: ''
         },
         width: {
@@ -59,7 +63,8 @@ export function spec(): RawSpecs {
           getAttrs: (dom: any): VideoNodeAttrs => {
             return {
               src: dom.getAttribute('video-src'),
-              muxId: dom.getAttribute('video-mux-id'),
+              muxAssetId: dom.getAttribute('video-mux-asset-id'),
+              muxPlaybackId: dom.getAttribute('video-mux-id'),
               width: dom.getAttribute('video-width')
             };
           }
@@ -68,7 +73,12 @@ export function spec(): RawSpecs {
       toDOM: (node: Node) => {
         return [
           'charm-video',
-          { 'video-src': node.attrs.src, 'video-mux-id': node.attrs.muxId, 'video-width': node.attrs.width }
+          {
+            'video-src': node.attrs.src,
+            'video-mux-asset-id': node.attrs.muxAssetId,
+            'video-mux-id': node.attrs.muxPlaybackId,
+            'video-width': node.attrs.width
+          }
         ];
       }
     }

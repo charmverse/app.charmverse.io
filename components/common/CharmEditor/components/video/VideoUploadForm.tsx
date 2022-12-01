@@ -1,6 +1,6 @@
 // upload form src by mux: https://github.com/vercel/next.js/blob/canary/examples/with-mux-video/components/upload-form.js
 
-import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
@@ -10,7 +10,7 @@ import Button from 'components/common/Button';
 import log from 'lib/log';
 
 type Props = {
-  onComplete: (muxId: string) => void;
+  onComplete: (upload: { assetId: string; playbackId: string }) => void;
   pageId: string;
 };
 
@@ -33,8 +33,8 @@ export function VideoUploadForm(props: Props) {
   );
 
   useEffect(() => {
-    if (upload && upload.asset_id) {
-      props.onComplete(upload.asset_id);
+    if (upload && upload.playbackId) {
+      props.onComplete({ assetId: upload.assetId, playbackId: upload.playbackId });
     }
   }, [upload]);
 
@@ -75,11 +75,18 @@ export function VideoUploadForm(props: Props) {
   if (errorMessage) return <Alert severity='error'>{errorMessage}</Alert>;
 
   return (
-    <Stack key='upload' alignItems='center' justifyContent='center' gap={1} width='100%' height='80px'>
+    <Stack
+      key='upload'
+      alignItems='center'
+      justifyContent='center'
+      gap={1}
+      width='100%'
+      height='92px' /* height is copied from 'Link' tab */
+    >
       {isUploading ? (
         <>
           {isPreparing ? (
-            <Typography>Preparing..</Typography>
+            <Typography>Preparing...</Typography>
           ) : (
             <Typography>Uploading...{progress ? `${progress}%` : ''}</Typography>
           )}
