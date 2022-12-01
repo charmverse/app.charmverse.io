@@ -16,6 +16,7 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
+import isAdmin from 'hooks/useIsAdmin';
 
 export default function FilterList() {
   const { getLinkUrl, categories, sortList, error, refetchForumCategories } = useForumFilters();
@@ -24,6 +25,7 @@ export default function FilterList() {
   const [forumCategoryName, setForumCategoryName] = useState('');
   const currentSpace = useCurrentSpace();
   const router = useRouter();
+  const admin = isAdmin();
   async function createForumCategory() {
     if (currentSpace) {
       await charmClient.forum.createPostCategory(currentSpace.id, {
@@ -84,8 +86,8 @@ export default function FilterList() {
             <SelectOptionItem
               option={category as SelectOptionType}
               key={category.name}
-              onChange={updateForumCategory}
-              onDelete={deleteForumCategory}
+              onChange={!admin ? undefined : updateForumCategory}
+              onDelete={!admin ? undefined : deleteForumCategory}
               onChipClick={() => {
                 router.push(getLinkUrl(category.name));
               }}
@@ -98,7 +100,7 @@ export default function FilterList() {
             // </Link>
           ))}
         </Stack>
-        <Button startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>
+        <Button disabled={!admin} startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>
           Add category
         </Button>
       </CardContent>
