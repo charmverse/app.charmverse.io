@@ -523,11 +523,17 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           onResizeStop,
+          pageId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
             const getPos = props.getPos;
-            view.dispatch(view.state.tr.deleteRange(getPos(), getPos() + 1));
+            const tr = view.state.tr;
+            const start = getPos();
+            const end = start === 0 ? 0 : start + 1; // for some reason, a range of 0 to 1 deletes the first two elements
+            tr.deleteRange(start, end);
+            tr.deleteSelection();
+            view.dispatch(tr);
           }
         };
 

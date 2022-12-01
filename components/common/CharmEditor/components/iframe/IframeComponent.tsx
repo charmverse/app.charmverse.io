@@ -29,7 +29,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
       embedText = 'Insert a Figma embed';
     }
     return (
-      <MediaSelectionPopup node={node} icon={embedIcon} buttonText={embedText}>
+      <MediaSelectionPopup node={node} icon={embedIcon} buttonText={embedText} onDelete={deleteNode}>
         <MediaUrlInput
           onSubmit={(urlToEmbed) => {
             const tweetAttrs = extractTweetAttrs(urlToEmbed);
