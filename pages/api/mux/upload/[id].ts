@@ -25,7 +25,7 @@ async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<Uploa
     pageId: query.pageId
   });
 
-  if (!pagePermissions.read) {
+  if (!pagePermissions.edit_content) {
     throw new ActionNotPermittedError();
   }
 

@@ -16,12 +16,12 @@ export type AssetResponse = Asset;
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getUploadEndpoint);
+handler.get(getAssetEndpoint);
 
-async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<AssetResponse>) {
+async function getAssetEndpoint(req: NextApiRequest, res: NextApiResponse<AssetResponse>) {
   const query = req.query as AssetRequest;
   const pagePermissions = await computeUserPagePermissions({
-    userId: req.session.user.id,
+    userId: req.session.user?.id,
     pageId: query.pageId
   });
 
