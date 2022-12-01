@@ -52,9 +52,10 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
   }
 
   return {
-    isLoading: !data || joiningSpace,
+    isLoading: !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
-    joinSpace
+    joinSpace,
+    joiningSpace
   };
 }
