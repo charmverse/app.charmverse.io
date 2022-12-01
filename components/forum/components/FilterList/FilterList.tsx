@@ -1,17 +1,21 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import Link from 'components/common/Link';
 import { useForumFilters } from 'hooks/useForumFilters';
+import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
-export default function FilterList() {
+type Props = {
+  categoryIdSelected: (categoryId: CategoryIdQuery) => void;
+};
+export default function FilterList({ categoryIdSelected }: Props) {
   const { getLinkUrl, categories, sortList, error } = useForumFilters();
   const { query } = useRouter();
-
   if (error) {
     return <Alert severity='error'>An error occured while loading the categories</Alert>;
   }
@@ -19,6 +23,7 @@ export default function FilterList() {
   return (
     <Card variant='outlined'>
       <CardContent>
+        {/** TODO - Enable sorting */}
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {sortList.map((sort) => (
             <Link
@@ -34,14 +39,15 @@ export default function FilterList() {
         <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {categories?.map((category) => (
-            <Link
+            <Typography
               key={category.id}
-              href={getLinkUrl(category.name)}
-              sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
+              onClick={() => null}
+              // sx={{ fontWeight: selectedCategory === category.id ? 'bold' : 'initial' }}
               color='inherit'
             >
+              {category.id}
               {category.name}
-            </Link>
+            </Typography>
           ))}
         </Box>
       </CardContent>

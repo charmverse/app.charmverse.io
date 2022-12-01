@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
-import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
 
 import CreateForumPost from '../CreateForumPost';
@@ -16,6 +16,7 @@ import ForumPostSkeleton from '../ForumPostSkeleton';
 
 interface ForumPostsProps {
   search: string;
+  categoryId?: CategoryIdQuery;
 }
 
 const resultsPerQuery = 1;
@@ -23,13 +24,10 @@ const resultsPerQuery = 1;
 // Add a manual delay so the user sees the post loading skeleton
 const postRefreshTimeout = 1000;
 
-export default function ForumPosts({ search }: ForumPostsProps) {
+export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
-  const { query } = useRouter();
-
-  const queryCategory = query.category;
 
   // Re-enable sorting later on
 
@@ -55,10 +53,11 @@ export default function ForumPosts({ search }: ForumPostsProps) {
 
   function loadMorePosts() {
     setIsLoadingMore(true);
+
     charmClient.forum
       .listForumPosts({
         spaceId: currentSpace!.id,
-        categoryIds: queryCategory,
+        categoryIds: categoryId,
         count: resultsPerQuery,
         page: posts?.cursor
       })
@@ -80,7 +79,23 @@ export default function ForumPosts({ search }: ForumPostsProps) {
             }
 
             _prevList.cursor = foundPosts.cursor;
-            _prevList.data = [..._prevList.data, ...filteredPosts];
+
+            const previousDataToKeep =
+              categoryId === undefined
+                ? // No need for filtering since categoryId is undefined
+                  _prevList.data
+                : _prevList.data.filter((postPage) => {
+                    if (typeof categoryId === 'string') {
+                      return postPage.post.categoryId === categoryId;
+                    } else if (categoryId instanceof Array && postPage.post.categoryId) {
+                      return categoryId.includes(postPage.post.categoryId);
+                    } else if (categoryId === null) {
+                      return !postPage.post.categoryId;
+                    }
+                    return false;
+                  });
+
+            _prevList.data = [...previousDataToKeep, ...filteredPosts];
             _prevList.hasNext = foundPosts.hasNext;
 
             return {
@@ -106,7 +121,7 @@ export default function ForumPosts({ search }: ForumPostsProps) {
     ) {
       loadMorePosts();
     }
-  }, [bottomPostReached, members, currentSpace, posts, isLoadingMore]);
+  }, [bottomPostReached, members, currentSpace, posts, isLoadingMore, categoryId]);
 
   return (
     <>
@@ -117,7 +132,7 @@ export default function ForumPosts({ search }: ForumPostsProps) {
         <ForumPost key={post.id} {...post} />
       ))}
       {isLoadingMore && <ForumPostSkeleton />}
-      <Box ref={ref}>{posts?.hasNext === false && <Alert severity='info'>End of the forum</Alert>}</Box>
+      <Box ref={ref}>{posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}</Box>
     </>
   );
 }

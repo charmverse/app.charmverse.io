@@ -5,40 +5,41 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumFilters } from 'hooks/useForumFilters';
+import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
-export default function FilterSelect() {
+type Props = {
+  selectedCategory?: CategoryIdQuery;
+  categoryIdSelected: (categoryId: CategoryIdQuery) => void;
+
+  // Unused prop for now
+  // eslint-disable-next-line react/no-unused-prop-types
+  sort?: any;
+};
+
+export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: Props) {
   const { query } = useRouter();
-  const querySort = query.sort;
-  const queryCategory = query.category;
+  function emitUpdate(category: CategoryIdQuery) {
+    //   setSelected(category);
+    categoryIdSelected(category);
+  }
 
-  const { disabled, handleClick, categories, sortList, error } = useForumFilters();
-
-  const sortValue = useMemo(() => {
-    const defaultValue = sortList[0];
-    if (querySort) {
-      if (Array.isArray(querySort)) {
-        return querySort[0] || defaultValue;
-      } else {
-        return querySort;
-      }
-    }
-    return defaultValue;
-  }, [querySort]);
-
-  const categoryValue = useMemo(() => {
-    if (queryCategory) {
-      if (Array.isArray(queryCategory)) {
-        return queryCategory[0] || 'none';
-      } else {
-        return queryCategory;
-      }
-    }
-    return 'none';
-  }, [queryCategory]);
+  const { categories, error } = useForumFilters();
+  // Unused for now
+  // const sortValue = useMemo(() => {
+  //   const defaultValue = sortList[0];
+  //   if (querySort) {
+  //     if (Array.isArray(querySort)) {
+  //       return querySort[0] || defaultValue;
+  //     } else {
+  //       return querySort;
+  //     }
+  //   }
+  //   return defaultValue;
+  // }, [querySort]);
 
   if (error) {
     return <Alert severity='error'>An error occured while loading the categories</Alert>;
@@ -46,6 +47,8 @@ export default function FilterSelect() {
 
   return (
     <Box justifyContent='flex-start' flexWrap='wrap'>
+      {/* 
+      Re-enable when we allow sorting in the app
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
         <Select disabled={disabled} value={sortValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
           {sortList.map((sort) => (
@@ -54,13 +57,24 @@ export default function FilterSelect() {
             </MenuItem>
           ))}
         </Select>
-      </ViewOptions>
+      </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
-        <Select value={categoryValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>
-          <MenuItem value='none'>Select a category</MenuItem>
+        <Select
+          value={selectedCategory}
+          onChange={(e) => {
+            emitUpdate(e.target.value);
+          }}
+        >
+          <MenuItem value='none'>All categories</MenuItem>
           {categories?.map((category) => (
-            <MenuItem key={category.id} value={category.name}>
-              <Typography>{category.name}</Typography>
+            <MenuItem key={category.id} value={category.id}>
+              <Typography
+                key={category.id}
+                sx={{ fontWeight: selectedCategory === category.id ? 'bold' : 'initial' }}
+                color='inherit'
+              >
+                {category.name}
+              </Typography>
             </MenuItem>
           ))}
         </Select>

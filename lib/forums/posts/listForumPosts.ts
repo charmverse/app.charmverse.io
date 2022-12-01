@@ -13,12 +13,13 @@ export type PaginatedPostList<T = Record<string, unknown>> = Required<
 > &
   T;
 
+export type CategoryIdQuery = string | string[] | null | undefined;
 /**
  * @sort ignored for now - the server sorts posts by most recent
  */
 export interface ListForumPostsRequest {
   spaceId: string;
-  categoryIds?: string | string[] | null;
+  categoryIds?: CategoryIdQuery;
   page?: number;
   count?: number;
   sort?: string;

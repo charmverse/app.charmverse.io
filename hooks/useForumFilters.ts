@@ -33,24 +33,5 @@ export function useForumFilters() {
     return `${query.domain}/forum/`;
   };
 
-  const handleClick = (value: string) => {
-    const isValidSort = value && sortList.some((sort) => sort === value);
-    const isValidCategory = value && categories?.some((category) => category.name === value);
-
-    push(
-      {
-        pathname: `/${query.domain}/forum`,
-        ...(isValidSort && {
-          query: { sort: value }
-        }),
-        ...(isValidCategory && {
-          query: { category: value }
-        })
-      },
-      undefined,
-      { shallow: true }
-    );
-  };
-
-  return { categories, sortList, error, getLinkUrl, handleClick, disabled: isValidating };
+  return { categories, sortList, error, getLinkUrl, disabled: isValidating };
 }
