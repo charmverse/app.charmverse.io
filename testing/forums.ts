@@ -10,8 +10,10 @@ const imageUrl2 =
   'https://www.teslarati.com/wp-content/uploads/2019/04/Falcon-9-by-land-and-by-sea-CRS-13-Eshail-2-B1047-SpaceX-1-c.jpg';
 const imageUrl3 =
   'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Tharsis_and_Valles_Marineris_-_Mars_Orbiter_Mission_%2830055660701%29.png/440px-Tharsis_and_Valles_Marineris_-_Mars_Orbiter_Mission_%2830055660701%29.png';
+const imageUrl4 = 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Astronaut-in-space.jpg';
+const imageUrl5 = 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Hubble_Ultra_Deep_Field_part_d.jpg';
 
-const images = [imageUrl1, imageUrl2, imageUrl3];
+const images = [imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5];
 
 function getRandomImage() {
   return images[Math.min(images.length - 1, Math.round(Math.random() * images.length))];

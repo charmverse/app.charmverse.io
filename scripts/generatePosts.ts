@@ -94,36 +94,43 @@ const spaceDomain = 'rough-copper-constrictor'
 // })
 
 
-const postsPerCategory = 15;
+const postsPerCategory = 30;
 
-const withImageRatio = 30;
+const withImageRatio = 55;
 // Step 3 - generate posts in different categories
 
-listCategories({spaceDomain}).then(async categories => {
-  for (let i = 0; i <= categories.length; i++) {
-    if (i === categories.length) {
-      await generatePosts({
-        spaceDomain: 'rough-copper-constrictor',
-        title: `Uncategorised post`,
-        count: postsPerCategory,
-        withImageRatio,
-      })
-    } else {
-      const category = categories[i];
-      await generatePosts({
-        spaceDomain: 'rough-copper-constrictor',
-        title: `${category.name} post`,
-        categoryId: category.id,
-        count: postsPerCategory,
-        withImageRatio,
-      })
+// autogeneratePosts().then(() => console.log('done'))
+
+function autogeneratePosts() {
+  return listCategories({spaceDomain}).then(async categories => {
+    for (let i = 0; i <= categories.length; i++) {
+      if (i === categories.length) {
+        await generatePosts({
+          spaceDomain: 'rough-copper-constrictor',
+          title: `Uncategorised post`,
+          count: postsPerCategory,
+          withImageRatio,
+        })
+      } else {
+        const category = categories[i];
+        await generatePosts({
+          spaceDomain: 'rough-copper-constrictor',
+          title: `${category.name} post`,
+          categoryId: category.id,
+          count: postsPerCategory,
+          withImageRatio,
+        })
+      }
     }
-  }
+  
+    const totalCategories = categories.length;
+  
+    console.log(`Generated ${postsPerCategory * (totalCategories + 1)} posts across ${totalCategories } categories`);
+    return true
+  })
+}
 
-  const totalCategories = categories.length;
 
-  console.log(`Generated ${postsPerCategory * (totalCategories + 1)} posts across ${totalCategories } categories`)
-})
 
 
 
