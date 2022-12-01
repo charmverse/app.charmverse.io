@@ -77,12 +77,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         // UX improvement: add a delay so the user sees the post loading skeleton
         setTimeout(() => {
           setPosts((_prevList) => {
-            const filteredPosts = foundPosts.data
-              .filter((post) => !posts?.data.find((i) => i.id === post.id))
-              .map((post) => {
-                const user = members.find((member) => member.id === post.createdBy);
-                return { ...post, user };
-              });
+            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
 
             if (!_prevList) {
               return foundPosts;
@@ -90,22 +85,26 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
             _prevList.cursor = foundPosts.cursor;
 
-            const previousDataToKeep =
-              categoryId === undefined
-                ? // No need for filtering since categoryId is undefined
-                  _prevList.data
-                : _prevList.data.filter((postPage) => {
-                    if (typeof categoryId === 'string') {
-                      return postPage.post.categoryId === categoryId;
-                    } else if (categoryId instanceof Array && postPage.post.categoryId) {
-                      return categoryId.includes(postPage.post.categoryId);
-                    } else if (categoryId === null) {
-                      return !postPage.post.categoryId;
-                    }
-                    return false;
-                  });
+            const previousDataToKeep = !_prevList
+              ? []
+              : categoryId === undefined
+              ? // No need for filtering since categoryId is undefined
+                _prevList.data
+              : _prevList.data.filter((postPage) => {
+                  if (typeof categoryId === 'string') {
+                    return postPage.post.categoryId === categoryId;
+                  } else if (categoryId instanceof Array && postPage.post.categoryId) {
+                    return categoryId.includes(postPage.post.categoryId);
+                  } else if (categoryId === null) {
+                    return !postPage.post.categoryId;
+                  }
+                  return false;
+                });
 
-            _prevList.data = [...previousDataToKeep, ...filteredPosts];
+            _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
+              const user = members.find((member) => member.id === post.createdBy);
+              return { ...post, user };
+            });
             _prevList.hasNext = foundPosts.hasNext;
 
             return {
