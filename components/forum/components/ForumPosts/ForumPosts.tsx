@@ -19,10 +19,20 @@ interface ForumPostsProps {
   categoryId?: CategoryIdQuery;
 }
 
-const resultsPerQuery = 1;
+const resultsPerQuery = 10;
 
 // Add a manual delay so the user sees the post loading skeleton
-const postRefreshTimeout = 1000;
+const generatePostRefreshTimeout = () => {
+  const delay = Math.min(Math.random() * 2 * 1500);
+
+  if (delay < 500) {
+    return 500;
+  } else if (delay > 1000) {
+    return 1000;
+  } else {
+    return delay;
+  }
+};
 
 export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
@@ -103,7 +113,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
             };
           });
           setIsLoadingMore(false);
-        }, postRefreshTimeout);
+        }, generatePostRefreshTimeout());
       })
       .catch((err) => {
         setError(err);
