@@ -25,7 +25,7 @@ function ForumPostContent({
   // Only show published posts
   if (galleryImage) {
     return (
-      <img src={galleryImage} alt={title || 'Post'} width='100%' style={{ maxHeight: '200px', objectFit: 'contain' }} />
+      <img src={galleryImage} alt={title || 'Post'} width='100%' style={{ maxHeight: '250px', objectFit: 'cover' }} />
     );
   } else if (title) {
     return <Typography variant='body2'>{fancyTrim(contentText, maxCharactersInPost)}</Typography>;
