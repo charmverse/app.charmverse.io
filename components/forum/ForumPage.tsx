@@ -13,8 +13,8 @@ import { useForumFilters } from 'hooks/useForumFilters';
 import useRoles from 'hooks/useRoles';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
-import FilterList from './components/FilterList';
-import FilterSelect from './components/FilterSelect';
+import DesktopFilterMenu from './components/Filters/FilterList';
+import MobileFilterMenu from './components/Filters/FilterSelect';
 import ForumPosts from './components/ForumPosts';
 
 export default function ForumPage() {
@@ -70,12 +70,12 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ xs: 'block', lg: 'none' }}>
-            <FilterSelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
+            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
           </Box>
           <ForumPosts search={search} categoryId={categoryId} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <FilterList categoryIdSelected={setCategoryId} />
+          <DesktopFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
         </Grid>
       </Grid>
     </CenteredPageContent>

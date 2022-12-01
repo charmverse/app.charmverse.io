@@ -1,17 +1,14 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
-import type { SelectChangeEvent } from '@mui/material/Select';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumFilters } from 'hooks/useForumFilters';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
-type Props = {
+export type FilterProps = {
   selectedCategory?: CategoryIdQuery;
   categoryIdSelected: (categoryId: CategoryIdQuery) => void;
 
@@ -20,13 +17,7 @@ type Props = {
   sort?: any;
 };
 
-export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: Props) {
-  const { query } = useRouter();
-  function emitUpdate(category: CategoryIdQuery) {
-    //   setSelected(category);
-    categoryIdSelected(category);
-  }
-
+export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
   const { categories, error } = useForumFilters();
   // Unused for now
   // const sortValue = useMemo(() => {
@@ -62,7 +53,7 @@ export default function FilterSelect({ categoryIdSelected, selectedCategory = 'n
         <Select
           value={selectedCategory}
           onChange={(e) => {
-            emitUpdate(e.target.value);
+            categoryIdSelected(e.target.value);
           }}
         >
           <MenuItem value='none'>All categories</MenuItem>
