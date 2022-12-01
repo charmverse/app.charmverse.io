@@ -81,7 +81,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
         <iframe
           allowFullScreen
           title='iframe'
-          src={src}
+          src={embeddableSrc}
           style={{ height: attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
         />
       </IframeContainer>
