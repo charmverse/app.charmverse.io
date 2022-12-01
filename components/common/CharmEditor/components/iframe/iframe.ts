@@ -1,14 +1,13 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 
-import { embeddedNodeSpec } from '../../specs/embeddedNodeSpec';
-
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from './config';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from 'lib/embed/constants';
 
 const name = 'iframe';
 
 export function spec(): RawSpecs {
-  return embeddedNodeSpec({
+  return {
+    type: 'node',
     name,
     markdown: {
       toMarkdown: (state, node) => {
@@ -49,6 +48,10 @@ export function spec(): RawSpecs {
           default: []
         }
       },
+      group: 'block',
+      inline: false,
+      draggable: false,
+      isolating: true, // dont allow backspace to delete
       parseDOM: [
         {
           tag: 'iframe',
@@ -63,5 +66,5 @@ export function spec(): RawSpecs {
         return ['iframe', { class: 'ns-embed', style: `height: ${node.attrs.height};`, ...node.attrs }];
       }
     }
-  });
+  };
 }

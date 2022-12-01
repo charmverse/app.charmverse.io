@@ -1,8 +1,9 @@
 import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 
+import { MAX_EMBED_WIDTH } from 'lib/embed/constants';
+
 import { embeddedNodeSpec } from '../../specs/embeddedNodeSpec';
-import { MAX_EMBED_WIDTH } from '../iframe/config';
 
 const name = 'video';
 

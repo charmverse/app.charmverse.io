@@ -4,14 +4,10 @@ import type { PageType, Prisma } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 as uuid } from 'uuid';
 
-import {
-  MAX_EMBED_WIDTH,
-  MIN_EMBED_HEIGHT,
-  MIN_EMBED_WIDTH
-} from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { prisma } from 'db';
 import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH } from 'lib/embed/constants';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
