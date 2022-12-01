@@ -6,12 +6,12 @@ import useSwr from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
-import { MIN_EMBED_WIDTH } from 'lib/embed/constants';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
+import { MIN_EMBED_WIDTH } from '../iframe/config';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 

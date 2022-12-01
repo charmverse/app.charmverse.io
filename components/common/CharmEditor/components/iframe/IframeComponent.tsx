@@ -1,9 +1,4 @@
-import PreviewIcon from '@mui/icons-material/Preview';
 import { useState, memo } from 'react';
-import { FiFigma } from 'react-icons/fi';
-
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from 'lib/embed/constants';
-import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -14,22 +9,36 @@ import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
+import type { EmbedType } from './config';
+import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
+import { extractEmbedType } from './utils';
+
+type IframeAttrs = {
+  src?: string;
+  type: EmbedType;
+  height: number;
+  width: number;
+};
+
 function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
-  const [height, setHeight] = useState(node.attrs.height);
+  const attrs = node.attrs as IframeAttrs;
+
+  const [height, setHeight] = useState(attrs.height);
 
   // If there are no source for the node, return the image select component
-  if (!node.attrs.src) {
+  if (!attrs.src) {
     if (readOnly) {
       return <div />;
     }
-    let embedIcon = <PreviewIcon fontSize='small' />;
-    let embedText = 'Insert an embed';
-    if (node.attrs.type === 'figma') {
-      embedIcon = <FiFigma fontSize='small' />;
-      embedText = 'Insert a Figma embed';
-    }
+    const config = embeds[attrs.type as EmbedType] || embeds.embed;
+
     return (
-      <MediaSelectionPopup node={node} icon={embedIcon} buttonText={embedText} onDelete={deleteNode}>
+      <MediaSelectionPopup
+        node={node}
+        icon={<config.icon fontSize='small' />}
+        buttonText={config.text}
+        onDelete={deleteNode}
+      >
         <MediaUrlInput
           onSubmit={(urlToEmbed) => {
             const tweetAttrs = extractTweetAttrs(urlToEmbed);
@@ -43,21 +52,21 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
               const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
               view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
             } else {
-              const attrs = extractEmbedLink(urlToEmbed);
+              const embedType = extractEmbedType(urlToEmbed);
               updateAttrs({
-                src: attrs.url,
-                type: attrs.type
+                src: urlToEmbed,
+                type: embedType
               });
             }
           }}
-          placeholder={node.attrs.type === 'figma' ? 'https://www.figma.com/file...' : 'https://...'}
+          placeholder={config.placeholder}
         />
       </MediaSelectionPopup>
     );
   }
 
-  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${node.attrs.src}`;
-  const src = node.attrs.type === 'figma' ? figmaSrc : node.attrs.src;
+  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${attrs.src}`;
+  const src = attrs.type === 'figma' ? figmaSrc : attrs.src;
 
   if (readOnly) {
     return (
@@ -66,7 +75,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
           allowFullScreen
           title='iframe'
           src={src}
-          style={{ height: node.attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
+          style={{ height: attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
         />
       </IframeContainer>
     );
@@ -83,7 +92,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
             onResizeStop(view);
           }
         }}
-        width={node.attrs.width}
+        width={attrs.width}
         height={height}
         onResize={(_, data) => {
           setHeight(data.size.height);
