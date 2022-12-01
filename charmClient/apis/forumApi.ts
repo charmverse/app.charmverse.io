@@ -34,6 +34,6 @@ export class ForumApi {
   }
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
-    return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
+    return http.DELETE(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 }

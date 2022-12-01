@@ -33,6 +33,7 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
 
   return res.status(200).json(postCategories);
 }
+
 async function createPostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategory>) {
   const { id: spaceId } = req.query;
 

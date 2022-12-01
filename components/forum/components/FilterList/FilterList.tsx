@@ -10,6 +10,8 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,7 +23,7 @@ export default function FilterList() {
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const [forumCategoryName, setForumCategoryName] = useState('');
   const currentSpace = useCurrentSpace();
-
+  const router = useRouter();
   async function createForumCategory() {
     if (currentSpace) {
       await charmClient.forum.createPostCategory(currentSpace.id, {
@@ -31,6 +33,25 @@ export default function FilterList() {
       refetchForumCategories();
       setForumCategoryName('');
       addCategoryPopupState.close();
+    }
+  }
+
+  async function updateForumCategory(option: SelectOptionType) {
+    if (currentSpace) {
+      await charmClient.forum.updatePostCategory({
+        spaceId: currentSpace.id,
+        id: option.id,
+        color: option.color,
+        name: option.name
+      });
+      refetchForumCategories();
+    }
+  }
+
+  async function deleteForumCategory(option: SelectOptionType) {
+    if (currentSpace) {
+      await charmClient.forum.deletePostCategory({ id: option.id, spaceId: currentSpace.id });
+      refetchForumCategories();
     }
   }
 
@@ -60,14 +81,21 @@ export default function FilterList() {
         <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Stack gap={1} my={1}>
           {categories?.map((category) => (
-            <Link
+            <SelectOptionItem
+              option={category as SelectOptionType}
               key={category.name}
-              href={getLinkUrl(category.name)}
-              sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
-              color='inherit'
-            >
-              {category.name}
-            </Link>
+              onChange={updateForumCategory}
+              onDelete={deleteForumCategory}
+              onChipClick={() => {
+                router.push(getLinkUrl(category.name));
+              }}
+            />
+            // <Link
+            //   key={category.name}
+            //   // sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
+            //   color='inherit'
+            // >
+            // </Link>
           ))}
         </Stack>
         <Button startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>
