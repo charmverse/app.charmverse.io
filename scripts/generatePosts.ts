@@ -20,7 +20,10 @@ async function listCategories({spaceDomain}: {spaceDomain: string}) {
   });
 }
 
-
+/**
+ * 
+ * @title - Will increment a number at the end of the title for each generated post
+ */
 async function generatePosts({spaceDomain, count, categoryId, title, withImageRatio}: {spaceDomain: string, count: number, categoryId?: string, title?: string, withImageRatio?: number}) {
 
   if(categoryId && !validate(categoryId)) {
@@ -81,23 +84,47 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
 
 }
 
+const spaceDomain = 'rough-copper-constrictor'
+
+// Step 1 - wipe posts
 // wipePosts({
-//   spaceDomain: 'rough-copper-constrictor'
+//   spaceDomain
 // }).then(posts => {
 //   console.log('Deleted posts')
 // })
 
 
-// listCategories({spaceDomain: 'rough-copper-constrictor'}).then(categories => {
-//   console.log('Done')
-// })
+const postsPerCategory = 15;
 
+const withImageRatio = 30;
+// Step 3 - generate posts in different categories
 
-const postsToGenerate = 50;
+listCategories({spaceDomain}).then(async categories => {
+  for (let i = 0; i <= categories.length; i++) {
+    if (i === categories.length) {
+      await generatePosts({
+        spaceDomain: 'rough-copper-constrictor',
+        title: `Uncategorised post`,
+        count: postsPerCategory,
+        withImageRatio,
+      })
+    } else {
+      const category = categories[i];
+      await generatePosts({
+        spaceDomain: 'rough-copper-constrictor',
+        title: `${category.name} post`,
+        categoryId: category.id,
+        count: postsPerCategory,
+        withImageRatio,
+      })
+    }
+  }
 
+  const totalCategories = categories.length;
 
-generatePosts({spaceDomain: 'rough-copper-constrictor', title: `Governance post`, count: postsToGenerate, withImageRatio: 50, categoryId: '50e1081a-385c-4308-ae0d-35f91f132880' }).then(() => {
-  console.log('Generated', postsToGenerate, 'posts')
+  console.log(`Generated ${postsPerCategory * (totalCategories + 1)} posts across ${totalCategories } categories`)
 })
+
+
 
 
