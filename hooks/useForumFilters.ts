@@ -14,7 +14,8 @@ export function useForumFilters() {
   const {
     data: categories,
     error,
-    isValidating
+    isValidating,
+    mutate
   } = useSWR(currentSpace ? '/forum/categories' : null, () => charmClient.forum.listPostCategories(currentSpace!.id));
 
   const getLinkUrl = (value: string) => {
@@ -50,5 +51,13 @@ export function useForumFilters() {
     );
   };
 
-  return { categories, sortList, error, getLinkUrl, handleClick, disabled: isValidating };
+  return {
+    categories,
+    sortList,
+    error,
+    getLinkUrl,
+    handleClick,
+    disabled: isValidating,
+    refetchForumCategories: mutate
+  };
 }
