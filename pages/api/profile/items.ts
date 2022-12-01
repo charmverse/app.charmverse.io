@@ -41,24 +41,26 @@ async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<
 
   if (hiddenProfileItems.length) {
     await Promise.all(
-      hiddenProfileItems.map((profileItem) =>
-        prisma.profileItem.upsert({
-          where: {
-            id: profileItem.id
-          },
-          update: {
-            id: profileItem.id,
-            isHidden: true
-          },
-          create: {
-            id: profileItem.id,
-            userId: req.session.user.id,
-            metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
-            isHidden: true,
-            type: profileItem.type
-          }
-        })
-      )
+      hiddenProfileItems
+        .filter((profileItem) => profileItem.id)
+        .map((profileItem) =>
+          prisma.profileItem.upsert({
+            where: {
+              id: profileItem.id
+            },
+            update: {
+              id: profileItem.id,
+              isHidden: true
+            },
+            create: {
+              id: profileItem.id,
+              userId: req.session.user.id,
+              metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+              isHidden: true,
+              type: profileItem.type
+            }
+          })
+        )
     );
   }
 
