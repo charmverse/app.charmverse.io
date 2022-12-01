@@ -2,12 +2,11 @@ import type { PostCategory } from '@prisma/client';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { prisma } from 'db';
-import { stringToColor } from 'lib/utilities/strings';
 
-export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'> & { color: SelectOptionType['color'] };
+export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'> & { color?: SelectOptionType['color'] };
 
 export function createPostCategory({ name, spaceId, color }: CreatePostCategoryInput) {
-  const categoryColour = color ?? stringToColor(name);
+  const categoryColor = color ?? 'default';
 
   return prisma.postCategory.create({
     data: {
@@ -17,7 +16,7 @@ export function createPostCategory({ name, spaceId, color }: CreatePostCategoryI
           id: spaceId
         }
       },
-      color: categoryColour
+      color: categoryColor
     }
   });
 }

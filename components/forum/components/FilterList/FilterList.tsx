@@ -28,8 +28,7 @@ export default function FilterList() {
     if (currentSpace) {
       await charmClient.forum.createPostCategory(currentSpace.id, {
         name: forumCategoryName,
-        spaceId: currentSpace.id,
-        color: 'default'
+        spaceId: currentSpace.id
       });
       refetchForumCategories();
       setForumCategoryName('');
