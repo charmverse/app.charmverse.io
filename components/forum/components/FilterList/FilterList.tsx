@@ -45,7 +45,6 @@ export default function FilterList({ categoryIdSelected }: Props) {
               // sx={{ fontWeight: selectedCategory === category.id ? 'bold' : 'initial' }}
               color='inherit'
             >
-              {category.id}
               {category.name}
             </Typography>
           ))}

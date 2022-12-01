@@ -4,6 +4,19 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 
+const imageUrl1 =
+  'https://media.wtsp.com/assets/WTSP/images/657c2b38-486d-467b-8f35-ba1014ff5c61/657c2b38-486d-467b-8f35-ba1014ff5c61.png';
+const imageUrl2 =
+  'https://www.teslarati.com/wp-content/uploads/2019/04/Falcon-9-by-land-and-by-sea-CRS-13-Eshail-2-B1047-SpaceX-1-c.jpg';
+const imageUrl3 =
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Tharsis_and_Valles_Marineris_-_Mars_Orbiter_Mission_%2830055660701%29.png/440px-Tharsis_and_Valles_Marineris_-_Mars_Orbiter_Mission_%2830055660701%29.png';
+
+const images = [imageUrl1, imageUrl2, imageUrl3];
+
+function getRandomImage() {
+  return images[Math.min(images.length - 1, Math.round(Math.random() * images.length))];
+}
+
 export async function generateForumPosts({
   count,
   spaceId,
@@ -11,7 +24,8 @@ export async function generateForumPosts({
   categoryId,
   content = { type: 'doc', content: [] },
   contentText = '',
-  galleryImage
+  title,
+  withImageRatio = 30
 }: {
   spaceId: string;
   createdBy: string;
@@ -19,7 +33,8 @@ export async function generateForumPosts({
   categoryId?: string;
   content?: any;
   contentText?: string;
-  galleryImage?: string;
+  title?: string;
+  withImageRatio?: number;
 }): Promise<ForumPostPage[]> {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
@@ -38,18 +53,21 @@ export async function generateForumPosts({
 
     const postDate = new Date(createdAt);
 
+    // eslint-disable-next-line prettier/prettier
+    const hasImage = (Math.random() * 100) < withImageRatio;
+
     pageCreateInputs.push({
       id: postInput.id,
       spaceId,
       contentText,
       content,
-      title: `Post ${i}`,
+      title: `${title ?? 'Post'} ${i}`,
       createdBy,
       updatedBy: createdBy,
       type: 'post',
       path: `path-${v4()}`,
       postId: postInput.id,
-      galleryImage,
+      galleryImage: hasImage ? getRandomImage() : undefined,
       createdAt: postDate,
       updatedAt: postDate
     });
