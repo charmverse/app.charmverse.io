@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useState, memo } from 'react';
 
 import BlockAligner from '../BlockAligner';
@@ -35,32 +36,34 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     return (
       <MediaSelectionPopup
         node={node}
-        icon={<config.icon fontSize='small' />}
+        icon={<config.icon style={{ fontSize: 20 }} />}
         buttonText={config.text}
         onDelete={deleteNode}
       >
-        <MediaUrlInput
-          onSubmit={(urlToEmbed) => {
-            const tweetAttrs = extractTweetAttrs(urlToEmbed);
-            const isYoutube = extractYoutubeLinkType(urlToEmbed);
-            if (isYoutube) {
-              const pos = getPos();
-              const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
-              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-            } else if (tweetAttrs) {
-              const pos = getPos();
-              const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-            } else {
-              const embedType = extractEmbedType(urlToEmbed);
-              updateAttrs({
-                src: urlToEmbed,
-                type: embedType
-              });
-            }
-          }}
-          placeholder={config.placeholder}
-        />
+        <Box py={3}>
+          <MediaUrlInput
+            onSubmit={(urlToEmbed) => {
+              const tweetAttrs = extractTweetAttrs(urlToEmbed);
+              const isYoutube = extractYoutubeLinkType(urlToEmbed);
+              if (isYoutube) {
+                const pos = getPos();
+                const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
+                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+              } else if (tweetAttrs) {
+                const pos = getPos();
+                const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
+                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+              } else {
+                const embedType = extractEmbedType(urlToEmbed);
+                updateAttrs({
+                  src: urlToEmbed,
+                  type: embedType
+                });
+              }
+            }}
+            placeholder={config.placeholder}
+          />
+        </Box>
       </MediaSelectionPopup>
     );
   }
