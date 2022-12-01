@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { defaultPostCategories } from 'lib/posts/generateDefaultPostCategories';
+import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 
 import { createWorkspace } from '../createWorkspace';
 
