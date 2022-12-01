@@ -14,12 +14,14 @@ export async function task() {
       archivedBlocksCount,
       archivedPagesCount,
       deletedProposalsCount,
-      deletedBountiesCount
+      deletedBountiesCount,
+      deletedPostsCount
     } = await deleteArchivedPages(MAX_ARCHIVE_DAYS);
 
     log.info(`Deleted ${deletedPagesCount} pages, ${deletedBlocksCount} blocks`);
 
     count('cron.delete-archived.deleted-proposals', deletedProposalsCount);
+    count('cron.delete-archived.deleted-posts', deletedPostsCount);
     count('cron.delete-archived.deleted-bounties', deletedBountiesCount);
     count('cron.delete-archived.deleted-pages', deletedPagesCount);
     count('cron.delete-archived.deleted-blocks', deletedBlocksCount);

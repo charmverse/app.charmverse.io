@@ -11,6 +11,8 @@ export default function useWeb3Signer() {
   useEffect(() => {
     if (account && library) {
       setSigner(library.getSigner(account));
+    } else {
+      setSigner(null);
     }
   }, [account, library]);
 

@@ -12,6 +12,7 @@ import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPri
 import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
+import { generateDefaultPostCategoriesInput } from 'lib/posts/generateDefaultPostCategories';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 
 type CreateSpaceProps = {
@@ -37,7 +38,8 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
     ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
     ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input })),
     prisma.proposalCategory.createMany({ data: defaultCategories }),
-    prisma.memberProperty.createMany({ data: defaultProperties })
+    prisma.memberProperty.createMany({ data: defaultProperties }),
+    prisma.postCategory.createMany({ data: generateDefaultPostCategoriesInput(space.id) })
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({

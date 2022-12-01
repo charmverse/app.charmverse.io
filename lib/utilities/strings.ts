@@ -32,6 +32,11 @@ export function getDomain(url: string, includeProtocol?: boolean) {
   return host;
 }
 
+export function isUrl(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return urlRegex.test(text);
+}
+
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
   return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
