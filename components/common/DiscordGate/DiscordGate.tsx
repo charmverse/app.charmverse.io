@@ -1,4 +1,5 @@
 import { Alert, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
+import type { Space } from '@prisma/client';
 
 import Button from 'components/common/Button';
 import { useDiscordGate } from 'components/common/DiscordGate/hooks/useDiscordGate';
@@ -7,10 +8,11 @@ import { DiscordProvider } from 'components/integrations/components/DiscordProvi
 
 type Props = {
   spaceDomain: string;
+  onSuccess: (space: Space) => void;
 };
 
-export function DiscordGate({ spaceDomain }: Props) {
-  const { discordGate, isConnectedToDiscord, isLoading: isLoadingGate } = useDiscordGate({ spaceDomain });
+export function DiscordGate({ spaceDomain, onSuccess }: Props) {
+  const { discordGate, isConnectedToDiscord, isLoading: isLoadingGate } = useDiscordGate({ spaceDomain, onSuccess });
 
   if (!discordGate?.hasDiscordServer) {
     return null;

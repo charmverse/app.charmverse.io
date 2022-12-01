@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { Space, User } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
@@ -20,5 +20,9 @@ export class DiscordApi {
 
   checkDiscordGate(spaceDomain: string) {
     return http.GET<CheckDiscordGateResult>(`/api/discord/gate?spaceDomain=${spaceDomain}`);
+  }
+
+  verifyDiscordGate(spaceId: string) {
+    return http.POST<Space>('/api/discord/gate/verify', { spaceId });
   }
 }

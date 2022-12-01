@@ -1,6 +1,6 @@
 import { prisma } from 'db';
-import { canJoinSpaceViaDiscord } from 'lib/collabland/collablandClient';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
+import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type Props = {
@@ -16,20 +16,10 @@ export async function checkDiscordGate({ spaceDomain, userId }: Props): Promise<
     throw new InvalidInputError('Space not found');
   }
 
-  const discordServerId = space.discordServerId;
-  const discordUserId = user?.discordUser?.discordId;
-
-  if (!discordServerId || !discordUserId) {
-    return {
-      isEligible: false,
-      hasDiscordServer: !!discordServerId
-    };
-  }
-
-  const isEligible = canJoinSpaceViaDiscord({ discordServerId, discordUserId });
+  const res = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
   return {
-    isEligible,
-    hasDiscordServer: true
+    ...res,
+    spaceId: space.id
   };
 }

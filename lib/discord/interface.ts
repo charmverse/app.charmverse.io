@@ -17,4 +17,5 @@ export interface DiscordServerRole {
 export type CheckDiscordGateResult = {
   hasDiscordServer: boolean;
   isEligible: boolean;
+  spaceId: string;
 };

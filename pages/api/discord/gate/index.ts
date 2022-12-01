@@ -8,9 +8,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(checkDiscordGateForSpace);
+handler.get(checkDiscordGateEndpoint);
 
-async function checkDiscordGateForSpace(req: NextApiRequest, res: NextApiResponse<CheckDiscordGateResult>) {
+async function checkDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<CheckDiscordGateResult>) {
   const spaceDomain = req.query.spaceDomain as string;
   const userId = req.session.user.id;
 

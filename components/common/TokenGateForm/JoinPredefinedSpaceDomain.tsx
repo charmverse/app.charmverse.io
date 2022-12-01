@@ -48,7 +48,7 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
         </Box>
       </Card>
 
-      <DiscordGate spaceDomain={spaceDomain} />
+      <DiscordGate spaceDomain={spaceDomain} onSuccess={onJoinSpace} />
       <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
     </>
   );
