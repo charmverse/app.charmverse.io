@@ -29,3 +29,15 @@ export function extractUrlFromIFrame(url: string): { type: EmbedType; url: strin
 
   return { type, url: embedUrl };
 }
+
+export function convertFigmaToEmbedUrl(url: string) {
+  return `https://www.figma.com/embed?embed_host=charmverse&url=${url}`;
+}
+
+export function convertAirtableToEmbedUrl(url: string) {
+  if (url.includes('embed')) {
+    return url; // already embeddable
+  }
+  const shareId = url.split('/').pop();
+  return `https://airtable.com/embed/${shareId}`;
+}

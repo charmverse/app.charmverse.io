@@ -12,7 +12,7 @@ import { extractYoutubeLinkType } from '../video/utils';
 
 import type { EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
-import { extractEmbedType } from './utils';
+import { convertFigmaToEmbedUrl, convertAirtableToEmbedUrl, extractEmbedType } from './utils';
 
 type IframeAttrs = {
   src?: string;
@@ -68,8 +68,12 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     );
   }
 
-  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${attrs.src}`;
-  const src = attrs.type === 'figma' ? figmaSrc : attrs.src;
+  let embeddableSrc = attrs.src;
+  if (attrs.type === 'figma') {
+    embeddableSrc = convertFigmaToEmbedUrl(attrs.src);
+  } else if (attrs.type === 'airtable') {
+    embeddableSrc = convertAirtableToEmbedUrl(attrs.src);
+  }
 
   if (readOnly) {
     return (
@@ -107,7 +111,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
           <iframe
             allowFullScreen
             title='iframe'
-            src={src}
+            src={embeddableSrc}
             style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
           />
         </IframeContainer>
