@@ -97,7 +97,7 @@ const spaceDomain = 'rough-copper-constrictor'
 const postsPerCategory = 30;
 
 const withImageRatio = 55;
-// Step 3 - generate posts in different categories
+// Step 2 - generate posts in different categories
 
 // autogeneratePosts().then(() => console.log('done'))
 
@@ -106,7 +106,7 @@ function autogeneratePosts() {
     for (let i = 0; i <= categories.length; i++) {
       if (i === categories.length) {
         await generatePosts({
-          spaceDomain: 'rough-copper-constrictor',
+          spaceDomain,
           title: `Uncategorised post`,
           count: postsPerCategory,
           withImageRatio,
@@ -114,7 +114,7 @@ function autogeneratePosts() {
       } else {
         const category = categories[i];
         await generatePosts({
-          spaceDomain: 'rough-copper-constrictor',
+          spaceDomain,
           title: `${category.name} post`,
           categoryId: category.id,
           count: postsPerCategory,
