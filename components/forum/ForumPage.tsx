@@ -52,8 +52,11 @@ export default function ForumPage() {
 
   return (
     <CenteredPageContent>
-      <Typography variant='h1'>Forum</Typography>
-      <TextField
+      <Typography variant='h1' mb={2}>
+        Forum
+      </Typography>
+      {/** Re-enable once we support searching for posts
+             <TextField
         variant='outlined'
         placeholder='Search Posts, Comments and Members'
         onChange={(e) => setSearch(e.target.value)}
@@ -67,6 +70,7 @@ export default function ForumPage() {
           )
         }}
       />
+         */}
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ xs: 'block', lg: 'none' }}>
