@@ -24,6 +24,9 @@ export async function generateForumPosts({
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
 
+  // Start creating the posts 3 days ago
+  let createdAt = Date.now() - 1000 * 60 * 60 * 24 * 30;
+
   for (let i = 0; i < count; i++) {
     const postInput: Prisma.PostCreateManyInput = {
       status: 'published',
@@ -32,6 +35,8 @@ export async function generateForumPosts({
     };
 
     postCreateInputs.push(postInput);
+
+    const postDate = new Date(createdAt);
 
     pageCreateInputs.push({
       id: postInput.id,
@@ -44,8 +49,13 @@ export async function generateForumPosts({
       type: 'post',
       path: `path-${v4()}`,
       postId: postInput.id,
-      galleryImage
+      galleryImage,
+      createdAt: postDate,
+      updatedAt: postDate
     });
+
+    // Space posts apart by 30 minutes
+    createdAt += 1000 * 60 * 30;
   }
 
   await prisma.post.createMany({ data: postCreateInputs });

@@ -71,10 +71,23 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
     }
   })
 
+  await prisma.page.deleteMany({
+    where: {
+      type: 'post',
+      spaceId: space.id
+    }
+  })
+
 }
 
+// wipePosts({
+//   spaceDomain: 'rough-copper-constrictor'
+// }).then(posts => {
+//   console.log('Done')
+// })
 
-generatePosts({spaceDomain: 'rough-copper-constrictor', count: 10}).then(posts => {
+
+generatePosts({spaceDomain: 'rough-copper-constrictor', count: 20}).then(posts => {
   console.log('Done')
 })
 .catch(err => {
