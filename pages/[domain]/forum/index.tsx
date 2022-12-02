@@ -10,7 +10,7 @@ export default function ForumPage() {
   const space = useCurrentSpace();
 
   // Show this page only to charmverse users
-  if (!space?.name.includes('charmverse') && isProdEnv) {
+  if (!isProdEnv || (isProdEnv && space?.domain.includes('charmverse'))) {
     return null;
   }
 
