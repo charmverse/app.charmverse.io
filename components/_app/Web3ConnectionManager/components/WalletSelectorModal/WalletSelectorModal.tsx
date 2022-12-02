@@ -9,9 +9,11 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
 import { useEffect, useRef } from 'react';
 
+import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
+import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/verifyUnstoppableDomainsSignature';
 
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
@@ -78,8 +80,9 @@ function WalletSelectorModal({
   async function handleAuth() {
     setIsConnectingIdentity(true);
     try {
-      const auth = await uauth.loginWithPopup();
-      closeModal();
+      const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
+      await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      window.location.reload();
     } catch (err) {
       // console.log('UD Error', err);
     } finally {
