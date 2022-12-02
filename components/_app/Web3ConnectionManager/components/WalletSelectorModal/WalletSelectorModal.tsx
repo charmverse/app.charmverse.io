@@ -75,7 +75,7 @@ function WalletSelectorModal({
   }, [error, openNetworkModal, closeModal]);
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
-  const redirectUri = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI as string;
+  const redirectUri = `${window.location.protocol}//${window.location.host}`;
   log.debug('UD client values:', 'ClientID', clientID, 'RedirectUri', redirectUri);
 
   const uauth = new UAuth({
