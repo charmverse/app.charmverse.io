@@ -1,6 +1,6 @@
-import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
+import type { IdentityType } from '@prisma/client';
+
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
-import type { IdentityType } from 'models/User';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 

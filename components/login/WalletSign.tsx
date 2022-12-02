@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/system';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -37,7 +37,8 @@ export function WalletSign({
     walletAuthSignature,
     verifiableWalletDetected,
     connectWallet,
-    connectWalletModalIsOpen
+    connectWalletModalIsOpen,
+    isConnectingIdentity
   } = useWeb3AuthSig();
   const { isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
@@ -54,11 +55,17 @@ export function WalletSign({
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && enableAutosign && verifiableWalletDetected) {
+    if (
+      userClickedConnect.current &&
+      !isSigning &&
+      enableAutosign &&
+      verifiableWalletDetected &&
+      !isConnectingIdentity
+    ) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
-  }, [verifiableWalletDetected]);
+  }, [verifiableWalletDetected, isConnectingIdentity]);
 
   async function generateWalletAuth() {
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
@@ -73,13 +80,13 @@ export function WalletSign({
     }
   }
 
-  if (!verifiableWalletDetected) {
+  if (!verifiableWalletDetected || isConnectingIdentity) {
     return (
       <ButtonComponent
         data-test='connect-wallet-button'
         sx={buttonStyle}
         size={buttonSize ?? 'large'}
-        loading={connectWalletModalIsOpen}
+        loading={connectWalletModalIsOpen || isConnectingIdentity}
         onClick={() => {
           userClickedConnect.current = true;
           connectWallet();

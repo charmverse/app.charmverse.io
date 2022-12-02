@@ -13,7 +13,6 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
 export async function createUser({
@@ -221,7 +220,7 @@ export async function generateBounty({
 export async function generateUser({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
   const user = await prisma.user.create({
     data: {
-      identityType: IDENTITY_TYPES[0],
+      identityType: 'Wallet',
       username: v4(),
       path: v4(),
       wallets: {
@@ -238,7 +237,7 @@ export async function generateUser({ walletAddress = Wallet.createRandom().addre
 export async function generateDiscordUser() {
   const user = await prisma.user.create({
     data: {
-      identityType: IDENTITY_TYPES[0],
+      identityType: 'Wallet',
       username: v4(),
       path: v4(),
       discordUser: {

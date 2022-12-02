@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -16,6 +17,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
+import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -90,6 +92,24 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 }
 
 async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
+  const { username, identityType } = req.body as User;
+  const { id: userId } = req.session.user;
+
+  if (identityType === 'UnstoppableDomain' && username) {
+    const domain = await prisma.unstoppableDomain.findFirst({
+      where: {
+        userId,
+        domain: username
+      }
+    });
+
+    if (!domain) {
+      throw new InsecureOperationError(
+        `Cannot switch to Unstoppable Domain ${username} for user ${userId} as it is not registered`
+      );
+    }
+  }
+
   const user = await prisma.user.update({
     where: {
       id: req.session.user.id

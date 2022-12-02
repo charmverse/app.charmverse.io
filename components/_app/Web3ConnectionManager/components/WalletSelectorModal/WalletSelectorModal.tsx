@@ -2,15 +2,20 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
 import { useEffect, useRef } from 'react';
 
+import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
+import { useSnackbar } from 'hooks/useSnackbar';
+import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
+import log from 'lib/log';
 
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
@@ -21,6 +26,7 @@ type Props = {
   isModalOpen: boolean;
   closeModal: () => void;
   openNetworkModal: () => void;
+  setIsConnectingIdentity: (isConnectingIdentity: boolean) => void;
 };
 
 function WalletSelectorModal({
@@ -28,10 +34,12 @@ function WalletSelectorModal({
   setActivatingConnector,
   isModalOpen,
   closeModal,
-  openNetworkModal // Passing as prop to avoid dependency cycle
+  openNetworkModal, // Passing as prop to avoid dependency cycle
+  setIsConnectingIdentity
 }: Props) {
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
+  const { showMessage } = useSnackbar();
 
   // initialize metamask onboarding
   const onboarding = useRef<MetaMaskOnboarding>();
@@ -65,6 +73,30 @@ function WalletSelectorModal({
       openNetworkModal();
     }
   }, [error, openNetworkModal, closeModal]);
+
+  const clientID =
+    (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string) ?? '0e8c724d-bbb8-4876-9dc7-ddfb466a3a0f';
+  const redirectUri = (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI as string) ?? 'http://localhost:3000';
+
+  const uauth = new UAuth({
+    clientID,
+    redirectUri,
+    scope: 'openid wallet'
+  });
+
+  async function handleAuth() {
+    setIsConnectingIdentity(true);
+    try {
+      const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
+      showMessage(`Logged in with Unstoppable Domains. Redirecting you now.`, 'success');
+      await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
+      window.location.reload();
+    } catch (err) {
+      setIsConnectingIdentity(false);
+      log.error(err);
+    }
+  }
 
   return (
     <Modal open={isModalOpen} onClose={closeModal}>
@@ -104,6 +136,16 @@ function WalletSelectorModal({
             name='Coinbase Wallet'
             onClick={() => handleConnect(walletLink)}
             iconUrl='coinbasewallet.png'
+            disabled={connector === walletLink || !!activatingConnector}
+            isActive={connector === walletLink}
+            isLoading={activatingConnector === walletLink}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <ConnectorButton
+            name='Unstoppable Domains'
+            onClick={handleAuth}
+            iconUrl='unstoppable-domains.png'
             disabled={connector === walletLink || !!activatingConnector}
             isActive={connector === walletLink}
             isLoading={activatingConnector === walletLink}

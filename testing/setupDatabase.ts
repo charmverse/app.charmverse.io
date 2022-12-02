@@ -28,10 +28,10 @@ import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput, ProposalWithUsers } from 'lib/proposal/interface';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
+import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 
 import { boardWithCardsArgs } from './generate-board-stub';
 
@@ -44,7 +44,7 @@ export async function generateSpaceUser({
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
-      identityType: IDENTITY_TYPES[1],
+      identityType: 'Discord',
       username: 'Username',
       wallets: {
         create: {
@@ -62,19 +62,7 @@ export async function generateSpaceUser({
         }
       }
     },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      wallets: true
-    }
+    include: sessionUserRelations
   });
 }
 

@@ -218,15 +218,15 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <Web3ReactProvider getLibrary={getLibrary}>
-              <Web3ConnectionManager>
-                <Web3AccountProvider>
-                  <ReactDndProvider>
-                    <DataProviders>
-                      <OnboardingProvider>
-                        <FocalBoardProvider>
-                          <IntlProvider>
-                            <SnackbarProvider>
+            <SnackbarProvider>
+              <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ConnectionManager>
+                  <Web3AccountProvider>
+                    <ReactDndProvider>
+                      <DataProviders>
+                        <OnboardingProvider>
+                          <FocalBoardProvider>
+                            <IntlProvider>
                               <PageMetaTags />
                               <CssBaseline enableColorScheme={true} />
                               <Global styles={cssVariables} />
@@ -248,15 +248,15 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                                   <GlobalComponents />
                                 </ErrorBoundary>
                               </RouteGuard>
-                            </SnackbarProvider>
-                          </IntlProvider>
-                        </FocalBoardProvider>
-                      </OnboardingProvider>
-                    </DataProviders>
-                  </ReactDndProvider>
-                </Web3AccountProvider>
-              </Web3ConnectionManager>
-            </Web3ReactProvider>
+                            </IntlProvider>
+                          </FocalBoardProvider>
+                        </OnboardingProvider>
+                      </DataProviders>
+                    </ReactDndProvider>
+                  </Web3AccountProvider>
+                </Web3ConnectionManager>
+              </Web3ReactProvider>
+            </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
