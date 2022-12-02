@@ -74,9 +74,9 @@ function WalletSelectorModal({
     }
   }, [error, openNetworkModal, closeModal]);
 
-  const clientID =
-    (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string) ?? '0e8c724d-bbb8-4876-9dc7-ddfb466a3a0f';
-  const redirectUri = (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI as string) ?? 'http://localhost:3000';
+  const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
+  const redirectUri = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI as string;
+  log.debug('UD client values:', 'ClientID', clientID, 'RedirectUri', redirectUri);
 
   const uauth = new UAuth({
     clientID,
