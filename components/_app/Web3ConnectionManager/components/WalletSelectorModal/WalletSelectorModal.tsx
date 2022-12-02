@@ -7,6 +7,7 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
+import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient';
@@ -40,6 +41,8 @@ function WalletSelectorModal({
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
   const { showMessage } = useSnackbar();
+
+  const router = useRouter();
 
   // initialize metamask onboarding
   const onboarding = useRef<MetaMaskOnboarding>();
@@ -75,7 +78,9 @@ function WalletSelectorModal({
   }, [error, openNetworkModal, closeModal]);
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
-  const redirectUri = `${window.location.protocol}//${window.location.host}`;
+  const redirectUri =
+    typeof window === 'undefined' ? (process.env.NEXT_PUBLIC_DOMAIN as string) : `${window.location.origin}`;
+
   log.debug('UD client values:', 'ClientID', clientID, 'RedirectUri', redirectUri);
 
   const uauth = new UAuth({
