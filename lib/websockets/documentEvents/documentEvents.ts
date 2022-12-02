@@ -119,7 +119,7 @@ export class DocumentEventHandler {
   }
 
   async onMessage(message: WrappedSocketMessage<ClientMessage>) {
-    log.debug('Received message:', { message, messages: this.messages });
+    // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
       await this.resendMessages(message.from);

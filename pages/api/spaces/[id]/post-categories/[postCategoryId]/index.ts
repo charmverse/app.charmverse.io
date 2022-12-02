@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
-import { updatePostCategory } from 'lib/posts/updatePostCategory';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

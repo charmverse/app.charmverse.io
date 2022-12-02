@@ -1,19 +1,13 @@
 import type { PostCategory } from '@prisma/client';
 
 import * as http from 'adapters/http';
-import type { ForumPost } from 'lib/forum/interfaces';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
-import type { PostCategoryUpdate } from 'lib/posts/updatePostCategory';
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
+import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
+import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
 export class ForumApi {
-  listForumPosts(
-    spaceId: string,
-    sort?: string,
-    category?: string,
-    count?: number,
-    page?: number
-  ): Promise<ForumPost[]> {
-    return http.GET('/api/forum/posts', { spaceId, sort, category, count, page });
+  listForumPosts({ spaceId, count, page, sort, categoryIds }: ListForumPostsRequest): Promise<PaginatedPostList> {
+    return http.GET('/api/forums/posts', { spaceId, sort, categoryIds, count, page });
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {

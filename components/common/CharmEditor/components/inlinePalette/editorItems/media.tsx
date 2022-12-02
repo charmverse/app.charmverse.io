@@ -3,10 +3,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 
-import { MAX_EMBED_WIDTH } from 'lib/embed/constants';
-
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import { VIDEO_ASPECT_RATIO } from '../../video/videoSpec';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';

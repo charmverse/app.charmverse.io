@@ -1,6 +1,6 @@
 
 import { prisma } from 'db'
-import { generateDefaultPostCategoriesInput } from 'lib/posts/generateDefaultPostCategories'
+import { generateDefaultPostCategoriesInput } from 'lib/forums/categories/generateDefaultPostCategories'
 
 
 export async function provisionDefaultPostCategories() {

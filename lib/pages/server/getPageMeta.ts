@@ -13,6 +13,7 @@ export function pageMetaSelect() {
     boardId: true,
     bountyId: true,
     cardId: true,
+    postId: true,
     createdAt: true,
     createdBy: true,
     deletedAt: true,

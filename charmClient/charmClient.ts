@@ -17,6 +17,7 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
+import { MuxApi } from 'charmClient/apis/muxApi';
 import { PagesApi } from 'charmClient/apis/pagesApi';
 import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -99,6 +100,8 @@ class CharmClient {
   track = new TrackApi();
 
   forum = new ForumApi();
+
+  mux = new MuxApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

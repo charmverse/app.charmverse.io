@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack, TextField } from '@mui/material';
+import { Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Divider from '@mui/material/Divider';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -12,19 +11,19 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
-import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
 import isAdmin from 'hooks/useIsAdmin';
 
-export default function FilterList() {
+import type { FilterProps } from './FilterSelect';
+
+export default function FilterList({ categoryIdSelected, selectedCategory }: FilterProps) {
   const { getLinkUrl, categories, sortList, error, refetchForumCategories } = useForumFilters();
   const { query } = useRouter();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const [forumCategoryName, setForumCategoryName] = useState('');
   const currentSpace = useCurrentSpace();
-  const router = useRouter();
   const admin = isAdmin();
   async function createForumCategory() {
     if (currentSpace) {
@@ -68,7 +67,8 @@ export default function FilterList() {
   return (
     <Card variant='outlined'>
       <CardContent>
-        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+        {/** TODO - Enable sorting 
+        <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {sortList.map((sort) => (
             <Link
               key={sort}
@@ -82,6 +82,24 @@ export default function FilterList() {
         </Box>
         <Divider sx={{ pt: '10px', mb: '10px' }} />
         <Stack gap={1} my={1}>
+          {
+            // <Link
+            //   key={category.name}
+            //   // sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
+            //   color='inherit'
+            // >
+            // </Link>
+                <Divider sx={{ pt: '10px', mb: '10px' }} />
+        */}
+        <Stack gap={2}>
+          <Typography
+            key='all-categories'
+            onClick={() => categoryIdSelected(undefined)}
+            sx={{ fontWeight: selectedCategory === undefined ? 'bold' : 'initial' }}
+            color='inherit'
+          >
+            All categories
+          </Typography>
           {categories?.map((category) => (
             <SelectOptionItem
               option={category as SelectOptionType}
@@ -89,15 +107,10 @@ export default function FilterList() {
               onChange={!admin ? undefined : updateForumCategory}
               onDelete={!admin ? undefined : deleteForumCategory}
               onChipClick={() => {
-                router.push(getLinkUrl(category.name));
+                categoryIdSelected(category.id);
+                // router.push(getLinkUrl(category.name));
               }}
             />
-            // <Link
-            //   key={category.name}
-            //   // sx={{ fontWeight: category.name === query.category ? 'bold' : 'initial' }}
-            //   color='inherit'
-            // >
-            // </Link>
           ))}
         </Stack>
         <Button disabled={!admin} startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>

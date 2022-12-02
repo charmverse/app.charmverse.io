@@ -1,13 +1,12 @@
-import type { NodeViewProps, RawSpecs } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node, Slice, Transaction } from '@bangle.dev/pm';
+import type { RawSpecs } from '@bangle.dev/core';
+import type { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
@@ -16,6 +15,8 @@ import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
+import BlockAligner from './BlockAligner';
+import type { CharmNodeViewProps } from './nodeView/nodeView';
 import Resizable from './Resizable/Resizable';
 
 const StyledEmptyImageContainer = styled(Box)`
@@ -27,29 +28,30 @@ const StyledEmptyImageContainer = styled(Box)`
 `;
 
 function EmptyImageContainer({
-  readOnly,
+  onDelete,
   isSelected,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; isSelected?: boolean }) {
+}: HTMLAttributes<HTMLDivElement> & { onDelete: () => void; readOnly: boolean; isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
-    <ListItem
-      button
-      disableRipple
-      disabled={readOnly}
-      sx={{
-        backgroundColor: isSelected && !readOnly ? 'var(--charmeditor-active)' : theme.palette.background.light,
-        p: 2,
-        display: 'flex'
-      }}
-      {...props}
-    >
-      <StyledEmptyImageContainer>
-        <ImageIcon fontSize='small' />
-        <Typography>Add an image</Typography>
-      </StyledEmptyImageContainer>
-    </ListItem>
+    <BlockAligner onDelete={onDelete}>
+      <ListItem
+        button
+        disableTouchRipple
+        sx={{
+          backgroundColor: isSelected ? 'var(--charmeditor-active)' : theme.palette.background.light,
+          p: 2,
+          display: 'flex'
+        }}
+        {...props}
+      >
+        <StyledEmptyImageContainer>
+          <ImageIcon fontSize='small' />
+          <Typography>Add an image</Typography>
+        </StyledEmptyImageContainer>
+      </ListItem>
+    </BlockAligner>
   );
 }
 
@@ -122,21 +124,16 @@ function imageSpec(): RawSpecs {
     }
   };
 }
-
-interface ResizableImageProps extends NodeViewProps {
-  readOnly?: boolean;
-  onResizeStop?: (view: EditorView) => void;
-}
-
 function ResizableImage({
   readOnly = false,
   getPos,
   view,
   onResizeStop,
+  deleteNode,
   node,
   updateAttrs,
   selected
-}: ResizableImageProps) {
+}: CharmNodeViewProps) {
   const imageSource = node.attrs.src;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
@@ -153,7 +150,7 @@ function ResizableImage({
   // If there are no source for the node, return the image select component
   if (!imageSource) {
     if (readOnly) {
-      return <EmptyImageContainer readOnly={readOnly} isSelected={selected} />;
+      return <div />;
     } else {
       return (
         <ImageSelector
@@ -165,11 +162,11 @@ function ResizableImage({
             });
           }}
         >
-          <EmptyImageContainer readOnly={readOnly} isSelected={selected} />
+          <EmptyImageContainer onDelete={deleteNode} readOnly={readOnly} isSelected={selected} />
         </ImageSelector>
       );
     }
-  } else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && onResizeStop && !uploadFailed) {
+  } else if (imageSource.startsWith('data') && !uploadingImage && !readOnly && !uploadFailed) {
     setUploadingImage(true);
 
     const fileExtension = imageSource.split('image/')[1].split(';')[0];

@@ -16,7 +16,21 @@ export function useForumFilters() {
     error,
     isValidating,
     mutate
-  } = useSWR(currentSpace ? '/forum/categories' : null, () => charmClient.forum.listPostCategories(currentSpace!.id));
+  } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
+    charmClient.forum.listPostCategories(currentSpace!.id).then((_categories) =>
+      _categories.sort((catA, catB) => {
+        const first = catA.name.toLowerCase();
+        const second = catB.name.toLowerCase();
+        if (first < second) {
+          return -1;
+        } else if (second < first) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    )
+  );
 
   const getLinkUrl = (value: string) => {
     const isValidSort = value && sortList.some((sortOption) => sortOption === value);

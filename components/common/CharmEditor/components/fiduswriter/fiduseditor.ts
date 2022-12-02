@@ -284,7 +284,6 @@ export class FidusEditor {
         if (tr.steps) {
           this.docInfo.updated = new Date();
         }
-        // // console.log('send to collaborators');
         this.mod.collab.doc.sendToCollaborators();
       }
     });

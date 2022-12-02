@@ -3,8 +3,7 @@ import type { PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -51,7 +50,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/spaces/[id]/post-categories - Create a post category', () => {
-  it('should create the post category if the user is a space admin, and return the post category, responding with 200', async () => {
+  it('should create the post category if the user is a space admin, and return the post category, responding with 201', async () => {
     const adminUserCookie = await loginUser(firstSpaceAdminUser.id);
 
     const createInput: Partial<CreatePostCategoryInput> = {
