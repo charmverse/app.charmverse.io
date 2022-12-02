@@ -27,6 +27,7 @@ enum IdentityType {
   Wallet
   Discord
   Telegram
+  UnstoppableDomain
   RandomName
 }
 
@@ -444,6 +445,7 @@ model User {
   wallets              UserWallet[]
   memberPropertyValues MemberPropertyValue[]
   userTokenGates       UserTokenGate[]
+  unstoppableDomains   UnstoppableDomain[]
 }
 
 model UserWallet {
@@ -1068,4 +1070,12 @@ model PageCommentUpDownVote {
   @@unique([createdBy, commentId])
   @@index([commentId])
   @@index([pageId])
+}
+
+
+model UnstoppableDomain {
+  id        String   @id @default(uuid()) @db.Uuid
+  domain    String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
