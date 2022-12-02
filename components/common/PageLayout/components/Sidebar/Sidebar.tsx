@@ -22,11 +22,11 @@ import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
 import Link from 'components/common/Link';
+import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useUser } from 'hooks/useUser';
-import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { isSmallScreen } from 'lib/utilities/browser';
@@ -231,6 +231,8 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
     }
   }
 
+  const showForums = !isProdEnv || (isProdEnv && space?.domain.includes('charmverse'));
+
   return (
     <SidebarContainer>
       <Workspaces />
@@ -267,15 +269,15 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
               label='Bounties'
               onClick={closeSidebarIfIsMobile}
             />
-            {/**
-                         <SidebarLink
-              href={`/${space.domain}/forum`}
-              active={router.pathname.startsWith('/[domain]/forum')}
-              icon={<MessageOutlinedIcon fontSize='small' />}
-              label='Forum'
-              onClick={closeSidebarIfIsMobile}
-            />  
-                */}
+            {showForums && (
+              <SidebarLink
+                href={`/${space.domain}/forum`}
+                active={router.pathname.startsWith('/[domain]/forum')}
+                icon={<MessageOutlinedIcon fontSize='small' />}
+                label='Forum'
+                onClick={closeSidebarIfIsMobile}
+              />
+            )}
             <Divider sx={{ mx: 2, my: 1 }} />
             <Tooltip
               title={
