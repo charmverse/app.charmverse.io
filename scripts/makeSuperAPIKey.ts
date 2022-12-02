@@ -3,7 +3,7 @@
 import { provisionSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 
 // use this file and run against production to generate super api keys
-const name = 'test';
+const name = '';
 
 (async () => {
     if (!name) {
