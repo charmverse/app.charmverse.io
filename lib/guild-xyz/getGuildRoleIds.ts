@@ -8,9 +8,11 @@ export async function getGuildRoleIds(addresses: string[]) {
   const guildMembershipsResponses = await Promise.all(addresses.map((address) => user.getMemberships(address)));
   guildMembershipsResponses.forEach((guildMembershipsResponse) => {
     guildMembershipsResponse?.forEach((guildMemberships) => {
-      const { roleIds } = guildMemberships as unknown as { roleIds: string[] };
+      const { roleIds, roleids } = guildMemberships as unknown as { roleids: string[]; roleIds: string[] };
       if (roleIds) {
         guildRoleIds.push(...roleIds.map(String));
+      } else if (roleids) {
+        guildRoleIds.push(...roleids.map(String));
       } else {
         log.warn('Guild.xyz response is missing roleIds', { addresses, guildMemberships });
       }
