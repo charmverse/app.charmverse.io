@@ -23,8 +23,10 @@ export function plugins() {
       props: {
         handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
           // @ts-ignore
-          const contentRow = slice.content.content?.[0]?.content.content;
-          const iframeUrl = extractUrlFromIFrame(contentRow?.[0]?.text);
+          const contentRow = slice.content.content?.[0]?.content.content || [];
+          // @ts-ignore
+          const nodesWithUrl = contentRow.map((node) => extractUrlFromIFrame(node.text)).filter(Boolean);
+          const iframeUrl = nodesWithUrl[0];
           if (iframeUrl) {
             const youtubeType = extractYoutubeLinkType(iframeUrl);
             if (youtubeType) {

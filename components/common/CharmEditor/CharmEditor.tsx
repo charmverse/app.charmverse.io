@@ -122,6 +122,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
+    iframe.plugins(), // make sure iframe appears before links plugin
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -220,7 +221,6 @@ export function charmEditorPlugins({
     disclosure.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    iframe.plugins(),
     videoPlugins()
   ];
 
