@@ -1,16 +1,14 @@
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import ForumPageComponent from 'components/forum/ForumPage';
-import { isProdEnv } from 'config/constants';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function ForumPage() {
   setTitle('Forum');
-
-  const space = useCurrentSpace();
+  const isCharmVerseSpace = useIsCharmverseSpace();
 
   // Show this page only to charmverse users
-  if (!isProdEnv || (isProdEnv && space?.domain.includes('charmverse'))) {
+  if (!isCharmVerseSpace) {
     return null;
   }
 
