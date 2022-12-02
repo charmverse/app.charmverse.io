@@ -9,7 +9,7 @@ import { name as videoName } from '../video/videoSpec';
 
 import type { IframeNodeAttrs } from './config';
 import { name } from './iframeSpec';
-import { extractUrlFromIFrame, extractEmbedType } from './utils';
+import { extractIframeUrl, extractEmbedType } from './utils';
 
 // inject a tweet node when pasting twitter url
 
@@ -22,11 +22,7 @@ export function plugins() {
     new Plugin({
       props: {
         handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-          // @ts-ignore
-          const contentRow = slice.content.content?.[0]?.content.content || [];
-          // @ts-ignore
-          const nodesWithUrl = contentRow.map((node) => extractUrlFromIFrame(node.text)).filter(Boolean);
-          const iframeUrl = nodesWithUrl[0];
+          const iframeUrl = extractIframeUrl(slice);
           if (iframeUrl) {
             const youtubeType = extractYoutubeLinkType(iframeUrl);
             if (youtubeType) {

@@ -31,7 +31,6 @@ import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
-import { removeNodeAtPosition } from 'lib/prosemirror/removeNodeAtPosition';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
@@ -122,7 +121,6 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
-    iframe.plugins(), // make sure iframe appears before links plugin
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -221,7 +219,8 @@ export function charmEditorPlugins({
     disclosure.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins()
+    videoPlugins(),
+    iframe.plugins()
   ];
 
   if (!readOnly) {
