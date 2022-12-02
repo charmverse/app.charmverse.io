@@ -64,47 +64,27 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
       }
     });
 
-    const loggedInUser = await prisma.$transaction(
-      async (tx) => {
-        let userId: string;
+    const user: LoggedInUser = !userWallet
+      ? await createUserFromWallet(address, signupAnalytics)
+      : await getUserProfile('id', userWallet.userId);
 
-        if (!userWallet) {
-          const user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId, tx);
-          userId = user.id;
-
-          await tx.unstoppableDomain.create({
-            data: {
-              domain,
-              user: {
-                connect: {
-                  id: userId
-                }
-              }
-            }
-          });
-
-          await assignUnstoppableDomainAsUserIdentity({ domain, userId, tx });
-        } else {
-          userId = userWallet.userId;
-          await tx.unstoppableDomain.create({
-            data: {
-              domain,
-              user: {
-                connect: {
-                  id: userId
-                }
-              }
-            }
-          });
+    await prisma.unstoppableDomain.create({
+      data: {
+        domain,
+        user: {
+          connect: {
+            id: user.id
+          }
         }
+      }
+    });
 
-        return getUserProfile('id', userId, tx);
-      },
-      { timeout: 10000 }
-    );
-    req.session.user = loggedInUser as LoggedInUser;
+    if (!userWallet) {
+      await assignUnstoppableDomainAsUserIdentity({ domain, userId: user.id });
+    }
+    req.session.user = user as LoggedInUser;
     await req.session.save();
-    res.status(200).json(loggedInUser);
+    res.status(200).json(user);
   }
 }
 

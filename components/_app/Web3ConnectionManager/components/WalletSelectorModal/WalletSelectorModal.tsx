@@ -13,6 +13,7 @@ import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import log from 'lib/log';
 
@@ -38,6 +39,7 @@ function WalletSelectorModal({
 }: Props) {
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
+  const { showMessage } = useSnackbar();
 
   // initialize metamask onboarding
   const onboarding = useRef<MetaMaskOnboarding>();
@@ -86,6 +88,7 @@ function WalletSelectorModal({
     setIsConnectingIdentity(true);
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
+      showMessage(`Logged in with Unstoppable Domains. Redirecting you now.`, 'success');
       await charmClient.profile.loginWithUnstoppableDomains({ authSig });
       // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
       window.location.reload();
