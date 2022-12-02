@@ -196,10 +196,6 @@ export function charmEditorPlugins({
       containerDOM: ['div']
     }),
     NodeView.createPlugin({
-      name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
@@ -223,7 +219,8 @@ export function charmEditorPlugins({
     disclosure.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins()
+    videoPlugins(),
+    iframe.plugins()
   ];
 
   if (!readOnly) {
@@ -523,11 +520,16 @@ function CharmEditor({
         const allProps: CharmNodeViewProps = {
           ...props,
           onResizeStop,
+          pageId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
-            const getPos = props.getPos;
-            view.dispatch(view.state.tr.deleteRange(getPos(), getPos() + 1));
+            const tr = view.state.tr;
+            const start = props.getPos();
+            const end = start + props.node.nodeSize;
+            tr.deleteRange(start, end);
+            tr.deleteSelection();
+            view.dispatch(tr);
           }
         };
 
