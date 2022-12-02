@@ -71,21 +71,32 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
         if (!userWallet) {
           const user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId, tx);
           userId = user.id;
+
+          await tx.unstoppableDomain.create({
+            data: {
+              domain,
+              user: {
+                connect: {
+                  id: userId
+                }
+              }
+            }
+          });
+
           await assignUnstoppableDomainAsUserIdentity({ domain, userId, tx });
         } else {
           userId = userWallet.userId;
-        }
-
-        await tx.unstoppableDomain.create({
-          data: {
-            domain,
-            user: {
-              connect: {
-                id: userId
+          await tx.unstoppableDomain.create({
+            data: {
+              domain,
+              user: {
+                connect: {
+                  id: userId
+                }
               }
             }
-          }
-        });
+          });
+        }
 
         return getUserProfile('id', userId, tx);
       },
