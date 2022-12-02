@@ -15,19 +15,15 @@ export function extractEmbedType(url: string): EmbedType {
   return type;
 }
 
-export function extractUrlFromIFrame(url: string): { type: EmbedType; url: string } {
-  let embedUrl = url;
-  const type: EmbedType = 'embed';
-
+export function extractUrlFromIFrame(url: string): string | null {
   const isIframeEmbed = url.startsWith('<iframe ');
   if (isIframeEmbed) {
     const indexOfSrc = url.indexOf('src');
     const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
     const indexOfLastQuote = url.indexOf('"', indexOfFirstQuote + 1);
-    embedUrl = url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
+    return url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
   }
-
-  return { type, url: embedUrl };
+  return null;
 }
 
 export function convertFigmaToEmbedUrl(url: string) {

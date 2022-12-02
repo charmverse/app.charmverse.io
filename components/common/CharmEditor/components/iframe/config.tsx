@@ -29,3 +29,10 @@ export const embeds = {
 };
 
 export type EmbedType = keyof typeof embeds;
+
+export type IframeNodeAttrs = {
+  src?: string;
+  type: EmbedType;
+  height: number;
+  width: number;
+};

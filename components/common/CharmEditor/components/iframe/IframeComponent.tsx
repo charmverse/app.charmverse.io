@@ -10,19 +10,12 @@ import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
-import type { EmbedType } from './config';
+import type { IframeNodeAttrs, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
 import { convertFigmaToEmbedUrl, convertAirtableToEmbedUrl, extractEmbedType } from './utils';
 
-type IframeAttrs = {
-  src?: string;
-  type: EmbedType;
-  height: number;
-  width: number;
-};
-
-function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
-  const attrs = node.attrs as IframeAttrs;
+function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
+  const attrs = node.attrs as IframeNodeAttrs;
 
   const [height, setHeight] = useState(attrs.height);
 
@@ -120,4 +113,4 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
   );
 }
 
-export default memo(ResizableIframe);
+export default memo(IframeComponent);
