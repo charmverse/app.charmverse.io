@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { generateDefaultPostCategoriesInput } from 'lib/forums/categories/generateDefaultPostCategories';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -12,7 +13,6 @@ import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPri
 import { createPage } from 'lib/pages/server/createPage';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { generateDefaultPostCategoriesInput } from 'lib/posts/generateDefaultPostCategories';
 import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCategoriesInput';
 
 type CreateSpaceProps = {

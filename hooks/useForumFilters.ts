@@ -15,7 +15,21 @@ export function useForumFilters() {
     data: categories,
     error,
     isValidating
-  } = useSWR(currentSpace ? '/forum/categories' : null, () => charmClient.forum.listPostCategories(currentSpace!.id));
+  } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
+    charmClient.forum.listPostCategories(currentSpace!.id).then((_categories) =>
+      _categories.sort((catA, catB) => {
+        const first = catA.name.toLowerCase();
+        const second = catB.name.toLowerCase();
+        if (first < second) {
+          return -1;
+        } else if (second < first) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    )
+  );
 
   const getLinkUrl = (value: string) => {
     const isValidSort = value && sortList.some((sortOption) => sortOption === value);
@@ -31,24 +45,5 @@ export function useForumFilters() {
     return `${query.domain}/forum/`;
   };
 
-  const handleClick = (value: string) => {
-    const isValidSort = value && sortList.some((btn) => btn === value);
-    const isValidCategory = value && categories?.some((category) => category.name === value);
-
-    push(
-      {
-        pathname: `/${query.domain}/forum`,
-        ...(isValidSort && {
-          query: { sort: value }
-        }),
-        ...(isValidCategory && {
-          query: { category: value }
-        })
-      },
-      undefined,
-      { shallow: true }
-    );
-  };
-
-  return { categories, sortList, error, getLinkUrl, handleClick, disabled: isValidating };
+  return { categories, sortList, error, getLinkUrl, disabled: isValidating };
 }

@@ -270,6 +270,9 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   const pages = (await prisma.page.findMany({
     where: {
       spaceId: input.spaceId,
+      type: {
+        not: 'post'
+      },
       deletedAt: input.archived ? { not: null } : null,
       ...searchQuery
     },

@@ -3,10 +3,10 @@ import type { PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
+import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
+import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
-import { createPostCategory } from 'lib/posts/createPostCategory';
-import type { PostCategoryUpdate } from 'lib/posts/updatePostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

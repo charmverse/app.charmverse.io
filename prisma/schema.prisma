@@ -299,7 +299,7 @@ model Page {
   bountyId           String?                 @unique @db.Uuid
   bounty             Bounty?                 @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  post               Post?                   @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  post               Post?                   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
@@ -1020,6 +1020,8 @@ enum PostStatus {
 model Post {
   id         String        @id @default(uuid()) @db.Uuid
   categoryId String?       @db.Uuid
+  pinned     Boolean?      @default(false)
+  locked     Boolean?      @default(false)
   category   PostCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   status     PostStatus
   page       Page?
