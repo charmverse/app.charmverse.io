@@ -31,6 +31,7 @@ import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
+import { removeNodeAtPosition } from 'lib/prosemirror/removeNodeAtPosition';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
@@ -219,6 +220,7 @@ export function charmEditorPlugins({
     disclosure.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
+    iframe.plugins(),
     videoPlugins()
   ];
 
@@ -523,10 +525,9 @@ function CharmEditor({
           readOnly,
           deleteNode: () => {
             const view = props.view;
-            const getPos = props.getPos;
             const tr = view.state.tr;
-            const start = getPos();
-            const end = start === 0 ? 0 : start + 1; // for some reason, a range of 0 to 1 deletes the first two elements
+            const start = props.getPos();
+            const end = start + props.node.nodeSize;
             tr.deleteRange(start, end);
             tr.deleteSelection();
             view.dispatch(tr);

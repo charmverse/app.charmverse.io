@@ -31,7 +31,7 @@ export function MediaSelectionPopup(props: InputProps) {
         >
           <Typography color='secondary' display='flex' gap={1.5} width='100%' alignItems='center'>
             {props.icon}
-            <Typography>{props.buttonText}</Typography>
+            <span>{props.buttonText}</span>
           </Typography>
         </ListItem>
       </BlockAligner>
