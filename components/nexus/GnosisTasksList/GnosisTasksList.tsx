@@ -69,7 +69,9 @@ export function GnosisTasksList({ error, mutateTasks, tasks }: GnosisTasksSectio
 
   return (
     <>
-      {safeData.length === 0 && <GnosisConnectCard loading={isRefreshingSafes} onClick={importSafes} />}
+      {safeData.length === 0 && (
+        <GnosisConnectCard connectable={!!gnosisSigner} loading={isRefreshingSafes} onClick={importSafes} />
+      )}
       {safeData.map((safe) => {
         const safeTasks = tasks
           .filter((taskGroup) => taskGroup.safeAddress === safe.address)

@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import { getChainById, getChainShortname } from 'connectors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -97,7 +98,7 @@ export default function GnosisSafesList() {
       </Legend>
 
       {sortedSafes.length === 0 && (
-        <GnosisConnectCard loading={!gnosisSigner || isLoadingSafes} onClick={importSafes} />
+        <GnosisConnectCard connectable={!!gnosisSigner} loading={isLoadingSafes} onClick={importSafes} />
       )}
 
       {sortedSafes.length > 0 && (
@@ -121,9 +122,18 @@ export default function GnosisSafesList() {
   );
 }
 
-export function GnosisConnectCard({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+export function GnosisConnectCard({
+  loading,
+  onClick,
+  connectable
+}: {
+  loading: boolean;
+  onClick: () => void;
+  connectable: boolean;
+}) {
   const router = useRouter();
   const isTasksPage = router.pathname.includes('/tasks');
+
   return (
     <Card variant='outlined'>
       <Box p={3} textAlign='center'>
@@ -137,9 +147,15 @@ export function GnosisConnectCard({ loading, onClick }: { loading: boolean; onCl
           )}
         </Typography>
         <br />
-        <Button loading={loading} onClick={onClick}>
-          Connect Gnosis Safe
-        </Button>
+        {connectable ? (
+          <Button loading={loading} onClick={onClick}>
+            Connect Gnosis Safe
+          </Button>
+        ) : (
+          <Alert sx={{ maxWidth: '80%', margin: 'auto' }} severity='info'>
+            Please unlock your wallet and ensure it is connected to your account.
+          </Alert>
+        )}
       </Box>
     </Card>
   );
