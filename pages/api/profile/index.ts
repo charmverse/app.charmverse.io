@@ -17,7 +17,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -104,7 +104,9 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
     });
 
     if (!domain) {
-      throw new DataNotFoundError(`Cannot find Unstoppable Domain ${username} for user ${userId}`);
+      throw new InsecureOperationError(
+        `Cannot switch to Unstoppable Domain ${username} for user ${userId} as it is not registered`
+      );
     }
   }
 

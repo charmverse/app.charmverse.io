@@ -2,12 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/verifyUnstoppableDomainsSignature';
+import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import {
   assignUnstoppableDomainAsUserIdentity,
   extractProofParams,
   verifyUnstoppableDomainsSignature
-} from 'lib/blockchain/verifyUnstoppableDomainsSignature';
+} from 'lib/blockchain/unstoppableDomains';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';

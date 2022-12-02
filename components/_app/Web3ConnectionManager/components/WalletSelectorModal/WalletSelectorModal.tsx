@@ -13,7 +13,7 @@ import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
-import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/verifyUnstoppableDomainsSignature';
+import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import log from 'lib/log';
 
 import ConnectorButton from './components/ConnectorButton';

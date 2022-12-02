@@ -8,7 +8,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
-type ProofParams = {
+export type ProofParams = {
   address: string;
   chainId: `Chain ID: ${string}`;
   chainName: string;
@@ -21,11 +21,10 @@ type ProofParams = {
   uri: `uns:${string}`;
   version: string;
 };
-type ProofContent = {
+export type ProofContent = {
   message: string;
   signature: string;
   template: {
-    format: string;
     params: ProofParams;
   };
   type: 'hybrid';
@@ -36,23 +35,10 @@ export type UnstoppableDomainsAuthSig = {
   accessToken: string;
   expiresAt: number;
   idToken: {
-    acr: 'sig';
     amr: ['swk', `v1.sign.ethereum.${string}`];
-    at_hash: string;
-    aud: [string];
-    auth_time: number;
-    domain_live: boolean;
-    eip4361_message: string;
-    eip4361_signature: string;
-    exp: number;
-    iat: number;
     iss: 'https://auth.unstoppabledomains.com/';
-    jti: string;
-    nonce: string;
     proof: Record<string, ProofContent>;
     wallet_address: string;
-    wallet_type_hint: string;
-    __raw: string;
   };
 };
 
