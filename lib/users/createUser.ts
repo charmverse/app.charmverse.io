@@ -56,7 +56,7 @@ export async function createUserFromWallet(
       include: sessionUserRelations
     });
 
-    updateTrackUserProfile(newUser);
+    updateTrackUserProfile(newUser, tx);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
 
     return newUser;
