@@ -1,5 +1,4 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Card, Typography } from '@mui/material';
+import { Alert, Card, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
