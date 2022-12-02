@@ -1,16 +1,17 @@
+import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import { Stack, TextField, Typography } from '@mui/material';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
+import { SelectOptionEdit } from 'components/common/form/fields/Select/SelectOptionEdit';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
@@ -18,9 +19,12 @@ import isAdmin from 'hooks/useIsAdmin';
 
 import type { FilterProps } from './FilterSelect';
 
+const StyledBox = styled(Box)`
+  ${hoverIconsStyle({ absolutePositioning: true, marginForIcons: false })}
+`;
+
 export default function FilterList({ categoryIdSelected, selectedCategory }: FilterProps) {
   const { getLinkUrl, categories, sortList, error, refetchForumCategories } = useForumFilters();
-  const { query } = useRouter();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const [forumCategoryName, setForumCategoryName] = useState('');
   const currentSpace = useCurrentSpace();
@@ -73,7 +77,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             <Link
               key={sort}
               href={getLinkUrl(sort)}
-              sx={{ fontWeight: sort === query.sort ? 'bold' : 'initial' }}
+              
               color='inherit'
             >
               {sort}
@@ -91,7 +95,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             // </Link>
                 <Divider sx={{ pt: '10px', mb: '10px' }} />
         */}
-        <Stack gap={2}>
+        <Stack gap={2} my={2}>
           <Typography
             key='all-categories'
             onClick={() => categoryIdSelected(undefined)}
@@ -101,16 +105,34 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             All categories
           </Typography>
           {categories?.map((category) => (
-            <SelectOptionItem
-              option={category as SelectOptionType}
-              key={category.name}
-              onChange={!admin ? undefined : updateForumCategory}
-              onDelete={!admin ? undefined : deleteForumCategory}
-              onChipClick={() => {
-                categoryIdSelected(category.id);
-                // router.push(getLinkUrl(category.name));
+            <StyledBox
+              key={category.id}
+              display='flex'
+              sx={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }}
-            />
+            >
+              <Typography
+                onClick={() => categoryIdSelected(category.id)}
+                sx={{
+                  cursor: 'pointer',
+                  fontWeight: selectedCategory === category.id ? 'bold' : 'initial'
+                }}
+              >
+                {category.name}
+              </Typography>
+              {!admin && (
+                <Box className='icons'>
+                  <SelectOptionEdit
+                    option={category as SelectOptionType}
+                    onChange={updateForumCategory}
+                    onDelete={deleteForumCategory}
+                  />
+                </Box>
+              )}
+            </StyledBox>
           ))}
         </Stack>
         <Button disabled={!admin} startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>

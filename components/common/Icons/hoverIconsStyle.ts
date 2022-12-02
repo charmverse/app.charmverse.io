@@ -4,7 +4,10 @@ import { css } from '@emotion/react';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 export const hoverIconsStyle =
-  ({ absolutePositioning = false }: { absolutePositioning?: boolean } = {}) =>
+  ({
+    absolutePositioning = false,
+    marginForIcons = true
+  }: { absolutePositioning?: boolean; marginForIcons?: boolean } = {}) =>
   ({ theme }: { theme: Theme }) =>
     css`
       position: relative;
@@ -28,7 +31,7 @@ export const hoverIconsStyle =
     position: absolute;
     top: 0;
     right: 0;
-    margin: ${theme.spacing(1)};
+    margin: ${marginForIcons ? theme.spacing(1) : 0};
     z-index: 1;
   `}
       }
