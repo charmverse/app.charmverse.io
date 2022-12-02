@@ -1,5 +1,5 @@
 import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
-import type { RawPlugins } from '@bangle.dev/core';
+import type { NodeViewProps, RawPlugins } from '@bangle.dev/core';
 import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
@@ -59,6 +59,7 @@ import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import { placeholderPlugin } from './components/placeholder/index';
@@ -72,8 +73,10 @@ import { plugins as trackPlugins } from './components/suggestions/suggestions.pl
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
-import { TweetComponent } from './components/tweet/components/Tweet';
 import * as tweet from './components/tweet/tweet';
+import { TweetNodeView } from './components/tweet/TweetNodeView';
+import { plugins as videoPlugins } from './components/video/video';
+import { VideoNodeView } from './components/video/VideoNodeView';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
@@ -193,10 +196,6 @@ export function charmEditorPlugins({
       containerDOM: ['div']
     }),
     NodeView.createPlugin({
-      name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
@@ -219,7 +218,9 @@ export function charmEditorPlugins({
     table.TableFiltersMenu(),
     disclosure.plugins(),
     tweet.plugins(),
-    trailingNode.plugins()
+    trailingNode.plugins(),
+    videoPlugins(),
+    iframe.plugins()
   ];
 
   if (!readOnly) {
@@ -516,9 +517,25 @@ function CharmEditor({
       }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
+        const allProps: CharmNodeViewProps = {
+          ...props,
+          onResizeStop,
+          pageId,
+          readOnly,
+          deleteNode: () => {
+            const view = props.view;
+            const tr = view.state.tr;
+            const start = props.getPos();
+            const end = start + props.node.nodeSize;
+            tr.deleteRange(start, end);
+            tr.deleteSelection();
+            view.dispatch(tr);
+          }
+        };
+
         switch (props.node.type.name) {
           case 'quote':
-            return <Quote {...props}>{_children}</Quote>;
+            return <Quote {...allProps}>{_children}</Quote>;
           case 'columnLayout': {
             return <LayoutRow node={props.node}>{_children}</LayoutRow>;
           }
@@ -555,10 +572,14 @@ function CharmEditor({
             );
           }
           case 'image': {
-            return <ResizableImage readOnly={readOnly} onResizeStop={onResizeStop} {...props} />;
+            return <ResizableImage {...allProps} />;
           }
           case 'iframe': {
-            return <iframe.Component readOnly={readOnly} onResizeStop={onResizeStop} {...props} />;
+            // support old video nodes which piggybacked on iframe type
+            if (props.node.attrs.type === 'video') {
+              return <VideoNodeView {...allProps} />;
+            }
+            return <iframe.Component {...allProps} />;
           }
           case 'mention': {
             return <Mention {...props}>{_children}</Mention>;
@@ -567,13 +588,16 @@ function CharmEditor({
             return <NestedPage {...props} />;
           }
           case 'pdf': {
-            return <ResizablePDF readOnly={readOnly} onResizeStop={onResizeStop} {...props} />;
+            return <ResizablePDF {...allProps} />;
           }
           case 'inlineDatabase': {
-            return <InlineDatabase containerWidth={containerWidth} readOnly={readOnly} {...props} />;
+            return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
           }
           case 'tweet': {
-            return <TweetComponent readOnly={readOnly} {...props} />;
+            return <TweetNodeView {...allProps} />;
+          }
+          case 'video': {
+            return <VideoNodeView {...allProps} />;
           }
           default: {
             return null;

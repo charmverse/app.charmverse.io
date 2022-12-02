@@ -6,7 +6,7 @@ import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { IPageWithPermissions } from '../interfaces';
 
 type PermissionsSelect = Record<keyof PagePermissionMeta, true>;
-type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version'>, true>;
+type PageFieldsWithoutContent = Record<keyof Omit<Page, 'content' | 'contentText' | 'version' | 'postId'>, true>;
 
 type PagesRequest = {
   spaceId: string;
@@ -270,6 +270,9 @@ export async function getAccessiblePages(input: PagesRequest): Promise<IPageWith
   const pages = (await prisma.page.findMany({
     where: {
       spaceId: input.spaceId,
+      type: {
+        not: 'post'
+      },
       deletedAt: input.archived ? { not: null } : null,
       ...searchQuery
     },

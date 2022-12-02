@@ -60,11 +60,19 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user: Omit<User, 'addresses'>;
+  user?: Omit<User, 'addresses'> | null;
   linkToProfile?: boolean;
 }
 
 function UserDisplay({ user, linkToProfile = false, ...props }: UserDisplayProps) {
+  if (!user) {
+    return (
+      <Box display='flex' alignItems='center' gap={1} {...props}>
+        <Avatar avatar={null} size='small' />
+      </Box>
+    );
+  }
+
   // Copied from User Details component
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
   const userPath = user.path || user.id;

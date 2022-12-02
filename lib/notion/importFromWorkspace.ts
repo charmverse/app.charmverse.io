@@ -4,10 +4,14 @@ import type { PageType, Prisma } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 as uuid } from 'uuid';
 
+import {
+  MAX_EMBED_WIDTH,
+  MIN_EMBED_HEIGHT,
+  MIN_EMBED_WIDTH
+} from 'components/common/CharmEditor/components/iframe/config';
+import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { prisma } from 'db';
 import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MIN_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
-import { extractEmbedLink } from 'lib/embed/extractEmbedLink';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -16,7 +20,6 @@ import log from 'lib/log';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { isTruthy } from 'lib/utilities/types';
 import type {
@@ -389,7 +392,7 @@ async function populateDoc(
           (parentNode as PageContent).content?.push({
             type: 'iframe',
             attrs: {
-              src: block.video.type === 'external' ? extractEmbedLink(block.video.external.url) : null,
+              src: block.video.type === 'external' ? block.video.external.url : null,
               type: 'video',
               width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
               height: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2 / VIDEO_ASPECT_RATIO
@@ -403,7 +406,7 @@ async function populateDoc(
           (parentNode as PageContent).content?.push({
             type: 'iframe',
             attrs: {
-              src: extractEmbedLink(block.type === 'bookmark' ? block.bookmark.url : block.embed.url),
+              src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
               type: 'embed',
               width: MAX_EMBED_WIDTH,
               height: MIN_EMBED_HEIGHT

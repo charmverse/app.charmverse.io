@@ -1,8 +1,6 @@
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
 
-import type { PageContent } from 'models';
-
 export function insertNode(
   state: EditorState,
   dispatch: ((tr: Transaction<any>) => void) | undefined,

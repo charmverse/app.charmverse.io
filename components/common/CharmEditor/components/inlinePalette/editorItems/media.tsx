@@ -3,8 +3,6 @@ import ImageIcon from '@mui/icons-material/Image';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 
-import { MAX_EMBED_WIDTH, VIDEO_ASPECT_RATIO } from 'lib/embed/constants';
-
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
@@ -55,16 +53,7 @@ export function items(): PaletteItemTypeNoGroup[] {
             rafCommandExec(view, (_state, _dispatch) => {
               // let the node view know to show the tooltip by default
               const tooltipMark = _state.schema.mark('tooltip-marker');
-              const node = _state.schema.nodes.iframe.create(
-                {
-                  src: null,
-                  type: 'video',
-                  width: MAX_EMBED_WIDTH,
-                  height: MAX_EMBED_WIDTH / VIDEO_ASPECT_RATIO
-                },
-                undefined,
-                [tooltipMark]
-              );
+              const node = _state.schema.nodes.video.create(undefined, undefined, [tooltipMark]);
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node, false));

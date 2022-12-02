@@ -17,6 +17,7 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors';
 
 import * as http from 'adapters/http';
+import { MuxApi } from 'charmClient/apis/muxApi';
 import { PagesApi } from 'charmClient/apis/pagesApi';
 import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
@@ -65,6 +66,7 @@ import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
+import { ForumApi } from './apis/forumApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
@@ -96,6 +98,10 @@ class CharmClient {
   tasks = new TasksApi();
 
   track = new TrackApi();
+
+  forum = new ForumApi();
+
+  mux = new MuxApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

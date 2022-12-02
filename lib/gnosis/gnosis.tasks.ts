@@ -75,6 +75,13 @@ function getTaskDescription(transaction: GnosisTransaction): string {
         }
         break;
       }
+
+      case 'swapOwner':
+        return 'Swap Owner';
+
+      case 'signMessage':
+        return 'Sign a message';
+
       case 'addOwnerWithThreshold': {
         // this is the JSON type in case we want it for something
         // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];
@@ -95,13 +102,13 @@ function getTaskDescription(transaction: GnosisTransaction): string {
       }
 
       default:
-        log.warn('Unknown transaction method', data.method);
+        log.warn(`Unknown transaction method: ${data.method}`, transaction);
+        return `Transaction method: ${data.method}`;
     }
   } else if (transaction.to && transaction.value) {
     return `Send ${getFriendlyEthValue(transaction.value)} ETH`;
   }
-  log.warn('Unknown transaction', transaction);
-  return 'N/A';
+  return 'Unknown transaction type';
 }
 
 type PaymentAction = { decodedValue: { to: string; value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
