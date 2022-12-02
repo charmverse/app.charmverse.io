@@ -17,15 +17,22 @@ export const embeds = {
   airtable: {
     icon: TbBrandAirtable,
     name: 'Airtable',
-    placeholder: 'https://www.figma.com/file...',
+    placeholder: 'https://www.airtable.com/...',
     text: 'Insert an Airtable embed'
   },
   figma: {
     icon: FiFigma,
     name: 'Figma',
-    placeholder: 'https://www.airtable.com/...',
+    placeholder: 'https://www.figma.com/file...',
     text: 'Insert a Figma embed'
   }
 };
 
 export type EmbedType = keyof typeof embeds;
+
+export type IframeNodeAttrs = {
+  src?: string;
+  type: EmbedType;
+  height: number;
+  width: number;
+};

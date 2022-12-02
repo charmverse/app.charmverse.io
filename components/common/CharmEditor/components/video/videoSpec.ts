@@ -4,7 +4,7 @@ import type { Node } from '@bangle.dev/pm';
 import { embeddedNodeSpec } from '../../specs/embeddedNodeSpec';
 import { MAX_EMBED_WIDTH } from '../iframe/config';
 
-const name = 'video';
+export const name = 'video';
 
 export const VIDEO_ASPECT_RATIO = 1.77;
 

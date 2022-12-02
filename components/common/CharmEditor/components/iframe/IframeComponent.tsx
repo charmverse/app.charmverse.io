@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useState, memo } from 'react';
 
 import BlockAligner from '../BlockAligner';
@@ -9,19 +10,12 @@ import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
-import type { EmbedType } from './config';
+import type { IframeNodeAttrs, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
-import { extractEmbedType } from './utils';
+import { convertFigmaToEmbedUrl, convertAirtableToEmbedUrl, extractEmbedType } from './utils';
 
-type IframeAttrs = {
-  src?: string;
-  type: EmbedType;
-  height: number;
-  width: number;
-};
-
-function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
-  const attrs = node.attrs as IframeAttrs;
+function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
+  const attrs = node.attrs as IframeNodeAttrs;
 
   const [height, setHeight] = useState(attrs.height);
 
@@ -35,38 +29,44 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
     return (
       <MediaSelectionPopup
         node={node}
-        icon={<config.icon fontSize='small' />}
+        icon={<config.icon style={{ fontSize: 20 }} />}
         buttonText={config.text}
         onDelete={deleteNode}
       >
-        <MediaUrlInput
-          onSubmit={(urlToEmbed) => {
-            const tweetAttrs = extractTweetAttrs(urlToEmbed);
-            const isYoutube = extractYoutubeLinkType(urlToEmbed);
-            if (isYoutube) {
-              const pos = getPos();
-              const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
-              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-            } else if (tweetAttrs) {
-              const pos = getPos();
-              const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-              view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
-            } else {
-              const embedType = extractEmbedType(urlToEmbed);
-              updateAttrs({
-                src: urlToEmbed,
-                type: embedType
-              });
-            }
-          }}
-          placeholder={config.placeholder}
-        />
+        <Box py={3}>
+          <MediaUrlInput
+            onSubmit={(urlToEmbed) => {
+              const tweetAttrs = extractTweetAttrs(urlToEmbed);
+              const isYoutube = extractYoutubeLinkType(urlToEmbed);
+              if (isYoutube) {
+                const pos = getPos();
+                const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
+                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+              } else if (tweetAttrs) {
+                const pos = getPos();
+                const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
+                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+              } else {
+                const embedType = extractEmbedType(urlToEmbed);
+                updateAttrs({
+                  src: urlToEmbed,
+                  type: embedType
+                });
+              }
+            }}
+            placeholder={config.placeholder}
+          />
+        </Box>
       </MediaSelectionPopup>
     );
   }
 
-  const figmaSrc = `https://www.figma.com/embed?embed_host=charmverse&url=${attrs.src}`;
-  const src = attrs.type === 'figma' ? figmaSrc : attrs.src;
+  let embeddableSrc = attrs.src;
+  if (attrs.type === 'figma') {
+    embeddableSrc = convertFigmaToEmbedUrl(attrs.src);
+  } else if (attrs.type === 'airtable') {
+    embeddableSrc = convertAirtableToEmbedUrl(attrs.src);
+  }
 
   if (readOnly) {
     return (
@@ -74,7 +74,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
         <iframe
           allowFullScreen
           title='iframe'
-          src={src}
+          src={embeddableSrc}
           style={{ height: attrs.height ?? MIN_EMBED_HEIGHT, border: '0 solid transparent', width: '100%' }}
         />
       </IframeContainer>
@@ -104,7 +104,7 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
           <iframe
             allowFullScreen
             title='iframe'
-            src={src}
+            src={embeddableSrc}
             style={{ height: '100%', border: '0 solid transparent', width: '100%' }}
           />
         </IframeContainer>
@@ -113,4 +113,4 @@ function ResizableIframe({ readOnly, node, getPos, view, deleteNode, updateAttrs
   );
 }
 
-export default memo(ResizableIframe);
+export default memo(IframeComponent);

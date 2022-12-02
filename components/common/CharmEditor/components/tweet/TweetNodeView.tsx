@@ -1,8 +1,9 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
+import { Box } from '@mui/material';
 import Script from 'next/script';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import log from 'lib/log';
 
@@ -83,17 +84,19 @@ export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: Charm
           buttonText='Embed a Tweet'
           onDelete={deleteNode}
         >
-          <MediaUrlInput
-            helperText='Works with links to Tweets'
-            isValid={(url) => extractTweetAttrs(url) !== null}
-            onSubmit={(url) => {
-              const _attrs = extractTweetAttrs(url);
-              if (_attrs) {
-                updateAttrs(_attrs);
-              }
-            }}
-            placeholder='https://twitter.com...'
-          />
+          <Box py={3}>
+            <MediaUrlInput
+              helperText='Works with links to Tweets'
+              isValid={(url) => extractTweetAttrs(url) !== null}
+              onSubmit={(url) => {
+                const _attrs = extractTweetAttrs(url);
+                if (_attrs) {
+                  updateAttrs(_attrs);
+                }
+              }}
+              placeholder='https://twitter.com...'
+            />
+          </Box>
         </MediaSelectionPopup>
       );
     }

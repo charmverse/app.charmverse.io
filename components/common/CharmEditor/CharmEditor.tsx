@@ -196,10 +196,6 @@ export function charmEditorPlugins({
       containerDOM: ['div']
     }),
     NodeView.createPlugin({
-      name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
@@ -223,7 +219,8 @@ export function charmEditorPlugins({
     disclosure.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins()
+    videoPlugins(),
+    iframe.plugins()
   ];
 
   if (!readOnly) {
@@ -527,10 +524,9 @@ function CharmEditor({
           readOnly,
           deleteNode: () => {
             const view = props.view;
-            const getPos = props.getPos;
             const tr = view.state.tr;
-            const start = getPos();
-            const end = start === 0 ? 0 : start + 1; // for some reason, a range of 0 to 1 deletes the first two elements
+            const start = props.getPos();
+            const end = start + props.node.nodeSize;
             tr.deleteRange(start, end);
             tr.deleteSelection();
             view.dispatch(tr);
