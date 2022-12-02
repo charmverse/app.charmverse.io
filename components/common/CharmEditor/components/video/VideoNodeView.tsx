@@ -23,7 +23,7 @@ import { VideoUploadForm } from './VideoUploadForm';
 export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
 
-  const [playbackIdWithToken, setPlaybackIdWithToken] = useState('US01AK9OHbAsRFQsUsTHQ13vrAtb01she01wjj6e6JWcog');
+  const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready
   const { data: asset, error } = useSwr(
