@@ -11,10 +11,9 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   Typography
 } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import Tooltip from '@mui/material/Tooltip';
 import { getChainById, getChainShortname } from 'connectors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -147,15 +146,13 @@ export function GnosisConnectCard({
           )}
         </Typography>
         <br />
-        {connectable ? (
-          <Button loading={loading} onClick={onClick}>
-            Connect Gnosis Safe
-          </Button>
-        ) : (
-          <Alert sx={{ maxWidth: '80%', margin: 'auto' }} severity='info'>
-            Please unlock your wallet and ensure it is connected to your account.
-          </Alert>
-        )}
+        <Tooltip title={!connectable ? 'Please unlock your wallet and ensure it is connected to your account.' : ''}>
+          <Box>
+            <Button disabled={!connectable} loading={loading} onClick={onClick}>
+              Connect Gnosis Safe
+            </Button>
+          </Box>
+        </Tooltip>
       </Box>
     </Card>
   );
