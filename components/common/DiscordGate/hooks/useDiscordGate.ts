@@ -23,7 +23,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     charmClient.discord.checkDiscordGate(spaceDomain)
   );
 
-  async function joinSpace() {
+  async function verifyDiscordGate() {
     if (!data?.isEligible) {
       showMessage('You are not eligible to join this space', 'error');
       return;
@@ -55,7 +55,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
     isLoading: !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
-    joinSpace,
+    verifyDiscordGate,
     joiningSpace
   };
 }

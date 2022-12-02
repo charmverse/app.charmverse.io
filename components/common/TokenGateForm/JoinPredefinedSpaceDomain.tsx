@@ -1,4 +1,5 @@
-import { Alert, Card, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Card, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { Space } from '@prisma/client';
 import { useRouter } from 'next/router';
@@ -6,6 +7,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { DiscordGate } from 'components/common/DiscordGate/DiscordGate';
+import { useDiscordGate } from 'components/common/DiscordGate/hooks/useDiscordGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 
 import LoadingComponent from '../LoadingComponent';
@@ -21,10 +23,17 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
     charmClient.getSpaceByDomain(stripUrlParts(spaceDomain))
   );
   const router = useRouter();
-
   async function onJoinSpace(joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
   }
+
+  const {
+    discordGate,
+    isConnectedToDiscord,
+    isLoading: isLoadingDiscordGate,
+    verifyDiscordGate,
+    joiningSpace
+  } = useDiscordGate({ spaceDomain, onSuccess: onJoinSpace });
 
   if (!spaceInfo) {
     return isValidating ? (
@@ -48,8 +57,25 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
         </Box>
       </Card>
 
-      <DiscordGate spaceDomain={spaceDomain} onSuccess={onJoinSpace} />
-      <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
+      {isLoadingDiscordGate ? (
+        <LoadingComponent isLoading />
+      ) : (
+        <>
+          <DiscordGate
+            isLoadingGate={isLoadingDiscordGate}
+            joiningSpace={joiningSpace}
+            verifyDiscordGate={verifyDiscordGate}
+            discordGate={discordGate}
+            isConnectedToDiscord={isConnectedToDiscord}
+          />
+          <TokenGateForm
+            autoVerify
+            onSuccess={onJoinSpace}
+            spaceDomain={spaceDomain}
+            displayAccordion={discordGate?.hasDiscordServer}
+          />
+        </>
+      )}
     </>
   );
 }
