@@ -93,7 +93,7 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
   });
 }
 
-export function canJoinSpaceViaDiscord({
+export async function canJoinSpaceViaDiscord({
   discordServerId,
   discordUserId
 }: {

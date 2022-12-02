@@ -17,7 +17,7 @@ export async function verifyDiscordGateForSpace({ discordUserId, space }: Props)
     };
   }
 
-  const isEligible = canJoinSpaceViaDiscord({ discordServerId, discordUserId });
+  const isEligible = await canJoinSpaceViaDiscord({ discordServerId, discordUserId });
 
   return {
     isEligible,
