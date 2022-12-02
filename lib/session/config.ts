@@ -50,5 +50,10 @@ export const sessionUserRelations = {
   discordUser: true,
   telegramUser: true,
   notificationState: true,
-  wallets: true
+  wallets: true,
+  unstoppableDomains: {
+    select: {
+      domain: true
+    }
+  }
 } as const;

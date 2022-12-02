@@ -4,6 +4,7 @@ import type {
   SpaceRole,
   SpaceRoleToRole,
   TelegramUser,
+  UnstoppableDomain,
   User,
   UserNotificationState
 } from '@prisma/client';
@@ -16,6 +17,7 @@ export interface LoggedInUser extends User {
   favorites: { pageId: string }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: { address: string }[];
+  unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;

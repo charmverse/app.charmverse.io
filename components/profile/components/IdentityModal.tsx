@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
+import Image from 'components/common/Image';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import randomName from 'lib/utilities/randomName';
 import DiscordIcon from 'public/images/discord_logo.svg';
@@ -48,11 +49,7 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
       );
 
     case 'UnstoppableDomain':
-      return (
-        <SvgIcon viewBox='0 -10 70 70' sx={{ color: '#229ED9', minHeight: '40px', minWidth: '40px' }}>
-          <TelegramIcon />
-        </SvgIcon>
-      );
+      return <img src='/images/walletLogos/unstoppable-domains.png' height={40} width={40} />;
 
     case 'RandomName':
     default:

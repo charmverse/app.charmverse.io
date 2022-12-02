@@ -13,6 +13,7 @@ import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
+import { getUserProfile } from 'lib/users/getUser';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
@@ -47,10 +48,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
 
   // Domain already registered to a user. Set this as active identity
   if (existingDomain) {
-    const user = await assignUnstoppableDomainAsUserIdentity({
-      domain: existingDomain.domain,
-      userId: existingDomain.userId
-    });
+    const user = await getUserProfile('id', existingDomain.userId);
     req.session.user = user as LoggedInUser;
     await req.session.save();
     res.status(200).json(user);
@@ -73,6 +71,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
         if (!userWallet) {
           const user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId, tx);
           userId = user.id;
+          await assignUnstoppableDomainAsUserIdentity({ domain, userId, tx });
         } else {
           userId = userWallet.userId;
         }
@@ -88,9 +87,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
           }
         });
 
-        const updatedUser = await assignUnstoppableDomainAsUserIdentity({ domain, userId, tx });
-
-        return updatedUser;
+        return getUserProfile('id', userId, tx);
       },
       { timeout: 10000 }
     );

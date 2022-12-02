@@ -148,6 +148,15 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       });
     }
 
+    user.unstoppableDomains?.forEach(({ domain }) => {
+      types.push({
+        type: 'UnstoppableDomain',
+        username: domain,
+        isInUse: user.identityType === 'UnstoppableDomain' && user.username === domain,
+        icon: getIdentityIcon('UnstoppableDomain')
+      });
+    });
+
     return types;
   }, [user]);
   const hostname = typeof window !== 'undefined' ? window.location.origin : '';
