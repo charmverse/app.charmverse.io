@@ -27,8 +27,8 @@ enum IdentityType {
   Wallet
   Discord
   Telegram
-  UnstoppableDomain
   RandomName
+  UnstoppableDomain
 }
 
 enum VoteStatus {

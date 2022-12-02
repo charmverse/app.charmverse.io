@@ -31,7 +31,6 @@ import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 
 import { boardWithCardsArgs } from './generate-board-stub';
 
@@ -44,7 +43,7 @@ export async function generateSpaceUser({
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
-      identityType: IDENTITY_TYPES[1],
+      identityType: 'Discord',
       username: 'Username',
       wallets: {
         create: {

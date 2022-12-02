@@ -11,7 +11,6 @@ import { sessionUserRelations } from 'lib/session/config';
 import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 
 export async function createUserFromWallet(
   address: string,
@@ -44,7 +43,7 @@ export async function createUserFromWallet(
     const newUser = await tx.user.create({
       data: {
         id: preExistingId,
-        identityType: IDENTITY_TYPES[0],
+        identityType: 'Wallet',
         username,
         path: isUserPathAvailable ? userPath : null,
         email: `${randomName()}@charmversetest.io`,

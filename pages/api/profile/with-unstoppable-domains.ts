@@ -11,9 +11,10 @@ import {
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
+import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import type { LoggedInUser, User } from 'models';
+import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -44,17 +45,15 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
     }
   });
 
-  let user: User;
-
   // Domain already registered to a user. Set this as active identity
   if (existingDomain) {
-    user = await assignUnstoppableDomainAsUserIdentity({
+    const user = await assignUnstoppableDomainAsUserIdentity({
       domain: existingDomain.domain,
       userId: existingDomain.userId
     });
-
-    req.session.user = user;
+    req.session.user = user as LoggedInUser;
     await req.session.save();
+    res.status(200).json(user);
   } else {
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 
@@ -67,11 +66,11 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
       }
     });
 
-    await prisma.$transaction(async (tx) => {
+    const loggedInUser = await prisma.$transaction(async (tx) => {
       let userId: string;
 
       if (!userWallet) {
-        user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId, tx);
+        const user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId, tx);
         userId = user.id;
       } else {
         userId = userWallet.userId;
@@ -88,10 +87,12 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
         }
       });
 
-      user = await assignUnstoppableDomainAsUserIdentity({ domain, userId: user.id, tx });
+      return assignUnstoppableDomainAsUserIdentity({ domain, userId, tx });
     });
+    req.session.user = loggedInUser as LoggedInUser;
+    await req.session.save();
+    res.status(200).json(loggedInUser);
   }
-
-  // TODO Verify inbound request is legitimately from Unstoppable Domains
-  res.status(200).send({} as any);
 }
+
+export default withSessionRoute(handler);

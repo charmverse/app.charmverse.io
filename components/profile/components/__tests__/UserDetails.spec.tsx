@@ -3,7 +3,6 @@ import type { UserDetails } from '@prisma/client';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 import { createThemeLightSensitive } from 'theme';
 
 import IdentityModal from '../IdentityModal';
@@ -30,7 +29,7 @@ function WrappedUserDetails() {
       id: '1',
       createdAt: new Date(),
       updatedAt: new Date(),
-      identityType: IDENTITY_TYPES[1],
+      identityType: 'Discord',
       username: 'test.ens',
       wallets: [{ address: '0x0000000000000000000000000000000000000000' }]
     } as LoggedInUser,

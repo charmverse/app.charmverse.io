@@ -5,6 +5,7 @@ import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
+import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -23,8 +24,7 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortenHex } from 'lib/utilities/strings';
-import type { IdentityType, LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
+import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -112,39 +112,39 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     const types: IntegrationModel[] = [];
     if (user?.wallets.length !== 0) {
       types.push({
-        type: IDENTITY_TYPES[0],
+        type: 'Wallet',
         username: ENSName || user.wallets[0].address,
-        isInUse: user.identityType === IDENTITY_TYPES[0],
-        icon: getIdentityIcon(IDENTITY_TYPES[0])
+        isInUse: user.identityType === 'Wallet',
+        icon: getIdentityIcon('Wallet')
       });
     }
 
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
-        type: IDENTITY_TYPES[1],
+        type: 'Discord',
         username: discordAccount.username || '',
-        isInUse: user.identityType === IDENTITY_TYPES[1],
-        icon: getIdentityIcon(IDENTITY_TYPES[1])
+        isInUse: user.identityType === 'Discord',
+        icon: getIdentityIcon('Discord')
       });
     }
 
     if (user?.telegramUser && user.telegramUser.account) {
       const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
       types.push({
-        type: IDENTITY_TYPES[2],
+        type: 'Telegram',
         username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
-        isInUse: user.identityType === IDENTITY_TYPES[2],
-        icon: getIdentityIcon(IDENTITY_TYPES[2])
+        isInUse: user.identityType === 'Telegram',
+        icon: getIdentityIcon('Telegram')
       });
     }
 
     if (user) {
       types.push({
-        type: IDENTITY_TYPES[3],
-        username: user.identityType === IDENTITY_TYPES[3] && user.username ? user.username : '',
-        isInUse: user.identityType === IDENTITY_TYPES[3],
-        icon: getIdentityIcon(IDENTITY_TYPES[3])
+        type: 'RandomName',
+        username: user.identityType === 'RandomName' && user.username ? user.username : '',
+        isInUse: user.identityType === 'RandomName',
+        icon: getIdentityIcon('RandomName')
       });
     }
 
@@ -224,11 +224,11 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
             save={(id: string, identityType: IdentityType) => {
-              const username: string = identityType === IDENTITY_TYPES[0] ? ENSName || shortenHex(id) : id;
+              const username: string = identityType === 'Wallet' ? ENSName || shortenHex(id) : id;
               handleUserUpdate({ username, identityType });
             }}
             identityTypes={identityTypes}
-            identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
+            identityType={(user?.identityType || 'Wallet') as IdentityType}
             username={user?.username || ''}
           />
           <DescriptionModal

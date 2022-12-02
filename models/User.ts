@@ -1,6 +1,5 @@
 import type {
   DiscordUser,
-  FavoritePage,
   Role as RoleMembership,
   SpaceRole,
   SpaceRoleToRole,
@@ -8,8 +7,6 @@ import type {
   User,
   UserNotificationState
 } from '@prisma/client';
-
-export { FavoritePage, SpaceRole, User };
 
 interface NestedMemberships {
   spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];
@@ -25,6 +22,3 @@ export interface LoggedInUser extends User {
   notificationState?: UserNotificationState | null;
   isNew?: boolean;
 }
-
-export const IDENTITY_TYPES = ['Wallet', 'Discord', 'Telegram', 'RandomName'] as const;
-export type IdentityType = typeof IDENTITY_TYPES[number];
