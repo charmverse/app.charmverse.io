@@ -14,6 +14,7 @@ import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/verifyUnstoppableDomainsSignature';
+import log from 'lib/log';
 
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
@@ -86,12 +87,11 @@ function WalletSelectorModal({
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
       await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
       window.location.reload();
     } catch (err) {
-      // console.log('UD Error', err);
-    } finally {
-      // console.log('Set not connecting identity');
       setIsConnectingIdentity(false);
+      log.error(err);
     }
   }
 
