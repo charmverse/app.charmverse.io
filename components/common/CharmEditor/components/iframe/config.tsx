@@ -21,7 +21,7 @@ export const embeds = {
     text: 'Insert an Airtable embed'
   },
   dune: {
-    icon: TbBrandAirtable,
+    iconUrl: '/images/dune_logo_bw.png',
     name: 'Dune',
     placeholder: 'https://dune.com/embeds/...',
     text: 'Insert analytics from Dune'
