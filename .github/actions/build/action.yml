@@ -19,6 +19,9 @@ inputs:
   NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
     description: "..."
     required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
+    description: "..."
+    required: false
 
 runs:
   using: 'composite'
