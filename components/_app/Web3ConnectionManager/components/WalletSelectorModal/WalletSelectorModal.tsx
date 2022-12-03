@@ -77,7 +77,7 @@ function WalletSelectorModal({
   const clientID =
     (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string) ?? '0e8c724d-bbb8-4876-9dc7-ddfb466a3a0f';
   const redirectUri = (process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI as string) ?? 'http://localhost:3000';
-  log.debug('UAuth meta', { redirectUri, clientId });
+  log.debug('UAuth meta', { redirectUri, clientID });
   const uauth = new UAuth({
     clientID,
     redirectUri,
