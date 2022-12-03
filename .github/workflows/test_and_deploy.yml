@@ -72,7 +72,7 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        env:
+        with:
           NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
