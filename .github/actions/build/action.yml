@@ -1,26 +1,27 @@
 name: 'Build application'
 
+inputs:
+  NEXT_PUBLIC_DD_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_APP_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_TELEGRAM_BOT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_WEBSOCKETS_HOST:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
+    description: "..."
+    required: false
+
 runs:
   using: 'composite'
-  inputs:
-    NEXT_PUBLIC_DD_CLIENT_TOKEN:
-      description: "..."
-      required: false
-    NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
-      description: "..."
-      required: false
-    NEXT_PUBLIC_DD_RUM_APP_ID:
-      description: "..."
-      required: false
-    NEXT_PUBLIC_TELEGRAM_BOT_ID:
-      description: "..."
-      required: false
-    NEXT_PUBLIC_WEBSOCKETS_HOST:
-      description: "..."
-      required: false
-    NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
-      description: "..."
-      required: false
   steps:
     # - name: Show GitHub context
     #   shell: bash
