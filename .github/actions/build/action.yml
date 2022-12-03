@@ -2,6 +2,25 @@ name: 'Build application'
 
 runs:
   using: 'composite'
+  inputs:
+    NEXT_PUBLIC_DD_CLIENT_TOKEN:
+      description: "..."
+      required: false
+    NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
+      description: "..."
+      required: false
+    NEXT_PUBLIC_DD_RUM_APP_ID:
+      description: "..."
+      required: false
+    NEXT_PUBLIC_TELEGRAM_BOT_ID:
+      description: "..."
+      required: false
+    NEXT_PUBLIC_WEBSOCKETS_HOST:
+      description: "..."
+      required: false
+    NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
+      description: "..."
+      required: false
   steps:
     # - name: Show GitHub context
     #   shell: bash
@@ -26,10 +45,9 @@ runs:
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
       env:
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
           NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
