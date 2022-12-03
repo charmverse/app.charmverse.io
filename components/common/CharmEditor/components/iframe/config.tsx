@@ -23,13 +23,13 @@ export const embeds = {
   dune: {
     icon: TbBrandAirtable,
     name: 'Dune',
-    placeholder: 'https://www.dune.com/...',
-    text: 'Insert a Dune embed'
+    placeholder: 'https://dune.com/embeds/...',
+    text: 'Insert analytics from Dune'
   },
   figma: {
     icon: FiFigma,
     name: 'Figma',
-    placeholder: 'https://www.figma.com/file...',
+    placeholder: 'https://www.figma.com/file/...',
     text: 'Insert a Figma embed'
   }
 };
