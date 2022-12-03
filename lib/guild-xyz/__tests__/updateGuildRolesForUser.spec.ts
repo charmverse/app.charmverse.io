@@ -137,7 +137,7 @@ it('Should correctly update guild roles for space', async () => {
       getMemberships: () => {
         return [
           {
-            roleIds: ['S1GR1']
+            roleids: ['S1GR1']
           },
           {
             roleIds: ['S2GR1', 'S2GR2']
