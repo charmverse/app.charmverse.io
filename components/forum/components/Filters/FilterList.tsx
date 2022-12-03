@@ -4,19 +4,19 @@ import { Box, Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { SelectOptionEdit } from 'components/common/form/fields/Select/SelectOptionEdit';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
 import isAdmin from 'hooks/useIsAdmin';
 
+import { FilterCategory } from './FilterCategory';
 import type { FilterProps } from './FilterSelect';
 
 const StyledBox = styled(Box)`
@@ -41,7 +41,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
     }
   }
 
-  async function updateForumCategory(option: SelectOptionType) {
+  async function updateForumCategory(option: PostCategory) {
     if (currentSpace) {
       await charmClient.forum.updatePostCategory({
         spaceId: currentSpace.id,
@@ -53,7 +53,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
     }
   }
 
-  async function deleteForumCategory(option: SelectOptionType) {
+  async function deleteForumCategory(option: PostCategory) {
     if (currentSpace) {
       await charmClient.forum.deletePostCategory({ id: option.id, spaceId: currentSpace.id });
       refetchForumCategories();
@@ -95,11 +95,14 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             // </Link>
                 <Divider sx={{ pt: '10px', mb: '10px' }} />
         */}
-        <Stack gap={2} my={2}>
+        <Stack gap={2} mb={2}>
           <Typography
             key='all-categories'
             onClick={() => categoryIdSelected(undefined)}
-            sx={{ fontWeight: selectedCategory === undefined ? 'bold' : 'initial' }}
+            sx={{
+              cursor: 'pointer',
+              fontWeight: selectedCategory === undefined ? 'bold' : 'initial'
+            }}
             color='inherit'
           >
             All categories
@@ -123,13 +126,9 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
               >
                 {category.name}
               </Typography>
-              {!admin && (
+              {admin && (
                 <Box className='icons'>
-                  <SelectOptionEdit
-                    option={category as SelectOptionType}
-                    onChange={updateForumCategory}
-                    onDelete={deleteForumCategory}
-                  />
+                  <FilterCategory category={category} onChange={updateForumCategory} onDelete={deleteForumCategory} />
                 </Box>
               )}
             </StyledBox>
