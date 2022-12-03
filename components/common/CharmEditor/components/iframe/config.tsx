@@ -20,6 +20,12 @@ export const embeds = {
     placeholder: 'https://www.airtable.com/...',
     text: 'Insert an Airtable embed'
   },
+  dune: {
+    icon: TbBrandAirtable,
+    name: 'Dune',
+    placeholder: 'https://www.dune.com/...',
+    text: 'Insert a Dune embed'
+  },
   figma: {
     icon: FiFigma,
     name: 'Figma',
