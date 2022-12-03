@@ -1,4 +1,3 @@
-
 const esmModules = [
   '@bangle.dev/base-components',
   '@bangle.dev/core',
@@ -22,7 +21,8 @@ const esmModules = [
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
-  'formdata-polyfill'
+  'formdata-polyfill',
+  'jose'
 ];
 
 exports.esmModules = esmModules;
