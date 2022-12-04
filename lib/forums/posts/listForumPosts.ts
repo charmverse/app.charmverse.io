@@ -24,7 +24,6 @@ export interface ListForumPostsRequest {
   count?: number;
   sort?: string;
 }
-
 export async function listForumPosts(
   {
     spaceId,
