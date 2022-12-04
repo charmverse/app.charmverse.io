@@ -4,9 +4,11 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import type { Dispatch, SetStateAction } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -15,6 +17,11 @@ import { PostVote } from './PostVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
+  setPosts: Dispatch<
+    SetStateAction<PaginatedPostList<{
+      user?: Member | undefined;
+    }> | null>
+  >;
 };
 
 const maxCharactersInPost = 140;
@@ -43,7 +50,8 @@ export default function ForumPost({
   title,
   contentText,
   galleryImage,
-  post: { upvotes, downvotes, upvoted }
+  post: { upvotes, downvotes, upvoted, id: postId },
+  setPosts
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
@@ -75,7 +83,7 @@ export default function ForumPost({
                 {relativeTime}
               </Box>
             </Box>
-            <PostVote downvotes={downvotes} upvotes={upvotes} upvoted={upvoted} />
+            <PostVote setPosts={setPosts} postId={postId} downvotes={downvotes} upvotes={upvotes} upvoted={upvoted} />
           </Box>
         </CardContent>
       </CardActionArea>

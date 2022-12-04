@@ -1,5 +1,7 @@
 import { prisma } from 'db';
 
+import type { ForumPostPageVote } from './interfaces';
+
 export async function voteForumPost({
   upvoted,
   userId,
@@ -8,9 +10,9 @@ export async function voteForumPost({
   pageId: string;
   userId: string;
   upvoted?: boolean;
-}) {
+}): Promise<ForumPostPageVote> {
   if (upvoted === undefined) {
-    return prisma.pageUpDownVote.delete({
+    await prisma.pageUpDownVote.delete({
       where: {
         createdBy_pageId: {
           createdBy: userId,
@@ -19,7 +21,7 @@ export async function voteForumPost({
       }
     });
   } else {
-    return prisma.pageUpDownVote.upsert({
+    await prisma.pageUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
@@ -36,4 +38,33 @@ export async function voteForumPost({
       }
     });
   }
+
+  const page = await prisma.page.findUnique({
+    where: {
+      id: pageId
+    },
+    select: {
+      upDownVotes: {
+        select: {
+          upvoted: true,
+          createdBy: true
+        }
+      }
+    }
+  });
+
+  if (page) {
+    const userVoted = page.upDownVotes.find((vote) => vote.createdBy === userId);
+    return {
+      downvotes: page.upDownVotes.filter((vote) => !vote.upvoted).length,
+      upvotes: page.upDownVotes.filter((vote) => vote.upvoted).length,
+      upvoted: userVoted !== undefined ? userVoted.upvoted : undefined
+    };
+  }
+
+  return {
+    downvotes: 0,
+    upvotes: 0,
+    upvoted: undefined
+  };
 }

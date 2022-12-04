@@ -37,7 +37,7 @@ export async function generateForumPosts({
   contentText?: string;
   title?: string;
   withImageRatio?: number;
-}): Promise<ForumPostPage[]> {
+}) {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
 
@@ -92,5 +92,5 @@ export async function generateForumPosts({
     include: {
       post: true
     }
-  }) as Promise<ForumPostPage[]>;
+  });
 }

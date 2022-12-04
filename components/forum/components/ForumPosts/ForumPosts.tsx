@@ -137,7 +137,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
 
       {posts?.data.map((post) => (
-        <ForumPost key={post.id} {...post} />
+        <ForumPost setPosts={setPosts} key={post.id} {...post} />
       ))}
       {isLoadingMore && <ForumPostSkeleton />}
       <Box ref={ref}>{posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}</Box>

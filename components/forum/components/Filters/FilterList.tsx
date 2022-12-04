@@ -2,10 +2,8 @@ import { Box, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 
-import Link from 'components/common/Link';
 import { useForumFilters } from 'hooks/useForumFilters';
 
 import type { FilterProps } from './FilterSelect';
@@ -33,7 +31,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             </Link>
           ))}
         </Box>
-                <Divider sx={{ pt: '10px', mb: '10px' }} />
+        <Divider sx={{ pt: '10px', mb: '10px' }} />
         */}
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           <Typography
