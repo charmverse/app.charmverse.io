@@ -11,6 +11,8 @@ import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
+import { PostVote } from './PostVote';
+
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
 };
@@ -34,7 +36,15 @@ function ForumPostContent({
   return null;
 }
 
-export default function ForumPost({ createdAt, updatedAt, user, title, contentText, galleryImage }: ForumPostProps) {
+export default function ForumPost({
+  createdAt,
+  updatedAt,
+  user,
+  title,
+  contentText,
+  galleryImage,
+  post: { upvotes, downvotes, upvoted }
+}: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
 
@@ -65,18 +75,7 @@ export default function ForumPost({ createdAt, updatedAt, user, title, contentTe
                 {relativeTime}
               </Box>
             </Box>
-            {/**
-               * 
-               * Re-enable this once we have up / downvoting as a feature
-               * Should be exracted to a separate widget component that handles up/down voting
-               * 
-                <Box display='flex' alignItems='center'>
-                  <NorthIcon fontSize='small' />
-                  {upVotes}
-                  <SouthIcon fontSize='small' />
-                  {downVotes}
-                </Box> 
-               */}
+            <PostVote downvotes={downvotes} upvotes={upvotes} upvoted={upvoted} />
           </Box>
         </CardContent>
       </CardActionArea>

@@ -25,6 +25,7 @@
   "jestrunner.configPath": "jest.config-all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
+    "downvotes",
     "Mainnets"
   ]
 }

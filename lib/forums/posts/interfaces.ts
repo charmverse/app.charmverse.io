@@ -4,4 +4,4 @@ export type ForumPostContent = {
   type: 'text' | 'image';
   content: string;
 };
-export type ForumPostPage = Page & { post: Post };
+export type ForumPostPage = Page & { post: Post & { upvotes: number; downvotes: number; upvoted?: boolean } };

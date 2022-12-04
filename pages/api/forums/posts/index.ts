@@ -18,8 +18,8 @@ handler
 // TODO - Update posts
 async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostList>) {
   const postQuery = req.query as any as ListForumPostsRequest;
-
-  const posts = await listForumPosts(postQuery);
+  const userId = req.session.user.id;
+  const posts = await listForumPosts(postQuery, userId);
 
   return res.status(200).json(posts);
 }
