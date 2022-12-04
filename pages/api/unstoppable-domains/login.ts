@@ -49,7 +49,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
   // Domain already registered to a user. Set this as active identity
   if (existingDomain) {
     const user = await getUserProfile('id', existingDomain.userId);
-    req.session.user = user as LoggedInUser;
+    req.session.user = { id: user.id };
     await req.session.save();
     res.status(200).json(user);
   } else {
@@ -82,7 +82,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
     if (!userWallet) {
       await assignUnstoppableDomainAsUserIdentity({ domain, userId: user.id });
     }
-    req.session.user = user as LoggedInUser;
+    req.session.user = { id: user.id };
     await req.session.save();
     res.status(200).json(user);
   }
