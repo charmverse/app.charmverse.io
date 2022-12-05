@@ -1,5 +1,3 @@
-import type { PageCommentUpDownVote } from '@prisma/client';
-
 import { prisma } from 'db';
 
 import type { PostCommentWithVote } from './interface';

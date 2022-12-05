@@ -3,7 +3,7 @@ import type { PostCategory } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
-import type { PostCommentWithVote } from 'lib/forums/comments/interface';
+import type { CreatePageCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
 export class ForumApi {
@@ -17,6 +17,10 @@ export class ForumApi {
 
   listPostComments(postId: string): Promise<PostCommentWithVote[]> {
     return http.GET(`/api/forum/posts/${postId}/comments`);
+  }
+
+  createPostComment(postId: string, body: CreatePageCommentInput): Promise<PostCommentWithVote> {
+    return http.POST(`/api/forum/posts/${postId}/comments`, body);
   }
 
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
