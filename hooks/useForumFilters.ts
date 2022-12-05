@@ -15,7 +15,7 @@ export function useForumFilters() {
     data: categories,
     error,
     isValidating,
-    mutate
+    mutate: mutateForumCategories
   } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
     charmClient.forum.listPostCategories(currentSpace!.id).then((_categories) =>
       _categories.sort((catA, catB) => {
@@ -72,6 +72,6 @@ export function useForumFilters() {
     getLinkUrl,
     applyFilters,
     disabled: isValidating,
-    refetchForumCategories: mutate
+    mutateForumCategories
   };
 }
