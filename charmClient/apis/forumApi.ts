@@ -51,4 +51,8 @@ export class ForumApi {
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
     return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
+
+  deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
+    return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
+  }
 }

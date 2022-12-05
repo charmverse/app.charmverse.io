@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 import type { UpdatePageCommentInput } from './interface';
 
@@ -19,7 +19,7 @@ export async function updatePostComment({
   });
 
   if (comment?.createdBy !== userId) {
-    throw new InsecureOperationError();
+    throw new UnauthorisedActionError();
   }
 
   return prisma.pageComment.update({
