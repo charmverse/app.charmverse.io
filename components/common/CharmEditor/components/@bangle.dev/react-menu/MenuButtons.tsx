@@ -13,8 +13,8 @@ import {
   TodoListIcon,
   UndoIcon
 } from '@bangle.dev/react-menu';
-import type { HintPos } from '@bangle.dev/react-menu/dist/types';
-import { defaultKeys as floatingMenuKeys, focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
+import { defaultKeys as floatingMenuKeys, focusFloatingMenuInput } from '@bangle.dev/react-menu/src/floating-menu';
+import type { HintPos } from '@bangle.dev/react-menu/src/types';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';

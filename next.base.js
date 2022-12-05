@@ -7,7 +7,6 @@ const esmModules = [
   '@bangle.dev/markdown',
   '@bangle.dev/tooltip',
   '@bangle.dev/react-menu',
-  '@bangle.dev/table',
   '@popperjs/core',
   '@fullcalendar/common',
   '@fullcalendar/core',

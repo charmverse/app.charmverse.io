@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
+import { hideSelectionTooltip } from '@bangle.dev/tooltip/src/selection-tooltip';
 import styled from '@emotion/styled';
 import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';

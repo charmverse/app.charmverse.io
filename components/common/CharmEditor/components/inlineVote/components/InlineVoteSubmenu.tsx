@@ -1,7 +1,7 @@
 import type { PluginKey } from '@bangle.dev/pm';
 import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
+import { hideSelectionTooltip } from '@bangle.dev/tooltip/src/selection-tooltip';
 
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 

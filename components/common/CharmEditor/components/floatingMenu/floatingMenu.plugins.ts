@@ -2,7 +2,7 @@ import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
 import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
 import { floatingMenu } from '@bangle.dev/react-menu';
-import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import { hasComponentInSchema } from '@bangle.dev/react-menu/src/helper';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
@@ -76,10 +76,10 @@ export function plugins({
 
   // We need to override the selection tooltip plugin to not show up when the rowAction plugin is handling drag and drop.
   // They both work through pm's active selection, but since this plugin responds to mousedown events, we can safely remove the listener to view updates
-  const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any, any>[];
+  const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any>[];
   menuPlugins[0] = () => {
     const selectionTooltipPlugins = selectionTooltipPluginFn();
-    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any, any>;
+    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any>;
     if (!selectionTooltipController.spec.view) {
       throw new Error('View not found for the selection toolip plugin');
     }

@@ -23,7 +23,7 @@ export function spec(): BaseRawNodeSpec {
     },
     markdown: {
       toMarkdown: (state: MarkdownSerializerState, node: Node) => {
-        state.wrapBlock('> ', undefined, node, () => state.renderContent(node));
+        state.wrapBlock('> ', null, node, () => state.renderContent(node));
       },
       parseMarkdown: {
         blockquote: {

@@ -3,7 +3,7 @@ import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
-import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/node-view-helpers';
+import { nodeViewUpdateStore, useNodeViews } from '@bangle.dev/react/src/node-view-helpers';
 import { objectUid } from '@bangle.dev/utils';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';

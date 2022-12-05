@@ -1,11 +1,11 @@
 import type { Command } from '@bangle.dev/pm';
-import { focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
-import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
+import { focusFloatingMenuInput } from '@bangle.dev/react-menu/src/floating-menu';
+import { hasComponentInSchema } from '@bangle.dev/react-menu/src/helper';
 import {
   querySelectionTooltipType,
   hideSelectionTooltip,
   updateSelectionTooltipType
-} from '@bangle.dev/tooltip/selection-tooltip';
+} from '@bangle.dev/tooltip/src/selection-tooltip';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PluginKey } from 'prosemirror-state';
 
