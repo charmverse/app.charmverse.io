@@ -23,6 +23,8 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.co
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
