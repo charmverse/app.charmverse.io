@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import type { ElementType } from 'react';
 import { useState, memo } from 'react';
 
 import BlockAligner from '../BlockAligner';
@@ -10,6 +11,7 @@ import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
+import { EmbedIcon } from './components/EmbedIcon';
 import type { IframeNodeAttrs, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
 import { convertFigmaToEmbedUrl, convertAirtableToEmbedUrl, extractEmbedType } from './utils';
@@ -29,7 +31,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
     return (
       <MediaSelectionPopup
         node={node}
-        icon={<config.icon style={{ fontSize: 20 }} />}
+        icon={<EmbedIcon {...config} size='small' />}
         buttonText={config.text}
         onDelete={deleteNode}
       >
