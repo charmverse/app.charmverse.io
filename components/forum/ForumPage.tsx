@@ -31,9 +31,12 @@ export default function ForumPage() {
   const [categoryId, setCategoryId] = useState<CategoryIdQuery>(router.query.categoryIds as CategoryIdQuery);
 
   const handleNewPostEvent = useCallback(
-    (value: WebSocketPayload<'pages_created'>) => {
-      const newPostPage = value.find((page) => page.type === 'post');
-      if (newPostPage && user && newPostPage.createdBy !== user.id) {
+    (postWithPage: WebSocketPayload<'post_created'>) => {
+      if (
+        user &&
+        postWithPage.page?.createdBy !== user.id &&
+        (categoryId ? postWithPage.categoryId === categoryId : true)
+      ) {
         setActions([
           <Button
             key='reload'
@@ -51,13 +54,13 @@ export default function ForumPage() {
         showMessage('New posts ready to view');
       }
     },
-    [user]
+    [user, categoryId]
   );
 
   useEffect(() => {
-    const unsubscribeFromNewPosts = subscribe('pages_created', handleNewPostEvent);
+    const unsubscribeFromNewPost = subscribe('post_created', handleNewPostEvent);
     return () => {
-      unsubscribeFromNewPosts();
+      unsubscribeFromNewPost();
     };
   }, []);
 
