@@ -62,7 +62,7 @@ export default function ForumPage() {
     return () => {
       unsubscribeFromNewPost();
     };
-  }, []);
+  }, [handleNewPostEvent]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
