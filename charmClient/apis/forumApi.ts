@@ -1,9 +1,13 @@
-import type { PostCategory } from '@prisma/client';
+import type { PageComment, PostCategory } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
-import type { CreatePageCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
+import type {
+  CreatePageCommentInput,
+  PostCommentWithVote,
+  UpdatePageCommentInput
+} from 'lib/forums/comments/interface';
 import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
 export class ForumApi {
@@ -16,11 +20,11 @@ export class ForumApi {
   }
 
   listPostComments(postId: string): Promise<PostCommentWithVote[]> {
-    return http.GET(`/api/forum/posts/${postId}/comments`);
+    return http.GET(`/api/forums/posts/${postId}/comments`);
   }
 
   createPostComment(postId: string, body: CreatePageCommentInput): Promise<PostCommentWithVote> {
-    return http.POST(`/api/forum/posts/${postId}/comments`, body);
+    return http.POST(`/api/forums/posts/${postId}/comments`, body);
   }
 
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
@@ -34,6 +38,14 @@ export class ForumApi {
     name
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
     return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
+  }
+
+  updatePostComment({
+    postId,
+    commentId,
+    ...body
+  }: UpdatePageCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
+    return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}`, body);
   }
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {

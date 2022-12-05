@@ -9,3 +9,8 @@ export type CreatePageCommentInput = {
   contentText: string;
   parentId: string;
 };
+
+export type UpdatePageCommentInput = {
+  content: PageContent;
+  contentText: string;
+};
