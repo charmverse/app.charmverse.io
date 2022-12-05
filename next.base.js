@@ -12,6 +12,7 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
+  'prosemirror-utils-bangle',
   'react-dnd',
   'react-pdf',
   '@hookform/resolvers',
