@@ -4,12 +4,13 @@ import { Fragment, keymap, Node } from '@bangle.dev/pm';
 import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { tooltipPlacement } from '@bangle.dev/tooltip';
 import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
-import { triggerInputRule } from '@bangle.dev/tooltip/src/trigger-input-rule';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey, Selection } from 'prosemirror-state';
 
 import log from 'lib/log';
+
+import { triggerInputRule } from './trigger-input-rule';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

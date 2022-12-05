@@ -1,17 +1,19 @@
 import type { Command } from '@bangle.dev/pm';
-import { focusFloatingMenuInput } from '@bangle.dev/react-menu/src/floating-menu';
-import { hasComponentInSchema } from '@bangle.dev/react-menu/src/helper';
-import {
-  querySelectionTooltipType,
-  hideSelectionTooltip,
-  updateSelectionTooltipType
-} from '@bangle.dev/tooltip/src/selection-tooltip';
+import { floatingMenu } from '@bangle.dev/react-menu';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PluginKey } from 'prosemirror-state';
+
+import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { markName as inlineCommentMarkName } from '../../inlineComment/inlineComment.constants';
 import { markName as inlineVoteMarkName } from '../../inlineVote/inlineVote.constants';
 
+const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
+const querySelectionTooltipType = selectionTooltip.querySelectionTooltipType;
+const updateSelectionTooltipType = selectionTooltip.updateSelectionTooltipType;
+
+const focusFloatingMenuInput = floatingMenu.focusFloatingMenuInput;
 export type SubMenu = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
 
 export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {

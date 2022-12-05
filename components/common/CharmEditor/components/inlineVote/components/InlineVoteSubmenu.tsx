@@ -1,11 +1,13 @@
 import type { PluginKey } from '@bangle.dev/pm';
 import { TextSelection } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/src/selection-tooltip';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 
 import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 
 import { updateInlineVote } from '../inlineVote.utils';
+
+const { hideSelectionTooltip } = selectionTooltip;
 
 export default function InlineVoteSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
