@@ -1,5 +1,10 @@
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
+type ProcessMssagesInput = {
+  maxNumOfMessages?: number;
+  processorFn: (messageBody: Record<string, any> | string) => Promise<void>;
+};
+
 const SQS_KEY = process.env.SQS_KEY as string;
 const SQS_SECRET = process.env.SQS_SECRET as string;
 const SQS_REGION = process.env.SQS_REGION as string;
@@ -40,4 +45,24 @@ export async function deleteMessage(receipt: string) {
   const res = await client.send(command);
 
   return res.$metadata.httpStatusCode === 200;
+}
+
+export async function processMessages({ processorFn, maxNumOfMessages = 5 }: ProcessMssagesInput) {
+  const messages = await getMessages(maxNumOfMessages);
+  for (const message of messages) {
+    let msgBody: Record<string, any> | string = '';
+    try {
+      msgBody = JSON.parse(message.Body || '');
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+
+    try {
+      // process message
+      await processorFn(msgBody);
+      // delete if processed correctly
+      await deleteMessage(message.ReceiptHandle || '');
+    } catch (e) {
+      log.error('Failed to process webhook message', e);
+    }
+  }
 }
