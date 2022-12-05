@@ -46,7 +46,7 @@ export function useForumFilters() {
     return `${query.domain}/forum/`;
   };
 
-  const handleClick = (value: string) => {
+  const applyFilters = (value: string) => {
     const isValidSort = value && sortList.some((btn) => btn === value);
     const isValidCategory = value && categories?.some((category) => category.name === value);
 
@@ -70,7 +70,7 @@ export function useForumFilters() {
     sortList,
     error,
     getLinkUrl,
-    handleClick,
+    applyFilters,
     disabled: isValidating,
     refetchForumCategories: mutate
   };

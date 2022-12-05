@@ -4,15 +4,14 @@ import { Box, Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useForumFilters } from 'hooks/useForumFilters';
 import isAdmin from 'hooks/useIsAdmin';
 
@@ -24,40 +23,17 @@ const StyledBox = styled(Box)`
 `;
 
 export default function FilterList({ categoryIdSelected, selectedCategory }: FilterProps) {
-  const { getLinkUrl, categories, sortList, error, refetchForumCategories } = useForumFilters();
+  const { getLinkUrl, categories, sortList, error } = useForumFilters();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
-  const [forumCategoryName, setForumCategoryName] = useState('');
   const currentSpace = useCurrentSpace();
   const admin = isAdmin();
-  async function createForumCategory() {
-    if (currentSpace) {
-      await charmClient.forum.createPostCategory(currentSpace.id, {
-        name: forumCategoryName,
-        spaceId: currentSpace.id
-      });
-      refetchForumCategories();
-      setForumCategoryName('');
-      addCategoryPopupState.close();
-    }
-  }
+  const [forumCategoryName, setForumCategoryName] = useState('');
+  const { createForumCategory, deleteForumCategory, updateForumCategory } = useForumCategories();
 
-  async function updateForumCategory(option: PostCategory) {
-    if (currentSpace) {
-      await charmClient.forum.updatePostCategory({
-        spaceId: currentSpace.id,
-        id: option.id,
-        color: option.color,
-        name: option.name
-      });
-      refetchForumCategories();
-    }
-  }
-
-  async function deleteForumCategory(option: PostCategory) {
-    if (currentSpace) {
-      await charmClient.forum.deletePostCategory({ id: option.id, spaceId: currentSpace.id });
-      refetchForumCategories();
-    }
+  function createCategory() {
+    createForumCategory(forumCategoryName);
+    setForumCategoryName('');
+    addCategoryPopupState.close();
   }
 
   if (error) {
@@ -121,7 +97,9 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
                 onClick={() => categoryIdSelected(category.id)}
                 sx={{
                   cursor: 'pointer',
-                  fontWeight: selectedCategory === category.id ? 'bold' : 'initial'
+                  fontWeight: selectedCategory === category.id ? 'bold' : 'initial',
+                  wordBreak: 'break-all',
+                  pr: 3.5
                 }}
               >
                 {category.name}
@@ -156,7 +134,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
           }}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              createForumCategory();
+              createCategory();
             }
           }}
         />
@@ -164,7 +142,7 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
           disabled={
             forumCategoryName.length === 0 || categories?.find((category) => category.name === forumCategoryName)
           }
-          onClick={createForumCategory}
+          onClick={createCategory}
         >
           Add
         </Button>
