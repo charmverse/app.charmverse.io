@@ -140,7 +140,7 @@ it('Should correctly update guild roles for space', async () => {
             roleids: ['S1GR1']
           },
           {
-            roleids: ['S2GR1', 'S2GR2']
+            roleIds: ['S2GR1', 'S2GR2']
           }
         ];
       }
