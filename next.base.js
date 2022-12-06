@@ -1,10 +1,5 @@
 const esmModules = [
-  '@bangle.dev/base-components',
-  '@bangle.dev/core',
-  '@bangle.dev/pm',
   '@bangle.dev/react',
-  '@bangle.dev/utils',
-  '@bangle.dev/markdown',
   '@bangle.dev/tooltip',
   '@popperjs/core',
   '@fullcalendar/common',
@@ -12,7 +7,6 @@ const esmModules = [
   '@fullcalendar/daygrid',
   '@fullcalendar/interaction',
   '@fullcalendar/react',
-  'prosemirror-utils-bangle',
   'react-dnd',
   'react-pdf',
   '@hookform/resolvers',
