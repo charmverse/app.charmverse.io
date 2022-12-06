@@ -231,9 +231,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                 <CommunityRow
                   key={community.id}
                   onClick={() => {
-                    if (community.id) {
-                      toggleCommunityVisibility(community);
-                    }
+                    toggleCommunityVisibility(community);
                   }}
                   visible={!community.isHidden}
                   showVisibilityIcon={!readOnly}
@@ -254,9 +252,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                   showVisibilityIcon={!readOnly}
                   visible={!collectable.isHidden}
                   onClick={() => {
-                    if (collectable.id) {
-                      toggleCollectibleVisibility(collectable);
-                    }
+                    toggleCollectibleVisibility(collectable);
                   }}
                   collectable={collectable}
                 />
