@@ -29,7 +29,7 @@ describe('voteForumPost', () => {
     });
 
     const postPageVote = await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPage.id!,
       userId: user.id,
       upvoted: true
     });
@@ -54,13 +54,13 @@ describe('voteForumPost', () => {
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPage.postId!,
       userId: user.id,
       upvoted: true
     });
 
     const postPageVote = await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPage.postId!,
       userId: user.id,
       upvoted: false
     });
@@ -85,13 +85,13 @@ describe('voteForumPost', () => {
     });
 
     await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPage.postId!,
       userId: user.id,
       upvoted: true
     });
 
     const postPageVote = await voteForumPost({
-      pageId: createdPage.id,
+      postId: createdPage.postId!,
       userId: user.id,
       upvoted: undefined
     });

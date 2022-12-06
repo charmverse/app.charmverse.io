@@ -95,7 +95,6 @@ wipePosts({
   console.log(err);
 })
 
-
 const postsPerCategory = 5;
 
 const withImageRatio = 55;

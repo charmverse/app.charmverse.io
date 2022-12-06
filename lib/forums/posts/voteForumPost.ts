@@ -1,3 +1,5 @@
+import { PageNotFoundError } from 'next/dist/shared/lib/utils';
+
 import { prisma } from 'db';
 
 import type { ForumPostPageVote } from './interfaces';
@@ -5,12 +7,33 @@ import type { ForumPostPageVote } from './interfaces';
 export async function voteForumPost({
   upvoted,
   userId,
-  pageId
+  postId
 }: {
-  pageId: string;
+  postId: string;
   userId: string;
   upvoted?: boolean;
 }): Promise<ForumPostPageVote> {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: postId
+    },
+    select: {
+      page: {
+        select: {
+          spaceId: true,
+          createdBy: true,
+          id: true
+        }
+      }
+    }
+  });
+
+  if (!post || !post.page) {
+    throw new PageNotFoundError(postId);
+  }
+
+  const pageId = post.page.id;
+
   if (upvoted === undefined) {
     await prisma.pageUpDownVote.delete({
       where: {
