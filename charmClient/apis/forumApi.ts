@@ -6,7 +6,7 @@ import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategor
 import type {
   CreatePostCommentInput,
   PostCommentWithVote,
-  UpdatePageCommentInput
+  UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
 import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
@@ -44,7 +44,7 @@ export class ForumApi {
     postId,
     commentId,
     ...body
-  }: UpdatePageCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
+  }: UpdatePostCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
     return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}`, body);
   }
 

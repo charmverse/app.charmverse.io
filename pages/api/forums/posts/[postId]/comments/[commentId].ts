@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
-import type { UpdatePageCommentInput } from 'lib/forums/comments/interface';
+import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/public-api';
@@ -17,7 +17,7 @@ handler.use(requireUser).put(updatePostCommentHandler).delete(deletePostCommentH
 
 async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PageComment>) {
   const { postId, commentId } = req.query as any as { postId: string; commentId: string };
-  const body = req.body as UpdatePageCommentInput;
+  const body = req.body as UpdatePostCommentInput;
   const userId = req.session.user.id;
 
   const post = await prisma.post.findUnique({

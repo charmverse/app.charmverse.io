@@ -1,14 +1,14 @@
 import { prisma } from 'db';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
-import type { UpdatePageCommentInput } from './interface';
+import type { UpdatePostCommentInput } from './interface';
 
 export async function updatePostComment({
   content,
   contentText,
   commentId,
   userId
-}: UpdatePageCommentInput & {
+}: UpdatePostCommentInput & {
   commentId: string;
   userId: string;
 }) {

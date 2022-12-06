@@ -10,7 +10,7 @@ export type CreatePostCommentInput = {
   parentId: string;
 };
 
-export type UpdatePageCommentInput = {
+export type UpdatePostCommentInput = {
   content: PageContent;
   contentText: string;
 };

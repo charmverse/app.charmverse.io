@@ -5,6 +5,7 @@ import type {
   BountyStatus,
   Comment,
   Page,
+  PostStatus,
   Prisma,
   ProposalStatus,
   Role,
@@ -505,11 +506,19 @@ export async function generatePostComment({ userId, spaceId }: { spaceId: string
   };
 }
 
-export async function generateForumPost({ pageId, categoryId = null }: { pageId: string; categoryId?: null | string }) {
+export async function generateForumPost({
+  status = 'draft',
+  pageId,
+  categoryId = null
+}: {
+  status?: PostStatus;
+  pageId: string;
+  categoryId?: null | string;
+}) {
   return prisma.post.create({
     data: {
       id: pageId,
-      status: 'draft',
+      status,
       categoryId,
       page: {
         connect: {
