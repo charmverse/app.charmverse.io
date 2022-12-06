@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-import type { CreatePageCommentInput } from './interface';
+import type { CreatePostCommentInput } from './interface';
 
 export async function createPostComment({
   content,
@@ -8,7 +8,7 @@ export async function createPostComment({
   parentId,
   postId,
   userId
-}: CreatePageCommentInput & {
+}: CreatePostCommentInput & {
   postId: string;
   userId: string;
 }) {

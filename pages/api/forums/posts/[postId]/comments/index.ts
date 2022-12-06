@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { getPostComments } from 'lib/forums/comments/getPostComments';
-import type { CreatePageCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
+import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -26,7 +26,7 @@ async function getPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<
 
 async function createPostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote>) {
   const { postId } = req.query as any as { postId: string };
-  const body = req.body as CreatePageCommentInput;
+  const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
 
   const post = await prisma.post.findUnique({

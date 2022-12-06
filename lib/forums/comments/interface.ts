@@ -4,7 +4,7 @@ import type { PageContent } from 'models';
 
 export type PostCommentWithVote = PageComment & { upvotes: number; downvotes: number; upvoted: null | boolean };
 
-export type CreatePageCommentInput = {
+export type CreatePostCommentInput = {
   content: PageContent;
   contentText: string;
   parentId: string;

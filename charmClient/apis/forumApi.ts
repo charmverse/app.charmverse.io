@@ -4,7 +4,7 @@ import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
 import type {
-  CreatePageCommentInput,
+  CreatePostCommentInput,
   PostCommentWithVote,
   UpdatePageCommentInput
 } from 'lib/forums/comments/interface';
@@ -23,7 +23,7 @@ export class ForumApi {
     return http.GET(`/api/forums/posts/${postId}/comments`);
   }
 
-  createPostComment(postId: string, body: CreatePageCommentInput): Promise<PostCommentWithVote> {
+  createPostComment(postId: string, body: CreatePostCommentInput): Promise<PostCommentWithVote> {
     return http.POST(`/api/forums/posts/${postId}/comments`, body);
   }
 

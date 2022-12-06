@@ -15,6 +15,9 @@ export async function getPostComments({
     },
     include: {
       votes: true
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   });
 
