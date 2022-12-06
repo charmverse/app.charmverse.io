@@ -3,59 +3,19 @@ import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { Dispatch, SetStateAction } from 'react';
-
-import charmClient from 'charmClient';
-import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
-import type { Member } from 'lib/members/interfaces';
 
 export function PostVote({
-  postId,
   downvotes,
   upvotes,
   upvoted,
-  setPosts
+  votePost
 }: {
-  postId: string;
   upvoted?: boolean;
   upvotes: number;
   downvotes: number;
-  setPosts: Dispatch<
-    SetStateAction<PaginatedPostList<{
-      user?: Member | undefined;
-    }> | null>
-  >;
+  votePost: (upvoted?: boolean) => void;
 }) {
   const theme = useTheme();
-
-  async function votePost(_upvoted?: boolean) {
-    const forumPostPageVote = await charmClient.forum.votePost({
-      postId,
-      upvoted: _upvoted
-    });
-
-    setPosts((postPages) => {
-      return postPages
-        ? {
-            cursor: postPages.cursor,
-            data: postPages.data.map((page) => {
-              if (page.postId === postId) {
-                return {
-                  ...page,
-                  post: {
-                    ...page.post,
-                    ...forumPostPageVote,
-                    upvoted: _upvoted
-                  }
-                };
-              }
-              return page;
-            }),
-            hasNext: postPages.hasNext
-          }
-        : null;
-    });
-  }
 
   return (
     <Box display='flex' alignItems='center' gap={0.5}>

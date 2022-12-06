@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import type { Dispatch, SetStateAction } from 'react';
 
+import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
@@ -50,11 +51,41 @@ export default function ForumPost({
   title,
   contentText,
   galleryImage,
-  post: { upvotes, downvotes, upvoted, id: postId },
+  post,
   setPosts
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
+  const { id: postId } = post;
+
+  async function votePost(upvoted?: boolean) {
+    const forumPostPageVote = await charmClient.forum.votePost({
+      postId,
+      upvoted
+    });
+
+    setPosts((postPages) => {
+      return postPages
+        ? {
+            cursor: postPages.cursor,
+            data: postPages.data.map((page) => {
+              if (page.postId === postId) {
+                return {
+                  ...page,
+                  post: {
+                    ...page.post,
+                    ...forumPostPageVote,
+                    upvoted
+                  }
+                };
+              }
+              return page;
+            }),
+            hasNext: postPages.hasNext
+          }
+        : null;
+    });
+  }
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
@@ -83,7 +114,7 @@ export default function ForumPost({
                 {relativeTime}
               </Box>
             </Box>
-            <PostVote setPosts={setPosts} postId={postId} downvotes={downvotes} upvotes={upvotes} upvoted={upvoted} />
+            <PostVote votePost={votePost} {...post} />
           </Box>
         </CardContent>
       </CardActionArea>
