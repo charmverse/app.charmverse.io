@@ -48,13 +48,6 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack']
     });
-    // force cjs version of prosemirror-model
-    // _config.module.rules.push({
-    //   test: /prosemirror-model/,
-    //   resolve: {
-    //     aliasFields: []
-    //   }
-    // });
     // check for nodejs runtime. see https://github.com/vercel/next.js/issues/36237#issuecomment-1117694528
     if (nextRuntime === 'nodejs') {
       const entry = _config.entry;
