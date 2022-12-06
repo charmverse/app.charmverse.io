@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Note: NODE_ENV can only be 'development' or 'production' according to Next.js, but we don't want to mix them with test env
 export const isTestEnv = process.env.NEXT_PUBLIC_APP_ENV === 'test';
 export const isStagingEnv = process.env.NEXT_PUBLIC_APP_ENV === 'staging';
@@ -13,3 +14,5 @@ export const cookieDomain = undefined; // TODO: set cookie domain so that we can
 export const cookieName = 'charm.sessionId';
 // web sockets
 export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
+console.log('boot: process.env', { env: process.env });
+console.log('boot: env vars', { isTestEnv, isStagingEnv, isDevEnv, isProdEnv, isNodeEnv, appEnv });
