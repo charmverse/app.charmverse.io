@@ -9,9 +9,7 @@ import Button from 'components/common/Button';
 import { Modal } from 'components/common/Modal';
 
 export const schema = yup.object({
-  email: yup.string().ensure().trim()
-    .email()
-    .max(50)
+  email: yup.string().ensure().trim().email().max(50)
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -23,7 +21,7 @@ type Props = {
   isOpen: boolean;
 };
 
-export default function NotifyMeModal (props: Props) {
+export default function NotifyMeModal(props: Props) {
   const { currentValue, close, isOpen, save } = props;
 
   const {
@@ -44,11 +42,11 @@ export default function NotifyMeModal (props: Props) {
     });
   }, [currentValue]);
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     save(values.email);
   }
 
-  function removeNotifications () {
+  function removeNotifications() {
     save('');
   }
 
@@ -57,7 +55,8 @@ export default function NotifyMeModal (props: Props) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHelperText sx={{ mb: 1 }}>
           Input your email to receive daily notifications.
-          <br />Note: Your email is private and not used for anything else
+          <br />
+          Note: Your email is private and not used for anything else
         </FormHelperText>
 
         <TextField
@@ -70,9 +69,7 @@ export default function NotifyMeModal (props: Props) {
           sx={{ mb: 2 }}
         />
         <Box display='flex' gap={1}>
-          <Button type='submit'>
-            Save
-          </Button>
+          <Button type='submit'>Save</Button>
           {currentValue && (
             <Button onClick={removeNotifications} color='secondary' variant='outlined'>
               Remove

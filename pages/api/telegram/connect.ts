@@ -1,13 +1,11 @@
-import type { TelegramUser, User } from '@prisma/client';
+import type { TelegramUser } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
   onError,
@@ -24,7 +22,7 @@ export interface TelegramAccount {
   username: string;
 }
 
-async function connectTelegram (req: NextApiRequest, res: NextApiResponse<TelegramUser | { error: string }>) {
+async function connectTelegram(req: NextApiRequest, res: NextApiResponse<TelegramUser | { error: string }>) {
   const telegramAccount = req.body as TelegramAccount;
 
   const { id, ...rest } = telegramAccount;
@@ -43,30 +41,12 @@ async function connectTelegram (req: NextApiRequest, res: NextApiResponse<Telegr
         }
       }
     });
-
-    const userFields: Partial<User> = {
-      username: telegramAccount.username,
-      identityType: IDENTITY_TYPES[2]
-    };
-
-    if (telegramAccount.photo_url) {
-      const pathInS3 = getUserS3FilePath({ userId, url: telegramAccount.photo_url });
-      const { url } = await uploadUrlToS3({ pathInS3, url: telegramAccount.photo_url });
-      userFields.avatar = url;
-    }
-
-    await prisma.user.update({
-      where: {
-        id: userId
-      },
-      data: userFields
-    });
-  }
-  catch (error) {
+  } catch (error) {
     log.warn('Error while connecting to Telegram', error);
     // If the telegram user is already connected to a charmverse account this code will be run
     res.status(400).json({
-      error: 'Connection to Telegram failed. Another CharmVerse account is already associated with this Telegram account.'
+      error:
+        'Connection to Telegram failed. Another CharmVerse account is already associated with this Telegram account.'
     });
     return;
   }

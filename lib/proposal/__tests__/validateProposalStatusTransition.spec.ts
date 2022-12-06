@@ -23,7 +23,7 @@ beforeAll(async () => {
   reviewer2 = await createUserFromWallet(v4());
 
   await prisma?.spaceRole.createMany({
-    data: [author2, reviewer1, reviewer2].map(user => ({ spaceId: generatedSpace.id, userId: user.id }))
+    data: [author2, reviewer1, reviewer2].map((user) => ({ spaceId: generatedSpace.id, userId: user.id }))
   });
 
   space = generatedSpace;
@@ -83,10 +83,12 @@ describe('Validate if the user can update the status of the proposal', () => {
       spaceId: space.id,
       userId: author1.id,
       authors: [],
-      reviewers: [{
-        type: 'role',
-        roleId: role.id
-      }],
+      reviewers: [
+        {
+          type: 'role',
+          roleId: role.id
+        }
+      ],
       proposalStatus: 'review'
     });
 
@@ -99,7 +101,7 @@ describe('Validate if the user can update the status of the proposal', () => {
     expect(canChangeStatus).toBe(true);
   });
 
-  it('Proposal author shouldn\'t be able to change the proposal status from review to reviewed', async () => {
+  it("Proposal author shouldn't be able to change the proposal status from review to reviewed", async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -118,7 +120,7 @@ describe('Validate if the user can update the status of the proposal', () => {
     expect(canChangeStatus).toBe(false);
   });
 
-  it('Proposal reviewer (userId) shouldn\'t be able to change the proposal status from private_draft to draft', async () => {
+  it("Proposal reviewer (userId) shouldn't be able to change the proposal status from private_draft to draft", async () => {
     // Create a test proposal first
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,

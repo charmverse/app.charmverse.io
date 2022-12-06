@@ -1,4 +1,3 @@
-
 const esmModules = [
   '@bangle.dev/base-components',
   '@bangle.dev/core',
@@ -16,14 +15,14 @@ const esmModules = [
   '@fullcalendar/interaction',
   '@fullcalendar/react',
   'react-dnd',
-  // 'react-dnd-scrolling',
   'react-pdf',
   '@hookform/resolvers',
   'lit-share-modal-v3-react-17',
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
-  'formdata-polyfill'
+  'formdata-polyfill',
+  'jose'
 ];
 
 exports.esmModules = esmModules;

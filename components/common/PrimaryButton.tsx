@@ -8,7 +8,6 @@ import type { InputProps } from './Button';
 import Button, { StyledSpinner } from './Button';
 
 const StyledButton = styled(Button)`
-
   background: ${blueColor};
   border: 0 none;
   color: white;
@@ -22,21 +21,24 @@ const StyledButton = styled(Button)`
   }
 
   span {
-    font-size: .85em;
+    font-size: 0.85em;
   }
 
-  &:hover {
-    background: ${darken(blueColor, 0.1)};
-    color: white;
-    border: 0 none;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      background: ${darken(blueColor, 0.1)};
+      color: white;
+      border: 0 none;
+    }
   }
 `;
 
-function PimpedButton<C extends ElementType> (props: InputProps<C>) {
+function PimpedButton<C extends ElementType>(props: InputProps<C>) {
   const { children, loading, loadingMessage, ...rest } = props;
   return (
     <StyledButton disabled={loading} {...rest}>
-      {(loading && loadingMessage) ? loadingMessage : children}
+      {loading && loadingMessage ? loadingMessage : children}
       {loading && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
   );

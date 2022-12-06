@@ -4,8 +4,8 @@ import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 interface AWSAssetUrl {
@@ -25,7 +25,7 @@ interface ConverterOutput {
  * Processes the recursive folder structure created by export page data script and returns the data necessary for a prisma page transaction
  * @oldNewHashmap - A Handy tree structure that keeps a reference to the old and new page IDs. It can be accessed in both directions
  */
-async function convertFolderContent ({
+async function convertFolderContent({
   entryPath,
   spaceId,
   authorId,
@@ -34,20 +34,20 @@ async function convertFolderContent ({
   parentPageId,
   parentPermissionId,
   oldNewHashmap,
-  awsAssetUrls }:
-  {
-    parentPageId?: string | null;
-    entryPath: string;
-    spaceId: string;
-    authorId: string;
-    parentPermissionId?: string;
-  } & ConverterOutput): Promise<ConverterOutput> {
+  awsAssetUrls
+}: {
+  parentPageId?: string | null;
+  entryPath: string;
+  spaceId: string;
+  authorId: string;
+  parentPermissionId?: string;
+} & ConverterOutput): Promise<ConverterOutput> {
   // Find the JSON content for the page
   const folderContent = await fs.readdir(entryPath);
 
   const newPageId = v4();
 
-  const pageContentPath = `${entryPath}/${folderContent.find(p => p.match('json')) as string}`;
+  const pageContentPath = `${entryPath}/${folderContent.find((p) => p.match('json')) as string}`;
 
   const pageContent = JSON.parse(await fs.readFile(pageContentPath, 'utf8')) as Page;
 
@@ -63,7 +63,14 @@ async function convertFolderContent ({
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { spaceId: droppedSpaceId, parentId, createdBy, cardId, boardId: boardIdToDrop, ...prismaCreateInput } = pageContent;
+  const {
+    spaceId: droppedSpaceId,
+    parentId,
+    createdBy,
+    cardId,
+    boardId: boardIdToDrop,
+    ...prismaCreateInput
+  } = pageContent;
 
   const typedPrismaCreateInput = prismaCreateInput as any as Prisma.PageCreateInput;
 
@@ -103,11 +110,13 @@ async function convertFolderContent ({
           id: spaceId
         }
       },
-      sourcePermission: parentPermissionId ? {
-        connect: {
-          id: parentPermissionId
-        }
-      } : undefined
+      sourcePermission: parentPermissionId
+        ? {
+            connect: {
+              id: parentPermissionId
+            }
+          }
+        : undefined
     }
   };
 
@@ -116,85 +125,83 @@ async function convertFolderContent ({
   }
 
   // Construct the blocks
-  if (folderContent.some(f => f === 'blocks')) {
+  if (folderContent.some((f) => f === 'blocks')) {
     const blocksFolderPath = `${entryPath}/blocks`;
 
     const blocksFolder = await fs.readdir(blocksFolderPath);
 
-    await Promise.all(blocksFolder.map(async blockFile => {
-      const blockFilePath = `${blocksFolderPath}/${blockFile}`;
-      const blockData = JSON.parse(await fs.readFile(blockFilePath, 'utf8')) as Block;
+    await Promise.all(
+      blocksFolder.map(async (blockFile) => {
+        const blockFilePath = `${blocksFolderPath}/${blockFile}`;
+        const blockData = JSON.parse(await fs.readFile(blockFilePath, 'utf8')) as Block;
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { createdBy: createdByToDrop, spaceId: spaceIdToDrop, ...block } = blockData;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { createdBy: createdByToDrop, spaceId: spaceIdToDrop, ...block } = blockData;
 
-      const typedBlock = block as Prisma.BlockCreateInput;
+        const typedBlock = block as Prisma.BlockCreateInput;
 
-      typedBlock.space = {
-        connect: {
-          id: spaceId
+        typedBlock.space = {
+          connect: {
+            id: spaceId
+          }
+        };
+
+        typedBlock.user = {
+          connect: {
+            id: authorId
+          }
+        };
+
+        const boardId = pageContent.type === 'board' ? newPageId : (parentPageId as string);
+
+        typedBlock.rootId = boardId;
+
+        if (typedBlock.type !== 'board') {
+          typedBlock.parentId = boardId;
+        } else {
+          typedBlock.parentId = '';
+          typedPrismaCreateInput.boardId = boardId;
         }
-      };
 
-      typedBlock.user = {
-        connect: {
-          id: authorId
+        // Assign the actual ID
+        if (typedBlock.type === 'board' || typedBlock.type === 'card') {
+          typedBlock.id = newPageId;
+        } else {
+          typedBlock.id = v4();
         }
-      };
 
-      const boardId = pageContent.type === 'board' ? newPageId : parentPageId as string;
-
-      typedBlock.rootId = boardId;
-
-      if (typedBlock.type !== 'board') {
-        typedBlock.parentId = boardId;
-      }
-      else {
-        typedBlock.parentId = '';
-        typedPrismaCreateInput.boardId = boardId;
-      }
-
-      // Assign the actual ID
-      if (typedBlock.type === 'board' || typedBlock.type === 'card') {
-        typedBlock.id = newPageId;
-      }
-      else {
-        typedBlock.id = v4();
-      }
-
-      blocksToCreate.push(typedBlock);
-
-    }));
-
+        blocksToCreate.push(typedBlock);
+      })
+    );
   }
 
   pagesToCreate.push(typedPrismaCreateInput);
 
   // Parse the children and recursively invoke this function
-  if (folderContent.some(f => f === 'children')) {
+  if (folderContent.some((f) => f === 'children')) {
     const childrenFolderPath = `${entryPath}/children`;
 
     const childrenFolder = await fs.readdir(childrenFolderPath);
 
     //    createManyPageInput.
 
-    await Promise.all(childrenFolder.map(childFolder => {
+    await Promise.all(
+      childrenFolder.map((childFolder) => {
+        const childFolderPath = `${childrenFolderPath}/${childFolder}`;
 
-      const childFolderPath = `${childrenFolderPath}/${childFolder}`;
-
-      return convertFolderContent({
-        entryPath: childFolderPath,
-        authorId,
-        blocksToCreate,
-        spaceId,
-        pagesToCreate,
-        parentPageId: newPageId,
-        parentPermissionId: permissionId,
-        oldNewHashmap,
-        awsAssetUrls
-      });
-    }));
-
+        return convertFolderContent({
+          entryPath: childFolderPath,
+          authorId,
+          blocksToCreate,
+          spaceId,
+          pagesToCreate,
+          parentPageId: newPageId,
+          parentPermissionId: permissionId,
+          oldNewHashmap,
+          awsAssetUrls
+        });
+      })
+    );
   }
 
   return {
@@ -203,7 +210,6 @@ async function convertFolderContent ({
     oldNewHashmap,
     awsAssetUrls
   };
-
 }
 
 /**
@@ -211,15 +217,20 @@ async function convertFolderContent ({
  * @folderPath The folder containing the exported pages for the target space
  * @findS3Assets Defaults to false - If enabled, will return all AWS S3 assets found in the page content, or the page header image
  */
-export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Assets = false }:
-  {
-    folderPath: string; spaceId: string; findS3Assets?: boolean;
-  }): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
-  const space = await prisma.space.findUnique({
+export async function convertJsonPagesToPrisma({
+  folderPath,
+  spaceId,
+  findS3Assets = false
+}: {
+  folderPath: string;
+  spaceId: string;
+  findS3Assets?: boolean;
+}): Promise<Omit<ConverterOutput, 'oldNewHashmap'>> {
+  const space = (await prisma.space.findUnique({
     where: {
       id: spaceId
     }
-  }) as Space;
+  })) as Space;
 
   const entryFolder = await fs.readdir(folderPath);
 
@@ -228,26 +239,32 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Ass
   const oldNewHashmap: Record<string, string> = {};
   const awsAssetUrls: AWSAssetUrl[] = [];
 
-  await Promise.all(entryFolder.map(pageFolder => convertFolderContent({
-    authorId: space.createdBy,
-    blocksToCreate,
-    pagesToCreate,
-    oldNewHashmap,
-    entryPath: `${folderPath}/${pageFolder}`,
-    spaceId,
-    awsAssetUrls
-  })));
+  await Promise.all(
+    entryFolder.map((pageFolder) =>
+      convertFolderContent({
+        authorId: space.createdBy,
+        blocksToCreate,
+        pagesToCreate,
+        oldNewHashmap,
+        entryPath: `${folderPath}/${pageFolder}`,
+        spaceId,
+        awsAssetUrls
+      })
+    )
+  );
 
   // Assess the page content for any data we want to update
-  pagesToCreate.forEach(p => {
+  pagesToCreate.forEach((p) => {
     const prosemirrorNodes = (p.content as PageContent)?.content;
     if (prosemirrorNodes) {
       let prosemirrorNodesAsText = JSON.stringify(prosemirrorNodes);
 
       // Step 1 - Update all nested page links
-      const nestedPageRefs = prosemirrorNodesAsText.match(/{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g);
+      const nestedPageRefs = prosemirrorNodesAsText.match(
+        /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g
+      );
 
-      nestedPageRefs?.forEach(pageLinkNode => {
+      nestedPageRefs?.forEach((pageLinkNode) => {
         const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
         const newPageId = oldPageId ? oldNewHashmap[oldPageId] : undefined;
 
@@ -267,14 +284,16 @@ export async function convertJsonPagesToPrisma ({ folderPath, spaceId, findS3Ass
         const pageId = p.id as string;
 
         if (awsAssetLinksFound) {
-          awsAssetUrls.push(...awsAssetLinksFound.map(link => {
-            const assetUrl: AWSAssetUrl = {
-              awsUrl: link,
-              newPageId: pageId,
-              oldPageId: oldNewHashmap[pageId]
-            };
-            return assetUrl;
-          }));
+          awsAssetUrls.push(
+            ...awsAssetLinksFound.map((link) => {
+              const assetUrl: AWSAssetUrl = {
+                awsUrl: link,
+                newPageId: pageId,
+                oldPageId: oldNewHashmap[pageId]
+              };
+              return assetUrl;
+            })
+          );
         }
 
         if (p.headerImage && p.headerImage.match(awsUrlRegex) !== null) {

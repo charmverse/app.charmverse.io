@@ -16,26 +16,32 @@ import Menu from '../widgets/menu';
 import MenuWrapper from '../widgets/menuWrapper';
 
 type Props = {
-    block: Board|Card;
-    size?: 's' | 'm' | 'l';
-    readOnly?: boolean;
-    setPage?: (page: Partial<Page>) => void;
-}
+  block: Board | Card;
+  size?: 's' | 'm' | 'l';
+  readOnly?: boolean;
+  setPage?: (page: Partial<Page>) => void;
+};
 
 const BlockIconSelector = React.memo((props: Props) => {
   const { block, size, setPage } = props;
   const intl = useIntl();
 
-  const onSelectEmoji = useCallback((emoji: string) => {
-    mutator.changeIcon(block.id, block.fields.icon, emoji);
-    document.body.click();
-  }, [block.id, block.fields.icon]);
+  const onSelectEmoji = useCallback(
+    (emoji: string) => {
+      mutator.changeIcon(block.id, block.fields.icon, emoji);
+      document.body.click();
+    },
+    [block.id, block.fields.icon]
+  );
   const onAddRandomIcon = useCallback(() => {
     const randomIcon = BlockIcons.shared.randomIcon();
     mutator.changeIcon(block.id, block.fields.icon, randomIcon);
     return randomIcon;
   }, [block.id, block.fields.icon]);
-  const onRemoveIcon = useCallback(() => mutator.changeIcon(block.id, block.fields.icon, '', 'remove icon'), [block.id, block.fields.icon]);
+  const onRemoveIcon = useCallback(
+    () => mutator.changeIcon(block.id, block.fields.icon, '', 'remove icon'),
+    [block.id, block.fields.icon]
+  );
 
   if (!block.fields.icon) {
     return null;
@@ -50,42 +56,42 @@ const BlockIconSelector = React.memo((props: Props) => {
   return (
     <div className='BlockIconSelector'>
       {props.readOnly && iconElement}
-      {!props.readOnly
-            && (
-              <MenuWrapper>
-                {iconElement}
-                <Menu>
-                  <Menu.Text
-                    id='random'
-                    icon={<EmojiEmotionsOutlinedIcon />}
-                    name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
-                    onClick={() => {
-                      setPage && setPage({ icon: onAddRandomIcon() });
-                    }}
-                  />
-                  <Menu.SubMenu
-                    id='pick'
-                    icon={<EmojiEmotionsOutlinedIcon />}
-                    name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
-                  >
-                    <EmojiPicker onSelect={(emoji) => {
-                      onSelectEmoji(emoji);
-                      setPage && setPage({ icon: emoji });
-                    }}
-                    />
-                  </Menu.SubMenu>
-                  <Menu.Text
-                    id='remove'
-                    icon={<DeleteOutlineIcon fontSize='small' />}
-                    name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
-                    onClick={() => {
-                      onRemoveIcon();
-                      setPage && setPage({ icon: null });
-                    }}
-                  />
-                </Menu>
-              </MenuWrapper>
-            )}
+      {!props.readOnly && (
+        <MenuWrapper>
+          {iconElement}
+          <Menu>
+            <Menu.Text
+              id='random'
+              icon={<EmojiEmotionsOutlinedIcon />}
+              name={intl.formatMessage({ id: 'ViewTitle.random-icon', defaultMessage: 'Random' })}
+              onClick={() => {
+                setPage && setPage({ icon: onAddRandomIcon() });
+              }}
+            />
+            <Menu.SubMenu
+              id='pick'
+              icon={<EmojiEmotionsOutlinedIcon />}
+              name={intl.formatMessage({ id: 'ViewTitle.pick-icon', defaultMessage: 'Pick icon' })}
+            >
+              <EmojiPicker
+                onSelect={(emoji) => {
+                  onSelectEmoji(emoji);
+                  setPage && setPage({ icon: emoji });
+                }}
+              />
+            </Menu.SubMenu>
+            <Menu.Text
+              id='remove'
+              icon={<DeleteOutlineIcon fontSize='small' />}
+              name={intl.formatMessage({ id: 'ViewTitle.remove-icon', defaultMessage: 'Remove icon' })}
+              onClick={() => {
+                onRemoveIcon();
+                setPage && setPage({ icon: null });
+              }}
+            />
+          </Menu>
+        </MenuWrapper>
+      )}
     </div>
   );
 });

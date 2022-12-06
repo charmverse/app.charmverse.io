@@ -12,7 +12,7 @@ type IContext = {
   bounties: BountyWithDetails[];
   setBounties: Dispatch<SetStateAction<BountyWithDetails[]>>;
   draftBounty?: BountyCreationData | null;
-  createDraftBounty: (data: { pageId: string, spaceId: string, userId: string }) => void;
+  createDraftBounty: (data: { pageId: string; spaceId: string; userId: string }) => void;
   cancelDraftBounty: () => void;
   currentBountyId: string | null;
   updateCurrentBountyId: (bountyId: string | null) => void;
@@ -39,8 +39,8 @@ export const BountiesContext = createContext<Readonly<IContext>>({
   loadingBounties: false
 });
 
-export function BountiesProvider ({ children }: { children: ReactNode }) {
-  const [space] = useCurrentSpace();
+export function BountiesProvider({ children }: { children: ReactNode }) {
+  const space = useCurrentSpace();
 
   const { user } = useUser();
   const [bounties, bountiesRef, setBounties] = useRefState<BountyWithDetails[]>([]);
@@ -52,11 +52,10 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     if (space?.id) {
       setIsLoading(true);
       setBounties([]);
-      charmClient.bounties.listBounties(space?.id)
-        .then(_bounties => {
-          setBounties(_bounties);
-          setIsLoading(false);
-        });
+      charmClient.bounties.listBounties(space?.id).then((_bounties) => {
+        setBounties(_bounties);
+        setIsLoading(false);
+      });
     }
   }, [user?.id, space?.id]);
 
@@ -65,24 +64,22 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
   const [currentBounty, setCurrentBounty] = useState<BountyWithDetails | null>(null);
 
   // Updates the value of a bounty in the bounty list
-  function refreshBountyList (bounty: BountyWithDetails) {
-    setBounties(_bounties => {
-      const bountyIndex = _bounties.findIndex(bountyInList => bountyInList.id === bounty.id);
+  function refreshBountyList(bounty: BountyWithDetails) {
+    setBounties((_bounties) => {
+      const bountyIndex = _bounties.findIndex((bountyInList) => bountyInList.id === bounty.id);
 
       const updatedList = _bounties.slice();
 
       if (bountyIndex > -1) {
         updatedList[bountyIndex] = bounty;
-      }
-      else {
+      } else {
         updatedList.push(bounty);
       }
       return updatedList;
     });
   }
 
-  async function updateBounty (bountyId: string, bountyUpdate: UpdateableBountyFields) {
-
+  async function updateBounty(bountyId: string, bountyUpdate: UpdateableBountyFields) {
     const updatedBounty = await charmClient.bounties.updateBounty({ bountyId, updateContent: bountyUpdate });
 
     refreshBountyList(updatedBounty);
@@ -94,11 +91,11 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     return updatedBounty;
   }
 
-  async function updateCurrentBountyId (id: string | null) {
+  async function updateCurrentBountyId(id: string | null) {
     setCurrentBountyId(id);
 
     if (id) {
-      const bountyFromCache = bountiesRef.current.find(b => b.id === id);
+      const bountyFromCache = bountiesRef.current.find((b) => b.id === id);
       if (bountyFromCache) {
         setCurrentBounty(bountyFromCache);
       }
@@ -106,13 +103,12 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
       const refreshed = await charmClient.bounties.getBounty(id);
       refreshBountyList(refreshed);
       setCurrentBounty(refreshed);
-    }
-    else {
+    } else {
       setCurrentBounty(null);
     }
   }
 
-  function createDraftBounty ({ pageId, spaceId, userId }: { pageId: string, spaceId: string, userId: string }) {
+  function createDraftBounty({ pageId, spaceId, userId }: { pageId: string; spaceId: string; userId: string }) {
     setDraftBounty({
       chainId: 1,
       status: 'open',
@@ -123,28 +119,30 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
       linkedPageId: pageId,
       maxSubmissions: 1,
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: spaceId
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: spaceId
+          }
+        ]
       }
     });
   }
 
-  function cancelDraftBounty () {
+  function cancelDraftBounty() {
     setDraftBounty(null);
   }
 
-  async function deleteBounty (bountyId: string): Promise<true> {
+  async function deleteBounty(bountyId: string): Promise<true> {
     await charmClient.bounties.deleteBounty(bountyId);
-    setBounties(_bounties => _bounties.filter(bounty => bounty.id !== bountyId));
+    setBounties((_bounties) => _bounties.filter((bounty) => bounty.id !== bountyId));
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(null);
     }
     return true;
   }
 
-  async function refreshBounty (bountyId: string) {
+  async function refreshBounty(bountyId: string) {
     const refreshed = await charmClient.bounties.getBounty(bountyId);
     if (currentBounty?.id === bountyId) {
       setCurrentBounty(refreshed);
@@ -152,37 +150,35 @@ export function BountiesProvider ({ children }: { children: ReactNode }) {
     refreshBountyList(refreshed);
   }
 
-  function _setCurrentBounty (bountyToSet: BountyWithDetails | null) {
-
+  function _setCurrentBounty(bountyToSet: BountyWithDetails | null) {
     setCurrentBounty(bountyToSet);
 
     if (bountyToSet) {
       // Replace current bounty in list of bounties
-      setBounties(_bounties => _bounties.map(b => b.id === bountyToSet.id ? bountyToSet : b));
+      setBounties((_bounties) => _bounties.map((b) => (b.id === bountyToSet.id ? bountyToSet : b)));
     }
   }
 
-  const value = useMemo(() => ({
-    bounties,
-    createDraftBounty,
-    cancelDraftBounty,
-    draftBounty,
-    setBounties,
-    currentBountyId,
-    updateCurrentBountyId,
-    currentBounty,
-    setCurrentBounty: _setCurrentBounty,
-    updateBounty,
-    deleteBounty,
-    refreshBounty,
-    loadingBounties: isLoading
-  }), [bounties, currentBountyId, currentBounty, draftBounty, isLoading]);
-
-  return (
-    <BountiesContext.Provider value={value}>
-      {children}
-    </BountiesContext.Provider>
+  const value = useMemo(
+    () => ({
+      bounties,
+      createDraftBounty,
+      cancelDraftBounty,
+      draftBounty,
+      setBounties,
+      currentBountyId,
+      updateCurrentBountyId,
+      currentBounty,
+      setCurrentBounty: _setCurrentBounty,
+      updateBounty,
+      deleteBounty,
+      refreshBounty,
+      loadingBounties: isLoading
+    }),
+    [bounties, currentBountyId, currentBounty, draftBounty, isLoading]
   );
+
+  return <BountiesContext.Provider value={value}>{children}</BountiesContext.Provider>;
 }
 
 export const useBounties = () => useContext(BountiesContext);

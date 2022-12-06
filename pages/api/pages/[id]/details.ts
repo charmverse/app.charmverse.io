@@ -1,7 +1,7 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import type { PageDetails } from 'lib/pages';
 import { getPageDetails } from 'lib/pages/server/getPageDetails';
@@ -10,15 +10,12 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireKeys(['id'], 'query'))
-  .get(getPageDetailsHandler);
+handler.use(requireKeys(['id'], 'query')).get(getPageDetailsHandler);
 
-async function getPageDetailsHandler (req: NextApiRequest, res: NextApiResponse<PageDetails>) {
-  const pageId = req.query.id as string;
+async function getPageDetailsHandler(req: NextApiRequest, res: NextApiResponse<PageDetails>) {
+  const pageIdOrPath = req.query.id as string;
   const userId = req.session?.user?.id;
-
-  const pageDetails = await getPageDetails(pageId, req.query.spaceId as string | undefined);
+  const pageDetails = await getPageDetails(pageIdOrPath, req.query.spaceId as string | undefined);
 
   if (!pageDetails) {
     throw new NotFoundError();
@@ -30,8 +27,16 @@ async function getPageDetailsHandler (req: NextApiRequest, res: NextApiResponse<
     userId
   });
 
-  if (permissions.read !== true) {
-    throw new ActionNotPermittedError('You do not have permission to view this page');
+  if (!permissions.read) {
+    const publicPagePermission = await prisma.pagePermission.count({
+      where: {
+        pageId: pageDetails.id,
+        public: true
+      }
+    });
+    if (!publicPagePermission) {
+      throw new ActionNotPermittedError('You do not have permission to view this page');
+    }
   }
 
   return res.status(200).json(pageDetails);

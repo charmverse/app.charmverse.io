@@ -1,4 +1,3 @@
-
 import * as path from 'path';
 
 import nextJest from 'next/jest';
@@ -12,8 +11,8 @@ interface JestConfig {
 }
 
 // we have to use this override since next/js hard-codes node_modules in transformIgnorePatterns
-export default async function overriddenConfig (_config: any) {
-  return async function defaultExport () {
+export default async function overriddenConfig(_config: any) {
+  return async function defaultExport() {
     const config: JestConfig = await createJestConfig(_config)();
     config.transformIgnorePatterns = [
       '/.next/',

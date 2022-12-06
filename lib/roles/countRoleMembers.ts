@@ -2,8 +2,7 @@ import { prisma } from 'db';
 
 import type { Roleup } from './interfaces';
 
-export async function countRoleMembers ({ roleId }: { roleId: string }): Promise<Roleup> {
-
+export async function countRoleMembers({ roleId }: { roleId: string }): Promise<Roleup> {
   const role = await prisma.role.findUnique({
     where: {
       id: roleId
@@ -32,5 +31,4 @@ export async function countRoleMembers ({ roleId }: { roleId: string }): Promise
     members: count,
     name: role.name
   };
-
 }

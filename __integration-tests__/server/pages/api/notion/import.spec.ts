@@ -5,9 +5,7 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/notion/import - Import from Notion', () => {
-
   it('should validate request params for space admin and respond 200', async () => {
-
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const sessionCookie = await loginUser(adminUser.id);
@@ -19,11 +17,9 @@ describe('POST /api/notion/import - Import from Notion', () => {
       .expect(200);
 
     expect(response.body).toStrictEqual({ failedImports: [] });
-
   });
 
   it('should fail if the requesting user is not a space admin and respond 401', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const sessionCookie = await loginUser(user.id);
@@ -33,7 +29,5 @@ describe('POST /api/notion/import - Import from Notion', () => {
       .set('Cookie', sessionCookie)
       .send({ code: 'code', spaceId: space.id })
       .expect(401);
-
   });
-
 });

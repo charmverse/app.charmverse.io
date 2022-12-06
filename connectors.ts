@@ -23,6 +23,10 @@ export interface IChainDetails {
 
 // Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services
 
+/**
+ * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
+ * https://github.com/ethereum-lists/chains/tree/master/_data/chains
+ */
 const RPC = {
   ETHEREUM: {
     chainId: 1,
@@ -32,13 +36,13 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    rpcUrls: ['https://main-light.eth.linkpool.io']
+    rpcUrls: ['https://main-light.eth.linkpool.io'],
+    shortName: 'eth'
   },
   BSC: {
     chainId: 56,
@@ -48,13 +52,13 @@ const RPC = {
       symbol: 'BNB',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
+      logoURI: 'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
     },
     rpcUrls: ['https://bsc-dataseed.binance.org'],
     blockExplorerUrls: ['https://bscscan.com'],
     gnosisUrl: 'https://safe-transaction.bsc.gnosis.io',
-    iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg'
+    iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
+    shortName: 'bnb'
   },
   POLYGON: {
     chainId: 137,
@@ -64,13 +68,13 @@ const RPC = {
       symbol: 'MATIC',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction.polygon.gnosis.io',
-    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg'
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    shortName: 'matic'
   },
   AVALANCHE: {
     chainId: 43114,
@@ -80,13 +84,13 @@ const RPC = {
       symbol: 'AVAX',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png?1604021818'
+      logoURI: 'https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png?1604021818'
     },
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     blockExplorerUrls: ['https://snowtrace.io'],
     gnosisUrl: 'https://safe-transaction.avalanche.gnosis.io',
-    iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg'
+    iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg',
+    shortName: 'avax'
   },
   XDAI: {
     chainId: 100,
@@ -96,13 +100,13 @@ const RPC = {
       symbol: 'XDAI',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
+      logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
     },
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
     gnosisUrl: 'https://safe-transaction.xdai.gnosis.io',
-    iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg'
+    iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg',
+    shortName: 'gno'
   },
   FANTOM: {
     chainId: 250,
@@ -112,12 +116,12 @@ const RPC = {
       symbol: 'FTM',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4001/small/Fantom.png?1558015016'
+      logoURI: 'https://assets.coingecko.com/coins/images/4001/small/Fantom.png?1558015016'
     },
     rpcUrls: ['https://rpc.ftm.tools'],
     blockExplorerUrls: ['https://ftmscan.com'],
-    iconUrl: '/images/cryptoLogos/fantom.svg'
+    iconUrl: '/images/cryptoLogos/fantom.svg',
+    shortName: 'ftm'
   },
   ARBITRUM: {
     chainId: 42161,
@@ -127,13 +131,13 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
     gnosisUrl: 'https://safe-transaction.arbitrum.gnosis.io',
-    iconUrl: '/images/cryptoLogos/arbitrum.svg'
+    iconUrl: '/images/cryptoLogos/arbitrum.svg',
+    shortName: 'arb1'
   },
   CELO: {
     chainId: 42220,
@@ -143,12 +147,12 @@ const RPC = {
       symbol: 'CELO',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
+      logoURI: 'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
     },
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
-    iconUrl: '/images/cryptoLogos/celo-celo-logo.svg'
+    iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
+    shortName: 'celo'
   },
   HARMONY: {
     chainId: 1666600000,
@@ -158,12 +162,12 @@ const RPC = {
       symbol: 'ONE',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
+      logoURI: 'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
     },
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
-    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg'
+    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
+    shortName: 'hmy-s0'
   },
   HARMONY_DEVNET: {
     chainId: 1666900000,
@@ -173,12 +177,12 @@ const RPC = {
       symbol: 'ONE',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
+      logoURI: 'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
     },
     rpcUrls: ['https://api.s0.ps.hmny.io'],
     blockExplorerUrls: ['https://explorer.ps.hmny.io/'],
-    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg'
+    iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
+    shortName: 'hmy-ps-s0'
   },
   GOERLI: {
     chainId: 5,
@@ -188,31 +192,14 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction.goerli.gnosis.io',
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    testnet: true
-  },
-  RINKEBY: {
-    chainId: 4,
-    chainName: 'Ethereum - Rinkeby',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
-    blockExplorerUrls: ['https://rinkeby-explorer.arbitrum.io/#/'],
-    gnosisUrl: 'https://safe-transaction.rinkeby.gnosis.io',
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    rpcUrls: ['https://rinkeby-light.eth.linkpool.io/'],
-    testnet: true
+    testnet: true,
+    shortName: 'gor'
   },
   MUMBAI: {
     chainId: 80001,
@@ -222,19 +209,40 @@ const RPC = {
       symbol: 'MATIC',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    testnet: true
+    testnet: true,
+    shortName: 'maticmum'
+  },
+  OPTIMISM: {
+    chainId: 10,
+    chainName: 'Optimism',
+    nativeCurrency: {
+      name: 'Optimism',
+      symbol: 'OP',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    rpcUrls: ['https://mainnet.optimism.io'],
+    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/optimism.svg',
+    testnet: true,
+    shortName: 'oeth'
   }
 } as const;
 
 export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC);
+
+export function getChainShortname(chainId: string | number): string {
+  const parsedChainId = parseInt(chainId.toString());
+  return RPCList.find((chain) => chain.chainId === parsedChainId)?.shortName ?? '';
+}
 
 export type CryptoCurrency = typeof RPC[Blockchain]['nativeCurrency']['symbol'];
 
@@ -248,9 +256,11 @@ export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
   return acc;
 }, {} as Record<CryptoCurrency, string>);
 
-export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
-  return chain.nativeCurrency.symbol as CryptoCurrency;
-}));
+export const CryptoCurrencies = uniqueValues<CryptoCurrency>(
+  RPCList.map((chain) => {
+    return chain.nativeCurrency.symbol as CryptoCurrency;
+  })
+);
 
 export const FiatCurrencyList = {
   USD: 'US Dollar',
@@ -274,8 +284,8 @@ export interface IPairQuote extends ICurrencyPair {
   source?: string;
 }
 
-export function getChainById (chainId: number): IChainDetails | undefined {
-  return RPCList.find(rpc => rpc.chainId === chainId);
+export function getChainById(chainId: number): IChainDetails | undefined {
+  return RPCList.find((rpc) => rpc.chainId === chainId);
 }
 
 const supportedChains: Blockchain[] = [
@@ -289,8 +299,8 @@ const supportedChains: Blockchain[] = [
   'HARMONY',
   'HARMONY_DEVNET',
   'BSC',
+  'OPTIMISM',
   'GOERLI',
-  'RINKEBY',
   'MUMBAI'
 ];
 
@@ -322,7 +332,7 @@ const walletLink = new WalletLinkConnector({
  * @param chainId
  * @returns The native crypto of a chain. If the chain is not found, returns an empty list
  */
-export function getCryptos (chainId: number): (string | CryptoCurrency)[] {
+export function getCryptos(chainId: number): (string | CryptoCurrency)[] {
   const chain = getChainById(chainId);
 
   if (!chain) {
@@ -330,17 +340,18 @@ export function getCryptos (chainId: number): (string | CryptoCurrency)[] {
   }
 
   return [chain.nativeCurrency.symbol];
-
 }
 
-export function getChainExplorerLink (chainId: string | number, transactionOrContractId: string, endpoint: 'transaction' | 'address' = 'transaction'): string {
-
+export function getChainExplorerLink(
+  chainId: string | number,
+  transactionOrContractId: string,
+  endpoint: 'transaction' | 'address' = 'transaction'
+): string {
   chainId = chainId.toString();
 
   const path = endpoint === 'transaction' ? 'tx' : 'token';
 
   switch (chainId) {
-
     case '1':
       return `https://etherscan.io/${path}/${transactionOrContractId}`;
 

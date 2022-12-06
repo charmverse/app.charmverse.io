@@ -17,11 +17,19 @@ import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import {
+  getViewCardsSortedFilteredAndGrouped,
+  sortCards
+} from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewDisplayBy, getCurrentViewGroupBy } from 'components/common/BoardEditor/focalboard/src/store/views';
+import {
+  getCurrentViewDisplayBy,
+  getCurrentViewGroupBy
+} from 'components/common/BoardEditor/focalboard/src/store/views';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
@@ -50,33 +58,33 @@ import ViewTitle, { InlineViewTitle } from './viewTitle';
 
 const CalendarFullView = dynamic(() => import('./calendar/fullCalendar'), { ssr: false });
 
-// eslint-disable-next-line no-use-before-define
-type Props = WrappedComponentProps & PropsFromRedux & {
-  board: Board;
-  embeddedBoardPath?: string;
-  // cards: Card[]
-  activeView?: BoardView;
-  views: BoardView[];
-  hideBanner?: boolean;
-  readOnly: boolean;
-  addCard: (card: Card) => void;
-  setPage: (p: Partial<Page>) => void;
-  updateView: (view: BoardView) => void;
-  showCard: (cardId: string | null) => void;
-  onViewTabClick?: (viewId: string) => void;
-  disableUpdatingUrl?: boolean;
-  maxTabsShown?: number;
-  onDeleteView?: (viewId: string) => void;
-}
+type Props = WrappedComponentProps &
+  // eslint-disable-next-line no-use-before-define
+  PropsFromRedux & {
+    board: Board;
+    embeddedBoardPath?: string;
+    // cards: Card[]
+    activeView?: BoardView;
+    views: BoardView[];
+    hideBanner?: boolean;
+    readOnly: boolean;
+    addCard: (card: Card) => void;
+    setPage: (p: Partial<Page>) => void;
+    updateView: (view: BoardView) => void;
+    showCard: (cardId: string | null) => void;
+    onViewTabClick?: (viewId: string) => void;
+    disableUpdatingUrl?: boolean;
+    maxTabsShown?: number;
+    onDeleteView?: (viewId: string) => void;
+  };
 
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
   showSettings: 'create-linked-view' | 'view-options' | null;
-}
+};
 
-function CenterPanel (props: Props) {
-
+function CenterPanel(props: Props) {
   const { activeView, board, views } = props;
 
   const [state, setState] = useState<State>({
@@ -87,25 +95,32 @@ function CenterPanel (props: Props) {
   });
 
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { pages, updatePage } = usePages();
   const _groupByProperty = useAppSelector(getCurrentViewGroupBy);
   const _dateDisplayProperty = useAppSelector(getCurrentViewDisplayBy);
+  const { members } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
-  const boardPageType = pages[board.id]?.type;
+  const boardPage = pages[board.id];
+  const boardPageType = boardPage?.type;
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
   const activeBoard = useAppSelector(getBoard(activeBoardId));
   const activePage = pages[activeBoardId];
 
-  const _cards = useAppSelector(getViewCardsSortedFilteredAndGrouped({
-    boardId: activeBoard?.id || '',
-    viewId: activeView?.id || ''
-  }));
+  const _cards = useAppSelector(
+    getViewCardsSortedFilteredAndGrouped({
+      boardId: activeBoard?.id || '',
+      viewId: activeView?.id || ''
+    })
+  );
+
   // filter cards by whats accessible
-  const cards = _cards.filter(card => pages[card.id]);
+  const cardPages: CardPage[] = _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
+  const sortedCardPages = activeView ? sortCards(cardPages, board, activeView, members) : [];
+  const cards = sortedCardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
   if ((!groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
@@ -118,7 +133,12 @@ function CenterPanel (props: Props) {
   }
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
-    ? getVisibleAndHiddenGroups(cards, activeView.fields.visibleOptionIds, activeView.fields.hiddenOptionIds, groupByProperty)
+    ? getVisibleAndHiddenGroups(
+        cards,
+        activeView.fields.visibleOptionIds,
+        activeView.fields.hiddenOptionIds,
+        groupByProperty
+      )
     : { visible: [], hidden: [] };
 
   const backgroundRef = React.createRef<HTMLDivElement>();
@@ -140,31 +160,39 @@ function CenterPanel (props: Props) {
         deleteSelectedCards();
         e.stopPropagation();
       }
-
     }
   };
 
-  function setRandomHeaderImage (_board: Board, headerImage?: string | null) {
+  function setRandomHeaderImage(_board: Board, headerImage?: string | null) {
     const newHeaderImage = headerImage ?? randomBannerImage();
     // Null is passed if we want to remove the image
     mutator.changeHeaderImage(_board.id, _board.fields.headerImage, headerImage !== null ? newHeaderImage : null);
   }
 
-  function backgroundClicked (e: React.MouseEvent) {
+  function backgroundClicked(e: React.MouseEvent) {
     if (state.selectedCardIds.length > 0) {
       setState({ ...state, selectedCardIds: [] });
       e.stopPropagation();
     }
   }
 
-  const showCard = React.useCallback((cardId: string | null) => {
-    if (state.selectedCardIds.length > 0) {
-      setState({ ...state, selectedCardIds: [] });
-    }
-    props.showCard(cardId);
-  }, [props.showCard, state.selectedCardIds]);
+  const showCard = React.useCallback(
+    (cardId: string | null) => {
+      if (state.selectedCardIds.length > 0) {
+        setState({ ...state, selectedCardIds: [] });
+      }
+      props.showCard(cardId);
+    },
+    [props.showCard, state.selectedCardIds]
+  );
 
-  const addCard = async (groupByOptionId?: string, show = false, properties: Record<string, string> = {}, insertLast = true, isTemplate = false) => {
+  const addCard = async (
+    groupByOptionId?: string,
+    show = false,
+    properties: Record<string, string> = {},
+    insertLast = true,
+    isTemplate = false
+  ) => {
     const { activeView, board } = props;
 
     if (!activeView) {
@@ -177,12 +205,14 @@ function CenterPanel (props: Props) {
 
     card.parentId = board.id;
     card.rootId = board.rootId;
-    const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(activeView.fields.filter, board.fields.cardProperties);
+    const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
+      activeView.fields.filter,
+      board.fields.cardProperties
+    );
     if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
       if (groupByOptionId) {
         propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
-      }
-      else {
+      } else {
         delete propertiesThatMeetFilters[groupByProperty.id];
       }
     }
@@ -195,7 +225,9 @@ function CenterPanel (props: Props) {
     card.fields.isTemplate = isTemplate;
 
     mutator.performAsUndoGroup(async () => {
-      const newCardOrder = insertLast ? [...activeView.fields.cardOrder, card.id] : [card.id, ...activeView.fields.cardOrder];
+      const newCardOrder = insertLast
+        ? [...activeView.fields.cardOrder, card.id]
+        : [card.id, ...activeView.fields.cardOrder];
       // update view order first so that when we add the block it appears in the right spot
       await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
 
@@ -204,24 +236,26 @@ function CenterPanel (props: Props) {
         'add card',
         async (block: Block) => {
           if (space) {
-            await mutate(`pages/${space.id}`, async (_pages: Record<string, Page>): Promise<Record<string, Page>> => {
-              const newPage = await charmClient.pages.getPage(block.id);
+            await mutate(
+              `pages/${space.id}`,
+              async (_pages: Record<string, Page>): Promise<Record<string, Page>> => {
+                const newPage = await charmClient.pages.getPage(block.id);
 
-              return { ..._pages, [newPage.id]: newPage };
-            }, {
-              revalidate: false
-            });
+                return { ..._pages, [newPage.id]: newPage };
+              },
+              {
+                revalidate: false
+              }
+            );
           }
 
           if (isTemplate) {
             showCard(block.id);
-          }
-          else if (show) {
+          } else if (show) {
             props.addCard(createCard(block));
             props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
             showCard(block.id);
-          }
-          else {
+          } else {
             // Focus on this card's title inline on next render
             setState({ ...state, cardIdToFocusOnRender: card.id });
             setTimeout(() => setState({ ...state, cardIdToFocusOnRender: '' }), 100);
@@ -253,33 +287,33 @@ function CenterPanel (props: Props) {
         const lastCardId = selectedCardIds[selectedCardIds.length - 1];
         const srcIndex = orderedCardIds.indexOf(lastCardId);
         const destIndex = orderedCardIds.indexOf(card.id);
-        const newCardIds = (srcIndex < destIndex) ? orderedCardIds.slice(srcIndex, destIndex + 1) : orderedCardIds.slice(destIndex, srcIndex + 1);
+        const newCardIds =
+          srcIndex < destIndex
+            ? orderedCardIds.slice(srcIndex, destIndex + 1)
+            : orderedCardIds.slice(destIndex, srcIndex + 1);
         for (const newCardId of newCardIds) {
           if (!selectedCardIds.includes(newCardId)) {
             selectedCardIds.push(newCardId);
           }
         }
         setState({ ...state, selectedCardIds });
-      }
-      else {
+      } else {
         // Shift+Click: add to selection
         if (selectedCardIds.includes(card.id)) {
           selectedCardIds = selectedCardIds.filter((o) => o !== card.id);
-        }
-        else {
+        } else {
           selectedCardIds.push(card.id);
         }
         setState({ ...state, selectedCardIds });
       }
-    }
-    else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
+    } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
       showCard(card.id);
     }
 
     e.stopPropagation();
   };
 
-  async function deleteSelectedCards () {
+  async function deleteSelectedCards() {
     const { selectedCardIds } = state;
     if (selectedCardIds.length < 1) {
       return;
@@ -289,9 +323,11 @@ function CenterPanel (props: Props) {
       for (const cardId of selectedCardIds) {
         const card = cards.find((o) => o.id === cardId);
         if (card) {
-          mutator.deleteBlock(card, selectedCardIds.length > 1 ? `delete ${selectedCardIds.length} cards` : 'delete card');
-        }
-        else {
+          mutator.deleteBlock(
+            card,
+            selectedCardIds.length > 1 ? `delete ${selectedCardIds.length} cards` : 'delete card'
+          );
+        } else {
           Utils.assertFailure(`Selected card not found: ${cardId}`);
         }
       }
@@ -300,8 +336,12 @@ function CenterPanel (props: Props) {
     setState({ ...state, selectedCardIds: [] });
   }
 
-  function getVisibleAndHiddenGroups (__cards: Card[], visibleOptionIds: string[], hiddenOptionIds: string[], groupByProperty?: IPropertyTemplate):
-    { visible: BoardGroup[], hidden: BoardGroup[] } {
+  function getVisibleAndHiddenGroups(
+    __cards: Card[],
+    visibleOptionIds: string[],
+    hiddenOptionIds: string[],
+    groupByProperty?: IPropertyTemplate
+  ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
     let unassignedOptionIds: string[] = [];
     if (groupByProperty) {
       unassignedOptionIds = groupByProperty.options
@@ -320,20 +360,28 @@ function CenterPanel (props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  const showView = useCallback((viewId) => {
-    if (!props.disableUpdatingUrl) {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          viewId: viewId || ''
-        }
-      }, undefined, { shallow: true });
-    }
-    props.onViewTabClick?.(viewId);
-  }, [router.query, typeof window !== 'undefined' && window.history]);
+  const showView = useCallback(
+    (viewId) => {
+      if (!props.disableUpdatingUrl) {
+        const { cardId, ...rest } = router.query;
+        router.push(
+          {
+            pathname: router.pathname,
+            query: {
+              ...rest,
+              viewId: viewId || ''
+            }
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+      props.onViewTabClick?.(viewId);
+    },
+    [router.query, typeof window !== 'undefined' && window.history]
+  );
 
-  async function createLinkedView ({ boardId: sourceBoardId }: { boardId: string }) {
+  async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
     const view = createBoardView();
     view.fields.viewType = 'board';
     view.parentId = board.id;
@@ -346,12 +394,12 @@ function CenterPanel (props: Props) {
     showView(view.id);
   }
 
-  async function createDatabase () {
+  async function createDatabase() {
     const { view } = await convertToInlineBoard({ board, updatePage });
     showView(view.id);
   }
 
-  function openSelectSource () {
+  function openSelectSource() {
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
       setState({ ...state, showSettings: 'create-linked-view' });
@@ -359,7 +407,7 @@ function CenterPanel (props: Props) {
     props.onViewTabClick?.('');
   }
 
-  function toggleViewOptions (enable?: boolean) {
+  function toggleViewOptions(enable?: boolean) {
     enable = enable ?? state.showSettings !== 'view-options';
     const showSettings = enable ? 'view-options' : null;
     // delay the sidebar opening so that we dont trigger it to close right away
@@ -368,7 +416,7 @@ function CenterPanel (props: Props) {
     });
   }
 
-  function closeSettings () {
+  function closeSettings() {
     setState({ ...state, showSettings: null });
   }
 
@@ -387,11 +435,8 @@ function CenterPanel (props: Props) {
         backgroundClicked(e);
       }}
     >
-      <Hotkeys
-        keyName='ctrl+d,del,esc,backspace'
-        onKeyDown={keydownHandler}
-      />
-      {!!board.deletedAt && <PageDeleteBanner pageId={board.id} />}
+      <Hotkeys keyName='ctrl+d,del,esc,backspace' onKeyDown={keydownHandler} />
+      {!!boardPage?.deletedAt && <PageDeleteBanner pageId={board.id} />}
       {!props.hideBanner && board.fields.headerImage && (
         <Box className='PageBanner' width='100%' mb={2}>
           <PageBanner
@@ -403,28 +448,23 @@ function CenterPanel (props: Props) {
         </Box>
       )}
       <div className='top-head'>
-        {(board && (boardPageType === 'board' || !isEmbedded)) && (
-          <ViewTitle
-            key={board.id + board.title}
-            board={board}
-            readOnly={props.readOnly}
-            setPage={props.setPage}
-          />
+        {board && (boardPageType === 'board' || !isEmbedded) && (
+          <ViewTitle key={board.id + board.title} board={board} readOnly={props.readOnly} setPage={props.setPage} />
         )}
         <ViewHeader
           onDeleteView={props.onDeleteView}
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
           onViewTabClick={props.onViewTabClick}
-          addViewButton={(
+          addViewButton={
             <AddViewMenu
               board={board}
               activeView={activeView}
               views={views}
               showView={showView}
-              onClick={(boardPageType === 'inline_linked_board') ? openSelectSource : undefined}
+              onClick={boardPageType === 'inline_linked_board' ? openSelectSource : undefined}
             />
-          )}
+          }
           viewsBoardId={board.id}
           activeBoard={activeBoard}
           activeView={props.activeView}
@@ -533,16 +573,25 @@ function CenterPanel (props: Props) {
             )}
           </Box>
           {activeBoard && activeView && (
-            <ViewSidebar board={activeBoard} view={activeView} isOpen={state.showSettings === 'view-options'} closeSidebar={closeSettings} groupByProperty={groupByProperty} />
+            <ViewSidebar
+              board={activeBoard}
+              view={activeView}
+              isOpen={state.showSettings === 'view-options'}
+              closeSidebar={closeSettings}
+              groupByProperty={groupByProperty}
+            />
           )}
         </Box>
       </div>
     </div>
   );
-
 }
 
-export function groupCardsByOptions (cards: Card[], optionIds: string[], groupByProperty?: IPropertyTemplate): BoardGroup[] {
+export function groupCardsByOptions(
+  cards: Card[],
+  optionIds: string[],
+  groupByProperty?: IPropertyTemplate
+): BoardGroup[] {
   const groups = [];
 
   for (const optionId of optionIds) {
@@ -556,8 +605,7 @@ export function groupCardsByOptions (cards: Card[], optionIds: string[], groupBy
         };
         groups.push(group);
       }
-    }
-    else {
+    } else {
       // Empty group
       const emptyGroupCards = cards.filter((card) => {
         const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];

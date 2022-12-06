@@ -5,8 +5,6 @@ const StyledRoot = styled.div`
   z-index: var(--z-index-modal);
 `;
 
-export default function RootPortal () {
-  return (
-    <StyledRoot id='focalboard-root-portal' className='focalboard-body'></StyledRoot>
-  );
+export default function RootPortal() {
+  return <StyledRoot id='focalboard-root-portal' className='focalboard-body'></StyledRoot>;
 }

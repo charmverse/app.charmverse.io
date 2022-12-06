@@ -23,9 +23,9 @@ const BreadCrumb = styled.span`
 
   :after {
     content: ' / ';
-    opacity: .5;
-    margin-left: .5em;
-    margin-right: .5em;
+    opacity: 0.5;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
   }
   a {
     color: inherit;
@@ -43,12 +43,12 @@ const PageIcon = styled(StyledPageIcon)`
 `;
 
 const StyledPageTitle = styled(Typography)`
-  font-size: .9rem;
+  font-size: 0.9rem;
   text-overflow: ellipsis;
   max-width: 500px;
 ` as typeof Typography;
 
-function PageTitle ({ children, sx = {} }: { children: ReactNode, sx?: object }) {
+function PageTitle({ children, sx = {} }: { children: ReactNode; sx?: object }) {
   return (
     <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
@@ -62,7 +62,7 @@ interface PageBreadCrumb {
   title: string;
 }
 
-function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: string }) {
+function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: string }) {
   const { pages } = usePages();
   const { isSaving } = usePrimaryCharmEditor();
 
@@ -90,7 +90,7 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
 
   return (
     <Box display='flex'>
-      {displayedCrumbs.map(crumb => (
+      {displayedCrumbs.map((crumb) => (
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
             <Link href={`${basePath}/${crumb.path}`}>
@@ -100,9 +100,7 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
               </PageTitle>
             </Link>
           ) : (
-            <PageTitle>
-              {crumb.title}
-            </PageTitle>
+            <PageTitle>{crumb.title}</PageTitle>
           )}
         </BreadCrumb>
       ))}
@@ -115,61 +113,52 @@ function DocumentPageTitle ({ basePath, pageId }: { basePath: string, pageId?: s
       {isSaving && (
         <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
           <CircularProgress size={12} />
-          <Typography variant='subtitle2'>
-            Saving
-          </Typography>
+          <Typography variant='subtitle2'>Saving</Typography>
         </Box>
       )}
     </Box>
   );
 }
 
-function ProposalPageTitle ({ basePath }: { basePath: string }) {
+function ProposalPageTitle({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/proposals`}>
-          Proposals
-        </Link>
+        <Link href={`${basePath}/proposals`}>Proposals</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
 
-function BountyPageTitle ({ basePath }: { basePath: string }) {
+function BountyPageTitle({ basePath }: { basePath: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/bounties`}>
-          Bounties
-        </Link>
+        <Link href={`${basePath}/bounties`}>Bounties</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
 
-function PublicBountyPageTitle () {
-  const [space] = useCurrentSpace();
+function PublicBountyPageTitle() {
+  const space = useCurrentSpace();
   return (
     <PageTitle>
       {space && (
         <>
-          <BreadCrumb>
-            {`${space.name}`}
-          </BreadCrumb>
+          <BreadCrumb>{`${space.name}`}</BreadCrumb>
           Bounties
         </>
       )}
-
     </PageTitle>
   );
 }
 
-function NexusPageTitle ({ route }: { route: string }) {
+function NexusPageTitle({ route }: { route: string }) {
   const [pageTitle] = usePageTitle();
 
   // show /nexus as the parent page
@@ -179,9 +168,7 @@ function NexusPageTitle ({ route }: { route: string }) {
     <PageTitle>
       {showNexusParent && (
         <BreadCrumb>
-          <Link href='/nexus'>
-            My Nexus
-          </Link>
+          <Link href='/nexus'>My Nexus</Link>
         </BreadCrumb>
       )}
       {pageTitle}
@@ -189,45 +176,34 @@ function NexusPageTitle ({ route }: { route: string }) {
   );
 }
 
-function DefaultPageTitle () {
+function DefaultPageTitle() {
   const [pageTitle] = usePageTitle();
-  return (
-    <PageTitle>
-      {pageTitle}
-    </PageTitle>
-  );
+  return <PageTitle>{pageTitle}</PageTitle>;
 }
 
-function EmptyPageTitle () {
+function EmptyPageTitle() {
   return <div></div>;
 }
 
-export default function PageTitleWithBreadcrumbs ({ pageId, pageType }: { pageId?: string, pageType?: PageType }) {
+export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  }
-  else if (pageType === 'bounty') {
+  } else if (pageType === 'bounty') {
     return <BountyPageTitle basePath={`/${router.query.domain}`} />;
-  }
-  else if (pageType === 'proposal') {
+  } else if (pageType === 'proposal') {
     return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
-  }
-  else if (router.route === '/[domain]/[pageId]') {
+  } else if (router.route === '/[domain]/[pageId]') {
     return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
-  }
-  else if (router.route === '/share/[...pageId]') {
+  } else if (router.route === '/share/[...pageId]') {
     return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
-  }
-  else if (NEXUS_ROUTES.includes(router.route)) {
+  } else if (NEXUS_ROUTES.includes(router.route)) {
     return <NexusPageTitle route={router.route} />;
-  }
-  else if (router.route.startsWith('/u/')) {
+  } else if (router.route.startsWith('/u/')) {
     return <EmptyPageTitle />;
-  }
-  else {
+  } else {
     return <DefaultPageTitle />;
   }
 }

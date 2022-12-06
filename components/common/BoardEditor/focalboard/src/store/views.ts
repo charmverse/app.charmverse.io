@@ -1,4 +1,3 @@
-
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -11,9 +10,9 @@ import { initialLoad, initialReadOnlyLoad } from './initialLoad';
 import type { RootState } from './index';
 
 type ViewsState = {
-    current: string;
-    views: { [key: string]: BoardView };
-}
+  current: string;
+  views: { [key: string]: BoardView };
+};
 
 const viewsSlice = createSlice({
   name: 'views',
@@ -29,8 +28,7 @@ const viewsSlice = createSlice({
       for (const view of action.payload) {
         if (!view.deletedAt) {
           state.views[view.id] = view;
-        }
-        else {
+        } else {
           delete state.views[view.id];
         }
       }
@@ -39,7 +37,7 @@ const viewsSlice = createSlice({
       state.views[action.payload.id] = action.payload;
     },
     deleteViews: (state, action: PayloadAction<Pick<BoardView, 'id'>[]>) => {
-      action.payload.forEach(deletedView => {
+      action.payload.forEach((deletedView) => {
         delete state.views[deletedView.id];
       });
     }
@@ -68,15 +66,14 @@ export const { updateViews, setCurrent, updateView, addView, deleteViews } = vie
 export const { reducer } = viewsSlice;
 
 export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;
-export const getSortedViews = createSelector(
-  getViews,
-  (views) => {
-    return Object.values(views).sort((a, b) => a.title.localeCompare(b.title)).map((v) => createBoardView(v));
-  }
-);
+export const getSortedViews = createSelector(getViews, (views) => {
+  return Object.values(views)
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .map((v) => createBoardView(v));
+});
 
-export function getView (viewId: string): (state: RootState) => BoardView|null {
-  return (state: RootState): BoardView|null => {
+export function getView(viewId: string): (state: RootState) => BoardView | null {
+  return (state: RootState): BoardView | null => {
     return state.views.views[viewId] || null;
   };
 }
@@ -84,10 +81,16 @@ export function getView (viewId: string): (state: RootState) => BoardView|null {
 export const getCurrentBoardViews = createSelector(
   (state: RootState) => state.boards.current,
   getViews,
-  (boardId: string, views: {
+  (
+    boardId: string,
+    views: {
       [key: string]: BoardView;
-    }) => {
-    return Object.values(views).filter((v) => v.parentId === boardId).sort((a, b) => a.title.localeCompare(b.title)).map((v) => createBoardView(v));
+    }
+  ) => {
+    return Object.values(views)
+      .filter((v) => v.parentId === boardId)
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((v) => createBoardView(v));
   }
 );
 
@@ -99,30 +102,22 @@ export const getCurrentView = createSelector(
   }
 );
 
-export const getCurrentViewGroupBy = createSelector(
-  getCurrentBoard,
-  getCurrentView,
-  (currentBoard, currentView) => {
-    if (!currentBoard) {
-      return undefined;
-    }
-    if (!currentView) {
-      return undefined;
-    }
-    return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.groupById);
+export const getCurrentViewGroupBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
+  if (!currentBoard) {
+    return undefined;
   }
-);
+  if (!currentView) {
+    return undefined;
+  }
+  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.groupById);
+});
 
-export const getCurrentViewDisplayBy = createSelector(
-  getCurrentBoard,
-  getCurrentView,
-  (currentBoard, currentView) => {
-    if (!currentBoard) {
-      return undefined;
-    }
-    if (!currentView) {
-      return undefined;
-    }
-    return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.dateDisplayPropertyId);
+export const getCurrentViewDisplayBy = createSelector(getCurrentBoard, getCurrentView, (currentBoard, currentView) => {
+  if (!currentBoard) {
+    return undefined;
   }
-);
+  if (!currentView) {
+    return undefined;
+  }
+  return currentBoard.fields.cardProperties.find((o) => o.id === currentView.fields.dateDisplayPropertyId);
+});

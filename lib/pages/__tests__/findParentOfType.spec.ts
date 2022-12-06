@@ -34,7 +34,6 @@ const page_1_2 = generatePageNode({
 const pages: PageNode[] = [root_1, page_1_1, page_1_1_1, page_1_2];
 
 const pagesMap: PagesMap<PageNode> = pages.reduce((acc, page) => {
-
   acc[page.id] = page;
 
   return acc;
@@ -54,28 +53,24 @@ const page_1_1_1_Tree: TargetPageTree<PageNode> = {
 
 describe('findParentOfType', () => {
   it('should return the id of the closest parent node matching the given type, when given a pages map', () => {
-
     const result = findParentOfType({ pageType: 'proposal', pageId: page_1_1_1.id, pageMap: pagesMap });
 
     expect(result).toBe(page_1_1.id);
   });
 
   it('should return the id of the closest parent node matching the given type, when given a resolved page tree', () => {
-
     const result = findParentOfType({ pageType: 'proposal', targetPageTree: page_1_1_1_Tree });
 
     expect(result).toBe(page_1_1.id);
   });
 
   it('should return the id of the closest parent node matching the given type, when given a pages map', () => {
-
     const result = findParentOfType({ pageType: 'board', pageId: page_1_1_1.id, pageMap: pagesMap });
 
     expect(result).toBe(null);
   });
 
   it('should return the id of the closest parent node matching the given type, when given a resolved page tree', () => {
-
     const result = findParentOfType({ pageType: 'board', targetPageTree: page_1_1_1_Tree });
 
     expect(result).toBe(null);

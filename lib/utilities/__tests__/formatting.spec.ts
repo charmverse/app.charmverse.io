@@ -1,7 +1,6 @@
 import { formatMoney } from '../formatting';
 
 describe('amount formatting', () => {
-
   it('should be correct for values larger than 1', () => {
     const amount = formatMoney(2932.12345, 'USD', 'en-US');
 
@@ -13,5 +12,4 @@ describe('amount formatting', () => {
 
     expect(amount).toBe('$0.1235');
   });
-
 });

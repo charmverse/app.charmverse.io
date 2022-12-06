@@ -38,10 +38,9 @@ export const schema = yup.object({
   tokenDecimals: yup.number().nullable(true)
 });
 
-type FormValues = yup.InferType<typeof schema>
+type FormValues = yup.InferType<typeof schema>;
 
-export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
-
+export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
   const [loadingToken, setLoadingToken] = useState(false);
 
   const {
@@ -63,8 +62,8 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [,, refreshPaymentMethods] = usePaymentMethods();
-  const [space] = useCurrentSpace();
+  const [, , refreshPaymentMethods] = usePaymentMethods();
+  const space = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
   const [formError, setFormError] = useState<ISystemError | null>(null);
@@ -75,7 +74,6 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
 
   useEffect(() => {
     const newContractAddress = watch(({ contractAddress, chainId }, { value, name }) => {
-
       if ((name === 'contractAddress' || name === 'chainId') && isValidChainAddress(contractAddress as string)) {
         loadToken({ chainId: chainId as SupportedChainId, contractAddress: contractAddress as string });
       }
@@ -88,7 +86,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     return () => newContractAddress.unsubscribe();
   }, [watch]);
 
-  async function loadToken (tokenInfo: ITokenMetadataRequest) {
+  async function loadToken(tokenInfo: ITokenMetadataRequest) {
     setLoadingToken(true);
     try {
       const tokenData = await charmClient.getTokenMetaData(tokenInfo);
@@ -102,8 +100,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       trigger('tokenDecimals');
       setAllowManualInput(false);
       setLoadingToken(false);
-    }
-    catch (error) {
+    } catch (error) {
       setValue('tokenLogo', null);
       setValue('tokenSymbol', null);
       setValue('tokenName', null);
@@ -113,11 +110,11 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     }
   }
 
-  function setChainId (_chainId: number) {
+  function setChainId(_chainId: number) {
     setValue('chainId', _chainId);
   }
 
-  async function addPaymentMethod (paymentMethod: Partial<PaymentMethod>) {
+  async function addPaymentMethod(paymentMethod: Partial<PaymentMethod>) {
     setFormError(null);
     paymentMethod.spaceId = space?.id;
     paymentMethod.walletType = 'metamask';
@@ -130,8 +127,7 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
       const createdPaymentMethod = await charmClient.createPaymentMethod(paymentMethod);
       refreshPaymentMethods();
       onSubmit(createdPaymentMethod);
-    }
-    catch (error: any) {
+    } catch (error: any) {
       setFormError(
         new FormError({
           message: error.message || error.error || (typeof error === 'object' ? JSON.stringify(error) : error),
@@ -142,7 +138,6 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
     }
 
     return false;
-
   }
 
   // Only checks the format, not if we can load the logo
@@ -161,21 +156,13 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
         style={{ margin: 'auto' }}
       >
         <Grid container direction='column' spacing={3}>
-
           <Grid item xs>
-            <InputLabel>
-              Blockchain
-            </InputLabel>
-            <InputSearchBlockchain
-              defaultChainId={defaultChainId}
-              onChange={setChainId}
-            />
+            <InputLabel>Blockchain</InputLabel>
+            <InputSearchBlockchain defaultChainId={defaultChainId} onChange={setChainId} />
           </Grid>
 
           <Grid item xs>
-            <InputLabel>
-              Contract address
-            </InputLabel>
+            <InputLabel>Contract address</InputLabel>
             <TextField
               {...register('contractAddress')}
               type='text'
@@ -187,126 +174,110 @@ export default function PaymentForm ({ onSubmit, defaultChainId = 1 }: Props) {
                 endAdornment: loadingToken && <Progress color='inherit' size='1em' />
               }}
             />
-            {
-                !(errors?.contractAddress) && allowManualInput && !loadingToken && (
-                  <Alert severity='info'>
-                    We couldn't find data about this token. Enter its details below, or select a different blockchain.
-                  </Alert>
-                )
-              }
+            {!errors?.contractAddress && allowManualInput && !loadingToken && (
+              <Alert severity='info'>
+                We couldn't find data about this token. Enter its details below, or select a different blockchain.
+              </Alert>
+            )}
           </Grid>
 
-          {
-            values.contractAddress && !errors.contractAddress && !loadingToken && (
-              <>
-                <Grid item container xs>
-                  <Grid item xs={6} sx={{ pr: 2 }}>
-                    <InputLabel>
-                      Token symbol
-                    </InputLabel>
-                    <TextField
-                      InputProps={{
-                        readOnly: !allowManualInput
-                      }}
-                      {...register('tokenSymbol')}
-                      size='small'
-                      type='text'
-                      error={!!errors.tokenSymbol?.message}
-                      helperText={errors.tokenSymbol?.message}
-                    />
-                  </Grid>
-
-                  <Grid item xs={6} sx={{ pl: 2 }}>
-                    <InputLabel>
-                      Token decimals
-                    </InputLabel>
-                    <TextField
-                      {...register('tokenDecimals', {
-                        valueAsNumber: true
-                      })}
-                      type='number'
-                      size='small'
-                      inputMode='numeric'
-                      inputProps={{
-                        step: 1,
-                        min: 1,
-                        max: 18,
-                        disabled: !allowManualInput
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-                <Grid item xs>
-                  <InputLabel>
-                    Token name
-                  </InputLabel>
+          {values.contractAddress && !errors.contractAddress && !loadingToken && (
+            <>
+              <Grid item container xs>
+                <Grid item xs={6} sx={{ pr: 2 }}>
+                  <InputLabel>Token symbol</InputLabel>
                   <TextField
-                    {...register('tokenName')}
-                    type='text'
-                    size='small'
-                    fullWidth
                     InputProps={{
                       readOnly: !allowManualInput
                     }}
-                    error={!!errors.tokenName?.message}
-                    helperText={errors.tokenName?.message}
+                    {...register('tokenSymbol')}
+                    size='small'
+                    type='text'
+                    error={!!errors.tokenSymbol?.message}
+                    helperText={errors.tokenSymbol?.message}
                   />
                 </Grid>
 
-                <Grid item container xs>
-                  <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
-                    <InputLabel>
-                      Token logo URL
-                    </InputLabel>
-                    <TextField
-                      {...register('tokenLogo')}
-                      type='text'
-                      size='small'
-                      fullWidth
-                      error={!!errors.tokenLogo?.message}
-                      helperText={errors.tokenLogo?.message}
-                      placeholder='https://app.charmverse.io/favicon.png'
-                    />
-                    {
-                      (errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
-                        <Alert severity='error'>
-                          Invalid token logo url
-                        </Alert>
-                      )
-                    }
-                  </Grid>
-                  {
-                    validTokenLogoAddressFormat && (
-                      <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}>
-                        <img
-                          alt=''
-                          style={{ maxHeight: '50px' }}
-                          src={values.tokenLogo || ''}
-                          onError={(error) => {
-                            setLogoLoadSuccess(false);
-                          }}
-                          onLoad={() => {
-                            setLogoLoadSuccess(true);
-                          }}
-                        />
-                      </Grid>
-                    )
-                  }
+                <Grid item xs={6} sx={{ pl: 2 }}>
+                  <InputLabel>Token decimals</InputLabel>
+                  <TextField
+                    {...register('tokenDecimals', {
+                      valueAsNumber: true
+                    })}
+                    type='number'
+                    size='small'
+                    inputMode='numeric'
+                    inputProps={{
+                      step: 1,
+                      min: 1,
+                      max: 18,
+                      disabled: !allowManualInput
+                    }}
+                  />
                 </Grid>
-              </>
-            )
-          }
-          {
-            formError && (
-              <Grid item xs>
-                <Alert severity={formError.severity}>
-                  {formError.message}
-                </Alert>
               </Grid>
-            )
-          }
+              <Grid item xs>
+                <InputLabel>Token name</InputLabel>
+                <TextField
+                  {...register('tokenName')}
+                  type='text'
+                  size='small'
+                  fullWidth
+                  InputProps={{
+                    readOnly: !allowManualInput
+                  }}
+                  error={!!errors.tokenName?.message}
+                  helperText={errors.tokenName?.message}
+                />
+              </Grid>
+
+              <Grid item container xs>
+                <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
+                  <InputLabel>Token logo URL</InputLabel>
+                  <TextField
+                    {...register('tokenLogo')}
+                    type='text'
+                    size='small'
+                    fullWidth
+                    error={!!errors.tokenLogo?.message}
+                    helperText={errors.tokenLogo?.message}
+                    placeholder='https://app.charmverse.io/favicon.png'
+                  />
+                  {(errors?.tokenLogo || (validTokenLogoAddressFormat && !logoLoadSuccess)) && (
+                    <Alert severity='error'>Invalid token logo url</Alert>
+                  )}
+                </Grid>
+                {validTokenLogoAddressFormat && (
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}
+                  >
+                    <img
+                      alt=''
+                      style={{ maxHeight: '50px' }}
+                      src={values.tokenLogo || ''}
+                      onError={(error) => {
+                        setLogoLoadSuccess(false);
+                      }}
+                      onLoad={() => {
+                        setLogoLoadSuccess(true);
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </>
+          )}
+          {formError && (
+            <Grid item xs>
+              <Alert severity={formError.severity}>{formError.message}</Alert>
+            </Grid>
+          )}
           <Grid item>
-            <Button type='submit' disabled={!isValid || (values.contractAddress === '')}>Create payment method</Button>
+            <Button type='submit' disabled={!isValid || values.contractAddress === ''}>
+              Create payment method
+            </Button>
           </Grid>
         </Grid>
       </form>

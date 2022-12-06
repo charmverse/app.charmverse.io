@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,11 +8,9 @@ import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getSpaceInfoController);
+handler.get(getSpaceInfoController);
 
-async function getSpaceInfoController (req: NextApiRequest, res: NextApiResponse<Space | null>) {
-
+async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<Space | null>) {
   const { search } = req.query;
 
   const publicSpace = await getSpaceByDomain(search as string);

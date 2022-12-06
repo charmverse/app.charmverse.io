@@ -7,7 +7,7 @@ import { useSpaces } from 'hooks/useSpaces';
 
 import { AlternateRouteButton } from './join';
 
-export default function CreateSpace () {
+export default function CreateSpace() {
   const { createNewSpace, isCreatingSpace } = useSpaces();
 
   return (
@@ -15,9 +15,7 @@ export default function CreateSpace () {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <CreateSpaceForm onSubmit={createNewSpace} isSubmitting={isCreatingSpace} submitText='Get Started' />
       </Card>
-      <AlternateRouteButton href='/join'>
-        Join a workspace
-      </AlternateRouteButton>
+      <AlternateRouteButton href='/join'>Join a workspace</AlternateRouteButton>
     </Box>
   );
 }

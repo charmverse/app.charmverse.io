@@ -20,9 +20,7 @@ beforeAll(async () => {
 });
 
 describe('removeBountyPermissionGroup', () => {
-
   it('should delete the assigned mapping', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -49,14 +47,12 @@ describe('removeBountyPermissionGroup', () => {
       resourceId: bounty.id
     });
 
-    typedKeys(BountyPermissionLevel).forEach(level => {
+    typedKeys(BountyPermissionLevel).forEach((level) => {
       expect(afterDelete[level].length).toBe(0);
     });
-
   });
 
   it('should return the assigned mapping as it was before if there is nothing to delete', async () => {
-
     const bounty = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
@@ -92,12 +88,11 @@ describe('removeBountyPermissionGroup', () => {
       resourceId: bounty.id
     });
 
-    typedKeys(afterSecondDelete).forEach(key => {
+    typedKeys(afterSecondDelete).forEach((key) => {
       // Simple way of asserting both are the same
       expect(afterDelete[key].length).toBe(0);
       expect(afterSecondDelete[key].length).toBe(0);
     });
-
   });
 
   it('should fail if the bounty does not exist', async () => {
@@ -111,8 +106,7 @@ describe('removeBountyPermissionGroup', () => {
         resourceId: v4()
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
@@ -136,11 +130,9 @@ describe('removeBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail if an invalid assignee group is provided', async () => {
@@ -162,8 +154,7 @@ describe('removeBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
@@ -187,10 +178,8 @@ describe('removeBountyPermissionGroup', () => {
         resourceId: bounty.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
-
 });

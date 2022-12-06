@@ -5,18 +5,12 @@ import Button from 'components/common/Button';
 
 import ShareBountyBoard from './ShareBountyBoard';
 
-export default function BountyShareButton ({ headerHeight }: { headerHeight: number }) {
-
+export default function BountyShareButton({ headerHeight }: { headerHeight: number }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
 
   return (
     <>
-      <Button
-        color='secondary'
-        variant='text'
-        size='small'
-        onClick={popupState.open}
-      >
+      <Button color='secondary' variant='text' size='small' onClick={popupState.open}>
         Share
       </Button>
       <Popover
@@ -38,7 +32,6 @@ export default function BountyShareButton ({ headerHeight }: { headerHeight: num
           }
         }}
       >
-
         <ShareBountyBoard />
       </Popover>
     </>

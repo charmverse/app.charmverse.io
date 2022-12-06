@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,14 +11,13 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .put(requireKeys(['resolved'], 'body'), resolveThread);
+handler.use(requireUser).put(requireKeys(['resolved'], 'body'), resolveThread);
 
 export interface ResolveThreadRequest {
   resolved: boolean;
 }
 
-async function resolveThread (req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
+async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWithCommentsAndAuthors>) {
   const userId = req.session.user.id as string;
   const threadId = req.query.id as string;
   const thread = await prisma.thread.findUnique({
@@ -59,7 +57,6 @@ async function resolveThread (req: NextApiRequest, res: NextApiResponse<ThreadWi
   else {
     return res.status(200).json(thread);
   }
-
 }
 
 export default withSessionRoute(handler);

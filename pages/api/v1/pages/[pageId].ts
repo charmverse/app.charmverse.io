@@ -1,4 +1,3 @@
-
 import type { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,10 +10,7 @@ import { getPageInBoard, mapProperties, PageFromBlock, validateUpdateData } from
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireApiKey)
-  .get(getPage)
-  .patch(updatePage);
+handler.use(requireApiKey).get(getPage).patch(updatePage);
 
 /**
  * @swagger
@@ -29,8 +25,7 @@ handler
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-export async function getPage (req: NextApiRequest, res: NextApiResponse) {
-
+export async function getPage(req: NextApiRequest, res: NextApiResponse) {
   const { pageId } = req.query;
 
   const page = await getPageInBoard(pageId as string);
@@ -63,8 +58,7 @@ export async function getPage (req: NextApiRequest, res: NextApiResponse) {
  *              schema:
  *                $ref: '#/components/schemas/Page'
  */
-async function updatePage (req: NextApiRequest, res: NextApiResponse) {
-
+async function updatePage(req: NextApiRequest, res: NextApiResponse) {
   const { pageId } = req.query;
 
   const spaceId = req.authorizedSpaceId;
@@ -93,14 +87,13 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send({ error: 'Board not found' });
   }
 
-  const boardSchema: PageProperty [] = (board.fields as any).cardProperties;
+  const boardSchema: PageProperty[] = (board.fields as any).cardProperties;
 
   const requestBodyUpdate = req.body as Pick<Page, 'properties' | 'title'>;
 
   try {
     validateUpdateData(requestBodyUpdate);
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(400).json(error);
   }
 
@@ -112,7 +105,6 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
 
   if (requestBodyUpdate.properties) {
     try {
-
       const mappedProperties = mapProperties(requestBodyUpdate.properties, boardSchema);
 
       const newPropertySet = {
@@ -126,9 +118,7 @@ async function updatePage (req: NextApiRequest, res: NextApiResponse) {
       };
 
       updateContent.fields = newFields;
-
-    }
-    catch (error) {
+    } catch (error) {
       return res.status(400).json(error);
     }
   }

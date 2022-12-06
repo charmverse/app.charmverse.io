@@ -15,11 +15,9 @@ export const useUserDetails = ({ updateUser }: UserDetailsProps) => {
       if (updateUser) {
         updateUser(updatedUser);
       }
-    }
-    finally {
+    } finally {
       setIsSaving(false);
     }
-
   };
 
   return { handleUserUpdate, isSaving };

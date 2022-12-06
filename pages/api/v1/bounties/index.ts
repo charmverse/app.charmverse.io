@@ -1,4 +1,3 @@
-
 import type { BountyStatus } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -8,9 +7,7 @@ import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireApiKey)
-  .use(getBounties);
+handler.use(requireApiKey).use(getBounties);
 
 /**
  * @swagger
@@ -125,19 +122,20 @@ interface BountyVC {
  *                  type: object
  *                  $ref: '#/components/schemas/Bounty'
  */
-async function getBounties (req: NextApiRequest, res: NextApiResponse) {
-
+async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   const { status } = req.query;
-  const statuses = (Array.isArray(status) ? status : (status ? [status] : null)) as BountyStatus[];
+  const statuses = (Array.isArray(status) ? status : status ? [status] : null) as BountyStatus[];
 
   const spaceId = req.authorizedSpaceId;
 
   const bounties = await prisma.bounty.findMany({
     where: {
       spaceId,
-      status: statuses ? {
-        in: statuses
-      } : undefined
+      status: statuses
+        ? {
+            in: statuses
+          }
+        : undefined
     },
     include: {
       author: {
@@ -154,35 +152,37 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse) {
   /**
    * Returns the wallet addresses that have received a payment for this bounty
    */
-  function getRecipients (bounty: (typeof bounties)[number]) {
+  function getRecipients(bounty: typeof bounties[number]) {
     return bounty.applications
-      .filter(application => application.status === 'paid' && application.walletAddress)
-      .map(application => ({
+      .filter((application) => application.status === 'paid' && application.walletAddress)
+      .map((application) => ({
         address: application.walletAddress as string
       }));
   }
 
-  function getUrl (bounty: (typeof bounties)[number]) {
+  function getUrl(bounty: typeof bounties[number]) {
     return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}`;
   }
 
-  const bountiesResponse = bounties.map((bounty): PublicApiBounty => ({
-    createdAt: bounty.createdAt.toISOString(),
-    description: bounty.page?.contentText || '',
-    id: bounty.id,
-    issuer: {
-      address: bounty.author.wallets[0]?.address
-    },
-    recipients: getRecipients(bounty),
-    reward: {
-      amount: bounty.rewardAmount,
-      chain: bounty.chainId,
-      token: bounty.rewardToken
-    },
-    title: bounty.page?.title || 'Untitled',
-    status: bounty.status,
-    url: getUrl(bounty)
-  }));
+  const bountiesResponse = bounties.map(
+    (bounty): PublicApiBounty => ({
+      createdAt: bounty.createdAt.toISOString(),
+      description: bounty.page?.contentText || '',
+      id: bounty.id,
+      issuer: {
+        address: bounty.author.wallets[0]?.address
+      },
+      recipients: getRecipients(bounty),
+      reward: {
+        amount: bounty.rewardAmount,
+        chain: bounty.chainId,
+        token: bounty.rewardToken
+      },
+      title: bounty.page?.title || 'Untitled',
+      status: bounty.status,
+      url: getUrl(bounty)
+    })
+  );
 
   return res.status(200).json(bountiesResponse);
 }

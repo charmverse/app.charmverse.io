@@ -2,9 +2,21 @@ import { css } from '@emotion/react';
 
 import * as colors from './colors';
 
+function rgbFromHex(hex: string) {
+  return hex
+    .replace('#', '')
+    .split(/(..)/)
+    .filter((c) => c)
+    .map((c) => parseInt(c, 16));
+}
+
 const globalCSS = css`
   :root {
-    ${Object.entries(colors.lightModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
+    ${Object.entries(colors.lightModeColors).map(
+      ([key, value]) => `
+      --bg-${key}: ${value};
+      --bg-${key}-rgb: ${rgbFromHex(value)};`
+    )}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
     --input-border-hover: #37352f;
@@ -22,15 +34,15 @@ const globalCSS = css`
     --z-index-tooltip: 1500;
 
     --prop-default: #fff;
-    --prop-gray: #E7E7E6;
-    --prop-turquoise: #C2DCF2;
-    --prop-orange: #F4D8D0;
-    --prop-yellow: #EFE9CB;
-    --prop-teal: #D0F4F1;
-    --prop-blue: #C1E7F4;
-    --prop-purple: #D7D3F4;
-    --prop-red: #F2CCD6;
-    --prop-pink: #E8D3ED;
+    --prop-gray: #e7e7e6;
+    --prop-turquoise: #c2dcf2;
+    --prop-orange: #f4d8d0;
+    --prop-yellow: #efe9cb;
+    --prop-teal: #d0f4f1;
+    --prop-blue: #c1e7f4;
+    --prop-purple: #d7d3f4;
+    --prop-red: #f2ccd6;
+    --prop-pink: #e8d3ed;
 
     --elevation-1: 0 2px 3px 0 rgba(0, 0, 0, 0.08);
     --elevation-2: 0 4px 6px 0 rgba(0, 0, 0, 0.12);
@@ -59,7 +71,9 @@ const globalCSS = css`
 
   /* dark theme */
   [data-theme='dark'] {
-    ${Object.entries(colors.darkModeColors).map(([key, value]) => `--bg-${key}: ${value};`).join('\n')}
+    ${Object.entries(colors.darkModeColors)
+      .map(([key, value]) => `--bg-${key}: ${value};`)
+      .join('\n')}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};
     --input-border-hover: #ededed;
@@ -70,9 +84,7 @@ const globalCSS = css`
     --background-paper: ${colors.backgroundLightColorDarkMode};
     --background-dark: ${colors.backgroundDarkColorDarkMode};
     --background-light: ${colors.backgroundLightColorDarkMode};
-
   }
-
 `;
 
 export default globalCSS;

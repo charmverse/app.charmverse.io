@@ -10,8 +10,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PageMeta } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
-
-  top: ${({ card }) => card ? '50px' : '55px'};
+  top: ${({ card }) => (card ? '50px' : '55px')};
   width: '100%';
   z-index: var(--z-index-appBar);
   display: flex;
@@ -21,8 +20,8 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
   padding: ${({ theme }) => theme.spacing(1.4)};
 `;
 
-export function PageTemplateBanner ({ page, parentPage }: { parentPage?: PageMeta | null, page: PageMeta }) {
-  const [space] = useCurrentSpace();
+export function PageTemplateBanner({ page, parentPage }: { parentPage?: PageMeta | null; page: PageMeta }) {
+  const space = useCurrentSpace();
   const theme = useTheme();
 
   const isShowingCard = page.type.match('card') !== null;
@@ -38,28 +37,18 @@ export function PageTemplateBanner ({ page, parentPage }: { parentPage?: PageMet
     <StyledPageTemplateBanner card={isShowingCard}>
       <Grid container display='flex' gap={1} alignItems='center' fontSize={theme.palette.templateBanner.fontSize}>
         <Grid item xs={2}>
-          {
-            isShowingCard && (
-              <Link
-                href={boardPath as string}
-                color={theme.palette.secondary.main}
-              >
-                <BackIcon label='Back' iconSize='small' fontSize='14px' />
-              </Link>
-            )
-          }
+          {isShowingCard && (
+            <Link href={boardPath as string} color={theme.palette.secondary.main}>
+              <BackIcon label='Back' iconSize='small' fontSize='14px' />
+            </Link>
+          )}
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
-          {
-          !isShowingCard ? (
-            <span>
-              You're editing a {page.type.split('_template')[0]} template
-            </span>
+          {!isShowingCard ? (
+            <span>You're editing a {page.type.split('_template')[0]} template</span>
           ) : (
             <>
-              <span>
-                You're editing a template in
-              </span>
+              <span>You're editing a template in</span>
 
               <Link
                 href={boardPath as string}
@@ -71,11 +60,14 @@ export function PageTemplateBanner ({ page, parentPage }: { parentPage?: PageMet
                 }}
                 color={theme.palette.templateBanner.highlightedText}
               >
-                <DocumentPageIcon iconSize='small' fontSize={theme.palette.templateBanner.fontSize} label={board?.title || 'Untitled'} />
+                <DocumentPageIcon
+                  iconSize='small'
+                  fontSize={theme.palette.templateBanner.fontSize}
+                  label={board?.title || 'Untitled'}
+                />
               </Link>
             </>
-          )
-        }
+          )}
         </Grid>
       </Grid>
     </StyledPageTemplateBanner>

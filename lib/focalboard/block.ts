@@ -1,44 +1,43 @@
-
 import { v4 } from 'uuid';
 
 const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const;
-type ContentBlockTypes = typeof contentBlockTypes[number]
-type BlockTypes = typeof blockTypes[number]
+type ContentBlockTypes = typeof contentBlockTypes[number];
+type BlockTypes = typeof blockTypes[number];
 
 interface BlockPatch {
-    spaceId?: string;
-    parentId?: string;
-    rootId?: string;
-    schema?: number;
-    type?: BlockTypes;
-    title?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updatedFields?: Record<string, any>;
-    deletedFields?: string[];
-    deletedAt?: number;
+  spaceId?: string;
+  parentId?: string;
+  rootId?: string;
+  schema?: number;
+  type?: BlockTypes;
+  title?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updatedFields?: Record<string, any>;
+  deletedFields?: string[];
+  deletedAt?: number;
 }
 
 interface Block {
-    id: string;
-    spaceId: string;
-    parentId: string;
-    rootId: string;
-    createdBy: string;
-    updatedBy: string;
+  id: string;
+  spaceId: string;
+  parentId: string;
+  rootId: string;
+  createdBy: string;
+  updatedBy: string;
 
-    schema: number;
-    type: BlockTypes;
-    title: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fields: Record<string, any>;
+  schema: number;
+  type: BlockTypes;
+  title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>;
 
-    createdAt: number;
-    updatedAt: number;
-    deletedAt: number | null;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt: number | null;
 }
 
-function createBlock (block?: Partial<Block>): Block {
+function createBlock(block?: Partial<Block>): Block {
   const now = Date.now();
   return {
     id: block?.id || v4(),
@@ -59,4 +58,3 @@ function createBlock (block?: Partial<Block>): Block {
 
 export type { ContentBlockTypes, BlockTypes, Block, BlockPatch };
 export { blockTypes, contentBlockTypes, createBlock };
-

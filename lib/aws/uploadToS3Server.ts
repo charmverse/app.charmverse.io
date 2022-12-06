@@ -6,18 +6,13 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { v4 as uuid } from 'uuid';
 
+import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
+
 const bucket = process.env.S3_UPLOAD_BUCKET;
 
-const client = new S3Client({
-  credentials: {
-    accessKeyId: process.env.S3_UPLOAD_KEY as string,
-    secretAccessKey: process.env.S3_UPLOAD_SECRET as string
-  },
-  region: process.env.S3_UPLOAD_REGION
-});
+const client = new S3Client(getS3ClientConfig());
 
-export async function uploadFileToS3 (file: { pathInS3: string, content: Buffer }) {
-
+export async function uploadFileToS3(file: { pathInS3: string; content: Buffer }) {
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
     Bucket: bucket,
@@ -36,8 +31,7 @@ export async function uploadFileToS3 (file: { pathInS3: string, content: Buffer 
   return { fileUrl };
 }
 
-export async function uploadUrlToS3 ({ pathInS3, url }: { pathInS3: string, url: string }) {
-
+export async function uploadUrlToS3({ pathInS3, url }: { pathInS3: string; url: string }) {
   const data = await fetch(url);
   const arrayBuffer = await data.arrayBuffer();
 
@@ -50,17 +44,17 @@ export async function uploadUrlToS3 ({ pathInS3, url }: { pathInS3: string, url:
   return { url: fileUrl };
 }
 
-function generateFilename (url: string) {
+function generateFilename(url: string) {
   // strip out url base
   const filename = url.includes('http') ? decodeURIComponent(new URL(url).pathname.split('/').pop() || '') : url;
   const sanitized = filename.replace(/\+/g, '_').replace(/\s/g, '-');
   return sanitized || uuid();
 }
 
-export function getFilePath ({ spaceId, url }: { spaceId: string, url: string }) {
+export function getFilePath({ spaceId, url }: { spaceId: string; url: string }) {
   return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
 }
 
-export function getUserS3FilePath ({ userId, url }: { userId: string, url: string }) {
+export function getUserS3FilePath({ userId, url }: { userId: string; url: string }) {
   return `user-content/${userId}/${uuid()}/${generateFilename(url)}`;
 }

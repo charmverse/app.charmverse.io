@@ -1,16 +1,9 @@
-
 import React from 'react';
 
-export default function SearchIllustration (props: React.HTMLAttributes<HTMLSpanElement>): JSX.Element {
+export default function SearchIllustration(props: React.HTMLAttributes<HTMLSpanElement>): JSX.Element {
   return (
     <span {...props}>
-      <svg
-        width='160'
-        height='160'
-        viewBox='0 0 211 211'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
+      <svg width='160' height='160' viewBox='0 0 211 211' fill='none' xmlns='http://www.w3.org/2000/svg'>
         <path
           opacity='0.5'
           d='M30.7386 30.5387C41.9645 19.17 56.1326 13.3142 73.2142 13C89.9817 13.3142 104.064 19.1414 115.461 30.5387C126.83 41.936 132.686 56.0183 133 72.7858C132.686 89.8674 126.859 104.007 115.461 115.261C104.064 126.487 89.9817 132.429 73.2142 133C56.1326 132.4 41.9931 126.487 30.7386 115.261C19.5127 104.007 13.5999 89.8389 13 72.7572C13.5999 55.9898 19.5127 41.9074 30.7386 30.5387Z'
@@ -28,12 +21,8 @@ export default function SearchIllustration (props: React.HTMLAttributes<HTMLSpan
           d='M192.739 210.413C189.038 211.471 186.297 211.099 184.517 209.298L126.291 145.395C124.511 143.594 123.776 141.278 124.059 138.419C124.341 135.559 126.121 132.357 129.398 128.755C132.958 125.467 136.122 123.579 138.947 123.122C141.773 122.665 144.061 123.494 145.841 125.609L209.407 184.537C211.187 186.339 211.47 189.026 210.283 192.629C209.097 196.231 206.865 199.834 203.616 203.436C200.084 207.039 196.44 209.355 192.739 210.413Z'
           fill='#FFBC1F'
         />
-        <path
-          d='M197 173L173.197 197L144.5 165.5L165.548 144L197 173Z'
-          fill='#7A5600'
-        />
+        <path d='M197 173L173.197 197L144.5 165.5L165.548 144L197 173Z' fill='#7A5600' />
       </svg>
     </span>
   );
 }
-

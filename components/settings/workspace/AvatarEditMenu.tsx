@@ -8,26 +8,26 @@ type Props = {
   anchorEl: HTMLElement | null;
 };
 
-export function AvatarEditMenu ({ onUploadClick, onNftClick, onClose, anchorEl }: Props) {
+export function AvatarEditMenu({ onUploadClick, onNftClick, onClose, anchorEl }: Props) {
   const isVisible = !!anchorEl;
 
   return (
-    <Menu
-      anchorEl={anchorEl}
-      open={isVisible}
-      onClose={onClose}
-    >
-      <MenuItem onClick={() => {
-        onUploadClick();
-        onClose();
-      }}
-      >Upload image
+    <Menu anchorEl={anchorEl} open={isVisible} onClose={onClose}>
+      <MenuItem
+        onClick={() => {
+          onUploadClick();
+          onClose();
+        }}
+      >
+        Upload image
       </MenuItem>
-      <MenuItem onClick={() => {
-        onNftClick();
-        onClose();
-      }}
-      >Select image from my NFT gallery
+      <MenuItem
+        onClick={() => {
+          onNftClick();
+          onClose();
+        }}
+      >
+        Select image from my NFT gallery
       </MenuItem>
     </Menu>
   );

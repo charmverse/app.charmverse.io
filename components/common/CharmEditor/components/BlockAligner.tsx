@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { ListItem } from '@mui/material';
-import type { ReactNode } from 'react';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import { ListItemButton } from '@mui/material';
+import type { ReactNode, MouseEvent } from 'react';
 import { memo, forwardRef } from 'react';
 
 interface BlockAlignerProps {
@@ -10,12 +10,16 @@ interface BlockAlignerProps {
 }
 
 const StyledBlockAligner = styled.div`
+  line-height: 0; // hide margin that appears underneath iframe
   position: relative;
   max-width: 100%;
   text-align: center;
-  &:hover .controls {
-    opacity: 1;
-    transition: opacity 250ms ease-in-out;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover .controls {
+      opacity: 1;
+      transition: opacity 250ms ease-in-out;
+    }
   }
 `;
 
@@ -32,25 +36,25 @@ const Controls = styled.div`
 
 const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete } = props;
+
+  function handleDelete(e: MouseEvent) {
+    onDelete();
+    e.stopPropagation();
+  }
+
   return (
-    <StyledBlockAligner
-      draggable={false}
-    >
+    <StyledBlockAligner draggable={false}>
       {children}
       <Controls className='controls'>
-        <ListItem
-          button
-          disableRipple
-          onClick={() => {
-            onDelete();
-          }}
+        <ListItemButton
+          onClick={handleDelete}
           sx={{
             padding: 1,
             backgroundColor: 'inherit'
           }}
         >
-          <DeleteIcon sx={{ fontSize: 14 }} />
-        </ListItem>
+          <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
+        </ListItemButton>
       </Controls>
     </StyledBlockAligner>
   );

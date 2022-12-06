@@ -32,9 +32,7 @@ beforeAll(async () => {
 });
 
 describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
-
   it('should return the bounties available to a workspace member, and respond 200', async () => {
-
     const creationContent: Partial<Bounty> = {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -46,11 +44,13 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
 
     await createBounty(creationContent as Bounty);
 
-    const bounties = (await request(baseUrl)
-      .get(`/api/bounties?spaceId=${nonAdminUserSpace.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(200)).body as Bounty[];
+    const bounties = (
+      await request(baseUrl)
+        .get(`/api/bounties?spaceId=${nonAdminUserSpace.id}`)
+        .set('Cookie', nonAdminCookie)
+        .send(creationContent)
+        .expect(200)
+    ).body as Bounty[];
 
     expect(bounties.length).toBe(1);
 
@@ -66,11 +66,9 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
         rewardToken: creationContent.rewardToken
       })
     );
-
   });
 
   it('should return the bounties available to the public if this is enabled, and respond 200', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await prisma.space.update({
@@ -91,19 +89,22 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
       rewardToken: 'ETH'
     };
 
-    await createBounty({ ...(creationContent as Bounty),
+    await createBounty({
+      ...(creationContent as Bounty),
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: otherSpace.id
-        }]
-      } });
+        submitter: [
+          {
+            group: 'space',
+            id: otherSpace.id
+          }
+        ]
+      }
+    });
 
     // Unauthenticated request
-    const bounties = (await request(baseUrl)
-      .get(`/api/bounties?spaceId=${otherSpace.id}`)
-      .send(creationContent)
-      .expect(200)).body as Bounty[];
+    const bounties = (
+      await request(baseUrl).get(`/api/bounties?spaceId=${otherSpace.id}`).send(creationContent).expect(200)
+    ).body as Bounty[];
 
     expect(bounties.length).toBe(1);
 
@@ -119,11 +120,9 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
         rewardToken: creationContent.rewardToken
       })
     );
-
   });
 
   it('should return only the bounties available to the public if this is requested by the user, ignoring the bounties they have access to, and respond 200', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const otherUserCookie = await loginUser(otherUser.id);
@@ -147,29 +146,39 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     };
 
     // Create a bounty viewable by the space
-    const visibleBounty = await createBounty({ ...(creationContent as Bounty),
+    const visibleBounty = await createBounty({
+      ...(creationContent as Bounty),
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: otherSpace.id
-        }]
-      } });
+        submitter: [
+          {
+            group: 'space',
+            id: otherSpace.id
+          }
+        ]
+      }
+    });
 
     // Create a bounty viewable only by this user
-    await createBounty({ ...(creationContent as Bounty),
+    await createBounty({
+      ...(creationContent as Bounty),
       permissions: {
-        creator: [{
-          group: 'user',
-          id: otherUser.id
-        }]
-      } });
+        creator: [
+          {
+            group: 'user',
+            id: otherUser.id
+          }
+        ]
+      }
+    });
 
     // Authenticated request, where we specify that we only want to see public data
-    const bounties = (await request(baseUrl)
-      .get(`/api/bounties?spaceId=${otherSpace.id}&publicOnly=${true}`)
-      .set('Cookie', otherUserCookie)
-      .send(creationContent)
-      .expect(200)).body as Bounty[];
+    const bounties = (
+      await request(baseUrl)
+        .get(`/api/bounties?spaceId=${otherSpace.id}&publicOnly=${true}`)
+        .set('Cookie', otherUserCookie)
+        .send(creationContent)
+        .expect(200)
+    ).body as Bounty[];
 
     // We shoukd only have received one result
     expect(bounties.length).toBe(1);
@@ -177,11 +186,9 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     const bounty = bounties[0];
 
     expect(bounty.id).toBe(visibleBounty.id);
-
   });
 
   it('should return an empty list if public bounties are disabled, and respond 200', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await prisma.space.update({
@@ -203,29 +210,29 @@ describe('GET /api/bounties?spaceId={spaceId} - list space bounties', () => {
     };
 
     // Create a bounty viewable by the space
-    await createBounty({ ...(creationContent as Bounty),
+    await createBounty({
+      ...(creationContent as Bounty),
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: otherSpace.id
-        }]
-      } });
+        submitter: [
+          {
+            group: 'space',
+            id: otherSpace.id
+          }
+        ]
+      }
+    });
 
     // Unauthenticated request
-    const bounties = (await request(baseUrl)
-      .get(`/api/bounties?spaceId=${otherSpace.id}`)
-      .send(creationContent)
-      .expect(200)).body as Bounty[];
+    const bounties = (
+      await request(baseUrl).get(`/api/bounties?spaceId=${otherSpace.id}`).send(creationContent).expect(200)
+    ).body as Bounty[];
 
     expect(bounties.length).toBe(0);
-
   });
 });
 
 describe('POST /api/bounties - create a bounty', () => {
-
   it('should allow admin users to create an open bounty, and respond 201', async () => {
-
     const creationContent: Partial<Bounty> = {
       createdBy: adminUser.id,
       spaceId: adminUserSpace.id,
@@ -235,11 +242,9 @@ describe('POST /api/bounties - create a bounty', () => {
       rewardToken: 'ETH'
     };
 
-    const createdBounty = (await request(baseUrl)
-      .post('/api/bounties')
-      .set('Cookie', adminCookie)
-      .send(creationContent)
-      .expect(201)).body;
+    const createdBounty = (
+      await request(baseUrl).post('/api/bounties').set('Cookie', adminCookie).send(creationContent).expect(201)
+    ).body;
 
     expect(createdBounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
@@ -251,22 +256,18 @@ describe('POST /api/bounties - create a bounty', () => {
         rewardToken: creationContent.rewardToken
       })
     );
-
   });
 
   it('should allow non-admin users to create a bounty suggestion, and respond 201', async () => {
-
     const creationContent: Partial<Bounty> = {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion'
     };
 
-    const createdBounty = (await request(baseUrl)
-      .post('/api/bounties')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(201)).body;
+    const createdBounty = (
+      await request(baseUrl).post('/api/bounties').set('Cookie', nonAdminCookie).send(creationContent).expect(201)
+    ).body;
 
     expect(createdBounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
@@ -275,11 +276,9 @@ describe('POST /api/bounties - create a bounty', () => {
         status: creationContent.status
       })
     );
-
   });
 
   it('should allow non-admin users with createBounty permission to create an open bounty, and respond 201', async () => {
-
     const { space: differentSpace, user: differentUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const creationContent: Partial<Bounty> = {
@@ -299,11 +298,9 @@ describe('POST /api/bounties - create a bounty', () => {
 
     const cookie = await loginUser(differentUser.id);
 
-    const createdBounty = (await request(baseUrl)
-      .post('/api/bounties')
-      .set('Cookie', cookie)
-      .send(creationContent)
-      .expect(201)).body;
+    const createdBounty = (
+      await request(baseUrl).post('/api/bounties').set('Cookie', cookie).send(creationContent).expect(201)
+    ).body;
 
     expect(createdBounty).toEqual(
       expect.objectContaining<Partial<Bounty>>({
@@ -312,11 +309,9 @@ describe('POST /api/bounties - create a bounty', () => {
         status: creationContent.status
       })
     );
-
   });
 
   it('should not allow non-admin users without createBounty permission to create an open bounty, and respond 401', async () => {
-
     const creationContent: Partial<Bounty> = {
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -326,15 +321,10 @@ describe('POST /api/bounties - create a bounty', () => {
       rewardToken: 'ETH'
     };
 
-    await request(baseUrl)
-      .post('/api/bounties')
-      .set('Cookie', nonAdminCookie)
-      .send(creationContent)
-      .expect(401);
+    await request(baseUrl).post('/api/bounties').set('Cookie', nonAdminCookie).send(creationContent).expect(401);
   });
 
   it('should not allow users to create a bounty in a space they are not a member of, and respond 401', async () => {
-
     const creationContent: Partial<Bounty> = {
       createdBy: adminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -344,12 +334,6 @@ describe('POST /api/bounties - create a bounty', () => {
       rewardToken: 'ETH'
     };
 
-    await request(baseUrl)
-      .post('/api/bounties')
-      .set('Cookie', adminCookie)
-      .send(creationContent)
-      .expect(401);
-
+    await request(baseUrl).post('/api/bounties').set('Cookie', adminCookie).send(creationContent).expect(401);
   });
-
 });

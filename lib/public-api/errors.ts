@@ -4,8 +4,7 @@ import { SystemError } from 'lib/utilities/errors';
 import type { PageProperty } from './interfaces';
 
 export class PageNotFoundError extends SystemError {
-
-  constructor (pageId: string) {
+  constructor(pageId: string) {
     super({
       message: `Page with id '${pageId}' was not found`,
       errorType: 'Data not found',
@@ -15,8 +14,7 @@ export class PageNotFoundError extends SystemError {
 }
 
 export class DatabasePageNotFoundError extends SystemError {
-
-  constructor (pageId: string) {
+  constructor(pageId: string) {
     super({
       message: `Database page with id '${pageId}' was not found`,
       errorType: 'Data not found',
@@ -26,14 +24,13 @@ export class DatabasePageNotFoundError extends SystemError {
 }
 
 export interface UnsupportedKeyDetails<E = any> {
-  unsupportedKeys: string [];
-  allowedKeys: string [];
+  unsupportedKeys: string[];
+  allowedKeys: string[];
   example: E;
 }
 
 export class UnsupportedKeysError<D = any> extends SystemError<UnsupportedKeyDetails> {
-
-  constructor (errorInfo: Pick<ISystemErrorInput<UnsupportedKeyDetails<D>>, 'error' | 'message'>) {
+  constructor(errorInfo: Pick<ISystemErrorInput<UnsupportedKeyDetails<D>>, 'error' | 'message'>) {
     super({
       errorType: 'Invalid input',
       message: errorInfo.message,
@@ -44,8 +41,7 @@ export class UnsupportedKeysError<D = any> extends SystemError<UnsupportedKeyDet
 }
 
 export class SpaceNotFoundError extends SystemError {
-
-  constructor (id: string) {
+  constructor(id: string) {
     super({
       message: `Space with id '${id}' was not found`,
       errorType: 'Data not found',
@@ -58,10 +54,8 @@ export class SpaceNotFoundError extends SystemError {
  * Specify one or multiple invalid keys that were attempted when assigning custom properties
  */
 export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDetails> {
-
-  constructor (errorInfo: { key: string | string [], boardSchema: PageProperty [] }) {
-
-    const allowedKeys = errorInfo.boardSchema.reduce((keys: string [], schema) => {
+  constructor(errorInfo: { key: string | string[]; boardSchema: PageProperty[] }) {
+    const allowedKeys = errorInfo.boardSchema.reduce((keys: string[], schema) => {
       keys.push(schema.name);
       return keys;
     }, []);
@@ -82,7 +76,10 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
       example
     };
 
-    const invalidKeyMessage = errorInfo.key instanceof Array ? `Key(s) '${errorInfo.key.join(', ')}' are invalid custom properties.` : `Key '${errorInfo.key} is an invalid custom property'`;
+    const invalidKeyMessage =
+      errorInfo.key instanceof Array
+        ? `Key(s) '${errorInfo.key.join(', ')}' are invalid custom properties.`
+        : `Key '${errorInfo.key} is an invalid custom property'`;
 
     super({
       message: invalidKeyMessage,
@@ -96,11 +93,10 @@ export class InvalidCustomPropertyKeyError extends SystemError<UnsupportedKeyDet
 /**
  * Used when an option does not exist in a list
  */
-export class InvalidCustomPropertyValueError extends SystemError<{ validOptions: any [] }> {
-
-  constructor (errorInfo: { key: string, value: any, boardSchema: PageProperty [] }) {
-
-    const allowedValues = errorInfo.boardSchema.find(schema => schema.name === errorInfo.key)?.options.map(opt => opt.value) ?? [];
+export class InvalidCustomPropertyValueError extends SystemError<{ validOptions: any[] }> {
+  constructor(errorInfo: { key: string; value: any; boardSchema: PageProperty[] }) {
+    const allowedValues =
+      errorInfo.boardSchema.find((schema) => schema.name === errorInfo.key)?.options.map((opt) => opt.value) ?? [];
 
     super({
       message: `Value '${errorInfo.value}' is an invalid option for property ${errorInfo.key}`,
@@ -112,4 +108,3 @@ export class InvalidCustomPropertyValueError extends SystemError<{ validOptions:
     });
   }
 }
-

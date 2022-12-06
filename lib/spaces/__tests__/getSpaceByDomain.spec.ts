@@ -16,7 +16,6 @@ beforeAll(async () => {
 });
 
 describe('getSpaceByDomain', () => {
-
   it('should return a space using its domain', async () => {
     const result = await getSpaceByDomain(space.domain);
     expect(result?.id).toBe(space.id);

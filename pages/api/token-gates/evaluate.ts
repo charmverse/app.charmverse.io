@@ -9,8 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(verifyWallet);
 
-async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
-
+async function verifyWallet(req: NextApiRequest, res: NextApiResponse) {
   const user = req.session.user;
 
   const result = await evalueTokenGateEligibility({
@@ -19,8 +18,6 @@ async function verifyWallet (req: NextApiRequest, res: NextApiResponse) {
   });
 
   res.status(200).send(result);
-
 }
 
 export default withSessionRoute(handler);
-

@@ -1,4 +1,3 @@
-
 import type { PagePermissionLevel, Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,21 +9,21 @@ import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePer
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .use(requireCustomPermissionMode({
-    keyLocation: 'query',
-    spaceIdKey: 'id'
-  }))
+handler
+  .use(requireUser)
+  .use(
+    requireCustomPermissionMode({
+      keyLocation: 'query',
+      spaceIdKey: 'id'
+    })
+  )
   .post(setDefaultPagePermission);
 
-async function setDefaultPagePermission (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function setDefaultPagePermission(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
   const { pagePermissionLevel } = req.body as { pagePermissionLevel: PagePermissionLevel };
 
-  const {
-    error
-  } = await hasAccessToSpace({
+  const { error } = await hasAccessToSpace({
     userId: req.session.user.id as string,
     spaceId: spaceId as string,
     adminOnly: true
@@ -35,7 +34,8 @@ async function setDefaultPagePermission (req: NextApiRequest, res: NextApiRespon
   }
 
   const updatedSpaceWithPermissions = await setSpaceDefaultPagePermission({
-    spaceId: spaceId as string, defaultPagePermissionGroup: pagePermissionLevel
+    spaceId: spaceId as string,
+    defaultPagePermissionGroup: pagePermissionLevel
   });
 
   return res.status(200).json(updatedSpaceWithPermissions);

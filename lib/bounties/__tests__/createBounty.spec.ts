@@ -1,4 +1,3 @@
-
 import type { Bounty, Role, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -27,9 +26,7 @@ beforeAll(async () => {
 });
 
 describe('createBounty', () => {
-
   it('should be able to create a bounty suggestion with only a title, createdBy, spaceId and status, and record who suggested the bounty', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -42,11 +39,9 @@ describe('createBounty', () => {
         suggestedBy: expect.stringContaining(user.id)
       })
     );
-
   });
 
   it('should accept as creation input: title, spaceId, createdBy, status, chainId, description, descriptionNodes, approveSubmitters, maxSubmissions, rewardAmount, rewardToken, reviewer, permissions', async () => {
-
     const fullBountyCreationData: BountyCreationData = {
       createdBy: user.id,
       spaceId: space.id,
@@ -80,19 +75,17 @@ describe('createBounty', () => {
     const bountyPermissions = await queryBountyPermissions({ bountyId: bounty.id });
 
     // Make sure permission was inserted correctly
-    expect(bountyPermissions.submitter.some(p => p.group === 'space' && p.id === space.id)).toBe(true);
+    expect(bountyPermissions.submitter.some((p) => p.group === 'space' && p.id === space.id)).toBe(true);
 
     // Make sure synthetic permission is applied
-    expect(bountyPermissions.creator.some(p => p.group === 'user' && user.id === bounty.createdBy)).toBe(true);
+    expect(bountyPermissions.creator.some((p) => p.group === 'user' && user.id === bounty.createdBy)).toBe(true);
     const { reviewer } = bountyPermissions;
 
     // Make sure nothing unexpected was added
     expect(reviewer.length).toBe(0);
-
   });
 
   it('should be able to create a bounty with a page in open status if the data provided has at least title, createdBy, spaceId, status and rewardAmount', async () => {
-
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const bounty = await createBounty({
@@ -109,10 +102,11 @@ describe('createBounty', () => {
       })
     );
 
-    expect(bounty.page).toMatchObject(expect.objectContaining({
-      title: ''
-    }));
-
+    expect(bounty.page).toMatchObject(
+      expect.objectContaining({
+        title: ''
+      })
+    );
   });
 
   it('should create a linked page with the same ID as the bounty', async () => {
@@ -127,11 +121,9 @@ describe('createBounty', () => {
   });
 
   it('should fail to create an open bounty if the reward amount is 0 and status is open', async () => {
-
     const { user: localUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     try {
-
       await createBounty({
         createdBy: localUser.id,
         spaceId: localSpace.id,
@@ -140,20 +132,15 @@ describe('createBounty', () => {
       });
 
       throw new ExpectedAnError();
-
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail to create a bounty if the reward amount is negative', async () => {
-
     const { user: localUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     try {
-
       await createBounty({
         createdBy: localUser.id,
         spaceId: localSpace.id,
@@ -162,28 +149,24 @@ describe('createBounty', () => {
       });
 
       throw new ExpectedAnError();
-
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(PositiveNumbersOnlyError);
     }
-
   });
-
 });
 
 describe('createBounty / permissions setup', () => {
-
   it('should always create a page/full_access permissions for the creator', async () => {
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const creatorFullAccessPermission = bounty.page.permissions.some(p => p.userId === user.id && p.permissionLevel === 'full_access');
+    const creatorFullAccessPermission = bounty.page.permissions.some(
+      (p) => p.userId === user.id && p.permissionLevel === 'full_access'
+    );
 
     expect(creatorFullAccessPermission).toBe(true);
-
   });
 
   // Suggestion status
@@ -194,7 +177,9 @@ describe('createBounty / permissions setup', () => {
       status: 'suggestion'
     });
 
-    const spaceViewPermission = bounty.page.permissions.some(p => p.spaceId === space.id && p.permissionLevel === 'view');
+    const spaceViewPermission = bounty.page.permissions.some(
+      (p) => p.spaceId === space.id && p.permissionLevel === 'view'
+    );
 
     expect(spaceViewPermission).toBe(true);
   });
@@ -209,20 +194,23 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        reviewer: [{
-          group: 'role',
-          id: role.id
-        }]
+        reviewer: [
+          {
+            group: 'role',
+            id: role.id
+          }
+        ]
       }
     });
 
-    const roleViewCommentPermission = bounty.page.permissions.some(p => p.roleId === role.id && p.permissionLevel === 'view_comment');
+    const roleViewCommentPermission = bounty.page.permissions.some(
+      (p) => p.roleId === role.id && p.permissionLevel === 'view_comment'
+    );
 
     expect(roleViewCommentPermission).toBe(true);
   });
 
   it('should create a page/view_comment permission for each user assigned as a reviewer', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -236,14 +224,18 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        reviewer: [{
-          group: 'user',
-          id: extraUser.id
-        }]
+        reviewer: [
+          {
+            group: 'user',
+            id: extraUser.id
+          }
+        ]
       }
     });
 
-    const userViewCommentPermission = bounty.page.permissions.some(p => p.userId === extraUser.id && p.permissionLevel === 'view_comment');
+    const userViewCommentPermission = bounty.page.permissions.some(
+      (p) => p.userId === extraUser.id && p.permissionLevel === 'view_comment'
+    );
 
     expect(userViewCommentPermission).toBe(true);
   });
@@ -257,14 +249,18 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       }
     });
 
-    const spaceViewPermission = bounty.page.permissions.some(p => p.spaceId === space.id && p.permissionLevel === 'view');
+    const spaceViewPermission = bounty.page.permissions.some(
+      (p) => p.spaceId === space.id && p.permissionLevel === 'view'
+    );
 
     expect(spaceViewPermission).toBe(true);
   });
@@ -278,14 +274,18 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        submitter: [{
-          group: 'role',
-          id: role.id
-        }]
+        submitter: [
+          {
+            group: 'role',
+            id: role.id
+          }
+        ]
       }
     });
 
-    const roleViewPermission = bounty.page.permissions.some(p => p.roleId === role.id && p.permissionLevel === 'view');
+    const roleViewPermission = bounty.page.permissions.some(
+      (p) => p.roleId === role.id && p.permissionLevel === 'view'
+    );
 
     expect(roleViewPermission).toBe(true);
   });
@@ -311,15 +311,16 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: publicBountySpace.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: publicBountySpace.id
+          }
+        ]
       }
     });
 
-    expect(bounty.page.permissions.some(p => p.public)).toBe(true);
-
+    expect(bounty.page.permissions.some((p) => p.public)).toBe(true);
   });
 
   it('should not add public page permission if the bounty is accessible to the space and public bounty board is disabled, ', async () => {
@@ -342,14 +343,15 @@ describe('createBounty / permissions setup', () => {
       chainId: 1,
       rewardToken: 'ETH',
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: publicBountySpace.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: publicBountySpace.id
+          }
+        ]
       }
     });
 
-    expect(bounty.page.permissions.some(p => p.public)).toBe(false);
-
+    expect(bounty.page.permissions.some((p) => p.public)).toBe(false);
   });
 });

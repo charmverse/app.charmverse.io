@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -15,12 +14,12 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<SubmissionCreationData>(['bountyId', 'submissionContent'], 'body'))
   .post(createSubmissionController);
 
-async function createSubmissionController (req: NextApiRequest, res: NextApiResponse<Application>) {
-
+async function createSubmissionController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { bountyId, submissionContent } = req.body;
 
   const bountySpaceId = await prisma.bounty.findUnique({
@@ -46,7 +45,11 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
   });
 
   if (!permissions.work) {
-    throw new UnauthorisedActionError(`You do not have the permission to ${bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'} to this bounty`);
+    throw new UnauthorisedActionError(
+      `You do not have the permission to ${
+        bountySpaceId.approveSubmitters === true ? 'apply' : 'submit work'
+      } to this bounty`
+    );
   }
 
   const createdSubmission = await createSubmission({
@@ -58,7 +61,6 @@ async function createSubmissionController (req: NextApiRequest, res: NextApiResp
   await rollupBountyStatus(createdSubmission.bountyId);
 
   return res.status(201).json(createdSubmission);
-
 }
 
 export default withSessionRoute(handler);

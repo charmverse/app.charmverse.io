@@ -2,12 +2,10 @@ import getPageLayout from 'components/common/PageLayout/getLayout';
 import MemberDirectoryPageWithContext from 'components/members/MemberDirectoryPageWithContext';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function MemberDirectory () {
+export default function MemberDirectory() {
   setTitle('Member Directory');
 
-  return (
-    <MemberDirectoryPageWithContext />
-  );
+  return <MemberDirectoryPageWithContext />;
 }
 
 MemberDirectory.getLayout = getPageLayout;

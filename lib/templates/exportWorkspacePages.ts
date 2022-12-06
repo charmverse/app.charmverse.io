@@ -21,13 +21,17 @@ const excludedPageTypes: PageType[] = ['bounty', 'bounty_template', 'proposal', 
 /**
  * @abstract Does not currently support bounty or proposal pages
  */
-export async function exportWorkspacePages ({ sourceSpaceIdOrDomain }: Pick<ExportWorkspacePage, 'sourceSpaceIdOrDomain'>):
-  Promise<{ data: WorkspaceExport }>
-export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: Required<ExportWorkspacePage>
-): Promise<{ data: WorkspaceExport, path: string }>
-export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName }: ExportWorkspacePage):
-  Promise<{ data: WorkspaceExport, path?: string }> {
-
+export async function exportWorkspacePages({
+  sourceSpaceIdOrDomain
+}: Pick<ExportWorkspacePage, 'sourceSpaceIdOrDomain'>): Promise<{ data: WorkspaceExport }>;
+export async function exportWorkspacePages({
+  sourceSpaceIdOrDomain,
+  exportName
+}: Required<ExportWorkspacePage>): Promise<{ data: WorkspaceExport; path: string }>;
+export async function exportWorkspacePages({
+  sourceSpaceIdOrDomain,
+  exportName
+}: ExportWorkspacePage): Promise<{ data: WorkspaceExport; path?: string }> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -50,16 +54,17 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
   });
 
   // Replace by multi resolve page tree in future
-  const mappedTrees = await Promise.all(rootPages.map(async page => {
-    return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true });
-  }));
+  const mappedTrees = await Promise.all(
+    rootPages.map(async (page) => {
+      return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true });
+    })
+  );
 
   // Console reporting for manual exports
   const pageIndexes = mappedTrees.reduce((acc, val) => {
-
     let pageCount = Object.keys(acc).length;
 
-    [val.targetPage, ...val.flatChildren].forEach(p => {
+    [val.targetPage, ...val.flatChildren].forEach((p) => {
       pageCount += 1;
       acc[p.id] = pageCount;
     });
@@ -72,9 +77,7 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
   /**
    * Mutates the given node to provision its block data
    */
-  async function recursiveResolveBlocks ({ node }:
-    { node: PageNodeWithChildren<ExportedPage> }): Promise<void> {
-
+  async function recursiveResolveBlocks({ node }: { node: PageNodeWithChildren<ExportedPage> }): Promise<void> {
     // eslint-disable-next-line no-console
     // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
 
@@ -89,11 +92,10 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
       });
 
       node.blocks = {
-        board: boardblocks.find(block => block.type === 'board') as Block,
-        views: boardblocks.filter(block => block.type === 'view') as Block[]
+        board: boardblocks.find((block) => block.type === 'board') as Block,
+        views: boardblocks.filter((block) => block.type === 'view') as Block[]
       };
-    }
-    else if (node.type.match('card')) {
+    } else if (node.type.match('card')) {
       const cardBlock = await prisma.block.findFirst({
         where: {
           id: node.id as string,
@@ -106,31 +108,31 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
       };
     }
 
-    node.children = node.children?.filter(child => !excludedPageTypes.includes(child.type)) ?? [];
+    node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
 
     await Promise.all(
-      (node.children ?? [])
-        .map(async (child) => {
-          await recursiveResolveBlocks({ node: child });
-        })
+      (node.children ?? []).map(async (child) => {
+        await recursiveResolveBlocks({ node: child });
+      })
     );
   }
 
-  await Promise.all(mappedTrees.map(async (tree) => {
-    await recursiveResolveBlocks({ node: tree.targetPage });
-  }));
+  await Promise.all(
+    mappedTrees.map(async (tree) => {
+      await recursiveResolveBlocks({ node: tree.targetPage });
+    })
+  );
 
   const exportFolder = path.join(__dirname, 'exports');
 
   try {
     await fs.readdir(exportFolder);
-  }
-  catch (err) {
+  } catch (err) {
     await fs.mkdir(exportFolder);
   }
 
   const exportData: WorkspaceExport = {
-    pages: mappedTrees.map(t => t.targetPage)
+    pages: mappedTrees.map((t) => t.targetPage)
   };
 
   if (!exportName) {
@@ -148,5 +150,4 @@ export async function exportWorkspacePages ({ sourceSpaceIdOrDomain, exportName 
     data: exportData,
     path: exportFilePath
   };
-
 }

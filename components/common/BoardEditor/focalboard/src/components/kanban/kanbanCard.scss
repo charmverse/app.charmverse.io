@@ -25,11 +25,14 @@
     border-color: transparent;
   }
 
-  &:hover {
-    background-color: rgba(var(--center-channel-color-rgb), 0.1);
-
-    .optionsMenu {
-      display: block;
+  // Disable hover on iOS so that cards popup on first click
+  @media (pointer: fine) {
+    &:hover {
+      background-color: rgba(var(--center-channel-color-rgb), 0.1);
+  
+      .optionsMenu {
+        display: block;
+      }
     }
   }
 

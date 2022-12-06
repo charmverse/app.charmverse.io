@@ -7,8 +7,7 @@ import collablandLogo from 'public/images/collabland_logo.jpeg';
 
 import { useCollablandCredentials } from '../../hooks/useCollablandCredentials';
 
-export default function CollablandCredentials ({ error }: { error?: any }) {
-
+export default function CollablandCredentials({ error }: { error?: any }) {
   const { getCollablandLogin } = useCollablandCredentials();
   const connectUrl = getCollablandLogin();
 
@@ -24,14 +23,19 @@ export default function CollablandCredentials ({ error }: { error?: any }) {
   );
 }
 
-function Authorize ({ connectUrl }: { connectUrl: string }) {
+function Authorize({ connectUrl }: { connectUrl: string }) {
   return (
     <>
       <Box width={100} maxWidth='100%'>
         <Image src={collablandLogo} />
       </Box>
       <Typography variant='body2' fontWeight='strong'>
-        Import credentials from <strong><Link color='inherit' external target='_blank' href='https://collab.land/'>Collab.land</Link></strong>
+        Import credentials from{' '}
+        <strong>
+          <Link color='inherit' external target='_blank' href='https://collab.land/'>
+            Collab.land
+          </Link>
+        </strong>
       </Typography>
       <Button href={connectUrl} external variant='outlined'>
         Connect

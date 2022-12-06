@@ -33,7 +33,6 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
-
   it('should allow an admin to update the proposal status and return 200', async () => {
     const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
@@ -45,13 +44,13 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
-    (await request(baseUrl)
+    await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', adminCookie)
       .send({
         newStatus: 'discussion'
       })
-      .expect(200));
+      .expect(200);
   });
   it('should throw error and return 400 if the newStatus is not passed in body', async () => {
     const proposalPage = await createProposalWithUsers({
@@ -61,13 +60,13 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    (await request(baseUrl)
+    await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', reviewerCookie)
-      .expect(400));
+      .expect(400);
   });
 
-  it('should throw error and return 404 if the proposal doesn\'t exist', async () => {
+  it("should throw error and return 404 if the proposal doesn't exist", async () => {
     await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
@@ -75,13 +74,13 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    (await request(baseUrl)
+    await request(baseUrl)
       .put(`/api/proposals/${v4()}/status`)
       .set('Cookie', authorCookie)
       .send({
         newStatus: 'draft'
       })
-      .expect(404));
+      .expect(404);
   });
 
   it('should throw error and return 401 if the author is not the one updating the status', async () => {
@@ -92,13 +91,13 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    (await request(baseUrl)
+    await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', reviewerCookie)
       .send({
         newStatus: 'draft'
       })
-      .expect(401));
+      .expect(401);
   });
 
   it('should successfully update the status of proposal and return 200', async () => {
@@ -109,12 +108,12 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    (await request(baseUrl)
+    await request(baseUrl)
       .put(`/api/proposals/${proposalPage.proposalId}/status`)
       .set('Cookie', authorCookie)
       .send({
         newStatus: 'draft'
       })
-      .expect(200));
+      .expect(200);
   });
 });

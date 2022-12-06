@@ -8,8 +8,7 @@ import { hasAccessToSpace } from '../middleware';
 import type { RoleAssignment, RoleWithMembers } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
 
-export async function assignRole ({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
-
+export async function assignRole({ roleId, userId }: RoleAssignment): Promise<RoleWithMembers> {
   const userExists = await prisma.user.findUnique({
     where: {
       id: userId
@@ -26,7 +25,7 @@ export async function assignRole ({ roleId, userId }: RoleAssignment): Promise<R
   const role = await listRoleMembers({ roleId });
 
   // User is already a member
-  if (role.users.find(u => u.id === userId)) {
+  if (role.users.find((u) => u.id === userId)) {
     return role;
   }
 
@@ -60,5 +59,4 @@ export async function assignRole ({ roleId, userId }: RoleAssignment): Promise<R
   });
 
   return updatedRoleMembers;
-
 }

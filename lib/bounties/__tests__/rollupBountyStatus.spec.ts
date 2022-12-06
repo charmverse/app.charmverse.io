@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -18,20 +17,16 @@ beforeAll(async () => {
 });
 
 describe('rollupBountyStatus', () => {
-
   it('should fail if the bounty does not exist', async () => {
     try {
       await rollupBountyStatus(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
 
   it('should set the bounty status to "open" if its cap is not reached', async () => {
-
     const bounty = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -43,7 +38,6 @@ describe('rollupBountyStatus', () => {
     const bountyAfterRollup = await rollupBountyStatus(bounty.id);
 
     expect(bountyAfterRollup.status).toBe('open');
-
   });
 
   it('should set the bounty status to "open" if there is no cap', async () => {
@@ -115,6 +109,4 @@ describe('rollupBountyStatus', () => {
 
     expect(bountyAfterRollup.status).toBe('suggestion');
   });
-
 });
-

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export function usePreventReload (isDirty: boolean) {
+export function usePreventReload(isDirty: boolean) {
   const warningText = 'You have unsaved changes. Please confirm changes.';
   // prompt the user if they try and leave with unsaved changes
   useEffect(() => {

@@ -21,26 +21,21 @@ type Props = {
   comment: Block;
   member?: Pick<Member, 'username' | 'avatar' | 'hasNftAvatar'>;
   readOnly: boolean;
-}
+};
 
-function Comment (props: Props) {
+function Comment(props: Props) {
   const { comment, member } = props;
   const intl = useIntl();
   const html = comment.title && Utils.htmlFromMarkdown(comment.title);
   const date = new Date(comment.createdAt);
 
   return (
-    <div
-      key={comment.id}
-      className='Comment comment'
-    >
+    <div key={comment.id} className='Comment comment'>
       <div className='comment-header'>
         <Avatar size='xSmall' name={member?.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
         <div className='comment-username'>{member?.username}</div>
         <Tooltip title={Utils.displayDateTime(date, intl)}>
-          <div className='comment-date'>
-            {Utils.relativeDisplayDateTime(date, intl)}
-          </div>
+          <div className='comment-date'>{Utils.relativeDisplayDateTime(date, intl)}</div>
         </Tooltip>
 
         {!props.readOnly && (
@@ -59,17 +54,10 @@ function Comment (props: Props) {
       </div>
       <Box ml={3}>
         {comment.fields.content ? (
-          <InlineCharmEditor
-            content={comment.fields.content}
-            readOnly
-            style={{ fontSize: '14px' }}
-          />
+          <InlineCharmEditor content={comment.fields.content} readOnly style={{ fontSize: '14px' }} />
         ) : (
           // support old model until we completely migrate to new model
-          <Typography
-            sx={{ fontSize: '14px', pl: 1 }}
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          <Typography sx={{ fontSize: '14px', pl: 1 }} dangerouslySetInnerHTML={{ __html: html }} />
         )}
       </Box>
     </div>

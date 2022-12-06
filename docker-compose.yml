@@ -11,7 +11,7 @@ services:
     env_file:
       - ".env"
     environment:
-      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}"
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWD}@${DB_HOSTNAME}:5432/${DB_NAME}?connection_limit=20"
     profiles:
       - stg
       - tst

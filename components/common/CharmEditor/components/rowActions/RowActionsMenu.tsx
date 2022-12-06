@@ -1,7 +1,7 @@
 import type { PluginKey } from '@bangle.dev/core';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
-import { ContentCopy as DuplicateIcon, DeleteOutlined as DeleteIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
+import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
 import type { Page } from '@prisma/client';
@@ -30,16 +30,16 @@ const menuPosition: Partial<MenuProps> = {
   }
 };
 
-function Component ({ menuState }: { menuState: PluginState }) {
+function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, currentPageId, pages } = usePages();
   const currentPage = pages[currentPageId];
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const dispatch = useAppDispatch();
   const boards = useAppSelector(getSortedBoards);
 
-  function _getNode () {
+  function _getNode() {
     if (!menuState.rowPos || !menuState.rowDOM) {
       return null;
     }
@@ -61,7 +61,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
 
     const nodeStart = topPos.pos;
-    const nodeSize = (pmNode && pmNode.type.name !== 'doc') ? pmNode.nodeSize : 0;
+    const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
     let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
 
     // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
@@ -78,9 +78,8 @@ function Component ({ menuState }: { menuState: PluginState }) {
     };
   }
 
-  function deleteRow () {
+  function deleteRow() {
     const node = _getNode();
-
     if (node) {
       let start = node.nodeStart;
       let end = node.nodeEnd;
@@ -95,7 +94,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
       // If its an embedded inline database delete the board page
       const page = pages[node.node.attrs.pageId];
       if (page?.type === 'inline_board' || page?.type === 'inline_linked_board') {
-        const board = boards.find(b => b.id === page.id);
+        const board = boards.find((b) => b.id === page.id);
         deletePage({
           board,
           pageId: page.id
@@ -104,7 +103,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  async function duplicateRow () {
+  async function duplicateRow() {
     const node = _getNode();
     const tr = view.state.tr;
     if (node?.node.type.name === 'page' && currentPage) {
@@ -116,14 +115,17 @@ function Component ({ menuState }: { menuState: PluginState }) {
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
         dispatch(initialLoad({ spaceId: currentSpace.id }));
-        await mutate(`pages/${currentSpace.id}`, (_pages: Page[]) => {
-          return [..._pages, duplicatedPage];
-        }, {
-          revalidate: true
-        });
+        await mutate(
+          `pages/${currentSpace.id}`,
+          (_pages: Page[]) => {
+            return [..._pages, duplicatedPage];
+          },
+          {
+            revalidate: true
+          }
+        );
       }
-    }
-    else if (node) {
+    } else if (node) {
       const copy = node.node.copy(node.node.content);
       const newTr = safeInsert(copy, node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
@@ -137,16 +139,17 @@ function Component ({ menuState }: { menuState: PluginState }) {
         <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
       </span>
 
-      <Menu
-        {...bindMenu(popupState)}
-        {...menuPosition}
-      >
+      <Menu {...bindMenu(popupState)} {...menuPosition}>
         <ListItemButton onClick={deleteRow} dense>
-          <ListItemIcon><DeleteIcon color='secondary' /></ListItemIcon>
+          <ListItemIcon>
+            <DeleteOutlined color='secondary' />
+          </ListItemIcon>
           <ListItemText primary='Delete' />
         </ListItemButton>
         <ListItemButton onClick={duplicateRow} dense>
-          <ListItemIcon><DuplicateIcon color='secondary' /></ListItemIcon>
+          <ListItemIcon>
+            <DuplicateIcon color='secondary' />
+          </ListItemIcon>
           <ListItemText primary='Duplicate' />
         </ListItemButton>
       </Menu>
@@ -154,8 +157,7 @@ function Component ({ menuState }: { menuState: PluginState }) {
   );
 }
 
-export default function RowActionsMenu ({ pluginKey }: { pluginKey: PluginKey }) {
-
+export default function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const menuState: PluginState = usePluginState(pluginKey);
 
   // Fixes the case where undefined menu state throws an error

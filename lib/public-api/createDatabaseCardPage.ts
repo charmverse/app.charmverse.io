@@ -10,8 +10,10 @@ import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';
 
-export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>, boardSchema: PageProperty [] = []): Promise<Page> {
-
+export async function createDatabase(
+  boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>,
+  boardSchema: PageProperty[] = []
+): Promise<Page> {
   const boardId = v4();
 
   const database = await createPage({
@@ -55,21 +57,34 @@ export async function createDatabase (boardInfo: Record<keyof Pick<Page, 'title'
         }
       },
       schema: 1,
-      fields: { icon: '', isTemplate: false, description: '', headerImage: null, cardProperties: boardSchema as any, showDescription: false, columnCalculations: [] }
+      fields: {
+        icon: '',
+        isTemplate: false,
+        description: '',
+        headerImage: null,
+        cardProperties: boardSchema as any,
+        showDescription: false,
+        columnCalculations: []
+      }
     }
   });
 
   return database;
 }
 
-export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & { properties: Record<string, string> }): Promise<PageFromBlock> {
-
+export async function createDatabaseCardPage(
+  pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
+    properties: Record<string, string>;
+  }
+): Promise<PageFromBlock> {
   const isValidUUid = validate(pageInfo.boardId);
 
   const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
 
   if (!isValidUUid) {
-    throw new InvalidInputError(`Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this`);
+    throw new InvalidInputError(
+      `Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this`
+    );
   }
 
   const board = await prisma.block.findFirst({
@@ -84,7 +99,7 @@ export async function createDatabaseCardPage (pageInfo: Record<keyof Pick<Page, 
     throw new DatabasePageNotFoundError(pageInfo.boardId);
   }
 
-  const boardSchema = (board.fields as any).cardProperties as PageProperty [];
+  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
 
   const cardBlock = await prisma.block.create({
     data: {

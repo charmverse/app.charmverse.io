@@ -25,16 +25,16 @@ import type { Page as PrismaPage } from '@prisma/client';
  *          items:
  *            type: object
  *            properties:
-*               id:
-*                 type: string
-*                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
-*               color:
-*                 type: string
-*                 example: propColorTeal
-*               value:
-*                 type: string
-*                 example: Complete
-*/
+ *               id:
+ *                 type: string
+ *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+ *               color:
+ *                 type: string
+ *                 example: propColorTeal
+ *               value:
+ *                 type: string
+ *                 example: Complete
+ */
 
 export interface PageProperty {
   id: string;
@@ -44,7 +44,7 @@ export interface PageProperty {
     id: string;
     color: string;
     value: string;
-  } [];
+  }[];
 }
 
 /**
@@ -88,10 +88,11 @@ export interface PageProperty {
  *            $ref: '#/components/schemas/PageProperty'
  *
  */
-export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
+export interface DatabasePage
+  extends Pick<PrismaPage, 'id' | 'createdAt' | 'updatedAt' | 'type' | 'title' | 'spaceId'> {
   url: string;
   type: 'board';
-  schema: PageProperty [];
+  schema: PageProperty[];
 }
 
 /**
@@ -104,7 +105,7 @@ export interface DatabasePage extends Pick<PrismaPage, 'id' | 'createdAt' | 'upd
  *        markdown:
  *          type: string
  *          example: Markdown content as a string
-*/
+ */
 export interface PageContentFormats {
   markdown: string;
 }
@@ -193,7 +194,7 @@ export interface Page {
  *              required: false
  *
  */
-export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>
+export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>;
 
 /**
  *
@@ -202,11 +203,135 @@ export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>
 export interface PaginatedResponse<T> {
   data: T[];
   hasNext: boolean;
-  cursor?: string;
+  // Can be a cursor or a page number depending on pagination method
+  cursor?: string | number;
 }
 
 export type PaginatedQuery<T> = {
   cursor?: string;
   limit?: number;
   query: T;
+};
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    Workspace:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        name:
+ *          type: string
+ *          example: Test DAO Space
+ *        domain:
+ *          type: string
+ *          example: test-dao-space
+ *        createdAt:
+ *          type: string
+ *          format: date-time
+ *          example: 2022-04-04T21:32:38.317Z
+ *        updatedAt:
+ *          type: string
+ *          format: date-time
+ *          example: 2022-04-04T21:32:38.317Z
+ *        createdBy:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        updatedBy:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        discordServerId:
+ *          type: string
+ *          example: 260918243123345408
+ *        spaceImage:
+ *          type: string
+ *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
+ *        defaultPublicPages:
+ *          type: boolean
+ *          example: false
+ *        publicBountyBoard:
+ *          type: boolean
+ *          example: false
+ */
+
+export interface Workspace {
+  id: string;
+  name: string;
+  domain: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+  discordServerId: string;
+  spaceImage: string | null;
+  defaultPublicPages: boolean;
+  publicBountyBoard: boolean;
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CreateWorkspaceRequestBody:
+ *      required:
+ *        - name
+ *        - discordServerId
+ *        - adminDiscordUserId
+ *      type: object
+ *      properties:
+ *        name:
+ *          type: string
+ *          example: Test DAO Space
+ *        discordServerId:
+ *          type: string
+ *          example: 260918243123345408
+ *        adminDiscordUserId:
+ *          type: string
+ *          example: 260918243123345408
+ *        avatar:
+ *          required: false
+ *          type: url
+ *          example: https://s3.amazonaws.com/charm.public/user-content/test/logo.jpg
+ */
+export interface CreateWorkspaceRequestBody {
+  name: string;
+  discordServerId: string;
+  adminDiscordUserId: string;
+  avatar?: string;
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    CreateWorkspaceResponseBody:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        spaceUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/test-dao-space
+ *        joinUrl:
+ *          type: url
+ *          example: https://app.charmverse.io/join?domain=test-dao-space
+ */
+export interface CreateWorkspaceResponseBody {
+  id: string;
+  spaceUrl: string;
+  joinUrl: string;
 }

@@ -1,16 +1,16 @@
 import { NodeView } from '@bangle.dev/core';
-import { NodeSelection, Plugin, PluginKey, TextSelection } from '@bangle.dev/pm';
-import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
-import { createTooltipDOM } from '@bangle.dev/tooltip';
+import { Plugin, PluginKey } from '@bangle.dev/pm';
 
 import { insertNestedPage } from 'lib/prosemirror/insertNestedPage';
 
+import { createTooltipDOM } from '../@bangle.dev/tooltip';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
-import { nestedPageNodeName, nestedPageSuggestMarkName } from './nestedPage.constants';
+import { nestedPageSuggestMarkName } from './nestedPage.constants';
 import type { NestedPagePluginState } from './nestedPage.interfaces';
 
-export function nestedPagePlugins ({
+export function nestedPagePlugins({
   key,
   markName = nestedPageSuggestMarkName,
   tooltipRenderOpts = {
@@ -32,14 +32,14 @@ export function nestedPagePlugins ({
       new Plugin({
         key,
         state: {
-          init () {
+          init() {
             return {
               tooltipContentDOM: tooltipDOMSpec.contentDOM,
               markName,
               suggestTooltipKey
             };
           },
-          apply (_, pluginState) {
+          apply(_, pluginState) {
             return pluginState;
           }
         }
@@ -47,7 +47,7 @@ export function nestedPagePlugins ({
       suggestTooltip.plugins({
         key: suggestTooltipKey,
         markName,
-        onEnter (_, __, view) {
+        onEnter(_, __, view) {
           const selectedMenuItem = document.querySelector('.mention-selected');
           const value = selectedMenuItem?.getAttribute('data-value');
 

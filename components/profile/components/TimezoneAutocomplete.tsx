@@ -10,7 +10,7 @@ export interface Timezone {
 
 const timezoneOptions = getTimezonesWithOffset();
 
-export function TimezoneAutocomplete ({
+export function TimezoneAutocomplete({
   setTimezone,
   timezone
 }: {
@@ -36,7 +36,7 @@ export function TimezoneAutocomplete ({
           </Box>
         </Box>
       )}
-      getOptionLabel={option => `${option.tz} (GMT ${option.offset})`}
+      getOptionLabel={(option) => `${option.tz} (GMT ${option.offset})`}
       renderInput={(params) => (
         <TextField
           {...params}

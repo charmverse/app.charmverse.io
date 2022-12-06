@@ -13,7 +13,7 @@ type Props = {
   isSaving?: boolean;
 };
 
-export default function NftAvatarGalleryPopup ({ onSelect, isVisible, onClose, isSaving }: Props) {
+export default function NftAvatarGalleryPopup({ onSelect, isVisible, onClose, isSaving }: Props) {
   const { user } = useUser();
   const { nfts, isLoading } = useMyNfts(user?.id || '');
 

@@ -166,47 +166,10 @@ html {
       rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
   }
 
-  .octo-block img {
-    margin: 5px 0;
-    object-fit: contain;
-    flex: none;
-  }
-
   .octo-content {
     width: 100%;
   }
 
-  .octo-block {
-    width: 100%;
-
-    &:hover {
-      position: relative;
-      z-index: 1;
-    }
-
-    > * {
-      flex: 1 1 auto;
-    }
-
-    > .octo-block-margin {
-      flex: 0 0 auto;
-    }
-
-    @media screen and (max-width: 975px) {
-      padding-right: 10px;
-    }
-  }
-
-  .octo-block-margin {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-end;
-
-    @media not screen and (max-width: 975px) {
-      width: 48px;
-    }
-  }
 }
 
 .CalendarContainer {

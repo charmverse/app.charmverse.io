@@ -39,8 +39,17 @@ export const SIDEBAR_VIEWS = {
   }
 } as const;
 
-function SidebarDrawerComponent ({ children, id, open, title }: { children: ReactNode, id: string, open: boolean, title: string }) {
-
+function SidebarDrawerComponent({
+  children,
+  id,
+  open,
+  title
+}: {
+  children: ReactNode;
+  id: string;
+  open: boolean;
+  title: string;
+}) {
   return (
     <Slide
       appear={false}
@@ -56,16 +65,19 @@ function SidebarDrawerComponent ({ children, id, open, title }: { children: Reac
       timeout={250}
     >
       <PageActionListBox id={id}>
-        <Box sx={{
-          height: 'calc(100%)',
-          gap: 1,
-          display: 'flex',
-          flexDirection: 'column'
-        }}
+        <Box
+          sx={{
+            height: 'calc(100%)',
+            gap: 1,
+            display: 'flex',
+            flexDirection: 'column'
+          }}
         >
           <Box display='flex' gap={1} alignItems='center'>
             <PageActionToggle />
-            <Typography flexGrow={1} fontWeight={600} fontSize={20}>{title}</Typography>
+            <Typography flexGrow={1} fontWeight={600} fontSize={20}>
+              {title}
+            </Typography>
             <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
               <PageActionIcon view='comments' />
               <PageActionIcon view='suggestions' />
@@ -79,17 +91,18 @@ function SidebarDrawerComponent ({ children, id, open, title }: { children: Reac
   );
 }
 
-function PageActionIcon ({ view }: { view: PageAction }) {
-
+function PageActionIcon({ view }: { view: PageAction }) {
   const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
 
-  function setView () {
+  function setView() {
     setCurrentPageActionDisplay(view);
   }
 
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size='small' onClick={setView}>{SIDEBAR_VIEWS[view].icon}</IconButton>
+      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size='small' onClick={setView}>
+        {SIDEBAR_VIEWS[view].icon}
+      </IconButton>
     </Tooltip>
   );
 }

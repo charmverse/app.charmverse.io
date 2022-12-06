@@ -1,5 +1,28 @@
 name: 'Build application'
 
+inputs:
+  NEXT_PUBLIC_DD_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_APP_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_TELEGRAM_BOT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_WEBSOCKETS_HOST:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
+    description: "..."
+    required: false
+
 runs:
   using: 'composite'
   steps:
@@ -25,3 +48,11 @@ runs:
       shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
+      env:
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          NEXT_PUBLIC_WEBSOCKETS_HOST: ${{ inputs.NEXT_PUBLIC_WEBSOCKETS_HOST }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}

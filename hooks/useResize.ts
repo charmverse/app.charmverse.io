@@ -4,7 +4,7 @@ interface UseResizeProps {
   initialWidth: number;
 }
 
-export default function useResize ({ initialWidth }: UseResizeProps) {
+export default function useResize({ initialWidth }: UseResizeProps) {
   // State to keep track of the current width
   const [width, setWidth] = useState(initialWidth);
   // State to keep track of the current dragged mouse position

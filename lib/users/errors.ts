@@ -1,7 +1,7 @@
 import { SystemError } from 'lib/utilities/errors';
 
 export class AdministratorOnlyError extends SystemError {
-  constructor () {
+  constructor() {
     super({
       errorType: 'Access denied',
       message: 'Only space administrators can perform this action',
@@ -11,7 +11,7 @@ export class AdministratorOnlyError extends SystemError {
 }
 
 export class UserIsNotSpaceMemberError extends SystemError {
-  constructor () {
+  constructor() {
     super({
       errorType: 'Access denied',
       message: 'User does not have access to this space',

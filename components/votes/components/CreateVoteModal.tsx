@@ -1,6 +1,16 @@
 import AddCircle from '@mui/icons-material/AddCircle';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { FormControlLabel, IconButton, ListItem, Radio, RadioGroup, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import {
+  FormControlLabel,
+  IconButton,
+  ListItem,
+  Radio,
+  RadioGroup,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { Box } from '@mui/system';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { VoteType } from '@prisma/client';
@@ -23,13 +33,7 @@ interface InlineVoteOptionsProps {
   setOptions: Dispatch<SetStateAction<{ name: string }[]>>;
 }
 
-function InlineVoteOptions (
-  {
-    options,
-    setOptions
-  }:
-  InlineVoteOptionsProps
-) {
+function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
   return (
     <div>
       {options.map((option, index) => {
@@ -54,13 +58,13 @@ function InlineVoteOptions (
             <Tooltip arrow placement='top' title={index < 2 ? 'At least two options are required' : ''}>
               <div>
                 <IconButton
-                  disabled={(options.length <= 2)}
+                  disabled={options.length <= 2}
                   size='small'
                   onClick={() => {
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
                   }}
                 >
-                  <DeleteIcon fontSize='small' />
+                  <DeleteOutlinedIcon fontSize='small' />
                 </IconButton>
               </div>
             </Tooltip>
@@ -72,15 +76,16 @@ function InlineVoteOptions (
         color='secondary'
         size='small'
         onClick={() => {
-          setOptions([...options, {
-            name: ''
-          }]);
+          setOptions([
+            ...options,
+            {
+              name: ''
+            }
+          ]);
         }}
       >
         <AddCircle fontSize='small' sx={{ mr: 1 }} />
-        <Typography variant='subtitle1'>
-          Add Option
-        </Typography>
+        <Typography variant='subtitle1'>Add Option</Typography>
       </Button>
     </div>
   );
@@ -94,8 +99,13 @@ interface CreateVoteModalProps {
   proposal?: ProposalWithUsers;
 }
 
-export default function CreateVoteModal ({
-  open = true, onClose = () => null, onCreateVote = () => null, onPublishToSnapshot = () => null, proposal }: CreateVoteModalProps) {
+export default function CreateVoteModal({
+  open = true,
+  onClose = () => null,
+  onCreateVote = () => null,
+  onPublishToSnapshot = () => null,
+  proposal
+}: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [voteDescription, setVoteDescription] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -107,33 +117,40 @@ export default function CreateVoteModal ({
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
-      setOptions([{
-        name: 'Option 1'
-      }, {
-        name: 'Option 2'
-      }, {
-        name: 'Abstain'
-      }]);
-    }
-    else if (voteType === VoteType.Approval) {
-      setOptions([{
-        name: 'Yes'
-      }, {
-        name: 'No'
-      }, {
-        name: 'Abstain'
-      }]);
+      setOptions([
+        {
+          name: 'Option 1'
+        },
+        {
+          name: 'Option 2'
+        },
+        {
+          name: 'Abstain'
+        }
+      ]);
+    } else if (voteType === VoteType.Approval) {
+      setOptions([
+        {
+          name: 'Yes'
+        },
+        {
+          name: 'No'
+        },
+        {
+          name: 'Abstain'
+        }
+      ]);
     }
   }, [voteType]);
 
   const [deadline, setDeadline] = useState(DateTime.fromMillis(Date.now()).plus({ hour: 12 }));
   const { currentPageId } = usePages();
   const handleSubmit = async (e: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const cardId = typeof window !== 'undefined' ? (new URLSearchParams(window.location.href)).get('cardId') : null;
+    const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
     e.preventDefault();
     const vote = await createVote({
       deadline: deadline.toJSDate(),
-      voteOptions: options.map(option => option.name),
+      voteOptions: options.map((option) => option.name),
       title: voteTitle,
       description: voteDescription,
       pageId: cardId ?? currentPageId,
@@ -147,21 +164,22 @@ export default function CreateVoteModal ({
     }
   };
 
-  const disabledSave = passThreshold > 100
-    || (!proposal && voteTitle.length === 0)
-    || (voteType === VoteType.SingleChoice && (options.findIndex(option => option.name.length === 0) !== -1))
-    || (new Set(options.map(option => option.name)).size !== options.length);
+  const disabledSave =
+    passThreshold > 100 ||
+    (!proposal && voteTitle.length === 0) ||
+    (voteType === VoteType.SingleChoice && options.findIndex((option) => option.name.length === 0) !== -1) ||
+    new Set(options.map((option) => option.name)).size !== options.length;
 
-  const isProposalAuthor = (proposal?.authors.find(author => author.userId === user?.id) ?? false);
+  const isProposalAuthor = proposal?.authors.find((author) => author.userId === user?.id) ?? false;
 
   return (
-    <Modal title={proposal ? 'Create a vote' : 'Create a poll'} size='large' open={open} onClose={onClose ?? (() => {})}>
-      <Box
-        flexDirection='column'
-        gap={1.5}
-        m={1}
-        display='flex'
-      >
+    <Modal
+      title={proposal ? 'Create a vote' : 'Create a poll'}
+      size='large'
+      open={open}
+      onClose={onClose ?? (() => {})}
+    >
+      <Box flexDirection='column' gap={1.5} m={1} display='flex'>
         {!proposal && (
           <Box flexDirection='column' display='flex'>
             <FieldLabel>Title</FieldLabel>
@@ -252,11 +270,7 @@ export default function CreateVoteModal ({
               setVoteType(e.target.value as VoteType);
             }}
           >
-            <FormControlLabel
-              value={VoteType.Approval}
-              control={<Radio />}
-              label='Yes / No / Abstain'
-            />
+            <FormControlLabel value={VoteType.Approval} control={<Radio />} label='Yes / No / Abstain' />
             <FormControlLabel value={VoteType.SingleChoice} control={<Radio />} label='Custom Options' />
           </RadioGroup>
         </Box>
@@ -289,7 +303,6 @@ export default function CreateVoteModal ({
                 </div>
               </Tooltip>
             </>
-
           )}
         </Stack>
       </Box>

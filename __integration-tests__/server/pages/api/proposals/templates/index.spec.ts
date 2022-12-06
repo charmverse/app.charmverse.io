@@ -17,27 +17,26 @@ beforeAll(async () => {
   space = generated.space;
 
   nonAdminUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
-
 });
 
 describe('POST /api/proposals/templates - Create a proposal from a template', () => {
   it('should create a proposal template if the user is a space admin and respond with 201', async () => {
-
     const adminCookie = await loginUser(adminUser.id);
 
-    const proposalTemplate = (await request(baseUrl)
-      .post('/api/proposals/templates')
-      .set('Cookie', adminCookie)
-      .send({
-        spaceId: space.id
-      })
-      .expect(201)).body as PageWithProposal;
+    const proposalTemplate = (
+      await request(baseUrl)
+        .post('/api/proposals/templates')
+        .set('Cookie', adminCookie)
+        .send({
+          spaceId: space.id
+        })
+        .expect(201)
+    ).body as PageWithProposal;
 
     expect(proposalTemplate.type === 'proposal_template').toBe(true);
   });
 
   it('should fail if the user is not a space admin and respond with 401', async () => {
-
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     await request(baseUrl)
@@ -48,5 +47,4 @@ describe('POST /api/proposals/templates - Create a proposal from a template', ()
       })
       .expect(401);
   });
-
 });

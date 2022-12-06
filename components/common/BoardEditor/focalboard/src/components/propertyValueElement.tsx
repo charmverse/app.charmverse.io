@@ -1,15 +1,13 @@
-
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
-import { randomIntFromInterval } from 'lib/utilities/random';
+import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from '../blocks/board';
+import type { Board, IPropertyTemplate, PropertyType } from '../blocks/board';
 import type { Card } from '../blocks/card';
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import { Utils, IDType } from '../utils';
 import Editable from '../widgets/editable';
 import Switch from '../widgets/switch';
 
@@ -19,35 +17,34 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import MultiSelectProperty from './properties/multiSelect/multiSelect';
-import SelectProperty from './properties/select/select';
 import UserProperty from './properties/user/user';
 
-const menuColors = Object.keys(Constants.menuColors);
-
 type Props = {
-    board: Board;
-    readOnly: boolean;
-    card: Card;
-    updatedBy: string;
-    updatedAt: string;
-    propertyTemplate: IPropertyTemplate;
-    showEmptyPlaceholder: boolean;
-}
+  board: Board;
+  readOnly: boolean;
+  card: Card;
+  updatedBy: string;
+  updatedAt: string;
+  propertyTemplate: IPropertyTemplate;
+  showEmptyPlaceholder: boolean;
+  displayType?: PropertyValueDisplayType;
+};
 
-function PropertyValueElement (props:Props): JSX.Element {
+function PropertyValueElement(props: Props): JSX.Element {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
 
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt } = props;
+  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, intl);
-  const emptyDisplayValue = showEmptyPlaceholder ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' }) : '';
+  const emptyDisplayValue = showEmptyPlaceholder
+    ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
+    : '';
   const finalDisplayValue = displayValue || emptyDisplayValue;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
-  const latestUpdated = (new Date(updatedAt)).getTime() > (new Date(card.updatedAt)).getTime() ? 'page' : 'card';
+  const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
   useEffect(() => {
     if (serverValue === value) {
@@ -55,8 +52,6 @@ function PropertyValueElement (props:Props): JSX.Element {
     }
     setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '');
   }, [value, props.card.fields.properties[props.propertyTemplate.id]]);
-
-  const onDeleteValue = useCallback(() => mutator.changePropertyValue(card, propertyTemplate.id, ''), [card, propertyTemplate.id]);
 
   const validateProp = (propType: string, val: string): boolean => {
     if (val === '') {
@@ -66,13 +61,15 @@ function PropertyValueElement (props:Props): JSX.Element {
       case 'number':
         return !Number.isNaN(parseInt(val, 10));
       case 'email': {
-        // eslint-disable-next-line max-len
-        const emailRegexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const emailRegexp =
+          // eslint-disable-next-line max-len
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return emailRegexp.test(val);
       }
       case 'url': {
-        // eslint-disable-next-line max-len
-        const urlRegexp = /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+        const urlRegexp =
+          // eslint-disable-next-line max-len
+          /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
         return urlRegexp.test(val);
       }
       case 'text':
@@ -84,66 +81,29 @@ function PropertyValueElement (props:Props): JSX.Element {
     }
   };
 
-  if (propertyTemplate.type === 'multiSelect') {
-    return (
-      <MultiSelectProperty
-        isEditable={!readOnly && Boolean(board)}
-        emptyValue={emptyDisplayValue}
-        propertyTemplate={propertyTemplate}
-        propertyValue={propertyValue}
-        onChange={async (newValue) => {
-          await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-        }}
-        onChangeColor={(option: IPropertyOption, colorId: string) => mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId)}
-        onDeleteOption={(option: IPropertyOption) => mutator.deletePropertyOption(board, propertyTemplate, option)}
-        onCreate={async (newValue, currentValues) => {
-          const option: IPropertyOption = {
-            id: Utils.createGuid(IDType.BlockID),
-            value: newValue,
-            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
-          };
-          currentValues.push(option);
-          await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
-          mutator.changePropertyValue(card, propertyTemplate.id, currentValues.map((v) => v.id));
-        }}
-        onDeleteValue={(valueToDelete, currentValues) => {
-          const viewIds = currentValues.filter((currentValue) => currentValue.id !== valueToDelete.id).map((currentValue) => currentValue.id);
-          mutator.changePropertyValue(card, propertyTemplate.id, viewIds);
-        }}
-      />
-    );
-  }
-
-  if (propertyTemplate.type === 'select') {
+  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     return (
       <SelectProperty
-        isEditable={!readOnly && Boolean(board)}
-        emptyValue={emptyDisplayValue}
+        multiselect={propertyTemplate.type === 'multiSelect'}
+        readOnly={readOnly || !board}
         propertyValue={propertyValue as string}
-        propertyTemplate={propertyTemplate}
-        onCreate={async (newValue) => {
-          const option: IPropertyOption = {
-            id: Utils.createGuid(IDType.BlockID),
-            value: newValue,
-            color: menuColors[randomIntFromInterval(0, menuColors.length - 1)]
-          };
-          await mutator.insertPropertyOption(board, propertyTemplate, option, 'add property option');
-          mutator.changePropertyValue(card, propertyTemplate.id, option.id);
-        }}
+        options={propertyTemplate.options}
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
         }}
-        onChangeColor={(option: IPropertyOption, colorId: string): void => {
-          mutator.changePropertyOptionColor(board, propertyTemplate, option, colorId);
+        onUpdateOption={(option) => {
+          mutator.changePropertyOption(board, propertyTemplate, option);
         }}
-        onDeleteOption={(option: IPropertyOption): void => {
+        onDeleteOption={(option) => {
           mutator.deletePropertyOption(board, propertyTemplate, option);
         }}
-        onDeleteValue={onDeleteValue}
+        onCreateOption={(newValue) => {
+          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+        }}
+        displayType={displayType}
       />
     );
-  }
-  else if (propertyTemplate.type === 'person') {
+  } else if (propertyTemplate.type === 'person') {
     return (
       <UserProperty
         value={propertyValue?.toString()}
@@ -153,8 +113,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         }}
       />
     );
-  }
-  else if (propertyTemplate.type === 'date') {
+  } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
       return <div className='octo-propertyvalue'>{displayValue}</div>;
     }
@@ -168,8 +127,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         }}
       />
     );
-  }
-  else if (propertyTemplate.type === 'url') {
+  } else if (propertyTemplate.type === 'url') {
     return (
       <URLProperty
         value={value.toString()}
@@ -183,8 +141,7 @@ function PropertyValueElement (props:Props): JSX.Element {
         validator={(newValue) => validateProp(propertyTemplate.type, newValue)}
       />
     );
-  }
-  else if (propertyTemplate.type === 'checkbox') {
+  } else if (propertyTemplate.type === 'checkbox') {
     return (
       <Switch
         isOn={Boolean(propertyValue)}
@@ -195,35 +152,17 @@ function PropertyValueElement (props:Props): JSX.Element {
         readOnly={readOnly}
       />
     );
-  }
-  else if (propertyTemplate.type === 'createdBy') {
-    return (
-      <CreatedBy userID={card.createdBy} />
-    );
-  }
-  else if (propertyTemplate.type === 'updatedBy') {
-    return (
-      <LastModifiedBy
-        updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy}
-      />
-    );
-  }
-  else if (propertyTemplate.type === 'createdTime') {
-    return (
-      <CreatedAt createdAt={card.createdAt} />
-    );
-  }
-  else if (propertyTemplate.type === 'updatedTime') {
-    return (
-      <LastModifiedAt
-        updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()}
-      />
-    );
+  } else if (propertyTemplate.type === 'createdBy') {
+    return <CreatedBy userID={card.createdBy} />;
+  } else if (propertyTemplate.type === 'updatedBy') {
+    return <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
+  } else if (propertyTemplate.type === 'createdTime') {
+    return <CreatedAt createdAt={card.createdAt} />;
+  } else if (propertyTemplate.type === 'updatedTime') {
+    return <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />;
   }
 
-  if (
-    editableFields.includes(propertyTemplate.type)
-  ) {
+  if (editableFields.includes(propertyTemplate.type)) {
     if (!readOnly) {
       return (
         <Editable

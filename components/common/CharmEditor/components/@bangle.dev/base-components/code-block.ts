@@ -1,22 +1,8 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type {
-  DOMOutputSpecArray,
-  EditorState,
-  EditorView,
-  Node,
-  Schema } from '@bangle.dev/pm';
-import {
-  keymap,
-  setBlockType,
-  textblockTypeInputRule
-} from '@bangle.dev/pm';
+import type { DOMOutputSpecArray, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import { keymap, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import { moveNode } from '@bangle.dev/pm-commands';
-import {
-  createObject,
-  filter,
-  findParentNodeOfType,
-  insertEmpty
-} from '@bangle.dev/utils';
+import { createObject, filter, findParentNodeOfType, insertEmpty } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
@@ -37,7 +23,7 @@ export const defaultKeys = {
 const name = 'codeBlock';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
-function specFactory (): RawSpecs {
+function specFactory(): RawSpecs {
   return {
     type: 'node',
     name,
@@ -56,7 +42,7 @@ function specFactory (): RawSpecs {
       toDOM: (): DOMOutputSpecArray => ['pre', ['code', 0]]
     },
     markdown: {
-      toMarkdown (state: MarkdownSerializerState, node: Node) {
+      toMarkdown(state: MarkdownSerializerState, node: Node) {
         state.write(`\`\`\`${node.attrs.language || ''}\n`);
         state.text(node.textContent, false);
         state.ensureNewLine();
@@ -75,16 +61,13 @@ function specFactory (): RawSpecs {
   };
 }
 
-function pluginsFactory ({
-  markdownShortcut = true,
-  keybindings = defaultKeys
-} = {}): RawPlugins {
+function pluginsFactory({ markdownShortcut = true, keybindings = defaultKeys } = {}): RawPlugins {
   return ({ schema }) => {
     const type = getTypeFromSchema(schema);
     return [
       markdownShortcut && textblockTypeInputRule(/^```$/, type),
-      keybindings
-        && keymap(
+      keybindings &&
+        keymap(
           createObject([
             [keybindings.toCodeBlock, setBlockType(type)],
 
@@ -93,30 +76,21 @@ function pluginsFactory ({
 
             [
               keybindings.insertEmptyParaAbove,
-              filter(
-                queryIsCodeActiveBlock(),
-                insertEmpty(schema.nodes.paragraph, 'above', false)
-              )
+              filter(queryIsCodeActiveBlock(), insertEmpty(schema.nodes.paragraph, 'above', false))
             ],
             [
               keybindings.insertEmptyParaBelow,
-              filter(
-                queryIsCodeActiveBlock(),
-                insertEmpty(schema.nodes.paragraph, 'below', false)
-              )
+              filter(queryIsCodeActiveBlock(), insertEmpty(schema.nodes.paragraph, 'below', false))
             ],
             [
               keybindings.tab,
-              filter(
-                queryIsCodeActiveBlock(),
-                (state: EditorState, dispatch, view?: EditorView) => {
-                  if (dispatch && view) {
-                    dispatch(state.tr.insertText('\t'));
-                    view?.focus();
-                  }
-                  return true;
+              filter(queryIsCodeActiveBlock(), (state: EditorState, dispatch, view?: EditorView) => {
+                if (dispatch && view) {
+                  dispatch(state.tr.insertText('\t'));
+                  view?.focus();
                 }
-              )
+                return true;
+              })
             ]
           ])
         )
@@ -124,7 +98,7 @@ function pluginsFactory ({
   };
 }
 
-export function queryIsCodeActiveBlock () {
+export function queryIsCodeActiveBlock() {
   return (state: EditorState) => {
     const type = getTypeFromSchema(state.schema);
     return Boolean(findParentNodeOfType(type)(state.selection));

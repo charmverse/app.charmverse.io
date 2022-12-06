@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -18,12 +18,12 @@ interface Props {
   spaceOwner: string;
 }
 
-export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
+export default function MemberList({ isAdmin, spaceId, spaceOwner }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
   const { members, mutateMembers } = useMembers();
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
 
-  const removedMember = removedMemberId ? members.find(member => member.id === removedMemberId) : null;
+  const removedMember = removedMemberId ? members.find((member) => member.id === removedMemberId) : null;
 
   const closed = popupState.close;
 
@@ -32,17 +32,22 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
     closed();
   };
 
-  async function updateMember (action: RoleAction, member: Member) {
+  async function updateMember(action: RoleAction, member: Member) {
     switch (action) {
-
       case 'makeAdmin':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: true });
-        mutateMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: true } : c), { revalidate: false });
+        mutateMembers(
+          members.map((c) => (c.id === member.id ? { ...c, isAdmin: true } : c)),
+          { revalidate: false }
+        );
         break;
 
       case 'makeMember':
         await charmClient.updateMember({ spaceId, userId: member.id, isAdmin: false });
-        mutateMembers(members.map(c => c.id === member.id ? { ...c, isAdmin: false } : c), { revalidate: false });
+        mutateMembers(
+          members.map((c) => (c.id === member.id ? { ...c, isAdmin: false } : c)),
+          { revalidate: false }
+        );
         break;
 
       case 'removeFromSpace':
@@ -56,37 +61,42 @@ export default function MemberList ({ isAdmin, spaceId, spaceOwner }: Props) {
   }
   const menuState = bindMenu(popupState);
 
-  async function removeMember () {
+  async function removeMember() {
     await charmClient.removeMember({ spaceId, userId: removedMemberId as string });
-    mutateMembers(members.filter(c => c.id !== removedMemberId), { revalidate: false });
+    mutateMembers(
+      members.filter((c) => c.id !== removedMemberId),
+      { revalidate: false }
+    );
     setRemovedMemberId(null);
   }
 
   return (
     <>
       <Legend>Current Members</Legend>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Join date</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {members.map(member => (
-            member.isBot === true ? null : (
-              <MemberListItem
-                isAdmin={isAdmin}
-                key={member.id}
-                isSpaceOwner={spaceOwner === member.id}
-                member={member}
-                onChange={updateMember}
-              />
-            )
-          ))}
-        </TableBody>
-      </Table>
+      <Box overflow='auto'>
+        <Table size='small' aria-label='Current members table'>
+          <TableHead>
+            <TableRow>
+              <TableCell>Username</TableCell>
+              <TableCell>Join date</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {members
+              .filter((member) => !member.isBot)
+              .map((member) => (
+                <MemberListItem
+                  isAdmin={isAdmin}
+                  key={member.id}
+                  isSpaceOwner={spaceOwner === member.id}
+                  member={member}
+                  onChange={updateMember}
+                />
+              ))}
+          </TableBody>
+        </Table>
+      </Box>
       {removedMember && (
         <ConfirmDeleteModal
           title='Remove member'

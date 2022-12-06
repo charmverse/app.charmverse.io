@@ -15,7 +15,7 @@ const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {
 
 const apiServiceToken = process.env.CMC_API_TOKEN as string;
 
-export function getPriceFromCoinMarketCap (
+export function getPriceFromCoinMarketCap(
   base: CryptoCurrency | string,
   quote: FiatCurrency,
   apiToken = apiServiceToken
@@ -28,10 +28,13 @@ export function getPriceFromCoinMarketCap (
       return;
     }
 
-    fetch<any>(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`, {
-      headers: { 'X-CMC_PRO_API_KEY': apiToken }
-    })
-      .then(data => {
+    fetch<any>(
+      `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${cmcCryptoCurrencyId}&convert=${quote}`,
+      {
+        headers: { 'X-CMC_PRO_API_KEY': apiToken }
+      }
+    )
+      .then((data) => {
         const quotedPrice = data.data[cmcCryptoCurrencyId.toString()].quote[quote].price;
 
         if (!quotedPrice) {
@@ -47,9 +50,8 @@ export function getPriceFromCoinMarketCap (
         };
 
         resolve(pairQuote);
-
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });

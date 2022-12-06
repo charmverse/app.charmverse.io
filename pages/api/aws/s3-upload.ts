@@ -2,19 +2,16 @@
 // We can replace with the actual library once next-s3-upload updates their AWS-SDK dependency to V3
 // see this issue for more: https://github.com/ryanto/next-s3-upload/issues/15
 
-import type { STSClientConfig } from '@aws-sdk/client-sts';
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-type NextRouteHandler = (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => Promise<void>;
+type NextRouteHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 
 // eslint-disable-next-line no-use-before-define
 type Configure = (options: Options) => Handler;
@@ -25,24 +22,13 @@ type Options = {
 };
 
 const makeRouteHandler = (options: Options = {}): Handler => {
-  const route: NextRouteHandler = async function routeRequest (req, res) {
+  const route: NextRouteHandler = async function routeRequest(req, res) {
     // eslint-disable-next-line no-use-before-define
     const missing = missingEnvs();
     const userId = req.session.user.id;
     if (missing.length > 0) {
-      res
-        .status(500)
-        .json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
-    }
-    else {
-      const config: STSClientConfig = {
-        credentials: {
-          accessKeyId: process.env.S3_UPLOAD_KEY as string,
-          secretAccessKey: process.env.S3_UPLOAD_SECRET as string
-        },
-        region: process.env.S3_UPLOAD_REGION
-      };
-
+      res.status(500).json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
+    } else {
       const bucket = process.env.S3_UPLOAD_BUCKET;
 
       const filename = decodeURIComponent(req.query.filename as string);
@@ -62,7 +48,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
         ]
       };
 
-      const sts = new STSClient(config);
+      const sts = new STSClient(getS3ClientConfig());
 
       const command = new GetFederationTokenCommand({
         Name: 'S3UploadWebToken',
@@ -96,12 +82,6 @@ const makeRouteHandler = (options: Options = {}): Handler => {
 //
 let missingEnvs = (): string[] => {
   const keys = [];
-  if (!process.env.S3_UPLOAD_KEY) {
-    keys.push('S3_UPLOAD_KEY');
-  }
-  if (!process.env.S3_UPLOAD_SECRET) {
-    keys.push('S3_UPLOAD_SECRET');
-  }
   if (!process.env.S3_UPLOAD_REGION) {
     keys.push('S3_UPLOAD_REGION');
   }

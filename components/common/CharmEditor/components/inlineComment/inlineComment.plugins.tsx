@@ -2,12 +2,12 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
 import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import reactDOM from 'react-dom';
 
-import { extractInlineCommentRows } from 'lib/inline-comments/findTotalInlineComments';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
@@ -19,21 +19,19 @@ export interface InlineCommentPluginState {
   ids: string[];
 }
 
-export function plugin ({ key } :{
-  key: PluginKey;
-}): RawPlugins {
+export function plugin({ key }: { key: PluginKey }): RawPlugins {
   const tooltipDOMSpec = createTooltipDOM();
   return [
     new Plugin<InlineCommentPluginState>({
       state: {
-        init () {
+        init() {
           return {
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             ids: []
           };
         },
-        apply (tr, pluginState) {
+        apply(tr, pluginState) {
           const meta = tr.getMeta(key);
           if (meta === undefined) {
             return pluginState;
@@ -62,7 +60,9 @@ export function plugin ({ key } :{
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          const className = (event.target as HTMLElement).className + ((event.target as HTMLElement).parentNode as HTMLElement).className;
+          const className =
+            (event.target as HTMLElement).className +
+            ((event.target as HTMLElement).parentNode as HTMLElement).className;
           if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,
@@ -93,15 +93,15 @@ export function plugin ({ key } :{
     // a plugin to display icons to the right of each paragraph and header
     new Plugin({
       state: {
-        init (_, { doc, schema }) {
+        init(_, { doc, schema }) {
           return getDecorations({ schema, doc });
         },
-        apply (tr, old, _, editorState) {
+        apply(tr, old, _, editorState) {
           return tr.docChanged ? getDecorations({ schema: editorState.schema, doc: tr.doc }) : old;
         }
       },
       props: {
-        decorations (state: EditorState) {
+        decorations(state: EditorState) {
           return this.getState(state);
         },
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
@@ -124,18 +124,18 @@ export function plugin ({ key } :{
   ];
 }
 
-function getDecorations ({ schema, doc }: { doc: Node, schema: Schema }) {
+function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
   const rows = extractInlineCommentRows(schema, doc);
   const uniqueCommentIds: Set<string> = new Set();
 
   const decorations: Decoration[] = [];
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
-    const commentIds = row.nodes.map(node => node.marks[0]?.attrs.id).filter(Boolean);
-    const newIds = commentIds.filter(commentId => !uniqueCommentIds.has(commentId));
-    commentIds.forEach(commentId => uniqueCommentIds.add(commentId));
+    const commentIds = row.nodes.map((node) => node.marks[0]?.attrs.id).filter(Boolean);
+    const newIds = Array.from(new Set(commentIds.filter((commentId) => !uniqueCommentIds.has(commentId))));
+    commentIds.forEach((commentId) => uniqueCommentIds.add(commentId));
 
     if (newIds.length !== 0) {
       const container = document.createElement('div');

@@ -1,4 +1,3 @@
-
 import type { Block } from '../blocks/block';
 import type { Board, IPropertyOption, IPropertyTemplate } from '../blocks/board';
 import { createBoard } from '../blocks/board';
@@ -20,7 +19,7 @@ import type { TextBlock } from '../blocks/textBlock';
 import { createTextBlock } from '../blocks/textBlock';
 
 class TestBlockFactory {
-  static createBoard (): Board {
+  static createBoard(): Board {
     const board = createBoard();
     board.rootId = board.id;
     board.title = 'board title';
@@ -54,7 +53,7 @@ class TestBlockFactory {
     return board;
   }
 
-  static createBoardView (board?: Board): BoardView {
+  static createBoardView(board?: Board): BoardView {
     const view = createBoardView();
     view.parentId = board ? board.id : 'parent';
     view.rootId = board ? board.rootId : 'root';
@@ -90,7 +89,7 @@ class TestBlockFactory {
     return view;
   }
 
-  static createTableView (board?: Board): BoardView {
+  static createTableView(board?: Board): BoardView {
     const view = createBoardView();
     view.parentId = board ? board.id : 'parent';
     view.rootId = board ? board.rootId : 'root';
@@ -126,7 +125,7 @@ class TestBlockFactory {
     return view;
   }
 
-  static createCard (board?: Board): Card {
+  static createCard(board?: Board): Card {
     const card = createCard();
     card.parentId = board ? board.id : 'parent';
     card.rootId = board ? board.rootId : 'root';
@@ -137,7 +136,7 @@ class TestBlockFactory {
     return card;
   }
 
-  private static addToCard<BlockType extends Block> (block: BlockType, card: Card, isContent = true): BlockType {
+  private static addToCard<BlockType extends Block>(block: BlockType, card: Card, isContent = true): BlockType {
     block.parentId = card.id;
     block.rootId = card.rootId;
     if (isContent) {
@@ -146,32 +145,32 @@ class TestBlockFactory {
     return block;
   }
 
-  static createComment (card: Card): CommentBlock {
+  static createComment(card: Card): CommentBlock {
     const block = this.addToCard(createCommentBlock(), card, false);
     block.title = 'title';
 
     return block;
   }
 
-  static createText (card: Card): TextBlock {
+  static createText(card: Card): TextBlock {
     const block = this.addToCard(createTextBlock(), card);
     block.title = 'title';
     return block;
   }
 
-  static createImage (card: Card): ImageBlock {
+  static createImage(card: Card): ImageBlock {
     const block = this.addToCard(createImageBlock(), card);
     block.fields.fileId = 'fileId';
     return block;
   }
 
-  static createDivider (card: Card): DividerBlock {
+  static createDivider(card: Card): DividerBlock {
     const block = this.addToCard(createDividerBlock(), card);
     block.title = 'title';
     return block;
   }
 
-  static createCheckbox (card: Card): CheckboxBlock {
+  static createCheckbox(card: Card): CheckboxBlock {
     const block = this.addToCard(createCheckboxBlock(), card);
     block.title = 'title';
     return block;

@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -23,7 +22,8 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     users: {
       me: {
         id: 'user-id-1',
-        username: 'username_1' }
+        username: 'username_1'
+      }
     }
   };
   const store = mockStateStore([], state);
@@ -34,11 +34,7 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderSortMenu
-            activeView={activeView}
-            orderedCards={cards}
-            properties={board.fields.cardProperties}
-          />
+          <ViewHeaderSortMenu activeView={activeView} orderedCards={cards} properties={board.fields.cardProperties} />
         </ReduxProvider>
       )
     );
@@ -50,11 +46,7 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderSortMenu
-            activeView={activeView}
-            orderedCards={cards}
-            properties={board.fields.cardProperties}
-          />
+          <ViewHeaderSortMenu activeView={activeView} orderedCards={cards} properties={board.fields.cardProperties} />
         </ReduxProvider>
       )
     );
@@ -69,11 +61,7 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderSortMenu
-            activeView={activeView}
-            orderedCards={cards}
-            properties={board.fields.cardProperties}
-          />
+          <ViewHeaderSortMenu activeView={activeView} orderedCards={cards} properties={board.fields.cardProperties} />
         </ReduxProvider>
       )
     );
@@ -89,11 +77,7 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderSortMenu
-            activeView={activeView}
-            orderedCards={cards}
-            properties={board.fields.cardProperties}
-          />
+          <ViewHeaderSortMenu activeView={activeView} orderedCards={cards} properties={board.fields.cardProperties} />
         </ReduxProvider>
       )
     );
@@ -103,6 +87,8 @@ describe('components/viewHeader/viewHeaderSortMenu', () => {
     userEvent.click(buttonName);
     expect(container).toMatchSnapshot();
     expect(mockedMutator.changeViewSortOptions).toBeCalledTimes(1);
-    expect(mockedMutator.changeViewSortOptions).toBeCalledWith(activeView.id, activeView.fields.sortOptions, [{ propertyId: '__title', reversed: false }]);
+    expect(mockedMutator.changeViewSortOptions).toBeCalledWith(activeView.id, activeView.fields.sortOptions, [
+      { propertyId: '__title', reversed: false }
+    ]);
   });
 });

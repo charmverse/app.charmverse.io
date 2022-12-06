@@ -17,16 +17,16 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createMemberPropertyHandler);
 
-async function getMemberPropertiesHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty[]>) {
+async function getMemberPropertiesHandler(req: NextApiRequest, res: NextApiResponse<MemberProperty[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const properties = await getAccessibleMemberPropertiesBySpace({ userId, spaceId });
+  const properties = await getAccessibleMemberPropertiesBySpace({ requestingUserId: userId, spaceId });
 
   return res.status(200).json(properties);
 }
 
-async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
+async function createMemberPropertyHandler(req: NextApiRequest, res: NextApiResponse<MemberProperty>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
   const propertyData = req.body as CreateMemberPropertyPayload;
@@ -39,7 +39,8 @@ async function createMemberPropertyHandler (req: NextApiRequest, res: NextApiRes
       updatedBy: userId,
       options: propertyData.options ?? Prisma.DbNull,
       space: { connect: { id: spaceId } }
-    }
+    },
+    spaceId
   });
 
   return res.status(201).json(property);

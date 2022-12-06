@@ -11,27 +11,35 @@ import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 
 type Props = {
-    templateId: string;
-    board: Board;
-    activeView: BoardView;
-    views: BoardView[];
-    cards: Card[];
-}
+  templateId: string;
+  board: Board;
+  activeView: BoardView;
+  views: BoardView[];
+  cards: Card[];
+};
 
-function TableHeaderMenu (props: Props): JSX.Element {
+function TableHeaderMenu(props: Props): JSX.Element {
   const { board, activeView, templateId, views, cards } = props;
   const intl = useIntl();
   return (
-    <Menu>
+    <Menu disablePortal={false}>
       <Menu.Text
         id='sortAscending'
         name={intl.formatMessage({ id: 'TableHeaderMenu.sort-ascending', defaultMessage: 'Sort ascending' })}
-        onClick={() => mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [{ propertyId: templateId, reversed: false }])}
+        onClick={() =>
+          mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
+            { propertyId: templateId, reversed: false }
+          ])
+        }
       />
       <Menu.Text
         id='sortDescending'
         name={intl.formatMessage({ id: 'TableHeaderMenu.sort-descending', defaultMessage: 'Sort descending' })}
-        onClick={() => mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [{ propertyId: templateId, reversed: true }])}
+        onClick={() =>
+          mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
+            { propertyId: templateId, reversed: true }
+          ])
+        }
       />
       <Menu.Text
         id='insertLeft'
@@ -40,8 +48,7 @@ function TableHeaderMenu (props: Props): JSX.Element {
           if (props.templateId === Constants.titleColumnId) {
             // eslint-disable-next-line no-warning-comments
             // TODO: Handle name column
-          }
-          else {
+          } else {
             const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
 
             // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
@@ -56,8 +63,7 @@ function TableHeaderMenu (props: Props): JSX.Element {
           if (templateId === Constants.titleColumnId) {
             // eslint-disable-next-line no-warning-comments
             // TODO: Handle title column
-          }
-          else {
+          } else {
             const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
 
             // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
@@ -65,29 +71,28 @@ function TableHeaderMenu (props: Props): JSX.Element {
           }
         }}
       />
-      {props.templateId !== Constants.titleColumnId
-                && (
-                  <>
-                    <Menu.Text
-                      id='hide'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
-                      onClick={() => {
-                        const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
-                        mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
-                      }}
-                    />
-                    <Menu.Text
-                      id='duplicate'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
-                      onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
-                    />
-                    <Menu.Text
-                      id='delete'
-                      name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
-                      onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
-                    />
-                  </>
-                )}
+      {props.templateId !== Constants.titleColumnId && (
+        <>
+          <Menu.Text
+            id='hide'
+            name={intl.formatMessage({ id: 'TableHeaderMenu.hide', defaultMessage: 'Hide' })}
+            onClick={() => {
+              const viewIds = activeView.fields.visiblePropertyIds.filter((o: string) => o !== templateId);
+              mutator.changeViewVisibleProperties(activeView.id, activeView.fields.visiblePropertyIds, viewIds);
+            }}
+          />
+          <Menu.Text
+            id='duplicate'
+            name={intl.formatMessage({ id: 'TableHeaderMenu.duplicate', defaultMessage: 'Duplicate' })}
+            onClick={() => mutator.duplicatePropertyTemplate(board, activeView, templateId)}
+          />
+          <Menu.Text
+            id='delete'
+            name={intl.formatMessage({ id: 'TableHeaderMenu.delete', defaultMessage: 'Delete' })}
+            onClick={() => mutator.deleteProperty(board, views, cards, templateId)}
+          />
+        </>
+      )}
     </Menu>
   );
 }

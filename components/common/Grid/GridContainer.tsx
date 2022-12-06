@@ -3,13 +3,12 @@ import { Grid } from '@mui/material';
 import type { ComponentProps } from 'react';
 
 const StyledGrid = styled(Grid)`
-
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   width: 100%;
   padding: ${({ theme }) => theme.spacing(2)};
 
   &:hover {
-    background-color: rgba(var(--center-channel-color-rgb),.05);
+    background-color: rgba(var(--center-channel-color-rgb), 0.05);
   }
 
   .show-on-hover {
@@ -20,7 +19,7 @@ const StyledGrid = styled(Grid)`
   }
 `;
 
-export default function GridContainer ({ children, ...props }: ComponentProps<typeof Grid>) {
+export default function GridContainer({ children, ...props }: ComponentProps<typeof Grid>) {
   return (
     <StyledGrid container justifyContent='space-between' alignItems='center' {...props}>
       {children}

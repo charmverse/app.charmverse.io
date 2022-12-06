@@ -22,7 +22,7 @@
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
-  "jestrunner.configPath": "jest.config-server.ts",
+  "jestrunner.configPath": "jest.config-all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "Mainnets"

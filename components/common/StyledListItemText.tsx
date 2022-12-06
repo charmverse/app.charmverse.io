@@ -1,7 +1,7 @@
 import type { ListItemTextProps } from '@mui/material';
 import { ListItemText } from '@mui/material';
 
-export function StyledListItemText (props: ListItemTextProps) {
+export function StyledListItemText(props: ListItemTextProps) {
   return (
     <ListItemText
       primaryTypographyProps={{

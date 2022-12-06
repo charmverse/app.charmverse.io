@@ -13,39 +13,52 @@ interface IRolesFilter {
   userIds: string[];
 }
 
-type ReducedRole = Role | ListSpaceRolesResponse
+type ReducedRole = Role | ListSpaceRolesResponse;
 
-function filterRoles (roles: ReducedRole[], filter: IRolesFilter): ReducedRole[] {
+function filterRoles(roles: ReducedRole[], filter: IRolesFilter): ReducedRole[] {
   if (filter.mode === 'exclude') {
-    return roles.filter(role => {
+    return roles.filter((role) => {
       const shouldInclude = filter.userIds.indexOf(role.id) === -1;
       return shouldInclude;
     });
-  }
-  else {
-    return roles.filter(role => {
+  } else {
+    return roles.filter((role) => {
       const shouldInclude = filter.userIds.indexOf(role.id) > -1;
       return shouldInclude;
     });
   }
 }
 
-function InputSearchRoleBase ({
-  defaultValue, disableCloseOnSelect = false, filter, showWarningOnNoRoles = false, placeholder, ...props
+function InputSearchRoleBase({
+  defaultValue,
+  disableCloseOnSelect = false,
+  filter,
+  showWarningOnNoRoles = false,
+  placeholder,
+  ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
 
-  const defaultRole = typeof defaultValue === 'string' ? roles?.find(role => {
-    return role.id === defaultValue;
-  }) : (defaultValue instanceof Array ? (roles?.filter(r => defaultValue.includes(r.id))) : undefined);
+  const defaultRole =
+    typeof defaultValue === 'string'
+      ? roles?.find((role) => {
+          return role.id === defaultValue;
+        })
+      : defaultValue instanceof Array
+      ? roles?.filter((r) => defaultValue.includes(r.id))
+      : undefined;
 
-  const filteredRoles = (!!filter && !!roles) ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
+  const filteredRoles = !!filter && !!roles ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
 
   if (roles?.length === 0 && showWarningOnNoRoles) {
     return (
       <Alert severity='warning'>
-        There are no roles in this space. Workspace admins can create roles in the <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>workspace settings page</Link>.
+        There are no roles in this space. Workspace admins can create roles in the{' '}
+        <Link external={false} sx={{ fontWeight: 'bold' }} href={`/${space?.domain}/settings/roles`}>
+          workspace settings page
+        </Link>
+        .
       </Alert>
     );
   }
@@ -56,23 +69,17 @@ function InputSearchRoleBase ({
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
-      placeholder={(filteredRoles.length > 0 || roles?.length === 0) ? placeholder : ''}
+      placeholder={filteredRoles.length > 0 || roles?.length === 0 ? placeholder : ''}
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
-      options={
-      filteredRoles
-      }
+      options={filteredRoles}
       autoHighlight
       getOptionLabel={(role) => role.name}
-      renderOption={(_props, role) => (
-        <li {..._props}>
-          {role.name}
-        </li>
-      )}
+      renderOption={(_props, role) => <li {..._props}>{role.name}</li>}
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder={(filteredRoles.length > 0 || roles?.length === 0) ? placeholder : ''}
+          placeholder={filteredRoles.length > 0 || roles?.length === 0 ? placeholder : ''}
           inputProps={{
             ...params.inputProps
           }}
@@ -89,8 +96,8 @@ interface IInputSearchRoleProps {
   showWarningOnNoRoles?: boolean;
 }
 
-export function InputSearchRole (props: IInputSearchRoleProps) {
-  function emitValue (selectedUser: Role) {
+export function InputSearchRole(props: IInputSearchRoleProps) {
+  function emitValue(selectedUser: Role) {
     if (selectedUser) {
       props.onChange(selectedUser.id);
     }
@@ -99,7 +106,8 @@ export function InputSearchRole (props: IInputSearchRoleProps) {
   return <InputSearchRoleBase {...props} onChange={(e, value) => emitValue(value as Role)} multiple />;
 }
 
-interface IInputSearchRoleMultipleProps extends Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange' | 'defaultValue'>> {
+interface IInputSearchRoleMultipleProps
+  extends Partial<Omit<ComponentProps<typeof Autocomplete>, 'onChange' | 'defaultValue'>> {
   onChange: (id: string[]) => void;
   defaultValue?: string[];
   filter?: IRolesFilter;
@@ -107,12 +115,16 @@ interface IInputSearchRoleMultipleProps extends Partial<Omit<ComponentProps<type
   showWarningOnNoRoles?: boolean;
 }
 
-export function InputSearchRoleMultiple ({
-  onChange, filter, defaultValue, showWarningOnNoRoles, disableCloseOnSelect, ...props
+export function InputSearchRoleMultiple({
+  onChange,
+  filter,
+  defaultValue,
+  showWarningOnNoRoles,
+  disableCloseOnSelect,
+  ...props
 }: IInputSearchRoleMultipleProps) {
-
-  function emitValue (roles: ReducedRole[]) {
-    onChange(roles.map(role => role.id));
+  function emitValue(roles: ReducedRole[]) {
+    onChange(roles.map((role) => role.id));
   }
 
   return (
@@ -128,4 +140,3 @@ export function InputSearchRoleMultiple ({
     />
   );
 }
-

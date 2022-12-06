@@ -15,13 +15,13 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 type DescriptionModalProps = {
-    currentDescription: string | null | undefined;
-    save: (description: string) => void;
-    close: () => void;
-    isOpen: boolean;
+  currentDescription: string | null | undefined;
+  save: (description: string) => void;
+  close: () => void;
+  isOpen: boolean;
 };
 
-function DescriptionModal (props: DescriptionModalProps) {
+function DescriptionModal(props: DescriptionModalProps) {
   const { currentDescription, close, isOpen, save } = props;
 
   const {
@@ -44,18 +44,14 @@ function DescriptionModal (props: DescriptionModalProps) {
     });
   }, [currentDescription]);
 
-  function onSubmit (values: FormValues) {
+  function onSubmit(values: FormValues) {
     save(values.description);
   }
 
   const watchDescription = watch('description');
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={close}
-      size='large'
-    >
+    <Modal open={isOpen} onClose={close} size='large'>
       <DialogTitle onClose={close}>Describe yourself in a few words</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack mt={1}>
@@ -70,17 +66,16 @@ function DescriptionModal (props: DescriptionModalProps) {
             onChange={(event) => {
               if (event.target.value.length > 500) {
                 setValue('description', event.target.value.substring(0, 500));
-              }
-              else {
+              } else {
                 setValue('description', event.target.value);
               }
             }}
           />
-          <Box justifyContent='end' sx={{ display: 'flex' }}>{watchDescription.length}/500</Box>
+          <Box justifyContent='end' sx={{ display: 'flex' }}>
+            {watchDescription.length}/500
+          </Box>
           <Box sx={{ display: 'flex' }}>
-            <Button type='submit'>
-              Save
-            </Button>
+            <Button type='submit'>Save</Button>
           </Box>
         </Stack>
       </form>

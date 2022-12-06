@@ -10,7 +10,7 @@ interface Props {
   label?: string;
 }
 
-export function BackIcon ({ iconSize, label, fontSize }: Props) {
+export function BackIcon({ iconSize, label, fontSize }: Props) {
   return (
     <IconWrapper>
       <ArrowBackIcon fontSize={iconSize} />

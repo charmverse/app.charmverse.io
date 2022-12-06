@@ -12,8 +12,11 @@ const StyledActionsMenu = styled(Box)`
   width: 26px;
   height: 26px;
   border-radius: 2px;
-  &:hover {
-    background: ${({ theme }) => theme.palette.action.hover};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      background: ${({ theme }) => theme.palette.action.hover};
+    }
   }
   text-align: center;
   display: flex;
@@ -26,7 +29,7 @@ interface ActionsMenuProps {
   children?: ReactNode;
 }
 
-export default function ActionsMenu ({ onClick, children }: ActionsMenuProps) {
+export default function ActionsMenu({ onClick, children }: ActionsMenuProps) {
   return (
     <StyledActionsMenu className='actions-menu' onClick={onClick}>
       <MoreHorizIcon color='secondary' fontSize='small' />

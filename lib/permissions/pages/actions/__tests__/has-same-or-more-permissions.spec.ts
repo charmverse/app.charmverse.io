@@ -16,11 +16,10 @@ let role: Role;
 
 // Will return a nested tree of pages and associated permissions
 // Creates as many pages as there are permission sets
-async function setupPagesWithPermissions (permissionSets: Partial<PagePermission>[][]): Promise<IPageWithPermissions []> {
-
+async function setupPagesWithPermissions(permissionSets: Partial<PagePermission>[][]): Promise<IPageWithPermissions[]> {
   let currentParentId: string | undefined;
 
-  const pagesWithPermissions: IPageWithPermissions [] = [];
+  const pagesWithPermissions: IPageWithPermissions[] = [];
 
   for (const set of permissionSets) {
     const newPage = await createPage({
@@ -32,7 +31,7 @@ async function setupPagesWithPermissions (permissionSets: Partial<PagePermission
     currentParentId = newPage.id;
 
     await Promise.all(
-      set.map(permission => {
+      set.map((permission) => {
         return upsertPermission(newPage.id, permission as any);
       })
     );
@@ -63,48 +62,49 @@ beforeAll(async () => {
   });
 
   role = createdRole;
-
 });
 
 describe('hasSameOrMorePermissions', () => {
-
   it('should return true when the compared list of permissions allows the same set of operations than the base', async () => {
-
     const [root, child] = await setupPagesWithPermissions([
       // Root page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }],
+      [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        },
+        {
+          spaceId: space.id,
+          permissionLevel: 'view'
+        }
+      ],
       // Child page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }]
+      [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        },
+        {
+          spaceId: space.id,
+          permissionLevel: 'view'
+        }
+      ]
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const hasEqualOrMorePermissions = hasSameOrMorePermissions(root!.permissions, child!.permissions);
 
     expect(hasEqualOrMorePermissions).toBe(true);
-
   });
 
   it('should return true if the base permissions array is empty', async () => {
-
     const [page] = await setupPagesWithPermissions([
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     ]);
 
     const hasEqualOrMorePermissions = hasSameOrMorePermissions([], page.permissions);
@@ -113,22 +113,25 @@ describe('hasSameOrMorePermissions', () => {
   });
 
   it('should return false when the compared list of permissions has less operations permitted than the base', async () => {
-
     const [root, child] = await setupPagesWithPermissions([
       // Root page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      },
-      {
-        spaceId: space.id,
-        permissionLevel: 'view'
-      }],
+      [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        },
+        {
+          spaceId: space.id,
+          permissionLevel: 'view'
+        }
+      ],
       // Child page
-      [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

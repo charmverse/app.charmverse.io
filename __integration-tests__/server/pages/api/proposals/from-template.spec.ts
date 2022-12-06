@@ -9,7 +9,6 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/proposals/from-template - Instantiate a proposal template', () => {
   it('should copy a proposal template if the user has the space.createVotes permission and respond with 201', async () => {
-
     const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations({
@@ -23,20 +22,24 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
       userId: nonAdminUser.id,
-      reviewers: [{
-        group: 'user',
-        id: nonAdminUser.id
-      }]
+      reviewers: [
+        {
+          group: 'user',
+          id: nonAdminUser.id
+        }
+      ]
     });
 
-    const createdProposal = (await request(baseUrl)
-      .post('/api/proposals/from-template')
-      .set('Cookie', nonAdminCookie)
-      .send({
-        templateId: proposalTemplate.id,
-        spaceId: space.id
-      })
-      .expect(201)).body as Page;
+    const createdProposal = (
+      await request(baseUrl)
+        .post('/api/proposals/from-template')
+        .set('Cookie', nonAdminCookie)
+        .send({
+          templateId: proposalTemplate.id,
+          spaceId: space.id
+        })
+        .expect(201)
+    ).body as Page;
 
     const proposal = await prisma.proposal.findUnique({
       where: {
@@ -47,12 +50,10 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       }
     });
 
-    expect(proposal?.reviewers?.some(r => r.userId === nonAdminUser.id)).toBe(true);
-
+    expect(proposal?.reviewers?.some((r) => r.userId === nonAdminUser.id)).toBe(true);
   });
 
   it('should copy a proposal template if the user is an admin, even if the space has no createVote permissions and respond with 201', async () => {
-
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
     const adminCookie = await loginUser(adminUser.id);
 
@@ -65,20 +66,24 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
-      reviewers: [{
-        group: 'user',
-        id: adminUser.id
-      }]
+      reviewers: [
+        {
+          group: 'user',
+          id: adminUser.id
+        }
+      ]
     });
 
-    const createdProposal = (await request(baseUrl)
-      .post('/api/proposals/from-template')
-      .set('Cookie', adminCookie)
-      .send({
-        templateId: proposalTemplate.id,
-        spaceId: space.id
-      })
-      .expect(201)).body as Page;
+    const createdProposal = (
+      await request(baseUrl)
+        .post('/api/proposals/from-template')
+        .set('Cookie', adminCookie)
+        .send({
+          templateId: proposalTemplate.id,
+          spaceId: space.id
+        })
+        .expect(201)
+    ).body as Page;
 
     const proposal = await prisma.proposal.findUnique({
       where: {
@@ -89,12 +94,10 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       }
     });
 
-    expect(proposal?.reviewers?.some(r => r.userId === adminUser.id)).toBe(true);
-
+    expect(proposal?.reviewers?.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should copy a proposal template if the user does not have createVote space permission and respond with 401', async () => {
-
     const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
@@ -107,10 +110,12 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
     const proposalTemplate = await createProposalTemplate({
       spaceId: space.id,
       userId: nonAdminUser.id,
-      reviewers: [{
-        group: 'user',
-        id: nonAdminUser.id
-      }]
+      reviewers: [
+        {
+          group: 'user',
+          id: nonAdminUser.id
+        }
+      ]
     });
 
     await request(baseUrl)
@@ -122,5 +127,4 @@ describe('POST /api/proposals/from-template - Instantiate a proposal template', 
       })
       .expect(401);
   });
-
 });

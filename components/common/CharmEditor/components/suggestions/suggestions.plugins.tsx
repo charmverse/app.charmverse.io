@@ -1,14 +1,13 @@
 import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
 import type { EditorState, PluginKey } from '@bangle.dev/pm';
-import { createTooltipDOM, tooltipPlacement } from '@bangle.dev/tooltip';
 import { RateReviewOutlined } from '@mui/icons-material';
 import reactDOM from 'react-dom';
 
+import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';
-import { trackPlugin } from './statePlugins/track';
 
 export interface SuggestionPluginState {
   tooltipContentDOM: HTMLElement;
@@ -17,22 +16,19 @@ export interface SuggestionPluginState {
   rowPos?: number;
 }
 
-export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
-    { onSelectionSet?: (state: EditorState) => void, readOnly: boolean, key: PluginKey, userId: string, username: string }) {
-
+export function plugins({ onSelectionSet, key }: { onSelectionSet?: (state: EditorState) => void; key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
 
   return [
-    trackPlugin({ userId, username }),
     // this plugin emits the changes/new state from the origianl trackPlugin, which allows the sidebar to update
     new Plugin({
       state: {
-        init () {
+        init() {
           return false;
         },
-        apply (tr, prev, oldState, state) {
+        apply(tr, prev, oldState, state) {
           // react to when something is clicked, or when a selection is set by the sidebar component
-          if ((tr.selectionSet || oldState.selection.eq(state.selection))) {
+          if (tr.selectionSet || oldState.selection.eq(state.selection)) {
             onSelectionSet?.(state);
           }
           return prev;
@@ -42,14 +38,14 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
     new Plugin<SuggestionPluginState>({
       key,
       state: {
-        init () {
+        init() {
           return {
             show: false,
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             rowPos: undefined
           };
         },
-        apply (tr, pluginState) {
+        apply(tr, pluginState) {
           const meta = tr.getMeta(key);
           if (meta === undefined) {
             return pluginState;
@@ -76,10 +72,12 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
       },
       props: {
         handleClickOn: (view, pos: number, node, nodePos, event: MouseEvent) => {
-
-          const isSuggestion = /^(insertion|deletion|format-change)/.test((event.target as HTMLElement).className)
-            || /^(insertion|deletion|format-change)/.test(((event.target as HTMLElement).parentNode as HTMLElement).className)
-            || /^(insertion|deletion|format-change)/.test((event.target as any).parentNode?.parentNode?.className);
+          const isSuggestion =
+            /^(insertion|deletion|format-change)/.test((event.target as HTMLElement).className) ||
+            /^(insertion|deletion|format-change)/.test(
+              ((event.target as HTMLElement).parentNode as HTMLElement).className
+            ) ||
+            /^(insertion|deletion|format-change)/.test((event.target as any).parentNode?.parentNode?.className);
           if (isSuggestion) {
             renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
             return true;
@@ -105,16 +103,16 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
     // a plugin to display icons to the right of each paragraph and header
     new Plugin({
       state: {
-        init (_, state) {
+        init(_, state) {
           return getDecorations(state);
         },
-        apply (tr, old, _, editorState) {
+        apply(tr, old, _, editorState) {
           // listen for 'track' event so that we update the decorations
           return tr.docChanged ? getDecorations(editorState) : old;
         }
       },
       props: {
-        decorations (state: EditorState) {
+        decorations(state: EditorState) {
           return this.getState(state);
         },
         handleClickOn: (view, pos: number, node, nodePos, event) => {
@@ -140,25 +138,28 @@ export function plugins ({ onSelectionSet, key, readOnly, userId, username }:
   ];
 }
 
-function getDecorations (state: EditorState) {
-
+function getDecorations(state: EditorState) {
   const rows = getEventsFromDoc({ state });
-  const decorations: Decoration[] = rows.map(row => {
+  const decorations: Decoration[] = rows.map((row) => {
     // inject decoration at the start of the paragraph/header
     const widgetPos = row.pos + 1;
     const firstMarkPos = row.marks[0].pos;
-    return Decoration.widget(widgetPos, () => renderComponent({
-      rowPos: row.pos,
-      firstMarkPos,
-      count: row.marks.length
-    }), { key: widgetPos.toString(), side: -1 });
+    return Decoration.widget(
+      widgetPos,
+      () =>
+        renderComponent({
+          rowPos: row.pos,
+          firstMarkPos,
+          count: row.marks.length
+        }),
+      { key: widgetPos.toString(), side: -1 }
+    );
   });
 
   return DecorationSet.create(state.doc, decorations);
 }
 
-function renderComponent ({ rowPos, firstMarkPos, count }: { rowPos: number, firstMarkPos: number, count: number }) {
-
+function renderComponent({ rowPos, firstMarkPos, count }: { rowPos: number; firstMarkPos: number; count: number }) {
   const container = document.createElement('div');
   container.className = 'charm-row-decoration-suggestions charm-row-decoration';
   container.setAttribute('data-pos', rowPos.toString());

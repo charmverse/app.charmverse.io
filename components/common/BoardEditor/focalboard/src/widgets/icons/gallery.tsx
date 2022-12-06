@@ -1,7 +1,6 @@
+import type { SVGProps } from 'react';
 
-import React from 'react';
-
-export default function GalleryIcon (): JSX.Element {
+export default function GalleryIcon(props: SVGProps<any>): JSX.Element {
   return (
     <svg
       width='24'
@@ -10,6 +9,7 @@ export default function GalleryIcon (): JSX.Element {
       fill='currentColor'
       xmlns='http://www.w3.org/2000/svg'
       className='GalleryIcon Icon'
+      {...props}
     >
       <g opacity='0.8'>
         <path
@@ -20,6 +20,5 @@ export default function GalleryIcon (): JSX.Element {
         />
       </g>
     </svg>
-
   );
 }

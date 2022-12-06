@@ -19,75 +19,81 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
   const board = TestBlockFactory.createBoard();
   const activeView = TestBlockFactory.createBoardView(board);
   const card = TestBlockFactory.createCard(board);
-  const option:IPropertyOption = {
+  const option: IPropertyOption = {
     id: 'id1',
     value: 'propOption',
     color: 'propColorDefault'
   };
-  beforeAll(() => {
-
-  });
+  beforeAll(() => {});
   test('should match snapshot', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanHiddenColumnItem
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        readOnly={false}
-        onDrop={jest.fn()}
-        intl={intl}
-      />
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          readOnly={false}
+          onDrop={jest.fn()}
+          intl={intl}
+        />
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot readonly', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanHiddenColumnItem
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        readOnly={true}
-        onDrop={jest.fn()}
-        intl={intl}
-      />
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          readOnly={true}
+          onDrop={jest.fn()}
+          intl={intl}
+        />
+      )
+    );
     expect(container).toMatchSnapshot();
   });
   test('return kanbanHiddenColumnItem and click menuwrapper', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanHiddenColumnItem
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        readOnly={false}
-        onDrop={jest.fn()}
-        intl={intl}
-      />
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          readOnly={false}
+          onDrop={jest.fn()}
+          intl={intl}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).not.toBeNull();
     userEvent.click(buttonMenuWrapper);
     expect(container).toMatchSnapshot();
   });
   test('return kanbanHiddenColumnItem, click menuwrapper and click show', () => {
-    const { container } = render(wrapDNDIntl(
-      <KanbanHiddenColumnItem
-        activeView={activeView}
-        group={{
-          option,
-          cards: [card]
-        }}
-        readOnly={false}
-        onDrop={jest.fn()}
-        intl={intl}
-      />
-    ));
+    const { container } = render(
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem
+          activeView={activeView}
+          group={{
+            option,
+            cards: [card]
+          }}
+          readOnly={false}
+          onDrop={jest.fn()}
+          intl={intl}
+        />
+      )
+    );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
     expect(buttonMenuWrapper).not.toBeNull();
     userEvent.click(buttonMenuWrapper);

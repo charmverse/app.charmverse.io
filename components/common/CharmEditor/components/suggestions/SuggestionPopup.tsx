@@ -14,27 +14,33 @@ import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';
 import type { SuggestionPluginState } from './suggestions.plugins';
 
-export default function SuggestionsPopup ({ pluginKey, readOnly }: { pluginKey: PluginKey<SuggestionPluginState>, readOnly: boolean }) {
+export default function SuggestionsPopup({
+  pluginKey,
+  readOnly
+}: {
+  pluginKey: PluginKey<SuggestionPluginState>;
+  readOnly: boolean;
+}) {
   const view = useEditorViewContext();
-  const {
-    tooltipContentDOM,
-    show: isVisible,
-    rowPos
-  } = usePluginState(pluginKey) as SuggestionPluginState;
+  const { tooltipContentDOM, show: isVisible, rowPos } = usePluginState(pluginKey) as SuggestionPluginState;
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
 
-  const isInPageDialog = (new URLSearchParams(window.location.href)).get('cardId');
+  const isInPageDialog = new URLSearchParams(window.location.href).get('cardId');
   const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || isInPageDialog) && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });
-    const activeSuggestion = rows.map(row => row.marks).flat().find(mark => mark.active);
-    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find(row => row.pos === rowPos)?.marks ?? [];
+    const activeSuggestion = rows
+      .map((row) => row.marks)
+      .flat()
+      .find((mark) => mark.active);
+    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find((row) => row.pos === rowPos)?.marks ?? [];
     return createPortal(
-      <ClickAwayListener onClickAway={() => {
-        hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
-      }}
+      <ClickAwayListener
+        onClickAway={() => {
+          hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
+        }}
       >
         <Grow
           in
@@ -47,7 +53,7 @@ export default function SuggestionsPopup ({ pluginKey, readOnly }: { pluginKey: 
           timeout={250}
         >
           <Box display='flex' flexDirection='column' gap={1}>
-            {suggestions.map(suggestion => (
+            {suggestions.map((suggestion) => (
               // dont show suggestion card as active when inside popup
               <ThreadContainer key={suggestion.pos + suggestion.type} elevation={4} sx={{ background: 'transparent' }}>
                 <SuggestionCard

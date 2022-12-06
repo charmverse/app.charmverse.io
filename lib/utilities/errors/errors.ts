@@ -1,22 +1,22 @@
-
 // Subset of error types from @mui/material/Alert
 export type ErrorSeverity = 'warning' | 'error';
 
 const ErrorCodes = {
-  Unknown: 500,
-  'Invalid input': 400,
-  'Unable to respond': 421,
-  'Undesirable operation': 400,
   'Duplicate data': 400,
-  'Data not found': 404,
+  'Invalid input': 400,
+  'Undesirable operation': 400,
   'Maximum size exceeded': 400,
   'Access denied': 401,
   'Insecure operation': 401,
+  'Data not found': 404,
+  Conflict: 409,
+  'Unable to respond': 421,
   'External service': 500,
+  Unknown: 500,
   'Unexpected result': 500
 };
 
-type ErrorType = keyof typeof ErrorCodes
+type ErrorType = keyof typeof ErrorCodes;
 
 /**
  * @error used for providing structured JSON or a stack trace
@@ -30,10 +30,10 @@ export interface ISystemError<E = any> {
   error: E;
 }
 
-export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> & Partial<Pick<ISystemError<E>, 'severity' | 'error'>>
+export type ISystemErrorInput<E = any> = Pick<ISystemError<E>, 'message' | 'errorType'> &
+  Partial<Pick<ISystemError<E>, 'severity' | 'error'>>;
 
 export class SystemError<E = any> implements ISystemError<E> {
-
   code: number;
 
   errorType: ErrorType;
@@ -46,21 +46,19 @@ export class SystemError<E = any> implements ISystemError<E> {
 
   error: E;
 
-  constructor (errorInfo: ISystemErrorInput<E>) {
+  constructor(errorInfo: ISystemErrorInput<E>) {
     this.errorType = errorInfo.errorType;
     this.code = ErrorCodes[this.errorType];
     this.message = errorInfo.message;
     this.errorConstructor = this.constructor.name;
     this.severity = errorInfo.severity ?? 'error';
-    this.error = errorInfo.error ?? {} as any;
+    this.error = errorInfo.error ?? ({} as any);
   }
-
 }
 
 // Common Errors
 export class InvalidInputError extends SystemError {
-
-  constructor (message: string) {
+  constructor(message: string) {
     super({
       message,
       errorType: 'Invalid input',
@@ -70,7 +68,7 @@ export class InvalidInputError extends SystemError {
 }
 
 export class DataNotFoundError extends SystemError {
-  constructor (message: string = 'Data not found') {
+  constructor(message: string = 'Data not found') {
     super({
       message,
       errorType: 'Data not found',
@@ -80,7 +78,7 @@ export class DataNotFoundError extends SystemError {
 }
 
 export class ExternalServiceError extends SystemError {
-  constructor (message: string = 'Something went wrong with an external service.') {
+  constructor(message: string = 'Something went wrong with an external service.') {
     super({
       message,
       errorType: 'External service',
@@ -90,7 +88,7 @@ export class ExternalServiceError extends SystemError {
 }
 
 export class UnknownError extends SystemError {
-  constructor (err?: any) {
+  constructor(err?: any) {
     super({
       message: 'Something went wrong.',
       errorType: 'Unknown',
@@ -101,7 +99,7 @@ export class UnknownError extends SystemError {
 }
 
 export class UnauthorisedActionError extends SystemError {
-  constructor (message = 'You do not have access to perform this action.') {
+  constructor(message = 'You do not have access to perform this action.') {
     super({
       message,
       errorType: 'Access denied',
@@ -111,7 +109,7 @@ export class UnauthorisedActionError extends SystemError {
 }
 
 export class InsecureOperationError extends SystemError {
-  constructor (message = 'Insecure operation cannot be performed.') {
+  constructor(message = 'Insecure operation cannot be performed.') {
     super({
       message,
       errorType: 'Access denied',
@@ -121,7 +119,7 @@ export class InsecureOperationError extends SystemError {
 }
 
 export class UndesirableOperationError extends SystemError {
-  constructor (message = 'This operation should not be performed.') {
+  constructor(message = 'This operation should not be performed.') {
     super({
       message,
       errorType: 'Undesirable operation',
@@ -131,7 +129,7 @@ export class UndesirableOperationError extends SystemError {
 }
 
 export class MissingWeb3AccountError extends SystemError {
-  constructor () {
+  constructor() {
     super({
       message: 'No connected wallet detected. This is required to proceed.',
       errorType: 'Invalid input',
@@ -141,10 +139,30 @@ export class MissingWeb3AccountError extends SystemError {
 }
 
 export class MissingWeb3SignatureError extends SystemError {
-  constructor () {
+  constructor() {
     super({
       message: 'This operation requires a signature from your connected wallet.',
       errorType: 'Insecure operation',
+      severity: 'warning'
+    });
+  }
+}
+
+export class DataConflictError extends SystemError {
+  constructor(message = 'Data conflict') {
+    super({
+      message,
+      errorType: 'Conflict',
+      severity: 'warning'
+    });
+  }
+}
+
+export class BrowserPopupError extends SystemError {
+  constructor(message = 'Popup could not be opened') {
+    super({
+      message,
+      errorType: 'Unknown',
       severity: 'warning'
     });
   }

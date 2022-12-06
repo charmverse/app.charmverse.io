@@ -1,25 +1,25 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import { useWeb3React } from '@web3-react/core';
 import type { Blockchain } from 'connectors';
 import { RPC } from 'connectors';
 
 import Button from 'components/common/Button';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { greyColor2 } from 'theme/colors';
 
 type Props = {
   chain: Blockchain;
   requestNetworkChange: () => void;
-}
+};
 
 const ImageIcon = styled.img`
   width: auto;
   height: 1.5rem;
 `;
 
-function NetworkButton ({ chain, requestNetworkChange }: Props) {
-  const { chainId } = useWeb3React();
+function NetworkButton({ chain, requestNetworkChange }: Props) {
+  const { chainId } = useWeb3AuthSig();
 
   const isCurrentChain = RPC[chain].chainId === chainId;
 
@@ -31,10 +31,10 @@ function NetworkButton ({ chain, requestNetworkChange }: Props) {
     >
       <Box>
         <Button
-          startIcon={(
+          startIcon={
             // @ts-ignore
             <ImageIcon src={RPC[chain]?.iconUrl} />
-          )}
+          }
           color='secondary'
           variant='outlined'
           disabled={isCurrentChain}

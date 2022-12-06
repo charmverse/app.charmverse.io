@@ -18,8 +18,7 @@ interface Props {
   children: (state: State) => JSX.Element;
 }
 
-export default function DiscordProvider ({ children }: Props) {
-
+export default function DiscordProvider({ children }: Props) {
   const { user, setUser } = useUser();
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
@@ -31,27 +30,28 @@ export default function DiscordProvider ({ children }: Props) {
 
   const connectedWithDiscord = Boolean(user?.discordUser);
 
-  async function connect () {
+  async function connect() {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
         await disconnect();
-      }
-      else {
-        window.location.replace(`/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`);
+      } else {
+        window.location.replace(
+          `/api/discord/oauth?redirect=${encodeURIComponent(window.location.href.split('?')[0])}&type=connect`
+        );
       }
     }
     setIsDisconnectingDiscord(false);
   }
 
-  function disconnect () {
-
+  function disconnect() {
     setIsDisconnectingDiscord(true);
 
-    return charmClient.disconnectDiscord()
+    return charmClient
+      .disconnectDiscord()
       .then(() => {
         setUser({ ...user, discordUser: null });
       })
-      .catch(error => {
+      .catch((error) => {
         log.warn('Error disconnecting from discord', error);
       })
       .finally(() => {
@@ -70,14 +70,14 @@ export default function DiscordProvider ({ children }: Props) {
   useEffect(() => {
     // Connection with discord
     if (authCode && user) {
-
       deleteCookie(AUTH_CODE_COOKIE);
       setIsConnectDiscordLoading(true);
 
-      charmClient.connectDiscord({
-        code: authCode
-      })
-        .then(updatedUserFields => {
+      charmClient
+        .connectDiscord({
+          code: authCode
+        })
+        .then((updatedUserFields) => {
           setUser({ ...user, ...updatedUserFields });
         })
         .catch((err) => {

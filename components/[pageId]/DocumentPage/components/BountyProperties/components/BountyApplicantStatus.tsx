@@ -1,4 +1,3 @@
-
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Tooltip, Typography } from '@mui/material';
 import type { Application } from '@prisma/client';
@@ -11,8 +10,7 @@ interface Props {
   submission: ApplicationWithTransactions | Application;
 }
 
-export default function BountyApplicantActions ({ submission }: Props) {
-
+export default function BountyApplicantActions({ submission }: Props) {
   const transaction = (submission as ApplicationWithTransactions).transactions[0];
 
   return (
@@ -61,7 +59,6 @@ export default function BountyApplicantActions ({ submission }: Props) {
           </Tooltip>
         </Link>
       )}
-
     </>
   );
 }

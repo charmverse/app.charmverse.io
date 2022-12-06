@@ -8,16 +8,14 @@ import configureStore from 'redux-mock-store';
 
 import type { Block } from './blocks/block';
 
-export const wrapIntl = (children?: React.ReactNode): JSX.Element => <IntlProvider locale='en'>{children}</IntlProvider>;
+export const wrapIntl = (children?: React.ReactNode): JSX.Element => (
+  <IntlProvider locale='en'>{children}</IntlProvider>
+);
 export const wrapDNDIntl = (children?: React.ReactNode): JSX.Element => {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      {wrapIntl(children)}
-    </DndProvider>
-  );
+  return <DndProvider backend={HTML5Backend}>{wrapIntl(children)}</DndProvider>;
 };
 
-export function mockDOM (): void {
+export function mockDOM(): void {
   window.focus = jest.fn();
   document.createRange = () => {
     const range = new Range();
@@ -32,7 +30,7 @@ export function mockDOM (): void {
     return range;
   };
 }
-export function mockMatchMedia (result: { matches: boolean }): void {
+export function mockMatchMedia(result: { matches: boolean }): void {
   // We check if system preference is dark or light theme.
   // This is required to provide it's definition since
   // window.matchMedia doesn't exist in Jest.
@@ -48,14 +46,14 @@ export function mockMatchMedia (result: { matches: boolean }): void {
   });
 }
 
-export function mockStateStore (middleware:Middleware[], state:unknown): MockStoreEnhanced<unknown, unknown> {
+export function mockStateStore(middleware: Middleware[], state: unknown): MockStoreEnhanced<unknown, unknown> {
   const mockStore = configureStore(middleware);
   return mockStore(state);
 }
 
-export type BlocksById<BlockType> = { [key: string]: BlockType }
+export type BlocksById<BlockType> = { [key: string]: BlockType };
 
-export function blocksById<BlockType extends Block> (blocks: BlockType[]): BlocksById<BlockType> {
+export function blocksById<BlockType extends Block>(blocks: BlockType[]): BlocksById<BlockType> {
   return blocks.reduce((res, block) => {
     res[block.id] = block;
     return res;

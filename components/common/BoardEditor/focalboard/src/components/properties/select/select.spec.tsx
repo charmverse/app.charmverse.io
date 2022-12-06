@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +8,7 @@ import { wrapIntl } from '../../../testUtils';
 
 import Select from './select';
 
-function selectPropertyTemplate (): IPropertyTemplate {
+function selectPropertyTemplate(): IPropertyTemplate {
   return {
     id: 'select-template',
     name: 'select',
@@ -34,7 +33,7 @@ function selectPropertyTemplate (): IPropertyTemplate {
   };
 }
 
-function selectCallbacks () {
+function selectCallbacks() {
   return {
     onCreate: jest.fn(),
     onChange: jest.fn(),
@@ -53,15 +52,17 @@ describe('components/properties/select', () => {
     const propertyTemplate = selectPropertyTemplate();
     const option = propertyTemplate.options[0];
 
-    const { container } = render(wrapIntl(
-      <Select
-        emptyValue=''
-        propertyTemplate={propertyTemplate}
-        propertyValue={option.id}
-        isEditable={false}
-        {...selectCallbacks()}
-      />
-    ));
+    const { container } = render(
+      wrapIntl(
+        <Select
+          emptyValue=''
+          propertyTemplate={propertyTemplate}
+          propertyValue={option.id}
+          isEditable={false}
+          {...selectCallbacks()}
+        />
+      )
+    );
 
     expect(screen.getByText(option.value)).toBeInTheDocument();
     expect(clearButton()).not.toBeInTheDocument();
@@ -73,15 +74,17 @@ describe('components/properties/select', () => {
     const propertyTemplate = selectPropertyTemplate();
     const emptyValue = 'Empty';
 
-    const { container } = render(wrapIntl(
-      <Select
-        emptyValue={emptyValue}
-        propertyTemplate={propertyTemplate}
-        propertyValue=''
-        isEditable={false}
-        {...selectCallbacks()}
-      />
-    ));
+    const { container } = render(
+      wrapIntl(
+        <Select
+          emptyValue={emptyValue}
+          propertyTemplate={propertyTemplate}
+          propertyValue=''
+          isEditable={false}
+          {...selectCallbacks()}
+        />
+      )
+    );
 
     expect(screen.getByText(emptyValue)).toBeInTheDocument();
     expect(clearButton()).not.toBeInTheDocument();
@@ -93,15 +96,17 @@ describe('components/properties/select', () => {
     const propertyTemplate = selectPropertyTemplate();
     const selected = propertyTemplate.options[1];
 
-    render(wrapIntl(
-      <Select
-        emptyValue=''
-        propertyTemplate={propertyTemplate}
-        propertyValue={selected.id}
-        isEditable={true}
-        {...selectCallbacks()}
-      />
-    ));
+    render(
+      wrapIntl(
+        <Select
+          emptyValue=''
+          propertyTemplate={propertyTemplate}
+          propertyValue={selected.id}
+          isEditable={true}
+          {...selectCallbacks()}
+        />
+      )
+    );
 
     userEvent.click(screen.getByTestId(nonEditableSelectTestId));
 
@@ -122,16 +127,18 @@ describe('components/properties/select', () => {
     const optionToSelect = propertyTemplate.options[2];
     const onChange = jest.fn();
 
-    render(wrapIntl(
-      <Select
-        emptyValue='Empty'
-        propertyTemplate={propertyTemplate}
-        propertyValue=''
-        isEditable={true}
-        {...selectCallbacks()}
-        onChange={onChange}
-      />
-    ));
+    render(
+      wrapIntl(
+        <Select
+          emptyValue='Empty'
+          propertyTemplate={propertyTemplate}
+          propertyValue=''
+          isEditable={true}
+          {...selectCallbacks()}
+          onChange={onChange}
+        />
+      )
+    );
 
     userEvent.click(screen.getByTestId(nonEditableSelectTestId));
     userEvent.click(screen.getByText(optionToSelect.value));
@@ -145,16 +152,18 @@ describe('components/properties/select', () => {
     const selected = propertyTemplate.options[1];
     const onDeleteValue = jest.fn();
 
-    render(wrapIntl(
-      <Select
-        emptyValue='Empty'
-        propertyTemplate={propertyTemplate}
-        propertyValue={selected.id}
-        isEditable={true}
-        {...selectCallbacks()}
-        onDeleteValue={onDeleteValue}
-      />
-    ));
+    render(
+      wrapIntl(
+        <Select
+          emptyValue='Empty'
+          propertyTemplate={propertyTemplate}
+          propertyValue={selected.id}
+          isEditable={true}
+          {...selectCallbacks()}
+          onDeleteValue={onDeleteValue}
+        />
+      )
+    );
 
     userEvent.click(screen.getByTestId(nonEditableSelectTestId));
 
@@ -171,16 +180,18 @@ describe('components/properties/select', () => {
     const newOption = 'new-option';
     const onCreate = jest.fn();
 
-    render(wrapIntl(
-      <Select
-        emptyValue='Empty'
-        propertyTemplate={propertyTemplate}
-        propertyValue={initialOption.id}
-        isEditable={true}
-        {...selectCallbacks()}
-        onCreate={onCreate}
-      />
-    ));
+    render(
+      wrapIntl(
+        <Select
+          emptyValue='Empty'
+          propertyTemplate={propertyTemplate}
+          propertyValue={initialOption.id}
+          isEditable={true}
+          {...selectCallbacks()}
+          onCreate={onCreate}
+        />
+      )
+    );
 
     userEvent.click(screen.getByTestId(nonEditableSelectTestId));
     userEvent.type(screen.getByRole('textbox', { name: /value selector/i }), `${newOption}{enter}`);

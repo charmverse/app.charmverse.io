@@ -1,4 +1,3 @@
-
 import * as client from './collablandClient';
 
 interface DiscordRoleSubject extends client.DiscordRoleSubject {
@@ -17,7 +16,9 @@ export interface VerifiedCredential<T> {
   subject: T;
 }
 
-function isBountyEventCredential (cred: client.AnyCredentialType['verifiableCredential']): cred is client.CollablandBountyEvent['verifiableCredential'] {
+function isBountyEventCredential(
+  cred: client.AnyCredentialType['verifiableCredential']
+): cred is client.CollablandBountyEvent['verifiableCredential'] {
   return cred.credentialSubject.hasOwnProperty('bountyId');
 }
 
@@ -26,8 +27,7 @@ export interface CredentialsResult {
   discordEvents: VerifiedCredential<DiscordRoleSubject>[];
 }
 
-export async function getCredentials ({ aeToken }: { aeToken: string }): Promise<CredentialsResult> {
-
+export async function getCredentials({ aeToken }: { aeToken: string }): Promise<CredentialsResult> {
   const res = await client.getCredentials({ aeToken });
 
   const bountyEvents: CredentialsResult['bountyEvents'] = [];
@@ -41,8 +41,7 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
         type: verifiableCredential.type,
         subject: verifiableCredential.credentialSubject
       });
-    }
-    else {
+    } else {
       discordEvents.push({
         id: verifiableCredential.id,
         createdAt: verifiableCredential.issuanceDate,
@@ -50,31 +49,31 @@ export async function getCredentials ({ aeToken }: { aeToken: string }): Promise
         subject: {
           ...verifiableCredential.credentialSubject,
           discordRoles: [],
-          expiresAt: verifiableCredential.credentialSubject.exp ? new Date(verifiableCredential.credentialSubject.exp).toISOString() : null
+          expiresAt: verifiableCredential.credentialSubject.exp
+            ? new Date(verifiableCredential.credentialSubject.exp).toISOString()
+            : null
         }
       });
     }
   });
 
-  bountyEvents
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  bountyEvents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  discordEvents
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  discordEvents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // group Discord VCs by role
   const discordEventsGrouped = discordEvents.reduce<CredentialsResult['discordEvents']>((newList, curr) => {
     const last = newList[newList.length - 1];
     // if previous VC was the same server and <24 hours, just append the roles
     const lastIsSameServer = last && last.subject.discordGuildId === curr.subject.discordGuildId;
-    const lastIsRecent = last && new Date(last.createdAt).getTime() > new Date(curr.createdAt).getTime() - (24 * 60 * 60 * 1000);
+    const lastIsRecent =
+      last && new Date(last.createdAt).getTime() > new Date(curr.createdAt).getTime() - 24 * 60 * 60 * 1000;
     if (lastIsSameServer && lastIsRecent) {
       last.subject.discordRoles.push({
         id: curr.subject.discordRoleId,
         name: curr.subject.discordRoleName
       });
-    }
-    else {
+    } else {
       newList.push(curr);
     }
     return newList;

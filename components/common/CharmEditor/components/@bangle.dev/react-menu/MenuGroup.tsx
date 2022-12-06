@@ -3,14 +3,16 @@ import React from 'react';
 
 const StyledMenuGroup = styled.div<{ keepBorder: boolean }>`
   display: flex;
-  ${props => props.keepBorder && `
+  ${(props) =>
+    props.keepBorder &&
+    `
     border-right: 1.5px solid ${props.theme.palette.divider};
     padding-right: ${props.theme.spacing(0.5)};
     margin-right: ${props.theme.spacing(0.5)};
   `}
 `;
 
-export function MenuGroup ({
+export function MenuGroup({
   className = '',
   children,
   isLastGroup = false
@@ -19,5 +21,9 @@ export function MenuGroup ({
   children: React.ReactNode;
   isLastGroup?: boolean;
 }) {
-  return <StyledMenuGroup keepBorder={!isLastGroup} className={className}>{children}</StyledMenuGroup>;
+  return (
+    <StyledMenuGroup keepBorder={!isLastGroup} className={className}>
+      {children}
+    </StyledMenuGroup>
+  );
 }

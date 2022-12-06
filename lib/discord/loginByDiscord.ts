@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 } from 'uuid';
 
 import { isProdEnv } from 'config/constants';
 import { prisma } from 'db';
@@ -9,12 +9,24 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
-import { IDENTITY_TYPES } from 'models';
 
-export default async function loginByDiscord ({ code, hostName, discordApiUrl }: { code: string, hostName?: string, discordApiUrl?: string }) {
-
+export default async function loginByDiscord({
+  code,
+  hostName,
+  discordApiUrl,
+  userId = v4()
+}: {
+  code: string;
+  hostName?: string;
+  discordApiUrl?: string;
+  userId?: string;
+}) {
   const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
-  const discordAccount = await getDiscordAccount({ code, discordApiUrl, redirectUrl: `${domain}/api/discord/callback` });
+  const discordAccount = await getDiscordAccount({
+    code,
+    discordApiUrl,
+    redirectUrl: `${domain}/api/discord/callback`
+  });
   const discordUser = await prisma.discordUser.findUnique({
     where: {
       discordId: discordAccount.id
@@ -29,18 +41,19 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
   if (discordUser) {
     trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
-  }
-  else {
-
+  } else {
     const { id, ...rest } = discordAccount;
-    const avatarUrl = discordAccount.avatar ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png` : undefined;
+    const avatarUrl = discordAccount.avatar
+      ? `https://cdn.discordapp.com/avatars/${discordAccount.id}/${discordAccount.avatar}.png`
+      : undefined;
     let avatar: string | null = null;
-    const userId = uuid();
     if (avatarUrl) {
       try {
-        ({ url: avatar } = await uploadUrlToS3({ pathInS3: getUserS3FilePath({ userId, url: avatarUrl }), url: avatarUrl }));
-      }
-      catch (error) {
+        ({ url: avatar } = await uploadUrlToS3({
+          pathInS3: getUserS3FilePath({ userId, url: avatarUrl }),
+          url: avatarUrl
+        }));
+      } catch (error) {
         log.warn('Error while uploading avatar to S3', error);
       }
     }
@@ -49,7 +62,7 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
       data: {
         id: userId,
         username: discordAccount.username,
-        identityType: IDENTITY_TYPES[1],
+        identityType: 'Discord',
         avatar,
         discordUser: {
           create: {
@@ -68,4 +81,3 @@ export default async function loginByDiscord ({ code, hostName, discordApiUrl }:
     return newUser;
   }
 }
-

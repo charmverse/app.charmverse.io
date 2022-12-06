@@ -1,4 +1,3 @@
-
 import type { Prisma, Role, SpacePermission, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,23 +9,24 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireSpaceMembership({ adminOnly: false }))
   .get(listSpaceRoles)
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
 
-export type ListSpaceRolesResponse = (Pick<Role, 'id' | 'name' | 'source'> & {
+export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
   spaceRolesToRole: {
-      spaceRole: {
-          user: User;
-      };
+    spaceRole: {
+      user: User;
+    };
   }[];
   spacePermissions: SpacePermission[];
-})
+};
 
-async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
+async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
   const { spaceId } = req.query;
 
   if (!spaceId) {
@@ -65,7 +65,7 @@ async function listSpaceRoles (req: NextApiRequest, res: NextApiResponse<ListSpa
   return res.status(200).json(roles);
 }
 
-async function createRole (req: NextApiRequest, res: NextApiResponse<Role>) {
+async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
   const data = req.body as Role;
 
   const creationData = {

@@ -6,8 +6,7 @@ import { replaceNestedPages } from 'components/common/CharmEditor/components/nes
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { Page, PageContent } from 'models';
 
-export async function generateMarkdown (page: Page, withTitle: boolean = false): Promise<string> {
-
+export async function generateMarkdown(page: Page, withTitle: boolean = false): Promise<string> {
   if (page) {
     const serializer = markdownSerializer(specRegistry);
 

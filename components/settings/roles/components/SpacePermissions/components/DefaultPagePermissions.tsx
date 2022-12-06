@@ -13,6 +13,7 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaces } from 'hooks/useSpaces';
 import type { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
 
@@ -24,9 +25,9 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, strin
   view: 'Workspace members can only view pages.'
 };
 
-export default function DefaultSpacePagePermissions () {
-
-  const [space, setSpace] = useCurrentSpace();
+export default function DefaultSpacePagePermissions() {
+  const space = useCurrentSpace();
+  const { setSpace } = useSpaces();
 
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
@@ -35,12 +36,15 @@ export default function DefaultSpacePagePermissions () {
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
 
   // Permission states
-  const [selectedPagePermission, setSelectedPagePermission] = useState<PagePermissionLevelWithoutCustom>(space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustom ?? 'full_access');
+  const [selectedPagePermission, setSelectedPagePermission] = useState<PagePermissionLevelWithoutCustom>(
+    (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustom) ?? 'full_access'
+  );
   const [defaultPublicPages, setDefaultPublicPages] = useState<boolean>(space?.defaultPublicPages ?? false);
 
-  const settingsChanged = space?.defaultPublicPages !== defaultPublicPages || selectedPagePermission !== space?.defaultPagePermissionGroup;
+  const settingsChanged =
+    space?.defaultPublicPages !== defaultPublicPages || selectedPagePermission !== space?.defaultPagePermissionGroup;
 
-  async function updateSpaceDefaultPagePermission () {
+  async function updateSpaceDefaultPagePermission() {
     if (space && selectedPagePermission !== space?.defaultPagePermissionGroup) {
       setIsUpdatingPagePermission(true);
       const updatedSpace = await charmClient.setDefaultPagePermission({
@@ -53,7 +57,7 @@ export default function DefaultSpacePagePermissions () {
     }
   }
 
-  async function updateSpaceDefaultPublicPages () {
+  async function updateSpaceDefaultPublicPages() {
     if (space && defaultPublicPages !== space?.defaultPublicPages) {
       const updatedSpace = await charmClient.setDefaultPublicPages({
         defaultPublicPages,
@@ -64,7 +68,7 @@ export default function DefaultSpacePagePermissions () {
     }
   }
 
-  function updateSpaceDefaults () {
+  function updateSpaceDefaults() {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
     setTouched(false);
@@ -104,9 +108,7 @@ export default function DefaultSpacePagePermissions () {
               sx: { width: 300 }
             }}
           >
-            {
-            (Object.keys(pagePermissionDescriptions) as PagePermissionLevelWithoutCustom[]).map(permissionLevel => {
-
+            {(Object.keys(pagePermissionDescriptions) as PagePermissionLevelWithoutCustom[]).map((permissionLevel) => {
               const permissionLevelLabel = permissionLevels[permissionLevel];
               const isSelected = selectedPagePermission === permissionLevel;
               const description = pagePermissionDescriptions[permissionLevel];
@@ -121,19 +123,17 @@ export default function DefaultSpacePagePermissions () {
                     setTouched(true);
                   }}
                 >
-                  <StyledListItemText
-                    primary={permissionLevelLabel}
-                    secondary={description}
-                  />
+                  <StyledListItemText primary={permissionLevelLabel} secondary={description} />
                 </MenuItem>
               );
-            })
-          }
-
+            })}
           </Menu>
         </Grid>
         <Grid item xs={6}>
-          <Typography variant='body2' sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
+          <Typography
+            variant='body2'
+            sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
+          >
             {pagePermissionDescriptions[selectedPagePermission]}
           </Typography>
         </Grid>
@@ -142,7 +142,7 @@ export default function DefaultSpacePagePermissions () {
       <Grid container item xs>
         <Grid item xs={6}>
           <FormControlLabel
-            control={(
+            control={
               <Switch
                 disabled={!isAdmin}
                 onChange={(ev) => {
@@ -152,32 +152,35 @@ export default function DefaultSpacePagePermissions () {
                 }}
                 defaultChecked={defaultPublicPages}
               />
-            )}
+            }
             label='Accessible to public'
           />
         </Grid>
         <Grid item xs={6}>
-          <Typography sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }} variant='body2'>
-            {
-            defaultPublicPages === true && ('New top-level pages will be viewable by the public.')
-          }
-            {
-            defaultPublicPages === false && ('New top-level pages can only be seen by workspace members.')
-          }
+          <Typography
+            sx={{ height: '100%', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}
+            variant='body2'
+          >
+            {defaultPublicPages === true && 'New top-level pages will be viewable by the public.'}
+            {defaultPublicPages === false && 'New top-level pages can only be seen by workspace members.'}
           </Typography>
         </Grid>
-
       </Grid>
 
-      {
-        isAdmin && (
-          <Grid item xs>
-            <Button onClick={() => updateSpaceDefaults()} disabled={!settingsChanged || isUpdatingPagePermission} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
-          </Grid>
-        )
-      }
-
+      {isAdmin && (
+        <Grid item xs>
+          <Button
+            onClick={() => updateSpaceDefaults()}
+            disabled={!settingsChanged || isUpdatingPagePermission}
+            type='submit'
+            variant='contained'
+            color='primary'
+            sx={{ mr: 1 }}
+          >
+            Save
+          </Button>
+        </Grid>
+      )}
     </Grid>
-
   );
 }

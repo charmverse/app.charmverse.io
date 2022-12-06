@@ -14,10 +14,10 @@ import Modal from '../modal';
 import FilterEntry from './filterEntry';
 
 type Props = {
-    board: Board;
-    activeView: BoardView;
-    onClose: () => void;
-}
+  board: Board;
+  activeView: BoardView;
+  onClose: () => void;
+};
 
 const FilterComponent = React.memo((props: Props): JSX.Element => {
   const conditionClicked = (optionId: string, filter: FilterClause): void => {
@@ -39,7 +39,8 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
   const addFilterClicked = () => {
     const { board, activeView } = props;
 
-    const filters = activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[] || [];
+    const filters =
+      (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
     const filterGroup = createFilterGroup(activeView.fields.filter);
     const filter = createFilterClause();
 
@@ -57,15 +58,12 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
 
   const { board, activeView } = props;
 
-  const filters: FilterClause[] = activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[] || [];
+  const filters: FilterClause[] =
+    (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
   return (
-    <Modal
-      onClose={props.onClose}
-    >
-      <div
-        className='FilterComponent'
-      >
+    <Modal onClose={props.onClose}>
+      <div className='FilterComponent'>
         {filters.map((filter) => (
           <FilterEntry
             key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
@@ -77,10 +75,7 @@ const FilterComponent = React.memo((props: Props): JSX.Element => {
         ))}
 
         <Button onClick={() => addFilterClicked()}>
-          <FormattedMessage
-            id='FilterComponent.add-filter'
-            defaultMessage='+ Add filter'
-          />
+          <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
         </Button>
       </div>
     </Modal>

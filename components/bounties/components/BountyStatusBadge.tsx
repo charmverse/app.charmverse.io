@@ -21,10 +21,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
 import { getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
-import { nanofy } from 'lib/utilities/numbers';
 import type { BrandColor } from 'theme/colors';
 
-const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
+export const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   inProgress: 'In Progress',
@@ -32,7 +31,7 @@ const BOUNTY_STATUS_LABELS: Record<BountyStatus, string> = {
   paid: 'Paid'
 };
 
-const BOUNTY_STATUS_ICONS : Record<BountyStatus, ReactNode> = {
+export const BOUNTY_STATUS_ICONS: Record<BountyStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   inProgress: <AssignmentIndIcon />,
@@ -81,18 +80,18 @@ export const BOUNTY_ACTION_COLORS: Record<BountyTaskAction, BrandColor> = {
   suggested_bounty: 'purple'
 };
 
-const isBountyStatus = (status: BountyStatus | BountyTaskAction): status is BountyStatus => status in BOUNTY_STATUS_LABELS;
-const isBountyAction = (status: BountyStatus | BountyTaskAction): status is BountyTaskAction => status in BOUNTY_ACTION_LABELS;
+const isBountyStatus = (status: BountyStatus | BountyTaskAction): status is BountyStatus =>
+  status in BOUNTY_STATUS_LABELS;
+const isBountyAction = (status: BountyStatus | BountyTaskAction): status is BountyTaskAction =>
+  status in BOUNTY_ACTION_LABELS;
 
 const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus | BountyTaskAction }>`
   background-color: ${({ status, theme }) => {
     if (isBountyStatus(status)) {
       return theme.palette[BOUNTY_STATUS_COLORS[status]].main;
-    }
-    else if (isBountyAction(status)) {
+    } else if (isBountyAction(status)) {
       return theme.palette[BOUNTY_ACTION_COLORS[status]].main;
-    }
-    else {
+    } else {
       return 'initial';
     }
   }};
@@ -118,10 +117,7 @@ export interface IBountyBadgeProps {
   hideStatus?: boolean;
 }
 
-export function BountyStatusChip ({
-  status,
-  size = 'small'
-}: { size?: ChipProps['size'], status: BountyStatus }) {
+export function BountyStatusChip({ status, size = 'small' }: { size?: ChipProps['size']; status: BountyStatus }) {
   return (
     <StyledBountyStatusChip
       size={size}
@@ -133,10 +129,13 @@ export function BountyStatusChip ({
   );
 }
 
-export function BountyStatusNexusChip ({
+export function BountyStatusNexusChip({
   action,
   size = 'small'
-}: { size?: ChipProps['size'], action: BountyTaskAction }) {
+}: {
+  size?: ChipProps['size'];
+  action: BountyTaskAction;
+}) {
   return (
     <StyledBountyStatusChip
       size={size}
@@ -148,8 +147,13 @@ export function BountyStatusNexusChip ({
   );
 }
 
-export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus, bounty, layout = 'row' } : IBountyBadgeProps) {
-  const [space] = useCurrentSpace();
+export default function BountyStatusBadgeWrapper({
+  truncate = false,
+  hideStatus,
+  bounty,
+  layout = 'row'
+}: IBountyBadgeProps) {
+  const space = useCurrentSpace();
 
   const bountyLink = `/${space?.domain}/bounties/${bounty.id}`;
 
@@ -157,15 +161,16 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus
     return (
       <Grid container direction='column' alignItems='center'>
         <Grid item xs width='100%'>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            width: '100%',
-            justifyContent: 'space-between',
-            gap: 1,
-            alignItems: 'center'
-          }}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: '100%',
+              justifyContent: 'space-between',
+              gap: 1,
+              alignItems: 'center'
+            }}
           >
             <BountyAmount bounty={bounty} truncate={truncate} />
             {!hideStatus && <BountyStatusChip status={bounty.status} />}
@@ -173,8 +178,7 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus
         </Grid>
       </Grid>
     );
-  }
-  else {
+  } else {
     return (
       <Box sx={{ textAlign: 'right' }}>
         <Box display='flex' alignItems='center' justifyContent='space-between'>
@@ -191,9 +195,15 @@ export default function BountyStatusBadgeWrapper ({ truncate = false, hideStatus
   }
 }
 
-export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>, truncate?: boolean }) {
-
+export function BountyAmount({
+  bounty,
+  truncate = false
+}: {
+  bounty: Pick<Bounty, 'rewardAmount' | 'rewardToken' | 'chainId'>;
+  truncate?: boolean;
+}) {
   const [paymentMethods] = usePaymentMethods();
+
   const tokenInfo = getTokenAndChainInfoFromPayments({
     chainId: bounty.chainId,
     methods: paymentMethods,
@@ -202,54 +212,56 @@ export function BountyAmount ({ bounty, truncate = false }: { bounty: Pick<Bount
 
   const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(bounty.rewardAmount);
 
-  const truncatedAmount = bounty.rewardAmount < 1 ? nanofy({ number: bounty.rewardAmount, spaceUnit: false }) : millify(bounty.rewardAmount);
+  const truncatedAmount = () => {
+    try {
+      return millify(bounty.rewardAmount, { precision: 4 });
+    } catch (error) {
+      return 'Invalid number';
+    }
+  };
 
   const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
 
   return (
     <Tooltip arrow placement='top' title={bounty.rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
-
-        {
-            bounty.rewardAmount === 0 ? (
-              <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
-                <Typography
-                  component='span'
-                  sx={{
-                    fontWeight: 600
-                  }}
-                  mr={0.5}
-                  variant='caption'
-
-                >
-                  Reward not set
-                </Typography>
-              </Box>
-            ) : (
-              <>
-                <Box
-                  component='span'
-                  sx={{
-                    width: 25,
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-                </Box>
-                <Typography
-                  component='span'
-                  sx={{
-                    fontWeight: 600
-                  }}
-                  variant='h6'
-                  fontSize={18}
-                >
-                  {truncate ? truncatedAmount : bounty.rewardAmount}
-                </Typography>
-              </>
-            )
-          }
+        {bounty.rewardAmount === 0 ? (
+          <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
+            <Typography
+              component='span'
+              sx={{
+                fontWeight: 600
+              }}
+              mr={0.5}
+              variant='caption'
+            >
+              Reward not set
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <Box
+              component='span'
+              sx={{
+                width: 25,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+            </Box>
+            <Typography
+              component='span'
+              sx={{
+                fontWeight: 600
+              }}
+              variant='h6'
+              fontSize={18}
+            >
+              {truncate ? truncatedAmount() : bounty.rewardAmount}
+            </Typography>
+          </>
+        )}
       </Box>
     </Tooltip>
   );

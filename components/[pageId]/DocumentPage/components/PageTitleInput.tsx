@@ -9,7 +9,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {
-    width: 100%
+    width: 100%;
   }
 
   & .MuiInput-input {
@@ -32,7 +32,7 @@ const StyledPageTitle = styled(TextField)`
   }
 
   & .MuiInput-root:hover:not(.Mui-disabled):before {
-    border: none
+    border: none;
   }
 `;
 
@@ -43,25 +43,29 @@ const StyledReadOnlyTitle = styled(Typography)`
 
 interface PageTitleProps {
   value: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  updatedAt: string; // need this to determine if the title has been updated
+  onChange: (page: { title: string; updatedAt: string }) => void;
   readOnly?: boolean;
 }
 
-export default function PageTitle ({ value, onChange, readOnly }: PageTitleProps) {
+export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, readOnly }: PageTitleProps) {
   const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
   const titleInput = useRef(null);
+  const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
 
-  // sync value with updates if input is not focused
   useEffect(() => {
-    if (document.activeElement !== titleInput.current) {
+    if (updatedAt < updatedAtExternal) {
       setTitle(value);
     }
-  }, [value]);
+  }, [value, updatedAtExternal]);
 
-  function _onChange (event: ChangeEvent<HTMLInputElement>) {
-    setTitle(event.target.value);
-    onChange(event);
+  function _onChange(event: ChangeEvent<HTMLInputElement>) {
+    const _title = event.target.value;
+    const _updatedAt = new Date().toISOString();
+    setTitle(_title);
+    setUpdatedAt(_updatedAt);
+    onChange({ title: _title, updatedAt: _updatedAt });
   }
 
   if (readOnly) {

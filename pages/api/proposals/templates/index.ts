@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,17 +10,15 @@ import { createProposalTemplate } from 'lib/templates/proposals/createProposalTe
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(
-    requireKeys<CreateProposalTemplateInput>(['spaceId'], 'body'),
-    requireSpaceMembership({
-      adminOnly: true
-    }),
-    createProposalTemplateController
-  );
+handler.use(requireUser).post(
+  requireKeys<CreateProposalTemplateInput>(['spaceId'], 'body'),
+  requireSpaceMembership({
+    adminOnly: true
+  }),
+  createProposalTemplateController
+);
 
-async function createProposalTemplateController (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-
+async function createProposalTemplateController(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const userId = req.session.user.id;
 
   const { spaceId } = req.body as CreateProposalTemplateInput;
@@ -31,7 +28,6 @@ async function createProposalTemplateController (req: NextApiRequest, res: NextA
   logFirstProposalTemplate({ userId, spaceId });
 
   res.status(201).send(proposal);
-
 }
 
 export default withSessionRoute(handler);

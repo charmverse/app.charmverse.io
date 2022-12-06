@@ -25,9 +25,7 @@ beforeAll(async () => {
 });
 
 describe('getPageInBoard', () => {
-
   it('should return the page', async () => {
-
     const databasePage = await createDatabase({
       title: 'Some title',
       createdBy: user.id,
@@ -63,7 +61,6 @@ describe('getPageInBoard', () => {
   });
 
   it('should throw a database not found error when the database for the page does not exist', async () => {
-
     const databasePage = await createDatabase({
       title: 'Some title',
       createdBy: user.id,
@@ -90,26 +87,22 @@ describe('getPageInBoard', () => {
     try {
       const foundCard = await getPageInBoard(card.id);
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(DatabasePageNotFoundError);
     }
   });
 
   it('should throw a page not found error when the page does not exist', async () => {
-
     try {
       const inexistentId = v4();
       const foundCard = await getPageInBoard(inexistentId);
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(PageNotFoundError);
     }
   });
 
   it('should throw a page not found error when the page does not have the board type', async () => {
-
     const page = await createPage({
       data: {
         title: 'Example title',
@@ -131,21 +124,16 @@ describe('getPageInBoard', () => {
     });
 
     try {
-
       await getPageInBoard(page.id);
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(PageNotFoundError);
     }
   });
-
 });
 
 describe('getDatabaseRoot', () => {
-
   it('should return a database by passing an ID', async () => {
-
     const database = await createDatabase({
       createdBy: user.id,
       spaceId: space.id,
@@ -204,11 +192,9 @@ describe('getDatabaseRoot', () => {
 
     try {
       await getDatabaseRoot(database.path);
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(InvalidInputError);
     }
-
   });
 });
 

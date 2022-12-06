@@ -1,4 +1,3 @@
-
 import type { Block } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -15,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getBlockSubtree);
 
-async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const blockId = req.query.id as string;
   const publicPage = await prisma.page.findFirst({
     where: {
@@ -25,7 +24,7 @@ async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[
 
   const computed = await computeUserPagePermissions({
     pageId: publicPage?.id as string,
-    userId: req.session?.user?.id
+    userId: req.session.user?.id
   });
 
   if (computed.read !== true) {
@@ -33,11 +32,7 @@ async function getBlockSubtree (req: NextApiRequest, res: NextApiResponse<Block[
   }
   const blocks = await prisma.block.findMany({
     where: {
-      OR: [
-        { id: blockId },
-        { rootId: blockId },
-        { parentId: blockId }
-      ]
+      OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
     }
   });
   return res.status(200).json(blocks);

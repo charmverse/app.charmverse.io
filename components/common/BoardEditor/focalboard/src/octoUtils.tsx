@@ -1,4 +1,3 @@
-
 import { DateUtils } from 'react-day-picker';
 import type { IntlShape } from 'react-intl';
 
@@ -19,17 +18,19 @@ import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';
 
 class OctoUtils {
-  static propertyDisplayValue (block: Block, propertyValue: string | string[] | undefined, propertyTemplate: IPropertyTemplate, intl: IntlShape):
-    string | string[] | undefined {
+  static propertyDisplayValue(
+    block: Block,
+    propertyValue: string | string[] | undefined,
+    propertyTemplate: IPropertyTemplate,
+    intl: IntlShape
+  ): string | string[] | undefined {
     let displayValue: string | string[] | undefined;
     switch (propertyTemplate.type) {
       case 'select': {
         // The property value is the id of the template
         if (propertyValue) {
           const option = propertyTemplate.options.find((o) => o.id === propertyValue);
-          if (!option) {
-            Utils.assertFailure(`Invalid select option ID ${propertyValue}, block.title: ${block.title}`);
-          }
+
           displayValue = option?.value || '(Unknown)';
         }
         break;
@@ -37,9 +38,6 @@ class OctoUtils {
       case 'multiSelect': {
         if (propertyValue?.length) {
           const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
-          if (!options.length) {
-            Utils.assertFailure(`Invalid multiSelect option IDs ${propertyValue}, block.title: ${block.title}`);
-          }
           displayValue = options.map((o) => o.value);
         }
         break;
@@ -57,8 +55,7 @@ class OctoUtils {
           const singleDate = new Date(parseInt(propertyValue as string, 10));
           if (singleDate && DateUtils.isDate(singleDate)) {
             displayValue = Utils.displayDate(new Date(parseInt(propertyValue as string, 10)), intl);
-          }
-          else {
+          } else {
             try {
               const dateValue = JSON.parse(propertyValue as string);
               if (dateValue.from) {
@@ -68,8 +65,7 @@ class OctoUtils {
                 displayValue += ' -> ';
                 displayValue += Utils.displayDate(new Date(dateValue.to), intl);
               }
-            }
-            catch {
+            } catch {
               // do nothing
             }
           }
@@ -83,16 +79,32 @@ class OctoUtils {
     return displayValue;
   }
 
-  static hydrateBlock (block: Block): Block {
+  static hydrateBlock(block: Block): Block {
     switch (block.type) {
-      case 'board': { return createBoard({ block }); }
-      case 'view': { return createBoardView(block); }
-      case 'card': { return createCard(block); }
-      case 'text': { return createTextBlock(block); }
-      case 'image': { return createImageBlock(block); }
-      case 'divider': { return createDividerBlock(block); }
-      case 'comment': { return createCommentBlock(block); }
-      case 'checkbox': { return createCheckboxBlock(block); }
+      case 'board': {
+        return createBoard({ block });
+      }
+      case 'view': {
+        return createBoardView(block);
+      }
+      case 'card': {
+        return createCard(block);
+      }
+      case 'text': {
+        return createTextBlock(block);
+      }
+      case 'image': {
+        return createImageBlock(block);
+      }
+      case 'divider': {
+        return createDividerBlock(block);
+      }
+      case 'comment': {
+        return createCommentBlock(block);
+      }
+      case 'checkbox': {
+        return createCheckboxBlock(block);
+      }
       default: {
         Utils.assertFailure(`Can't hydrate unknown block type: ${block.type}`);
         return createBlock(block);
@@ -100,11 +112,11 @@ class OctoUtils {
     }
   }
 
-  static hydrateBlocks (blocks: readonly Block[]): Block[] {
+  static hydrateBlocks(blocks: readonly Block[]): Block[] {
     return blocks.map((block) => this.hydrateBlock(block));
   }
 
-  static mergeBlocks (blocks: readonly Block[], updatedBlocks: readonly Block[]): Block[] {
+  static mergeBlocks(blocks: readonly Block[], updatedBlocks: readonly Block[]): Block[] {
     const updatedBlockIds = updatedBlocks.map((o) => o.id);
     const newBlocks = blocks.filter((o) => !updatedBlockIds.includes(o.id));
     const updatedAndNotDeletedBlocks = updatedBlocks.filter((o) => o.deletedAt === 0);
@@ -113,7 +125,10 @@ class OctoUtils {
   }
 
   // Creates a copy of the blocks with new ids and parentIDs
-  static duplicateBlockTree (blocks: readonly Block[], sourceBlockId: string): [Block[], Block, Readonly<Record<string, string>>] {
+  static duplicateBlockTree(
+    blocks: readonly Block[],
+    sourceBlockId: string
+  ): [Block[], Block, Readonly<Record<string, string>>] {
     const idMap: Record<string, string> = {};
     const now = Date.now();
     const newBlocks = blocks.map((block) => {
@@ -157,7 +172,9 @@ class OctoUtils {
       // Remap card content order
       if (newBlock.type === 'card') {
         const card = newBlock as Card;
-        card.fields.contentOrder = card.fields.contentOrder.map((o) => (Array.isArray(o) ? o.map((o2) => idMap[o2]) : idMap[o]));
+        card.fields.contentOrder = card.fields.contentOrder.map((o) =>
+          Array.isArray(o) ? o.map((o2) => idMap[o2]) : idMap[o]
+        );
       }
     });
 
@@ -165,12 +182,16 @@ class OctoUtils {
     return [newBlocks, newSourceBlock, idMap];
   }
 
-  static filterConditionDisplayString (filterCondition: FilterCondition, intl: IntlShape): string {
+  static filterConditionDisplayString(filterCondition: FilterCondition, intl: IntlShape): string {
     switch (filterCondition) {
-      case 'includes': return intl.formatMessage({ id: 'Filter.includes', defaultMessage: 'includes' });
-      case 'notIncludes': return intl.formatMessage({ id: 'Filter.not-includes', defaultMessage: 'doesn\'t include' });
-      case 'isEmpty': return intl.formatMessage({ id: 'Filter.is-empty', defaultMessage: 'is empty' });
-      case 'isNotEmpty': return intl.formatMessage({ id: 'Filter.is-not-empty', defaultMessage: 'is not empty' });
+      case 'includes':
+        return intl.formatMessage({ id: 'Filter.includes', defaultMessage: 'includes' });
+      case 'notIncludes':
+        return intl.formatMessage({ id: 'Filter.not-includes', defaultMessage: "doesn't include" });
+      case 'isEmpty':
+        return intl.formatMessage({ id: 'Filter.is-empty', defaultMessage: 'is empty' });
+      case 'isNotEmpty':
+        return intl.formatMessage({ id: 'Filter.is-not-empty', defaultMessage: 'is not empty' });
       default: {
         Utils.assertFailure();
         return '(unknown)';

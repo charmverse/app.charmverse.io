@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -13,7 +12,6 @@ import LastModifiedBy from './lastModifiedBy';
 
 describe('components/properties/lastModifiedBy', () => {
   test('should match snapshot', () => {
-
     const mockStore = configureStore([]);
     const store = mockStore({
       users: {
@@ -25,9 +23,7 @@ describe('components/properties/lastModifiedBy', () => {
 
     const component = (
       <ReduxProvider store={store}>
-        <LastModifiedBy
-          updatedBy='user-id-1'
-        />
+        <LastModifiedBy updatedBy='user-id-1' />
       </ReduxProvider>
     );
 

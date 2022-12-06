@@ -2,12 +2,15 @@ import type { DiscordUser } from '@prisma/client';
 
 import { prisma } from 'db';
 
-export async function mergeUserDiscordAccounts ({ currentUserId, toDeleteUserId, discordId }: {
+export async function mergeUserDiscordAccounts({
+  currentUserId,
+  toDeleteUserId,
+  discordId
+}: {
   currentUserId: string;
   toDeleteUserId: string;
   discordId: string;
 }): Promise<DiscordUser> {
-
   const [discordUser] = await prisma.$transaction([
     prisma.discordUser.update({
       where: {
@@ -36,4 +39,3 @@ export async function mergeUserDiscordAccounts ({ currentUserId, toDeleteUserId,
 
   return discordUser;
 }
-

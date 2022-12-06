@@ -6,15 +6,16 @@ import type { GnosisPaymentProps } from 'hooks/useGnosisPayment';
 import { useGnosisPayment } from 'hooks/useGnosisPayment';
 
 export interface MultiPaymentResult {
+  safeAddress: string;
   transactions: (MetaTransactionData & { applicationId: string })[];
   txHash: string;
 }
 
 type Props = GnosisPaymentProps & {
   isLoading: boolean;
-}
+};
 
-export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
+export default function MultiPaymentButton({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
   const { safe, makePayment } = useGnosisPayment({
     chainId,
     onSuccess,

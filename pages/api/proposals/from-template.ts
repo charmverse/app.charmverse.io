@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,13 +10,13 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<CreateProposalFromTemplateInput>(['spaceId', 'templateId'], 'body'))
   .use(requireSpaceMembership())
   .post(createProposalFromTemplateController);
 
-async function createProposalFromTemplateController (req: NextApiRequest, res: NextApiResponse) {
-
+async function createProposalFromTemplateController(req: NextApiRequest, res: NextApiResponse) {
   const { spaceId, templateId } = req.body as CreateProposalFromTemplateInput;
 
   const userId = req.session.user.id;

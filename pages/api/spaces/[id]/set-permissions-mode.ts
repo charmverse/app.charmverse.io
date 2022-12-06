@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,17 +9,22 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .use(requireSpaceMembership({
-    adminOnly: true,
-    spaceIdKey: 'id'
-  }))
+handler
+  .use(requireUser)
+  .use(
+    requireSpaceMembership({
+      adminOnly: true,
+      spaceIdKey: 'id'
+    })
+  )
   .post(setPermissionsMode);
 
-async function setPermissionsMode (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function setPermissionsMode(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
-  const { permissionConfigurationMode } = req.body as Pick<SpacePermissionConfigurationUpdate, 'permissionConfigurationMode'>;
+  const { permissionConfigurationMode } = req.body as Pick<
+    SpacePermissionConfigurationUpdate,
+    'permissionConfigurationMode'
+  >;
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({
     permissionConfigurationMode,

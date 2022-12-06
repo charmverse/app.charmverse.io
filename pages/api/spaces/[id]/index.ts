@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -15,15 +14,17 @@ handler
   .put(updateSpace)
   .delete(deleteSpace);
 
-async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
-
+async function updateSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const spaceDomain = req.body.domain as string | undefined;
 
-  const existing = (typeof spaceDomain === 'string') ? await prisma.space.findFirst({
-    where: {
-      domain: spaceDomain
-    }
-  }) : null;
+  const existing =
+    typeof spaceDomain === 'string'
+      ? await prisma.space.findFirst({
+          where: {
+            domain: spaceDomain
+          }
+        })
+      : null;
 
   if (existing && existing.id !== req.query.id) {
     throw new ActionNotPermittedError('This domain is already in use');
@@ -41,7 +42,7 @@ async function updateSpace (req: NextApiRequest, res: NextApiResponse<Space>) {
   return res.status(200).json(space);
 }
 
-async function deleteSpace (req: NextApiRequest, res: NextApiResponse) {
+async function deleteSpace(req: NextApiRequest, res: NextApiResponse) {
   await prisma.space.delete({
     where: {
       id: req.query.id as string

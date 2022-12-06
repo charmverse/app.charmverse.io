@@ -1,4 +1,3 @@
-
 import type { CSSObject } from '@emotion/serialize';
 import color from 'color';
 import isEqual from 'lodash/isEqual';
@@ -11,29 +10,29 @@ import { Utils } from './utils';
 let activeThemeName: string;
 
 export type Theme = {
-    mainBg: string;
-    mainFg: string;
-    buttonBg: string;
-    buttonFg: string;
-    sidebarBg: string;
-    sidebarFg: string;
-    sidebarTextActiveBorder: string;
-    sidebarWhiteLogo: string;
+  mainBg: string;
+  mainFg: string;
+  buttonBg: string;
+  buttonFg: string;
+  sidebarBg: string;
+  sidebarFg: string;
+  sidebarTextActiveBorder: string;
+  sidebarWhiteLogo: string;
 
-    link: string;
-    linkVisited: string;
+  link: string;
+  linkVisited: string;
 
-    propDefault: string;
-    propGray: string;
-    propTurquoise: string;
-    propOrange: string;
-    propYellow: string;
-    propTeal: string;
-    propBlue: string;
-    propPurple: string;
-    propPink: string;
-    propRed: string;
-}
+  propDefault: string;
+  propGray: string;
+  propTurquoise: string;
+  propOrange: string;
+  propYellow: string;
+  propTeal: string;
+  propBlue: string;
+  propPurple: string;
+  propPink: string;
+  propRed: string;
+};
 
 export const systemThemeName = 'system-theme';
 
@@ -104,13 +103,12 @@ export const lightTheme = {
   sidebarWhiteLogo: 'false'
 };
 
-export function setTheme (theme: Theme | null): Theme {
+export function setTheme(theme: Theme | null): Theme {
   let consolidatedTheme = defaultTheme;
   if (theme) {
     consolidatedTheme = { ...defaultTheme, ...theme };
     UserSettings.theme = JSON.stringify(consolidatedTheme);
-  }
-  else {
+  } else {
     UserSettings.theme = '';
     const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
     if (darkThemeMq.matches) {
@@ -128,13 +126,18 @@ export function setTheme (theme: Theme | null): Theme {
     document.documentElement.style.setProperty('--sidebar-bg-rgb', consolidatedTheme.sidebarBg);
     document.documentElement.style.setProperty('--sidebar-text-rgb', consolidatedTheme.sidebarFg);
     document.documentElement.style.setProperty('--link-color-rgb', consolidatedTheme.link);
-    document.documentElement.style.setProperty('--sidebar-text-active-border-rgb', consolidatedTheme.sidebarTextActiveBorder);
+    document.documentElement.style.setProperty(
+      '--sidebar-text-active-border-rgb',
+      consolidatedTheme.sidebarTextActiveBorder
+    );
   }
 
   document.documentElement.style.setProperty('--sidebar-white-logo', consolidatedTheme.sidebarWhiteLogo);
   document.documentElement.style.setProperty('--link-visited-color-rgb', consolidatedTheme.linkVisited);
 
-  const mainBgColor = color(`rgb(${getComputedStyle(document.documentElement).getPropertyValue('--center-channel-bg-rgb')})`);
+  const mainBgColor = color(
+    `rgb(${getComputedStyle(document.documentElement).getPropertyValue('--center-channel-bg-rgb')})`
+  );
 
   if (Utils.isFocalboardPlugin()) {
     let fixedTheme = lightTheme;
@@ -167,22 +170,19 @@ export function setTheme (theme: Theme | null): Theme {
   return consolidatedTheme;
 }
 
-function setActiveThemeName (consolidatedTheme: Theme, theme: Theme | null) {
+function setActiveThemeName(consolidatedTheme: Theme, theme: Theme | null) {
   if (theme === null) {
     activeThemeName = systemThemeName;
-  }
-  else if (isEqual(consolidatedTheme, darkTheme)) {
+  } else if (isEqual(consolidatedTheme, darkTheme)) {
     activeThemeName = darkThemeName;
-  }
-  else if (isEqual(consolidatedTheme, lightTheme)) {
+  } else if (isEqual(consolidatedTheme, lightTheme)) {
     activeThemeName = lightThemeName;
-  }
-  else {
+  } else {
     activeThemeName = defaultThemeName;
   }
 }
 
-export function loadTheme (): Theme {
+export function loadTheme(): Theme {
   const themeStr = UserSettings.theme;
   if (themeStr) {
     try {
@@ -190,17 +190,15 @@ export function loadTheme (): Theme {
       const consolidatedTheme = setTheme(theme);
       setActiveThemeName(consolidatedTheme, theme);
       return consolidatedTheme;
-    }
-    catch (e) {
+    } catch (e) {
       return setTheme(null);
     }
-  }
-  else {
+  } else {
     return setTheme(null);
   }
 }
 
-export function getSelectBaseStyle () {
+export function getSelectBaseStyle() {
   return {
     dropdownIndicator: (provided: CSSObject): CSSObject => ({
       ...provided,

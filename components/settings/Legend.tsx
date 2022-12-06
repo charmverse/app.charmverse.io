@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 
 const StyledBox = styled(Box)<{ noBorder?: boolean }>`
   white-space: nowrap;
-  border-bottom: ${({ noBorder, theme }) => noBorder ? '0' : `1px solid ${theme.palette.divider}`};
+  border-bottom: ${({ noBorder, theme }) => (noBorder ? '0' : `1px solid ${theme.palette.divider}`)};
   padding-bottom: ${({ theme }) => theme.spacing(2)};
   margin-top: ${({ theme }) => theme.spacing(6)};
   margin-bottom: ${({ theme }) => theme.spacing(2)};
@@ -31,12 +31,10 @@ interface LegendProps extends TypographyProps {
   noBorder?: boolean;
 }
 
-function Legend ({ children, helperText, noBorder, ...props }: LegendProps) {
+function Legend({ children, helperText, noBorder, ...props }: LegendProps) {
   return (
     <StyledBox noBorder={noBorder}>
-      <StyledTypography {...props}>
-        {children}
-      </StyledTypography>
+      <StyledTypography {...props}>{children}</StyledTypography>
       {helperText && (
         <Typography color='secondary' mt={0.5} variant='caption' component='p'>
           {helperText}

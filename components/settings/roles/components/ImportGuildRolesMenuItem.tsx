@@ -15,27 +15,27 @@ import { PimpedButton, StyledSpinner } from '../../../common/Button';
 
 import GuildsAutocomplete from './GuildsAutocomplete';
 
-export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => void }) {
+export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => void }) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
   const [guilds, setGuilds] = useState<GetGuildsResponse>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user: currentUser } = useUser();
-  const addresses = currentUser?.wallets.map(w => w.address) ?? [];
+  const addresses = currentUser?.wallets.map((w) => w.address) ?? [];
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
-    async function main () {
+    async function main() {
       if (showImportedRolesModal) {
         setFetchingGuilds(true);
-        const guildMembershipsResponses = await Promise.all(addresses.map(address => user.getMemberships(address)));
+        const guildMembershipsResponses = await Promise.all(addresses.map((address) => user.getMemberships(address)));
         const userGuildIds: number[] = [];
 
-        guildMembershipsResponses.forEach(guildMembershipsResponse => {
+        guildMembershipsResponses.forEach((guildMembershipsResponse) => {
           if (guildMembershipsResponse) {
-            userGuildIds.push(...guildMembershipsResponse.map(guildMembership => guildMembership.guildId));
+            userGuildIds.push(...guildMembershipsResponse.map((guildMembership) => guildMembership.guildId));
           }
         });
         const allGuilds = await guild.getAll();
@@ -47,7 +47,7 @@ export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => 
     main();
   }, [showImportedRolesModal]);
 
-  function resetState () {
+  function resetState() {
     setShowImportedRolesModal(false);
     setImportingRoles(false);
     setFetchingGuilds(false);
@@ -56,7 +56,7 @@ export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => 
     onClose();
   }
 
-  async function importRoles () {
+  async function importRoles() {
     if (space) {
       setImportingRoles(true);
       const { importedRolesCount } = await charmClient.importRolesFromGuild({
@@ -77,45 +77,53 @@ export default function ImportGuildRolesMenuItem ({ onClose }: { onClose: () => 
           setShowImportedRolesModal(true);
         }}
       >
-        <GuildXYZIcon style={{
-          marginRight: 8,
-          transform: 'scale(0.75)'
-        }}
+        <GuildXYZIcon
+          style={{
+            marginRight: 8,
+            transform: 'scale(0.75)'
+          }}
         />
         Guild.xyz
       </MenuItem>
       <ScrollableModal size='large' title='Import Guild roles' onClose={resetState} open={showImportedRolesModal}>
-        <Box sx={{
-          px: 4,
-          minHeight: 50
-        }}
+        <Box
+          sx={{
+            px: 4,
+            minHeight: 50
+          }}
         >
-          {
-            fetchingGuilds ? <StyledSpinner /> : guilds.length === 0 ? <Typography variant='subtitle1' color='secondary'>You are not part of any guild(s)</Typography> : (
-              <Box sx={{
+          {fetchingGuilds ? (
+            <StyledSpinner />
+          ) : guilds.length === 0 ? (
+            <Typography variant='subtitle1' color='secondary'>
+              You are not part of any guild(s)
+            </Typography>
+          ) : (
+            <Box
+              sx={{
                 paddingRight: 1
               }}
+            >
+              <GuildsAutocomplete
+                disabled={importingRoles || fetchingGuilds}
+                onChange={(guildIds) => {
+                  setSelectedGuildIds(guildIds);
+                }}
+                selectedGuildIds={selectedGuildIds}
+                guilds={guilds}
+              />
+              <PimpedButton
+                loading={importingRoles}
+                sx={{
+                  mt: 2
+                }}
+                disabled={importingRoles || selectedGuildIds.length === 0}
+                onClick={importRoles}
               >
-                <GuildsAutocomplete
-                  disabled={importingRoles || fetchingGuilds}
-                  onChange={(guildIds) => {
-                    setSelectedGuildIds(guildIds);
-                  }}
-                  selectedGuildIds={selectedGuildIds}
-                  guilds={guilds}
-                />
-                <PimpedButton
-                  loading={importingRoles}
-                  sx={{
-                    mt: 2
-                  }}
-                  disabled={importingRoles || selectedGuildIds.length === 0}
-                  onClick={importRoles}
-                >Import Roles
-                </PimpedButton>
-              </Box>
-            )
-          }
+                Import Roles
+              </PimpedButton>
+            </Box>
+          )}
         </Box>
       </ScrollableModal>
     </>

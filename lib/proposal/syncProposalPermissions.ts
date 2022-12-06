@@ -61,8 +61,13 @@ export interface ProposalPermissionsSync {
 /**
  * Generates proposal page permission prisma arguments to be consumed inside updateProposalStatus
  */
-export async function generateSyncProposalPermissions ({ proposalId, isNewProposal, tx = prisma }: ProposalPermissionsSync & OptionalTransaction):
-  Promise<[Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]> {
+export async function generateSyncProposalPermissions({
+  proposalId,
+  isNewProposal,
+  tx = prisma
+}: ProposalPermissionsSync & OptionalTransaction): Promise<
+  [Prisma.PagePermissionDeleteManyArgs, Prisma.PagePermissionCreateArgs[]]
+> {
   const queryResult = await tx.page.findUnique({
     where: {
       proposalId
@@ -87,27 +92,31 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
 
   // Delete permissions
   // Check if there are children so we don't perform resolve page tree operation for nothing
-  let children = isNewProposal ? [] : await tx.page.findMany({
-    where: {
-      parentId: page.id
-    },
-    select: {
-      id: true,
-      permissions: {
-        include: {
-          sourcePermission: true
+  let children = isNewProposal
+    ? []
+    : await tx.page.findMany({
+        where: {
+          parentId: page.id
+        },
+        select: {
+          id: true,
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
         }
-      }
-    }
-  });
+      });
 
   if (children.length > 0) {
-    children = (await resolvePageTree({
-      pageId: page.id,
-      flattenChildren: true,
-      includeDeletedPages: true,
-      tx
-    })).flatChildren;
+    children = (
+      await resolvePageTree({
+        pageId: page.id,
+        flattenChildren: true,
+        includeDeletedPages: true,
+        tx
+      })
+    ).flatChildren;
   }
 
   // -------------------- Create permissions
@@ -123,8 +132,7 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
   const communityPermissionSetting = proposalPermissionMapping[currentStage].community;
 
   if (authorPermissionSetting !== null) {
-    proposal.authors.forEach(a => {
-
+    proposal.authors.forEach((a) => {
       const newId = v4();
 
       const authorPermission: Prisma.PagePermissionCreateArgs = {
@@ -149,36 +157,43 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
   }
 
   if (reviewerPermissionSetting !== null) {
-    proposal.reviewers.forEach(reviewer => {
-
-      const assignedAuthor = reviewer.userId ? createProposalPermissionArgs.find(permissionArgs => {
-        return permissionArgs.data.user?.connect?.id === reviewer.userId;
-      }) : undefined;
+    proposal.reviewers.forEach((reviewer) => {
+      const assignedAuthor = reviewer.userId
+        ? createProposalPermissionArgs.find((permissionArgs) => {
+            return permissionArgs.data.user?.connect?.id === reviewer.userId;
+          })
+        : undefined;
 
       // If author is also a reviewer, only assign a permission if this is higher
-      const isHigherPermissionLevel = assignedAuthor && comparePermissionLevels({
-        base: assignedAuthor.data.permissionLevel as PagePermissionLevel, comparison: reviewerPermissionSetting
-      }) === 'more';
+      const isHigherPermissionLevel =
+        assignedAuthor &&
+        comparePermissionLevels({
+          base: assignedAuthor.data.permissionLevel as PagePermissionLevel,
+          comparison: reviewerPermissionSetting
+        }) === 'more';
 
       if (isHigherPermissionLevel) {
         assignedAuthor.data.permissionLevel = reviewerPermissionSetting;
-      }
-      else if (!assignedAuthor) {
+      } else if (!assignedAuthor) {
         const newId = v4();
         const reviewerPermission: Prisma.PagePermissionCreateArgs = {
           data: {
             id: newId,
             permissionLevel: reviewerPermissionSetting,
-            role: reviewer.roleId ? {
-              connect: {
-                id: reviewer.roleId
-              }
-            } : undefined,
-            user: reviewer.userId ? {
-              connect: {
-                id: reviewer.userId
-              }
-            } : undefined,
+            role: reviewer.roleId
+              ? {
+                  connect: {
+                    id: reviewer.roleId
+                  }
+                }
+              : undefined,
+            user: reviewer.userId
+              ? {
+                  connect: {
+                    id: reviewer.userId
+                  }
+                }
+              : undefined,
             page: {
               connect: {
                 id: page.id
@@ -193,7 +208,6 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
   }
 
   if (communityPermissionSetting !== null) {
-
     const newId = v4();
 
     createProposalPermissionArgs.push({
@@ -214,12 +228,21 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
     });
   }
 
-  children.forEach(child => {
-    createProposalPermissionArgs.forEach(permission => {
+  children.forEach((child) => {
+    createProposalPermissionArgs.forEach((permission) => {
+      const assignee: 'user' | 'role' | 'space' = permission.data.user
+        ? 'user'
+        : permission.data.role
+        ? 'role'
+        : 'space';
 
-      const assignee: 'user' | 'role' | 'space' = permission.data.user ? 'user' : permission.data.role ? 'role' : 'space';
-
-      const assigneeId = (assignee === 'user' ? permission.data.user?.connect?.id : assignee === 'role' ? permission.data.role?.connect?.id : permission.data.space?.connect?.id) as string;
+      const assigneeId = (
+        assignee === 'user'
+          ? permission.data.user?.connect?.id
+          : assignee === 'role'
+          ? permission.data.role?.connect?.id
+          : permission.data.space?.connect?.id
+      ) as string;
 
       const permissionLevel = permission.data.permissionLevel as PagePermissionLevel;
 
@@ -231,21 +254,30 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
         data: {
           id: newId,
           permissionLevel,
-          role: assignee === 'role' ? {
-            connect: {
-              id: assigneeId
-            }
-          } : undefined,
-          user: assignee === 'user' ? {
-            connect: {
-              id: assigneeId
-            }
-          } : undefined,
-          space: assignee === 'space' ? {
-            connect: {
-              id: assigneeId
-            }
-          } : undefined,
+          role:
+            assignee === 'role'
+              ? {
+                  connect: {
+                    id: assigneeId
+                  }
+                }
+              : undefined,
+          user:
+            assignee === 'user'
+              ? {
+                  connect: {
+                    id: assigneeId
+                  }
+                }
+              : undefined,
+          space:
+            assignee === 'space'
+              ? {
+                  connect: {
+                    id: assigneeId
+                  }
+                }
+              : undefined,
           page: {
             connect: {
               id: child.id
@@ -272,25 +304,26 @@ export async function generateSyncProposalPermissions ({ proposalId, isNewPropos
           }
         },
         {
-          OR: [{
-            public: false
-          }, {
-            public: null
-          }]
+          OR: [
+            {
+              public: false
+            },
+            {
+              public: null
+            }
+          ]
         }
       ]
     }
   };
 
-  return [
-    deletePermissionArgs,
-    [...createProposalPermissionArgs, ...createChildProposalPermissionArgs]
-  ];
-
+  return [deletePermissionArgs, [...createProposalPermissionArgs, ...createChildProposalPermissionArgs]];
 }
 
-export async function syncProposalPermissions ({ proposalId, tx }: ProposalPermissionsSync & OptionalTransaction): Promise<IPageWithPermissions> {
-
+export async function syncProposalPermissions({
+  proposalId,
+  tx
+}: ProposalPermissionsSync & OptionalTransaction): Promise<IPageWithPermissions> {
   if (!tx) {
     return prisma.$transaction(txHandler);
   }
@@ -298,7 +331,7 @@ export async function syncProposalPermissions ({ proposalId, tx }: ProposalPermi
   return txHandler(tx);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  async function txHandler (tx: TransactionClient) {
+  async function txHandler(tx: TransactionClient) {
     const [deletePermissionArgs, upsertPermissionArgs] = await generateSyncProposalPermissions({ proposalId, tx });
 
     await tx.pagePermission.deleteMany(deletePermissionArgs);
@@ -321,5 +354,4 @@ export async function syncProposalPermissions ({ proposalId, tx }: ProposalPermi
       }
     }) as Promise<IPageWithPermissions>;
   }
-
 }

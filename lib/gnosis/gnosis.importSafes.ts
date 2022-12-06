@@ -1,4 +1,3 @@
-
 import type { Signer } from 'ethers';
 
 import charmClient from 'charmClient';
@@ -11,11 +10,10 @@ interface ImportSafeProps {
   getWalletName?: (address: string) => string | null | undefined;
 }
 
-export async function importSafesFromWallet ({ signer, addresses, getWalletName }: ImportSafeProps) {
-
+export async function importSafesFromWallet({ signer, addresses, getWalletName }: ImportSafeProps) {
   const safes = await getSafesForAddresses(signer, addresses);
 
-  const safesData = safes.map(safe => ({
+  const safesData = safes.map((safe) => ({
     address: safe.address,
     owners: safe.owners,
     threshold: safe.threshold,

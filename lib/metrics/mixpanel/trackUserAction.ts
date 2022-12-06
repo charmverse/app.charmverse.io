@@ -4,7 +4,7 @@ import type { MixpanelEventMap, MixpanelEventName, MixpanelTrackBase } from 'lib
 import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import { eventNameToHumanFormat, paramsToHumanFormat } from 'lib/metrics/mixpanel/utils';
 
-export function trackUserAction<T extends MixpanelEventName> (eventName: T, params: MixpanelEventMap[T]) {
+export function trackUserAction<T extends MixpanelEventName>(eventName: T, params: MixpanelEventMap[T]) {
   const { userId, ...restParams } = params;
 
   // map userId prop to distinct_id required by mixpanel to recognize the user
@@ -16,8 +16,7 @@ export function trackUserAction<T extends MixpanelEventName> (eventName: T, para
 
   try {
     mixpanel?.track(humanReadableEventName, mixpanelTrackParams);
-  }
-  catch (e) {
+  } catch (e) {
     log.warn(`Failed to update mixpanel event ${eventName}`);
   }
 }

@@ -23,9 +23,9 @@ type Props = {
   hovered: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   optionsComponent: React.ComponentType<CommonCalculationOptionProps>;
-}
+};
 
-function Calculation (props: Props): JSX.Element {
+function Calculation(props: Props): JSX.Element {
   const value = props.value || Options.none.value;
   const valueOption = Options[value];
   const intl = useIntl();
@@ -40,44 +40,30 @@ function Calculation (props: Props): JSX.Element {
   );
 
   return (
-
-  // tabindex is needed to make onBlur work on div.
-  // See this for more details-
-  // https://stackoverflow.com/questions/47308081/onblur-event-is-not-firing
+    // tabindex is needed to make onBlur work on div.
+    // See this for more details-
+    // https://stackoverflow.com/questions/47308081/onblur-event-is-not-firing
     <div
-      className={`Calculation ${value} ${props.class} ${props.menuOpen ? 'menuOpen' : ''} ${props.hovered ? 'hovered' : ''}`}
+      className={`Calculation ${value} ${props.class} ${props.menuOpen ? 'menuOpen' : ''} ${
+        props.hovered ? 'hovered' : ''
+      }`}
       style={props.style}
       onClick={() => (props.menuOpen ? props.onMenuClose() : props.onMenuOpen())}
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       onBlur={props.onMenuClose}
     >
-      {
-                props.menuOpen && (
-                  <div>
-                    {option}
-                  </div>
-                )
-            }
+      {props.menuOpen && <div>{option}</div>}
 
-      <span className='calculationLabel'>
-        {optionDisplayNameString(valueOption!, intl)}
-      </span>
+      <span className='calculationLabel'>{optionDisplayNameString(valueOption!, intl)}</span>
 
-      {
-                value === Options.none.value
-                && <ExpandLessIcon fontSize='small' />
-            }
+      {value === Options.none.value && <ExpandLessIcon fontSize='small' />}
 
-      {
-                value !== Options.none.value
-                && (
-                  <span className='calculationValue'>
-                    {Calculations[value] ? Calculations[value](props.cards, props.property, intl) : ''}
-                  </span>
-                )
-            }
-
+      {value !== Options.none.value && (
+        <span className='calculationValue'>
+          {Calculations[value] ? Calculations[value](props.cards, props.property, intl) : ''}
+        </span>
+      )}
     </div>
   );
 }

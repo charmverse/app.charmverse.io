@@ -11,7 +11,7 @@ interface Props {
   onClickBack: () => void;
 }
 
-export default function ViewSelection (props: Props) {
+export default function ViewSelection(props: Props) {
   return (
     <Box>
       <Box display='flex' alignItems='flex-end' justifyContent='space-between'>
@@ -25,11 +25,8 @@ export default function ViewSelection (props: Props) {
           <Typography fontWeight='bold'>Select a view:</Typography>
         </Box>
         <Divider light />
-        {props.views.map(view => (
-          <MenuItem
-            onClick={() => props.onSelect(view.id)}
-            key={view.id}
-          >
+        {props.views.map((view) => (
+          <MenuItem onClick={() => props.onSelect(view.id)} key={view.id}>
             {view.title}
           </MenuItem>
         ))}

@@ -1,14 +1,16 @@
 import { NodeView } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/pm';
-import type { SuggestTooltipRenderOpts } from '@bangle.dev/tooltip';
-import { createTooltipDOM, suggestTooltip } from '@bangle.dev/tooltip';
 import { PluginKey } from 'prosemirror-state';
+
+import { createTooltipDOM } from '../@bangle.dev/tooltip';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 import type { MentionPluginState } from './mention.interfaces';
 import { selectMention } from './mention.utils';
 
-export function mentionPlugins ({
+export function mentionPlugins({
   key,
   markName = mentionSuggestMarkName,
   tooltipRenderOpts = {
@@ -28,14 +30,14 @@ export function mentionPlugins ({
     new Plugin({
       key,
       state: {
-        init () {
+        init() {
           return {
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             markName,
             suggestTooltipKey
           };
         },
-        apply (_, pluginState) {
+        apply(_, pluginState) {
           return pluginState;
         }
       }
@@ -44,7 +46,7 @@ export function mentionPlugins ({
       key: suggestTooltipKey,
       markName,
       trigger: mentionTrigger,
-      onEnter (state, dispatch, view) {
+      onEnter(state, dispatch, view) {
         const selectedMenuItem = document.querySelector('.mention-selected');
         const value = selectedMenuItem?.getAttribute('data-value');
         const type = selectedMenuItem?.getAttribute('data-type');

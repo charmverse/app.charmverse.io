@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import type { AccessControlCondition } from 'lit-js-sdk';
 import { flatten } from 'lodash';
@@ -10,6 +9,7 @@ import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { addDaylightAbility } from 'lib/token-gates/daylight';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
 import { getAccessTypes } from 'lib/token-gates/utils';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -21,7 +21,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: true }))
   .post(saveTokenGate);
 
-async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
+async function saveTokenGate(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
@@ -36,7 +36,7 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
 
   // Flatten to get all nested conditions in the same flat array
   const conditionsArr: AccessControlCondition[] = flatten(req.body.conditions?.unifiedAccessControlConditions);
-  const conditions = conditionsArr.filter(c => Boolean(c.chain));
+  const conditions = conditionsArr.filter((c) => Boolean(c.chain));
   const chains: string[] = req.body.conditions?.chains || [];
   const numberOfConditions = conditions.length;
   const accessTypes = getAccessTypes(conditions);
@@ -54,15 +54,23 @@ async function saveTokenGate (req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
+  addDaylightAbility(result);
+
   const chainTypeParam = chains.length === 1 ? chains[0] : chains;
-  const accessTypesParam = accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map(at => accessTypeDict[at]);
-  trackUserAction('add_a_gate', { userId, spaceId, accesType: accessTypesParam, chainType: chainTypeParam, numberOfConditions });
+  const accessTypesParam =
+    accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map((at) => accessTypeDict[at]);
+  trackUserAction('add_a_gate', {
+    userId,
+    spaceId,
+    accesType: accessTypesParam,
+    chainType: chainTypeParam,
+    numberOfConditions
+  });
 
   res.status(200).json(result);
 }
 
-async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[]>) {
-
+async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[]>) {
   let space: Pick<Space, 'id'> | null = null;
 
   const { spaceDomain } = req.query;
@@ -82,7 +90,7 @@ async function getTokenGates (req: NextApiRequest, res: NextApiResponse<TokenGat
     }
   }
 
-  const spaceId = space?.id || req.query.spaceId as string;
+  const spaceId = space?.id || (req.query.spaceId as string);
 
   if (!spaceId) {
     throw new InvalidInputError('spaceId is required');

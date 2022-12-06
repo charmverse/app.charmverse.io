@@ -1,16 +1,16 @@
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, ListItemText, Typography } from '@mui/material';
+import { Box, ListItemText, Tooltip } from '@mui/material';
 import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import type { bindTrigger } from 'material-ui-popup-state';
-import { memo, useState } from 'react';
+import { bindTrigger } from 'material-ui-popup-state';
+import type { PopupState } from 'material-ui-popup-state/core';
 import type { MouseEvent, SyntheticEvent } from 'react';
+import { memo, useState } from 'react';
 
 import Button from 'components/common/Button';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -29,8 +29,7 @@ const StyledMenu = styled((props: MenuProps) => (
   '& .MuiPaper-root': {
     borderRadius: 6,
     maxWidth: 260,
-    color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
     boxShadow:
       'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
     '& .MuiMenu-list': {
@@ -52,15 +51,23 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = ReturnType<typeof bindTrigger>
+export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>;
 
 interface InviteActionsProps {
   isAdmin: boolean;
-  openInvites: popupStateTrigger;
-  openTokenGate: popupStateTrigger;
+  invitePopupState: PopupState;
+  tokenGatePopupState: PopupState;
+  onOpenInvitesClick: (e: SyntheticEvent<any, Event>) => void;
+  onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
 }
 
-function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsProps) {
+function InviteActions({
+  isAdmin,
+  invitePopupState,
+  tokenGatePopupState,
+  onOpenInvitesClick,
+  onOpenTokenGateClick
+}: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -70,35 +77,36 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const { account } = useWeb3AuthSig();
 
-  const { onClick: onOpenInvitesClick, ...restInviteProps } = openInvites;
-  const { onClick: onOpenTokenGateClick, ...restTokenGateProps } = openTokenGate;
-
-  const handleInvites = (event: SyntheticEvent<any, Event>) => {
-    onOpenInvitesClick(event);
+  const handleInvites = (e: SyntheticEvent<any, Event>) => {
+    onOpenInvitesClick(e);
     handleClose();
   };
 
-  const handleTokenGate = (event: SyntheticEvent<any, Event>) => {
-    onOpenTokenGateClick(event);
+  const handleTokenGate = (e: SyntheticEvent<any, Event>) => {
+    onOpenTokenGateClick(e);
     handleClose();
   };
 
   return (
     <>
-      <Button
-        id='add-invites-menu'
-        aria-controls={open ? 'demo-customized-menu' : undefined}
-        aria-haspopup='true'
-        aria-expanded={open ? 'true' : undefined}
-        disableElevation
-        onClick={handleAddClick}
-        endIcon={<KeyboardArrowDownIcon />}
-        disabled={!isAdmin}
-      >
-        Add
-      </Button>
+      <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
+        {/* Tooltip on disabled button requires one block element below wrapper */}
+        <span>
+          <Button
+            id='add-invites-menu'
+            aria-controls={open ? 'demo-customized-menu' : undefined}
+            aria-haspopup='true'
+            aria-expanded={open ? 'true' : undefined}
+            disableElevation
+            onClick={handleAddClick}
+            endIcon={<KeyboardArrowDownIcon />}
+            disabled={!isAdmin}
+          >
+            Add
+          </Button>
+        </span>
+      </Tooltip>
       <StyledMenu
         id='demo-customized-menu'
         MenuListProps={{
@@ -108,7 +116,7 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleInvites} disableRipple dense {...restInviteProps}>
+        <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -119,7 +127,7 @@ function InviteActions ({ isAdmin, openInvites, openTokenGate }: InviteActionsPr
             />
           </Box>
         </MenuItem>
-        <MenuItem disabled={!account} onClick={handleTokenGate} disableRipple dense {...restTokenGateProps}>
+        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText

@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-export async function deleteThread (threadId: string): Promise<true> {
+export async function deleteThread(threadId: string): Promise<true> {
   const existingThread = await prisma.thread.findUnique({
     where: {
       id: threadId

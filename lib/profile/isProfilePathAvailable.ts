@@ -1,7 +1,13 @@
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from 'db';
 
-export async function isProfilePathAvailable (path: string, id?: string | null): Promise<boolean> {
-  const existing = await prisma.user.findUnique({
+export async function isProfilePathAvailable(
+  path: string,
+  id?: string | null,
+  tx: Prisma.TransactionClient = prisma
+): Promise<boolean> {
+  const existing = await tx.user.findUnique({
     where: {
       path
     },

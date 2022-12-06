@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -43,12 +42,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
@@ -61,12 +55,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
@@ -81,12 +70,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
@@ -97,23 +81,18 @@ describe('components/viewHeader/filterEntry', () => {
     userEvent.click(buttonIncludes);
     expect(mockedConditionClicked).toBeCalledTimes(1);
   });
-  test('return filterEntry and click on doesn\'t include', () => {
+  test("return filterEntry and click on doesn't include", () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
     const buttonElement = screen.getAllByRole('button', { name: 'menuwrapper' })[1];
     userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();
-    const buttonNotInclude = screen.getByRole('button', { name: 'doesn\'t include' });
+    const buttonNotInclude = screen.getByRole('button', { name: "doesn't include" });
     userEvent.click(buttonNotInclude);
     expect(mockedConditionClicked).toBeCalledTimes(1);
   });
@@ -121,12 +100,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
@@ -141,12 +115,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );
@@ -161,12 +130,7 @@ describe('components/viewHeader/filterEntry', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <FilterEntry
-            board={board}
-            view={activeView}
-            conditionClicked={mockedConditionClicked}
-            filter={filter}
-          />
+          <FilterEntry board={board} view={activeView} conditionClicked={mockedConditionClicked} filter={filter} />
         </ReduxProvider>
       )
     );

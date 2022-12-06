@@ -22,11 +22,10 @@ const editModeConfig = {
   }
 } as const;
 
-function EditModeToggle () {
-
+function EditModeToggle() {
   const { availableEditModes, editMode, setPageProps } = usePrimaryCharmEditor();
 
-  function setMode (mode: EditMode) {
+  function setMode(mode: EditMode) {
     setPageProps({ editMode: mode });
   }
 
@@ -71,9 +70,7 @@ function EditModeToggle () {
                 <ListItemIcon sx={{ color: editMode === mode ? `${editModeConfig[mode].color}.main` : '' }}>
                   {EDIT_MODE_CONFIG[mode].icon}
                 </ListItemIcon>
-                <ListItemText>
-                  {label}
-                </ListItemText>
+                <ListItemText>{label}</ListItemText>
               </MenuItem>
             ))}
           </Menu>

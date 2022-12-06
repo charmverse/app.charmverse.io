@@ -9,7 +9,11 @@ type Props = {
   iconLabel?: ReactNode;
 };
 
-export function FieldWrapper ({ children, label, inline, iconLabel }: Props): JSX.Element {
+export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
+  if (!label) {
+    return children as JSX.Element;
+  }
+
   return (
     <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' gap={1} my={1}>
       {(label || !!iconLabel) && (
@@ -22,7 +26,8 @@ export function FieldWrapper ({ children, label, inline, iconLabel }: Props): JS
               }}
               variant='subtitle2'
               fontWeight='bold'
-            >{label}
+            >
+              {label}
             </Typography>
           )}
         </Box>

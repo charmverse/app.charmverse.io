@@ -1,6 +1,6 @@
 import { validate } from 'uuid';
 
-export function fancyTrim (_text: string = '', maxLength: number = 40) {
+export function fancyTrim(_text: string = '', maxLength: number = 40) {
   const text = _text || '';
   if (text.length <= maxLength) {
     return text;
@@ -8,7 +8,7 @@ export function fancyTrim (_text: string = '', maxLength: number = 40) {
   return `${text.slice(0, maxLength - 3)}...`;
 }
 
-export function fancyTrimWords (_text: string = '', maxWords: number = 40) {
+export function fancyTrimWords(_text: string = '', maxWords: number = 40) {
   const text = _text || '';
   const words = text.split(' ');
   if (words.length <= maxWords) {
@@ -18,7 +18,7 @@ export function fancyTrimWords (_text: string = '', maxWords: number = 40) {
 }
 
 // example: https://google.com/search?q=3531422 -> https://google.com
-export function getDomain (url: string, includeProtocol?: boolean) {
+export function getDomain(url: string, includeProtocol?: boolean) {
   if (!url.includes('http')) {
     // invalid url, oh well
     return url;
@@ -32,16 +32,26 @@ export function getDomain (url: string, includeProtocol?: boolean) {
   return host;
 }
 
+export function isUrl(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return urlRegex.test(text);
+}
+
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
-export function stringToColor (name: string, saturation = 50, lightness = 60) {
+export function stringToColor(name: string, saturation = 50, lightness = 60) {
+  return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
+}
+
+export function stringToHue(name: string) {
+  const cleanName = name.replace('0x', ''); // ignore the universal prefix of addresses
   let hash = 0;
-  for (let i = 0; i < name.length; i++) {
+  for (let i = 0; i < cleanName.length; i++) {
     // eslint-disable-next-line
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
   }
 
   const h = hash % 360;
-  return `hsl(${h}, ${saturation}%, ${lightness}%)`;
+  return h;
 }
 
 export const shortenHex = (hex: string = '', length = 4): string => {
@@ -53,7 +63,7 @@ export const shortenHex = (hex: string = '', length = 4): string => {
  * Leaves other characters unchanged
  * @param input
  */
-export function upperCaseFirstCharacter (input: string): string {
+export function upperCaseFirstCharacter(input: string): string {
   if (!input) {
     return '';
   }
@@ -61,7 +71,7 @@ export function upperCaseFirstCharacter (input: string): string {
   return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
 }
 
-export function isUUID (uuid: string) {
+export function isUUID(uuid: string) {
   return validate(uuid);
 }
 
@@ -69,7 +79,7 @@ export function isUUID (uuid: string) {
  * Converts a list of string to human friendly gramatically correct comma list, with an and / or at the end
  * Won't add the conjunction if there is less than 2 items in the list
  */
-export function humaniseList ({
+export function humaniseList({
   content,
   conjunction,
   capitaliseFirstCharacter
@@ -78,20 +88,18 @@ export function humaniseList ({
   conjunction: 'and' | 'or';
   capitaliseFirstCharacter: boolean;
 }): string {
-
   if (content.length === 1) {
     return capitaliseFirstCharacter ? upperCaseFirstCharacter(content[0]) : content[0];
-  }
-  else if (content.length === 0) {
+  } else if (content.length === 0) {
     return '';
-  }
-  else if (content.length === 2) {
-    return capitaliseFirstCharacter ? `${upperCaseFirstCharacter(content[0])} ${conjunction} ${upperCaseFirstCharacter(content[1])}`
+  } else if (content.length === 2) {
+    return capitaliseFirstCharacter
+      ? `${upperCaseFirstCharacter(content[0])} ${conjunction} ${upperCaseFirstCharacter(content[1])}`
       : `${content[0]} ${conjunction} ${content[1]}`;
   }
 
   const last = content.pop();
-  const formatted = content.map(item => {
+  const formatted = content.map((item) => {
     if (capitaliseFirstCharacter) {
       return upperCaseFirstCharacter(item);
     }
@@ -99,8 +107,7 @@ export function humaniseList ({
   });
   if (formatted.length > 1) {
     formatted.push(`${conjunction} ${last}`);
-  }
-  else if (last) {
+  } else if (last) {
     formatted.push(last);
   }
 
@@ -111,13 +118,13 @@ export function humaniseList ({
  * Append an 's' to a value's descriptor if it is not equal to 1
  * Default values will return an empty string
  */
-export function conditionalPlural ({ word = '', count = 1 }: { word: string, count: number }): string {
+export function conditionalPlural({ word = '', count = 1 }: { word: string; count: number }): string {
   if (count !== 1) {
     return `${word}s`;
   }
   return word;
 }
 
-export function lowerCaseEqual (firstString?: string | null, secondString?: string | null): boolean {
+export function lowerCaseEqual(firstString?: string | null, secondString?: string | null): boolean {
   return firstString?.toLowerCase() === secondString?.toLowerCase();
 }

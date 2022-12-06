@@ -8,15 +8,18 @@ import { createServer } from '../utils/mockServer';
 
 // A dummy server that pretends to be the Discord API
 
-export type WorkerFixture = {
-  discordServer: Server;
-}
+export type DiscordServerDetails = {
+  discordUserId: string;
+  host: string;
+};
 
 // kind of hacky way to extract the interface for fixture
-type DiscordServerFixture = Fixtures<any, WorkerFixture>['discordServer'];
+type DiscordServer = Fixtures<{ discordServer: DiscordServerDetails }>['discordServer'];
 
 // eslint-disable-next-line no-empty-pattern
-export const discordServer: (userId?: string) => DiscordServerFixture = (userId = uuid()) => [async ({}, use, workerInfo) => {
+export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
+  const discordUserId = uuid();
+
   // Start the server.
   const { listen, router } = createServer();
 
@@ -25,9 +28,9 @@ export const discordServer: (userId?: string) => DiscordServerFixture = (userId 
     ctx.body = { access_token: '123' };
   });
 
-  router.get('/users/@me', ctx => {
+  router.get('/users/@me', (ctx) => {
     ctx.body = {
-      id: userId,
+      id: discordUserId,
       username: 'disc0rd_user'
     };
   });
@@ -35,14 +38,17 @@ export const discordServer: (userId?: string) => DiscordServerFixture = (userId 
   const server = await listen(9000 + workerInfo.workerIndex);
 
   // Use the server in the tests.
-  await use(server);
+  await use({
+    discordUserId,
+    host: getServerHost(server)
+  });
 
   // Cleanup.
-  await new Promise(done => {
+  await new Promise((done) => {
     server.close(done);
   });
-}, { scope: 'worker' }];
+};
 
-export function getServerHost (server: Server) {
+function getServerHost(server: Server) {
   return `http://localhost:${(server.address() as AddressInfo).port}`;
 }

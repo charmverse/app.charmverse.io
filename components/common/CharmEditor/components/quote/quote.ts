@@ -1,13 +1,10 @@
 import { type BaseRawNodeSpec } from '@bangle.dev/core';
-import type {
-  DOMOutputSpec,
-  Node
-} from '@bangle.dev/pm';
+import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 const name = 'quote';
 
-export function spec (): BaseRawNodeSpec {
+export function spec(): BaseRawNodeSpec {
   return {
     type: 'node',
     name,

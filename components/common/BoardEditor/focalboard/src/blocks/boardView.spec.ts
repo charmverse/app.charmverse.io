@@ -1,4 +1,3 @@
-
 import { TestBlockFactory } from '../test/testBlockFactory';
 
 import { sortBoardViewsAlphabetically } from './boardView';

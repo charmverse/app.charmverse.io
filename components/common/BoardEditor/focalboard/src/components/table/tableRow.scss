@@ -20,6 +20,7 @@
         background-color: rgba(90, 200, 255, 0.2);
     }
 
+    // Unlike cards and gallery, table rows allow inline editing, so we won't disable this style on iOS (see kanbanCard.scss and galleryCard.scss)
     &:hover {
         background-color: rgba(var(--center-channel-color-rgb), 0.05);
 
@@ -27,4 +28,5 @@
             display: block;
         }
     }
+  
 }

@@ -1,4 +1,3 @@
-
 import type { Page, Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,11 +10,9 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .get(getPageLink);
+handler.use(requireUser).get(getPageLink);
 
-async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
-
+async function getPageLink(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
 
   const page = await prisma.page.findUnique({
@@ -41,10 +38,9 @@ async function getPageLink (req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  const pageLink = await generatePageLink(page as (Page & { space: Space }));
+  const pageLink = await generatePageLink(page as Page & { space: Space });
 
   res.status(200).json(pageLink);
-
 }
 
 export default withSessionRoute(handler);

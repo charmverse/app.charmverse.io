@@ -2,7 +2,7 @@ import type { ProposalStatus } from '@prisma/client';
 
 import type { ProposalTask } from './getProposalTasks';
 
-export function getProposalAction ({
+export function getProposalAction({
   isAuthor,
   currentStatus,
   isReviewer
@@ -11,22 +11,18 @@ export function getProposalAction ({
   isAuthor: boolean;
   isReviewer: boolean;
 }): ProposalTask['action'] | null {
-
   if (currentStatus === 'discussion') {
     if (isAuthor) {
       return 'start_review';
     }
     return 'discuss';
-  }
-  else if (currentStatus === 'reviewed') {
+  } else if (currentStatus === 'reviewed') {
     if (isAuthor) {
       return 'start_vote';
     }
-  }
-  else if (currentStatus === 'vote_active') {
+  } else if (currentStatus === 'vote_active') {
     return 'vote';
-  }
-  else if (currentStatus === 'review') {
+  } else if (currentStatus === 'review') {
     if (isReviewer) {
       return 'review';
     }

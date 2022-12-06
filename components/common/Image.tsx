@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import NextImage from 'next/image';
@@ -10,8 +9,7 @@ const ImageWrapper = styled(Box)`
   ${({ theme }) => theme.palette.mode === 'dark' && 'filter: invert(100%);'}
 `;
 
-export default function Image ({ src, ...props }: Props) {
-
+export default function Image({ src, ...props }: Props) {
   return (
     <ImageWrapper {...props}>
       <NextImage src={src} />

@@ -1,4 +1,3 @@
-
 import type { Block } from '@prisma/client';
 
 import type { Page, PageContentFormats, PageProperty } from './interfaces';
@@ -25,8 +24,7 @@ export class PageFromBlock implements Page {
 
   properties: Record<string, string | number>;
 
-  constructor (block: Block, propertySchemas: PageProperty []) {
-
+  constructor(block: Block, propertySchemas: PageProperty[]) {
     this.id = block.id;
     this.createdAt = new Date(block.createdAt).toISOString();
     this.updatedAt = new Date(block.createdAt).toISOString();
@@ -45,14 +43,18 @@ export class PageFromBlock implements Page {
    * @param properties
    * @param propertySchemas
    */
-  private parseProperties (properties: Record<string, string | number>, propertySchemas: PageProperty []): Record<string, string | number> {
+  private parseProperties(
+    properties: Record<string, string | number>,
+    propertySchemas: PageProperty[]
+  ): Record<string, string | number> {
     const values: any = Object.keys(properties).reduce((constructedObj, propertyId) => {
-
-      const matchedSchema = propertySchemas.find(schema => schema.id === propertyId);
+      const matchedSchema = propertySchemas.find((schema) => schema.id === propertyId);
 
       if (matchedSchema) {
-        const valueToAssign = (matchedSchema.type === 'select' || matchedSchema.type === 'multiSelect')
-          ? matchedSchema.options.find(option => option.id === properties[propertyId])?.value : properties[propertyId];
+        const valueToAssign =
+          matchedSchema.type === 'select' || matchedSchema.type === 'multiSelect'
+            ? matchedSchema.options.find((option) => option.id === properties[propertyId])?.value
+            : properties[propertyId];
 
         const humanFriendlyPropertyKey = matchedSchema.name;
 

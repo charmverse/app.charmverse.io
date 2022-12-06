@@ -1,4 +1,3 @@
-
 import CancelIcon from '@mui/icons-material/Cancel';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SnoozeIcon from '@mui/icons-material/Snooze';
@@ -18,7 +17,7 @@ import type { LoggedInUser } from 'models';
 
 import useTasksState from '../hooks/useTasksState';
 
-export default function SnoozeButton () {
+export default function SnoozeButton() {
   const { setUser } = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
 
@@ -38,28 +37,28 @@ export default function SnoozeButton () {
   });
   const dateTimePickerRef = useRef<HTMLDivElement>(null);
 
-  function hideDateMenu () {
+  function hideDateMenu() {
     setShowDatePicker(false);
     dateInput.close();
   }
 
-  function hideMessageMenu () {
+  function hideMessageMenu() {
     setSnoozeMessage(null);
     messageInput.close();
   }
 
-  function closeMenus () {
+  function closeMenus() {
     hideMessageMenu();
     hideDateMenu();
   }
 
-  function resetState () {
+  function resetState() {
     setShowDatePicker(false);
     setSnoozeMessage(null);
     setSnoozedForValue(null);
   }
 
-  async function removeSnoozedForDate () {
+  async function removeSnoozedForDate() {
     resetState();
     setShowLoading(true);
     await charmClient.tasks.updateTasksState({
@@ -98,7 +97,7 @@ export default function SnoozeButton () {
     setSnoozeMessage(snoozedMessage);
   }, [snoozedMessage]);
 
-  async function saveSnoozeState (_snoozeMessage: string | null) {
+  async function saveSnoozeState(_snoozeMessage: string | null) {
     resetState();
     setShowLoading(true);
     const newSnoozedForDate = getSnoozedDate();
@@ -106,16 +105,18 @@ export default function SnoozeButton () {
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });
-    setUser((user: LoggedInUser) => ({ ...user,
+    setUser((user: LoggedInUser) => ({
+      ...user,
       notificationState: {
         snoozedUntil: newSnoozedForDate.toString(),
         snoozeMessage: _snoozeMessage
-      } }));
+      }
+    }));
     await mutateTasks();
     setShowLoading(false);
   }
 
-  function getSnoozedDate () {
+  function getSnoozedDate() {
     let newSnoozedForDate = DateTime.fromMillis(Date.now());
     switch (snoozedForValue) {
       case '1_day': {
@@ -129,8 +130,7 @@ export default function SnoozeButton () {
       default: {
         if (snoozedForValue instanceof DateTime) {
           newSnoozedForDate = snoozedForValue;
-        }
-        else if (snoozedForDate instanceof DateTime) {
+        } else if (snoozedForDate instanceof DateTime) {
           newSnoozedForDate = snoozedForDate;
         }
       }
@@ -154,22 +154,22 @@ export default function SnoozeButton () {
   return (
     <div>
       <Box display='flex' alignItems='center' gap={0.5} justifyContent='flex-end' width='100%'>
-        <Tooltip arrow placement='top' title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}>
+        <Tooltip
+          arrow
+          placement='top'
+          title={snoozedForDate ? `Snoozed until ${humanFriendlyDate(snoozedForDate, { withTime: true })}` : ''}
+        >
           <Button
             color={snoozedForDate ? 'warning' : dateInput.isOpen ? 'primary' : 'secondary'}
             size='small'
             disableElevation
             loading={showLoading}
             variant='outlined'
-            startIcon={(
-              <SnoozeIcon
-                fontSize='small'
-              />
-            )}
+            startIcon={<SnoozeIcon fontSize='small' />}
             sx={{ fontSize: { xs: '12px', sm: '14px' } }}
             {...bindTrigger(dateInput)}
           >
-            {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: (DateTime.now()) })?.slice(3)}` : 'Snooze'}
+            {isSnoozed ? `Snoozed for ${snoozedForDate.toRelative({ base: DateTime.now() })?.slice(3)}` : 'Snooze'}
           </Button>
         </Tooltip>
         <Tooltip
@@ -183,10 +183,7 @@ export default function SnoozeButton () {
             }
           }}
         >
-          <InfoOutlinedIcon
-            color='secondary'
-            fontSize='small'
-          />
+          <InfoOutlinedIcon color='secondary' fontSize='small' />
         </Tooltip>
       </Box>
 
@@ -205,7 +202,8 @@ export default function SnoozeButton () {
             messageInput.open();
             dateInput.close();
           }}
-        >Snooze for 1 day
+        >
+          Snooze for 1 day
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -217,67 +215,63 @@ export default function SnoozeButton () {
         >
           Snooze for 3 days
         </MenuItem>
-        {showDatePicker
-          ? (
-            <Box display='flex' gap={1}>
-              <DateTimePicker
-                ref={dateTimePickerRef}
-                minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-                value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
-                onAccept={async (value) => {
-                  if (value) {
-                    setSnoozedForValue(value);
-                    messageInput.open();
-                    dateInput.close();
-                  }
-                }}
-                onChange={() => {}}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
-                      readOnly: true
-                    }}
-                    disabled
-                    fullWidth
-                  />
-                )}
-              />
-              <IconButton
-                color='error'
-                onClick={() => {
-                  setShowDatePicker(false);
-                }}
-              >
-                <CancelIcon />
-              </IconButton>
-            </Box>
-          )
-          : (
-            <MenuItem
-              divider={isSnoozed}
-              onClick={() => {
-                setShowDatePicker(true);
+        {showDatePicker ? (
+          <Box display='flex' gap={1}>
+            <DateTimePicker
+              ref={dateTimePickerRef}
+              minDate={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
+              value={DateTime.fromMillis(Date.now()).plus({ day: 1 })}
+              onAccept={async (value) => {
+                if (value) {
+                  setSnoozedForValue(value);
+                  messageInput.open();
+                  dateInput.close();
+                }
               }}
-            >Pick a date
-            </MenuItem>
-          )}
+              onChange={() => {}}
+              renderInput={(props) => (
+                <TextField
+                  {...props}
+                  inputProps={{
+                    ...props.inputProps,
+                    readOnly: true
+                  }}
+                  disabled
+                  fullWidth
+                />
+              )}
+            />
+            <IconButton
+              color='error'
+              onClick={() => {
+                setShowDatePicker(false);
+              }}
+            >
+              <CancelIcon />
+            </IconButton>
+          </Box>
+        ) : (
+          <MenuItem
+            divider={isSnoozed}
+            onClick={() => {
+              setShowDatePicker(true);
+            }}
+          >
+            Pick a date
+          </MenuItem>
+        )}
         {isSnoozed && (
-          <MenuItem onClick={() => {
-            // Close the menu and then update the state after a bit of delay
-            closeMenus();
-            removeSnoozedForDate();
-          }}
+          <MenuItem
+            onClick={() => {
+              // Close the menu and then update the state after a bit of delay
+              closeMenus();
+              removeSnoozedForDate();
+            }}
           >
             Unsnooze
           </MenuItem>
         )}
-        {isSnoozed && (
-          <MenuItem onClick={messageInput.open}>
-            Edit message
-          </MenuItem>
-        )}
+        {isSnoozed && <MenuItem onClick={messageInput.open}>Edit message</MenuItem>}
       </Menu>
       <Modal {...bindPopover(messageInput)} title={`Snooze until ${humanFriendlyDate(getSnoozedDate())}`}>
         <TextField
@@ -296,10 +290,11 @@ export default function SnoozeButton () {
           onChange={(e) => setSnoozeMessage(e.target.value)}
           value={snoozeMessage}
         />
-        <Button onClick={() => {
-          closeMenus();
-          saveSnoozeState(snoozeMessage);
-        }}
+        <Button
+          onClick={() => {
+            closeMenus();
+            saveSnoozeState(snoozeMessage);
+          }}
         >
           {isSnoozed ? 'Save Message' : 'Snooze notifications'}
         </Button>

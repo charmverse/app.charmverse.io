@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react';
 import 'isomorphic-fetch';
 import React from 'react';
@@ -42,22 +41,13 @@ describe('components/cardDetail/CommentsList', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       users: {
-        workspaceUsers: [
-          { username: 'username_1' }
-        ]
+        workspaceUsers: [{ username: 'username_1' }]
       }
     });
 
     const component = (
       <ReduxProvider store={store}>
-        {wrapIntl(
-          <CommentsList
-            comments={[comment1, comment2]}
-            rootId='root_id'
-            cardId='card_id'
-            readOnly={false}
-          />
-        )}
+        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId='root_id' cardId='card_id' readOnly={false} />)}
       </ReduxProvider>
     );
 
@@ -83,22 +73,13 @@ describe('components/cardDetail/CommentsList', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       users: {
-        workspaceUsers: [
-          { username: 'username_1' }
-        ]
+        workspaceUsers: [{ username: 'username_1' }]
       }
     });
 
     const component = (
       <ReduxProvider store={store}>
-        {wrapIntl(
-          <CommentsList
-            comments={[comment1, comment2]}
-            rootId='root_id'
-            cardId='card_id'
-            readOnly={true}
-          />
-        )}
+        {wrapIntl(<CommentsList comments={[comment1, comment2]} rootId='root_id' cardId='card_id' readOnly={true} />)}
       </ReduxProvider>
     );
 

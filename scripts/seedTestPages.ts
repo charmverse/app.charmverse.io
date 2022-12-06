@@ -20,7 +20,7 @@ export async function seedTestPages({spaceDomain, nestedPercent = 50, pagesToCre
     throw new DataNotFoundError(`Space with domain ${spaceDomain} not found`)
   }
 
-  const pageInputs: Prisma.PageCreateInput[] = [];
+  const pageInputs: Prisma.PageCreateManyInput[] = [];
 
   for (let pageCount = 0; pageCount < pagesToCreate; pageCount++) {
     const page = pageStubToCreate({spaceId: space.id, createdBy: space.createdBy, title: `Page ${pageCount + 1}`})
@@ -43,8 +43,22 @@ export async function seedTestPages({spaceDomain, nestedPercent = 50, pagesToCre
     permissionLevel: 'full_access'
   }))
 
+  console.log('Pages to create', pageInputs.length)
+
+  pageInputs.forEach(i => {
+    permissionInputs.push({
+      pageId: i.id as string,
+      userId: space.createdBy,
+      permissionLevel: 'full_access'
+    })
+  })
+
+  console.log('Permission inputs', permissionInputs.length);
+
   await prisma.$transaction([
-    ...pageInputs.map(page => createPage({data: page})),
+    prisma.page.createMany({
+      data: pageInputs
+    }),
     prisma.pagePermission.createMany({
       data: permissionInputs
     })
@@ -127,21 +141,21 @@ async function cleanSpacePages({spaceDomain}: {spaceDomain: string}) {
 //   process.exit(1)
 // })
 
-seedTestBoards({spaceDomain: 'maximum-fuchsia-cicada', boardCount: 1, cardCount: 500})
-  .then(() => console.log('Done'))
-.catch(e => {
-  console.error(e)
-  process.exit(1)
-})
-
-
-// seedTestPages({spaceDomain: 'slim-ivory-tyrannosaurus', pagesToCreate: 100, nestedPercent: 92})
-// .then(() => {
-//   console.log('Done')
-//   process.exit(0)
-// })
+// seedTestBoards({spaceDomain: 'maximum-fuchsia-cicada', boardCount: 1, cardCount: 500})
+//   .then(() => console.log('Done'))
 // .catch(e => {
 //   console.error(e)
 //   process.exit(1)
 // })
+
+
+seedTestPages({spaceDomain: 'prospective-decentralized-hummingbird', pagesToCreate: 15000, nestedPercent: 92})
+.then(() => {
+  console.log('Done')
+  process.exit(0)
+})
+.catch(e => {
+  console.error(e)
+  process.exit(1)
+})
 

@@ -75,9 +75,7 @@ describe('components/centerPanel', () => {
     searchText: '',
     users: {
       me: {},
-      workspaceUsers: [
-        { username: 'username_1' }
-      ],
+      workspaceUsers: [{ username: 'username_1' }],
       blockSubscriptions: []
     },
     boards: {
@@ -101,72 +99,17 @@ describe('components/centerPanel', () => {
   const store = mockStateStore([], state);
   beforeAll(() => {
     mockDOM();
-
   });
   beforeEach(() => {
     activeView.fields.viewType = 'board';
     jest.clearAllMocks();
   });
   test('should match snapshot for Kanban', () => {
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <CenterPanel
-          cards={[card1]}
-          setPage={() => {}}
-          views={[activeView]}
-          board={board}
-          activeView={activeView}
-          readOnly={false}
-          showCard={jest.fn()}
-          groupByProperty={groupProperty}
-        />
-      </ReduxProvider>
-    ));
-    expect(container).toMatchSnapshot();
-  });
-  test('should match snapshot for Gallery', () => {
-    activeView.fields.viewType = 'gallery';
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <CenterPanel
-          cards={[card1]}
-          setPage={() => {}}
-          views={[activeView]}
-          board={board}
-          activeView={activeView}
-          readOnly={false}
-          showCard={jest.fn()}
-          groupByProperty={groupProperty}
-        />
-      </ReduxProvider>
-    ));
-    expect(container).toMatchSnapshot();
-  });
-  test('should match snapshot for Table', () => {
-    activeView.fields.viewType = 'table';
-    const { container } = render(wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <CenterPanel
-          cards={[card1]}
-          setPage={() => {}}
-          views={[activeView]}
-          board={board}
-          activeView={activeView}
-          readOnly={false}
-          showCard={jest.fn()}
-          groupByProperty={groupProperty}
-        />
-      </ReduxProvider>
-    ));
-    expect(container).toMatchSnapshot();
-  });
-  describe('return centerPanel and', () => {
-    test('select one card and click background', () => {
-      activeView.fields.viewType = 'table';
-      const { container } = render(wrapDNDIntl(
+    const { container } = render(
+      wrapDNDIntl(
         <ReduxProvider store={store}>
           <CenterPanel
-            cards={[card1, card2]}
+            cards={[card1]}
             setPage={() => {}}
             views={[activeView]}
             board={board}
@@ -176,7 +119,69 @@ describe('components/centerPanel', () => {
             groupByProperty={groupProperty}
           />
         </ReduxProvider>
-      ));
+      )
+    );
+    expect(container).toMatchSnapshot();
+  });
+  test('should match snapshot for Gallery', () => {
+    activeView.fields.viewType = 'gallery';
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <CenterPanel
+            cards={[card1]}
+            setPage={() => {}}
+            views={[activeView]}
+            board={board}
+            activeView={activeView}
+            readOnly={false}
+            showCard={jest.fn()}
+            groupByProperty={groupProperty}
+          />
+        </ReduxProvider>
+      )
+    );
+    expect(container).toMatchSnapshot();
+  });
+  test('should match snapshot for Table', () => {
+    activeView.fields.viewType = 'table';
+    const { container } = render(
+      wrapDNDIntl(
+        <ReduxProvider store={store}>
+          <CenterPanel
+            cards={[card1]}
+            setPage={() => {}}
+            views={[activeView]}
+            board={board}
+            activeView={activeView}
+            readOnly={false}
+            showCard={jest.fn()}
+            groupByProperty={groupProperty}
+          />
+        </ReduxProvider>
+      )
+    );
+    expect(container).toMatchSnapshot();
+  });
+  describe('return centerPanel and', () => {
+    test('select one card and click background', () => {
+      activeView.fields.viewType = 'table';
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
 
       // select card
       const cardElement = screen.getByRole('textbox', { name: 'card1' });
@@ -193,20 +198,22 @@ describe('components/centerPanel', () => {
 
     test('press touch 1 with readonly', () => {
       activeView.fields.viewType = 'table';
-      const { container, baseElement } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={true}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container, baseElement } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={true}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
 
       // touch '1'
       fireEvent.keyDown(baseElement, { keyCode: 49 });
@@ -215,20 +222,22 @@ describe('components/centerPanel', () => {
 
     test('press touch esc for one card selected', () => {
       activeView.fields.viewType = 'table';
-      const { container, baseElement } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container, baseElement } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
 
       const cardElement = screen.getByRole('textbox', { name: 'card1' });
       expect(cardElement).not.toBeNull();
@@ -241,20 +250,22 @@ describe('components/centerPanel', () => {
     });
     test('press touch esc for two cards selected', async () => {
       activeView.fields.viewType = 'table';
-      const { container, baseElement } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container, baseElement } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
 
       // select card1
       const card1Element = screen.getByRole('textbox', { name: 'card1' });
@@ -274,20 +285,22 @@ describe('components/centerPanel', () => {
     });
     test('press touch del for one card selected', () => {
       activeView.fields.viewType = 'table';
-      const { container, baseElement } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container, baseElement } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const cardElement = screen.getByRole('textbox', { name: 'card1' });
       expect(cardElement).not.toBeNull();
       userEvent.click(cardElement, { shiftKey: true });
@@ -299,20 +312,22 @@ describe('components/centerPanel', () => {
     });
     test('press touch ctrl+d for one card selected', () => {
       activeView.fields.viewType = 'table';
-      const { container, baseElement } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container, baseElement } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const cardElement = screen.getByRole('textbox', { name: 'card1' });
       expect(cardElement).not.toBeNull();
       userEvent.click(cardElement, { shiftKey: true });
@@ -325,20 +340,22 @@ describe('components/centerPanel', () => {
     test('click on card to show card', () => {
       activeView.fields.viewType = 'board';
       const mockedShowCard = jest.fn();
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={mockedShowCard}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={mockedShowCard}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
 
       const kanbanCardElements = container.querySelectorAll('.KanbanCard');
       expect(kanbanCardElements).not.toBeNull();
@@ -349,20 +366,22 @@ describe('components/centerPanel', () => {
     });
     test('click on new card to add card', () => {
       activeView.fields.viewType = 'table';
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonWithMenuElement = container.querySelector('.ButtonWithMenu');
       expect(buttonWithMenuElement).not.toBeNull();
       userEvent.click(buttonWithMenuElement!);
@@ -370,44 +389,50 @@ describe('components/centerPanel', () => {
     });
     test('click on new card to add card template', () => {
       activeView.fields.viewType = 'table';
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const elementMenuWrapper = container.querySelector('.ButtonWithMenu > div.MenuWrapper');
       expect(elementMenuWrapper).not.toBeNull();
       userEvent.click(elementMenuWrapper!);
-      const buttonNewTemplate = within(elementMenuWrapper!.parentElement!).getByRole('button', { name: 'New template' });
+      const buttonNewTemplate = within(elementMenuWrapper!.parentElement!).getByRole('button', {
+        name: 'New template'
+      });
       userEvent.click(buttonNewTemplate);
       expect(mockedMutator.insertBlock).toBeCalledTimes(1);
     });
     test('click on new card to add card from template', () => {
       activeView.fields.viewType = 'table';
       activeView.fields.defaultTemplateId = '1';
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const elementMenuWrapper = container.querySelector('.ButtonWithMenu > div.MenuWrapper');
       expect(elementMenuWrapper).not.toBeNull();
       userEvent.click(elementMenuWrapper!);
@@ -419,20 +444,22 @@ describe('components/centerPanel', () => {
     test('click on new card to edit template', () => {
       activeView.fields.viewType = 'table';
       activeView.fields.defaultTemplateId = '1';
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <CenterPanel
-            cards={[card1, card2]}
-            setPage={() => {}}
-            views={[activeView]}
-            board={board}
-            activeView={activeView}
-            readOnly={false}
-            showCard={jest.fn()}
-            groupByProperty={groupProperty}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              cards={[card1, card2]}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={jest.fn()}
+              groupByProperty={groupProperty}
+            />
+          </ReduxProvider>
+        )
+      );
       const elementMenuWrapper = container.querySelector('.ButtonWithMenu > div.MenuWrapper');
       expect(elementMenuWrapper).not.toBeNull();
       userEvent.click(elementMenuWrapper!);

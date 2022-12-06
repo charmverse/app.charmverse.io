@@ -13,7 +13,7 @@ import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
 import PdfSelector from 'components/common/PdfSelector';
-import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/image/constants';
+import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import Resizable from './Resizable/Resizable';
 
@@ -51,7 +51,7 @@ interface DispatchFn {
   (tr: Transaction): void;
 }
 
-function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
+function insertPDFNode(state: EditorState, dispatch: DispatchFn, view: EditorView, attrs?: { [key: string]: any }) {
   const type = state.schema.nodes.pdf;
   const newTr = type.create(attrs);
   const { tr } = view.state;
@@ -62,7 +62,11 @@ function insertPDFNode (state: EditorState, dispatch: DispatchFn, view: EditorVi
   }
 }
 
-function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<HTMLDivElement> & { readOnly: boolean, isSelected?: boolean }) {
+function EmptyPDFContainer({
+  readOnly,
+  isSelected,
+  ...props
+}: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
@@ -71,7 +75,7 @@ function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<H
       disableRipple
       disabled={readOnly}
       sx={{
-        backgroundColor: (isSelected && !readOnly) ? 'var(--charmeditor-active)' : theme.palette.background.light,
+        backgroundColor: isSelected && !readOnly ? 'var(--charmeditor-active)' : theme.palette.background.light,
         p: 2,
         display: 'flex'
       }}
@@ -79,15 +83,13 @@ function EmptyPDFContainer ({ readOnly, isSelected, ...props }: HTMLAttributes<H
     >
       <StyledEmptyPDFContainer>
         <PictureAsPdfIcon fontSize='small' />
-        <Typography>
-          Add a PDF
-        </Typography>
+        <Typography>Add a PDF</Typography>
       </StyledEmptyPDFContainer>
     </ListItem>
   );
 }
 
-export function pdfSpec () {
+export function pdfSpec() {
   const spec: BaseRawNodeSpec = {
     name: 'pdf',
     type: 'node',
@@ -127,31 +129,26 @@ const PDF = memo((props: PDFViewerProps) => {
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
 
-  function onDocumentLoadSuccess ({ numPages }: { numPages : number }) {
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setPageCount(numPages);
     setPageNumber(pageNumber || 1);
   }
 
-  function changePage (offset : number) {
+  function changePage(offset: number) {
     setPageNumber((prevPageNumber: number) => prevPageNumber + offset);
   }
 
-  function previousPage () {
+  function previousPage() {
     changePage(-1);
   }
 
-  function nextPage () {
+  function nextPage() {
     changePage(1);
   }
 
   return (
     <Box>
-      <PDFViewer
-        onLoadSuccess={onDocumentLoadSuccess}
-        pageNumber={pageNumber}
-        url={url}
-        width={width}
-      />
+      <PDFViewer onLoadSuccess={onDocumentLoadSuccess} pageNumber={pageNumber} url={url} width={width} />
       <div>
         <p>
           Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
@@ -167,22 +164,27 @@ const PDF = memo((props: PDFViewerProps) => {
   );
 });
 
-function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
-  NodeViewProps & { readOnly?: boolean, onResizeStop?: (view: EditorView) => void }) {
+function ResizablePDF({
+  readOnly,
+  onResizeStop,
+  node,
+  updateAttrs,
+  selected
+}: NodeViewProps & { readOnly?: boolean; onResizeStop?: (view: EditorView) => void }) {
   readOnly = readOnly ?? false;
 
   const url: string = useMemo(() => node.attrs.src, [node.attrs.src]);
   const size: number = useMemo(() => node.attrs.size, [node.attrs.size]);
+  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   // If there are no source for the node, return the pdf select component
   if (!url) {
     if (readOnly) {
       return <EmptyPDFContainer readOnly={readOnly} isSelected={selected} />;
-    }
-    else {
+    } else {
       return (
         <PdfSelector
-          autoOpen={true}
+          autoOpen={autoOpen}
           onPdfSelect={async (pdfSrc) => {
             updateAttrs({
               src: pdfSrc
@@ -203,11 +205,8 @@ function ResizablePDF ({ readOnly, onResizeStop, node, updateAttrs, selected }:
   };
 
   if (readOnly) {
-    return (
-      <PDF url={url} width={size} />
-    );
-  }
-  else {
+    return <PDF url={url} width={size} />;
+  } else {
     return (
       <Resizable
         initialSize={size}

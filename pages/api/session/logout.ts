@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +8,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.post(logout);
 
-async function logout (req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
+async function logout(req: NextApiRequest, res: NextApiResponse<{ ok: boolean }>) {
   req.session.destroy();
   res.send({ ok: true });
 }

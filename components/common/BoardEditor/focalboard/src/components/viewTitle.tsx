@@ -33,9 +33,9 @@ type Props = {
   board: Board;
   readOnly: boolean;
   setPage: (page: Partial<Page>) => void;
-}
+};
 
-function ViewTitle (props: Props) {
+function ViewTitle(props: Props) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);
@@ -47,99 +47,92 @@ function ViewTitle (props: Props) {
     setTitle(board.title);
     props.setPage({ title: board.title });
   }, [board.title]);
-  const onDescriptionChange = useCallback((text: PageContent) => mutator.changeDescription(board.id, board.fields.description, text), [board.id, board.fields.description]);
+  const onDescriptionChange = useCallback(
+    (text: PageContent) => mutator.changeDescription(board.id, board.fields.description, text),
+    [board.id, board.fields.description]
+  );
   const onAddRandomIcon = useCallback(() => {
     const newIcon = BlockIcons.shared.randomIcon();
     mutator.changeIcon(board.id, board.fields.icon, newIcon);
     return newIcon;
   }, [board.id, board.fields.icon]);
-  const setRandomHeaderImage = useCallback((headerImage?: string | null) => {
-    const newHeaderImage = headerImage ?? randomBannerImage();
-    // Null is passed if we want to remove the image
-    mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null);
-  }, [board.id, board.fields.headerImage]);
-  const onShowDescription = useCallback(() => mutator.showDescription(board.id, Boolean(board.fields.showDescription), true), [board.id, board.fields.showDescription]);
-  const onHideDescription = useCallback(() => mutator.showDescription(board.id, Boolean(board.fields.showDescription), false), [board.id, board.fields.showDescription]);
+  const setRandomHeaderImage = useCallback(
+    (headerImage?: string | null) => {
+      const newHeaderImage = headerImage ?? randomBannerImage();
+      // Null is passed if we want to remove the image
+      mutator.changeHeaderImage(board.id, board.fields.headerImage, headerImage !== null ? newHeaderImage : null);
+    },
+    [board.id, board.fields.headerImage]
+  );
+  const onShowDescription = useCallback(
+    () => mutator.showDescription(board.id, Boolean(board.fields.showDescription), true),
+    [board.id, board.fields.showDescription]
+  );
+  const onHideDescription = useCallback(
+    () => mutator.showDescription(board.id, Boolean(board.fields.showDescription), false),
+    [board.id, board.fields.showDescription]
+  );
 
   const intl = useIntl();
 
   return (
     <div className='ViewTitle'>
       <div className='add-buttons add-visible'>
-        {!props.readOnly && !board.fields.headerImage
-          && (
-            <div className='add-buttons'>
-              <Button
-                onClick={() => setRandomHeaderImage()}
-                icon={(
-                  <ImageIcon
-                    fontSize='small'
-                    sx={{ marginRight: 1 }}
-                  />
-                )}
-              >
-                <FormattedMessage
-                  id='CardDetail.add-cover'
-                  defaultMessage='Add cover'
-                />
-              </Button>
-            </div>
-          )}
-        {!props.readOnly && !board.fields.icon
-          && (
+        {!props.readOnly && !board.fields.headerImage && (
+          <div className='add-buttons'>
             <Button
-              onClick={() => {
-                props.setPage({ icon: onAddRandomIcon() });
-              }}
-              icon={(
-                <EmojiEmotionsOutlinedIcon
-                  fontSize='small'
-                  sx={{
-                    mr: 1
-                  }}
-                />
-              )}
+              onClick={() => setRandomHeaderImage()}
+              icon={<ImageIcon fontSize='small' sx={{ marginRight: 1 }} />}
             >
-              <FormattedMessage
-                id='TableComponent.add-icon'
-                defaultMessage='Add icon'
-              />
+              <FormattedMessage id='CardDetail.add-cover' defaultMessage='Add cover' />
             </Button>
-          )}
-        {!props.readOnly && board.fields.showDescription
-          && (
-            <Button
-              onClick={onHideDescription}
-              icon={(
-                <VisibilityOffOutlinedIcon sx={{
+          </div>
+        )}
+        {!props.readOnly && !board.fields.icon && (
+          <Button
+            onClick={() => {
+              props.setPage({ icon: onAddRandomIcon() });
+            }}
+            icon={
+              <EmojiEmotionsOutlinedIcon
+                fontSize='small'
+                sx={{
                   mr: 1
                 }}
-                />
-              )}
-            >
-              <FormattedMessage
-                id='ViewTitle.hide-description'
-                defaultMessage='hide description'
               />
-            </Button>
-          )}
-        {!props.readOnly && !board.fields.showDescription
-          && (
-            <Button
-              onClick={onShowDescription}
-              icon={(
-                <VisibilityOutlinedIcon sx={{
+            }
+          >
+            <FormattedMessage id='TableComponent.add-icon' defaultMessage='Add icon' />
+          </Button>
+        )}
+        {!props.readOnly && board.fields.showDescription && (
+          <Button
+            onClick={onHideDescription}
+            icon={
+              <VisibilityOffOutlinedIcon
+                sx={{
                   mr: 1
                 }}
-                />
-              )}
-            >
-              <FormattedMessage
-                id='ViewTitle.show-description'
-                defaultMessage='show description'
               />
-            </Button>
-          )}
+            }
+          >
+            <FormattedMessage id='ViewTitle.hide-description' defaultMessage='hide description' />
+          </Button>
+        )}
+        {!props.readOnly && !board.fields.showDescription && (
+          <Button
+            onClick={onShowDescription}
+            icon={
+              <VisibilityOutlinedIcon
+                sx={{
+                  mr: 1
+                }}
+              />
+            }
+          >
+            <FormattedMessage id='ViewTitle.show-description' defaultMessage='show description' />
+          </Button>
+        )}
       </div>
 
       <div className='title' data-test='board-title'>
@@ -157,25 +150,24 @@ function ViewTitle (props: Props) {
         />
       </div>
 
-      {board.fields.showDescription
-        && (
-          <div className='description'>
-            <CharmEditor
-              disablePageSpecificFeatures
-              content={board.fields.description}
-              onContentChange={(content: ICharmEditorOutput) => {
-                onDescriptionChange(content.doc);
-              }}
-              pageId={board.id}
-            />
-          </div>
-        )}
+      {board.fields.showDescription && (
+        <div className='description'>
+          <CharmEditor
+            disablePageSpecificFeatures
+            isContentControlled={true}
+            content={board.fields.description}
+            onContentChange={(content: ICharmEditorOutput) => {
+              onDescriptionChange(content.doc);
+            }}
+            pageId={board.id}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-export function InlineViewTitle (props: Props) {
-
+export function InlineViewTitle(props: Props) {
   const { board } = props;
 
   const [title, setTitle] = useState(board.title);
@@ -185,7 +177,7 @@ export function InlineViewTitle (props: Props) {
   }, [board.id, board.title, title]);
 
   // cancel key events, such as "Delete" or "Backspace" so that prosemiror doesnt pick them up on inline dbs
-  function cancelEvent (e: KeyboardEvent<HTMLDivElement>) {
+  function cancelEvent(e: KeyboardEvent<HTMLDivElement>) {
     e.stopPropagation();
   }
 

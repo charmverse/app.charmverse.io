@@ -23,12 +23,15 @@ beforeAll(async () => {
 describe('markTasks', () => {
   it('Should create notification for a task if its not present', async () => {
     const taskId = v4();
-    await markTasks([
-      {
-        id: taskId,
-        type: 'mention'
-      }
-    ], user.id);
+    await markTasks(
+      [
+        {
+          id: taskId,
+          type: 'mention'
+        }
+      ],
+      user.id
+    );
 
     const userNotifications = await prisma.userNotification.findMany({
       where: {
@@ -39,7 +42,7 @@ describe('markTasks', () => {
       }
     });
 
-    const userNotificationTaskIds = userNotifications.map(_userNotification => _userNotification.taskId);
+    const userNotificationTaskIds = userNotifications.map((_userNotification) => _userNotification.taskId);
     expect(userNotificationTaskIds).toStrictEqual([userNotification.taskId, taskId]);
   });
 });

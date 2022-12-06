@@ -18,11 +18,13 @@ export interface LitJwtPayload {
   extraData: '{"tokenGateId":"bd177a2f-c980-4595-8079-d4bee95a7924"}';
 }
 
-export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate'
+export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
 export interface TokenGateWithRoles extends TokenGate {
   tokenGateToRoles: (TokenGateToRole & { role: Role })[];
 }
+
+export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
 export interface TokenGateJwt {
   signedToken: string;
@@ -65,4 +67,10 @@ export interface TokenGateVerificationResult {
   roles: Role[];
 }
 
-export type TokenGateAccessType = 'individual_wallet' | 'individual_nft' | 'group_token_or_nft' | 'dao_members' | 'poap_collectors' | 'cask_subscribers'
+export type TokenGateAccessType =
+  | 'individual_wallet'
+  | 'individual_nft'
+  | 'group_token_or_nft'
+  | 'dao_members'
+  | 'poap_collectors'
+  | 'cask_subscribers';

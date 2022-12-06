@@ -20,7 +20,7 @@ import { usePages } from 'hooks/usePages';
 import type { IPagePermissionWithAssignee } from 'lib/permissions/pages/page-permission-interfaces';
 
 const StyledInput = styled(Input)`
-  font-size: .8em;
+  font-size: 0.8em;
   height: 35px;
   padding-right: 0;
 
@@ -56,13 +56,12 @@ const alerts: Partial<Record<PageType, string>> = {
   proposal: 'Proposal permissions update automatically based on the proposal stage and authors / reviewers.'
 };
 
-export default function ShareToWeb ({ pageId, pagePermissions, refreshPermissions, proposalParentId }: Props) {
-
+export default function ShareToWeb({ pageId, pagePermissions, refreshPermissions, proposalParentId }: Props) {
   const router = useRouter();
   const { pages, getPagePermissions } = usePages();
   const [copied, setCopied] = useState<boolean>(false);
-  const [space] = useCurrentSpace();
-  const publicPermission = pagePermissions.find(publicPerm => publicPerm.public === true) ?? null;
+  const space = useCurrentSpace();
+  const publicPermission = pagePermissions.find((publicPerm) => publicPerm.public === true) ?? null;
 
   const currentPagePermissions = getPagePermissions(pageId);
 
@@ -75,11 +74,10 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
 
   const shareAlertMessage = currentPage ? alerts[proposalParentId ? 'proposal' : currentPage.type] : undefined;
 
-  async function togglePublic () {
+  async function togglePublic() {
     if (publicPermission) {
       await charmClient.deletePermission(publicPermission.id);
-    }
-    else {
+    } else {
       await charmClient.createPermission({
         pageId,
         permissionLevel: 'view',
@@ -93,50 +91,46 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
     updateShareLink();
   }, [publicPermission, router.query.viewId]);
 
-  function onCopy () {
+  function onCopy() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
-  async function updateShareLink () {
+  async function updateShareLink() {
     if (!publicPermission) {
       setShareLink(null);
-    }
-    else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
-      const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
+    } else if (currentPage?.type === 'page' || currentPage?.type === 'card' || currentPage?.type === 'proposal') {
+      const shareLinkToSet =
+        typeof window !== 'undefined' ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}` : '';
       setShareLink(shareLinkToSet);
-    }
-    else if (currentPage?.type.match(/board/)) {
+    } else if (currentPage?.type.match(/board/)) {
       const viewIdToProvide = router.query.viewId;
-      const shareLinkToSet = (typeof window !== 'undefined')
-        ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}` : '';
+      const shareLinkToSet =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/share/${space?.domain}/${currentPage.path}?viewId=${viewIdToProvide}`
+          : '';
       setShareLink(shareLinkToSet);
     }
   }
 
   return (
     <>
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-        padding={1}
-      >
-
+      <Box display='flex' justifyContent='space-between' alignItems='center' padding={1}>
         <Box>
-
           <Typography>Share to web</Typography>
 
           <Typography variant='body2' color='secondary'>
-            {publicPermission
-              ? 'Anyone with the link can view'
-              : 'Publish and share link with anyone'}
+            {publicPermission ? 'Anyone with the link can view' : 'Publish and share link with anyone'}
           </Typography>
         </Box>
-        <Tooltip title={currentPagePermissions.edit_isPublic && Boolean(proposalParentId) ? 'You can only change this setting from the top proposal page.' : ''}>
+        <Tooltip
+          title={
+            currentPagePermissions.edit_isPublic && Boolean(proposalParentId)
+              ? 'You can only change this setting from the top proposal page.'
+              : ''
+          }
+        >
           <Box>
-
             <Switch
               data-test='toggle-public-page'
               checked={!!publicPermission}
@@ -147,49 +141,37 @@ export default function ShareToWeb ({ pageId, pagePermissions, refreshPermission
         </Tooltip>
       </Box>
 
-      {
-        shareAlertMessage && (
-          <Alert severity='info'>
-            {shareAlertMessage}
-          </Alert>
-        )
-      }
+      {shareAlertMessage && <Alert severity='info'>{shareAlertMessage}</Alert>}
 
       <Collapse in={!!publicPermission}>
-        {
-          shareLink && (
-            <Box p={1}>
-              <StyledInput
-                data-test='share-link'
-                fullWidth
-                disabled
-                value={shareLink}
-                endAdornment={(
-                  <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
-                    <InputAdornment position='end'>
-                      <CopyButton>
-                        {copied ? 'Copied!' : 'Copy'}
-                      </CopyButton>
-                    </InputAdornment>
-                  </CopyToClipboard>
-                )}
-              />
-            </Box>
-          )
-        }
-      </Collapse>
-      {
-        publicPermission?.sourcePermission && (
-          <Box display='block'>
-            <Typography variant='caption' sx={{ ml: 1 }}>
-              Inherited from
-              <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
-                {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
-              </Link>
-            </Typography>
+        {shareLink && (
+          <Box p={1}>
+            <StyledInput
+              data-test='share-link'
+              fullWidth
+              disabled
+              value={shareLink}
+              endAdornment={
+                <CopyToClipboard data-test='copy-button' text={shareLink} onCopy={onCopy}>
+                  <InputAdornment position='end'>
+                    <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
+                  </InputAdornment>
+                </CopyToClipboard>
+              }
+            />
           </Box>
-        )
-      }
+        )}
+      </Collapse>
+      {publicPermission?.sourcePermission && (
+        <Box display='block'>
+          <Typography variant='caption' sx={{ ml: 1 }}>
+            Inherited from
+            <Link sx={{ ml: 0.5 }} href={`/${space?.domain}/${pages[publicPermission?.sourcePermission.pageId]?.path}`}>
+              {pages[publicPermission?.sourcePermission.pageId]?.title || 'Untitled'}
+            </Link>
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }

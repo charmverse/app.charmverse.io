@@ -1,30 +1,65 @@
-import type { ProposalStatus, Prisma } from '@prisma/client';
+import type { ProposalStatus, Page, PrismaPromise, Prisma } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
-import type { PageContent } from 'models';
 
 import { getPagePath } from '../pages';
 
 import { generateSyncProposalPermissions } from './syncProposalPermissions';
 
 type PageProps = 'createdBy' | 'spaceId';
-type OptionalPageProps = 'content' | 'contentText' | 'title';
+type OptionalPageProps = 'content' | 'contentText' | 'id' | 'title';
 
-type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
-  & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
-type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
+type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps> &
+  Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
 
-export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
+type ProposalInput = { reviewers: { roleId?: string; userId?: string }[]; categoryId: string | null };
 
-  const { createdBy, spaceId } = pageProps;
+export async function createProposal(pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
+  const { createdBy, id: pageId, spaceId } = pageProps;
 
-  // Making the page id same as proposalId
-  const proposalId = uuid();
+  const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
+
+  const existingPage =
+    pageId &&
+    (await prisma.page.findUnique({
+      where: {
+        id: pageId
+      }
+    }));
+
+  function upsertPage(): PrismaPromise<Page> {
+    if (existingPage) {
+      return prisma.page.update({
+        where: {
+          id: pageId
+        },
+        data: {
+          proposalId,
+          type: 'proposal',
+          updatedAt: new Date(),
+          updatedBy: createdBy
+        }
+      });
+    } else {
+      return createPage({
+        data: {
+          proposalId,
+          contentText: '',
+          path: getPagePath(),
+          title: '',
+          updatedBy: createdBy,
+          ...pageProps,
+          id: proposalId,
+          type: 'proposal'
+        },
+        include: null
+      });
+    }
+  }
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page, workspaceEvent] = await prisma.$transaction([
@@ -41,28 +76,16 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
             userId: createdBy
           }
         },
-        ...proposalProps?.reviewers && {
+        ...(proposalProps?.reviewers && {
           reviewers: {
             createMany: {
               data: proposalProps.reviewers
             }
           }
-        }
+        })
       }
     }),
-    createPage({
-      data: {
-        proposalId,
-        contentText: '',
-        path: getPagePath(),
-        title: '',
-        updatedBy: createdBy,
-        ...pageProps,
-        id: proposalId,
-        type: 'proposal'
-      },
-      include: null
-    }),
+    upsertPage(),
     prisma.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',
@@ -80,9 +103,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
 
   await prisma.$transaction([
     prisma.pagePermission.deleteMany(deleteArgs),
-    ...createArgs.map(args => (
-      prisma.pagePermission.create(args)
-    ))
+    ...createArgs.map((args) => prisma.pagePermission.create(args))
   ]);
 
   trackUserAction('new_proposal_created', { userId: createdBy, pageId: page.id, resourceId: proposal.id, spaceId });

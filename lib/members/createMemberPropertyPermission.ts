@@ -1,14 +1,13 @@
-
 import { MemberPropertyPermissionLevel } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { CreateMemberPropertyPermissionInput } from 'lib/members/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-export async function createMemberPropertyPermission (data: CreateMemberPropertyPermissionInput) {
+export async function createMemberPropertyPermission(data: CreateMemberPropertyPermissionInput) {
   const space = await prisma.space.findFirst({
     where: {
-      memberProperty: {
+      memberProperties: {
         some: {
           id: data.memberPropertyId
         }

@@ -3,7 +3,12 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { createVote, generateProposal, generateRoleWithSpaceRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createVote,
+  generateProposal,
+  generateRoleWithSpaceRole,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { getProposalTasks } from '../getProposalTasks';
 
@@ -32,13 +37,14 @@ describe('getProposalTasks', () => {
     const proposalTasks = await getProposalTasks(user.id);
 
     // sd d
-    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: privateDraftProposal1.proposal.status,
-        action: 'start_review'
-      })
-    ]));
-
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: privateDraftProposal1.proposal.status,
+          action: 'start_review'
+        })
+      ])
+    );
   });
 
   it('Should not get draft and private draft proposals where the user is one of the authors', async () => {
@@ -97,12 +103,14 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: reviewedProposal1.proposal.status,
-        action: 'start_vote'
-      })
-    ]));
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: reviewedProposal1.proposal.status,
+          action: 'start_vote'
+        })
+      ])
+    );
   });
 
   it('Should get all proposals to review where the user is one of the reviewer through both roleId and userId', async () => {
@@ -112,7 +120,7 @@ describe('getProposalTasks', () => {
     const { role } = await generateRoleWithSpaceRole({
       spaceId: space.id,
       createdBy: user.id,
-      spaceRoleId: (space.spaceRoles.find(spaceRole => spaceRole.userId === user.id) as SpaceRole).id
+      spaceRoleId: (space.spaceRoles.find((spaceRole) => spaceRole.userId === user.id) as SpaceRole).id
     });
 
     const proposalToReviewViaRole = await generateProposal({
@@ -141,16 +149,18 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: proposalToReviewViaRole.proposal.status,
-        action: 'review'
-      }),
-      expect.objectContaining({
-        status: proposalToReviewViaUser.proposal.status,
-        action: 'review'
-      })
-    ]));
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: proposalToReviewViaRole.proposal.status,
+          action: 'review'
+        }),
+        expect.objectContaining({
+          status: proposalToReviewViaUser.proposal.status,
+          action: 'review'
+        })
+      ])
+    );
   });
 
   it('Should get all proposals in discussion and active vote stage where the user is a member of the proposal space', async () => {
@@ -237,26 +247,30 @@ describe('getProposalTasks', () => {
 
     const proposalTasks = await getProposalTasks(user.id);
 
-    expect(proposalTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: discussionProposal1.proposal.status,
-        action: 'start_review'
-      }),
-      expect.objectContaining({
-        status: activeVoteProposal.proposal.status,
-        action: 'vote'
-      }),
-      expect.objectContaining({
-        status: discussionProposal2.proposal.status,
-        action: 'discuss'
-      })
-    ]));
+    expect(proposalTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: discussionProposal1.proposal.status,
+          action: 'start_review'
+        }),
+        expect.objectContaining({
+          status: activeVoteProposal.proposal.status,
+          action: 'vote'
+        }),
+        expect.objectContaining({
+          status: discussionProposal2.proposal.status,
+          action: 'discuss'
+        })
+      ])
+    );
 
     // Making double sure private draft wasn't fetched
-    expect(proposalTasks.unmarked).toEqual(expect.not.arrayContaining([
-      expect.objectContaining({
-        status: 'private_draft'
-      })
-    ]));
+    expect(proposalTasks.unmarked).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          status: 'private_draft'
+        })
+      ])
+    );
   });
 });

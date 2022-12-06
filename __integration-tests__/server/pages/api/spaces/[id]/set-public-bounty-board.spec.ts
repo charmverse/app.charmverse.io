@@ -25,21 +25,21 @@ beforeAll(async () => {
 
   nonAdminUserCookie = await loginUser(nonAdminUser.id);
   adminUserCookie = await loginUser(adminUser.id);
-
 });
 
 describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty board public or private', () => {
   it('should update a space`s public bounty board status, set its mode to "custom" and return the space, responding with 200', async () => {
-
     const update: Pick<PublicBountyToggle, 'publicBountyBoard'> = {
       publicBountyBoard: true
     };
 
-    let updatedSpace = (await request(baseUrl)
-      .post(`/api/spaces/${space.id}/set-public-bounty-board`)
-      .set('Cookie', adminUserCookie)
-      .send(update)
-      .expect(200)).body as Space;
+    let updatedSpace = (
+      await request(baseUrl)
+        .post(`/api/spaces/${space.id}/set-public-bounty-board`)
+        .set('Cookie', adminUserCookie)
+        .send(update)
+        .expect(200)
+    ).body as Space;
 
     expect(updatedSpace.publicBountyBoard).toBe(true);
 
@@ -50,17 +50,18 @@ describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty 
     // Make a second request to ensure the value is actually being changed
     update.publicBountyBoard = false;
 
-    updatedSpace = (await request(baseUrl)
-      .post(`/api/spaces/${space.id}/set-public-bounty-board`)
-      .set('Cookie', adminUserCookie)
-      .send(update)
-      .expect(200)).body as Space;
+    updatedSpace = (
+      await request(baseUrl)
+        .post(`/api/spaces/${space.id}/set-public-bounty-board`)
+        .set('Cookie', adminUserCookie)
+        .send(update)
+        .expect(200)
+    ).body as Space;
 
     expect(updatedSpace.publicBountyBoard).toBe(false);
   });
 
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
-
     await request(baseUrl)
       .post(`/api/spaces/${space.id}/set-public-bounty-board`)
       .set('Cookie', nonAdminUserCookie)
@@ -68,6 +69,5 @@ describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty 
         defaultPublicPage: true
       })
       .expect(401);
-
   });
 });

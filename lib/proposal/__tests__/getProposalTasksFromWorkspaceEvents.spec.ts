@@ -51,19 +51,22 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const reviewProposal = await generateProposal({
       authors: [user2.id],
       proposalStatus: 'draft',
-      reviewers: [{
-        group: 'user',
-        id: user1.id
-      }],
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
       spaceId: space.id,
       userId: user2.id
     });
 
-    const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } = await updateProposalStatus({
-      proposalId: reviewProposal.proposal.id,
-      newStatus: 'discussion',
-      userId: user2.id
-    });
+    const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } =
+      await updateProposalStatus({
+        proposalId: reviewProposal.proposal.id,
+        newStatus: 'discussion',
+        userId: user2.id
+      });
 
     await updateProposalStatus({
       proposalId: updatedReviewProposal.id,
@@ -111,10 +114,12 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
     const reviewedProposal = await generateProposal({
       authors: [user1.id],
       proposalStatus: 'review',
-      reviewers: [{
-        group: 'user',
-        id: user1.id
-      }],
+      reviewers: [
+        {
+          group: 'user',
+          id: user1.id
+        }
+      ],
       spaceId: space.id,
       userId: user1.id
     });
@@ -142,48 +147,53 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
       userId: user2.id
     });
 
-    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalTasksFromWorkspaceEvents(user1.id, await prisma.workspaceEvent.findMany({
-      where: {
-        createdAt: {
-          lte: new Date(),
-          gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-        },
-        type: 'proposal_status_change'
-      }
-    }));
-
-    expect(proposalTasks).toEqual(expect.arrayContaining([
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'vote',
-        pagePath: voteActiveProposal.path
-      }),
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'start_vote',
-        pagePath: reviewedProposal.path
-      }),
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'discuss',
-        pagePath: discussedProposal.path
-      }),
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'start_review',
-        pagePath: authoredStartReviewProposal.path
-      }),
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'review',
-        pagePath: reviewProposal.path
+    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalTasksFromWorkspaceEvents(
+      user1.id,
+      await prisma.workspaceEvent.findMany({
+        where: {
+          createdAt: {
+            lte: new Date(),
+            gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
+          },
+          type: 'proposal_status_change'
+        }
       })
-    ]));
+    );
 
-    expect(proposalTasks).toEqual(expect.not.arrayContaining([
-      expect.objectContaining<Partial<ProposalTask>>({
-        action: 'start_discussion',
-        pagePath: authoredDraftProposal.path
-      })
-    ]));
+    expect(proposalTasks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'vote',
+          pagePath: voteActiveProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'start_vote',
+          pagePath: reviewedProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'discuss',
+          pagePath: discussedProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'start_review',
+          pagePath: authoredStartReviewProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'review',
+          pagePath: reviewProposal.path
+        })
+      ])
+    );
 
-    expect(unmarkedWorkspaceEvents).toEqual(expect.arrayContaining([
-      reviewProposalWorkspaceEvent.id
-    ]));
+    expect(proposalTasks).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining<Partial<ProposalTask>>({
+          action: 'start_discussion',
+          pagePath: authoredDraftProposal.path
+        })
+      ])
+    );
+
+    expect(unmarkedWorkspaceEvents).toEqual(expect.arrayContaining([reviewProposalWorkspaceEvent.id]));
   });
 });

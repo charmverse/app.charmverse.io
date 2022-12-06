@@ -10,7 +10,7 @@ import DiscordIcon from 'public/images/discord_logo.svg';
 
 import { DiscordSocialIcon } from './DiscordSocialIcon';
 
-export function SocialIcons ({
+export function SocialIcons({
   children,
   social = {
     twitterURL: '',
@@ -18,8 +18,12 @@ export function SocialIcons ({
     discordUsername: '',
     linkedinURL: ''
   },
+  showDiscord = true,
+  showTwitter = true,
   ...props
 }: {
+  showDiscord?: boolean;
+  showTwitter?: boolean;
   children?: ReactNode;
   social?: {
     twitterURL?: string;
@@ -32,37 +36,36 @@ export function SocialIcons ({
 
   return (
     <Stack direction='row' alignItems='center' gap={2} {...props}>
-      {
-        social.twitterURL ? (
+      {showTwitter &&
+        (social.twitterURL ? (
           <Link href={social.twitterURL} target='_blank' display='flex'>
             <TwitterIcon style={{ color: '#00ACEE', height: '22px' }} />
           </Link>
-        ) : <TwitterIcon color='disabled' style={{ height: '22px' }} />
-      }
-      {
-        social.githubURL ? (
-          <Link href={social.githubURL} target='_blank' display='flex'>
-            <GitHubIcon style={{ color: '#888', height: '22px' }} />
-          </Link>
-        ) : <GitHubIcon color='disabled' style={{ height: '22px' }} />
-      }
-      {
-        social?.discordUsername ? <DiscordSocialIcon username={social.discordUsername} />
-          : (
-            <SvgIcon viewBox='0 -10 70 70' sx={{ color: theme.palette.text.disabled, height: '22px' }}>
-              <DiscordIcon />
-            </SvgIcon>
-          )
-      }
-      {
-        social?.linkedinURL ? (
-          <Link href={social.linkedinURL} target='_blank' display='flex'>
-            <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
-          </Link>
         ) : (
-          <LinkedInIcon color='disabled' style={{ height: '22px' }} />
-        )
-      }
+          <TwitterIcon color='disabled' style={{ height: '22px' }} />
+        ))}
+      {social.githubURL ? (
+        <Link href={social.githubURL} target='_blank' display='flex'>
+          <GitHubIcon style={{ color: '#888', height: '22px' }} />
+        </Link>
+      ) : (
+        <GitHubIcon color='disabled' style={{ height: '22px' }} />
+      )}
+      {showDiscord &&
+        (social?.discordUsername && showDiscord ? (
+          <DiscordSocialIcon username={social.discordUsername} />
+        ) : (
+          <SvgIcon viewBox='0 -10 70 70' sx={{ color: theme.palette.text.disabled, height: '22px' }}>
+            <DiscordIcon />
+          </SvgIcon>
+        ))}
+      {social?.linkedinURL ? (
+        <Link href={social.linkedinURL} target='_blank' display='flex'>
+          <LinkedInIcon style={{ color: '#0072B1', height: '22px' }} />
+        </Link>
+      ) : (
+        <LinkedInIcon color='disabled' style={{ height: '22px' }} />
+      )}
       {children}
     </Stack>
   );

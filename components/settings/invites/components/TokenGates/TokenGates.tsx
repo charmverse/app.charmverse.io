@@ -1,11 +1,10 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { TokenGate } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import type { ResourceId, SigningConditions } from 'lit-js-sdk';
 import LitShareModal from 'lit-share-modal-v3-react-17';
 import type { PopupState } from 'material-ui-popup-state/hooks';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import useSWR from 'swr';
 import { v4 as uuid } from 'uuid';
@@ -49,7 +48,10 @@ const ShareModalContainer = styled.div`
 // Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & { authSigTypes: string[], chains: string[] };
+type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & {
+  authSigTypes: string[];
+  chains: string[];
+};
 
 interface TokenGatesProps {
   isAdmin: boolean;
@@ -57,38 +59,38 @@ interface TokenGatesProps {
   popupState: PopupState;
 }
 
-export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
   const theme = useTheme();
   const litClient = useLitProtocol();
-  const { chainId } = useWeb3React();
-  const { walletAuthSignature } = useWeb3AuthSig();
+  const { chainId } = useWeb3AuthSig();
+  const { walletAuthSignature, sign } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
 
   const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
 
-  function onSubmit (conditions: ConditionsModalResult) {
+  function onSubmit(conditions: ConditionsModalResult) {
     setApiError('');
     return saveTokenGate(conditions)
       .then(() => {
         closeTokenGateModal();
       })
-      .catch(error => {
+      .catch((error) => {
         setApiError(error.message || error);
         errorPopupState.open();
       });
   }
 
-  function closeTokenGateDeleteModal () {
+  function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);
     deletePopupState.close();
   }
 
-  async function saveTokenGate (conditions: ConditionsModalResult) {
+  async function saveTokenGate(conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
     const resourceId: ResourceId = {
       baseUrl: 'https://app.charmverse.io',
@@ -102,10 +104,12 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
 
     const chain = getLitChainFromChainId(chainId);
 
+    const authSig: AuthSig = walletAuthSignature ?? (await sign());
+
     await litClient!.saveSigningCondition({
       ...conditions,
       chain,
-      authSig: walletAuthSignature as AuthSig,
+      authSig,
       resourceId
     });
     await charmClient.saveTokenGate({
@@ -117,7 +121,7 @@ export default function TokenGates ({ isAdmin, spaceId, popupState }: TokenGates
     await mutate();
   }
 
-  async function deleteTokenGate (tokenGate: TokenGate) {
+  async function deleteTokenGate(tokenGate: TokenGate) {
     setRemovedTokenGate(tokenGate);
     deletePopupState.open();
   }

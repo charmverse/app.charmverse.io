@@ -17,7 +17,10 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({ page, tokenGatePage }) => {
+test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({
+  page,
+  tokenGatePage
+}) => {
   const { space, page: pageDoc, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
 
@@ -52,7 +55,7 @@ test('tokenGateSuccess - join workspace after meeting conditions in a token gate
   // wait for token gate page to open for the workspace
   await tokenGatePage.waitForWorkspaceURL({ domain: space.domain, returnUrl: workspacePath });
   await expect(tokenGatePage.tokenGateForm).toBeVisible();
-  await tokenGatePage.verifyWalletButton.click();
+
   await expect(tokenGatePage.joinWorkspaceButton).toBeVisible();
   await tokenGatePage.joinWorkspaceButton.click();
   // Joining a workspace creates a spaceRole

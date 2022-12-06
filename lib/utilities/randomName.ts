@@ -1,4 +1,3 @@
-
 import type { Config } from 'unique-names-generator';
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 
@@ -56,15 +55,11 @@ const CRYPTO_WORD_LIST = [
 ];
 
 const nameGeneratorConfig: Config = {
-  dictionaries: [
-    adjectives,
-    [...colors, ...CRYPTO_WORD_LIST],
-    animals
-  ],
+  dictionaries: [adjectives, [...colors, ...CRYPTO_WORD_LIST], animals],
   separator: '-',
   length: 3
 };
 
-export default function randomName () {
+export default function randomName() {
   return uniqueNamesGenerator(nameGeneratorConfig);
 }

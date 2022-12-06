@@ -55,7 +55,7 @@ interface ViewTabsProps {
   openViewOptions: () => void;
 }
 
-function ViewTabs (props: ViewTabsProps) {
+function ViewTabs(props: ViewTabsProps) {
   const {
     onDeleteView,
     openViewOptions,
@@ -68,7 +68,8 @@ function ViewTabs (props: ViewTabsProps) {
     intl,
     readOnly,
     showView,
-    views: viewsProp } = props;
+    views: viewsProp
+  } = props;
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dropdownView, setDropdownView] = useState<BoardView | null>(null);
@@ -78,9 +79,9 @@ function ViewTabs (props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
-  const views = viewsProp.filter(view => !view.fields.inline);
+  const views = viewsProp.filter((view) => !view.fields.inline);
   // Find the index of the current view
-  const currentViewIndex = views.findIndex(view => view.id === activeView?.id);
+  const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
@@ -89,21 +90,17 @@ function ViewTabs (props: ViewTabsProps) {
     const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
     shownViews[maxTabsShown - 1] = views[currentViewIndex];
-    restViews = restViews.filter(restView => restView.id !== activeView?.id);
+    restViews = restViews.filter((restView) => restView.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
 
-  const {
-    register,
-    handleSubmit,
-    setValue
-  } = useForm<{ title: string }>({
+  const { register, handleSubmit, setValue } = useForm<{ title: string }>({
     defaultValues: { title: dropdownView?.title || '' }
   });
 
-  function handleViewClick (event: MouseEvent<HTMLElement>) {
+  function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    const view = views.find(v => v.id === event.currentTarget.id);
+    const view = views.find((v) => v.id === event.currentTarget.id);
     // eslint-disable-next-line no-unused-expressions
     view && onViewTabClick?.(view.id);
     if (readOnly) return;
@@ -119,16 +116,17 @@ function ViewTabs (props: ViewTabsProps) {
     }
   }
 
-  function handleClose () {
+  function handleClose() {
     setAnchorEl(null);
     setDropdownView(null);
   }
 
-  function getViewUrl (viewId: string) {
+  function getViewUrl(viewId: string) {
+    const { cardId, ...rest } = router.query;
     return {
       pathname: router.pathname,
       query: {
-        ...router.query,
+        ...rest,
         viewId
       }
     };
@@ -167,17 +165,17 @@ function ViewTabs (props: ViewTabsProps) {
     }
   }, [views, dropdownView, showView]);
 
-  function handleRenameView () {
+  function handleRenameView() {
     setAnchorEl(null);
     renameViewPopupState.open();
   }
 
-  function handleViewOptions () {
+  function handleViewOptions() {
     openViewOptions();
     setAnchorEl(null);
   }
 
-  function saveViewTitle (form: { title: string }) {
+  function saveViewTitle(form: { title: string }) {
     if (dropdownView) {
       mutator.changeTitle(dropdownView.id, dropdownView.title, form.title);
       renameViewPopupState.close();
@@ -200,13 +198,18 @@ function ViewTabs (props: ViewTabsProps) {
 
   return (
     <>
-      <Tabs textColor='primary' indicatorColor='secondary' value={activeView?.id ?? false} sx={{ minHeight: 0, mb: '-4px' }}>
-        {shownViews.map(view => (
+      <Tabs
+        textColor='primary'
+        indicatorColor='secondary'
+        value={activeView?.id ?? false}
+        sx={{ minHeight: 0, mb: '-4px' }}
+      >
+        {shownViews.map((view) => (
           <Tab
             component='div'
             disableRipple
             key={view.id}
-            label={(
+            label={
               <StyledButton
                 startIcon={iconForViewType(view.fields.viewType)}
                 onClick={handleViewClick}
@@ -218,7 +221,7 @@ function ViewTabs (props: ViewTabsProps) {
               >
                 {view.title}
               </StyledButton>
-            )}
+            }
             sx={{ p: 0, mb: '5px' }}
             value={view.id}
           />
@@ -228,57 +231,54 @@ function ViewTabs (props: ViewTabsProps) {
             component='div'
             disableRipple
             sx={{ p: 0, mb: 0.5 }}
-            label={(
-              <Button
-                variant='text'
-                size='small'
-                color='secondary'
-                {...showViewsTriggerState}
-              >
+            label={
+              <Button variant='text' size='small' color='secondary' {...showViewsTriggerState}>
                 {restViews.length} more...
               </Button>
-            )}
+            }
           />
         )}
       </Tabs>
-      <Menu
-        anchorEl={anchorEl}
-        disablePortal
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} disablePortal open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem dense onClick={handleRenameView}>
-          <ListItemIcon><EditIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <EditIcon fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleViewOptions}>
-          <ListItemIcon><TuneIcon fontSize='small' /></ListItemIcon>
+          <ListItemIcon>
+            <TuneIcon fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Edit View</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem dense onClick={handleDuplicateView}>
-          <ListItemIcon><DuplicateIcon /></ListItemIcon>
+          <ListItemIcon>
+            <DuplicateIcon />
+          </ListItemIcon>
           <ListItemText>{duplicateViewText}</ListItemText>
         </MenuItem>
         {views.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
-            <ListItemIcon><DeleteOutlineIcon fontSize='small' /></ListItemIcon>
+            <ListItemIcon>
+              <DeleteOutlineIcon fontSize='small' />
+            </ListItemIcon>
             <ListItemText>{deleteViewText}</ListItemText>
           </MenuItem>
         )}
       </Menu>
 
-      <Menu
-        {...showViewsMenuState}
-      >
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-          mb: 1
-        }}
+      <Menu {...showViewsMenuState}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            mb: 1
+          }}
         >
-          {restViews.map(view => {
+          {restViews.map((view) => {
             const content = (
               <MenuItem
                 onClick={() => {
@@ -293,11 +293,10 @@ function ViewTabs (props: ViewTabsProps) {
                 <ListItemText>{view.title}</ListItemText>
               </MenuItem>
             );
-            return disableUpdatingUrl ? content : (
-              <Link
-                href={getViewUrl(view.id)}
-                passHref
-              >
+            return disableUpdatingUrl ? (
+              content
+            ) : (
+              <Link href={getViewUrl(view.id)} passHref>
                 {content}
               </Link>
             );
@@ -305,16 +304,6 @@ function ViewTabs (props: ViewTabsProps) {
         </Box>
         <Divider />
         {addViewButton}
-        {/* <AddViewMenu
-          sx={{
-            width: '100%'
-          }}
-          showLabel={true}
-          board={board}
-          activeView={activeView}
-          showView={showView}
-          views={views}
-        /> */}
       </Menu>
 
       {/* Form to rename views */}

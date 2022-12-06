@@ -1,9 +1,9 @@
 import { v4 } from 'uuid';
 
 import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import type { ProposalReviewerInput } from '../../proposal/interface';
 
@@ -18,10 +18,12 @@ export interface CreateProposalTemplateInput {
   reviewers?: ProposalReviewerInput[];
 }
 
-export async function createProposalTemplate ({
-  spaceId, userId, pageContent, reviewers
+export async function createProposalTemplate({
+  spaceId,
+  userId,
+  pageContent,
+  reviewers
 }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
-
   const proposalId = v4();
 
   return createPage({
@@ -61,7 +63,7 @@ export async function createProposalTemplate ({
           },
           reviewers: {
             createMany: {
-              data: (reviewers ?? []).map(r => {
+              data: (reviewers ?? []).map((r) => {
                 return {
                   roleId: r.group === 'role' ? r.id : undefined,
                   userId: r.group === 'user' ? r.id : undefined

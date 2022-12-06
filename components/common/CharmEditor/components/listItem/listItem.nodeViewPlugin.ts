@@ -5,7 +5,7 @@ import { createElement } from '@bangle.dev/utils';
 
 import log from 'lib/log';
 
-export function listItemNodeViewPlugin (name: string) {
+export function listItemNodeViewPlugin(name: string) {
   const checkParentBulletList = (state: EditorState, pos: number) => {
     return state.doc.resolve(pos).parent.type.name === 'bulletList';
   };
@@ -19,10 +19,7 @@ export function listItemNodeViewPlugin (name: string) {
     instance.containerDOM!.removeChild(instance.containerDOM!.firstChild!);
   };
 
-  const createCheckbox = (
-    todoChecked: boolean | null,
-    onUpdate: (newValue: boolean) => void
-  ) => {
+  const createCheckbox = (todoChecked: boolean | null, onUpdate: (newValue: boolean) => void) => {
     const checkBox = createElement([
       'span',
       // @ts-ignore DOMOutputSpec from @types/prosemirror-model is buggy
@@ -51,26 +48,19 @@ export function listItemNodeViewPlugin (name: string) {
     return checkBox;
   };
 
-  const setupCheckbox = (
-    attrs: Node['attrs'],
-    updateAttrs: UpdateAttrsFunction,
-    instance: NodeView
-  ) => {
+  const setupCheckbox = (attrs: Node['attrs'], updateAttrs: UpdateAttrsFunction, instance: NodeView) => {
     // no need to create as it is already created
     if (instance.containerDOM!.hasAttribute('data-bangle-is-todo')) {
       return;
     }
 
-    const checkbox = createCheckbox(
-      attrs.todoChecked,
-      (newValue: boolean | null) => {
-        updateAttrs({
-          // Fetch latest attrs as the one in outer
-          // closure can be stale.
-          todoChecked: newValue
-        });
-      }
-    );
+    const checkbox = createCheckbox(attrs.todoChecked, (newValue: boolean | null) => {
+      updateAttrs({
+        // Fetch latest attrs as the one in outer
+        // closure can be stale.
+        todoChecked: newValue
+      });
+    });
 
     instance.containerDOM!.setAttribute('data-bangle-is-todo', '');
     instance.containerDOM!.prepend(checkbox);
@@ -124,8 +114,7 @@ export function listItemNodeViewPlugin (name: string) {
         // will be called. The create handler was called in the past
         // but without the checkbox element, hence the checkbox wont be there
         setupCheckbox(attrs, updateAttrs, instance as NodeView);
-        const checkbox = instance!.containerDOM!.firstChild!
-          .firstChild! as HTMLInputElement;
+        const checkbox = instance!.containerDOM!.firstChild!.firstChild! as HTMLInputElement;
         log.debug(`updating inputElement, checked = ${todoChecked}`);
         checkbox.checked = todoChecked;
       },

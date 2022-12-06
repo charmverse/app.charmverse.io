@@ -10,12 +10,26 @@ import { DataNotFoundError, InvalidInputError } from '../utilities/errors';
 
 import type { PublicBountyToggle } from './interfaces';
 
-async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<false>):
-Promise<[Prisma.PagePermissionDeleteManyArgs | null]>
-async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle<true>):
-Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs, Prisma.PagePermissionCreateManyArgs]>
-async function generatePublicBountyPermissionArgs ({ publicBountyBoard, spaceId }: PublicBountyToggle):
-Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs?, Prisma.PagePermissionCreateManyArgs?]> {
+async function generatePublicBountyPermissionArgs({
+  publicBountyBoard,
+  spaceId
+}: PublicBountyToggle<false>): Promise<[Prisma.PagePermissionDeleteManyArgs | null]>;
+async function generatePublicBountyPermissionArgs({
+  publicBountyBoard,
+  spaceId
+}: PublicBountyToggle<true>): Promise<
+  [Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreateManyArgs, Prisma.PagePermissionCreateManyArgs]
+>;
+async function generatePublicBountyPermissionArgs({
+  publicBountyBoard,
+  spaceId
+}: PublicBountyToggle): Promise<
+  [
+    Prisma.PagePermissionDeleteManyArgs | null,
+    Prisma.PagePermissionCreateManyArgs?,
+    Prisma.PagePermissionCreateManyArgs?
+  ]
+> {
   const spaceBountyPages = await prisma.page.findMany({
     where: {
       spaceId,
@@ -23,11 +37,13 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
         not: null
       },
       // If creating permissions, target only pages the space can view. Otherwise, lock all bounties down
-      permissions: publicBountyBoard ? {
-        some: {
-          spaceId
-        }
-      } : undefined
+      permissions: publicBountyBoard
+        ? {
+            some: {
+              spaceId
+            }
+          }
+        : undefined
     },
     select: {
       id: true,
@@ -85,20 +101,18 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
    * We need to create permissions for all child pages of the bounty pages
    * If this page already has a public permission, we don't need to change it
    */
-  function extractInheritableChildren (
-    { node,
-      bountyPageId
-    } : {
-      node: PageNodeWithChildren<PageNodeWithPermissions>;
-      bountyPageId: string;
-    }
-  ): void {
-    node.children?.forEach(child => {
+  function extractInheritableChildren({
+    node,
+    bountyPageId
+  }: {
+    node: PageNodeWithChildren<PageNodeWithPermissions>;
+    bountyPageId: string;
+  }): void {
+    node.children?.forEach((child) => {
       const canInherit = hasSameOrMorePermissions(node.permissions, child.permissions);
 
       if (canInherit) {
-
-        const sourcePermission = createArgs.find(a => a.pageId === bountyPageId);
+        const sourcePermission = createArgs.find((a) => a.pageId === bountyPageId);
 
         childCreateArgs.push({
           pageId: child.id,
@@ -111,12 +125,11 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
           node: child,
           bountyPageId
         });
-
       }
     });
   }
 
-  bountyTopPageIds.forEach(id => {
+  bountyTopPageIds.forEach((id) => {
     const tree = pageTrees[id];
 
     if (tree) {
@@ -128,15 +141,12 @@ Promise<[Prisma.PagePermissionDeleteManyArgs | null, Prisma.PagePermissionCreate
   });
 
   return [deleteArgs, { data: createArgs }, { data: childCreateArgs }];
-
 }
 
-export async function togglePublicBounties ({ spaceId, publicBountyBoard }: PublicBountyToggle): Promise<Space> {
-
+export async function togglePublicBounties({ spaceId, publicBountyBoard }: PublicBountyToggle): Promise<Space> {
   if (typeof publicBountyBoard !== 'boolean') {
     throw new InvalidInputError('PublicBountyBoard must be true or false.');
-  }
-  else if (validate(spaceId) === false) {
+  } else if (validate(spaceId) === false) {
     throw new InvalidInputError('Please provide a valid space ID.');
   }
 
@@ -150,8 +160,10 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
       });
 
       if (publicBountyBoard === true) {
-
-        const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
+        const [deleteArgs, createArgs, childCreateArgs] = await generatePublicBountyPermissionArgs({
+          publicBountyBoard,
+          spaceId
+        });
 
         if (deleteArgs) {
           await tx.pagePermission.deleteMany(deleteArgs);
@@ -160,8 +172,7 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
         await tx.pagePermission.createMany(createArgs);
 
         await tx.pagePermission.createMany(childCreateArgs);
-      }
-      else {
+      } else {
         const [deleteArgs] = await generatePublicBountyPermissionArgs({ publicBountyBoard, spaceId });
 
         if (deleteArgs) {
@@ -173,10 +184,7 @@ export async function togglePublicBounties ({ spaceId, publicBountyBoard }: Publ
     });
 
     return spaceAfterUpdate;
-  }
-  catch (err) {
+  } catch (err) {
     throw new DataNotFoundError(`Space ${spaceId} not found.`);
   }
-
 }
-

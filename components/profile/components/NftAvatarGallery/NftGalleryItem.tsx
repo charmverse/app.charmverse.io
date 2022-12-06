@@ -11,7 +11,7 @@ type Props = {
   onClick: () => void;
 };
 
-export default function NftGalleryItem ({ nft, isSelected, onClick }: Props) {
+export default function NftGalleryItem({ nft, isSelected, onClick }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const onAvatarClick = () => {
     if (!isSelected) {

@@ -9,7 +9,6 @@ import createJestConfig from 'testing/createJestConfig';
  * https://nextjs.org/docs/testing
  * */
 export const jestConfig = {
-
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
@@ -19,10 +18,7 @@ export const jestConfig = {
   globalTeardown: './testing/wipeTestData.ts',
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  moduleDirectories: [
-    'node_modules',
-    '<rootDir>'
-  ],
+  moduleDirectories: ['node_modules', '<rootDir>'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   setupFilesAfterEnv: ['./jest.setup.ts'],
@@ -31,10 +27,7 @@ export const jestConfig = {
   testEnvironment: 'jest-environment-node',
 
   // The glob patterns Jest uses to detect test files
-  testMatch: [
-    '**/lib/**/*.spec.ts',
-    '**/testing/**/*.spec.ts'
-  ],
+  testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   testTimeout: 30000,
   transform: {

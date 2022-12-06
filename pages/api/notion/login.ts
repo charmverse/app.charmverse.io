@@ -18,14 +18,14 @@ const handler = nc({
 
 handler.use(requireUser).get(login);
 
-async function login (req: NextApiRequest, res: NextApiResponse) {
+async function login(req: NextApiRequest, res: NextApiResponse) {
   if (!req.query.redirect) {
     return res.status(400).json('Missing redirect');
   }
   const state: NotionState = {
     redirect: encodeURIComponent(req.query.redirect as string)
   };
-  const proto = (req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted) ? 'https' : 'http';
+  const proto = req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted ? 'https' : 'http';
   const redirectUri = `${proto}://${req.headers.host}/api/notion/callback`;
   const oauthUrl = `${notionUrl}&state=${JSON.stringify(state)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
   res.redirect(oauthUrl);

@@ -6,11 +6,11 @@ import { isAFilterGroupInstance } from './blocks/filterGroup';
 import { Utils } from './utils';
 
 class CardFilter {
-  static applyFilterGroup (filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
+  static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
     return cards.filter((card) => this.isFilterGroupMet(filterGroup, templates, card));
   }
 
-  static isFilterGroupMet (filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
+  static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const { filters } = filterGroup;
 
     if (filterGroup.filters.length < 1) {
@@ -23,8 +23,7 @@ class CardFilter {
           if (this.isFilterGroupMet(filter, templates, card)) {
             return true;
           }
-        }
-        else if (this.isClauseMet(filter, templates, card)) {
+        } else if (this.isClauseMet(filter, templates, card)) {
           return true;
         }
       }
@@ -36,28 +35,33 @@ class CardFilter {
         if (!this.isFilterGroupMet(filter, templates, card)) {
           return false;
         }
-      }
-      else if (!this.isClauseMet(filter, templates, card)) {
+      } else if (!this.isClauseMet(filter, templates, card)) {
         return false;
       }
     }
     return true;
   }
 
-  static isClauseMet (filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
+  static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const value = card.fields.properties[filter.propertyId];
     switch (filter.condition) {
       case 'includes': {
         if (filter.values?.length < 1) {
           break;
         } // No values = ignore clause (always met)
-        return (filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) !== undefined);
+        return (
+          filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) !==
+          undefined
+        );
       }
       case 'notIncludes': {
         if (filter.values?.length < 1) {
           break;
         } // No values = ignore clause (always met)
-        return (filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) === undefined);
+        return (
+          filter.values.find((cValue) => (Array.isArray(value) ? value.includes(cValue) : cValue === value)) ===
+          undefined
+        );
       }
       case 'isEmpty': {
         return (value || '').length <= 0;
@@ -72,7 +76,10 @@ class CardFilter {
     return true;
   }
 
-  static propertiesThatMeetFilterGroup (filterGroup: FilterGroup | undefined, templates: readonly IPropertyTemplate[]): Record<string, string> {
+  static propertiesThatMeetFilterGroup(
+    filterGroup: FilterGroup | undefined,
+    templates: readonly IPropertyTemplate[]
+  ): Record<string, string> {
     // TODO: Handle filter groups
     if (!filterGroup) {
       return {};
@@ -104,7 +111,10 @@ class CardFilter {
     return result;
   }
 
-  static propertyThatMeetsFilterClause (filterClause: FilterClause, templates: readonly IPropertyTemplate[]): { id: string, value?: string } {
+  static propertyThatMeetsFilterClause(
+    filterClause: FilterClause,
+    templates: readonly IPropertyTemplate[]
+  ): { id: string; value?: string } {
     const template = templates.find((o) => o.id === filterClause.propertyId);
     if (!template) {
       Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);

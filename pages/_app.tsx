@@ -39,17 +39,15 @@ import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
 import { PrimaryCharmEditorProvider } from 'hooks/usePrimaryCharmEditor';
 import { SnackbarProvider } from 'hooks/useSnackbar';
-import { WebSocketClientProvider } from 'hooks/useSocketClient';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
+import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { createThemeLightSensitive } from 'theme';
 import cssVariables from 'theme/cssVariables';
 import { setDarkMode } from 'theme/darkMode';
-import {
-  darkTheme,
-  lightTheme
-} from 'theme/focalboard/theme';
+import { darkTheme, lightTheme } from 'theme/focalboard/theme';
 
 import '@bangle.dev/tooltip/style.css';
 import '@skiff-org/prosemirror-tables/style/table-filters.css';
@@ -140,15 +138,14 @@ const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Pr
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
-}
+};
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-}
+};
 
-export default function App ({ Component, pageProps }: AppPropsWithLayout) {
-
-  const getLayout = Component.getLayout ?? (page => page);
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
   useEffect(() => {
@@ -163,14 +160,17 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>('darkMode', null);
   const [mode, setMode] = useState<PaletteMode>('dark');
   const [isOldBuild, setIsOldBuild] = useState(false);
-  const colorModeContext = useMemo(() => ({
-    toggleColorMode: () => {
-      setMode((prevMode: PaletteMode) => {
-        const newMode = prevMode === 'light' ? 'dark' : 'light';
-        return newMode;
-      });
-    }
-  }), []);
+  const colorModeContext = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode: PaletteMode) => {
+          const newMode = prevMode === 'light' ? 'dark' : 'light';
+          return newMode;
+        });
+      }
+    }),
+    []
+  );
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
@@ -200,6 +200,14 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
 
   // wait for router to be ready, as we rely on the URL to know what space to load
 
+  const { refreshSignupData } = useUserAcquisition();
+
+  useEffect(() => {
+    if (router.isReady) {
+      refreshSignupData();
+    }
+  }, [router.isReady]);
+
   if (!router.isReady) {
     return null;
   }
@@ -210,15 +218,15 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
       <ColorModeContext.Provider value={colorModeContext}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterLuxon as any}>
-            <Web3ReactProvider getLibrary={getLibrary}>
-              <Web3ConnectionManager>
-                <Web3AccountProvider>
-                  <ReactDndProvider>
-                    <DataProviders>
-                      <OnboardingProvider>
-                        <FocalBoardProvider>
-                          <IntlProvider>
-                            <SnackbarProvider>
+            <SnackbarProvider>
+              <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ConnectionManager>
+                  <Web3AccountProvider>
+                    <ReactDndProvider>
+                      <DataProviders>
+                        <OnboardingProvider>
+                          <FocalBoardProvider>
+                            <IntlProvider>
                               <PageMetaTags />
                               <CssBaseline enableColorScheme={true} />
                               <Global styles={cssVariables} />
@@ -240,15 +248,15 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
                                   <GlobalComponents />
                                 </ErrorBoundary>
                               </RouteGuard>
-                            </SnackbarProvider>
-                          </IntlProvider>
-                        </FocalBoardProvider>
-                      </OnboardingProvider>
-                    </DataProviders>
-                  </ReactDndProvider>
-                </Web3AccountProvider>
-              </Web3ConnectionManager>
-            </Web3ReactProvider>
+                            </IntlProvider>
+                          </FocalBoardProvider>
+                        </OnboardingProvider>
+                      </DataProviders>
+                    </ReactDndProvider>
+                  </Web3AccountProvider>
+                </Web3ConnectionManager>
+              </Web3ReactProvider>
+            </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
@@ -256,10 +264,8 @@ export default function App ({ Component, pageProps }: AppPropsWithLayout) {
   );
 }
 
-function DataProviders ({ children }: { children: ReactNode }) {
-
+function DataProviders({ children }: { children: ReactNode }) {
   return (
-
     <UserProvider>
       <SpacesProvider>
         <WebSocketClientProvider>
@@ -268,9 +274,7 @@ function DataProviders ({ children }: { children: ReactNode }) {
               <PaymentMethodsProvider>
                 <PagesProvider>
                   <PrimaryCharmEditorProvider>
-                    <PageTitleProvider>
-                      {children}
-                    </PageTitleProvider>
+                    <PageTitleProvider>{children}</PageTitleProvider>
                   </PrimaryCharmEditorProvider>
                 </PagesProvider>
               </PaymentMethodsProvider>
@@ -278,13 +282,11 @@ function DataProviders ({ children }: { children: ReactNode }) {
           </MembersProvider>
         </WebSocketClientProvider>
       </SpacesProvider>
-
     </UserProvider>
-
   );
 }
 
-function PageMetaTags () {
+function PageMetaTags() {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 

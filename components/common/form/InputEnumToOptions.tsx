@@ -12,8 +12,14 @@ export interface Props extends Omit<SelectProps, 'onChange'> {
   keyAndLabel: Record<string | any, string | number>;
 }
 
-export default function InputEnumToOptions ({ onChange = () => {}, defaultValue, title, keyAndLabel, sx, ...props }: Props) {
-
+export default function InputEnumToOptions({
+  onChange = () => {},
+  defaultValue,
+  title,
+  keyAndLabel,
+  sx,
+  ...props
+}: Props) {
   const options = Object.entries(keyAndLabel);
 
   const [value, setValue] = useState<string | null>('');
@@ -26,9 +32,7 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
 
   return (
     <FormControl fullWidth>
-      {
-        title && (<InputLabel>{title}</InputLabel>)
-      }
+      {title && <InputLabel>{title}</InputLabel>}
 
       <Select
         sx={sx}
@@ -41,17 +45,19 @@ export default function InputEnumToOptions ({ onChange = () => {}, defaultValue,
         }}
         {...props}
       >
-        {
-          options.map(option => {
-            return <MenuItem value={option[0]} key={option[0]}>{option[1]}</MenuItem>;
-          })
-        }
+        {options.map((option) => {
+          return (
+            <MenuItem value={option[0]} key={option[0]}>
+              {option[1]}
+            </MenuItem>
+          );
+        })}
       </Select>
     </FormControl>
   );
 }
 
-export function SmallSelect ({ sx = {}, ...props }: Props) {
+export function SmallSelect({ sx = {}, ...props }: Props) {
   return (
     <InputEnumToOptions
       {...props}

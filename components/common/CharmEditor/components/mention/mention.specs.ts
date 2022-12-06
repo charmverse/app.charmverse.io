@@ -13,7 +13,7 @@ export interface MentionSpecSchemaAttrs {
   createdBy: string;
 }
 
-export function mentionSpecs (): RawSpecs {
+export function mentionSpecs(): RawSpecs {
   const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
   return [
     {

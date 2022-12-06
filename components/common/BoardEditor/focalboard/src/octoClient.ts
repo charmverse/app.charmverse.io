@@ -19,7 +19,7 @@ class OctoClient {
   // after the first instance of OctoClient is created.
   // Avoiding the race condition becomes more complex than making
   // the base URL dynamic though a function
-  private getBaseURL (): string {
+  private getBaseURL(): string {
     const baseURL = (this.serverUrl || Utils.getBaseURL(true)).replace(/\/$/, '');
 
     // Logging this for debugging.
@@ -32,22 +32,21 @@ class OctoClient {
     return baseURL;
   }
 
-  constructor (serverUrl?: string, public workspaceId = '0') {
+  constructor(serverUrl?: string, public workspaceId = '0') {
     this.serverUrl = serverUrl;
   }
 
-  private async getJson (response: Response, defaultValue: unknown): Promise<any> {
+  private async getJson(response: Response, defaultValue: unknown): Promise<any> {
     // The server may return null or malformed json
     try {
       const value = await response.json();
       return value || defaultValue;
-    }
-    catch {
+    } catch {
       return defaultValue;
     }
   }
 
-  async getClientConfig (): Promise<ClientConfig | null> {
+  async getClientConfig(): Promise<ClientConfig | null> {
     const path = '/api/focalboard/clientConfig';
     const response = await fetch(this.getBaseURL() + path, {
       method: 'GET',
@@ -61,7 +60,12 @@ class OctoClient {
     return json;
   }
 
-  async register (email: string, username: string, password: string, token?: string): Promise<{ code: number, json: { error?: string } }> {
+  async register(
+    email: string,
+    username: string,
+    password: string,
+    token?: string
+  ): Promise<{ code: number; json: { error?: string } }> {
     const path = '/api/focalboard/register';
     const body = JSON.stringify({ email, username, password, token });
     const response = await fetch(this.getBaseURL() + path, {
@@ -73,7 +77,11 @@ class OctoClient {
     return { code: response.status, json };
   }
 
-  async changePassword (userId: string, oldPassword: string, newPassword: string): Promise<{ code: number, json: { error?: string } }> {
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<{ code: number; json: { error?: string } }> {
     const path = `/api/focalboard/users/${encodeURIComponent(userId)}/changepassword`;
     const body = JSON.stringify({ oldPassword, newPassword });
     const response = await fetch(this.getBaseURL() + path, {
@@ -85,7 +93,7 @@ class OctoClient {
     return { code: response.status, json };
   }
 
-  private headers () {
+  private headers() {
     return {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -94,11 +102,11 @@ class OctoClient {
   }
 
   /**
-     * Generates workspace's path.
-     * Uses workspace ID from `workspaceId` param is provided,
-     * Else uses Client's workspaceID if available, else the user's last visited workspace ID.
-     */
-  private workspacePath (workspaceId?: string) {
+   * Generates workspace's path.
+   * Uses workspace ID from `workspaceId` param is provided,
+   * Else uses Client's workspaceID if available, else the user's last visited workspace ID.
+   */
+  private workspacePath(workspaceId?: string) {
     let workspaceIdToUse = workspaceId;
     if (!workspaceId) {
       workspaceIdToUse = this.workspaceId === '0' ? UserSettings.lastWorkspaceId || this.workspaceId : this.workspaceId;
@@ -107,7 +115,7 @@ class OctoClient {
     return `/api/focalboard/workspaces/${workspaceIdToUse}`;
   }
 
-  async getMe (): Promise<IUser | undefined> {
+  async getMe(): Promise<IUser | undefined> {
     const path = '/api/focalboard/users/me';
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {
@@ -117,7 +125,7 @@ class OctoClient {
     return user;
   }
 
-  async getUser (userId: string): Promise<IUser | undefined> {
+  async getUser(userId: string): Promise<IUser | undefined> {
     const path = `/api/focalboard/users/${encodeURIComponent(userId)}`;
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {
@@ -127,7 +135,7 @@ class OctoClient {
     return user;
   }
 
-  async getSubtree (rootId?: string, levels?: number, workspaceID?: string): Promise<Block[]> {
+  async getSubtree(rootId?: string, levels?: number, workspaceID?: string): Promise<Block[]> {
     levels ||= 2;
     let path = `${this.workspacePath(workspaceID)}/blocks/${encodeURIComponent(rootId || '')}/subtree?l=${levels}`;
     const readToken = Utils.getReadToken();
@@ -143,7 +151,7 @@ class OctoClient {
   }
 
   // If no boardID is provided, it will export the entire archive
-  async exportArchive (boardID = ''): Promise<Block[]> {
+  async exportArchive(boardID = ''): Promise<Block[]> {
     const path = `${this.workspacePath()}/blocks/export?root_id=${boardID}`;
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {
@@ -153,7 +161,7 @@ class OctoClient {
     return this.fixBlocks(blocks);
   }
 
-  async importFullArchive (blocks: readonly Block[]): Promise<Response> {
+  async importFullArchive(blocks: readonly Block[]): Promise<Response> {
     Utils.log(`importFullArchive: ${blocks.length} blocks(s)`);
 
     // blocks.forEach((block) => {
@@ -167,7 +175,7 @@ class OctoClient {
     });
   }
 
-  fixBlocks (blocks: Block[]): Block[] {
+  fixBlocks(blocks: Block[]): Block[] {
     if (!blocks) {
       return [];
     }
@@ -180,7 +188,7 @@ class OctoClient {
 
   // Sharing
 
-  async getSharing (rootId: string): Promise<ISharing | undefined> {
+  async getSharing(rootId: string): Promise<ISharing | undefined> {
     const path = `${this.workspacePath()}/sharing/${rootId}`;
     const response = await fetch(this.getBaseURL() + path, { headers: this.headers() });
     if (response.status !== 200) {
@@ -190,17 +198,14 @@ class OctoClient {
     return sharing;
   }
 
-  async setSharing (sharing: ISharing): Promise<boolean> {
+  async setSharing(sharing: ISharing): Promise<boolean> {
     const path = `${this.workspacePath()}/sharing/${sharing.id}`;
     const body = JSON.stringify(sharing);
-    const response = await fetch(
-      this.getBaseURL() + path,
-      {
-        method: 'POST',
-        headers: this.headers(),
-        body
-      }
-    );
+    const response = await fetch(this.getBaseURL() + path, {
+      method: 'POST',
+      headers: this.headers(),
+      body
+    });
     if (response.status !== 200) {
       return false;
     }
@@ -210,7 +215,7 @@ class OctoClient {
 
   // Workspace
 
-  async regenerateWorkspaceSignupToken (): Promise<boolean> {
+  async regenerateWorkspaceSignupToken(): Promise<boolean> {
     const path = `${this.workspacePath()}/regenerate_signup_token`;
     const response = await fetch(this.getBaseURL() + path, {
       method: 'POST',
@@ -226,7 +231,7 @@ class OctoClient {
   // Files
 
   // Returns fileId of uploaded file, or undefined on failure
-  async uploadFile (rootID: string, file: File): Promise<string | undefined> {
+  async uploadFile(rootID: string, file: File): Promise<string | undefined> {
     // IMPORTANT: We need to post the image as a form. The browser will convert this to a application/x-www-form-urlencoded POST
     const formData = new FormData();
     formData.append('file', file);
@@ -252,19 +257,17 @@ class OctoClient {
         const json = JSON.parse(text);
 
         return json.fileId;
-      }
-      catch (e) {
+      } catch (e) {
         Utils.logError(`uploadFile json ERROR: ${e}`);
       }
-    }
-    catch (e) {
+    } catch (e) {
       Utils.logError(`uploadFile ERROR: ${e}`);
     }
 
     return undefined;
   }
 
-  async getFileAsDataUrl (rootId: string, fileId: string): Promise<string> {
+  async getFileAsDataUrl(rootId: string, fileId: string): Promise<string> {
     let path = `/files/workspaces/${this.workspaceId}/${rootId}/${fileId}`;
     const readToken = Utils.getReadToken();
     if (readToken) {
@@ -278,11 +281,10 @@ class OctoClient {
     return URL.createObjectURL(blob);
   }
 
-  async getGlobalTemplates (): Promise<Block[]> {
+  async getGlobalTemplates(): Promise<Block[]> {
     // const path = this.workspacePath('0') + '/blocks?type=board'
     return [];
   }
-
 }
 
 const octoClient = new OctoClient();

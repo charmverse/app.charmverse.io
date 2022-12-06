@@ -1,9 +1,8 @@
 import { countValueOccurrences, nanofy, percent } from '../numbers';
 
-type Fruit = 'banana' | 'watermelon' | 'mango'
+type Fruit = 'banana' | 'watermelon' | 'mango';
 
 describe('countValueOccurrences', () => {
-
   const testData: Record<'fruit', Fruit>[] = [
     {
       fruit: 'banana'
@@ -34,7 +33,6 @@ describe('countValueOccurrences', () => {
 
 describe('nanofy', () => {
   it('should return the number if it is equal to or above 1', () => {
-
     const above1 = 1.0033454;
 
     expect(nanofy({ number: above1 })).toEqual(above1.toString());
@@ -42,7 +40,6 @@ describe('nanofy', () => {
   });
 
   it('should return the 3 most significant digits with the correct unit, and a space if this parameter is provided', () => {
-
     const milliNum = 0.99722345;
     const microNum = milliNum / 1000;
     const nanoNum = microNum / 1000;
@@ -62,7 +59,6 @@ describe('nanofy', () => {
     expect(nanofy({ number: femtoNum, spaceUnit: false })).toBe('997f');
 
     expect(nanofy({ number: attoNum, spaceUnit: true })).toBe('997 a');
-
   });
 
   it('should work when the first decimal is 0', () => {
@@ -91,7 +87,6 @@ describe('nanofy', () => {
   });
 
   it('should work when the first and second decimal is 0', () => {
-
     const milliNum = 0.0099722;
     const microNum = milliNum / 1000;
     const nanoNum = microNum / 1000;
@@ -114,9 +109,7 @@ describe('nanofy', () => {
 
     const numberWithZero = 0.0090004;
     expect(nanofy({ number: numberWithZero })).toBe('9m');
-
   });
-
 });
 
 describe('percent', () => {

@@ -16,7 +16,11 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
-export type NewPageInput = Partial<Page> & { spaceId: string, createdBy: string, shouldCreateDefaultBoardData?: boolean };
+export type NewPageInput = Partial<Page> & {
+  spaceId: string;
+  createdBy: string;
+  shouldCreateDefaultBoardData?: boolean;
+};
 
 interface AddPageResponse {
   board: Board | null;
@@ -25,11 +29,15 @@ interface AddPageResponse {
   page: IPageWithPermissions;
 }
 
-export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardData = true, ...page }: NewPageInput): Promise<AddPageResponse> {
-
+export async function addPage({
+  createdBy,
+  spaceId,
+  shouldCreateDefaultBoardData = true,
+  ...page
+}: NewPageInput): Promise<AddPageResponse> {
   const pageId = page?.id || v4();
 
-  const isBoardPage = (page.type?.match(/board/));
+  const isBoardPage = page.type?.match(/board/);
 
   const pageProperties: Partial<Page> = {
     id: pageId,
@@ -57,36 +65,32 @@ export async function addPage ({ createdBy, spaceId, shouldCreateDefaultBoardDat
   };
 
   if (isBoardPage) {
-
     const { board, view, cards } = createDefaultBoardData({ boardId: pageId });
 
     if (shouldCreateDefaultBoardData) {
       result.board = board;
       result.view = view;
       result.cards = cards;
-      await mutator.insertBlocks(
-        [board, view],
-        'add board'
-      );
+      await mutator.insertBlocks([board, view], 'add board');
 
       // Wait for board creation to succeed before adding cards
-      await mutator.insertBlocks(
-        [...cards],
-        'add cards'
-      );
-    }
-    else {
+      await mutator.insertBlocks([...cards], 'add cards');
+    } else {
       result.board = board;
       await mutator.insertBlocks([board]);
     }
   }
 
-  await mutate(getPagesListCacheKey(spaceId), (pages: Record<string, Page>) => {
-    return { ...pages, [newPage.id]: newPage };
-  }, {
-    // revalidate pages for board since we create 3 default ones
-    revalidate: Boolean(isBoardPage)
-  });
+  await mutate(
+    getPagesListCacheKey(spaceId),
+    (pages: Record<string, Page>) => {
+      return { ...pages, [newPage.id]: newPage };
+    },
+    {
+      // revalidate pages for board since we create 3 default ones
+      revalidate: Boolean(isBoardPage)
+    }
+  );
 
   return result;
 }
@@ -95,8 +99,7 @@ interface DefaultBoardProps {
   boardId: string;
 }
 
-function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
-
+function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   const board = createBoard({ addDefaultProperty: true });
   board.id = boardId;
   board.rootId = board.id;
@@ -110,8 +113,7 @@ function createDefaultBoardData ({ boardId }: DefaultBoardProps) {
   };
 }
 
-export function createDefaultViewsAndCards ({ board }: { board: Board }) {
-
+export function createDefaultViewsAndCards({ board }: { board: Board }) {
   const view = createBoardView();
   view.fields.viewType = 'board';
   view.parentId = board.id;
@@ -133,10 +135,9 @@ export function createDefaultViewsAndCards ({ board }: { board: Board }) {
   return { view, cards };
 }
 
-export async function addPageAndRedirect (page: NewPageInput, router: NextRouter) {
+export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {
   if (page) {
     const { page: newPage } = await addPage(page);
     router.push(`/${router.query.domain}/${newPage.path}`);
   }
 }
-

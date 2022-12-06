@@ -1,8 +1,8 @@
 import type { SpecRegistry } from '@bangle.dev/core';
 import type { Command, EditorState, EditorView, Schema } from '@bangle.dev/pm';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
-import { createTooltipDOM } from '@bangle.dev/tooltip';
 
+import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { markName } from './emojiSuggest.constants';
@@ -13,17 +13,8 @@ export const commands = {
   selectEmoji
 };
 
-function pluginsFactory ({
-  key
-}: {
-  key: PluginKey;
-}) {
-  return ({
-    specRegistry
-  }: {
-    schema: Schema;
-    specRegistry: SpecRegistry;
-  }) => {
+function pluginsFactory({ key }: { key: PluginKey }) {
+  return ({ specRegistry }: { schema: Schema; specRegistry: SpecRegistry }) => {
     const { trigger } = specRegistry.options[markName as any] as any;
 
     const suggestTooltipKey = new PluginKey('suggestTooltipKey');
@@ -41,14 +32,14 @@ function pluginsFactory ({
       new Plugin({
         key,
         state: {
-          init () {
+          init() {
             return {
               tooltipContentDOM: tooltipDOMSpec.contentDOM,
               markName,
               suggestTooltipKey
             };
           },
-          apply (_, pluginState) {
+          apply(_, pluginState) {
             return pluginState;
           }
         }
@@ -66,36 +57,41 @@ function pluginsFactory ({
   };
 }
 
-function getScrollContainer (view: EditorView) {
+function getScrollContainer(view: EditorView) {
   return view.dom.parentElement!;
 }
 
-export function getSuggestTooltipKey (key: PluginKey) {
+export function getSuggestTooltipKey(key: PluginKey) {
   return (state: EditorState) => {
-    return key.getState(state).suggestTooltipKey as PluginKey;
+    const pluginState = key.getState(state);
+    if (pluginState) {
+      return pluginState.suggestTooltipKey as PluginKey;
+    }
+    return '';
   };
 }
 
 /** Commands */
-export function queryTriggerText (key: PluginKey) {
+export function queryTriggerText(key: PluginKey) {
   return (state: EditorState) => {
     const suggestKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.queryTriggerText(suggestKey)(state);
+    if (suggestKey) {
+      return suggestTooltip.queryTriggerText(suggestKey)(state);
+    }
+    return '';
   };
 }
 
-export function selectEmoji (key: PluginKey, emoji: string): Command {
+export function selectEmoji(key: PluginKey, emoji: string): Command {
   return (state, dispatch, view) => {
     const emojiNode = state.schema.nodes.emoji.create({
       emoji
     });
 
     const suggestKey = getSuggestTooltipKey(key)(state);
-
-    return suggestTooltip.replaceSuggestMarkWith(suggestKey, emojiNode)(
-      state,
-      dispatch,
-      view
-    );
+    if (suggestKey) {
+      return suggestTooltip.replaceSuggestMarkWith(suggestKey, emojiNode)(state, dispatch, view);
+    }
+    return false;
   };
 }

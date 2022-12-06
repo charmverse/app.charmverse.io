@@ -1,49 +1,91 @@
 import type { Block } from '@prisma/client';
 
 import type { PageMeta } from 'lib/pages';
-import type { SystemError } from 'lib/utilities/errors';
+import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
-export const WebsocketEvents = ['blocks_updated', 'blocks_created', 'blocks_deleted', 'pages_meta_updated', 'pages_created', 'pages_deleted', 'subscribe', 'error'] as const;
+export type Resource = { id: string };
+export type ResourceWithSpaceId = Resource & { spaceId: string };
 
-export type WebsocketEvent = typeof WebsocketEvents[number]
-
-export type Resource = { id: string }
-export type ResourceWithSpaceId = Resource & { spaceId: string }
-
-// List of event payloads
-export type BlockUpdate = Partial<Block> & ResourceWithSpaceId
-
-export type BlockDelete = Resource & Pick<Block, 'type'>;
-
-export type PageMetaUpdate = Partial<PageMeta> & ResourceWithSpaceId
+export type SealedUserId = {
+  userId: string;
+};
 
 export type SocketAuthReponse = {
   authToken: string;
-}
+};
 
-export type SubscribeRequest = {
-  spaceId: string;
-} & SocketAuthReponse
+type BlocksUpdated = {
+  type: 'blocks_updated';
+  payload: (Partial<Block> & ResourceWithSpaceId)[];
+};
 
-// Map of event type to event payload
-export type Updates = {
-  blocks_updated: BlockUpdate[];
-  blocks_created: Block[];
-  blocks_deleted: BlockDelete[];
-  pages_meta_updated: PageMetaUpdate[];
-  pages_created: PageMeta[];
-  pages_deleted: Resource[];
-  subscribe: SubscribeRequest;
-  error: SystemError;
-}
+type BlocksCreated = {
+  type: 'blocks_created';
+  payload: Block[];
+};
 
-export type WebsocketPayload<T extends WebsocketEvent = WebsocketEvent> = Updates[T]
+type BlocksDeleted = {
+  type: 'blocks_deleted';
+  payload: (Resource & Pick<Block, 'type'>)[];
+};
 
-export type WebsocketMessage<T extends WebsocketEvent = WebsocketEvent> = {
-  type: T;
-  payload: WebsocketPayload<T>;
-}
+type PagesMetaUpdated = {
+  type: 'pages_meta_updated';
+  payload: (Partial<PageMeta> & ResourceWithSpaceId)[];
+};
 
-export type WebsocketSubscriber = {
-  userId: string;
-}
+type PagesCreated = {
+  type: 'pages_created';
+  payload: PageMeta[];
+};
+
+type PagesDeleted = {
+  type: 'pages_deleted';
+  payload: Resource[];
+};
+
+type VotesCreated = {
+  type: 'votes_created';
+  // We need a VoteTask, not just an extended vote, so this can be passed to the users' tasks, which will span different spaces
+  payload: VoteTask[];
+};
+
+type VotesDeleted = {
+  type: 'votes_deleted';
+  payload: Resource[];
+};
+
+type VotesUpdated = {
+  type: 'votes_updated';
+  payload: ExtendedVote[];
+};
+
+type ErrorMessage = {
+  type: 'error';
+  payload: string;
+};
+
+type SubscribeToWorkspace = {
+  type: 'subscribe';
+  payload: {
+    spaceId: string;
+  } & SocketAuthReponse;
+};
+
+export type ClientMessage = SubscribeToWorkspace;
+
+export type ServerMessage =
+  | BlocksUpdated
+  | BlocksCreated
+  | BlocksDeleted
+  | PagesMetaUpdated
+  | PagesCreated
+  | PagesDeleted
+  | ErrorMessage
+  | VotesCreated
+  | VotesDeleted
+  | VotesUpdated;
+
+export type WebSocketMessage = ClientMessage | ServerMessage;
+
+export type WebSocketPayload<T extends WebSocketMessage['type']> = Extract<WebSocketMessage, { type: T }>['payload'];

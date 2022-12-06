@@ -49,7 +49,6 @@ describe('countRoleMembers', () => {
     });
 
     expect(roleup.members).toBe(2);
-
   });
 
   it('should return a count of 0 if the role does not exist', async () => {

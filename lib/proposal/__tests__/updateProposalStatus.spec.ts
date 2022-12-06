@@ -4,7 +4,12 @@ import { prisma } from 'db';
 import { InvalidStateError } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
-import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createProposalWithUsers,
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { proposalPermissionMapping } from '../syncProposalPermissions';
 import { updateProposalStatus } from '../updateProposalStatus';
@@ -69,11 +74,13 @@ describe('Updates the proposal of a page', () => {
       reviewers: [],
       proposalStatus: 'reviewed'
     });
-    await expect(updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
-      newStatus: 'review',
-      userId: user.id
-    })).rejects.toBeInstanceOf(InvalidStateError);
+    await expect(
+      updateProposalStatus({
+        proposalId: pageWithProposal.proposal?.id as string,
+        newStatus: 'review',
+        userId: user.id
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
   it('Throw error when trying to move a discussion proposal to review without any reviewers attached', async () => {
@@ -84,15 +91,16 @@ describe('Updates the proposal of a page', () => {
       reviewers: [],
       proposalStatus: 'discussion'
     });
-    await expect(updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
-      newStatus: 'review',
-      userId: user.id
-    })).rejects.toBeInstanceOf(InvalidStateError);
+    await expect(
+      updateProposalStatus({
+        proposalId: pageWithProposal.proposal?.id as string,
+        newStatus: 'review',
+        userId: user.id
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
   it('Should assign the correct permissions when updating proposal authors and reviewers', async () => {
-
     const status: ProposalStatus = 'discussion';
     const newStatus: ProposalStatus = 'review';
 
@@ -111,7 +119,7 @@ describe('Updates the proposal of a page', () => {
       userId: user.id
     });
 
-    const { permissions } = await getPage(proposal.id) as IPageWithPermissions;
+    const { permissions } = (await getPage(proposal.id)) as IPageWithPermissions;
 
     const permissionTemplate = proposalPermissionMapping[newStatus];
 
@@ -119,20 +127,29 @@ describe('Updates the proposal of a page', () => {
       // Check all authors have a permission
       proposal.authors.forEach((author) => {
         if (author.userId) {
-          expect(permissions.some(p => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)).toBe(true);
+          expect(
+            permissions.some((p) => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)
+          ).toBe(true);
         }
       });
     }
 
     if (permissionTemplate.reviewer) {
       proposal.reviewers.forEach((assignedReviewer) => {
-        expect(permissions.some(p => (assignedReviewer.userId ? p.userId === assignedReviewer.userId : p.roleId === assignedReviewer.roleId)
-        && p.permissionLevel === permissionTemplate.author)).toBe(true);
+        expect(
+          permissions.some(
+            (p) =>
+              (assignedReviewer.userId ? p.userId === assignedReviewer.userId : p.roleId === assignedReviewer.roleId) &&
+              p.permissionLevel === permissionTemplate.author
+          )
+        ).toBe(true);
       });
     }
 
     if (permissionTemplate.community) {
-      expect(permissions.some(p => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)).toBe(true);
+      expect(
+        permissions.some((p) => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)
+      ).toBe(true);
     }
   });
 
@@ -162,6 +179,5 @@ describe('Updates the proposal of a page', () => {
     });
 
     expect(proposal.snapshotProposalExpiry?.toISOString()).toMatch('2022-10-13T20:55:51');
-
   });
 });

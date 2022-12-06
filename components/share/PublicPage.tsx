@@ -5,14 +5,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import SunIcon from '@mui/icons-material/WbSunny';
 import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import type { Space } from '@prisma/client';
-import { useWeb3React } from '@web3-react/core';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { validate } from 'uuid';
 
 import charmClient from 'charmClient';
-import BoardPage from 'components/[pageId]/BoardPage';
+import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -35,6 +34,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import type { PublicPageResponse } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
 
 import { lowerCaseEqual } from '../../lib/utilities/strings';
@@ -46,20 +46,20 @@ const LayoutContainer = styled.div`
   height: 100%;
 `;
 
-export default function PublicPage () {
-
-  const { account } = useWeb3React();
+export default function PublicPage() {
+  const { account, verifiableWalletDetected } = useWeb3AuthSig();
   const { setUser } = useUser();
   const { walletAuthSignature } = useWeb3AuthSig();
 
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();
-  const pageIdOrPath = router.query.pageId instanceof Array ? router.query.pageId.join('/') : router.query.pageId as string;
+  const pageIdOrPath =
+    router.query.pageId instanceof Array ? router.query.pageId.join('/') : (router.query.pageId as string);
   const dispatch = useAppDispatch();
   const { pages, setCurrentPageId, getPagePermissions } = usePages();
   const [loadingSpace, setLoadingSpace] = useState(true);
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { setSpaces } = useSpaces();
   const [, setTitleState] = usePageTitle();
   // keep track of the pageId by path since currentPageId may change when a page is viewed inside a modal
@@ -72,30 +72,42 @@ export default function PublicPage () {
   const hasShareInPath = router.asPath.split('/')[1] === 'share';
   const editString = router.asPath.replace('/share', '');
 
-  async function onLoad () {
-
+  async function onLoad() {
     const spaceDomain = (router.query.pageId as string[])[0];
 
     let foundSpace: Space | null = null;
+    let foundPage: PublicPageResponse | null = null;
 
     try {
-      foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
-      if (foundSpace) {
-        setSpaces([foundSpace]);
+      if (validate(router.query.pageId?.[0] || '')) {
+        foundPage = await charmClient.getPublicPage(pageIdOrPath);
+        foundSpace = foundPage.space;
+        router.replace(`/share/${foundSpace?.domain}/${foundPage.page.path}`);
       }
-    }
-    catch (err) {
+      if (!foundPage) {
+        foundSpace = await charmClient.getSpaceByDomain(spaceDomain);
+        if (foundSpace) {
+          setSpaces([foundSpace]);
+        } else {
+          setPageNotFound(true);
+        }
+      }
+    } catch (err) {
       setPageNotFound(true);
     }
 
     if (!isBountiesPage && foundSpace) {
       try {
-
-        const { page: rootPage, cards, boards, space, views } = await charmClient.getPublicPage(pageIdOrPath);
-
-        if (validate(router.query.pageId?.[0] || '')) {
-          router.replace(`/share/${foundSpace.domain}/${rootPage.path}`);
+        if (!foundPage) {
+          foundPage = await charmClient.getPublicPage(pageIdOrPath);
         }
+        const { page: rootPage, cards, boards, space, views } = foundPage;
+
+        charmClient.track.trackAction('page_view', {
+          type: rootPage.type,
+          pageId: rootPage.id,
+          spaceId: rootPage.spaceId
+        });
 
         setTitleState(rootPage.title);
         setCurrentPageId(rootPage.id);
@@ -103,17 +115,16 @@ export default function PublicPage () {
         setSpaces([space]);
 
         dispatch(setCurrent(rootPage.id));
-        cards.forEach(card => {
+        cards.forEach((card) => {
           dispatch(addCard(card));
         });
 
-        views.forEach(view => {
+        views.forEach((view) => {
           dispatch(addView(view));
         });
 
         dispatch(updateBoards(boards));
-      }
-      catch (err) {
+      } catch (err) {
         setPageNotFound(true);
       }
     }
@@ -121,44 +132,23 @@ export default function PublicPage () {
   }
 
   useEffect(() => {
-
     onLoad();
 
     return () => {
       setCurrentPageId('');
     };
-
   }, []);
-
-  useEffect(() => {
-    if (account && walletAuthSignature && lowerCaseEqual(account, walletAuthSignature.address)) {
-      charmClient.login({ address: account, walletSignature: walletAuthSignature })
-        .then(loggedInUser => {
-          setUser(loggedInUser);
-        })
-        .catch(() => {
-          charmClient.createUser({ address: account, walletSignature: walletAuthSignature })
-            .then(loggedInUser => {
-              setUser(loggedInUser);
-            }).catch(() => {
-              charmClient.logout();
-              setUser(null);
-            });
-        });
-
-    }
-  }, [account]);
 
   if (!router.query || loadingSpace) {
     return <LoadingComponent height='200px' isLoading={true} />;
   }
 
   if (isBountiesPage && !currentSpace) {
-    return <ErrorPage message={'Sorry, that space doesn\'t exist'} />;
+    return <ErrorPage message={"Sorry, that space doesn't exist"} />;
   }
 
   if (pageNotFound) {
-    return <ErrorPage message={'Sorry, that page doesn\'t exist'} />;
+    return <ErrorPage message={"Sorry, that page doesn't exist"} />;
   }
 
   const currentPage = pages[basePageId];
@@ -171,17 +161,16 @@ export default function PublicPage () {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer>
-
         <AppBar sidebarWidth={0} position='fixed' open={false}>
-
           <StyledToolbar variant='dense'>
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 1,
-              width: '100%'
-            }}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 1,
+                width: '100%'
+              }}
             >
               <PageTitleWithBreadcrumbs pageId={basePageId} />
               <Box display='flex' alignItems='center'>
@@ -196,7 +185,11 @@ export default function PublicPage () {
                 {/** dark mode toggle */}
                 <Tooltip title={theme.palette.mode === 'dark' ? 'Light mode' : 'Dark mode'} arrow placement='top'>
                   <IconButton sx={{ mx: 1 }} onClick={colorMode.toggleColorMode} color='inherit'>
-                    {theme.palette.mode === 'dark' ? <SunIcon color='secondary' fontSize='small' /> : <MoonIcon color='secondary' fontSize='small' />}
+                    {theme.palette.mode === 'dark' ? (
+                      <SunIcon color='secondary' fontSize='small' />
+                    ) : (
+                      <MoonIcon color='secondary' fontSize='small' />
+                    )}
                   </IconButton>
                 </Tooltip>
                 {/** user account */}
@@ -210,20 +203,23 @@ export default function PublicPage () {
           <PageContainer>
             <HeaderSpacer />
 
-            {isBountiesPage
-              ? <PublicBountiesPage />
-              : (currentPage?.type.match(/board/)
-                ? (
-                  <BoardPage page={currentPage} setPage={() => {}} readOnly={true} />
-                ) : (
-                  currentPage && <DocumentPage page={currentPage} setPage={() => {}} readOnly={true} parentProposalId={parentProposalId} />
-                )
-              )}
+            {isBountiesPage ? (
+              <PublicBountiesPage />
+            ) : currentPage?.type.match(/board/) ? (
+              <DatabasePage page={currentPage} setPage={() => {}} readOnly={true} />
+            ) : (
+              currentPage && (
+                <DocumentPage
+                  page={currentPage}
+                  setPage={() => {}}
+                  readOnly={true}
+                  parentProposalId={parentProposalId}
+                />
+              )
+            )}
             <PageDialogGlobalModal />
-
           </PageContainer>
         </PageDialogProvider>
-
       </LayoutContainer>
     </>
   );

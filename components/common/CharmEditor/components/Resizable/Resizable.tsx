@@ -18,7 +18,7 @@ interface ResizableProps {
   onResizeStop?: (view: EditorView) => void;
 }
 
-function Resizable (props: ResizableProps) {
+function Resizable(props: ResizableProps) {
   const { onResizeStop, updateAttrs, onDelete, initialSize = 100, aspectRatio, children, minWidth } = props;
   const [size, setSize] = useState(initialSize || 100);
   const view = useEditorViewContext();

@@ -1,13 +1,5 @@
-import {
-  bold,
-  code,
-  hardBreak,
-  italic,
-  link,
-  strike,
-  underline
-} from '@bangle.dev/base-components';
-import type { RawPlugins } from '@bangle.dev/core';
+import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
+import type { NodeViewProps, RawPlugins } from '@bangle.dev/core';
 import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
@@ -30,15 +22,15 @@ import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/Vot
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
+import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useUser } from 'hooks/useUser';
-import { extractDeletedThreadIds } from 'lib/inline-comments/extractDeletedThreadIds';
 import log from 'lib/log';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { PageContent } from 'models';
 
@@ -51,34 +43,40 @@ import LayoutRow from './components/columnLayout/Row';
 import { CryptoPrice } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
+import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
+import fiduswriterStyles from './components/fiduswriter/styles';
+import { rejectAll } from './components/fiduswriter/track/rejectAll';
 import * as floatingMenu from './components/floatingMenu';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import InlineCommentThread, * as inlineComment from './components/inlineComment';
 import InlineDatabase from './components/inlineDatabase/components/InlineDatabase';
-import InlinePalette, { plugins as inlinePalettePlugins } from './components/inlinePalette';
+import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
-import Placeholder from './components/Placeholder';
+import { placeholderPlugin } from './components/placeholder/index';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
 import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu, * as rowActions from './components/rowActions';
 import { SidebarDrawer, SIDEBAR_VIEWS } from './components/SidebarDrawer';
-import { getSelectedChanges } from './components/suggestions/statePlugins/track';
-import trackStyles from './components/suggestions/styles';
 import SuggestionsPopup from './components/suggestions/SuggestionPopup';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
-import { rejectAll } from './components/suggestions/track/rejectAll';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
 import * as trailingNode from './components/trailingNode';
+import * as tweet from './components/tweet/tweet';
+import { TweetNodeView } from './components/tweet/TweetNodeView';
+import { plugins as videoPlugins } from './components/video/video';
+import { VideoNodeView } from './components/video/VideoNodeView';
 import DevTools from './DevTools';
 import { specRegistry } from './specRegistry';
 
@@ -96,37 +94,33 @@ const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
 
-export function charmEditorPlugins (
-  {
-    onContentChange,
-    onSelectionSet,
-    readOnly = false,
-    disablePageSpecificFeatures = false,
-    enableVoting,
-    enableComments = true,
-    userId = null,
-    pageId = null,
-    spaceId = null,
-    username = null
-  }:
-    {
-      spaceId?: string | null;
-      pageId?: string | null;
-      userId?: string | null;
-      readOnly?: boolean;
-      onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
-      onSelectionSet?: (state: EditorState) => void;
-      disablePageSpecificFeatures?: boolean;
-      enableVoting?: boolean;
-      enableComments?: boolean;
-      username?: string | null;
-    } = {}
-): () => RawPlugins[] {
-
+export function charmEditorPlugins({
+  onContentChange,
+  onSelectionSet,
+  readOnly = false,
+  disablePageSpecificFeatures = false,
+  enableVoting,
+  enableComments = true,
+  userId = null,
+  pageId = null,
+  spaceId = null,
+  placeholderText
+}: {
+  spaceId?: string | null;
+  pageId?: string | null;
+  userId?: string | null;
+  readOnly?: boolean;
+  onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
+  onSelectionSet?: (state: EditorState) => void;
+  disablePageSpecificFeatures?: boolean;
+  enableVoting?: boolean;
+  enableComments?: boolean;
+  placeholderText?: string;
+} = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
-    (username && userId ? trackPlugins({ readOnly, userId, username, onSelectionSet, key: suggestionsPluginKey }) : []),
+    trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -134,7 +128,12 @@ export function charmEditorPlugins (
         }
         return {
           update: (view, prevState) => {
-            if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
+            if (
+              // Update only if page is in editing mode or in viewing mode
+              (!readOnly || enableComments || enableVoting) &&
+              onContentChange &&
+              !view.state.doc.eq(prevState.doc)
+            ) {
               onContentChange(view, prevState.doc);
             }
           }
@@ -197,10 +196,6 @@ export function charmEditorPlugins (
       containerDOM: ['div']
     }),
     NodeView.createPlugin({
-      name: 'iframe',
-      containerDOM: ['div', { class: 'iframe-container', draggable: 'false' }]
-    }),
-    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
@@ -221,27 +216,34 @@ export function charmEditorPlugins (
     table.selectionShadowPlugin(),
     // @ts-ignore missing type
     table.TableFiltersMenu(),
+    disclosure.plugins(),
+    tweet.plugins(),
     trailingNode.plugins(),
-    disclosure.plugins()
-    // TODO: Pasting iframe or image link shouldn't create those blocks for now
-    // iframePlugin,
-    // pasteImagePlugin
+    videoPlugins(),
+    iframe.plugins()
   ];
 
   if (!readOnly) {
-    basePlugins.push(rowActions.plugins({
-      key: actionsPluginKey
-    }));
+    basePlugins.push(
+      rowActions.plugins({
+        key: actionsPluginKey
+      })
+    );
+    basePlugins.push(placeholderPlugin(placeholderText));
   }
 
   if (!disablePageSpecificFeatures) {
-    basePlugins.push(inlineComment.plugin({
-      key: inlineCommentPluginKey
-    }));
+    basePlugins.push(
+      inlineComment.plugin({
+        key: inlineCommentPluginKey
+      })
+    );
     if (enableVoting) {
-      basePlugins.push(inlineVote.plugin({
-        key: inlineVotePluginKey
-      }));
+      basePlugins.push(
+        inlineVote.plugin({
+          key: inlineVotePluginKey
+        })
+      );
     }
   }
 
@@ -281,13 +283,19 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     background-color: ${({ theme }) => theme.palette.background.light};
   }
 
-  ${({ disablePageSpecificFeatures }) => !disablePageSpecificFeatures && `
+  ${({ disablePageSpecificFeatures }) =>
+    !disablePageSpecificFeatures &&
+    `
     .charm-inline-comment.active {
       background: rgba(255,212,0,0.14);
       border-bottom: 2px solid rgb(255, 212, 0);
       padding-bottom: 2px;
-      &:hover {
-        background: rgba(255,212,0,0.56) !important;
+
+      // disable hover UX on ios which converts first click to a hover event
+      @media (pointer: fine) {
+        &:hover {
+          background: rgba(255,212,0,0.56) !important;
+        }
       }
       cursor: pointer;
     }
@@ -296,23 +304,22 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
       background: rgba(0,171,255,0.14);
       border-bottom: 2px solid rgb(0,171,255);
       padding-bottom: 2px;
-      &:hover {
-        background: rgba(0,171,255,0.56) !important;
+      // disable hover UX on ios which converts first click to a hover event
+      @media (pointer: fine) {
+        &:hover {
+          background: rgba(0,171,255,0.56) !important;
+        }
       }
       cursor: pointer;
     }
   `}
 
-  ${trackStyles}
+  ${fiduswriterStyles}
 `;
 
 const defaultContent: PageContent = {
   type: 'doc',
-  content: [
-    {
-      type: 'paragraph'
-    }
-  ]
+  content: []
 };
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
@@ -326,16 +333,16 @@ interface CharmEditorProps {
   style?: CSSProperties;
   pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
   disablePageSpecificFeatures?: boolean;
+  isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
   pageId: string;
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
-  placeholder?: JSX.Element | undefined | null;
+  onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 }
 
-export function convertPageContentToMarkdown (content: PageContent, title?: string): string {
-
+export function convertPageContentToMarkdown(content: PageContent, title?: string): string {
   const serializer = markdownSerializer(specRegistry);
 
   const state = new BangleEditorState({
@@ -354,85 +361,76 @@ export function convertPageContentToMarkdown (content: PageContent, title?: stri
   return markdown;
 }
 
-function CharmEditor (
-  {
-    enableSuggestingMode = false,
-    pageActionDisplay = null,
-    content = defaultContent,
-    children,
-    onContentChange,
-    style,
-    readOnly = false,
-    disablePageSpecificFeatures = false,
-    enableVoting,
-    pageId,
-    containerWidth,
-    pageType,
-    pagePermissions,
-    placeholder
-  }:
-  CharmEditorProps
-) {
+function CharmEditor({
+  enableSuggestingMode = false,
+  pageActionDisplay = null,
+  content = defaultContent,
+  children,
+  onContentChange,
+  style,
+  readOnly = false,
+  disablePageSpecificFeatures = false,
+  isContentControlled = false,
+  enableVoting,
+  pageId,
+  containerWidth,
+  pageType,
+  pagePermissions,
+  onParticipantUpdate
+}: CharmEditorProps) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
-  const [currentSpace] = useCurrentSpace();
+  const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
-  // check empty state of page on first load
-  const _isEmpty = checkIsContentEmpty(content);
-  const [isEmpty, setIsEmpty] = useState(_isEmpty);
   const { user } = useUser();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
 
-  // eslint-disable-next-line
-  const onThreadResolveDebounced = debounce((pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
-    const deletedThreadIds = extractDeletedThreadIds(
-      specRegistry.schema,
-      doc,
-      prevDoc
-    );
+  const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+    const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
-      charmClient.resolveMultipleThreads({
-        threadIds: deletedThreadIds,
-        pageId
-      }).then(() => {
-        charmClient.getPageThreads(pageId).then((threads) => {
-          mutate(`pages/${pageId}/threads`, threads);
-        }).catch((err) => {
-          log.warn(`Failed to fetch threads for page ${pageId}`, err);
+      charmClient
+        .resolveMultipleThreads({
+          threadIds: deletedThreadIds,
+          pageId: _pageId
+        })
+        .then(() => {
+          charmClient
+            .getPageThreads(_pageId)
+            .then((threads) => {
+              mutate(`pages/${_pageId}/threads`, threads);
+            })
+            .catch((err) => {
+              log.warn(`Failed to fetch threads for page ${_pageId}`, err);
+            });
+        })
+        .catch((err) => {
+          log.warn('Failed to auto resolve threads', err);
         });
-      }).catch((err) => {
-        log.warn('Failed to auto resolve threads', err);
-      });
     }
   }, 1000);
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
+
+  const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
     }
-    onContentChange({ doc, rawText });
-  }, 100) : undefined;
-
-  function _onContentChange (view: EditorView, prevDoc: Node<any>) {
-    // @ts-ignore missing types from the @bangle.dev/react package
-    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
-    if (onContentChangeDebounced) {
-      onContentChangeDebounced(view, prevDoc);
+    if (onContentChange) {
+      onContentChange({ doc, rawText });
     }
-  }
+  }, 100);
 
   const editorRef = useRef<HTMLDivElement>(null);
 
   const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
 
-  function onSelectionSet (state: EditorState) {
+  function onSelectionSet(state: EditorState) {
     // update state that triggers updates in the sidebar
     setSuggestionState(state);
     // expand the sidebar if the user is selecting a suggestion
-    setCurrentPageActionDisplay(sidebarState => {
+    setCurrentPageActionDisplay((sidebarState) => {
       if (sidebarState) {
         const selected = getSelectedChanges(state);
         const hasSelection = Object.values(selected).some((value) => value);
@@ -444,31 +442,37 @@ function CharmEditor (
     });
   }
 
-  const state = useEditorState({
-    specRegistry,
-    plugins: charmEditorPlugins({
-      onContentChange: _onContentChange,
+  function getPlugins() {
+    return charmEditorPlugins({
+      onContentChange: (view: EditorView, prevDoc: Node<any>) => {
+        debouncedUpdate(view, prevDoc);
+      },
       onSelectionSet,
       readOnly,
       disablePageSpecificFeatures,
       enableVoting,
       pageId,
       spaceId: currentSpace?.id,
-      userId: user?.id,
-      username: user?.username
-    }),
+      userId: user?.id
+    });
+  }
+
+  const state = useEditorState({
+    specRegistry,
+    plugins: getPlugins(),
     initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
     dropCursorOpts: {
       color: 'var(--charmeditor-active)'
     }
   });
 
-  const onResizeStop = useCallback((view: EditorView) => {
-    if (onContentChangeDebounced) {
+  const onResizeStop = useCallback(
+    (view: EditorView) => {
       // Save the current embed size on the backend after we are done resizing
-      onContentChangeDebounced(view);
-    }
-  }, [onContentChangeDebounced]);
+      debouncedUpdate(view);
+    },
+    [debouncedUpdate]
+  );
 
   useEffect(() => {
     if (editorRef.current) {
@@ -487,40 +491,51 @@ function CharmEditor (
         }, 250);
       }
     }
+    return () => {
+      // console.log('destroy charmeditor');
+    };
   }, [editorRef.current]);
 
   return (
     <StyledReactBangleEditor
+      pageId={pageId}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
+      isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
+      onParticipantUpdate={onParticipantUpdate}
       trackChanges={true}
+      readOnly={readOnly}
       style={{
         ...(style ?? {}),
         width: '100%',
         height: '100%'
       }}
       editorRef={editorRef}
-      className={`czi-editor-frame-body ${isEmpty ? 'empty-editor' : ''}`}
       pmViewOpts={{
         editable: () => !readOnly,
         plugins: []
       }}
-      placeholderComponent={(
-        placeholder || (
-          <Placeholder
-            sx={{
-              // This fixes the placeholder and cursor not being aligned
-              top: -34
-            }}
-            show={isEmpty && !readOnly}
-          />
-        )
-      )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
+        const allProps: CharmNodeViewProps = {
+          ...props,
+          onResizeStop,
+          pageId,
+          readOnly,
+          deleteNode: () => {
+            const view = props.view;
+            const tr = view.state.tr;
+            const start = props.getPos();
+            const end = start + props.node.nodeSize;
+            tr.deleteRange(start, end);
+            tr.deleteSelection();
+            view.dispatch(tr);
+          }
+        };
+
         switch (props.node.type.name) {
           case 'quote':
-            return <Quote {...props}>{_children}</Quote>;
+            return <Quote {...allProps}>{_children}</Quote>;
           case 'columnLayout': {
             return <LayoutRow node={props.node}>{_children}</LayoutRow>;
           }
@@ -528,13 +543,11 @@ function CharmEditor (
             return <LayoutColumn node={props.node}>{_children}</LayoutColumn>;
           }
           case 'cryptoPrice': {
-            const attrs = props.attrs as { base: null | CryptoCurrency, quote: null | FiatCurrency };
+            const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
               <CryptoPrice
-                preset={{
-                  base: attrs.base,
-                  quote: attrs.quote
-                }}
+                base={attrs.base}
+                quote={attrs.quote}
                 onBaseCurrencyChange={(newBaseCurrency) => {
                   props.updateAttrs({
                     base: newBaseCurrency
@@ -549,11 +562,7 @@ function CharmEditor (
             );
           }
           case 'blockquote': {
-            return (
-              <Callout {...props}>
-                {_children}
-              </Callout>
-            );
+            return <Callout {...props}>{_children}</Callout>;
           }
           case 'horizontalRule': {
             return (
@@ -563,52 +572,32 @@ function CharmEditor (
             );
           }
           case 'image': {
-            return (
-              <ResizableImage
-                readOnly={readOnly}
-                onResizeStop={onResizeStop}
-                {...props}
-              />
-            );
+            return <ResizableImage {...allProps} />;
           }
           case 'iframe': {
-            return (
-              <iframe.Component
-                readOnly={readOnly}
-                onResizeStop={onResizeStop}
-                {...props}
-              />
-            );
+            // support old video nodes which piggybacked on iframe type
+            if (props.node.attrs.type === 'video') {
+              return <VideoNodeView {...allProps} />;
+            }
+            return <iframe.Component {...allProps} />;
           }
           case 'mention': {
-            return (
-              <Mention {...props}>
-                {_children}
-              </Mention>
-            );
+            return <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return (
-              <NestedPage {...props} />
-            );
+            return <NestedPage {...props} />;
           }
           case 'pdf': {
-            return (
-              <ResizablePDF
-                readOnly={readOnly}
-                onResizeStop={onResizeStop}
-                {...props}
-              />
-            );
+            return <ResizablePDF {...allProps} />;
           }
           case 'inlineDatabase': {
-            return (
-              <InlineDatabase
-                containerWidth={containerWidth}
-                readOnly={readOnly}
-                {...props}
-              />
-            );
+            return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
+          }
+          case 'tweet': {
+            return <TweetNodeView {...allProps} />;
+          }
+          case 'video': {
+            return <VideoNodeView {...allProps} />;
           }
           default: {
             return null;
@@ -617,22 +606,30 @@ function CharmEditor (
       }}
     >
       <floatingMenu.FloatingMenu
-      // disable comments and polls in suggestions mode since they dont interact well
+        // disable comments and polls in suggestions mode since they dont interact well
         enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
         pluginKey={floatingMenuPluginKey}
         pagePermissions={pagePermissions}
+        nestedPagePluginKey={nestedPagePluginKey}
+        disableNestedPage={disableNestedPage}
       />
       <MentionSuggest pluginKey={mentionPluginKey} />
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlinePalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
+      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>
-          <SidebarDrawer id='page-action-sidebar' title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''} open={!!pageActionDisplay}>
-            {pageActionDisplay === 'suggestions' && <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />}
+          <SidebarDrawer
+            id='page-action-sidebar'
+            title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
+            open={!!pageActionDisplay}
+          >
+            {pageActionDisplay === 'suggestions' && (
+              <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
+            )}
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
             {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
@@ -648,8 +645,6 @@ function CharmEditor (
 
 export default memo((props: CharmEditorProps) => (
   <ErrorBoundary>
-    <CharmEditor
-      {...props}
-    />
+    <CharmEditor {...props} />
   </ErrorBoundary>
 ));

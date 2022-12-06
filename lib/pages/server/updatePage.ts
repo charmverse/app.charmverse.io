@@ -1,20 +1,24 @@
 import type { PageType, Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { IPageWithPermissions } from 'lib/pages/server';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 type CurrentPageData = {
   id: string;
   type: PageType;
-}
+};
 
-export async function updatePage (page: CurrentPageData, userId: string, updates: Prisma.PageUpdateInput): Promise<IPageWithPermissions> {
+export async function updatePage(
+  page: CurrentPageData,
+  userId: string,
+  updates: Prisma.PageUpdateInput
+): Promise<IPageWithPermissions> {
   const data: Prisma.PageUpdateInput = {
-    ...updates,
     updatedAt: new Date(),
+    ...updates,
     updatedBy: userId
   };
 
@@ -45,5 +49,4 @@ export async function updatePage (page: CurrentPageData, userId: string, updates
       }
     }
   });
-
 }

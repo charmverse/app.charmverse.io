@@ -1,20 +1,9 @@
-import type {
-  EditorState,
-  Node,
-  Schema,
-  Transaction } from '@bangle.dev/pm';
-import {
-  canJoin,
-  findWrapping,
-  InputRule
-} from '@bangle.dev/pm';
+import type { EditorState, Node, Schema, Transaction } from '@bangle.dev/pm';
+import { canJoin, findWrapping, InputRule } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
 
 export const isNodeTodo = (node: Node, schema: Schema) => {
-  return (
-    node.type === schema.nodes.listItem
-    && typeof node.attrs.todoChecked === 'boolean'
-  );
+  return node.type === schema.nodes.listItem && typeof node.attrs.todoChecked === 'boolean';
 };
 
 /**
@@ -25,18 +14,9 @@ export const isNodeTodo = (node: Node, schema: Schema) => {
  * @param {*} node
  * @param {*} pos
  */
-export const removeTodoCheckedAttr = (
-  tr: Transaction,
-  schema: Schema,
-  node: Node,
-  pos: number
-) => {
+export const removeTodoCheckedAttr = (tr: Transaction, schema: Schema, node: Node, pos: number) => {
   if (isNodeTodo(node, schema)) {
-    tr = tr.setNodeMarkup(
-      pos,
-      undefined,
-      { ...node.attrs, todoChecked: null }
-    );
+    tr = tr.setNodeMarkup(pos, undefined, { ...node.attrs, todoChecked: null });
   }
   return tr;
 };
@@ -49,18 +29,9 @@ export const removeTodoCheckedAttr = (
  * @param {*} node
  * @param {*} pos
  */
-export const setTodoCheckedAttr = (
-  tr: Transaction,
-  schema: Schema,
-  node: Node,
-  pos: number
-) => {
+export const setTodoCheckedAttr = (tr: Transaction, schema: Schema, node: Node, pos: number) => {
   if (node.type === schema.nodes.listItem && !isNodeTodo(node, schema)) {
-    tr = tr.setNodeMarkup(
-      pos,
-      undefined,
-      { ...node.attrs, todoChecked: false }
-    );
+    tr = tr.setNodeMarkup(pos, undefined, { ...node.attrs, todoChecked: false });
   }
   return tr;
 };
@@ -119,13 +90,13 @@ export const setTodo = filter(
 );
 
 // Alteration of PM's wrappingInputRule
-export function wrappingInputRuleForTodo (
+export function wrappingInputRuleForTodo(
   regexp: RegExp,
   getAttrs: Node['attrs'] | ((match: RegExpMatchArray) => Node['attrs'])
 ) {
-  return new InputRule(regexp, ((state, match, start, end) => {
+  return new InputRule(regexp, (state, match, start, end) => {
     const nodeType = state.schema.nodes.listItem;
-    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
+    const attrs = getAttrs instanceof Function ? getAttrs(match as RegExpMatchArray) : getAttrs;
     const tr = state.tr.delete(start, end);
     const $start = tr.doc.resolve(start);
     const range = $start.blockRange();
@@ -136,17 +107,17 @@ export function wrappingInputRuleForTodo (
     tr.wrap(range!, wrapping);
     const before = tr.doc.resolve(start - 1).nodeBefore;
     if (
-      before
-      && before.type === state.schema.nodes.bulletList
-      && canJoin(tr.doc, start - 1)
-      && before.lastChild
+      before &&
+      before.type === state.schema.nodes.bulletList &&
+      canJoin(tr.doc, start - 1) &&
+      before.lastChild &&
       // only join if before is todo
-      && isNodeTodo(before.lastChild, state.schema)
+      isNodeTodo(before.lastChild, state.schema)
     ) {
       tr.join(start - 1);
     }
     return tr;
-  }));
+  });
 }
 
 /**
@@ -169,18 +140,12 @@ export function wrappingInputRuleForTodo (
  * In the above the callback will be called for everyone
  *  A, list-A's kids, B, C, D _but_ not list-D's kids.
  */
-export function siblingsAndNodesBetween (
-  state: EditorState,
-  callback: (node: Node, pos: number) => void
-) {
+export function siblingsAndNodesBetween(state: EditorState, callback: (node: Node, pos: number) => void) {
   const {
     schema,
     selection: { $from, $to }
   } = state;
-  const range = $from.blockRange(
-    $to,
-    (node) => node.childCount > 0 && node.firstChild!.type === schema.nodes.listItem
-  );
+  const range = $from.blockRange($to, (node) => node.childCount > 0 && node.firstChild!.type === schema.nodes.listItem);
 
   if (!range) {
     return;
@@ -206,23 +171,22 @@ export function siblingsAndNodesBetween (
 
     startPos += child.nodeSize;
   }
-
 }
 
-function isSelectionParentBulletList (state: EditorState) {
+function isSelectionParentBulletList(state: EditorState) {
   const { selection } = state;
   const fromNode = selection.$from.node(-2);
   const endNode = selection.$to.node(-2);
 
   return (
-    fromNode
-    && fromNode.type === state.schema.nodes.bulletList
-    && endNode
-    && endNode.type === state.schema.nodes.bulletList
+    fromNode &&
+    fromNode.type === state.schema.nodes.bulletList &&
+    endNode &&
+    endNode.type === state.schema.nodes.bulletList
   );
 }
 
-function todoCount (state: EditorState) {
+function todoCount(state: EditorState) {
   let lists = 0;
   let todos = 0;
 

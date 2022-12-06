@@ -68,7 +68,7 @@ test('OctoClient: importFullArchive', async () => {
   );
 });
 
-function createBoards (): Block[] {
+function createBoards(): Block[] {
   const blocks = [];
 
   for (let i = 0; i < 5; i++) {

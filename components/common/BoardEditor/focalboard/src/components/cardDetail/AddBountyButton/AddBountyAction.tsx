@@ -14,7 +14,7 @@ type Props = {
   cardId: string;
 };
 
-export default function AddBountyAction ({ readOnly, cardId }: Props) {
+export default function AddBountyAction({ readOnly, cardId }: Props) {
   const router = useRouter();
   const { pages } = usePages();
   const [spacePermissions] = useCurrentSpacePermissions();
@@ -22,10 +22,10 @@ export default function AddBountyAction ({ readOnly, cardId }: Props) {
   const cardPage = pages[cardId];
   const { draftBounty, cancelDraftBounty, bounties } = useBounties();
   const hasBounty = useMemo(() => {
-    return !!bounties.find(bounty => bounty.page?.id === cardId) ?? null;
+    return !!bounties.find((bounty) => bounty.page?.id === cardId) ?? null;
   }, [cardId, bounties]);
   const { user } = useUser();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { createDraftBounty } = useBounties();
 
   // clear draft bounty on close, just in case
@@ -35,29 +35,23 @@ export default function AddBountyAction ({ readOnly, cardId }: Props) {
     };
   }, []);
 
-  const canAddBounty = spacePermissions?.createBounty
-    && !isSharedPage
-    && cardPage
-    && !hasBounty
-    && !draftBounty
-    && !readOnly
-    && cardPage.type.match('template') === null
-    && spacePermissions?.createBounty
-    && space
-    && user;
+  const canAddBounty =
+    spacePermissions?.createBounty &&
+    !isSharedPage &&
+    cardPage &&
+    !hasBounty &&
+    !draftBounty &&
+    !readOnly &&
+    cardPage.type.match('template') === null &&
+    spacePermissions?.createBounty &&
+    space &&
+    user;
 
-  return (
-    canAddBounty
-      ? (
-        <div className='octo-propertyname add-property'>
-          <Button onClick={() => createDraftBounty({ pageId: cardId, userId: user.id, spaceId: space.id })}>
-            <FormattedMessage
-              id='CardDetail.add-bounty'
-              defaultMessage='+ Add a bounty'
-            />
-          </Button>
-        </div>
-      )
-      : null
-  );
+  return canAddBounty ? (
+    <div className='octo-propertyname add-property'>
+      <Button onClick={() => createDraftBounty({ pageId: cardId, userId: user.id, spaceId: space.id })}>
+        <FormattedMessage id='CardDetail.add-bounty' defaultMessage='+ Add a bounty' />
+      </Button>
+    </div>
+  ) : null;
 }

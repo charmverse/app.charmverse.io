@@ -7,15 +7,15 @@ import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export interface IPageWithPermissions extends Page {
-  permissions: (PagePermission & { sourcePermission: PagePermission | null }) [];
+  permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
 }
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
-}
+};
 
 export interface PageWithChildren extends IPageWithPermissions {
-  children: PageWithChildren [];
+  children: PageWithChildren[];
 }
 
 export interface ModifyChildPagesResponse {
@@ -41,12 +41,19 @@ export interface PublicPageResponse {
 // Generic type A is optional, we can mount additional properties on basic node definitions
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNode<A = {}> = Pick<Page, 'id' | 'spaceId' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'> & Partial<Pick<Page, 'boardId' | 'cardId'>> & A
+export type PageNode<A = {}> = Pick<
+  Page,
+  'id' | 'spaceId' | 'type' | 'parentId' | 'index' | 'createdAt' | 'deletedAt'
+> &
+  Partial<Pick<Page, 'boardId' | 'cardId'>> &
+  A;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type PageNodeWithChildren<A = {}> = PageNode<{ children: PageNodeWithChildren<A>[] }> & A
+export type PageNodeWithChildren<A = {}> = PageNode<{ children: PageNodeWithChildren<A>[] }> & A;
 
-export type PageNodeWithPermissions = PageNode<{ permissions: (PagePermission & { sourcePermission: PagePermission | null })[] }>
+export type PageNodeWithPermissions = PageNode<{
+  permissions: (PagePermission & { sourcePermission: PagePermission | null })[];
+}>;
 
 /**
  * @rootPageIds The list of roots we want to track
@@ -77,7 +84,7 @@ export interface PageTreeResolveInput {
 export type TargetPageTree<T extends PageNode = PageNode> = {
   parents: PageNodeWithChildren<T>[];
   targetPage: PageNodeWithChildren<T>;
-}
+};
 
 /**
  * A target page tree that also contains a pre-computed flat list of children
@@ -86,19 +93,19 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
   parents: PageNodeWithChildren<T>[];
   targetPage: PageNodeWithChildren<T>;
   flatChildren: PageNodeWithChildren<T>[];
-}
+};
 
 // Page without content and contentText props - used for list of pages (on the client)
-export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText'>
+export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText' | 'version'>;
 
 export type PageDetails = {
   id: string;
   content: string | number | boolean | Record<string, any> | any[] | null;
   contentText: string;
   spaceId: string;
-}
+};
 
-export type PageWithProposal = (Page & { proposal: ProposalWithUsers | null });
+export type PageWithProposal = Page & { proposal: ProposalWithUsers | null };
 
 export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, P | undefined>;
 

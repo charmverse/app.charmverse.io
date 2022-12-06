@@ -14,23 +14,31 @@ type Props = {
   pageId: string;
   closeParentPopup: () => void;
   isDefaultTemplate?: boolean;
-}
+};
 
-export function TemplatePageMenuActions ({ deleteTemplate, closeParentPopup, pageId, editTemplate, isDefaultTemplate }: Props) {
-
+export function TemplatePageMenuActions({
+  deleteTemplate,
+  closeParentPopup,
+  pageId,
+  editTemplate,
+  isDefaultTemplate
+}: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
 
   return (
     <>
-      <IconButton size='small' {...bindTrigger(popupState)}><MoreHorizIcon /></IconButton>
+      <IconButton size='small' {...bindTrigger(popupState)}>
+        <MoreHorizIcon />
+      </IconButton>
 
       <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
-        <MenuItem onClick={(e) => {
-          e.stopPropagation();
-          popupState.close();
-          closeParentPopup();
-          editTemplate(pageId);
-        }}
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            popupState.close();
+            closeParentPopup();
+            editTemplate(pageId);
+          }}
         >
           <EditIcon fontSize='small' />
           <Typography variant='body2' color='text.secondary'>
@@ -38,11 +46,12 @@ export function TemplatePageMenuActions ({ deleteTemplate, closeParentPopup, pag
           </Typography>
         </MenuItem>
 
-        <MenuItem onClick={(e) => {
-          e.stopPropagation();
-          popupState.close();
-          deleteTemplate(pageId);
-        }}
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            popupState.close();
+            deleteTemplate(pageId);
+          }}
         >
           <DeleteIcon fontSize='small' />
           <Typography variant='body2' color='text.secondary'>

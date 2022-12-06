@@ -36,10 +36,9 @@ type AddViewProps = {
   showView: (viewId: string) => void;
   sx?: SxProps;
   onClick?: () => void;
-}
+};
 
-function AddViewMenu (props: AddViewProps) {
-
+function AddViewMenu(props: AddViewProps) {
   const intl = props.intl;
   const showView = props.showView;
 
@@ -169,7 +168,9 @@ function AddViewMenu (props: AddViewProps) {
     const oldViewId = activeView?.id;
 
     // Find first date property
-    view.fields.dateDisplayPropertyId = board.fields.cardProperties.find((o: IPropertyTemplate) => o.type === 'date')?.id;
+    view.fields.dateDisplayPropertyId = board.fields.cardProperties.find(
+      (o: IPropertyTemplate) => o.type === 'date'
+    )?.id;
 
     mutator.insertBlock(
       view,
@@ -193,13 +194,7 @@ function AddViewMenu (props: AddViewProps) {
   return (
     <>
       {props.showLabel ? (
-        <Button
-          {...triggers}
-          color='secondary'
-          size='small'
-          startIcon={<Add />}
-          variant='text'
-        >
+        <Button {...triggers} color='secondary' size='small' startIcon={<Add />} variant='text'>
           Add view
         </Button>
       ) : (
@@ -209,19 +204,27 @@ function AddViewMenu (props: AddViewProps) {
       )}
       <Menu {...bindMenu(popupState)}>
         <MenuItem dense onClick={handleAddViewBoard}>
-          <ListItemIcon><BoardIcon /></ListItemIcon>
+          <ListItemIcon>
+            <BoardIcon />
+          </ListItemIcon>
           <ListItemText>{boardText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewTable}>
-          <ListItemIcon><TableIcon /></ListItemIcon>
+          <ListItemIcon>
+            <TableIcon />
+          </ListItemIcon>
           <ListItemText>{tableText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewGallery}>
-          <ListItemIcon><GalleryIcon /></ListItemIcon>
+          <ListItemIcon>
+            <GalleryIcon />
+          </ListItemIcon>
           <ListItemText>{galleryText}</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={handleAddViewCalendar}>
-          <ListItemIcon><CalendarIcon /></ListItemIcon>
+          <ListItemIcon>
+            <CalendarIcon />
+          </ListItemIcon>
           <ListItemText>Calendar</ListItemText>
         </MenuItem>
       </Menu>

@@ -8,6 +8,10 @@ describe('mixpanel/eventNameToHumanFormat', () => {
 
   it('Should return params oject with human readable props', async () => {
     expect(paramsToHumanFormat({ someParam: 1 })).toEqual({ 'Some Param': 1 });
-    expect(paramsToHumanFormat({ someParam: 1, paramBName: 2, ParamCName: 3 })).toEqual({ 'Some Param': 1, 'Param B Name': 2, 'Param C Name': 3 });
+    expect(paramsToHumanFormat({ someParam: 1, paramBName: 2, ParamCName: 3 })).toEqual({
+      'Some Param': 1,
+      'Param B Name': 2,
+      'Param C Name': 3
+    });
   });
 });

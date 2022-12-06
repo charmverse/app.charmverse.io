@@ -6,7 +6,11 @@ import type { SubmissionReview } from 'lib/applications/interfaces';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBountyWithSingleApplication,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -21,9 +25,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/submissions/{submissionId}/review - review a submission', () => {
-
   it('should succed if the user has "review" permission, respond with 200', async () => {
-
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const reviewerCookie = await loginUser(reviewer.id);
@@ -59,7 +61,6 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
   });
 
   it('should allow a space admin to review a submission and respond with 200', async () => {
-
     const adminUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
     const adminUserCookie = await loginUser(adminUser.id);
@@ -85,7 +86,6 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
   });
 
   it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
-
     const user = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const userCookie = await loginUser(user.id);
@@ -109,5 +109,4 @@ describe('POST /api/submissions/{submissionId}/review - review a submission', ()
       .send(decision)
       .expect(401);
   });
-
 });

@@ -9,22 +9,22 @@ import type { Card } from '../../blocks/card';
 import TableRow from './tableRow';
 
 type Props = {
-    board: Board;
-    activeView: BoardView;
-    columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
-    cards: readonly Card[];
-    offset: number;
-    resizingColumn: string;
-    selectedCardIds: string[];
-    readOnly: boolean;
-    cardIdToFocusOnRender: string;
-    showCard: (cardId: string) => void;
-    addCard: (groupByOptionId?: string) => Promise<void>;
-    onCardClicked: (e: React.MouseEvent, card: Card) => void;
-    onDrop: (srcCard: Card, dstCard: Card) => void;
-}
+  board: Board;
+  activeView: BoardView;
+  columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+  cards: readonly Card[];
+  offset: number;
+  resizingColumn: string;
+  selectedCardIds: string[];
+  readOnly: boolean;
+  cardIdToFocusOnRender: string;
+  showCard: (cardId: string) => void;
+  addCard: (groupByOptionId?: string) => Promise<void>;
+  onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  onDrop: (srcCard: Card, dstCard: Card) => void;
+};
 
-function TableRows (props: Props): JSX.Element {
+function TableRows(props: Props): JSX.Element {
   const { board, cards, activeView } = props;
   const { pages, updatePage } = usePages();
 
@@ -32,16 +32,17 @@ function TableRows (props: Props): JSX.Element {
     await updatePage({ id: cardId, title });
 
     if (saveType === 'onEnter') {
-      const card = cards.find(c => c.id === cardId);
+      const card = cards.find((c) => c.id === cardId);
       if (card && cards.length > 0 && cards[cards.length - 1] === card) {
-        props.addCard(activeView.fields.groupById ? card.fields.properties[activeView.fields.groupById!] as string : '');
+        props.addCard(
+          activeView.fields.groupById ? (card.fields.properties[activeView.fields.groupById!] as string) : ''
+        );
       }
     }
   }, []);
   return (
     <>
       {cards.map((card) => {
-
         const cardPage = pages[card.id];
         if (!cardPage) {
           throw new Error(`Card ${card.id} not found in pages`);

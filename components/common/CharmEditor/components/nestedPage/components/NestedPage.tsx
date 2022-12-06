@@ -6,7 +6,7 @@ import Link from 'components/common/Link';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 const NestedPageContainer = styled(Link)`
@@ -19,13 +19,11 @@ const NestedPageContainer = styled(Link)`
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-
     .actions-menu {
       opacity: 0;
     }
 
     &:hover {
-
       background-color: ${({ theme }) => theme.palette.background.light};
 
       .actions-menu {
@@ -35,25 +33,32 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-export default function NestedPage ({ node }: NodeViewProps) {
-  const [space] = useCurrentSpace();
+export default function NestedPage({ node }: NodeViewProps) {
+  const space = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
 
   const isPublicShareMode = window.location.href.match(`${window.location.origin}/share/`) !== null;
 
-  const appPath = isPublicShareMode ? `share/${nestedPage?.id}` : `${space?.domain}/${nestedPage?.path}`;
+  const appPath = `${isPublicShareMode ? 'share/' : ''}${space?.domain}/${nestedPage?.path}`;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
   return (
-    <NestedPageContainer href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
+    <NestedPageContainer
+      data-test={`nested-page-${nestedPage?.id}`}
+      href={nestedPage ? `/${appPath}` : ''}
+      color='inherit'
+      data-id={`page-${nestedPage?.id}`}
+      data-title={nestedPage?.title}
+      data-path={fullPath}
+    >
       <div>
-        {nestedPage && <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />}
+        {nestedPage && (
+          <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />
+        )}
       </div>
-      <Typography fontWeight={600}>
-        {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}
-      </Typography>
+      <Typography fontWeight={600}>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</Typography>
     </NestedPageContainer>
   );
 }

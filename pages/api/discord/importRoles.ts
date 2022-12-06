@@ -22,7 +22,7 @@ export interface ImportDiscordRolesPayload {
 
 export type ImportRolesResponse = { importedRoleCount: number };
 
-async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
+async function importRoles(req: NextApiRequest, res: NextApiResponse<ImportRolesResponse | { error: string }>) {
   const { spaceId, guildId } = req.body as ImportDiscordRolesPayload;
 
   if (!spaceId || !guildId) {
@@ -44,12 +44,13 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   const discordServerRoles: DiscordServerRole[] = [];
   const discordGuildMembers: DiscordGuildMember[] = [];
 
-  const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(`https://discord.com/api/v8/guilds/${guildId}/roles`);
+  const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(
+    `https://discord.com/api/v8/guilds/${guildId}/roles`
+  );
 
   if (discordServerRolesResponse.status === 'success') {
     discordServerRoles.push(...discordServerRolesResponse.data);
-  }
-  else {
+  } else {
     res.status(discordServerRolesResponse.status).json(discordServerRolesResponse);
     return;
   }
@@ -75,15 +76,15 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
     }
   });
 
-  const discordGuildMemberResponses = await Promise.all(
-    discordConnectedMembers.map(
-      discordConnectedMember => handleDiscordResponse<DiscordGuildMember>(
+  const discordGuildMemberResponses = (await Promise.all(
+    discordConnectedMembers.map((discordConnectedMember) =>
+      handleDiscordResponse<DiscordGuildMember>(
         `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
       )
     )
-  ) as { status: 'success', data: DiscordGuildMember | null }[];
+  )) as { status: 'success'; data: DiscordGuildMember | null }[];
 
-  discordGuildMemberResponses.forEach(discordGuildMemberResponse => {
+  discordGuildMemberResponses.forEach((discordGuildMemberResponse) => {
     if (discordGuildMemberResponse.status === 'success' && discordGuildMemberResponse.data) {
       discordGuildMembers.push(discordGuildMemberResponse.data);
     }
@@ -101,6 +102,9 @@ async function importRoles (req: NextApiRequest, res: NextApiResponse<ImportRole
   res.status(200).json({ importedRoleCount: discordServerRoles.length });
 }
 
-handler.use(requireUser).use(requireSpaceMembership({ adminOnly: true })).post(importRoles);
+handler
+  .use(requireUser)
+  .use(requireSpaceMembership({ adminOnly: true }))
+  .post(importRoles);
 
 export default withSessionRoute(handler);

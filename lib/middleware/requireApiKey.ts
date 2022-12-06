@@ -7,7 +7,6 @@ import type { NextHandler } from 'next-connect';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError } from 'lib/middleware/errors';
-import { IDENTITY_TYPES } from 'models';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -16,7 +15,7 @@ declare module 'http' {
   }
 }
 
-export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> {
+export async function provisionApiKey(spaceId: string): Promise<SpaceApiToken> {
   const newApiKey = crypto.randomBytes(160 / 8).toString('hex');
 
   const spaceToken = await prisma.spaceApiToken.upsert({
@@ -45,7 +44,7 @@ export async function provisionApiKey (spaceId: string): Promise<SpaceApiToken> 
 /**
  * Returns bot user for the space, and creates one if they do not exist
  */
-export async function getBotUser (spaceId: string): Promise<User> {
+export async function getBotUser(spaceId: string): Promise<User> {
   let botUser = await prisma.user.findFirst({
     where: {
       isBot: true,
@@ -62,7 +61,7 @@ export async function getBotUser (spaceId: string): Promise<User> {
       data: {
         username: 'Bot',
         isBot: true,
-        identityType: IDENTITY_TYPES[3]
+        identityType: 'RandomName'
       }
     });
 
@@ -82,8 +81,8 @@ export async function getBotUser (spaceId: string): Promise<User> {
  * @returns Space linked to API key in the request
  * Throws if the API key or space do not exist
  */
-export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
-  const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? req.query.api_key as string;
+export async function getSpaceFromApiKey(req: NextApiRequest): Promise<Space> {
+  const apiKey = req.headers?.authorization?.split('Bearer').join('').trim() ?? (req.query.api_key as string);
 
   // Protect against api keys or nullish API Keys
   if (!apiKey || apiKey.length < 1) {
@@ -117,8 +116,7 @@ export async function getSpaceFromApiKey (req: NextApiRequest): Promise<Space> {
  *
  * assigns authorizedSpaceId so follow-on endpoints can use it
  */
-export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-
+export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
     const space = await getSpaceFromApiKey(req);
 
@@ -145,9 +143,7 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
     const botUser = await getBotUser(space.id);
 
     req.botUser = botUser;
-
-  }
-  catch (error) {
+  } catch (error) {
     log.warn('Found error', error);
     throw new ApiError({
       message: 'Please provide a valid API token',
@@ -156,7 +152,6 @@ export async function requireApiKey (req: NextApiRequest, res: NextApiResponse, 
   }
 
   next();
-
 }
 
 export default requireApiKey;

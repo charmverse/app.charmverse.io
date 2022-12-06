@@ -6,9 +6,9 @@ import { v4, validate } from 'uuid';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import type { PageContent } from 'models';
@@ -23,16 +23,18 @@ interface UpdateRefs {
 /**
  * Mutates the provided content to replace nested page refs
  */
-function updateReferences ({ oldNewHashMap, pages }: UpdateRefs) {
-  pages.forEach(p => {
+function updateReferences({ oldNewHashMap, pages }: UpdateRefs) {
+  pages.forEach((p) => {
     const prosemirrorNodes = (p.content as PageContent)?.content;
     if (prosemirrorNodes) {
       let prosemirrorNodesAsText = JSON.stringify(prosemirrorNodes);
 
       // Step 1 - Update all nested page links
-      const nestedPageRefs = prosemirrorNodesAsText.match(/{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g);
+      const nestedPageRefs = prosemirrorNodesAsText.match(
+        /{"type":"page","attrs":{"id":"((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}"}}/g
+      );
 
-      nestedPageRefs?.forEach(pageLinkNode => {
+      nestedPageRefs?.forEach((pageLinkNode) => {
         const oldPageId = pageLinkNode.match(/((\d|[a-f]){1,}-){1,}(\d|[a-f]){1,}/)?.[0];
         const newPageId = oldPageId ? oldNewHashMap[oldPageId] : undefined;
 
@@ -51,8 +53,11 @@ interface WorkspaceImportResult {
   blocks: number;
 }
 
-export async function generateImportWorkspacePages ({ targetSpaceIdOrDomain, exportData, exportName }: WorkspaceImport):
-Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyArgs }> {
+export async function generateImportWorkspacePages({
+  targetSpaceIdOrDomain,
+  exportData,
+  exportName
+}: WorkspaceImport): Promise<{ pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -63,7 +68,8 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
     throw new DataNotFoundError(`Space not found: ${targetSpaceIdOrDomain}`);
   }
 
-  const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(path.join(__dirname, 'exports', `${exportName}.json`), 'utf-8'));
+  const dataToImport: WorkspaceExport =
+    exportData ?? JSON.parse(await fs.readFile(path.join(__dirname, 'exports', `${exportName}.json`), 'utf-8'));
 
   if (!dataToImport) {
     throw new InvalidInputError('Please provide the source export data, or export path');
@@ -77,14 +83,20 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
   const blockArgs: Prisma.BlockCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
-  const oldNewHashmap: Record<string, string> = {
-  };
+  const oldNewHashmap: Record<string, string> = {};
 
   /**
    * Mutates the pages, updating their ids
    */
-  function recursivePagePrep ({ node, newParentId, rootSpacePermissionId }:
-    { node: ExportedPage, newParentId: string | null, rootSpacePermissionId?: string }) {
+  function recursivePagePrep({
+    node,
+    newParentId,
+    rootSpacePermissionId
+  }: {
+    node: ExportedPage;
+    newParentId: string | null;
+    rootSpacePermissionId?: string;
+  }) {
     const newId = v4();
 
     oldNewHashmap[newId] = node.id;
@@ -92,9 +104,22 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
 
     flatPages.push(node);
 
-    const { children, permissions, createdBy, updatedBy, spaceId, cardId, proposalId, parentId, bountyId, blocks, ...pageWithoutJoins } = node;
+    const {
+      children,
+      permissions,
+      createdBy,
+      updatedBy,
+      spaceId,
+      cardId,
+      proposalId,
+      parentId,
+      bountyId,
+      blocks,
+      postId,
+      ...pageWithoutJoins
+    } = node;
 
-    typedKeys(pageWithoutJoins).forEach(key => {
+    typedKeys(pageWithoutJoins).forEach((key) => {
       if (pageWithoutJoins[key] == null) {
         delete pageWithoutJoins[key];
       }
@@ -111,7 +136,7 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         id: newId,
         boardId: node.type.match('board') ? newId : undefined,
         parentId: newParentId ?? undefined,
-        content: node.content as Prisma.InputJsonValue ?? undefined,
+        content: (node.content as Prisma.InputJsonValue) ?? undefined,
         path: getPagePath(),
         space: {
           connect: {
@@ -121,13 +146,15 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         },
         permissions: {
           createMany: {
-            data: [{
-              id: newPermissionId,
-              permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              spaceId: space!.id,
-              inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
-            }]
+            data: [
+              {
+                id: newPermissionId,
+                permissionLevel: space?.defaultPagePermissionGroup ?? 'full_access',
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                spaceId: space!.id,
+                inheritedFromPermission: rootSpacePermissionId === newPermissionId ? undefined : rootSpacePermissionId
+              }
+            ]
           }
         },
         updatedBy: space!.createdBy,
@@ -141,7 +168,6 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
     };
 
     if (node.type.match('card')) {
-
       const cardBlock = node.blocks?.card;
 
       if (cardBlock) {
@@ -158,23 +184,19 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         pageArgs.push(newPageContent);
         blockArgs.push(cardBlock as Prisma.BlockCreateManyInput);
 
-        node.children?.forEach(child => {
+        node.children?.forEach((child) => {
           recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
         });
-
       }
-    }
-    else if (node.type.match('board')) {
-
+    } else if (node.type.match('board')) {
       const boardBlock = node.blocks?.board;
       const viewBlocks = node.blocks?.views;
 
       if (boardBlock && !!viewBlocks?.length) {
-        [boardBlock, ...viewBlocks].forEach(block => {
+        [boardBlock, ...viewBlocks].forEach((block) => {
           if (block.type === 'board') {
             block.id = newId;
-          }
-          else {
+          } else {
             block.id = v4();
           }
 
@@ -190,20 +212,19 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
         });
         pageArgs.push(newPageContent);
 
-        node.children?.forEach(child => {
+        node.children?.forEach((child) => {
           recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
         });
       }
-    }
-    else if (node.type === 'page') {
+    } else if (node.type === 'page') {
       pageArgs.push(newPageContent);
-      node.children?.forEach(child => {
+      node.children?.forEach((child) => {
         recursivePagePrep({ node: child, newParentId: newId, rootSpacePermissionId });
       });
     }
   }
 
-  dataToImport.pages.forEach(page => {
+  dataToImport.pages.forEach((page) => {
     recursivePagePrep({ node: page, newParentId: null });
   });
 
@@ -218,10 +239,13 @@ Promise<{ pageArgs: Prisma.PageCreateArgs[], blockArgs: Prisma.BlockCreateManyAr
       data: blockArgs
     }
   };
-
 }
 
-export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData, exportName }: WorkspaceImport): Promise<WorkspaceImportResult> {
+export async function importWorkspacePages({
+  targetSpaceIdOrDomain,
+  exportData,
+  exportName
+}: WorkspaceImport): Promise<WorkspaceImportResult> {
   const { pageArgs, blockArgs } = await generateImportWorkspacePages({ targetSpaceIdOrDomain, exportData, exportName });
 
   const pagesToCreate = pageArgs.length;
@@ -230,7 +254,7 @@ export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData,
   const createdBlocks = 0;
 
   await prisma.$transaction([
-    ...pageArgs.map(p => {
+    ...pageArgs.map((p) => {
       createdPages += 1;
       log.debug(`Creating page ${createdPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);
       return createPage(p);
@@ -245,4 +269,3 @@ export async function importWorkspacePages ({ targetSpaceIdOrDomain, exportData,
     blocks: createdBlocks
   };
 }
-

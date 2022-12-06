@@ -1,4 +1,3 @@
-
 import { v4 } from 'uuid';
 
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -8,9 +7,7 @@ import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { queryBountyPermissions } from '../queryBountyPermissions';
 
 describe('queryBountyPermissions', () => {
-
   it('should return a mapping of all assigned groups', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const bounty = await generateBounty({
@@ -49,11 +46,9 @@ describe('queryBountyPermissions', () => {
     expect(queryResult.reviewer[0].id).toBe(user.id);
     // Creator gets a synthetic permission injected
     expect(queryResult.creator.length).toBe(1);
-
   });
 
   it('should assign a creator permission to creator in query results, even if this is not in the database', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const bounty = await generateBounty({
@@ -72,15 +67,13 @@ describe('queryBountyPermissions', () => {
     const syntheticPermission = queryResult.creator[0];
 
     expect(syntheticPermission.group === 'user' && syntheticPermission.id === user.id).toBe(true);
-
   });
 
   it('should fail if the bounty does not exist', async () => {
-
-    await expect(queryBountyPermissions({
-      bountyId: v4()
-    })).rejects.toBeInstanceOf(DataNotFoundError);
-
+    await expect(
+      queryBountyPermissions({
+        bountyId: v4()
+      })
+    ).rejects.toBeInstanceOf(DataNotFoundError);
   });
-
 });

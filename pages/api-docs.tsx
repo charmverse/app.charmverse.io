@@ -20,7 +20,8 @@ export const getStaticProps: GetStaticProps = async () => {
       openapi: '3.0.0',
       info: {
         title: 'Charmverse API',
-        description: 'The Charmverse public API requires an API key. You can request this on our [Discord server](https://discord.gg/ACYCzBGC2M).\r\n\r\nYour API key can be passed in the **query url as api_key=<your-api-key>** or the **request headers as Authorization: "Bearer <your-api-key>"**.\r\n\r\n**Base path: https://app.charmverse.io/api/v1/**',
+        description:
+          'The Charmverse public API requires an API key. You can request this on our [Discord server](https://discord.gg/ACYCzBGC2M).\r\n\r\nYour API key can be passed in the **request headers as Authorization: "Bearer <your-api-key>"**.\r\n\r\n**Base path: https://app.charmverse.io/api/v1/**',
         version: '1.0.0',
         contact: 'hello@charmverse.io',
         host: 'app.charmverse.io',
@@ -38,8 +39,7 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 };
 
-export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
-
+export default function ApiDoc({ spec }: InferGetStaticPropsType<typeof getStaticProps>) {
   const theme = useTheme();
   const colorMode = useColorMode();
 
@@ -47,13 +47,8 @@ export default function ApiDoc ({ spec }: InferGetStaticPropsType<typeof getStat
     if (theme.palette.mode === 'dark') {
       colorMode.toggleColorMode();
     }
-
   }, []);
 
-  return (
-    <SwaggerUI spec={spec}>
-    </SwaggerUI>
-  );
-//  ;
+  return <SwaggerUI spec={spec}></SwaggerUI>;
+  //  ;
 }
-

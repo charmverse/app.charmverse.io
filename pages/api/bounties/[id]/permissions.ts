@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,11 +9,12 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .get(computeBountyGroupPermissionsController);
+handler.use(requireUser).get(computeBountyGroupPermissionsController);
 
-async function computeBountyGroupPermissionsController (req: NextApiRequest, res: NextApiResponse<AssignedBountyPermissions>) {
-
+async function computeBountyGroupPermissionsController(
+  req: NextApiRequest,
+  res: NextApiResponse<AssignedBountyPermissions>
+) {
   const { id: bountyId } = req.query;
 
   const bounty = await getBountyOrThrow(bountyId as string);

@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,11 +12,9 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(closeBountyController);
+handler.use(requireUser).post(closeBountyController);
 
-async function closeBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
-
+async function closeBountyController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { id: bountyId } = req.query as { id: string };
 
   const bounty = await getBountyOrThrow(bountyId);
@@ -39,12 +36,12 @@ async function closeBountyController (req: NextApiRequest, res: NextApiResponse<
   const completedApplications = completeBounty.applications.filter((application) => application.status === 'complete');
 
   for (const application of completedApplications) {
-
-    collabland.createBountyCompletedCredential({
-      bountyId,
-      userId: application.createdBy
-    })
-      .catch(error => {
+    collabland
+      .createBountyCompletedCredential({
+        bountyId,
+        userId: application.createdBy
+      })
+      .catch((error) => {
         log.error('Error creating a collabland VC for completing bounty', error);
       });
   }

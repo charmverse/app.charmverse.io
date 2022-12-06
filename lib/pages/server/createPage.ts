@@ -1,11 +1,11 @@
 import type { Page, Prisma, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
-export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
+export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
   const createArgs: Prisma.PageCreateArgs = {
     data: {
       ...data,
@@ -14,16 +14,18 @@ export function createPage<T> ({ data, include }: Prisma.PageCreateArgs): Prisma
     }
   };
 
-  const includeData = typeof include !== undefined ? include : {
-    permissions: {
-      include: {
-        sourcePermission: true
-      }
-    }
-  };
+  const includeData =
+    typeof include !== undefined
+      ? include
+      : {
+          permissions: {
+            include: {
+              sourcePermission: true
+            }
+          }
+        };
 
   createArgs.include = includeData;
 
   return prisma.page.create(createArgs) as unknown as PrismaPromise<Page & T>;
-
 }

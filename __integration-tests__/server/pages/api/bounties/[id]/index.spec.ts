@@ -32,9 +32,7 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
-
   it('should allow a user with the edit permission to update the bounty and respond with 200', async () => {
-
     const createdBounty = await createBounty({
       createdBy: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -69,11 +67,9 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
     expect(updatedBounty.rewardAmount).toBe(updateContent.rewardAmount);
     expect(updatedBounty.rewardToken).toBe(updateContent.rewardToken);
-
   });
 
   it('should ignore irrelevant bounty fields and succeed with the update and respond with 200', async () => {
-
     const createdBounty = await createBounty({
       createdBy: adminUser.id,
       spaceId: adminUserSpace.id,
@@ -86,10 +82,10 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
     const updateContent: Partial<Bounty> = {
       rewardAmount: 10,
       rewardToken: 'BNB',
-      ...{
+      ...({
         randomField: 2,
         anotherWrongField: 'some text'
-      } as any
+      } as any)
     };
 
     const response = await request(baseUrl)
@@ -102,11 +98,9 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
 
     expect(updatedBounty.rewardAmount).toBe(updateContent.rewardAmount);
     expect(updatedBounty.rewardToken).toBe(updateContent.rewardToken);
-
   });
 
   it('should reject an update attempt from a non admin user who did not create the bounty and respond with 401', async () => {
-
     const randomSpaceUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: nonAdminUserSpace.id
@@ -130,12 +124,10 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       .set('Cookie', randomSpaceUserCookie)
       .send(updateContent)
       .expect(401);
-
   });
 
   // This needs to be updated.
   it.skip('should allow the creator to edit only the bounty title and description if it is in suggestion status and respond with 200', async () => {
-
     const bountyCreator = await generateSpaceUser({
       isAdmin: false,
       spaceId: nonAdminUserSpace.id
@@ -163,18 +155,19 @@ describe('PUT /api/bounties/{bountyId} - update a bounty', () => {
       rewardToken: 'BNB'
     };
 
-    const updated = (await request(baseUrl)
-      .put(`/api/bounties/${createdBounty.id}`)
-      .set('Cookie', bountyCreatorCookie)
-      .send(updateContent)
-      .expect(200)).body as BountyWithDetails;
+    const updated = (
+      await request(baseUrl)
+        .put(`/api/bounties/${createdBounty.id}`)
+        .set('Cookie', bountyCreatorCookie)
+        .send(updateContent)
+        .expect(200)
+    ).body as BountyWithDetails;
 
     // Reward amount was dropped
     expect(updated.rewardAmount).toBe(createdBounty.rewardAmount);
   });
 
   it('should allow the creator to edit the whole bounty if it has gone past suggestion status and respond with 200', async () => {
-
     const bountyCreator = await generateSpaceUser({
       isAdmin: false,
       spaceId: nonAdminUserSpace.id

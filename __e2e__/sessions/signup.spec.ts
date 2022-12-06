@@ -1,5 +1,5 @@
-import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 
 import { baseUrl } from 'config/constants';
@@ -28,19 +28,20 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ sandboxPage }, use) => use(new TokenGatePage(sandboxPage))
 });
 
-test('signup - allows user to sign up and create a workspace using Metamask wallet', async ({ sandboxPage, loginPage, signupPage }) => {
-
+test('signup - allows user to sign up and create a workspace using Metamask wallet', async ({
+  sandboxPage,
+  loginPage,
+  signupPage
+}) => {
   await mockWeb3({
     page: sandboxPage,
     init: ({ Web3Mock, context }) => {
-
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {
           return: [context.address]
         }
       });
-
     }
   });
 
@@ -55,11 +56,12 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   await signupPage.submitWorkspaceForm({ domain: uniqueDomain });
 
   await signupPage.waitForWorkspaceLoaded({ domain: uniqueDomain });
-
 });
 
-test('signup - ignores the logic to redirect user after connect', async ({ sandboxPage, signupPage }) => {
-
+test('signup - ignores the logic to redirect user after connect if the user has 0 spaces', async ({
+  sandboxPage,
+  signupPage
+}) => {
   // mimic signup: create a user and a session
   const user = await generateUser();
   await sandboxPage.goto('/');
@@ -67,11 +69,9 @@ test('signup - ignores the logic to redirect user after connect', async ({ sandb
   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent('/profile')}`);
 
   await signupPage.waitForURL();
-
 });
 
 test('signup - follows the logic to redirect to a token gate', async ({ sandboxPage }) => {
-
   const user = await generateUser();
 
   // go to a workspace
@@ -81,5 +81,4 @@ test('signup - follows the logic to redirect to a token gate', async ({ sandboxP
   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/${space.domain}`)}`);
 
   await sandboxPage.waitForURL('**/join**');
-
 });

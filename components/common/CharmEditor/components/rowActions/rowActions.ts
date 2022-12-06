@@ -1,4 +1,3 @@
-
 import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
@@ -17,20 +16,18 @@ export interface PluginState {
   rowNodeOffset?: number;
 }
 
-export function plugins ({ key }: { key: PluginKey }) {
-
+export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOM = createElement(['div', { class: 'row-handle' }]);
 
-  function onMouseOver (view: EditorView, e: MouseEventInit) {
+  function onMouseOver(view: EditorView, e: MouseEventInit) {
     // @ts-ignore
     const containerXOffset = e.target.getBoundingClientRect().left;
     const clientX = e.clientX!;
-    const left = (clientX - containerXOffset) < 50 ? clientX + 50 : clientX;
+    const left = clientX - containerXOffset < 50 ? clientX + 50 : clientX;
 
     const startPos = posAtCoords(view, { left, top: e.clientY! });
 
     if (startPos) {
-
       // Step 1. grab the top-most ancestor of the related DOM element
       const dom = rowNodeAtPos(view, startPos);
       const rowNode = dom.rowNode;
@@ -54,18 +51,19 @@ export function plugins ({ key }: { key: PluginKey }) {
     }
   }
 
-  const throttled = throttle(onMouseOver, 100);
+  const throttledMouseOver = throttle(onMouseOver, 100);
 
   const brokenClipboardAPI = false;
 
-  function dragStart (view: EditorView, e: DragEvent) {
-
+  function dragStart(view: EditorView, e: DragEvent) {
     if (!e.dataTransfer || !/charm-drag-handle/.test((e.target as HTMLElement)?.className)) return;
 
     const coords = { left: e.clientX + 100, top: e.clientY };
     const pos = blockPosAtCoords(view, coords);
     if (pos != null) {
-      view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)));
+      view.dispatch(
+        view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)).setMeta('row-handle-drag', true)
+      );
 
       const slice = view.state.selection.content();
       const { dom, text } = serializeForClipboard(view, slice);
@@ -76,11 +74,9 @@ export function plugins ({ key }: { key: PluginKey }) {
 
       view.dragging = { slice, move: true };
     }
-
   }
 
   return [
-
     new Plugin({
       key,
       state: {
@@ -103,22 +99,20 @@ export function plugins ({ key }: { key: PluginKey }) {
       props: {
         handleDOMEvents: {
           mousemove: (view: EditorView, event: MouseEvent) => {
-            throttled(view, event);
+            throttledMouseOver(view, event);
             return false;
           }
         }
       },
       view: (view) => {
-
-        function onDragStart (e: DragEvent) {
+        function onDragStart(e: DragEvent) {
           return dragStart(view, e);
         }
-
         view.dom.parentNode?.appendChild(tooltipDOM);
         tooltipDOM.addEventListener('dragstart', onDragStart);
 
         return {
-          destroy () {
+          destroy() {
             // remove tooltip from DOM
             tooltipDOM.parentNode?.removeChild(tooltipDOM);
             tooltipDOM.removeEventListener('dragstart', onDragStart);
@@ -129,7 +123,7 @@ export function plugins ({ key }: { key: PluginKey }) {
   ];
 }
 
-function posAtCoords (view: EditorView, coords: { left: number, top: number }) {
+function posAtCoords(view: EditorView, coords: { left: number; top: number }) {
   const pos = view.posAtCoords(coords);
   if (!pos) {
     return null;
@@ -139,8 +133,7 @@ function posAtCoords (view: EditorView, coords: { left: number, top: number }) {
   return startPos;
 }
 
-function rowNodeAtPos (view: EditorView, startPos: number) {
-
+function rowNodeAtPos(view: EditorView, startPos: number) {
   const dom = view.domAtPos(startPos);
   let rowNode = dom.node;
   // Note: for leaf nodes, domAtPos() only returns the parent with an offset. text nodes have an offset but don't have childNodes
@@ -168,8 +161,7 @@ function rowNodeAtPos (view: EditorView, startPos: number) {
   };
 }
 
-function blockPosAtCoords (view: EditorView, coords: { left: number, top: number }) {
-
+function blockPosAtCoords(view: EditorView, coords: { left: number; top: number }) {
   const startPos = posAtCoords(view, coords);
   if (!startPos) {
     return;

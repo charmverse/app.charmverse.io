@@ -8,9 +8,11 @@ import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 import { groupIsValid } from './utility';
 
-export async function computeGroupSpacePermissions ({ id, group, resourceId }:
-  AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
-
+export async function computeGroupSpacePermissions({
+  id,
+  group,
+  resourceId
+}: AssignedPermissionsQuery): Promise<SpacePermissionFlags> {
   if (!id || !groupIsValid(group) || !resourceId) {
     throw new InvalidInputError('Please verify your input for requesting computation of space permissions.');
   }
@@ -30,8 +32,7 @@ export async function computeGroupSpacePermissions ({ id, group, resourceId }:
     if (spacePermissions) {
       permissionsToReturn.addPermissions(spacePermissions.operations);
     }
-  }
-  else if (group === 'role') {
+  } else if (group === 'role') {
     const rolePermissions = await prisma.spacePermission.findUnique({
       where: {
         roleId_forSpaceId: {
@@ -47,9 +48,7 @@ export async function computeGroupSpacePermissions ({ id, group, resourceId }:
     if (rolePermissions && rolePermissions.role?.spaceId === resourceId) {
       permissionsToReturn.addPermissions(rolePermissions.operations);
     }
-
-  }
-  else if (group === 'user') {
+  } else if (group === 'user') {
     const userPermissions = await prisma.spacePermission.findUnique({
       where: {
         userId_forSpaceId: {
@@ -65,5 +64,4 @@ export async function computeGroupSpacePermissions ({ id, group, resourceId }:
 
   // This last return should never be reached, as one of 3 previous
   return permissionsToReturn.operationFlags;
-
 }

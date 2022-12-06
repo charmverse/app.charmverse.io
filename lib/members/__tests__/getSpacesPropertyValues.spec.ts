@@ -91,7 +91,11 @@ describe('getSpacesPropertyValues', () => {
   });
 
   it('Should return properties only for space specified in param', async () => {
-    const result = await getSpacesPropertyValues({ memberId: user1.id, requestingUserId: user1.id, spaceId: u1Space1.id });
+    const result = await getSpacesPropertyValues({
+      memberId: user1.id,
+      requestingUserId: user1.id,
+      spaceId: u1Space1.id
+    });
 
     expect(result.length).toEqual(1);
     expect(result).toEqual(

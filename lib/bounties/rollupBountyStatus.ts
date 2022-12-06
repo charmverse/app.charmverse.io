@@ -9,7 +9,7 @@ import { countValueOccurrences } from '../utilities/numbers';
 
 import { getBountyOrThrow } from './getBounty';
 
-export async function rollupBountyStatus (bountyId: string): Promise<BountyWithDetails> {
+export async function rollupBountyStatus(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
   // No-op on bounty suggestions. They need to be approved first
@@ -17,7 +17,7 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
     return bounty;
   }
 
-  function statusUpdate (newStatus: BountyStatus): Promise<BountyWithDetails> {
+  function statusUpdate(newStatus: BountyStatus): Promise<BountyWithDetails> {
     return prisma.bounty.update({
       where: {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -48,15 +48,11 @@ export async function rollupBountyStatus (bountyId: string): Promise<BountyWithD
 
   if (submissionSummary.inProgress > 0 || submissionSummary.review > 0) {
     return statusUpdate('inProgress');
-  }
-  else if (submissionSummary.complete > 0) {
+  } else if (submissionSummary.complete > 0) {
     return statusUpdate('complete');
-  }
-  else if (submissionSummary.paid === bounty.maxSubmissions) {
+  } else if (submissionSummary.paid === bounty.maxSubmissions) {
     return statusUpdate('paid');
   }
 
   return bounty;
-
 }
-

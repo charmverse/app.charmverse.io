@@ -1,4 +1,3 @@
-
 import type { UserDetails } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,13 +8,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .post(createUserDetails)
-  .use(requireUser)
-  .get(getUserDetails)
-  .put(updateUserDetails);
+handler.post(createUserDetails).use(requireUser).get(getUserDetails).put(updateUserDetails);
 
-export async function createUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
+export async function createUserDetails(req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
   const details: UserDetails = await prisma.userDetails.create({
     data: {
       id: req.session.user.id
@@ -25,7 +20,7 @@ export async function createUserDetails (req: NextApiRequest, res: NextApiRespon
   res.status(200).json(details);
 }
 
-async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
+async function getUserDetails(req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
   const details = await prisma.userDetails.findUnique({
     where: {
       id: req.session.user.id
@@ -38,7 +33,7 @@ async function getUserDetails (req: NextApiRequest, res: NextApiResponse<UserDet
   return res.status(200).json(details);
 }
 
-async function updateUserDetails (req: NextApiRequest, res: NextApiResponse<UserDetails | { error: string }>) {
+async function updateUserDetails(req: NextApiRequest, res: NextApiResponse<UserDetails | { error: string }>) {
   const details = await prisma.userDetails.upsert({
     where: {
       id: req.session.user.id

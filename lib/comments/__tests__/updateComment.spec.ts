@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -18,9 +17,7 @@ beforeAll(async () => {
 });
 
 describe('updateComment', () => {
-
   it('should return the updated comment along with the user', async () => {
-
     const { comment } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -41,14 +38,12 @@ describe('updateComment', () => {
   });
 
   it('should fail if the comment does not exist', async () => {
-
     try {
       await updateComment({
         id: v4(),
         content: 'New content'
       });
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
@@ -66,12 +61,8 @@ describe('updateComment', () => {
         content: null as any
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
-
 });
-

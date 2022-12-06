@@ -9,10 +9,10 @@ import { Utils } from '../utils';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
-    className: string;
-    value: string;
-    onChange: (value: string | undefined) => void;
-}
+  className: string;
+  value: string;
+  onChange: (value: string | undefined) => void;
+};
 
 const parseValue = (value: string): Date | undefined => {
   return value ? new Date(parseInt(value, 10)) : undefined;
@@ -27,7 +27,7 @@ const displayDate = (date: Date | undefined, intl: IntlShape): string | undefine
 
 const dateFormat = 'MM/DD/YYYY';
 
-function EditableDayPicker (props: Props): JSX.Element {
+function EditableDayPicker(props: Props): JSX.Element {
   const { className, onChange } = props;
   const intl = useIntl();
   const [value, setValue] = useState(() => parseValue(props.value));

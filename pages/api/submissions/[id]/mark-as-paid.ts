@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,11 +12,9 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(markSubmissionAsPaidController);
+handler.use(requireUser).post(markSubmissionAsPaidController);
 
-async function markSubmissionAsPaidController (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: submissionId } = req.query;
 
   const userId = req.session.user.id;

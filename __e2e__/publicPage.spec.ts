@@ -24,7 +24,6 @@ test.describe.serial('Make a page public and visit it', async () => {
   let pages: IPageWithPermissions[] = [];
 
   test('make a page public', async () => {
-
     // Arrange ------------------
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await userContext.newPage();
@@ -35,14 +34,12 @@ test.describe.serial('Make a page public and visit it', async () => {
       page,
       context: { address, privateKey },
       init: ({ Web3Mock, context }) => {
-
         Web3Mock.mock({
           blockchain: 'ethereum',
           accounts: {
             return: [context.address]
           }
         });
-
       }
     });
 
@@ -50,14 +47,14 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     const domain = space.domain;
 
-    boardPage = pages.find(p => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
+    boardPage = pages.find((p) => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
 
-    cardPage = await prisma.page.findFirst({
+    cardPage = (await prisma.page.findFirst({
       where: {
         type: 'card',
         parentId: boardPage?.id
       }
-    }) as Page;
+    })) as Page;
 
     const targetPage = `${baseUrl}/${domain}/${boardPage?.path}`;
 
@@ -102,11 +99,33 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     // // Set the share URL we will visit to be the exact clipboard content
     // shareUrl = clipboardContent;
+  });
 
+  test('open a page with id in url', async () => {
+    const publicContext = await browser.newContext({});
+
+    const page = await publicContext.newPage();
+
+    await page.goto(`share/${boardPage?.id}`);
+
+    const boardTitle = page.locator('data-test=board-title').locator('input');
+
+    await expect(boardTitle).toBeVisible();
+  });
+
+  test('open a page with incorrect in url', async () => {
+    const publicContext = await browser.newContext({});
+
+    const page = await publicContext.newPage();
+
+    await page.goto('share/not-existing-page-id');
+
+    const errorTitle = page.locator('data-test=error-title');
+
+    await expect(errorTitle).toBeVisible();
   });
 
   test('visit the public page', async () => {
-
     // Part B - Visit this page as a non logged in user
     const publicContext = await browser.newContext({});
 
@@ -137,7 +156,7 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     const openedCardId = queryParams.get('cardId');
 
-    const openedCardPage = pages.find(p => p.id === openedCardId);
+    const openedCardPage = pages.find((p) => p.id === openedCardId);
 
     expect(openedCardPage).toBeDefined();
 
@@ -150,8 +169,5 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(documentTitle).toBeVisible();
 
     expect(await documentTitle.innerText()).toBe(openedCardPage?.title);
-
   });
-
 });
-

@@ -7,7 +7,7 @@ import { assignRolesToUser } from './assignRolesToUser';
 import { createRoleRecord } from './createRoleRecord';
 import { unassignRolesFromUser } from './unassignRolesFromUser';
 
-export async function updateGuildRolesForSpace (spaceId: string) {
+export async function updateGuildRolesForSpace(spaceId: string) {
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId
@@ -36,7 +36,7 @@ export async function updateGuildRolesForSpace (spaceId: string) {
   const guildRoleIdCharmverseRoleIdRecord = await createRoleRecord(spaceId);
   for (const spaceRole of spaceRoles) {
     try {
-      const addresses = spaceRole.user.wallets.map(w => w.address);
+      const addresses = spaceRole.user.wallets.map((w) => w.address);
       // Only proceed further if the user has at least a single address
       if (addresses.length > 0) {
         const userGuildRoleIds = await getGuildRoleIds(addresses);
@@ -45,11 +45,12 @@ export async function updateGuildRolesForSpace (spaceId: string) {
           userGuildRoleIds,
           guildRoleIdCharmverseRoleIdRecord,
           spaceRoleId: spaceRole.id,
-          userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole.filter(spaceRoleToRole => spaceRoleToRole.role.source === 'guild_xyz').map(spaceRoleToRole => spaceRoleToRole.role.sourceId as string)
+          userGuildRoleIdsInSpace: spaceRole.spaceRoleToRole
+            .filter((spaceRoleToRole) => spaceRoleToRole.role.source === 'guild_xyz')
+            .map((spaceRoleToRole) => spaceRoleToRole.role.sourceId as string)
         });
       }
-    }
-    catch (_) {
+    } catch (_) {
       log.debug(`[guild.xyz]: Failed to update roles for userId:${spaceRole.userId}`);
     }
   }

@@ -1,23 +1,19 @@
 import type { Space, SpaceRole } from '@prisma/client';
 import { Wallet } from 'ethers';
 import fetchMock from 'fetch-mock-jest';
-import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { DEEP_DAO_BASE_URL } from 'lib/deepdao/client';
 import { getAggregatedData } from 'lib/profile';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
-import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: LoggedInUser;
 let space: Space & { spaceRoles: SpaceRole[] };
 
-const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address];
+const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address].map((a) => a.toLowerCase());
 
 beforeAll(async () => {
-
   const generated = await generateUserAndSpaceWithApiToken(walletAddresses[0], false);
   user = generated.user;
   space = generated.space;
@@ -35,9 +31,7 @@ afterAll(() => {
 });
 
 describe('GET /api/public/profile/[userPath]', () => {
-
   it('Should combine several responses', async () => {
-
     const bounty = await generateBountyWithSingleApplication({
       bountyCap: 1,
       applicationStatus: 'complete',
@@ -48,24 +42,24 @@ describe('GET /api/public/profile/[userPath]', () => {
     const proposal1 = {
       organizationId: '1',
       createdAt: new Date().toString()
-    }; const
-      proposal2 = {
-        organizationId: '1',
-        createdAt: new Date().toString()
-      };
+    };
+    const proposal2 = {
+      organizationId: '1',
+      createdAt: new Date().toString()
+    };
 
     const vote1 = {
       organizationId: '1',
       createdAt: new Date().toString()
-    }; const
-      vote2 = {
-        organizationId: '1',
-        createdAt: new Date().toString()
-      }; const
-      vote3 = {
-        organizationId: '2',
-        createdAt: new Date().toString()
-      };
+    };
+    const vote2 = {
+      organizationId: '1',
+      createdAt: new Date().toString()
+    };
+    const vote3 = {
+      organizationId: '2',
+      createdAt: new Date().toString()
+    };
 
     fetchMock
       .get(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/${walletAddresses[0]}`, {
@@ -101,51 +95,58 @@ describe('GET /api/public/profile/[userPath]', () => {
       bounties: 1,
       totalProposals: 3,
       totalVotes: 4,
-      communities: [{
-        id: '1',
-        name: 'organization 1',
-        isHidden: false,
-        logo: null,
-        joinDate: proposal1.createdAt,
-        votes: [vote1, vote2],
-        proposals: [proposal1, proposal2],
-        bounties: [],
-        latestEventDate: vote2.createdAt
-      }, {
-        id: '2',
-        name: 'organization 2',
-        isHidden: false,
-        logo: null,
-        joinDate: vote3.createdAt,
-        votes: [vote3],
-        proposals: [],
-        bounties: [],
-        latestEventDate: vote3.createdAt
-      }, {
-        id: space.id,
-        joinDate: space.spaceRoles[0].createdAt.toISOString(),
-        latestEventDate: bounty.createdAt.toISOString(),
-        name: space.name,
-        isHidden: false,
-        logo: null,
-        votes: [],
-        proposals: [],
-        bounties: [{
-          bountyId: bounty.id,
-          createdAt: bounty.applications[0].createdAt.toISOString(),
-          eventName: 'bounty_completed',
-          organizationId: space.id,
-          bountyPath: `/${space.domain}/${bounty.page?.path}`,
-          bountyTitle: bounty.page?.title
-        }, {
-          bountyId: bounty.id,
-          createdAt: bounty.createdAt.toISOString(),
-          eventName: 'bounty_created',
-          organizationId: space.id,
-          bountyPath: `/${space.domain}/${bounty.page?.path}`,
-          bountyTitle: bounty.page?.title
-        }]
-      }]
+      communities: [
+        {
+          id: '1',
+          name: 'organization 1',
+          isHidden: false,
+          logo: null,
+          joinDate: proposal1.createdAt,
+          votes: [vote1, vote2],
+          proposals: [proposal1, proposal2],
+          bounties: [],
+          latestEventDate: vote2.createdAt
+        },
+        {
+          id: '2',
+          name: 'organization 2',
+          isHidden: false,
+          logo: null,
+          joinDate: vote3.createdAt,
+          votes: [vote3],
+          proposals: [],
+          bounties: [],
+          latestEventDate: vote3.createdAt
+        },
+        {
+          id: space.id,
+          joinDate: space.spaceRoles[0].createdAt.toISOString(),
+          latestEventDate: bounty.createdAt.toISOString(),
+          name: space.name,
+          isHidden: false,
+          logo: null,
+          votes: [],
+          proposals: [],
+          bounties: [
+            {
+              bountyId: bounty.id,
+              createdAt: bounty.applications[0].createdAt.toISOString(),
+              eventName: 'bounty_completed',
+              organizationId: space.id,
+              bountyPath: `/${space.domain}/${bounty.page?.path}`,
+              bountyTitle: bounty.page?.title
+            },
+            {
+              bountyId: bounty.id,
+              createdAt: bounty.createdAt.toISOString(),
+              eventName: 'bounty_created',
+              organizationId: space.id,
+              bountyPath: `/${space.domain}/${bounty.page?.path}`,
+              bountyTitle: bounty.page?.title
+            }
+          ]
+        }
+      ]
     });
   });
 });

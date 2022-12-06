@@ -8,7 +8,6 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space should use a preset permissions mode or a custom one', () => {
   it('should update the space permissions mode if user is admin and return the space, responding with 200', async () => {
-
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const userCookie = await loginUser(adminUser.id);
@@ -17,11 +16,13 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
       permissionConfigurationMode: 'readOnly'
     };
 
-    const updatedSpace = (await request(baseUrl)
-      .post(`/api/spaces/${space.id}/set-permissions-mode`)
-      .set('Cookie', userCookie)
-      .send(update)
-      .expect(200)).body as Space;
+    const updatedSpace = (
+      await request(baseUrl)
+        .post(`/api/spaces/${space.id}/set-permissions-mode`)
+        .set('Cookie', userCookie)
+        .send(update)
+        .expect(200)
+    ).body as Space;
 
     expect(updatedSpace.permissionConfigurationMode).toBe('readOnly');
   });
@@ -38,6 +39,5 @@ describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space shoul
         defaultPublicPage: true
       })
       .expect(401);
-
   });
 });

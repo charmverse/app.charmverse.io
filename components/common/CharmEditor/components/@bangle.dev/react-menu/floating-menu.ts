@@ -1,7 +1,11 @@
 import type { Command } from '@bangle.dev/pm';
 import { focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
 import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
-import { querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } from '@bangle.dev/tooltip/selection-tooltip';
+import {
+  querySelectionTooltipType,
+  hideSelectionTooltip,
+  updateSelectionTooltipType
+} from '@bangle.dev/tooltip/selection-tooltip';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PluginKey } from 'prosemirror-state';
 
@@ -10,8 +14,13 @@ import { markName as inlineVoteMarkName } from '../../inlineVote/inlineVote.cons
 
 export type SubMenu = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
 
-export function toggleSubMenu (floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
-  const nodeName = subMenu === 'inlineCommentSubMenu' ? inlineCommentMarkName : subMenu === 'inlineVoteSubMenu' ? inlineVoteMarkName : 'link';
+export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
+  const nodeName =
+    subMenu === 'inlineCommentSubMenu'
+      ? inlineCommentMarkName
+      : subMenu === 'inlineVoteSubMenu'
+      ? inlineVoteMarkName
+      : 'link';
   return (state, _dispatch, view) => {
     const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
 
@@ -33,11 +42,6 @@ export function toggleSubMenu (floatingMenuPluginKey: PluginKey, subMenu: SubMen
 
     rafCommandExec(view!, focusFloatingMenuInput(floatingMenuPluginKey));
 
-    return updateSelectionTooltipType(floatingMenuPluginKey, subMenu)(
-      view!.state,
-      view!.dispatch,
-      view
-    );
+    return updateSelectionTooltipType(floatingMenuPluginKey, subMenu)(view!.state, view!.dispatch, view);
   };
 }
-

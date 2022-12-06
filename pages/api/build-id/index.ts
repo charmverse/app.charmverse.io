@@ -6,11 +6,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getBuildId);
+handler.get(getBuildId);
 
-async function getBuildId (req: NextApiRequest, res: NextApiResponse) {
-
+async function getBuildId(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({ buildId: process.env.NEXT_PUBLIC_BUILD_ID });
 }
 

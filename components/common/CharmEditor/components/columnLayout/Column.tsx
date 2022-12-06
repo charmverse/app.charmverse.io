@@ -24,12 +24,10 @@ const StyledColumnBlock = styled.div`
   }
 `;
 
-function ColumnBlock ({ children, node }: { node: Node, children: ReactNode }) {
+function ColumnBlock({ children, node }: { node: Node; children: ReactNode }) {
   return (
     <StyledColumnBlock>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </StyledColumnBlock>
   );
 }

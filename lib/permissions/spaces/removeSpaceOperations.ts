@@ -12,7 +12,13 @@ import { generateSpacePermissionQuery } from './utility';
  * @param param0
  * @returns
  */
-export async function removeSpaceOperations<A extends AssignablePermissionGroups = 'any'> ({ forSpaceId, operations, roleId, spaceId, userId }: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
+export async function removeSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
+  forSpaceId,
+  operations,
+  roleId,
+  spaceId,
+  userId
+}: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
   const query = generateSpacePermissionQuery({
     forSpaceId,
     roleId,
@@ -30,7 +36,7 @@ export async function removeSpaceOperations<A extends AssignablePermissionGroups
 
   const assignedOperations = existingPermission.operations.slice();
 
-  const filteredOperations = assignedOperations.filter(op => {
+  const filteredOperations = assignedOperations.filter((op) => {
     // Return only operations not targeted by this delete action
     return operations.indexOf(op) === -1;
   });
@@ -39,8 +45,7 @@ export async function removeSpaceOperations<A extends AssignablePermissionGroups
     await prisma.spacePermission.delete({
       where: query
     });
-  }
-  else if (filteredOperations.length < assignedOperations.length) {
+  } else if (filteredOperations.length < assignedOperations.length) {
     await prisma.spacePermission.update({
       where: query,
       data: {

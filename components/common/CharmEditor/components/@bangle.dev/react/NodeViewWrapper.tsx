@@ -1,9 +1,7 @@
 import type { NodeView, NodeViewProps } from '@bangle.dev/core';
 import React from 'react';
 
-export type RenderNodeViewsFunction = (
-  props: NodeViewProps & { children: React.ReactNode },
-) => React.ReactNode;
+export type RenderNodeViewsFunction = (props: NodeViewProps & { children: React.ReactNode }) => React.ReactNode;
 
 interface PropsType {
   nodeView: NodeView;
@@ -20,7 +18,7 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
 
   attachToContentDOM: (reactElement: HTMLDivElement) => void;
 
-  constructor (props: PropsType) {
+  constructor(props: PropsType) {
     super(props);
     this.update = () => {
       this.setState(() => ({
@@ -54,7 +52,7 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
     this.state = { nodeViewProps: this.props.nodeView.getNodeViewProps() };
   }
 
-  getChildren () {
+  getChildren() {
     if (!this.props.nodeView.contentDOM) {
       return null;
     }
@@ -70,15 +68,10 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
     //   );
     // }
 
-    return (
-      <div
-        className='bangle-nv-child-container'
-        ref={this.attachToContentDOM}
-      />
-    );
+    return <div className='bangle-nv-child-container' ref={this.attachToContentDOM} />;
   }
 
-  render () {
+  render() {
     const element = this.props.renderNodeViews({
       ...this.state.nodeViewProps,
       children: this.getChildren()

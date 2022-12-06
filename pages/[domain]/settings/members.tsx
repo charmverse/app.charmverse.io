@@ -6,24 +6,17 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function MemberSettings () {
-
-  const [space] = useCurrentSpace();
+export default function MemberSettings() {
+  const space = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   setTitle('Members');
   if (!space) {
     return null;
   }
-  return (
-    <MemberList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />
-  );
+  return <MemberList isAdmin={isAdmin} spaceId={space.id} spaceOwner={space.createdBy} />;
 }
 
 MemberSettings.getLayout = (page: ReactElement) => {
-  return (
-    <SettingsLayout>
-      {page}
-    </SettingsLayout>
-  );
+  return <SettingsLayout>{page}</SettingsLayout>;
 };

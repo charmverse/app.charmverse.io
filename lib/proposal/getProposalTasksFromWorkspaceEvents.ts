@@ -15,30 +15,32 @@ export interface ProposalTask {
   pageId: string;
 }
 
-type PopulatedPage = Pick<Page, 'id' | 'path' | 'title'> & {
+type PopulatedPage = Pick<Page, 'id' | 'path' | 'title' | 'deletedAt'> & {
   space: Pick<Space, 'domain' | 'name'>;
   proposal: ProposalWithUsers | null;
 };
 
-type ProposalRecord = Record<string, PopulatedPage | undefined>;
+type ProposalPageMap = Record<string, PopulatedPage | undefined>;
 
 type ProposalStatusChangeMetaData = {
   newStatus: ProposalStatus;
   oldStatus?: ProposalStatus; // by convention, an undefined oldStatus means the proposal was just created
-}
+};
 
-type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & { meta: ProposalStatusChangeMetaData };
+type ProposalStatusChangeWorkspaceEvent = WorkspaceEvent & { type: 'proposal_status_change' } & {
+  meta: ProposalStatusChangeMetaData;
+};
 
-export async function getProposalTasksFromWorkspaceEvents (userId: string, workspaceEvents: WorkspaceEvent[]) {
+export async function getProposalTasksFromWorkspaceEvents(userId: string, workspaceEvents: WorkspaceEvent[]) {
   const proposalTasks: ProposalTask[] = [];
 
   // Sort the events in descending order based on their created date to help in de-duping
-  workspaceEvents.sort((we1, we2) => we1.createdAt > we2.createdAt ? -1 : 1);
+  workspaceEvents.sort((we1, we2) => (we1.createdAt > we2.createdAt ? -1 : 1));
 
   const proposalPages = await prisma.page.findMany({
     where: {
       id: {
-        in: workspaceEvents.map(workspaceEvent => workspaceEvent.pageId)
+        in: workspaceEvents.map((workspaceEvent) => workspaceEvent.pageId)
       },
       proposal: {
         status: {
@@ -66,7 +68,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
   // Get all the spaceRole and role this user has been assigned to
   // Roles would be used to detect if the user is a reviewer of the proposal
   // SpaceRoles would be used to detect if the user is a member of the proposal space
-  const spaceRoles = (await prisma.spaceRole.findMany({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
     },
@@ -87,16 +89,16 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         }
       }
     }
-  }));
+  });
 
-  const spaceIds = spaceRoles.map(spaceRole => spaceRole.spaceId);
+  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
   // Get all the roleId assigned to this user
-  const roleIds = spaceRoles.map(spaceRole => spaceRole.spaceRoleToRole.length !== 0
-    ? spaceRole.spaceRoleToRole[0].role.id
-    : null).filter(roleId => roleId);
+  const roleIds = spaceRoles
+    .map((spaceRole) => (spaceRole.spaceRoleToRole.length !== 0 ? spaceRole.spaceRoleToRole[0].role.id : null))
+    .filter((roleId) => roleId);
 
-  const proposalsRecord: ProposalRecord = proposalPages.reduce<ProposalRecord>((record, proposal) => {
-    record[proposal.id] = proposal;
+  const proposalsRecord: ProposalPageMap = proposalPages.reduce<ProposalPageMap>((record, page) => {
+    record[page.id] = page;
     return record;
   }, {});
 
@@ -110,19 +112,26 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
 
   for (const workspaceEvent of workspaceEvents) {
     const page = proposalsRecord[workspaceEvent.pageId];
-    const { meta: { newStatus } } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
+    const {
+      meta: { newStatus }
+    } = workspaceEvent as ProposalStatusChangeWorkspaceEvent;
 
-    if (page?.proposal && !newStatus.match(/draft/)) {
+    // ignore draft events
+    if (newStatus.match(/draft/) || page?.deletedAt) {
+      unmarkedWorkspaceEvents.push(workspaceEvent.id);
+    } else if (page?.proposal) {
       // If an event for this proposal was already handled no need to process further
       if (!visitedProposals.has(page.id)) {
-        const isAuthor = Boolean(page.proposal.authors.find(author => author.userId === userId));
+        const isAuthor = Boolean(page.proposal.authors.find((author) => author.userId === userId));
         const isMember = spaceIds.includes(workspaceEvent.spaceId);
-        const isReviewer = Boolean(page.proposal.reviewers.find(reviewer => {
-          if (reviewer.userId) {
-            return reviewer.userId === userId;
-          }
-          return roleIds.includes(reviewer.roleId as string);
-        }));
+        const isReviewer = Boolean(
+          page.proposal.reviewers.find((reviewer) => {
+            if (reviewer.userId) {
+              return reviewer.userId === userId;
+            }
+            return roleIds.includes(reviewer.roleId as string);
+          })
+        );
 
         const proposalTask: Omit<ProposalTask, 'action'> = {
           id: workspaceEvent.id,
@@ -140,31 +149,27 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
               ...proposalTask,
               action: 'start_review'
             });
-          }
-          else if (isMember) {
+          } else if (isMember) {
             proposalTasks.push({
               ...proposalTask,
               action: 'discuss'
             });
           }
-        }
-        else if (newStatus === 'reviewed') {
+        } else if (newStatus === 'reviewed') {
           if (isAuthor) {
             proposalTasks.push({
               ...proposalTask,
               action: 'start_vote'
             });
           }
-        }
-        else if (newStatus === 'vote_active') {
+        } else if (newStatus === 'vote_active') {
           if (isMember) {
             proposalTasks.push({
               ...proposalTask,
               action: 'vote'
             });
           }
-        }
-        else if (newStatus === 'review') {
+        } else if (newStatus === 'review') {
           if (isReviewer) {
             proposalTasks.push({
               ...proposalTask,
@@ -174,8 +179,7 @@ export async function getProposalTasksFromWorkspaceEvents (userId: string, works
         }
 
         visitedProposals.add(page.id);
-      }
-      else {
+      } else {
         unmarkedWorkspaceEvents.push(workspaceEvent.id);
       }
     }

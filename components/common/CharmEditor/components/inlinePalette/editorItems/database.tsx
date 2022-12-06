@@ -1,11 +1,10 @@
-import type { EditorState } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import type { PageType } from '@prisma/client';
 
 import { addPage } from 'lib/pages';
 
-import { insertNode } from '../../../utils';
+import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
@@ -18,17 +17,23 @@ interface DatabaseItemsProps {
   pageType?: PageType;
 }
 
-export function items ({ addNestedPage, currentPageId, userId, space, pageType }: DatabaseItemsProps): PaletteItemTypeNoGroup[] {
+const iconSize = 30;
 
-  const returnedItems: PaletteItemTypeNoGroup[] = [
-  ];
+export function items({
+  addNestedPage,
+  currentPageId,
+  userId,
+  space,
+  pageType
+}: DatabaseItemsProps): PaletteItemTypeNoGroup[] {
+  const returnedItems: PaletteItemTypeNoGroup[] = [];
 
   if (pageType !== 'card_template') {
     returnedItems.push(
       {
         uid: 'database-inline',
         title: 'Database - Inline',
-        icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
+        icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
         description: 'Add a new inline database to this page',
         editorExecuteCommand: () => {
           return (state, dispatch, view) => {
@@ -41,71 +46,7 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
                   parentId: currentPageId,
                   spaceId: space.id,
                   createdBy: userId
-                })
-                  .then(({ page }) => {
-                    const node = _state.schema.nodes.inlineDatabase.create({
-                      pageId: page.id
-                    });
-
-                    if (_dispatch && isAtBeginningOfLine(state)) {
-                      _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
-                      return true;
-                    }
-                    return insertNode(_state, _dispatch, node);
-                  });
-                return true;
-              });
-            }
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
-          };
-        }
-      },
-      {
-        uid: 'database-full-page',
-        title: 'Database - Full page',
-        requiredSpacePermission: 'createPage',
-        icon: <DatabaseIcon sx={{
-          fontSize: 16
-        }}
-        />,
-        description: 'Insert a new board',
-        editorExecuteCommand: (() => {
-          return (async (state, dispatch, view) => {
-            await addNestedPage('board');
-            return replaceSuggestionMarkWith(palettePluginKey, '')(
-              state,
-              dispatch,
-              view
-            );
-          }) as PromisedCommand;
-        })
-      }
-    );
-  }
-
-  returnedItems.push(
-    {
-      uid: 'database-linked',
-      title: 'Linked view of database',
-      icon: <DatabaseIcon sx={{ fontSize: 16 }} />,
-      description: 'Embed a view from an existing board',
-      editorExecuteCommand: () => {
-        return (state, dispatch, view) => {
-          // Execute the animation
-          if (view) {
-            rafCommandExec(view, (_state, _dispatch) => {
-              addPage({
-                type: 'inline_linked_board',
-                parentId: currentPageId,
-                spaceId: space.id,
-                createdBy: userId,
-                shouldCreateDefaultBoardData: false
-              })
-                .then(({ page }) => {
+                }).then(({ page }) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
                     pageId: page.id
                   });
@@ -116,25 +57,69 @@ export function items ({ addNestedPage, currentPageId, userId, space, pageType }
                   }
                   return insertNode(_state, _dispatch, node);
                 });
-              return true;
-            });
-          }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(
-            state,
-            dispatch,
-            view
-          );
-
-        };
+                return true;
+              });
+            }
+            return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+          };
+        }
+      },
+      {
+        uid: 'database-full-page',
+        title: 'Database - Full page',
+        requiredSpacePermission: 'createPage',
+        icon: (
+          <DatabaseIcon
+            sx={{
+              fontSize: iconSize
+            }}
+          />
+        ),
+        description: 'Insert a new board',
+        editorExecuteCommand: () => {
+          return (async (state, dispatch, view) => {
+            await addNestedPage('board');
+            return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+          }) as PromisedCommand;
+        }
       }
+    );
+  }
+
+  returnedItems.push({
+    uid: 'database-linked',
+    title: 'Linked view of database',
+    icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
+    description: 'Embed a view from an existing board',
+    editorExecuteCommand: () => {
+      return (state, dispatch, view) => {
+        // Execute the animation
+        if (view) {
+          rafCommandExec(view, (_state, _dispatch) => {
+            addPage({
+              type: 'inline_linked_board',
+              parentId: currentPageId,
+              spaceId: space.id,
+              createdBy: userId,
+              shouldCreateDefaultBoardData: false
+            }).then(({ page }) => {
+              const node = _state.schema.nodes.inlineDatabase.create({
+                pageId: page.id
+              });
+
+              if (_dispatch && isAtBeginningOfLine(state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+            return true;
+          });
+        }
+        return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+      };
     }
-  );
+  });
 
   return returnedItems;
-}
-
-function isAtBeginningOfLine (state: EditorState) {
-  // @ts-ignore types package is missing $cursor property as of 1.2.8
-  const parentOffset = state.selection.$cursor.parentOffset;
-  return parentOffset === 0;
 }

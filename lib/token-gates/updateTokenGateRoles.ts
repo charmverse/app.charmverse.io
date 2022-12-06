@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-export async function updateTokenGateRoles (roleIds: string[], tokenGateId: string) {
+export async function updateTokenGateRoles(roleIds: string[], tokenGateId: string) {
   const roleIdsSet = new Set(roleIds);
 
   const tokenGateRoles = await prisma.tokenGateToRole.findMany({
@@ -12,13 +12,15 @@ export async function updateTokenGateRoles (roleIds: string[], tokenGateId: stri
     }
   });
 
-  const tokenGateRoleIds = new Set(tokenGateRoles.map(role => role.roleId));
-  const tokenGateRoleIdsToAdd = roleIds.filter(roleId => !tokenGateRoleIds.has(roleId));
-  const tokenGateRoleIdsToRemove = Array.from(tokenGateRoleIds).filter(tokenGateRoleId => !roleIdsSet.has(tokenGateRoleId));
+  const tokenGateRoleIds = new Set(tokenGateRoles.map((role) => role.roleId));
+  const tokenGateRoleIdsToAdd = roleIds.filter((roleId) => !tokenGateRoleIds.has(roleId));
+  const tokenGateRoleIdsToRemove = Array.from(tokenGateRoleIds).filter(
+    (tokenGateRoleId) => !roleIdsSet.has(tokenGateRoleId)
+  );
 
   if (tokenGateRoleIdsToAdd.length !== 0) {
     await prisma.tokenGateToRole.createMany({
-      data: tokenGateRoleIdsToAdd.map(tokenGateRoleIdToAdd => ({
+      data: tokenGateRoleIdsToAdd.map((tokenGateRoleIdToAdd) => ({
         roleId: tokenGateRoleIdToAdd,
         tokenGateId
       }))

@@ -3,7 +3,7 @@ import type { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box } from '@mui/material';
@@ -13,7 +13,13 @@ import { MenuInput } from 'components/common/MenuInput';
 
 import { MenuButton } from './Icon';
 
-export function LinkSubMenu ({ showMessage, getIsTop = () => true }: { showMessage: (msg: string) => void, getIsTop?: () => boolean }) {
+export function LinkSubMenu({
+  showMessage,
+  getIsTop = () => true
+}: {
+  showMessage: (msg: string) => void;
+  getIsTop?: () => boolean;
+}) {
   const view = useEditorViewContext();
   const result = link.queryLinkAttrs()(view.state);
   const originalHref = (result && result.href) || '';
@@ -32,7 +38,7 @@ export function LinkSubMenu ({ showMessage, getIsTop = () => true }: { showMessa
   );
 }
 
-function LinkMenu ({
+function LinkMenu({
   getIsTop,
   view,
   originalHref = '',
@@ -49,12 +55,13 @@ function LinkMenu ({
     link.updateLink(href)(view.state, view.dispatch);
     view.focus();
   };
-  const isSavedDisabled = href === originalHref || (!/^(ipfs|http(s?)):\/\//i.test(href));
+  const isSavedDisabled = href === originalHref || !/^(ipfs|http(s?)):\/\//i.test(href);
 
   return (
-    <Box sx={{
-      display: 'flex'
-    }}
+    <Box
+      sx={{
+        display: 'flex'
+      }}
     >
       <MenuInput
         value={href}
@@ -80,7 +87,6 @@ function LinkMenu ({
           if (e.key === 'Escape') {
             e.preventDefault();
             view.focus();
-
           }
         }}
         onChange={(e) => {
@@ -109,9 +115,10 @@ function LinkMenu ({
           window.open(href, '_blank');
         }}
       >
-        <OpenInNewIcon sx={{
-          fontSize: 14
-        }}
+        <OpenInNewIcon
+          sx={{
+            fontSize: 14
+          }}
         />
       </MenuButton>
       <MenuButton hints={['Copy link']}>
@@ -126,7 +133,7 @@ function LinkMenu ({
         />
       </MenuButton>
       <MenuButton hints={['Remove link']}>
-        <DeleteIcon
+        <DeleteOutlinedIcon
           sx={{
             fontSize: 14
           }}

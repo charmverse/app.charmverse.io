@@ -7,7 +7,7 @@ export interface MarkTask {
   type: NotificationType;
 }
 
-export async function markTasks (tasks: MarkTask[], userId: string) {
+export async function markTasks(tasks: MarkTask[], userId: string) {
   const userNotifications = await prisma.userNotification.findMany({
     where: {
       userId
@@ -17,13 +17,13 @@ export async function markTasks (tasks: MarkTask[], userId: string) {
     }
   });
 
-  const taskIds = new Set(userNotifications.map(userNotification => userNotification.taskId));
+  const taskIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
 
-  const tasksNotNotified = tasks.filter(task => !taskIds.has(task.id));
+  const tasksNotNotified = tasks.filter((task) => !taskIds.has(task.id));
 
   if (tasksNotNotified.length !== 0) {
     await prisma.userNotification.createMany({
-      data: tasksNotNotified.map(task => ({
+      data: tasksNotNotified.map((task) => ({
         taskId: task.id,
         channel: 'webapp' as const,
         type: task.type,

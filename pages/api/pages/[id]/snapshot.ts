@@ -1,4 +1,3 @@
-
 import type { Page } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -12,12 +11,12 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<Page>(['snapshotProposalId'], 'body'))
   .put(recordSnapshotInfo);
 
-async function recordSnapshotInfo (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-
+async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const { snapshotProposalId } = req.body;
 
   const pageId = req.query.id as string;
@@ -54,7 +53,6 @@ async function recordSnapshotInfo (req: NextApiRequest, res: NextApiResponse<IPa
   });
 
   res.status(200).json(updatedPage);
-
 }
 
 export default withSessionRoute(handler);

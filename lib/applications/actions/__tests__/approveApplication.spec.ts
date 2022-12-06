@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -20,9 +19,7 @@ beforeAll(async () => {
 });
 
 describe('approveApplication', () => {
-
   it('should approve an application if the bounty submissions cap has not been reached, and record who approved it', async () => {
-
     const reviewerUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -51,11 +48,9 @@ describe('approveApplication', () => {
 
     expect(approved.status).toBe('inProgress');
     expect(approved.acceptedBy).toBe(reviewerUser.id);
-
   });
 
   it('should fail to approve the application if the limit of active submissions has been reached', async () => {
-
     const { user: adminUser, space: adminSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const reviewerUser = await generateSpaceUser({
@@ -87,15 +82,12 @@ describe('approveApplication', () => {
         applicationOrApplicationId: application
       });
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(LimitReachedError);
     }
-
   });
 
   it('should fail if a user tries to approve their own application, even if they are an admin', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id,
@@ -112,12 +104,11 @@ describe('approveApplication', () => {
       userId: user.id
     });
 
-    await expect(approveApplication({
-      userId: user.id,
-      applicationOrApplicationId: application
-    })).rejects.toBeInstanceOf(UndesirableOperationError);
-
+    await expect(
+      approveApplication({
+        userId: user.id,
+        applicationOrApplicationId: application
+      })
+    ).rejects.toBeInstanceOf(UndesirableOperationError);
   });
-
 });
-

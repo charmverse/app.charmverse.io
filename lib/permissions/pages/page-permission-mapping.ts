@@ -26,8 +26,8 @@ export const permissionDescriptions: Record<PageOperationType, string> = {
   grant_permissions: 'manage page access'
 };
 
-export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType []> = {
-  full_access: Object.keys(PageOperations) as PageOperationType [],
+export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageOperationType[]> = {
+  full_access: Object.keys(PageOperations) as PageOperationType[],
   proposal_editor: ['read', 'comment', 'edit_content', 'edit_isPublic', 'delete', 'create_poll'],
   editor: ['read', 'edit_content', 'comment', 'create_poll'],
   view_comment: ['read', 'comment', 'create_poll'],
@@ -35,4 +35,3 @@ export const permissionTemplates: Record<keyof typeof PagePermissionLevel, PageO
   // Implemented at the database level
   custom: []
 };
-

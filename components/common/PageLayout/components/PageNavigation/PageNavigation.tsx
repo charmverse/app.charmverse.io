@@ -24,16 +24,15 @@ import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 
 const StyledTreeRoot = styled(TreeRoot)<{ isFavorites?: boolean }>`
-  flex-grow: ${props => props.isFavorites ? 0 : 1};
+  flex-grow: ${(props) => (props.isFavorites ? 0 : 1)};
   width: 100%;
   overflow-y: auto;
 `;
 
-export function filterVisiblePages (pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
-  return pages
-    .filter((page): page is IPageWithPermissions => isTruthy(
-      page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id))
-    ));
+export function filterVisiblePages(pages: (PageMeta | undefined)[], rootPageIds: string[] = []) {
+  return pages.filter((page): page is IPageWithPermissions =>
+    isTruthy(page && (page.type === 'board' || page.type === 'page' || rootPageIds?.includes(page.id)))
+  );
 }
 
 type TreeRootProps = {
@@ -42,22 +41,24 @@ type TreeRootProps = {
   mutatePage: (page: PageUpdates) => void;
 } & ComponentProps<typeof TreeView>;
 
-function TreeRoot ({ children, mutatePage, isFavorites, ...rest }: TreeRootProps) {
-  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean, isOverCurrent: boolean }>(() => ({
-    accept: 'item',
-    drop (item, monitor) {
-      const didDrop = monitor.didDrop();
-      if (didDrop || !item.parentId) {
-        return;
-      }
+function TreeRoot({ children, mutatePage, isFavorites, ...rest }: TreeRootProps) {
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<MenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
+    () => ({
+      accept: 'item',
+      drop(item, monitor) {
+        const didDrop = monitor.didDrop();
+        if (didDrop || !item.parentId) {
+          return;
+        }
 
-      mutatePage({ id: item.id, parentId: null });
-    },
-    collect: (monitor) => ({
-      isOverCurrent: monitor.isOver({ shallow: true }),
-      canDrop: monitor.canDrop()
+        mutatePage({ id: item.id, parentId: null });
+      },
+      collect: (monitor) => ({
+        isOverCurrent: monitor.isOver({ shallow: true }),
+        canDrop: monitor.canDrop()
+      })
     })
-  }));
+  );
 
   const theme = useTheme();
   const isActive = canDrop && isOverCurrent;
@@ -78,21 +79,18 @@ type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
   rootPageIds?: string[];
+  onClick?: () => void;
 };
 
-function PageNavigation ({
-  deletePage,
-  isFavorites,
-  rootPageIds
-}: PageNavigationProps) {
+function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
   const router = useRouter();
   const { pages, currentPageId, setPages, mutatePage } = usePages();
-  const [space] = useCurrentSpace();
+  const space = useCurrentSpace();
   const { user } = useUser();
   const [expanded, setExpanded] = useLocalStorage<string[]>(`${space!.id}.expanded-pages`, []);
   const { showMessage } = useSnackbar();
-  const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages))
-    .map((page): MenuNode => ({
+  const pagesArray: MenuNode[] = filterVisiblePages(Object.values(pages)).map(
+    (page): MenuNode => ({
       id: page.id,
       title: page.title,
       icon: page.icon,
@@ -104,7 +102,8 @@ function PageNavigation ({
       createdAt: page.createdAt,
       deletedAt: page.deletedAt,
       spaceId: page.spaceId
-    }));
+    })
+  );
 
   const pageHash = JSON.stringify(pagesArray);
 
@@ -119,8 +118,9 @@ function PageNavigation ({
 
     const parentId = containerItem.parentId;
 
-    setPages(_pages => {
-      const unsortedSiblings = Object.values(_pages).filter(isTruthy)
+    setPages((_pages) => {
+      const unsortedSiblings = Object.values(_pages)
+        .filter(isTruthy)
         .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
       const siblings = sortNodes(unsortedSiblings);
 
@@ -128,7 +128,7 @@ function PageNavigation ({
       if (!droppedPage) {
         throw new Error('canot find dropped page');
       }
-      const originIndex: number = siblings.findIndex(sibling => sibling.id === containerItem.id);
+      const originIndex: number = siblings.findIndex((sibling) => sibling.id === containerItem.id);
       siblings.splice(originIndex, 0, droppedPage);
       siblings.forEach((page, _index) => {
         page.index = _index;
@@ -139,7 +139,7 @@ function PageNavigation ({
           parentId
         });
       });
-      siblings.forEach(page => {
+      siblings.forEach((page) => {
         const currentPage = _pages[page.id];
         if (currentPage) {
           _pages[page.id] = {
@@ -153,47 +153,48 @@ function PageNavigation ({
     });
   }, []);
 
-  const onDropChild = useCallback((droppedItem: MenuNode, containerItem: MenuNode) => {
-
-    if (containerItem.type.match(/board/)) {
-      return;
-    }
-
-    // Prevent a page becoming child of itself
-    if (droppedItem.id === containerItem?.id) {
-      return;
-    }
-
-    // Make sure the new parent is not in the children of this page
-    let currentNode: MenuNode | undefined = containerItem;
-    while (currentNode) {
-      if (currentNode.parentId === droppedItem.id) {
+  const onDropChild = useCallback(
+    (droppedItem: MenuNode, containerItem: MenuNode) => {
+      if (containerItem.type.match(/board/)) {
         return;
       }
-      // We reached the current node. It's fine to reorder under a parent or root
-      else if (currentNode.id === droppedItem.id || !currentNode.parentId) {
-        break;
+
+      // Prevent a page becoming child of itself
+      if (droppedItem.id === containerItem?.id) {
+        return;
       }
-      else {
-        currentNode = pages[currentNode.parentId];
+
+      // Make sure the new parent is not in the children of this page
+      let currentNode: MenuNode | undefined = containerItem;
+      while (currentNode) {
+        if (currentNode.parentId === droppedItem.id) {
+          return;
+        }
+        // We reached the current node. It's fine to reorder under a parent or root
+        else if (currentNode.id === droppedItem.id || !currentNode.parentId) {
+          break;
+        } else {
+          currentNode = pages[currentNode.parentId];
+        }
       }
-    }
 
-    const index = 1000; // send it to the end
-    const parentId = (containerItem as MenuNode)?.id ?? null;
+      const index = 1000; // send it to the end
+      const parentId = (containerItem as MenuNode)?.id ?? null;
 
-    mutatePage({ id: droppedItem.id, parentId });
+      mutatePage({ id: droppedItem.id, parentId });
 
-    charmClient.pages.updatePage({
-      id: droppedItem.id,
-      index, // send it to the end
-      parentId
-    })
-      .catch(err => {
-        showMessage(err.message, 'error');
-      });
-
-  }, [pages]);
+      charmClient.pages
+        .updatePage({
+          id: droppedItem.id,
+          index, // send it to the end
+          parentId
+        })
+        .catch((err) => {
+          showMessage(err.message, 'error');
+        });
+    },
+    [pages]
+  );
 
   const pageNavigationElement = document.querySelector('.page-navigation');
   const treeViewElement = pageNavigationElement?.querySelector('.MuiTreeView-root');
@@ -230,13 +231,13 @@ function PageNavigation ({
     const currentPage = pages[currentPageId];
     // expand the parent of the active page
     if (currentPage?.parentId && !isFavorites) {
-      if (!expanded.includes(currentPage.parentId)) {
+      if (!expanded.includes(currentPage.parentId) && currentPage.type !== 'card') {
         setExpanded(expanded.concat(currentPage.parentId));
       }
     }
   }, [currentPageId, pages, isFavorites]);
 
-  function onNodeToggle (event: SyntheticEvent, nodeIds: string[]) {
+  function onNodeToggle(event: SyntheticEvent, nodeIds: string[]) {
     setExpanded(nodeIds);
   }
 
@@ -282,6 +283,7 @@ function PageNavigation ({
           selectedNodeId={selectedNodeId}
           addPage={addPage}
           deletePage={deletePage}
+          onClick={onClick}
         />
       ))}
     </StyledTreeRoot>

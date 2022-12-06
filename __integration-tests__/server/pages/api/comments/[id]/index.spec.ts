@@ -4,7 +4,11 @@ import request from 'supertest';
 
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateCommentWithThreadAndPage,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -21,9 +25,7 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/comments/{id} - update a comment', () => {
-
   it('should update the comment if the user created it, and respond 200', async () => {
-
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
@@ -38,7 +40,6 @@ describe('PUT /api/comments/{id} - update a comment', () => {
   });
 
   it('should fail if the user did not create the comment, and respond 401', async () => {
-
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: true
@@ -58,28 +59,20 @@ describe('PUT /api/comments/{id} - update a comment', () => {
       .send({ content: [] })
       .expect(401);
   });
-
 });
 
 describe('DELETE /api/comments/{id} - delete a comment', () => {
-
   it('should delete the comment if the user created it, and respond 200', async () => {
-
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(200);
+    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', nonAdminCookie).send({}).expect(200);
   });
 
   it('should fail if the user did not create the comment, and respond 401', async () => {
-
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: true
@@ -93,11 +86,6 @@ describe('DELETE /api/comments/{id} - delete a comment', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl)
-      .delete(`/api/comments/${comment.id}`)
-      .set('Cookie', otherAdminCookie)
-      .send({})
-      .expect(401);
+    await request(baseUrl).delete(`/api/comments/${comment.id}`).set('Cookie', otherAdminCookie).send({}).expect(401);
   });
-
 });

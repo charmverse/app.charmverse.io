@@ -12,8 +12,11 @@ const litClient = new LitNodeClient({
   debug: false
 } as any);
 
-export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, userId }:TokenGateEvaluationAttempt):
- Promise<TokenGateEvaluationResult> {
+export async function evalueTokenGateEligibility({
+  authSig,
+  spaceIdOrDomain,
+  userId
+}: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
     await litClient.connect();
   }
@@ -26,7 +29,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
       id: validUuid ? spaceIdOrDomain : undefined
     },
     include: {
-      TokenGate: {
+      tokenGates: {
         include: {
           tokenGateToRoles: {
             include: {
@@ -42,7 +45,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
   }
 
-  if (space.TokenGate.length === 0) {
+  if (space.tokenGates.length === 0) {
     throw new MissingDataError('There are no token gates available in this space.');
   }
 
@@ -51,15 +54,16 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
   }
 
   const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
-    space.TokenGate.map(tokenGate => {
-      return litClient.getSignedToken({
-        authSig,
-        // note that we used to store 'chain' but now it is an array
-        // TODO: migrate old token gate conditions to all be an array?
-        chain: (tokenGate.conditions as any).chains?.[0],
-        resourceId: tokenGate.resourceId,
-        ...tokenGate.conditions as any
-      })
+    space.tokenGates.map((tokenGate) => {
+      return litClient
+        .getSignedToken({
+          authSig,
+          // note that we used to store 'chain' but now it is an array
+          // TODO: migrate old token gate conditions to all be an array?
+          chain: (tokenGate.conditions as any).chains?.[0],
+          resourceId: tokenGate.resourceId,
+          ...(tokenGate.conditions as any)
+        })
         .then((signedToken: string) => {
           return {
             signedToken,
@@ -72,7 +76,7 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     })
   );
 
-  const successGates = tokenGateResults.filter(result => result !== null) as TokenGateJwt[];
+  const successGates = tokenGateResults.filter((result) => result !== null) as TokenGateJwt[];
 
   if (successGates.length === 0) {
     return {
@@ -86,15 +90,13 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
   }
 
   const eligibleRoles = successGates.reduce((roleList, result) => {
-
-    result.tokenGate.tokenGateToRoles.forEach(tokenGateRoleMapping => {
-      if (roleList.every(role => role.id !== tokenGateRoleMapping.roleId)) {
+    result.tokenGate.tokenGateToRoles.forEach((tokenGateRoleMapping) => {
+      if (roleList.every((role) => role.id !== tokenGateRoleMapping.roleId)) {
         roleList.push(tokenGateRoleMapping.role);
       }
     });
 
     return roleList;
-
   }, [] as Role[]);
 
   return {
@@ -105,5 +107,4 @@ export async function evalueTokenGateEligibility ({ authSig, spaceIdOrDomain, us
     gateTokens: successGates,
     roles: eligibleRoles
   };
-
 }

@@ -14,20 +14,15 @@ const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);
 `;
 
-export default function EmojiSuggest ({ pluginKey }: { pluginKey: PluginKey }) {
+export default function EmojiSuggest({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
-  const {
-    tooltipContentDOM,
-    suggestTooltipKey
-  } = usePluginState(pluginKey);
+  const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey);
 
-  const {
-    show: isVisible
-  } = usePluginState(suggestTooltipKey);
+  const { show: isVisible } = usePluginState(suggestTooltipKey);
 
   const theme = useTheme();
 
-  function closeTooltip () {
+  function closeTooltip() {
     if (view.dispatch) {
       view.dispatch(
         // Chain transactions together
@@ -46,12 +41,7 @@ export default function EmojiSuggest ({ pluginKey }: { pluginKey: PluginKey }) {
 
   return (
     <ClickAwayListener onClickAway={closeTooltip}>
-      <StyledPopper
-        disablePortal
-        open={isVisible}
-        anchorEl={tooltipContentDOM}
-        placement='bottom-start'
-      >
+      <StyledPopper disablePortal open={isVisible} anchorEl={tooltipContentDOM} placement='bottom-start'>
         <Picker
           theme={theme.palette.mode}
           onSelect={(emoji: BaseEmoji) => {

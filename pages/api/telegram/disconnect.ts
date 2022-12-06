@@ -1,3 +1,4 @@
+import type { IdentityType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,8 +8,6 @@ import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { shortenHex } from 'lib/utilities/strings';
-import type { IdentityType } from 'models';
-import { IDENTITY_TYPES } from 'models';
 
 const handler = nc({
   onError,
@@ -17,7 +16,7 @@ const handler = nc({
 
 handler.use(requireUser).post(disconnectTelegram);
 
-async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
+async function disconnectTelegram(req: NextApiRequest, res: NextApiResponse) {
   await prisma.telegramUser.delete({
     where: {
       userId: req.session.user.id
@@ -41,7 +40,7 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
   }
 
   // If identity type is not Telegram
-  if (user.identityType !== IDENTITY_TYPES[2]) {
+  if (user.identityType !== 'Telegram') {
     return res.status(200).json({ success: 'ok' });
   }
 
@@ -55,22 +54,17 @@ async function disconnectTelegram (req: NextApiRequest, res: NextApiResponse) {
 
   if (ens) {
     newUserName = ens;
-    newIdentityProvider = IDENTITY_TYPES[0];
+    newIdentityProvider = 'Wallet';
   }
-  if (user.discordUser
-    && user.discordUser.account
-    && (user.discordUser.account as Partial<DiscordAccount>).username
-  ) {
+  if (user.discordUser && user.discordUser.account && (user.discordUser.account as Partial<DiscordAccount>).username) {
     const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
     // Already checked that there is a username
     newUserName = discordAccount.username || '';
-    newIdentityProvider = IDENTITY_TYPES[1];
-  }
-  else if (user.wallets.length) {
+    newIdentityProvider = 'Discord';
+  } else if (user.wallets.length) {
     newUserName = shortenHex(user.wallets[0].address);
-    newIdentityProvider = IDENTITY_TYPES[0];
-  }
-  else {
+    newIdentityProvider = 'Wallet';
+  } else {
     throw new InvalidStateError();
   }
 

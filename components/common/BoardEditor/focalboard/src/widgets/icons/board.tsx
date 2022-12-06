@@ -1,7 +1,6 @@
-
 import React from 'react';
 
-export default function BoardIcon (): JSX.Element {
+export default function BoardIcon(): JSX.Element {
   return (
     <svg
       width='24'

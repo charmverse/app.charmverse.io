@@ -5,8 +5,7 @@ import { prisma } from 'db';
 
 export type InviteLinkPopulated = InviteLink & { space: Space };
 
-export async function getInviteLink (code: string): Promise<{ invite?: InviteLinkPopulated, expired?: boolean }> {
-
+export async function getInviteLink(code: string): Promise<{ invite?: InviteLinkPopulated; expired?: boolean }> {
   const invite = await prisma.inviteLink.findUnique({
     where: {
       code
@@ -20,13 +19,11 @@ export async function getInviteLink (code: string): Promise<{ invite?: InviteLin
   }
   if (invite.maxUses > 0 && invite.useCount >= invite.maxUses) {
     return { invite, expired: true };
-  }
-  else if (invite.maxAgeMinutes > 0) {
+  } else if (invite.maxAgeMinutes > 0) {
     const timePassed = Date.now() - invite.createdAt.getTime();
     const expired = timePassed > invite.maxAgeMinutes * 60 * 1000;
     return { invite, expired };
-  }
-  else {
+  } else {
     return { invite, expired: false };
   }
 }
@@ -38,7 +35,7 @@ interface InviteLinkInput {
   maxUses?: number;
 }
 
-export async function createInviteLink ({ maxAgeMinutes, maxUses, spaceId, createdBy }: InviteLinkInput) {
+export async function createInviteLink({ maxAgeMinutes, maxUses, spaceId, createdBy }: InviteLinkInput) {
   const link = await prisma.inviteLink.create({
     data: {
       code: uuid().substring(0, 6),
@@ -51,11 +48,9 @@ export async function createInviteLink ({ maxAgeMinutes, maxUses, spaceId, creat
   return link;
 }
 
-export function acceptInviteLink () {
+export function acceptInviteLink() {}
 
-}
-
-export async function deleteInviteLink (id: string) {
+export async function deleteInviteLink(id: string) {
   await prisma.inviteLink.delete({
     where: {
       id
@@ -63,12 +58,11 @@ export async function deleteInviteLink (id: string) {
   });
 }
 
-export function parseUrl (url: string): string | undefined {
+export function parseUrl(url: string): string | undefined {
   let inviteId: string | undefined;
   try {
     inviteId = new URL(url).pathname.split('/').pop();
-  }
-  catch (err) {
+  } catch (err) {
     //
   }
   return inviteId;

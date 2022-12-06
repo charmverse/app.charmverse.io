@@ -18,6 +18,8 @@ export class CdkDeployStack extends Stack {
     // Create a ElasticBeanStalk app. - must be 40 characters or less
     const appName = sanitizeAppName('stg-charmverse-' + process.env.STAGE);
 
+    const deploymentDomain = `${process.env.STAGE || ''}.${domain}`;
+
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName,
     });
@@ -87,13 +89,18 @@ export class CdkDeployStack extends Stack {
         optionName: 'InstanceTypes',
         value: 't3.micro',
       },
+      {
+        namespace: 'aws:elasticbeanstalk:application:environment',
+        optionName: 'DOMAIN',
+        value: 'https://' + deploymentDomain,
+      }
     ];
 
     const resourceTags: CfnTag[] = [
-      { 
+      {
         key: 'env',
         value: 'stg'
-      } 
+      }
     ];
 
     // add ddenabled tag to instance to enable datadog aws integration.
@@ -119,8 +126,6 @@ export class CdkDeployStack extends Stack {
     const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
       domainName: domain
     });
-
-    const deploymentDomain = `${process.env.STAGE || ''}.${domain}`;
 
     new route53.ARecord(this, 'ARecord', {
       zone,

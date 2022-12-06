@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,11 +13,9 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .put(updateProposalController)
-  .get(getProposalController);
+handler.use(requireUser).put(updateProposalController).get(getProposalController);
 
-async function getProposalController (req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -50,8 +47,7 @@ async function getProposalController (req: NextApiRequest, res: NextApiResponse<
   return res.status(200).json(proposal);
 }
 
-async function updateProposalController (req: NextApiRequest, res: NextApiResponse) {
-
+async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -91,10 +87,13 @@ async function updateProposalController (req: NextApiRequest, res: NextApiRespon
     throw new AdministratorOnlyError();
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+  const isCurrentUserProposalAuthor = proposal.authors.some((author) => author.userId === userId);
 
   // A proposal can only be updated when its in private_draft, draft or discussion status and only the proposal author can update it
-  if ((!isCurrentUserProposalAuthor && !isAdmin) || (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')) {
+  if (
+    (!isCurrentUserProposalAuthor && !isAdmin) ||
+    (proposal.status !== 'discussion' && proposal.status !== 'private_draft' && proposal.status !== 'draft')
+  ) {
     throw new UnauthorisedActionError();
   }
 

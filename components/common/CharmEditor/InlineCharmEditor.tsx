@@ -1,12 +1,4 @@
-import {
-  bold,
-  code,
-  italic,
-  link,
-  paragraph,
-  strike,
-  underline
-} from '@bangle.dev/base-components';
+import { bold, code, italic, link, paragraph, strike, underline } from '@bangle.dev/base-components';
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
@@ -14,19 +6,16 @@ import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
-import { useState } from 'react';
 
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/pages/checkIsContentEmpty';
 import type { PageContent } from 'models';
 
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
-import Placeholder from './components/Placeholder';
 import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
@@ -52,21 +41,21 @@ export const specRegistry = new SpecRegistry([
   tabIndent.spec()
 ]);
 
-export function charmEditorPlugins (
-  {
-    onContentChange,
-    readOnly,
-    userId = null,
-    pageId = null,
-    spaceId = null
-  }:
-    {
-      readOnly?: boolean; onContentChange?: (view: EditorView) => void;
-      spaceId?: string | null;
-      pageId?: string | null;
-      userId?: string | null;
-    } = {}
-) {
+export function charmEditorPlugins({
+  onContentChange,
+  readOnly,
+  userId = null,
+  pageId = null,
+  spaceId = null,
+  placeholderText
+}: {
+  readOnly?: boolean;
+  onContentChange?: (view: EditorView) => void;
+  spaceId?: string | null;
+  pageId?: string | null;
+  userId?: string | null;
+  placeholderText?: string;
+} = {}) {
   return () => [
     new Plugin({
       view: () => ({
@@ -106,7 +95,7 @@ export function charmEditorPlugins (
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
   & {
-    padding: ${({ noPadding, theme }) => noPadding ? 0 : theme.spacing(0, 1)};
+    padding: ${({ noPadding, theme }) => (noPadding ? 0 : theme.spacing(0, 1))};
   }
   .ProseMirror.bangle-editor {
     padding-left: 0px !important;
@@ -138,28 +127,32 @@ interface CharmEditorProps {
   readOnly?: boolean;
   style?: CSSProperties;
   noPadding?: boolean;
-  placeholderText?: string;
   focusOnInit?: boolean;
+  placeholderText?: string;
 }
 
-export default function CharmEditor (
-  { focusOnInit, content, children, onContentChange, style, noPadding, readOnly = false, placeholderText }:
-  CharmEditorProps
-) {
-  const [currentSpace] = useCurrentSpace();
+export default function CharmEditor({
+  focusOnInit,
+  content,
+  children,
+  onContentChange,
+  style,
+  noPadding,
+  placeholderText,
+  readOnly = false
+}: CharmEditorProps) {
+  const currentSpace = useCurrentSpace();
   const { user } = useUser();
 
-  const _isEmpty = !content || checkIsContentEmpty(content);
-  const [isEmpty, setIsEmpty] = useState(_isEmpty);
+  const onContentChangeDebounced = onContentChange
+    ? debounce((view: EditorView) => {
+        const doc = view.state.doc.toJSON() as PageContent;
+        const rawText = view.state.doc.textContent as string;
+        onContentChange({ doc, rawText });
+      }, 100)
+    : undefined;
 
-  const onContentChangeDebounced = onContentChange ? debounce((view: EditorView) => {
-    const doc = view.state.doc.toJSON() as PageContent;
-    const rawText = view.state.doc.textContent as string;
-    onContentChange({ doc, rawText });
-  }, 100) : undefined;
-
-  function _onContentChange (view: EditorView) {
-    setIsEmpty(checkIsContentEmpty(view.state.doc.toJSON() as PageContent));
+  function _onContentChange(view: EditorView) {
     // @ts-ignore missing types from the @bangle.dev/react package
     if (onContentChangeDebounced) {
       onContentChangeDebounced(view);
@@ -170,8 +163,7 @@ export default function CharmEditor (
   if (typeof contentJSON === 'string') {
     try {
       contentJSON = JSON.parse(contentJSON);
-    }
-    catch (e) {
+    } catch (e) {
       // well, we tried
     }
   }
@@ -184,7 +176,8 @@ export default function CharmEditor (
       onContentChange: _onContentChange,
       readOnly,
       spaceId: currentSpace?.id,
-      userId: user?.id
+      userId: user?.id,
+      placeholderText: placeholderText ?? 'Reply...'
     }),
     initialValue,
     dropCursorOpts: {
@@ -200,34 +193,16 @@ export default function CharmEditor (
         width: '100%',
         height: '100%'
       }}
-      className='czi-editor-frame-body'
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,
         plugins: []
       }}
-      placeholderComponent={(
-        <Placeholder
-          sx={{
-            fontSize: style?.fontSize,
-            zIndex: 20,
-            top: noPadding ? 2 : 8,
-            left: noPadding ? 0 : 8,
-            position: 'absolute'
-          }}
-          text={placeholderText ?? 'Reply...'}
-          show={isEmpty}
-        />
-      )}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
         switch (props.node.type.name) {
           case 'mention': {
-            return (
-              <Mention {...props}>
-                {_children}
-              </Mention>
-            );
+            return <Mention {...props}>{_children}</Mention>;
           }
           default: {
             return null;

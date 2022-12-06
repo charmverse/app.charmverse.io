@@ -28,7 +28,7 @@ interface Props {
   enableNewTemplates?: boolean;
 }
 
-export function TemplatesMenu ({
+export function TemplatesMenu({
   pages,
   anchorEl,
   addPageFromTemplate,
@@ -40,71 +40,77 @@ export function TemplatesMenu ({
   enableItemOptions,
   enableNewTemplates
 }: Props) {
-
   const theme = useTheme();
 
   const maxTitleLength = 35;
 
   return (
-    <Menu {...bindMenu(popupState)} onClose={popupState.close} anchorEl={anchorEl} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
-      <MenuItem dense sx={{ pointerEvents: 'none' }}>Templates {boardTitle ? (<>for <b style={{ marginLeft: 4 }}>{boardTitle}</b></>) : ''} </MenuItem>
+    <Menu
+      {...bindMenu(popupState)}
+      onClose={popupState.close}
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+    >
+      <MenuItem dense sx={{ pointerEvents: 'none' }}>
+        Templates{' '}
+        {boardTitle ? (
+          <>
+            for <b style={{ marginLeft: 4 }}>{boardTitle}</b>
+          </>
+        ) : (
+          ''
+        )}{' '}
+      </MenuItem>
 
-      {
-        pages.length === 0 && (
+      {pages.length === 0 && (
+        <MenuItem dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <ListItemText>No templates found</ListItemText>
+        </MenuItem>
+      )}
+
+      {pages.map((page) => {
+        return (
           <MenuItem
+            key={page.id}
             dense
             sx={{ display: 'flex', justifyContent: 'space-between' }}
+            onClick={() => {
+              addPageFromTemplate(page.id);
+              popupState.close();
+            }}
           >
-            <ListItemText>No templates found</ListItemText>
+            <ListItemIcon>
+              <DescriptionOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
+
+            {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
+            <Box ml={1} onClick={(e) => e.stopPropagation()}>
+              {enableItemOptions && (
+                <TemplatePageMenuActions
+                  editTemplate={editTemplate}
+                  deleteTemplate={deleteTemplate}
+                  pageId={page.id}
+                  closeParentPopup={popupState.close}
+                />
+              )}
+            </Box>
           </MenuItem>
-        )
-      }
-
-      {
-        pages.map((page) => {
-
-          return (
-            <MenuItem
-              key={page.id}
-              dense
-              sx={{ display: 'flex', justifyContent: 'space-between' }}
-              onClick={() => {
-                addPageFromTemplate(page.id);
-                popupState.close();
-              }}
-            >
-              <ListItemIcon><DescriptionOutlinedIcon /></ListItemIcon>
-              <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
-
-              {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-              <Box ml={1} onClick={e => e.stopPropagation()}>
-                {
-                enableItemOptions && (
-                  <TemplatePageMenuActions
-                    editTemplate={editTemplate}
-                    deleteTemplate={deleteTemplate}
-                    pageId={page.id}
-                    closeParentPopup={popupState.close}
-                  />
-                )
-              }
-              </Box>
-
-            </MenuItem>
-          );
-        })
-}
-      {
-    enableNewTemplates && (
-      [
+        );
+      })}
+      {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
-        <MenuItem key='templates-menu-new-item' dense sx={{ color: `${theme.palette.primary.main} !important` }} onClick={createTemplate}>
+        <MenuItem
+          key='templates-menu-new-item'
+          dense
+          sx={{ color: `${theme.palette.primary.main} !important` }}
+          onClick={createTemplate}
+        >
           <AddIcon />
           <ListItemText>New template</ListItemText>
         </MenuItem>
-      ]
-    )
-  }
+      ]}
     </Menu>
   );
 }

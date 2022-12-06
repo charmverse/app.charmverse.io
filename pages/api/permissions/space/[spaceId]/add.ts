@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,15 +9,17 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .use(requireCustomPermissionMode({
-    keyLocation: 'query',
-    spaceIdKey: 'spaceId'
-  }))
+handler
+  .use(requireUser)
+  .use(
+    requireCustomPermissionMode({
+      keyLocation: 'query',
+      spaceIdKey: 'spaceId'
+    })
+  )
   .post(addSpacePermissionsController);
 
-async function addSpacePermissionsController (req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
-
+async function addSpacePermissionsController(req: NextApiRequest, res: NextApiResponse<SpacePermissionFlags>) {
   const { spaceId } = req.query;
   const { id: userId } = req.session.user;
 

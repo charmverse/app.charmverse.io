@@ -1,10 +1,13 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError, WrongStateError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
-import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBountyWithSingleApplication,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 import { reviewSubmission } from '../reviewSubmission';
 
@@ -20,9 +23,7 @@ beforeAll(async () => {
 });
 
 describe('reviewSubmission', () => {
-
   it('should return the updated submission with a complete status when reviewed, and record who approved or rejected it.', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -42,7 +43,6 @@ describe('reviewSubmission', () => {
   });
 
   it('should return the updated submission with a rejected status when reject action is initiated', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -61,7 +61,6 @@ describe('reviewSubmission', () => {
   });
 
   it('should fail if the reviewer is the same person as the submitter', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -77,14 +76,12 @@ describe('reviewSubmission', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(UndesirableOperationError);
     }
   });
 
   it('should fail if the decision is not approve or reject', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -100,14 +97,12 @@ describe('reviewSubmission', () => {
         userId: reviewer.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
 
   it('should fail if the submission does not exist', async () => {
-
     try {
       await reviewSubmission({
         submissionId: v4(),
@@ -115,14 +110,12 @@ describe('reviewSubmission', () => {
         userId: reviewer.id
       });
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(DataNotFoundError);
     }
   });
 
   it('should fail if trying to approve a submission that is not in review status', async () => {
-
     const bountyWithSubmission = await generateBountyWithSingleApplication({
       userId: user.id,
       spaceId: space.id,
@@ -138,10 +131,8 @@ describe('reviewSubmission', () => {
         userId: reviewer.id
       });
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(WrongStateError);
     }
   });
 });
-

@@ -1,4 +1,3 @@
-
 import type { ProfileItem } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,22 +9,18 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .put(updateUserProfileItems);
+handler.use(requireUser).put(updateUserProfileItems);
 
-async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse<any | { error: string }>) {
-
+async function updateUserProfileItems(req: NextApiRequest, res: NextApiResponse<any | { error: string }>) {
   const { profileItems }: UpdateProfileItemRequest = req.body;
 
   const shownProfileItems: Omit<ProfileItem, 'userId'>[] = [];
   const hiddenProfileItems: Omit<ProfileItem, 'userId'>[] = [];
 
-  profileItems.forEach(profileItem => {
+  profileItems.forEach((profileItem) => {
     if (!profileItem.isHidden) {
       shownProfileItems.push(profileItem);
-    }
-    else {
+    } else {
       hiddenProfileItems.push(profileItem);
     }
   });
@@ -45,22 +40,26 @@ async function updateUserProfileItems (req: NextApiRequest, res: NextApiResponse
   }
 
   if (hiddenProfileItems.length) {
-    await Promise.all(hiddenProfileItems.map(profileItem => prisma.profileItem.upsert({
-      where: {
-        id: profileItem.id
-      },
-      update: {
-        id: profileItem.id,
-        isHidden: true
-      },
-      create: {
-        id: profileItem.id,
-        userId: req.session.user.id,
-        metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
-        isHidden: true,
-        type: profileItem.type
-      }
-    })));
+    await Promise.all(
+      hiddenProfileItems.map((profileItem) =>
+        prisma.profileItem.upsert({
+          where: {
+            id: profileItem.id
+          },
+          update: {
+            id: profileItem.id,
+            isHidden: true
+          },
+          create: {
+            id: profileItem.id,
+            userId: req.session.user.id,
+            metadata: profileItem.metadata === null ? undefined : profileItem.metadata,
+            isHidden: true,
+            type: profileItem.type
+          }
+        })
+      )
+    );
   }
 
   return res.status(200).end();

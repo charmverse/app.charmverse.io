@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,12 +10,12 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys<Application>(['message'], 'body'))
   .put(updateApplicationController);
 
-async function updateApplicationController (req: NextApiRequest, res: NextApiResponse<Application>) {
-
+async function updateApplicationController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id } = req.query;
 
   const existingApplicationWithIdsOnly = await prisma.application.findFirst({
@@ -33,7 +32,7 @@ async function updateApplicationController (req: NextApiRequest, res: NextApiRes
   }
 
   if (existingApplicationWithIdsOnly.createdBy !== req.session.user.id) {
-    throw new UnauthorisedActionError('You cannot edit another user\'s application');
+    throw new UnauthorisedActionError("You cannot edit another user's application");
   }
 
   const updatedApplication = await updateApplication({

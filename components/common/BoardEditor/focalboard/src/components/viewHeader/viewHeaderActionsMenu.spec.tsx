@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -39,11 +38,7 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderActionsMenu
-            board={board}
-            activeView={activeView}
-            cards={[card]}
-          />
+          <ViewHeaderActionsMenu board={board} activeView={activeView} cards={[card]} />
         </ReduxProvider>
       )
     );
@@ -58,11 +53,7 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderActionsMenu
-            board={board}
-            activeView={activeView}
-            cards={[card]}
-          />
+          <ViewHeaderActionsMenu board={board} activeView={activeView} cards={[card]} />
         </ReduxProvider>
       )
     );
@@ -76,11 +67,7 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderActionsMenu
-            board={board}
-            activeView={activeView}
-            cards={[card]}
-          />
+          <ViewHeaderActionsMenu board={board} activeView={activeView} cards={[card]} />
         </ReduxProvider>
       )
     );
@@ -96,11 +83,7 @@ describe('components/viewHeader/viewHeaderActionsMenu', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>
-          <ViewHeaderActionsMenu
-            board={board}
-            activeView={activeView}
-            cards={[card]}
-          />
+          <ViewHeaderActionsMenu board={board} activeView={activeView} cards={[card]} />
         </ReduxProvider>
       )
     );

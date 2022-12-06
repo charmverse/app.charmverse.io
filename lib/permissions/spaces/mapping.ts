@@ -6,6 +6,6 @@ export const spaceOperationLabels: Record<SpaceOperation, string> = {
   createVote: 'Create new proposals'
 };
 
-export function spaceOperations () {
+export function spaceOperations() {
   return Object.keys(SpaceOperation) as SpaceOperation[];
 }

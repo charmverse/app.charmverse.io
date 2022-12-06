@@ -1,18 +1,28 @@
+import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
 
 declare module 'iron-session' {
   interface IronSessionData {
     // this data is only useful for authentication - it is not kept up-to-date!
     user: { id: string };
+    // Used when we have a non signed in user
+    anonymousUserId?: string;
   }
 }
 
+if (!_maybeAuthSecret && !isTestEnv) {
+  throw new Error('The AUTH_SECRET env var is required to start server');
+}
+
+export const authSecret = _maybeAuthSecret as string;
+
 export const ironOptions = {
-  cookieName: 'charm.sessionId',
-  password: process.env.AUTH_SECRET as string,
-  // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+  cookieName,
+  password: authSecret,
   cookieOptions: {
     sameSite: 'strict' as const,
-    secure: typeof process.env.DOMAIN === 'string' && process.env.DOMAIN.includes('https')
+    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+    secure: typeof baseUrl === 'string' && baseUrl.includes('https')
+    // domain: cookieDomain TODO: change domain to subdomain without logging people out, so we can use them across subdomains
   }
 };
 
@@ -40,5 +50,10 @@ export const sessionUserRelations = {
   discordUser: true,
   telegramUser: true,
   notificationState: true,
-  wallets: true
+  wallets: true,
+  unstoppableDomains: {
+    select: {
+      domain: true
+    }
+  }
 } as const;

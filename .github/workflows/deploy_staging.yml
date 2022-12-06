@@ -23,6 +23,15 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.co
+          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
+          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
 
       - name: Build and Push Docker image
         uses: ./.github/actions/build_docker_image
@@ -30,6 +39,13 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
+
+      - name: Replace env_var with staging settings
+        run: |
+          sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
+          sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
+          sed -i 's/production/staging/g' .ebextensions_websockets/00_env_vars.config
+          sed -i 's/prd/stg/g' .ebextensions_websockets/00_env_vars.config
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -40,6 +56,16 @@ jobs:
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_cron/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_websockets/00_env_vars.config
 
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
@@ -93,3 +119,23 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ steps.cdk_deploy.outputs.env_url }}
+
+      # update websockets in staging
+
+      - name: Update and Package websockets
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+
+      - name: Deploy websockets to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: stg-charmverse-websockets
+          environment_name: stg-charmverse-websockets
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_websockets.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes

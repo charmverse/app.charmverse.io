@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
 
@@ -16,9 +15,7 @@ beforeAll(async () => {
 });
 
 describe('computeSpacePermissions', () => {
-
   it('should combine permissions from user, role assignments and space membership', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const role = await generateRole({
@@ -51,11 +48,9 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(true);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should give user space permissions via their role', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -85,11 +80,9 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(true);
     expect(computedPermissions.createBounty).toBe(false);
-
   });
 
   it('should give user space permissions via their space membership', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations<'space'>({
@@ -106,11 +99,9 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should give user space permissions as an individual', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations<'user'>({
@@ -127,11 +118,9 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should return true to all operations if user is a space admin and admin bypass was enabled', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const computedPermissions = await computeSpacePermissions({
@@ -142,11 +131,9 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(true);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
-
     const { space: otherSpace, user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     await addSpaceOperations({
@@ -163,7 +150,6 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should contain all Space Operations as keys, with no additional or missing properties', async () => {
@@ -176,19 +162,17 @@ describe('computeSpacePermissions', () => {
     });
 
     // Check the object has no extra keys
-    (Object.keys(computedPermissions) as SpaceOperation[]).forEach(key => {
+    (Object.keys(computedPermissions) as SpaceOperation[]).forEach((key) => {
       expect(SpaceOperation[key]).toBeDefined();
     });
 
     // Check the object has no missing keys
-    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(key => {
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach((key) => {
       expect(computedPermissions[key]).toBeDefined();
     });
-
   });
 
   it('should return false to all operations if the the user is not a member of the space', async () => {
-
     const { user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const computedPermissions = await computeSpacePermissions({
@@ -199,7 +183,5 @@ describe('computeSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(false);
-
   });
-
 });

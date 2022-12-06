@@ -12,8 +12,7 @@ test.beforeAll(async () => {
   browser = await chromium.launch();
 });
 
-test('visit a public bounty a page public', async () => {
-
+test('visit a public bounty page', async () => {
   // Arrange ------------------
   const loggedInUserContext = await browser.newContext();
   const publicContext = await browser.newContext();
@@ -31,16 +30,19 @@ test('visit a public bounty a page public', async () => {
     rewardAmount: 100,
     rewardToken: 'ETH',
     bountyPermissions: {
-      submitter: [{
-        group: 'space',
-        id: space.id
-      }]
+      submitter: [
+        {
+          group: 'space',
+          id: space.id
+        }
+      ]
     },
     pagePermissions: [
       {
         permissionLevel: 'view',
         spaceId: space.id
-      }, {
+      },
+      {
         permissionLevel: 'view',
         public: true
       }
@@ -56,29 +58,29 @@ test('visit a public bounty a page public', async () => {
   // Act
 
   // Test a logged in user viewing the public board, and a public user viewing the public board
-  await Promise.all([loggedInPage, publicPage].map(async (page) => {
+  await Promise.all(
+    [loggedInPage, publicPage].map(async (page) => {
+      await page.goto(bountyBoard);
 
-    await page.goto(bountyBoard);
+      const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
 
-    const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
+      await expect(bountyCard).toBeVisible();
 
-    await expect(bountyCard).toBeVisible();
+      await bountyCard.click();
 
-    await bountyCard.click();
+      // 4. Open the card and make sure it renders content
+      await page.waitForURL(`${bountyBoard}*bountyId*`);
 
-    // 4. Open the card and make sure it renders content
-    await page.waitForURL(`${bountyBoard}*bountyId*`);
+      const cardPopup = page.locator('div.Dialog');
 
-    const cardPopup = page.locator('div.Dialog');
+      await expect(cardPopup).toBeVisible();
+      const documentTitle = cardPopup.locator('data-test=editor-page-title');
 
-    await expect(cardPopup).toBeVisible();
-    const documentTitle = cardPopup.locator('data-test=editor-page-title');
+      await expect(documentTitle).toBeVisible();
 
-    await expect(documentTitle).toBeVisible();
+      const spaceActionButton = page.locator('data-test=public-bounty-space-action');
 
-    const spaceActionButton = page.locator('data-test=public-bounty-space-action');
-
-    await expect(spaceActionButton).toBeVisible();
-  }));
-
+      await expect(spaceActionButton).toBeVisible();
+    })
+  );
 });

@@ -9,13 +9,11 @@ import { duplicatePage } from '../duplicatePage';
 import { PageNotFoundError } from '../errors';
 
 describe('duplicatePage', () => {
-
-  it('should fail if the page doesn\'t exist', async () => {
+  it("should fail if the page doesn't exist", async () => {
     try {
       await duplicatePage(v4(), v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(PageNotFoundError);
     }
   });
@@ -118,7 +116,7 @@ describe('duplicatePage', () => {
 
     const duplicateBoardPage = await duplicatePage(boardPage.id, user.id);
 
-    const duplicateCardPage = await prisma.page.findFirst({
+    const duplicateCardPage = (await prisma.page.findFirst({
       where: {
         id: {
           notIn: [cardId]
@@ -126,9 +124,9 @@ describe('duplicatePage', () => {
         spaceId: space.id,
         type: 'card'
       }
-    }) as Page;
+    })) as Page;
 
-    const duplicateCardBlock = await prisma.block.findFirst({
+    const duplicateCardBlock = (await prisma.block.findFirst({
       where: {
         id: {
           notIn: [cardId]
@@ -136,17 +134,17 @@ describe('duplicatePage', () => {
         spaceId: space.id,
         type: 'card'
       }
-    }) as Block;
+    })) as Block;
 
-    const duplicateBoardBlock = await prisma.block.findFirst({
+    const duplicateBoardBlock = (await prisma.block.findFirst({
       where: {
         id: duplicateBoardPage.id,
         type: 'board',
         spaceId: space.id
       }
-    }) as Block;
+    })) as Block;
 
-    const duplicateViewBlock = await prisma.block.findFirst({
+    const duplicateViewBlock = (await prisma.block.findFirst({
       where: {
         id: {
           notIn: [viewBlock.id]
@@ -154,7 +152,7 @@ describe('duplicatePage', () => {
         spaceId: space.id,
         type: 'view'
       }
-    }) as Block;
+    })) as Block;
 
     expect(duplicateBoardPage.title).toBe(`${boardPage.title} (copy)`);
     expect(duplicateBoardPage.type).toBe(boardPage.type);

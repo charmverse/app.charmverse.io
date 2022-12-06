@@ -6,7 +6,11 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBountyWithSingleApplication, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBountyWithSingleApplication,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -21,9 +25,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
-
   it('should allow a user with the lock permission to close the bounty, returning the bounty with complete status and responding with 200', async () => {
-
     const bounty = await generateBountyWithSingleApplication({
       userId: nonAdminUser.id,
       spaceId: nonAdminUserSpace.id,
@@ -42,17 +44,14 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       resourceId: bounty.id
     });
 
-    const result = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/close`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(200)).body as BountyWithDetails;
+    const result = (
+      await request(baseUrl).post(`/api/bounties/${bounty.id}/close`).set('Cookie', nonAdminCookie).send({}).expect(200)
+    ).body as BountyWithDetails;
 
     expect(result.status).toBe('complete');
   });
 
   it('should allow a space admin to close the bounty, returning the bounty with complete status and responding with 200', async () => {
-
     const adminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: true
@@ -68,17 +67,14 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       bountyStatus: 'open'
     });
 
-    const result = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/close`)
-      .set('Cookie', adminCookie)
-      .send({})
-      .expect(200)).body as BountyWithDetails;
+    const result = (
+      await request(baseUrl).post(`/api/bounties/${bounty.id}/close`).set('Cookie', adminCookie).send({}).expect(200)
+    ).body as BountyWithDetails;
 
     expect(result.status).toBe('complete');
   });
 
   it('should fail if the non-admin user does not have the lock permission and respond with 401', async () => {
-
     const extraNonAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: false
@@ -100,5 +96,4 @@ describe('POST /api/bounties/{submissionId}/close - close a bounty', () => {
       .send({})
       .expect(401);
   });
-
 });

@@ -5,7 +5,12 @@ import request from 'supertest';
 import { addBountyPermissionGroup } from 'lib/permissions/bounties';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBountyWithSingleApplication, generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateBountyWithSingleApplication,
+  generateRole,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;
@@ -20,9 +25,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/applications/{applicationId}/approve - accept an application to become a submitter', () => {
-
   it('should succed if the user has "approve_applications" permission, and respond with 200', async () => {
-
     const reviewer = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const reviewerCookie = await loginUser(reviewer.id);
@@ -64,7 +67,6 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
   });
 
   it('should allow a space admin to accept an applicant to become submitter and respond with 200', async () => {
-
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
     const adminCookie = await loginUser(admin.id);
@@ -87,7 +89,6 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
   });
 
   it('should fail if the requesting non-admin user does not have the "review" permission and respond with 401', async () => {
-
     const extraUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: nonAdminUserSpace.id
@@ -111,5 +112,4 @@ describe('POST /api/applications/{applicationId}/approve - accept an application
       .send({})
       .expect(401);
   });
-
 });

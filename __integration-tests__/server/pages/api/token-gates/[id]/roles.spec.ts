@@ -96,37 +96,49 @@ beforeAll(async () => {
 
   cookie1 = await loginUser(user1.id);
   cookie2 = await loginUser(user2.id);
-
 });
 
 describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', () => {
   it('Should fail if correct keys are not provided in body', async () => {
-    const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie1).send({});
+    const response = await request(baseUrl)
+      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .set('Cookie', cookie1)
+      .send({});
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value');
+    expect(response.body.message).toBe('Key roleIds is required in request body and must not be an empty value.');
   });
 
   it('Should fail if the user is not an admin of the space', async () => {
-    const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie2).send({ spaceId: space.id, roleIds: [] });
+    const response = await request(baseUrl)
+      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .set('Cookie', cookie2)
+      .send({ spaceId: space.id, roleIds: [] });
     expect(response.statusCode).toBe(401);
     expect(response.body.message).toBe('Only space administrators can perform this action');
   });
 
   it('Should create & delete new tokeGateToRole records', async () => {
-    const response = await request(baseUrl).post(`/api/token-gates/${tokenGate.id}/roles`).set('Cookie', cookie1).send({ spaceId: space.id, roleIds: [role2.id] });
+    const response = await request(baseUrl)
+      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .set('Cookie', cookie1)
+      .send({ spaceId: space.id, roleIds: [role2.id] });
     expect(response.statusCode).toBe(200);
-    expect(response.body).toMatchObject<TokenGateToRole[]>([{
-      createdAt: expect.any(String),
-      id: expect.any(String),
-      roleId: role2.id,
-      tokenGateId: tokenGate.id
-    }]);
-    // The previous token gate role record was deleted
-    expect(await prisma.tokenGateToRole.findUnique({
-      where: {
-        id: tokenGateToRole.id
+    expect(response.body).toMatchObject<TokenGateToRole[]>([
+      {
+        createdAt: expect.any(String),
+        id: expect.any(String),
+        roleId: role2.id,
+        tokenGateId: tokenGate.id
       }
-    })).toBeNull();
+    ]);
+    // The previous token gate role record was deleted
+    expect(
+      await prisma.tokenGateToRole.findUnique({
+        where: {
+          id: tokenGateToRole.id
+        }
+      })
+    ).toBeNull();
   });
 });
 

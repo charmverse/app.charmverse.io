@@ -1,11 +1,9 @@
-
 import { DateTime } from 'luxon';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
-export default function useTasks () {
-
+export default function useTasks() {
   const { data, error: serverError, mutate } = useSWR('/tasks/state', () => charmClient.tasks.getTasksState());
   const error = serverError?.message || serverError;
 

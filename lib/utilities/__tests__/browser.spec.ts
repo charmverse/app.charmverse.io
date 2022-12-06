@@ -1,7 +1,6 @@
 import { getNewUrl } from '../browser';
 
 describe('getNewUrl()', () => {
-
   const baseUrl = 'https://google.com/search?q=3531422';
 
   it('should add a property to the query string', () => {
@@ -21,5 +20,4 @@ describe('getNewUrl()', () => {
 
     expect(result.toString()).toEqual(baseUrl);
   });
-
 });

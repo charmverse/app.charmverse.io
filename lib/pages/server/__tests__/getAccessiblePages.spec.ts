@@ -8,9 +8,7 @@ import type { IPageWithPermissions } from '../../interfaces';
 import { getAccessiblePages } from '../getAccessiblePages';
 
 describe('getAccessiblePages', () => {
-
   it('Should return all pages if user is admin', async () => {
-
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     // Page without any permission
@@ -20,11 +18,9 @@ describe('getAccessiblePages', () => {
     const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id });
 
     expect(pages.length).toBe(2);
-
   });
 
   it('should return only the pages the user has access to', async () => {
-
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page1 = await createPage({ createdBy: nonAdminUser.id, spaceId: space.id });
@@ -39,11 +35,9 @@ describe('getAccessiblePages', () => {
 
     expect(pages.length).toBe(1);
     expect(pages[0].id).toBe(page1.id);
-
   });
 
   it('should return proposal templates independent of their permissions the pages the user has access to in the target space', async () => {
-
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const { space: secondSpace, user: secondUser } = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -72,9 +66,8 @@ describe('getAccessiblePages', () => {
     const pages = await getAccessiblePages({ userId: nonAdminUser.id, spaceId: space.id });
 
     expect(pages.length).toBe(2);
-    expect(pages.some(p => p.id === page1.id)).toBe(true);
-    expect(pages.some(p => p.id === proposalPage.id)).toBe(true);
-
+    expect(pages.some((p) => p.id === page1.id)).toBe(true);
+    expect(pages.some((p) => p.id === proposalPage.id)).toBe(true);
   });
 
   it('Should return only public pages if an anonymous person is requesting', async () => {
@@ -96,7 +89,6 @@ describe('getAccessiblePages', () => {
   });
 
   it('Should not return a page if it has only a space permission, and the user is not a member of that space', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken();
 
     const { user: otherUser } = await generateUserAndSpaceWithApiToken(undefined, false);
@@ -115,7 +107,6 @@ describe('getAccessiblePages', () => {
   });
 
   it('Should include permissions for each page, and the source for each permision', async () => {
-
     const { space, user } = await generateUserAndSpaceWithApiToken();
 
     const page = await createPage({
@@ -138,19 +129,19 @@ describe('getAccessiblePages', () => {
 
     const pages = await getAccessiblePages({ spaceId: space.id, userId: user.id });
 
-    const foundChild = pages.find(p => p.id === childPage.id) as IPageWithPermissions;
-    const foundInherited = foundChild.permissions.find(perm => perm.spaceId === space.id) as IPagePermissionWithSource;
+    const foundChild = pages.find((p) => p.id === childPage.id) as IPageWithPermissions;
+    const foundInherited = foundChild.permissions.find(
+      (perm) => perm.spaceId === space.id
+    ) as IPagePermissionWithSource;
 
     // We are returning permissions
     expect(foundInherited).toBeDefined();
 
     // We are returning source
     expect(foundInherited.sourcePermission).toBeDefined();
-
   });
 
   it('Should return a page based on search', async () => {
-
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     // Page without any permission
@@ -158,8 +149,19 @@ describe('getAccessiblePages', () => {
     await createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Papa' });
 
     const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
-    expect(pages.map(p => p.id)).toEqual([pageToFind.id]);
-
+    expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
 
+  it('should not return pages of type post', async () => {
+    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const [pageToFind, postToIgnore] = await Promise.all([
+      createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Page', type: 'page' }),
+      createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Post', type: 'post' })
+    ]);
+
+    const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id });
+
+    expect(pages.length).toBe(1);
+    expect(pages[0].id).toBe(pageToFind.id);
+  });
 });
