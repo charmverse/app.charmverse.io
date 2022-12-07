@@ -165,7 +165,8 @@ function WalletSelectorModal({
           />
           {uAuthPopupError && (
             <Alert severity='warning'>
-              Could not open the popup. Please ensure popups are enabled for this site in your browser.
+              Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
+              browser.
             </Alert>
           )}
         </Grid>
