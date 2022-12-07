@@ -1,6 +1,9 @@
 name: 'Build application'
 
 inputs:
+  NEXT_PUBLIC_APP_ENV:
+    description: "..."
+    required: false
   NEXT_PUBLIC_DD_CLIENT_TOKEN:
     description: "..."
     required: false
