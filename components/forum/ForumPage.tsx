@@ -1,19 +1,13 @@
-import ReplayIcon from '@mui/icons-material/Replay';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Router, { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
-import Button from 'components/common/Button';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import DesktopFilterMenu from './components/Filters/FilterList';
 import MobileFilterMenu from './components/Filters/FilterSelect';
@@ -22,47 +16,9 @@ import ForumPosts from './components/ForumPosts';
 export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
-  const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const { categories } = useForumFilters();
-  const { subscribe } = useWebSocketClient();
-  const { setActions, showMessage } = useSnackbar();
-
   const [categoryId, setCategoryId] = useState<CategoryIdQuery>(router.query.categoryIds as CategoryIdQuery);
-
-  const handleNewPostEvent = useCallback(
-    (postWithPage: WebSocketPayload<'post_created'>) => {
-      if (
-        user &&
-        postWithPage.page?.createdBy !== user.id &&
-        (categoryId ? postWithPage.categoryId === categoryId : true)
-      ) {
-        setActions([
-          <Button
-            key='reload'
-            variant='outlined'
-            onClick={() => {
-              Router.reload();
-            }}
-            size='small'
-            startIcon={<ReplayIcon fontSize='small' />}
-            color='inherit'
-          >
-            Reload
-          </Button>
-        ]);
-        showMessage('New posts ready to view');
-      }
-    },
-    [user, categoryId]
-  );
-
-  useEffect(() => {
-    const unsubscribeFromNewPost = subscribe('post_created', handleNewPostEvent);
-    return () => {
-      unsubscribeFromNewPost();
-    };
-  }, [handleNewPostEvent]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {

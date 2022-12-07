@@ -1,14 +1,19 @@
+import ReplayIcon from '@mui/icons-material/Replay';
 import Alert from '@mui/material/Alert';
 import { Box } from '@mui/system';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import CreateForumPost from '../CreateForumPost';
 import ForumPost from '../ForumPost/ForumPost';
@@ -38,6 +43,8 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
+  const createPostBoxRef = useRef<HTMLDivElement>(null);
+  const { setActions, showMessage, setOrigin, setIsOpen } = useSnackbar();
 
   // Re-enable sorting later on
 
@@ -55,13 +62,14 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   // }, [querySort]);
 
   const { members } = useMembers();
-
+  const { user } = useUser();
   const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { subscribe } = useWebSocketClient();
 
-  function loadMorePosts() {
+  function loadMorePosts(refetch = false) {
     setIsLoadingMore(true);
 
     charmClient.forum
@@ -69,7 +77,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         spaceId: currentSpace!.id,
         categoryIds: categoryId,
         count: resultsPerQuery,
-        page: posts?.cursor
+        page: refetch ? undefined : posts?.cursor
       })
       .then((foundPosts) => {
         setError(null);
@@ -77,12 +85,10 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         // UX improvement: add a delay so the user sees the post loading skeleton
         setTimeout(() => {
           setPosts((_prevList) => {
-            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
-
-            if (!_prevList) {
+            if (!_prevList || refetch) {
               return foundPosts;
             }
-
+            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
             _prevList.cursor = foundPosts.cursor;
 
             const previousDataToKeep = !_prevList
@@ -102,8 +108,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
                 });
 
             _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
-              const user = members.find((member) => member.id === post.createdBy);
-              return { ...post, user };
+              return { ...post, user: members.find((member) => member.id === post.createdBy) };
             });
             _prevList.hasNext = foundPosts.hasNext;
 
@@ -120,6 +125,49 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       });
   }
 
+  const handleNewPostEvent = useCallback(
+    (postWithPage: WebSocketPayload<'post_created'>) => {
+      if (
+        user &&
+        postWithPage.page?.createdBy !== user.id &&
+        (categoryId ? postWithPage.categoryId === categoryId : true)
+      ) {
+        setActions([
+          <Button
+            key='reload'
+            variant='outlined'
+            onClick={() => {
+              if (createPostBoxRef.current) {
+                createPostBoxRef.current.scrollIntoView({
+                  behavior: 'smooth'
+                });
+                loadMorePosts(true);
+              }
+            }}
+            size='small'
+            startIcon={<ReplayIcon fontSize='small' />}
+            color='inherit'
+          >
+            Fetch
+          </Button>
+        ]);
+        setOrigin({
+          horizontal: 'center',
+          vertical: 'top'
+        });
+        showMessage('New posts ready to view');
+      }
+    },
+    [user, categoryId]
+  );
+
+  useEffect(() => {
+    const unsubscribeFromNewPost = subscribe('post_created', handleNewPostEvent);
+    return () => {
+      unsubscribeFromNewPost();
+    };
+  }, [handleNewPostEvent]);
+
   useEffect(() => {
     if (
       currentSpace &&
@@ -134,7 +182,9 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      <CreateForumPost />
+      <Box ref={createPostBoxRef}>
+        <CreateForumPost />
+      </Box>
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
 
       {posts?.data.map((post) => (

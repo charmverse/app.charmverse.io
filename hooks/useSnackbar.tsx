@@ -12,6 +12,7 @@ type IContext = {
   severity: AlertColor;
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
   setActions: Dispatch<SetStateAction<ReactNode[]>>;
+  setOrigin: Dispatch<SetStateAction<SnackbarOrigin>>;
   showMessage: (msg: string, newSeverity?: AlertColor) => void;
   handleClose: SnackbarProps['onClose'];
 };
@@ -27,7 +28,8 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   setSeverity: () => {},
   severity: 'info',
   showMessage: () => {},
-  setActions: () => {}
+  setActions: () => {},
+  setOrigin: () => {}
 });
 
 export function SnackbarProvider({ children }: { children: ReactNode }) {
@@ -45,7 +47,10 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     if (reason === 'clickaway') {
       return;
     }
-
+    setOrigin({
+      horizontal: 'left',
+      vertical: 'bottom'
+    });
     setIsOpen(false);
   };
 
