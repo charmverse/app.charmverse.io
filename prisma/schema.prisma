@@ -29,6 +29,7 @@ enum IdentityType {
   Telegram
   RandomName
   UnstoppableDomain
+  Google
 }
 
 enum VoteStatus {
