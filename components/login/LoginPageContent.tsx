@@ -8,6 +8,7 @@ import Image from 'components/common/Image';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import splashImage from 'public/images/artwork/world.png';
 
+import { LoginWithAnyId } from './LoginWithAnyId';
 import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`
@@ -56,6 +57,8 @@ export function LoginPageContent({ walletSigned }: Props) {
             </Typography>
             <Typography sx={{ fontSize: 20, mb: 6 }}>Tasks, docs, bounties, and more</Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
+              <LoginWithAnyId />
+
               <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or

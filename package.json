@@ -134,6 +134,7 @@
     "dotenv-expand": "^8.0.3",
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
+    "firebase": "^9.14.0",
     "form-data": "^4.0.0",
     "graphql": "^16.4.0",
     "hot-shots": "^9.0.0",
