@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -45,6 +45,10 @@ export default function ForumPage() {
       setCategoryId(undefined);
     }
   }
+
+  useEffect(() => {
+    setCategoryId(categories?.find((c) => c.id === categoryId)?.id);
+  }, [router.query.categoryIds]);
 
   return (
     <CenteredPageContent>

@@ -11,7 +11,6 @@ import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 export type FilterProps = {
   selectedCategory?: CategoryIdQuery;
   categoryIdSelected: (categoryId: CategoryIdQuery) => void;
-
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;
