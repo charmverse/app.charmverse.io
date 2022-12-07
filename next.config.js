@@ -14,7 +14,7 @@ const config = {
     dirs: ['pages', 'components', 'lib', 'background']
   },
   experimental: {
-    esmExternals: 'loose',
+    esmExternals: false,
     modularizeImports: {
       '@mui/material': {
         transform: '@mui/material/{{member}}'
@@ -27,7 +27,7 @@ const config = {
       }
     }
   },
-  async redirects () {
+  async redirects() {
     return [
       {
         source: '/:domain(^(?!.*\bapi\b).*$)/settings',
@@ -41,7 +41,7 @@ const config = {
       }
     ];
   },
-  webpack (_config, { buildId, nextRuntime }) {
+  webpack(_config, { buildId, nextRuntime }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
     _config.module.rules.push({
@@ -52,7 +52,7 @@ const config = {
     if (nextRuntime === 'nodejs') {
       const entry = _config.entry;
       _config.entry = () => {
-        return entry().then(_entry => {
+        return entry().then((_entry) => {
           return {
             ..._entry,
             cron: './background/cron.ts',
@@ -73,9 +73,9 @@ const config = {
 /**
  * Remove undefined values so Next.js doesn't complain during serialization
  */
-const removeUndefined = obj => {
+const removeUndefined = (obj) => {
   const newObj = {};
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     if (obj[key] === Object(obj[key])) newObj[key] = removeUndefined(obj[key]);
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
@@ -84,7 +84,7 @@ const removeUndefined = obj => {
 
 // eslint-disable-next-line prefer-destructuring
 const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps (page, method, input) {
+next.isSerializableProps = function _isSerializableProps(page, method, input) {
   return isSerializableProps(page, method, removeUndefined(input));
 };
 

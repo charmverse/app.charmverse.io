@@ -1,10 +1,10 @@
-import type { PluginKey } from '@bangle.dev/pm';
 import { FloatingMenu } from '@bangle.dev/react-menu';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { PluginKey } from 'prosemirror-state';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
@@ -40,7 +40,7 @@ interface Props {
   pluginKey: PluginKey;
   inline?: boolean;
   pagePermissions?: IPagePermissionFlags;
-  nestedPagePluginKey?: PluginKey<any, any>;
+  nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
 }
 

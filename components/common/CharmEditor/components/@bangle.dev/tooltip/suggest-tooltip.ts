@@ -1,13 +1,16 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
-import type { Command, EditorState, MarkType, Schema } from '@bangle.dev/pm';
-import { Fragment, keymap, Node, Plugin, PluginKey, Selection } from '@bangle.dev/pm';
+import type { MarkType, Schema } from '@bangle.dev/pm';
+import { Fragment, keymap, Node } from '@bangle.dev/pm';
 import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { tooltipPlacement } from '@bangle.dev/tooltip';
-import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
-import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
+import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+import type { Command, EditorState } from 'prosemirror-state';
+import { Plugin, PluginKey, Selection } from 'prosemirror-state';
 
 import log from 'lib/log';
+
+import { triggerInputRule } from './trigger-input-rule';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -58,6 +61,13 @@ function specFactory({
       },
       attrs: {
         trigger: { default: trigger }
+      },
+      markdown: {
+        toMarkdown: {
+          open: '',
+          close: '',
+          mixable: true
+        }
       }
     }
   };
@@ -78,7 +88,7 @@ interface PluginsOptions {
   onArrowLeft?: Command;
   onArrowRight?: Command;
 }
-export interface SuggestTooltipPluginState {
+export interface PluginState {
   triggerText: string;
   show: boolean;
   counter: number;
@@ -108,12 +118,8 @@ function pluginsFactory({
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
-      new Plugin<SuggestTooltipPluginState, Schema>({
+      new Plugin<PluginState>({
         key,
-        // filterTransaction: (tr, state) => {
-
-        //   return true;
-        // },
         state: {
           init(_, _state) {
             return {
@@ -415,7 +421,7 @@ export function replaceSuggestMarkWith(
 
       const isInputFragment = maybeNode instanceof Fragment;
 
-      let node: Node;
+      let node: any;
       try {
         node =
           maybeNode instanceof Node || isInputFragment

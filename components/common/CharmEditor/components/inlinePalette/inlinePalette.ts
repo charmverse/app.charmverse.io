@@ -1,8 +1,10 @@
 import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { PluginKey } from '@bangle.dev/core';
 import { keymap } from '@bangle.dev/pm';
-import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
+import type { Node, Schema } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
@@ -131,10 +133,10 @@ export function getSuggestTooltipKey(key: PluginKey) {
   };
 }
 
-export function replaceSuggestionMarkWith(key: PluginKey, replaceWith: string, setSelection?: boolean): Command {
+export function replaceSuggestionMarkWith(key: PluginKey, maybeNode?: string | Node, setSelection?: boolean): Command {
   return (state, dispatch, view) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, replaceWith, setSelection)(state, dispatch, view);
+    return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, maybeNode, setSelection)(state, dispatch, view);
   };
 }
 

@@ -8,10 +8,9 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'models';
 
-import { getPage, PageNotFoundError } from '.';
+import { PageNotFoundError } from './errors';
+import { getPage } from './getPage';
 
 export async function duplicatePage(pageId: string, userId: string, parentId?: string) {
   const page = await getPage(pageId);

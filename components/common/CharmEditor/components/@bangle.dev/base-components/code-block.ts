@@ -1,5 +1,5 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type { DOMOutputSpecArray, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import type { DOMOutputSpec, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { keymap, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import { moveNode } from '@bangle.dev/pm-commands';
 import { createObject, filter, findParentNodeOfType, insertEmpty } from '@bangle.dev/utils';
@@ -39,7 +39,7 @@ function specFactory(): RawSpecs {
       defining: true,
       draggable: false,
       parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-      toDOM: (): DOMOutputSpecArray => ['pre', ['code', 0]]
+      toDOM: (): DOMOutputSpec => ['pre', ['code', 0]]
     },
     markdown: {
       toMarkdown(state: MarkdownSerializerState, node: Node) {

@@ -43,11 +43,15 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
               if (isYoutube) {
                 const pos = getPos();
                 const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
-                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                if (_node) {
+                  view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                }
               } else if (tweetAttrs) {
                 const pos = getPos();
                 const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-                view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                if (_node) {
+                  view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                }
               } else {
                 const embedType = extractEmbedType(urlToEmbed);
                 updateAttrs({

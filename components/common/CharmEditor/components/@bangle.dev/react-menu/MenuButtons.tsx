@@ -11,10 +11,10 @@ import {
   ParagraphIcon,
   RedoIcon,
   TodoListIcon,
-  UndoIcon
+  UndoIcon,
+  floatingMenu
 } from '@bangle.dev/react-menu';
-import type { HintPos } from '@bangle.dev/react-menu/dist/types';
-import { defaultKeys as floatingMenuKeys, focusFloatingMenuInput } from '@bangle.dev/react-menu/floating-menu';
+import type { HintPos } from '@bangle.dev/react-menu/src/types';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -31,6 +31,9 @@ import paragraph from '../../paragraph';
 import type { SubMenu } from './floating-menu';
 import { toggleSubMenu } from './floating-menu';
 import { MenuButton } from './Icon';
+
+const focusFloatingMenuInput = floatingMenu.focusFloatingMenuInput;
+const floatingMenuKeys = floatingMenu.defaultKeys;
 
 const { defaultKeys: orderedListKeys, queryIsOrderedListActive, toggleOrderedList } = orderedList;
 const { defaultKeys: italicKeys, queryIsItalicActive, toggleItalic } = italic;

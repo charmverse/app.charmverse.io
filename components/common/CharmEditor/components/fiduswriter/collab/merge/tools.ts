@@ -137,7 +137,7 @@ export const removeDiffFromJson = function (object: {
 };
 
 function mapFragment(
-  fragment: Fragment<any>,
+  fragment: Fragment,
   f: (node: Node, parent: Node, index: number) => Node,
   parent: Node,
   mark: Mark

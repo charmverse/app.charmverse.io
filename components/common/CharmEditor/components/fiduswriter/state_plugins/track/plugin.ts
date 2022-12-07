@@ -68,7 +68,8 @@ export function trackPlugin(options: Options) {
           return meta;
         }
 
-        let { decos } = this.getState(oldState);
+        const plugin = this as unknown as Plugin;
+        let { decos } = plugin.getState(oldState);
 
         if (tr.selectionSet) {
           const { insertion, deletion, formatChange } = findSelectedChanges(state);
@@ -120,8 +121,8 @@ export function trackPlugin(options: Options) {
     },
     props: {
       decorations(state) {
-        const { decos } = this.getState(state);
-        return decos;
+        const _state = this.getState(state) as { decos: any } | undefined;
+        return _state?.decos;
       }
       // handleDOMEvents: {
       //   focus: (view, _event) => {
