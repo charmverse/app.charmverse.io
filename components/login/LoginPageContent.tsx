@@ -51,10 +51,13 @@ export function LoginPageContent({ walletSigned }: Props) {
                 mb: 3
               }}
             >
-              Powering the Future of Work through Web3
+              Powering the Future <br />
+              of Work through Web3
             </Typography>
             <Typography sx={{ fontSize: 20, mb: 6 }}>
-              The solution for token communities to build relationships, work together and vote
+              The solution for token communities to build relationships,
+              <br />
+              work together and vote
             </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
               <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
