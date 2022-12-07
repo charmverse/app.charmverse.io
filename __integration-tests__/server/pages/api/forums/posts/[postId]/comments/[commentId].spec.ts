@@ -81,6 +81,18 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
       .expect(401);
   });
 
+  it(`should throw error if user isn't the comment author, responding with 401`, async () => {
+    const { comment, post } = await generatePostComment({
+      spaceId: space.id,
+      userId: v4()
+    });
+    await request(baseUrl)
+      .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
+      .set('Cookie', userCookie)
+      .send(updateInput)
+      .expect(401);
+  });
+
   it('should update post comment, responding with 200', async () => {
     const { comment, post } = await generatePostComment({
       spaceId: space.id,

@@ -1,7 +1,5 @@
 import type { Space, User } from '@prisma/client';
-import { v4 } from 'uuid';
 
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostComment } from 'testing/utils/forums';
 
@@ -28,8 +26,7 @@ describe('updatePostComment', () => {
       content: {
         type: 'paragraph'
       },
-      commentId: comment.id,
-      userId: user.id
+      commentId: comment.id
     });
 
     expect(updatedPostComment).toMatchObject(
@@ -40,23 +37,5 @@ describe('updatePostComment', () => {
         }
       })
     );
-  });
-
-  it('should throw error when updating a post comment if the user is not the creator', async () => {
-    const { comment } = await generatePostComment({
-      userId: user.id,
-      spaceId: space.id
-    });
-
-    await expect(async () => {
-      await updatePostComment({
-        contentText: 'New Content',
-        content: {
-          type: 'paragraph'
-        },
-        commentId: comment.id,
-        userId: v4()
-      });
-    }).rejects.toBeInstanceOf(UnauthorisedActionError);
   });
 });

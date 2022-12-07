@@ -3,11 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
+import { getComment } from 'lib/forums/comments/getComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -23,7 +25,13 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     userId
   });
 
-  const postComment = await updatePostComment({ commentId, userId, ...body });
+  const comment = await getComment(commentId);
+
+  if (comment?.createdBy !== userId) {
+    throw new UnauthorisedActionError();
+  }
+
+  const postComment = await updatePostComment({ commentId, ...body });
 
   res.status(200).json(postComment);
 }
