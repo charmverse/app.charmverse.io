@@ -24,6 +24,10 @@ const io = new Server(server, {
       else if (requestOrigin?.endsWith('.charmverse.co')) {
         callback(null, requestOrigin);
       }
+      // support any subdomain for staging
+      else if (requestOrigin?.endsWith('.charmverse.io')) {
+        callback(null, requestOrigin);
+      }
     }
   }
 });

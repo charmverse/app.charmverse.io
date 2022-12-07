@@ -121,10 +121,10 @@ jobs:
       #     rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
       #     cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      # - name: Update and Package websockets
-      #   run: |
-      #     rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
-      #     cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
+      - name: Update and Package websockets
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
@@ -152,15 +152,15 @@ jobs:
       #     use_existing_version_if_available: true # allows triggering re-deploys with same version
       #     wait_for_deployment: false # set to false to save sweet Github minutes
 
-      # - name: Deploy Websockets to Beanstalk
-      #   uses: einaregilsson/beanstalk-deploy@v18
-      #   with:
-      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     application_name: prd-charmverse-websockets
-      #     environment_name: prd-charmverse-websockets
-      #     version_label: ${{ github.sha }}
-      #     region: us-east-1
-      #     deployment_package: deploy_websockets.zip
-      #     use_existing_version_if_available: true # allows triggering re-deploys with same version
-      #     wait_for_deployment: false # set to false to save sweet Github minutes
+      - name: Deploy Websockets to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: prd-charmverse-websockets
+          environment_name: prd-charmverse-websockets
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_websockets.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
