@@ -7,7 +7,8 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generatePostComment, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostComment } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;

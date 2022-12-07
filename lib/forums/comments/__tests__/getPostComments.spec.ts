@@ -1,6 +1,7 @@
 import type { Space, User } from '@prisma/client';
 
-import { generatePostComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostComment } from 'testing/utils/forums';
 
 import { getPostComments } from '../getPostComments';
 

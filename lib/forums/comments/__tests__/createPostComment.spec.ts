@@ -1,7 +1,8 @@
 import type { PageComment, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { createPage, generateForumPost, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
 import { createPostComment } from '../createPostComment';
 import type { CreatePostCommentInput } from '../interface';

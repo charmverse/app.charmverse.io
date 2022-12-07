@@ -2,9 +2,9 @@ import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { generatePostComment, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generatePostComment } from 'testing/utils/forums';
 
-import { deletePostComment } from '../deletePostComment';
 import { updatePostComment } from '../updatePostComment';
 
 let space: Space;

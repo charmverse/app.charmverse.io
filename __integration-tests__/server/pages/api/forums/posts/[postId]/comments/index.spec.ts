@@ -4,7 +4,8 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, generateForumPost, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
