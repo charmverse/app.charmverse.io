@@ -1,6 +1,22 @@
 import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { filter, rafCommandExec } from '@bangle.dev/utils';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
+import React, { useCallback } from 'react';
+
+import * as bulletList from '../bulletList';
+import * as heading from '../heading';
+import { createInlineComment } from '../inlineComment';
+import { createInlineVote } from '../inlineVote';
+import * as orderedList from '../orderedList';
+import paragraph from '../paragraph';
+
+import type { SubMenu } from './floating-menu';
+import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floating-menu';
+import { MenuButton } from './Icon';
 import {
   BoldIcon,
   BulletListIcon,
@@ -11,29 +27,9 @@ import {
   ParagraphIcon,
   RedoIcon,
   TodoListIcon,
-  UndoIcon,
-  floatingMenu
-} from '@bangle.dev/react-menu';
-import type { HintPos } from '@bangle.dev/react-menu/src/types';
-import { filter, rafCommandExec } from '@bangle.dev/utils';
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import React, { useCallback } from 'react';
-
-import * as bulletList from '../../bulletList';
-import * as heading from '../../heading';
-import { createInlineComment } from '../../inlineComment';
-import { createInlineVote } from '../../inlineVote';
-import * as orderedList from '../../orderedList';
-import paragraph from '../../paragraph';
-
-import type { SubMenu } from './floating-menu';
-import { toggleSubMenu } from './floating-menu';
-import { MenuButton } from './Icon';
-
-const focusFloatingMenuInput = floatingMenu.focusFloatingMenuInput;
-const floatingMenuKeys = floatingMenu.defaultKeys;
+  UndoIcon
+} from './Icons';
+import type { HintPos } from './types';
 
 const { defaultKeys: orderedListKeys, queryIsOrderedListActive, toggleOrderedList } = orderedList;
 const { defaultKeys: italicKeys, queryIsItalicActive, toggleItalic } = italic;
