@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack, TextField, Typography } from '@mui/material';
+import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -19,7 +19,7 @@ import { FilterCategory } from './FilterCategory';
 import type { FilterProps } from './FilterSelect';
 
 const StyledBox = styled(Box)`
-  ${hoverIconsStyle({ absolutePositioning: true, marginForIcons: false })}
+  ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
 export default function FilterList({ categoryIdSelected, selectedCategory }: FilterProps) {
@@ -46,7 +46,11 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
 
   return (
     <Card variant='outlined'>
-      <CardContent>
+      <CardContent
+        sx={{
+          px: 0
+        }}
+      >
         {/** TODO - Enable sorting 
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {sortList.map((sort) => (
@@ -71,48 +75,59 @@ export default function FilterList({ categoryIdSelected, selectedCategory }: Fil
             // </Link>
                 <Divider sx={{ pt: '10px', mb: '10px' }} />
         */}
-        <Stack gap={2} mb={2}>
-          <Typography
-            key='all-categories'
-            onClick={() => categoryIdSelected(undefined)}
-            sx={{
-              cursor: 'pointer',
-              fontWeight: selectedCategory === undefined ? 'bold' : 'initial'
-            }}
-            color='inherit'
-          >
-            All categories
-          </Typography>
-          {categories?.map((category) => (
-            <StyledBox
-              key={category.id}
-              display='flex'
+        <Stack gap={1} mb={2}>
+          <MenuItem>
+            <Typography
+              key='all-categories'
+              onClick={() => categoryIdSelected(undefined)}
               sx={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between'
+                cursor: 'pointer',
+                fontWeight: selectedCategory === undefined ? 'bold' : 'initial'
               }}
+              color='inherit'
             >
-              <Typography
-                onClick={() => categoryIdSelected(category.id)}
+              All categories
+            </Typography>
+          </MenuItem>
+          {categories?.map((category) => (
+            <StyledBox key={category.id}>
+              <MenuItem
                 sx={{
-                  cursor: 'pointer',
-                  fontWeight: selectedCategory === category.id ? 'bold' : 'initial',
-                  wordBreak: 'break-all',
-                  pr: 3.5
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
                 }}
               >
-                {category.name}
-              </Typography>
-              {admin && (
-                <Box className='icons'>
-                  <FilterCategory category={category} onChange={updateForumCategory} onDelete={deleteForumCategory} />
-                </Box>
-              )}
+                <Typography
+                  onClick={() => categoryIdSelected(category.id)}
+                  sx={{
+                    cursor: 'pointer',
+                    fontWeight: selectedCategory === category.id ? 'bold' : 'initial',
+                    wordBreak: 'break-all',
+                    pr: 3.5
+                  }}
+                >
+                  {category.name}
+                </Typography>
+                {admin && (
+                  <Box className='icons'>
+                    <FilterCategory category={category} onChange={updateForumCategory} onDelete={deleteForumCategory} />
+                  </Box>
+                )}
+              </MenuItem>
             </StyledBox>
           ))}
         </Stack>
-        <Button disabled={!admin} startIcon={<AddIcon />} onClick={addCategoryPopupState.open} variant='outlined'>
+        <Button
+          sx={{
+            ml: 2
+          }}
+          disabled={!admin}
+          startIcon={<AddIcon />}
+          onClick={addCategoryPopupState.open}
+          variant='outlined'
+        >
           Add category
         </Button>
       </CardContent>
