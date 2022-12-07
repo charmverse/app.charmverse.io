@@ -38,7 +38,7 @@ describe('GET /api/forums/posts/[postId]/comments - Get comments of a post', () 
   });
 });
 
-describe('PUT /api/forums/posts/[postId]/comments - Create a comment', () => {
+describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
   it('should throw error if post is not found, responding with 404', async () => {
     await request(baseUrl).post(`/api/forums/posts/${v4()}/comments`).set('Cookie', userCookie).expect(404);
   });
