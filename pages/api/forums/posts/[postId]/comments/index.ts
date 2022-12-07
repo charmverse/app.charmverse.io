@@ -1,14 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { getPostComments } from 'lib/forums/comments/getPostComments';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/public-api';
+import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -29,34 +27,12 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
 
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId
-    },
-    select: {
-      page: {
-        select: {
-          spaceId: true
-        }
-      },
-      status: true
-    }
-  });
-
-  if (!post || !post.page) {
-    throw new PageNotFoundError(postId);
-  }
-
-  const spaceRole = await hasAccessToSpace({
-    spaceId: post.page.spaceId,
+  const page = await checkPostAccess({
+    postId,
     userId
   });
 
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
-  }
-
-  if (post.status === 'draft') {
+  if (page.post.status === 'draft') {
     throw new UndesirableOperationError("Can't create comment on drafted posts");
   }
 
