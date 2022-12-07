@@ -27,6 +27,8 @@ const io = new Server(server, {
       // support any subdomain for staging
       else if (requestOrigin?.endsWith('.charmverse.io')) {
         callback(null, requestOrigin);
+      } else {
+        callback(new Error('Not allowed by CORS'));
       }
     }
   }
