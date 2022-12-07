@@ -82,6 +82,5 @@ export const specRegistry = new SpecRegistry([
   deletion,
   insertion,
   formatChange,
-  video.spec(),
-  textColor.spec()
+  video.spec()
 ]);
