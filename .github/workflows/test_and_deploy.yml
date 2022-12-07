@@ -84,7 +84,7 @@ jobs:
           # Comment out websocket connection till we get it working (fallback to single node socket)
           # NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLxE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
+          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
 
 
       - name: Build and Push Docker image
