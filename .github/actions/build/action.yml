@@ -38,7 +38,7 @@ runs:
       with:
         path: .next
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        key: nextjs-build-${{ github.sha }}
 
     # Re-build prisma types which are cached inside of node_modules
     - name: Re-build Prisma types
@@ -50,7 +50,6 @@ runs:
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
       env:
-          NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
           NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
           NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
