@@ -24,11 +24,8 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.co
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+          NEXT_PUBLIC_APP_ENV: 'staging'
+          NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co'
           # NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS: ${{ secrets.NEXT_PUBLIC_DISCORD_WEBHOOK_ERRORS }} comment for now
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
           NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
@@ -78,10 +75,10 @@ jobs:
           echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
-          if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then 
+          if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
             echo "DDENABLED=true" >> $GITHUB_ENV
           fi
-          cat $GITHUB_ENV 
+          cat $GITHUB_ENV
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2
