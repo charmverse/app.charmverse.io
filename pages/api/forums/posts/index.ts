@@ -27,7 +27,7 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
   const newPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
-  await setupPermissionsAfterPageCreated(newPost.id);
+  await setupPermissionsAfterPageCreated(newPost.id, false);
   return res.status(201).json(newPost);
 }
 

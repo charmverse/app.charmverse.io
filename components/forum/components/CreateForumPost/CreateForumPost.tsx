@@ -55,7 +55,7 @@ export default function CreateForumPost() {
             />
           </Box>
           <Box display='flex' justifyContent='flex-end'>
-            <Button component='div' float='right' onClick={addPageCb}>
+            <Button disabled={!userSpacePermissions?.createPage} component='div' float='right' onClick={addPageCb}>
               Create Post
             </Button>
           </Box>

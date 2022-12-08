@@ -43,7 +43,8 @@ export default function ForumPost({
   title,
   contentText,
   galleryImage,
-  postId
+  postId,
+  headerImage
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
@@ -62,7 +63,7 @@ export default function ForumPost({
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
             {title}
           </Typography>
-          <ForumPostContent galleryImage={galleryImage} contentText={contentText} title={title} />
+          <ForumPostContent galleryImage={galleryImage || headerImage} contentText={contentText} title={title} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <UserDisplay
