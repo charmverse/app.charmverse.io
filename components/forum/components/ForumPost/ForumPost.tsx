@@ -90,18 +90,6 @@ export default function ForumPost({
                 {relativeTime}
               </Box>
             </Stack>
-            {/**
-               * 
-               * Re-enable this once we have up / downvoting as a feature
-               * Should be exracted to a separate widget component that handles up/down voting
-               * 
-                <Box display='flex' alignItems='center'>
-                  <NorthIcon fontSize='small' />
-                  {upVotes}
-                  <SouthIcon fontSize='small' />
-                  {downVotes}
-                </Box> 
-               */}
           </Box>
         </CardContent>
       </CardActionArea>

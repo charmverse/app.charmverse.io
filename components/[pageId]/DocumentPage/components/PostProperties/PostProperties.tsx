@@ -15,7 +15,7 @@ interface PostPropertiesProps {
 
 export default function PostProperties({ postId, readOnly }: PostPropertiesProps) {
   const currentSpace = useCurrentSpace();
-  const { data: post, mutate } = useSWR(`post/${postId}`, () => charmClient.forum.getForumPost(postId));
+  const { data: post, mutate, isValidating } = useSWR(`post/${postId}`, () => charmClient.forum.getForumPost(postId));
   const { data: categories } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
     charmClient.forum.listPostCategories(currentSpace!.id)
   );
@@ -61,7 +61,7 @@ export default function PostProperties({ postId, readOnly }: PostPropertiesProps
           onChange={updateForumPost}
         />
       </Stack>
-      {postStatus !== 'published' && (
+      {postStatus !== 'published' && !isValidating && (
         <Button
           sx={{
             width: 'fit-content'
