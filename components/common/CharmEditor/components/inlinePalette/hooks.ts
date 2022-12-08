@@ -1,5 +1,6 @@
-import type { EditorState, EditorView, PluginKey, Transaction } from '@bangle.dev/pm';
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
+import type { EditorState, PluginKey, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import { useCallback, useEffect } from 'react';
 
 import { suggestTooltip } from '../@bangle.dev/tooltip';
@@ -68,7 +69,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
         return () => true;
       }
 
-      return (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, _view: EditorView) => {
+      return (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, _view: EditorView) => {
         return item.editorExecuteCommand({
           item,
           itemIndex
@@ -82,7 +83,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
     // Save the callback to get the active item so that the plugin
     // can execute an enter on the active item
     setExecuteItemCommand(
-      (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined, _view: EditorView) => {
+      (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, _view: EditorView) => {
         const result = executeHandler(getActiveIndex(counter, items.length))(state, dispatch, _view);
         return result;
       }

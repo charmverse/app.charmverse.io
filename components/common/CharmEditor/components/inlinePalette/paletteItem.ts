@@ -1,5 +1,6 @@
-import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@prisma/client';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import type { InlinePaletteItem } from './hooks';
 
@@ -25,7 +26,7 @@ export interface PaletteItemTypeNoGroup {
   requiredSpacePermission?: SpaceOperation;
   description: string;
   keywords?: string[];
-  disabled?: ((state: EditorState<any>) => boolean) | boolean;
+  disabled?: ((state: EditorState) => boolean) | boolean;
   hidden?: boolean | ((state: EditorState) => boolean);
   editorExecuteCommand: EditorExecuteCommand;
   skipFiltering?: boolean;
@@ -54,7 +55,7 @@ export class PaletteItem implements PaletteItemType {
 
   keywords: string[];
 
-  disabled: ((state: EditorState<any>) => boolean) | boolean;
+  disabled: ((state: EditorState) => boolean) | boolean;
 
   hidden: boolean | ((state: EditorState) => boolean);
 

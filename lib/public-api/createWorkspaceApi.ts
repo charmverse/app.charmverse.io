@@ -6,7 +6,6 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { createWorkspace } from 'lib/spaces/createWorkspace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
-import { IDENTITY_TYPES } from 'models';
 
 export type CreatedSpaceResponse = {
   id: string;
@@ -36,7 +35,7 @@ export async function createWorkspaceApi({
     data: {
       username: 'Bot',
       isBot: true,
-      identityType: IDENTITY_TYPES[3]
+      identityType: 'RandomName'
     }
   });
   const adminUserId = await upsertUserForDiscordId(adminDiscordUserId);

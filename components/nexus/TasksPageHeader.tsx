@@ -27,8 +27,7 @@ const TasksPageHeaderContainer = styled.div`
 
 export default function TasksPageHeader() {
   const { user } = useUser();
-  const { account } = useWeb3AuthSig();
-  const metamaskConnected = !!account;
+  const metamaskConnected = user && user?.wallets.length > 0;
   const discordConnected = user?.discordUser;
   const telegramConnected = user?.telegramUser;
   const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);

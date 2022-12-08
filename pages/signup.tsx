@@ -8,7 +8,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { getDefaultWorkspaceUrl } from './index';
 
 export default function LoginPage() {
-  const { spaces } = useSpaces();
+  const { spaces, isLoaded } = useSpaces();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,6 +16,11 @@ export default function LoginPage() {
       router.push(getDefaultWorkspaceUrl(spaces));
     }
   }, [spaces]);
+
+  if (!spaces || !isLoaded) {
+    return null;
+  }
+
   return <SignupForm />;
 }
 

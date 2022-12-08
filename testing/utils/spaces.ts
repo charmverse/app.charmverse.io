@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { sessionUserRelations } from 'lib/session/config';
 import type { LoggedInUser } from 'models';
 
 /**
@@ -31,19 +32,7 @@ export async function addUserToSpace({
         }
       }
     },
-    include: {
-      favorites: true,
-      spaceRoles: {
-        include: {
-          spaceRoleToRole: {
-            include: {
-              role: true
-            }
-          }
-        }
-      },
-      wallets: true
-    }
+    include: sessionUserRelations
   });
 }
 

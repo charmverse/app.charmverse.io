@@ -19,7 +19,8 @@ const Web3Connection = createContext({
   triedEager: false,
   isNetworkModalOpen: false,
   openNetworkModal: () => {},
-  closeNetworkModal: () => {}
+  closeNetworkModal: () => {},
+  isConnectingIdentity: false
 });
 
 function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
@@ -44,6 +45,9 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
     }
   }, [activatingConnector, connector]);
 
+  // Used for connecting to unstoppable domains
+  const [isConnectingIdentity, setIsConnectingIdentity] = useState(false);
+
   // try to eagerly connect to an injected provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
 
@@ -64,7 +68,8 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
         triedEager,
         isNetworkModalOpen,
         openNetworkModal,
-        closeNetworkModal
+        closeNetworkModal,
+        isConnectingIdentity
       }}
     >
       {children}
@@ -74,7 +79,8 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
           isModalOpen: isWalletSelectorModalOpen,
           openModal: openWalletSelectorModal,
           closeModal: closeWalletSelectorModal,
-          openNetworkModal
+          openNetworkModal,
+          setIsConnectingIdentity
         }}
       />
       <NetworkModal {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }} />

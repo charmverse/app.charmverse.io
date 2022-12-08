@@ -1,13 +1,13 @@
-import type { Space } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import log from 'lib/log';
 import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import type { LoggedInUser } from 'models';
 
-export async function updateTrackUserProfile(user: LoggedInUser) {
+export async function updateTrackUserProfile(user: LoggedInUser, tx: Prisma.TransactionClient = prisma) {
   const spaceIds = user.spaceRoles.map((sr) => sr.spaceId);
-  const userSpaces = await prisma.space.findMany({ where: { id: { in: spaceIds } } });
+  const userSpaces = await tx.space.findMany({ where: { id: { in: spaceIds } } });
 
   try {
     mixpanel?.people.set(user.id, getTrackUserProfile(user, userSpaces));

@@ -32,8 +32,6 @@ export default function LoginPage() {
   const isLogInWithDiscord = Boolean(discordCookie);
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
   const isLoggedIn = !!user;
-  const walletIsVerified = !!account && !!walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account);
-  const walletNeedsVerification = !!account && !walletIsVerified;
   const returnUrl = router.query.returnUrl as string | undefined;
 
   function redirectToDefaultPage() {
@@ -66,13 +64,13 @@ export default function LoginPage() {
   useEffect(() => {
     if (isDataLoaded) {
       // redirect once user is logged in unless we are verifying their wallet
-      if (isLoggedIn && (!walletNeedsVerification || !!user?.discordUser)) {
+      if (isLoggedIn) {
         redirectToDefaultPage();
       } else {
         setShowLogin(true);
       }
     }
-  }, [isDataLoaded, isLoggedIn, walletNeedsVerification, user]);
+  }, [isDataLoaded, isLoggedIn, user]);
 
   const signature = getStoredSignature();
 

@@ -1,4 +1,4 @@
-import type { Node, NodeSpec } from 'prosemirror-model';
+import type { DOMOutputSpec, Mark, Node, NodeSpec } from 'prosemirror-model';
 import { Schema } from 'prosemirror-model';
 
 export function parseDiff(str: string) {
@@ -39,13 +39,16 @@ export const createDiffSchema = function (docSchema: Schema) {
             }
             dom = [dom[0], { 'data-diffdata': JSON.stringify(node.attrs.diffdata), ...dom[1] }, dom[2]];
           }
-          return dom;
+          return dom as unknown as DOMOutputSpec;
         }
-        return null;
+        return 'span';
       },
       parseDOM: nodeType.parseDOM?.map((tag) => ({
         tag: tag.tag,
-        getAttrs(dom: HTMLElement) {
+        getAttrs(dom: HTMLElement | string) {
+          if (typeof dom === 'string') {
+            return {};
+          }
           const _attrs = tag.getAttrs?.(dom);
           return { diffdata: parseDiff(dom.dataset.diffdata || ''), ..._attrs };
         }
@@ -67,13 +70,18 @@ export const createDiffSchema = function (docSchema: Schema) {
       to: {
         default: ''
       },
-      markOnly: false
+      markOnly: {
+        default: false
+      }
     },
     inclusive: false,
     parseDOM: [
       {
         tag: 'span.diff',
-        getAttrs(dom: HTMLElement) {
+        getAttrs(dom: HTMLElement | string) {
+          if (typeof dom === 'string') {
+            return {};
+          }
           return {
             diff: dom.dataset.diff,
             steps: dom.dataset.steps
@@ -81,7 +89,7 @@ export const createDiffSchema = function (docSchema: Schema) {
         }
       }
     ],
-    toDOM(node: Node) {
+    toDOM(node: Mark): DOMOutputSpec {
       return [
         'span',
         {
@@ -107,10 +115,13 @@ export const createDiffSchema = function (docSchema: Schema) {
   const linkMarkSpec = spec.marks.get('link');
   spec.marks = spec.marks.update('link', {
     ...linkMarkSpec,
-    toDOM: (node: Node) => {
-      const dom = linkMarkSpec.toDOM(node);
-      dom[0] = 'span';
-      return dom;
+    toDOM: (node: Mark) => {
+      const dom = linkMarkSpec?.toDOM?.(node, true);
+      if (dom instanceof Array) {
+        // @ts-ignore readonly prop
+        dom[0] = 'span';
+      }
+      return dom || 'span';
     }
   });
 
