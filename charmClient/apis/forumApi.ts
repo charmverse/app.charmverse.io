@@ -3,6 +3,8 @@ import type { PostCategory } from '@prisma/client';
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
+import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
 export class ForumApi {
@@ -29,5 +31,9 @@ export class ForumApi {
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
     return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
+  }
+
+  createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
+    return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
   }
 }

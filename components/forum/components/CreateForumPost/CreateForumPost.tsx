@@ -5,13 +5,13 @@ import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import { useCallback, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
-import { addPage } from 'lib/pages';
 
 export default function CreateForumPost() {
   const { user } = useUser();
@@ -19,31 +19,43 @@ export default function CreateForumPost() {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const [createPageLoading, setCreatePageLoading] = useState(false);
+  const [pageTitle, setPageTitle] = useState('');
 
   const addPageCb = useCallback(async () => {
     if (user && currentSpace) {
       setCreatePageLoading(true);
-      const { page } = await addPage({
-        type: 'post',
-        createdBy: user.id,
+      const page = await charmClient.forum.createForumPost({
+        content: { type: 'doc' },
+        contentText: '',
         spaceId: currentSpace.id,
-        shouldCreateDefaultBoardData: false
+        title: pageTitle
       });
-      showPage({ pageId: page.id });
+      showPage({
+        pageId: page.id
+      });
+      setPageTitle('');
       setCreatePageLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [currentSpace, user, pageTitle]);
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
-      <CardActionArea disabled={createPageLoading} onClick={addPageCb}>
+      <CardActionArea disabled={createPageLoading || !userSpacePermissions?.createPage}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
             <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
-            <TextField variant='outlined' placeholder='Create post' fullWidth />
+            <TextField
+              variant='outlined'
+              placeholder='Create post'
+              value={pageTitle}
+              fullWidth
+              onChange={(e) => {
+                setPageTitle(e.target.value);
+              }}
+            />
           </Box>
           <Box display='flex' justifyContent='flex-end'>
-            <Button component='div' float='right'>
+            <Button component='div' float='right' onClick={addPageCb}>
               Create Post
             </Button>
           </Box>
