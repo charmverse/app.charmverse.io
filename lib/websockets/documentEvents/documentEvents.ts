@@ -69,6 +69,14 @@ export class DocumentEventHandler {
     return this.socket.data as SocketSessionData;
   }
 
+  getSessionMeta() {
+    const session = this.socket.data as SocketSessionData;
+    return {
+      userId: session.user?.id,
+      pageId: session.documentId
+    };
+  }
+
   setSession(data: Partial<SocketSessionData>) {
     Object.assign(this.socket.data, data);
   }
@@ -96,13 +104,12 @@ export class DocumentEventHandler {
   }
 
   init() {
-    const session = this.getSession();
-
     this.socket.on(this.socketEvent, async (message) => {
       try {
         await this.onMessage(message);
       } catch (error) {
-        log.error('Error handling document event', { userId: session.user.id, error });
+        const logData = this.getSessionMeta();
+        log.error('Error handling document event', { ...logData, error });
       }
     });
 
@@ -111,7 +118,8 @@ export class DocumentEventHandler {
       try {
         this.onClose();
       } catch (error) {
-        log.error('Error handling web socket disconnect', { userId: session.user.id, error });
+        const logData = this.getSessionMeta();
+        log.error('Error handling web socket disconnect', { ...logData, error });
       }
     });
 
@@ -119,6 +127,7 @@ export class DocumentEventHandler {
   }
 
   async onMessage(message: WrappedSocketMessage<ClientMessage>) {
+    const logData = this.getSessionMeta();
     // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
@@ -131,17 +140,17 @@ export class DocumentEventHandler {
       return;
     } else if (message.c < this.messages.client + 1) {
       // Receive a message already received at least once. Ignore.
-      log.debug(`Ignore duplicate ${message.type} message from client`);
+      log.debug(`Ignore duplicate ${message.type} message from client`, logData);
       return;
     } else if (message.c > this.messages.client + 1) {
-      log.debug('Request resent of lost messages from client');
+      log.debug('Request resent of lost messages from client', logData);
       this.sendMessage({ type: 'request_resend', from: this.messages.client });
       return;
     } else if (message.s < this.messages.server) {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.debug('Resend messages to client');
+      log.debug('Resend messages to client', logData);
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -155,7 +164,7 @@ export class DocumentEventHandler {
     } catch (error) {
       log.error('Error handling socket message', {
         error: (error as any).stack || error,
-        userId: this.getSession().user.id
+        ...logData
       });
     }
   }
@@ -175,7 +184,7 @@ export class DocumentEventHandler {
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.debug('Ignore message from closed document', { pageId: session.documentId });
+      log.debug('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
       return;
     }
 
@@ -199,7 +208,7 @@ export class DocumentEventHandler {
         break;
 
       default:
-        log.debug('Unhandled socket message type', message);
+        log.debug(`Unhandled socket message type: "${message.type}"`, message);
     }
   }
 
