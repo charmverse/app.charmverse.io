@@ -5,11 +5,13 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
@@ -49,14 +51,19 @@ export default function ForumPost({
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const { showPage } = usePageDialog();
+  const router = useRouter();
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
         onClick={() => {
           showPage({
-            pageId: postId
+            pageId: postId,
+            onClose() {
+              setUrlWithoutRerender(router.pathname, { postId: null });
+            }
           });
+          setUrlWithoutRerender(router.pathname, { postId });
         }}
       >
         <CardContent>

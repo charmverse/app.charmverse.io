@@ -1,17 +1,15 @@
-import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumFilters } from 'hooks/useForumFilters';
-import useRoles from 'hooks/useRoles';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import DesktopFilterMenu from './components/Filters/FilterList';
 import MobileFilterMenu from './components/Filters/FilterSelect';
@@ -23,6 +21,7 @@ export default function ForumPage() {
 
   const currentSpace = useCurrentSpace();
   const { categories } = useForumFilters();
+  const { showPage } = usePageDialog();
 
   const [categoryId, setCategoryId] = useState<CategoryIdQuery>(router.query.categoryIds as CategoryIdQuery);
 
@@ -49,6 +48,17 @@ export default function ForumPage() {
       setCategoryId(undefined);
     }
   }
+
+  useEffect(() => {
+    if (typeof router.query.postId === 'string') {
+      showPage({
+        pageId: router.query.postId,
+        onClose() {
+          setUrlWithoutRerender(router.pathname, { postId: null });
+        }
+      });
+    }
+  }, [router.query.postId]);
 
   return (
     <CenteredPageContent>
