@@ -1,11 +1,16 @@
-import type { Post, PostCategory } from '@prisma/client';
+import type { PageComment, Post, PostCategory } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
+import type {
+  CreatePostCommentInput,
+  PostCommentWithVote,
+  UpdatePostCommentInput
+} from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
-import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
+import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
 export class ForumApi {
@@ -29,6 +34,14 @@ export class ForumApi {
     return http.GET(`/api/spaces/${spaceId}/post-categories`);
   }
 
+  listPostComments(postId: string): Promise<PostCommentWithVote[]> {
+    return http.GET(`/api/forums/posts/${postId}/comments`);
+  }
+
+  createPostComment(postId: string, body: CreatePostCommentInput): Promise<PostCommentWithVote> {
+    return http.POST(`/api/forums/posts/${postId}/comments`, body);
+  }
+
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
     return http.POST(`/api/spaces/${spaceId}/post-categories`, category);
   }
@@ -42,11 +55,23 @@ export class ForumApi {
     return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
   }
 
+  updatePostComment({
+    postId,
+    commentId,
+    ...body
+  }: UpdatePostCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
+    return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}`, body);
+  }
+
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
     return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
     return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
+  }
+
+  deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
+    return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
 }

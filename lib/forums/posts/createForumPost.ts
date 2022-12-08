@@ -8,7 +8,7 @@ import { InsecureOperationError } from 'lib/utilities/errors';
 import type { ForumPostPage } from './interfaces';
 
 export type CreateForumPostInput = Pick<Page, 'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title'> &
-  Partial<Pick<Post, 'categoryId'> & Pick<Page, 'galleryImage' | 'headerImage'>>;
+  Partial<Pick<Post, 'categoryId' | 'status'> & Pick<Page, 'galleryImage' | 'headerImage'>>;
 
 export async function createForumPost({
   content,
@@ -18,7 +18,8 @@ export async function createForumPost({
   title,
   categoryId,
   galleryImage,
-  headerImage
+  headerImage,
+  status = 'draft'
 }: CreateForumPostInput): Promise<ForumPostPage> {
   if (categoryId) {
     const category = await prisma.postCategory.findUnique({
@@ -61,7 +62,7 @@ export async function createForumPost({
       post: {
         create: {
           id: postId,
-          status: 'draft',
+          status,
           category: !categoryId
             ? undefined
             : {

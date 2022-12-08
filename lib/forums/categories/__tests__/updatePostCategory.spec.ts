@@ -1,4 +1,4 @@
-import type { PostCategory, Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
