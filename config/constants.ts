@@ -13,3 +13,7 @@ export const cookieDomain = undefined; // TODO: set cookie domain so that we can
 export const cookieName = 'charm.sessionId';
 // web sockets
 export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
+// Google config
+export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+export const googleOAuthWebClientConfig = JSON.parse(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG ?? '{}');
