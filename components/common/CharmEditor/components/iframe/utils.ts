@@ -2,18 +2,17 @@ import type { Slice } from 'prosemirror-model';
 
 import { isUrl } from 'lib/utilities/strings';
 
+import { embeds } from './config';
 import type { EmbedType } from './config';
 
 export function extractEmbedType(url: string): EmbedType {
   let type: EmbedType = 'embed';
 
-  const isAirtable = url.includes('airtable.com');
-  const isFigma = url.includes('www.figma.com');
-  if (isFigma) {
-    type = 'figma';
-  }
-  if (isAirtable) {
-    type = 'airtable';
+  for (const embedType in embeds) {
+    if ((embeds[embedType as EmbedType] as typeof embeds.airtable).urlTest?.(url)) {
+      type = embedType as EmbedType;
+      break;
+    }
   }
 
   return type;
@@ -36,16 +35,4 @@ export function extractIframeUrl(slice: Slice): string | null {
     return url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
   }
   return null;
-}
-
-export function convertFigmaToEmbedUrl(url: string) {
-  return `https://www.figma.com/embed?embed_host=charmverse&url=${url}`;
-}
-
-export function convertAirtableToEmbedUrl(url: string) {
-  if (url.includes('embed')) {
-    return url; // already embeddable
-  }
-  const shareId = url.split('/').pop();
-  return `https://airtable.com/embed/${shareId}`;
 }
