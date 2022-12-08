@@ -3,8 +3,6 @@ import { FiFigma } from 'react-icons/fi';
 import { SiLoom } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
 
-import { VIDEO_ASPECT_RATIO } from '../video/videoSpec';
-
 export const MAX_EMBED_WIDTH = 700;
 export const MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
@@ -77,7 +75,7 @@ export const embeds = {
     urlTest(url: string) {
       return url.includes('www.loom.com');
     },
-    heightRatio: VIDEO_ASPECT_RATIO
+    heightRatio: 1.63
   }
 };
 // doesn't compile due to next.js - https://github.com/vercel/next.js/issues/43799

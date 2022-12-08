@@ -53,8 +53,15 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
                 }
               } else {
                 const embedType = extractEmbedType(urlToEmbed);
+                const newConfig = embeds[embedType] as Embed;
+                const width = attrs.width;
+                let _height = attrs.height;
+                if (width && _height && newConfig.heightRatio) {
+                  _height = width / newConfig.heightRatio;
+                }
                 updateAttrs({
                   src: urlToEmbed,
+                  height: _height,
                   type: embedType
                 });
               }

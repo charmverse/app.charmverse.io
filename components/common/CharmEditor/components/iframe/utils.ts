@@ -14,7 +14,6 @@ export function extractEmbedType(url: string): EmbedType {
       break;
     }
   }
-
   return type;
 }
 
