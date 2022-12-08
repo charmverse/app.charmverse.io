@@ -2,15 +2,15 @@ import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prisma } from 'db';
+import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InsecureOperationError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -21,32 +21,10 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId
-    },
-    select: {
-      page: {
-        select: {
-          spaceId: true,
-          createdBy: true
-        }
-      }
-    }
+  await checkPostAccess({
+    postId,
+    userId
   });
-
-  if (!post || !post.page) {
-    throw new PageNotFoundError(postId);
-  }
-
-  // Only allow post author or space admin to update post
-  if (userId !== post.page.createdBy) {
-    const { isAdmin } = await hasAccessToSpace({ spaceId: post.page.spaceId, userId });
-
-    if (!isAdmin) {
-      throw new InsecureOperationError(`You can only edit your own posts`);
-    }
-  }
 
   const updatedPost = await updateForumPost(postId, req.body);
 
@@ -57,32 +35,10 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId
-    },
-    select: {
-      page: {
-        select: {
-          spaceId: true,
-          createdBy: true
-        }
-      }
-    }
+  await checkPostAccess({
+    postId,
+    userId
   });
-
-  if (!post || !post.page) {
-    return res.status(200).json({});
-  }
-
-  // Only allow post author or space admin to update post
-  if (userId !== post.page.createdBy) {
-    const { isAdmin } = await hasAccessToSpace({ spaceId: post.page.spaceId, userId });
-
-    if (!isAdmin) {
-      throw new InsecureOperationError(`You can only edit your own posts`);
-    }
-  }
 
   await deleteForumPost(postId);
 

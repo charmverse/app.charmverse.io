@@ -17,6 +17,10 @@ export class ForumApi {
     return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}`, payload);
   }
 
+  publishForumPost(postId: string) {
+    return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}/publish`);
+  }
+
   getForumPost(postId: string) {
     return http.GET<Post>(`/api/forums/posts/${postId}`);
   }
