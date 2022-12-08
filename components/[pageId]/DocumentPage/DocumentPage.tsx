@@ -71,8 +71,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-  const pagePermissions = getPagePermissions(page.id);
-
+  const pagePermissions = getPagePermissions(page.id, page.type === 'post' ? page : undefined);
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = usePrimaryCharmEditor();
@@ -244,7 +243,9 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
                   )}
-                  {page.postId && <PostProperties pageId={page.id} postId={page.postId} readOnly={readOnly} />}
+                  {page.postId && (
+                    <PostProperties pageId={page.id} postId={page.postId} readOnly={!pagePermissions.edit_content} />
+                  )}
                   {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}

@@ -27,7 +27,8 @@ export default function PostProperties({ pageId, postId, readOnly }: PostPropert
       sx={{
         '& .MuiInputBase-input': {
           background: 'none'
-        }
+        },
+        my: 2
       }}
     >
       <Box width='150px' marginRight='5px' color='text.secondary'>

@@ -38,7 +38,7 @@ export default function PageDialog(props: Props) {
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
   const { currentPageId, setCurrentPageId, updatePage, getPagePermissions, deletePage, pages } = usePages();
-  const pagePermission = page ? getPagePermissions(page.id) : null;
+  const pagePermission = page ? getPagePermissions(page.id, page.type === 'post' ? page : undefined) : null;
   // extract domain from shared pages: /share/<domain>/<page_path>
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;

@@ -6,6 +6,7 @@ import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -26,7 +27,7 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
   const newPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
-
+  await setupPermissionsAfterPageCreated(newPost.id);
   return res.status(201).json(newPost);
 }
 

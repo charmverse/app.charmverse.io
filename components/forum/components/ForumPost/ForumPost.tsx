@@ -1,10 +1,12 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
@@ -34,20 +36,35 @@ function ForumPostContent({
   return null;
 }
 
-export default function ForumPost({ createdAt, updatedAt, user, title, contentText, galleryImage }: ForumPostProps) {
+export default function ForumPost({
+  createdAt,
+  updatedAt,
+  user,
+  title,
+  contentText,
+  galleryImage,
+  postId
+}: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
+  const { showPage } = usePageDialog();
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
-      <CardActionArea>
+      <CardActionArea
+        onClick={() => {
+          showPage({
+            pageId: postId
+          });
+        }}
+      >
         <CardContent>
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
             {title}
           </Typography>
           <ForumPostContent galleryImage={galleryImage} contentText={contentText} title={title} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
-            <Box display='flex' alignItems='center'>
+            <Stack flexDirection='row' gap={1} alignItems='center'>
               <UserDisplay
                 user={user}
                 avatarSize='small'
@@ -64,7 +81,7 @@ export default function ForumPost({ createdAt, updatedAt, user, title, contentTe
                 <AccessTimeIcon fontSize='small' sx={{ pr: '5px' }} />
                 {relativeTime}
               </Box>
-            </Box>
+            </Stack>
             {/**
                * 
                * Re-enable this once we have up / downvoting as a feature
