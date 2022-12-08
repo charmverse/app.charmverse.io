@@ -307,16 +307,17 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
-    log.debug('Handling change event', { userId: this.getSession().user.id, clientV, serverV });
+    log.debug('Handling change event', { userId: this.getSession().user.id, pageId: room.doc.id, clientV, serverV });
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
 
-        const updatedNode = applyStepsToNode(message.ds, room.node);
-        if (updatedNode) {
+        try {
+          const updatedNode = applyStepsToNode(message.ds, room.node);
           room.node = updatedNode;
-        } else {
+          room.doc.content = updatedNode.toJSON();
+        } catch (error) {
           this.unfixable();
           const patchError = { type: 'patch_error' } as const;
           this.sendMessage(patchError);
@@ -324,7 +325,6 @@ export class DocumentEventHandler {
           this.resetCollaboration(patchError);
           return;
         }
-        room.doc.content = updatedNode.toJSON();
       }
       room.doc.diffs.push(message);
       room.doc.diffs = room.doc.diffs.slice(this.historyLength);
@@ -392,6 +392,11 @@ export class DocumentEventHandler {
 
   async sendDocument(messages?: ClientDiffMessage[]) {
     const session = this.getSession();
+
+    if (!session.documentId) {
+      log.error('Cannot send document - session is missing documentId', { session });
+      return;
+    }
 
     const page = await prisma.page.findUniqueOrThrow({
       where: { id: session.documentId },
