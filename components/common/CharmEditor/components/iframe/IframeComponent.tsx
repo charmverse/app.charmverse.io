@@ -11,7 +11,7 @@ import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';
-import type { IframeNodeAttrs, EmbedType } from './config';
+import type { IframeNodeAttrs, Embed, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
 import { extractEmbedType } from './utils';
 
@@ -66,7 +66,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
     );
   }
 
-  const embeddableSrc = (config as typeof embeds.airtable).convertURLToEmbed?.(attrs.src) || attrs.src;
+  const embeddableSrc = (config as Embed).convertURLToEmbed?.(attrs.src) || attrs.src;
 
   if (readOnly) {
     return (

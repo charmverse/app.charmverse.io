@@ -4,7 +4,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
-import type { EmbedType } from '../../iframe/config';
+import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
@@ -25,12 +25,17 @@ function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
           rafCommandExec(view, (_state, _dispatch) => {
             // let the node view know to show the tooltip by default
             const tooltipMark = _state.schema.mark('tooltip-marker');
+            let height = MIN_EMBED_HEIGHT;
+            const config = embeds[type] as Embed;
+            if (config.heightRatio) {
+              height = Math.round(MAX_EMBED_WIDTH / config.heightRatio);
+            }
             const node = _state.schema.nodes.iframe.create(
               {
                 src: null,
                 type,
                 width: MAX_EMBED_WIDTH,
-                height: MIN_EMBED_HEIGHT
+                height
               },
               undefined,
               [tooltipMark]
@@ -56,6 +61,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('airtable'),
     iframeEmbedType('dune'),
     iframeEmbedType('figma'),
+    iframeEmbedType('loom'),
     {
       uid: 'price',
       title: 'Crypto price',

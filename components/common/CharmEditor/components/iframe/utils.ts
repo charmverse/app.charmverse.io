@@ -3,13 +3,13 @@ import type { Slice } from 'prosemirror-model';
 import { isUrl } from 'lib/utilities/strings';
 
 import { embeds } from './config';
-import type { EmbedType } from './config';
+import type { Embed, EmbedType } from './config';
 
 export function extractEmbedType(url: string): EmbedType {
   let type: EmbedType = 'embed';
 
   for (const embedType in embeds) {
-    if ((embeds[embedType as EmbedType] as typeof embeds.airtable).urlTest?.(url)) {
+    if ((embeds[embedType as EmbedType] as Embed).urlTest?.(url)) {
       type = embedType as EmbedType;
       break;
     }

@@ -3,10 +3,23 @@ import { FiFigma } from 'react-icons/fi';
 import { SiLoom } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
 
+import { VIDEO_ASPECT_RATIO } from '../video/videoSpec';
+
 export const MAX_EMBED_WIDTH = 700;
 export const MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
 export const MIN_EMBED_HEIGHT = 200;
+
+export type Embed = {
+  icon?: React.ReactNode;
+  iconUrl?: string;
+  name: string;
+  placeholder: string;
+  text: string;
+  convertURLToEmbed?(url: string): string;
+  urlTest?(url: string): boolean;
+  heightRatio?: number;
+};
 
 export const embeds = {
   embed: {
@@ -63,9 +76,12 @@ export const embeds = {
     },
     urlTest(url: string) {
       return url.includes('www.loom.com');
-    }
+    },
+    heightRatio: VIDEO_ASPECT_RATIO
   }
 };
+// doesn't compile due to next.js - https://github.com/vercel/next.js/issues/43799
+// } satisfies Record<string, Embed>;
 
 export type EmbedType = keyof typeof embeds;
 
