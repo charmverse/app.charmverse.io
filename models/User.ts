@@ -1,5 +1,6 @@
 import type {
   DiscordUser,
+  GoogleAccount,
   Role as RoleMembership,
   SpaceRole,
   SpaceRoleToRole,
@@ -18,6 +19,7 @@ export interface LoggedInUser extends User {
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: { address: string }[];
   unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];
+  googleAccounts: Pick<GoogleAccount, 'email'>[];
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;

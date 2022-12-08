@@ -148,6 +148,15 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       });
     }
 
+    user?.googleAccounts?.forEach((acc) => {
+      types.push({
+        type: 'Google',
+        username: acc.email,
+        icon: getIdentityIcon('Google'),
+        isInUse: user.identityType === 'Google' && user.username === acc.email
+      });
+    });
+
     user.unstoppableDomains?.forEach(({ domain }) => {
       types.push({
         type: 'UnstoppableDomain',
