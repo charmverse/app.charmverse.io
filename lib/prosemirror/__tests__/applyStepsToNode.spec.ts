@@ -137,6 +137,6 @@ const testDoc = {
 
 describe('applyStepsToNode', () => {
   it('Should be able to parse an existing document', () => {
-    expect(applyStepsToNode([], getNodeFromJson(testDoc))).toNotThrow();
+    expect(() => applyStepsToNode([], getNodeFromJson(testDoc))).not.toThrow();
   });
 });
