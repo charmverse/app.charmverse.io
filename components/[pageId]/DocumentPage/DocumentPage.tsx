@@ -243,9 +243,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
                   )}
-                  {page.postId && (
-                    <PostProperties pageId={page.id} postId={page.postId} readOnly={!pagePermissions.edit_content} />
-                  )}
+                  {page.postId && <PostProperties postId={page.postId} readOnly={!pagePermissions.edit_content} />}
                   {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}
