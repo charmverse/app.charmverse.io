@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
-import type { AnyIdLogin } from 'components/login/LoginWithAnyId';
+import type { AnyIdLogin } from 'components/login/Login';
 import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
 
 export async function loginWIthGoogle(): Promise<AnyIdLogin> {

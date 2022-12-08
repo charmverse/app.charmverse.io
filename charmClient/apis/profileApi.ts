@@ -21,4 +21,8 @@ export class ProfileApi {
   loginWithUnstoppableDomains(login: UnstoppableDomainsLoginRequest) {
     return http.POST<LoggedInUser>('/api/unstoppable-domains/login', login);
   }
+
+  loginWithGoogle(login: any) {
+    return http.POST<LoggedInUser>('/api/google/login', login);
+  }
 }

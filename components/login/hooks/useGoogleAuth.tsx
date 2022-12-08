@@ -1,27 +1,19 @@
 /* eslint-disable import/order */
 /* eslint-disable no-console */
 import type { FirebaseApp } from 'firebase/app';
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { useEffect, useState } from 'react';
 
+import { googleOAuthWebClientConfig } from 'config/constants';
 import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
 
-import type { AnyIdLogin } from '../LoginWithAnyId';
+import charmClient from 'charmClient';
+import type { AnyIdLogin } from '../Login';
 
 export function useGoogleAuth() {
-  const [firebaseApp] = useState<FirebaseApp>(
-    initializeApp({
-      //      appId: '834736816902-el27p3t3og92l0g7gslchl5r0r5q0rea.apps.googleusercontent.com',
-      // Unique project-level ID
-      projectId: '834736816902',
-      // Project-level webAPI key ID
-      apiKey: 'AIzaSyBhfFP-ZSD06cUCAc8AMXrnpNYHtrjn2tU',
-      authDomain: '21e4762df101.eu.ngrok.io',
-      appId: '834736816902-el27p3t3og92l0g7gslchl5r0r5q0rea.apps.googleusercontent.com'
-    })
-  );
+  const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleOAuthWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
 
@@ -29,6 +21,9 @@ export function useGoogleAuth() {
     provider.addScope('email');
     provider.addScope('openid');
     provider.addScope('profile');
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
   }, []);
 
   async function loginWithGoogle(): Promise<AnyIdLogin> {
@@ -52,7 +47,13 @@ export function useGoogleAuth() {
 
       console.log({ 'Printed token': token, user });
 
-      return { user: user as any, identityType: 'Google' };
+      const loggedInUser = await charmClient.profile.loginWithGoogle({
+        ...credential,
+        email: user.email,
+        refresh_token: user.refreshToken
+      });
+
+      return { user: loggedInUser, identityType: 'Google' };
 
       // ...
     } catch (error: any) {

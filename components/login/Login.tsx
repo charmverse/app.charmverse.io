@@ -56,24 +56,16 @@ function SimpleDialog(props: SimpleDialogProps) {
           </ListItemAvatar>
           <ListItemText primary='Login with Google' />
         </ListItem>
-
-        {emails.map((email) => (
-          <ListItem button key={email}>
-            <ListItemAvatar>
-              <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-                <PersonIcon />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText primary={email} />
-          </ListItem>
-        ))}
-        <ListItem autoFocus button onClick={() => handleListItemClick('addAccount')}>
+      </List>
+      <DialogTitle>With web 2</DialogTitle>
+      <List sx={{ pt: 0 }}>
+        <ListItem button onClick={() => loginWithGoogle().then(handleLogin)}>
           <ListItemAvatar>
-            <Avatar>
-              <AddIcon />
+            <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
+              <PersonIcon />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary='Add account' />
+          <ListItemText primary='Login with Google' />
         </ListItem>
       </List>
     </Dialog>
@@ -107,7 +99,7 @@ export default function SimpleDialogDemo() {
   );
 }
 
-export function LoginWithAnyId() {
+export function Login() {
   return (
     <Box>
       <Button size='large' primary>

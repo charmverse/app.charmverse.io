@@ -55,5 +55,6 @@ export const sessionUserRelations = {
     select: {
       domain: true
     }
-  }
+  },
+  googleAccounts: true
 } as const;
