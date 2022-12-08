@@ -82,10 +82,13 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
   });
 
   it(`should throw error if user isn't the comment author, responding with 401`, async () => {
+    const spaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+
     const { comment, post } = await generatePostComment({
       spaceId: space.id,
-      userId: v4()
+      userId: spaceUser.id
     });
+
     await request(baseUrl)
       .put(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', userCookie)
@@ -116,6 +119,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
       spaceId: space.id,
       userId: user.id
     });
+
     await request(baseUrl)
       .delete(`/api/forums/posts/${post.id}/comments/${comment.id}`)
       .set('Cookie', nonSpaceUserCookie)

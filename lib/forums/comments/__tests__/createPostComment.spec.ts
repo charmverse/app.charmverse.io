@@ -1,7 +1,7 @@
 import type { PageComment, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
 import { createPostComment } from '../createPostComment';
@@ -26,13 +26,9 @@ describe('createPostComment', () => {
       parentId: v4()
     };
 
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const post = await generateForumPost({
-      pageId: page.id
+      spaceId: space.id,
+      userId: user.id
     });
 
     const postComment = await createPostComment({
@@ -44,7 +40,7 @@ describe('createPostComment', () => {
     expect(postComment).toMatchObject(
       expect.objectContaining<Partial<PageComment>>({
         ...commentInput,
-        pageId: page.id
+        pageId: post.id
       })
     );
   });

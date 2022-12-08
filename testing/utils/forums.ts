@@ -1,12 +1,19 @@
 import type { PostStatus } from '@prisma/client';
 import { v4 } from 'uuid';
 
-import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
-import { createPage } from 'testing/setupDatabase';
+import { createForumPost } from 'lib/forums/posts/createForumPost';
 
-export async function generatePostComment({ userId, spaceId }: { spaceId: string; userId: string }) {
+export async function generatePostComment({
+  userId,
+  spaceId,
+  status = 'draft'
+}: {
+  status?: PostStatus;
+  spaceId: string;
+  userId: string;
+}) {
   const commentInput: CreatePostCommentInput = {
     content: {
       type: ''
@@ -15,13 +22,10 @@ export async function generatePostComment({ userId, spaceId }: { spaceId: string
     parentId: v4()
   };
 
-  const page = await createPage({
-    createdBy: userId,
-    spaceId
-  });
-
   const post = await generateForumPost({
-    pageId: page.id
+    spaceId,
+    userId,
+    status
   });
 
   const postComment = await createPostComment({
@@ -32,30 +36,27 @@ export async function generatePostComment({ userId, spaceId }: { spaceId: string
 
   return {
     comment: postComment,
-    post,
-    page
+    post
   };
 }
 
 export async function generateForumPost({
   status = 'draft',
-  pageId,
-  categoryId = null
+  userId,
+  spaceId
 }: {
+  userId: string;
+  spaceId: string;
   status?: PostStatus;
-  pageId: string;
-  categoryId?: null | string;
 }) {
-  return prisma.post.create({
-    data: {
-      id: pageId,
-      status,
-      categoryId,
-      page: {
-        connect: {
-          id: pageId
-        }
-      }
-    }
+  return createForumPost({
+    content: {
+      type: ''
+    },
+    status,
+    contentText: '',
+    createdBy: userId,
+    spaceId,
+    title: 'Title'
   });
 }

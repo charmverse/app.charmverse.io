@@ -26,13 +26,9 @@ beforeAll(async () => {
 
 describe('GET /api/forums/posts/[postId]/comments - Get comments of a post', () => {
   it('should return a list of post comments with vote information, responding with 200', async () => {
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const post = await generateForumPost({
-      pageId: page.id
+      userId: user.id,
+      spaceId: space.id
     });
 
     await request(baseUrl).get(`/api/forums/posts/${post.id}/comments`).set('Cookie', userCookie).expect(200);
@@ -45,13 +41,9 @@ describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
   });
 
   it(`should throw error if user doesn't have access to workspace, responding with 401`, async () => {
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const post = await generateForumPost({
-      pageId: page.id
+      userId: user.id,
+      spaceId: space.id
     });
 
     await request(baseUrl)
@@ -62,26 +54,18 @@ describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
   });
 
   it('should throw error when creating comment in a drafted post, responding with 400', async () => {
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const post = await generateForumPost({
-      pageId: page.id
+      userId: user.id,
+      spaceId: space.id
     });
 
     await request(baseUrl).post(`/api/forums/posts/${post.id}/comments`).send({}).set('Cookie', userCookie).expect(400);
   });
 
   it('should create comment, responding with 200', async () => {
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
     const post = await generateForumPost({
-      pageId: page.id,
+      userId: user.id,
+      spaceId: space.id,
       status: 'published'
     });
 
