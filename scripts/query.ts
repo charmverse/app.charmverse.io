@@ -1,10 +1,10 @@
 import { prisma } from 'db';
 
-prisma.pageDiff.deleteMany({
+prisma.page.findUnique({
   where: {
-    pageId: '4bd13deb-57eb-4c1f-8939-1a0ce886f2a9'
+    id: '0c4a865a-9b5d-469c-a4ae-a2b34fd62d7e'
   }
-}).then(space => {
+}).then(record => {
   // eslint-disable-next-line no-console
-  console.log('Found space', space);
+  console.log( JSON.stringify(record?.content));
 });

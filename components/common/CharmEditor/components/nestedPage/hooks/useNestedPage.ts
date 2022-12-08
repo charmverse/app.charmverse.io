@@ -1,5 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
-import { rafCommandExec } from '@bangle.dev/utils/pm-helpers';
+import { rafCommandExec } from '@bangle.dev/utils';
 import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';

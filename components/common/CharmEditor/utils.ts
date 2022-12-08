@@ -1,11 +1,8 @@
-import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
+import type { Node } from 'prosemirror-model';
+import type { EditorState, Transaction } from 'prosemirror-state';
 
-export function insertNode(
-  state: EditorState,
-  dispatch: ((tr: Transaction<any>) => void) | undefined,
-  nodeToInsert: Node
-) {
+export function insertNode(state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, nodeToInsert: Node) {
   const insertPos = state.selection.$from.after();
 
   const tr = state.tr;

@@ -52,10 +52,14 @@ export function LoginPageContent({ walletSigned }: Props) {
                 mb: 3
               }}
             >
-              First Web 3 Native <br />
-              All-in-one Workspace
+              Powering the Future <br />
+              of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>Tasks, docs, bounties, and more</Typography>
+            <Typography sx={{ fontSize: 20, mb: 6 }}>
+              The solution for token communities to build relationships,
+              <br />
+              work together and vote
+            </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
               <Login />
 

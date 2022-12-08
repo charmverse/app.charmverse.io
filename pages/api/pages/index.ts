@@ -9,8 +9,10 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages/server';
-import { getPage, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
+import { PageNotFoundError } from 'lib/pages/server/errors';
+import { getPage } from 'lib/pages/server/getPage';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';

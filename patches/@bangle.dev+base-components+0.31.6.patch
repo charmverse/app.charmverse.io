@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bangle.dev/base-components/dist/index.js b/node_modules/@bangle.dev/base-components/dist/index.js
+index c720a17..18f85bb 100644
+--- a/node_modules/@bangle.dev/base-components/dist/index.js
++++ b/node_modules/@bangle.dev/base-components/dist/index.js
+@@ -2847,7 +2847,7 @@ const isValidList = (state) => {
+     return parentHasDirectParentOfType(type, [
+         getNodeType(state, 'bulletList'),
+         getNodeType(state, 'orderedList'),
+-    ]);
++    ])(state);
+ };
+ function specFactory$3() {
+     const { toDOM, parseDOM } = domSerializationHelpers(name$3, {
