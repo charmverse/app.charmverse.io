@@ -160,6 +160,13 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
     )
     .flat();
 
+  const filteredDeepdaoCommunities = deepDaoCommunities.filter((org) => org.id);
+
+  if (deepDaoCommunities.length !== filteredDeepdaoCommunities.length) {
+    // Deepdao API returned some organization with id
+    log.info(`[deepdao profiles]`, profiles);
+  }
+
   const charmVerseCommunities: UserCommunity[] = userWorkspaces.map((userWorkspace) => ({
     id: userWorkspace.id,
     isHidden: hiddenItems.includes(userWorkspace.id),
@@ -168,7 +175,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
     logo: userWorkspace.spaceImage
   }));
 
-  const communities = [...deepDaoCommunities, ...charmVerseCommunities];
+  const communities = [...filteredDeepdaoCommunities, ...charmVerseCommunities];
 
   const votes = [
     // Deepdao votes

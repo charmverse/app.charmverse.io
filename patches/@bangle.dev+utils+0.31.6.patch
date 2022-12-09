@@ -1,0 +1,13 @@
+diff --git a/node_modules/@bangle.dev/utils/dist/index.cjs b/node_modules/@bangle.dev/utils/dist/index.cjs
+index 277e7e6..472b7c2 100644
+--- a/node_modules/@bangle.dev/utils/dist/index.cjs
++++ b/node_modules/@bangle.dev/utils/dist/index.cjs
+@@ -3,7 +3,7 @@
+ Object.defineProperty(exports, '__esModule', { value: true });
+ 
+ var pm = require('@bangle.dev/pm');
+-var prosemirrorUtilsBangle = require('prosemirror-utils-bangle');
++var prosemirrorUtilsBangle = require('prosemirror-utils');
+ 
+ const browser = {
+     mac: false,

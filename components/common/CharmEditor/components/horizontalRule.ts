@@ -1,5 +1,5 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type { DOMOutputSpecArray, Schema } from '@bangle.dev/pm';
+import type { DOMOutputSpec, Schema } from '@bangle.dev/pm';
 import { InputRule } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
 
@@ -22,7 +22,7 @@ function specFactory(): RawSpecs {
       },
       group: 'block',
       parseDOM: [{ tag: 'hr' }],
-      toDOM: (): DOMOutputSpecArray => ['hr']
+      toDOM: (): DOMOutputSpec => ['hr']
     },
     markdown: {
       toMarkdown(state, node) {

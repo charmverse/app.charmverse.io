@@ -1,14 +1,6 @@
-
 const esmModules = [
-  '@bangle.dev/base-components',
-  '@bangle.dev/core',
-  '@bangle.dev/pm',
   '@bangle.dev/react',
-  '@bangle.dev/utils',
-  '@bangle.dev/markdown',
   '@bangle.dev/tooltip',
-  '@bangle.dev/react-menu',
-  '@bangle.dev/table',
   '@popperjs/core',
   '@fullcalendar/common',
   '@fullcalendar/core',
@@ -22,7 +14,8 @@ const esmModules = [
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
-  'formdata-polyfill'
+  'formdata-polyfill',
+  'jose'
 ];
 
 exports.esmModules = esmModules;

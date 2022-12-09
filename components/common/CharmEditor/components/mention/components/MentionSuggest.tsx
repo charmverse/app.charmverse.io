@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import type { PageMeta } from 'lib/pages';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
-import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';

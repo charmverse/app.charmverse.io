@@ -57,7 +57,7 @@ const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBu
 const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
 
 const setHeadingBlockType =
-  (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {
+  (level: number) => (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {
     const type = state.schema.nodes.heading;
     return setBlockType(type, { level })(state, dispatch);
   };
@@ -383,7 +383,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
             if (nestedPagePluginState) {
               replaceSuggestionMarkWith(
                 palettePluginKey,
-                state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})),
+                state.schema.text(' ', [state.schema.marks[nestedPageSuggestMarkName].create({})]),
                 true
               )(state, dispatch, view);
             }

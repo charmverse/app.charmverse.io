@@ -7,7 +7,6 @@ import type { NextHandler } from 'next-connect';
 import { prisma } from 'db';
 import log from 'lib/log';
 import { ApiError } from 'lib/middleware/errors';
-import { IDENTITY_TYPES } from 'models';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -62,7 +61,7 @@ export async function getBotUser(spaceId: string): Promise<User> {
       data: {
         username: 'Bot',
         isBot: true,
-        identityType: IDENTITY_TYPES[3]
+        identityType: 'RandomName'
       }
     });
 

@@ -1,5 +1,5 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import type { Command, DOMOutputSpecArray, EditorState, Node, Schema } from '@bangle.dev/pm';
+import type { Command, DOMOutputSpec, EditorState, Node, Schema } from '@bangle.dev/pm';
 import { chainCommands, keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
@@ -33,7 +33,7 @@ function specFactory(): RawSpecs {
       content: 'listItem+',
       group: 'block',
       parseDOM: [{ tag: 'ul' }],
-      toDOM: (): DOMOutputSpecArray => ['ul', 0],
+      toDOM: (): DOMOutputSpec => ['ul', 0],
       attrs: {
         // a style preference attribute which be used for
         // rendering output.

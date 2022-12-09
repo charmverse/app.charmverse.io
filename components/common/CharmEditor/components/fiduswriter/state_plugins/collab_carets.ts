@@ -128,7 +128,8 @@ export const collabCaretsPlugin = function (options: { editor: { docInfo: { acce
           // of previous values
           return meta;
         }
-        let { decos, caretPositions } = this.getState(oldState) as CollabState;
+        const plugin = this as unknown as Plugin;
+        let { decos, caretPositions } = plugin.getState(oldState) as CollabState;
         let caretUpdate: CaretUpdate | false = false;
 
         decos = decos.map(tr.mapping, tr.doc, {
@@ -154,8 +155,8 @@ export const collabCaretsPlugin = function (options: { editor: { docInfo: { acce
     },
     props: {
       decorations(state) {
-        const { decos } = this.getState(state);
-        return decos;
+        const _state = this.getState(state) as CollabState | undefined;
+        return _state?.decos;
       }
     }
   });
