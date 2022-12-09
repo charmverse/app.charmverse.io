@@ -4,12 +4,16 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
+
+import { PostVote } from './PostVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
@@ -34,9 +38,54 @@ function ForumPostContent({
   return null;
 }
 
-export default function ForumPost({ createdAt, updatedAt, user, title, contentText, galleryImage }: ForumPostProps) {
+export default function ForumPost({
+  createdAt,
+  updatedAt,
+  user,
+  title,
+  contentText,
+  galleryImage,
+  post
+}: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
+  const [pagePost, setPagePost] = useState(post);
+  const { id: postId } = pagePost;
+  const currentUpvotedStatus = pagePost.upvoted;
+
+  async function votePost(newUpvotedStatus?: boolean) {
+    await charmClient.forum.votePost({
+      postId,
+      upvoted: newUpvotedStatus
+    });
+
+    const forumPostPageVote: ForumPostPageVote = {
+      downvotes: pagePost.downvotes,
+      upvotes: pagePost.upvotes,
+      upvoted: newUpvotedStatus
+    };
+
+    if (newUpvotedStatus === true) {
+      forumPostPageVote.upvotes += 1;
+      if (currentUpvotedStatus === false) {
+        forumPostPageVote.downvotes -= 1;
+      }
+    } else if (newUpvotedStatus === false) {
+      forumPostPageVote.downvotes += 1;
+      if (currentUpvotedStatus === true) {
+        forumPostPageVote.upvotes -= 1;
+      }
+    } else if (currentUpvotedStatus === true) {
+      forumPostPageVote.upvotes -= 1;
+    } else {
+      forumPostPageVote.downvotes -= 1;
+    }
+
+    setPagePost({
+      ...pagePost,
+      ...forumPostPageVote
+    });
+  }
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
@@ -65,18 +114,7 @@ export default function ForumPost({ createdAt, updatedAt, user, title, contentTe
                 {relativeTime}
               </Box>
             </Box>
-            {/**
-               * 
-               * Re-enable this once we have up / downvoting as a feature
-               * Should be exracted to a separate widget component that handles up/down voting
-               * 
-                <Box display='flex' alignItems='center'>
-                  <NorthIcon fontSize='small' />
-                  {upVotes}
-                  <SouthIcon fontSize='small' />
-                  {downVotes}
-                </Box> 
-               */}
+            <PostVote votePost={votePost} {...pagePost} />
           </Box>
         </CardContent>
       </CardActionArea>

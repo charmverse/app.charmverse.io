@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
 
 const imageUrl1 =
   'https://media.wtsp.com/assets/WTSP/images/657c2b38-486d-467b-8f35-ba1014ff5c61/657c2b38-486d-467b-8f35-ba1014ff5c61.png';
@@ -37,7 +37,7 @@ export async function generateForumPosts({
   contentText?: string;
   title?: string;
   withImageRatio?: number;
-}): Promise<ForumPostPage[]> {
+}) {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
 
@@ -92,5 +92,5 @@ export async function generateForumPosts({
     include: {
       post: true
     }
-  }) as Promise<ForumPostPage[]>;
+  }) as Promise<ForumPostPageWithoutVote[]>;
 }

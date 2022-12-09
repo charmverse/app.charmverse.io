@@ -1071,10 +1071,9 @@ model PageCommentUpDownVote {
   @@index([pageId])
 }
 
-
 model UnstoppableDomain {
-  id        String   @id @default(uuid()) @db.Uuid
-  domain    String   @unique
-  userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid()) @db.Uuid
+  domain String @unique
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
