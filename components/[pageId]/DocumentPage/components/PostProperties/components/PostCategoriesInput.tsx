@@ -19,7 +19,6 @@ function PostCategoryOption({ props, category }: PostCategoryOptionProps) {
       <Box justifyContent='space-between' alignItems='center' display='flex' flex={1}>
         <Chip
           variant='filled'
-          color={category.color as BrandColor}
           label={category.name}
           sx={{ maxWidth: 150, flex: 1, display: 'flex', cursor: 'pointer' }}
         />
@@ -47,13 +46,7 @@ export default function PostCategoryInput({ disabled, options, onChange }: Props
       renderOption={(_props, category) => <PostCategoryOption key={category.id} category={category} props={_props} />}
       renderTags={(tagValue, getTagProps) =>
         tagValue.map((option, index) => (
-          <Chip
-            label={option.name}
-            {...getTagProps({ index })}
-            key={option.id}
-            color={option.color as BrandColor}
-            disabled={disabled}
-          />
+          <Chip label={option.name} {...getTagProps({ index })} key={option.id} disabled={disabled} />
         ))
       }
       getOptionLabel={(option) => option.name}

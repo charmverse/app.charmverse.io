@@ -14,8 +14,7 @@ describe('createPostCategory', () => {
   it('should create a post category', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'Test Category',
-      spaceId: space.id,
-      color: '#000000'
+      spaceId: space.id
     };
 
     const postCategory = await createPostCategory(createInput);
@@ -26,8 +25,7 @@ describe('createPostCategory', () => {
   it('should fail to create a post category if one with the same name already exists in this space', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'Duplicate Category',
-      spaceId: space.id,
-      color: '#000000'
+      spaceId: space.id
     };
 
     await createPostCategory(createInput);

@@ -76,6 +76,15 @@ export const embeds = {
       return url.includes('www.loom.com');
     },
     heightRatio: 1.63
+  },
+  typeform: {
+    iconUrl: '/images/typeform_logo.png',
+    name: 'Typeform',
+    placeholder: 'https://typeform.com/to/...',
+    text: 'Insert a typeform embed',
+    urlTest(url: string) {
+      return url.includes('typeform.com');
+    }
   }
 };
 // doesn't compile due to next.js - https://github.com/vercel/next.js/issues/43799

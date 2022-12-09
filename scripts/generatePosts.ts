@@ -84,22 +84,21 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
 
 }
 
-const spaceDomain = 'rough-copper-constrictor'
+const spaceDomain = 'xenacious-solana-rabbit'
 
 // Step 1 - wipe posts
-// wipePosts({
-//   spaceDomain
-// }).then(posts => {
-//   console.log('Deleted posts')
-// })
+wipePosts({
+  spaceDomain
+}).then(posts => {
+  autogeneratePosts().then(() => console.log('done'))
+}).catch(err => {
+  console.log(err);
+})
 
-
-const postsPerCategory = 30;
+const postsPerCategory = 5;
 
 const withImageRatio = 55;
 // Step 2 - generate posts in different categories
-
-// autogeneratePosts().then(() => console.log('done'))
 
 function autogeneratePosts() {
   return listCategories({spaceDomain}).then(async categories => {

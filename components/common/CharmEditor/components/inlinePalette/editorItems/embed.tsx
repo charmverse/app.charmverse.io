@@ -62,6 +62,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('dune'),
     iframeEmbedType('figma'),
     iframeEmbedType('loom'),
+    iframeEmbedType('typeform'),
     {
       uid: 'price',
       title: 'Crypto price',
