@@ -84,7 +84,7 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
 
 }
 
-const spaceDomain = 'massive-emerald-snail'
+const spaceDomain = 'xenacious-solana-rabbit'
 
 // Step 1 - wipe posts
 wipePosts({

@@ -8,7 +8,7 @@ import type { Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
 import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -57,11 +57,12 @@ export default function ForumPost({
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const { id: postId } = post;
+  const currentUpvotedStatus = post.upvoted;
 
-  async function votePost(upvoted?: boolean) {
-    const forumPostPageVote = await charmClient.forum.votePost({
+  async function votePost(newUpvotedStatus?: boolean) {
+    await charmClient.forum.votePost({
       postId,
-      upvoted
+      upvoted: newUpvotedStatus
     });
 
     setPosts((postPages) => {
@@ -70,12 +71,34 @@ export default function ForumPost({
             cursor: postPages.cursor,
             data: postPages.data.map((page) => {
               if (page.postId === postId) {
+                const forumPostPageVote: ForumPostPageVote = {
+                  downvotes: post.downvotes,
+                  upvotes: post.upvotes,
+                  upvoted: newUpvotedStatus
+                };
+
+                if (newUpvotedStatus === true) {
+                  forumPostPageVote.upvotes += 1;
+                  if (currentUpvotedStatus === false) {
+                    forumPostPageVote.downvotes -= 1;
+                  }
+                } else if (newUpvotedStatus === false) {
+                  forumPostPageVote.downvotes += 1;
+                  if (currentUpvotedStatus === true) {
+                    forumPostPageVote.upvotes -= 1;
+                  }
+                } else if (currentUpvotedStatus === true) {
+                  forumPostPageVote.upvotes -= 1;
+                } else {
+                  forumPostPageVote.downvotes -= 1;
+                }
+
                 return {
                   ...page,
                   post: {
                     ...page.post,
                     ...forumPostPageVote,
-                    upvoted
+                    upvoted: newUpvotedStatus
                   }
                 };
               }

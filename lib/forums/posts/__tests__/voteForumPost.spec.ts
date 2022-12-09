@@ -4,6 +4,7 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createForumPost } from '../createForumPost';
+import { getPostVote } from '../getPostVote';
 import { voteForumPost } from '../voteForumPost';
 
 let space: Space;
@@ -28,10 +29,15 @@ describe('voteForumPost', () => {
       categoryId: category1.id
     });
 
-    const postPageVote = await voteForumPost({
+    await voteForumPost({
       pageId: createdPage.id!,
       userId: user.id,
       upvoted: true
+    });
+
+    const postPageVote = await getPostVote({
+      userId: user.id,
+      pageId: createdPage.id
     });
 
     expect(postPageVote).toStrictEqual({
@@ -59,10 +65,15 @@ describe('voteForumPost', () => {
       upvoted: true
     });
 
-    const postPageVote = await voteForumPost({
+    await voteForumPost({
       pageId: createdPage.id!,
       userId: user.id,
       upvoted: false
+    });
+
+    const postPageVote = await getPostVote({
+      userId: user.id,
+      pageId: createdPage.id
     });
 
     expect(postPageVote).toStrictEqual({
@@ -90,10 +101,15 @@ describe('voteForumPost', () => {
       upvoted: true
     });
 
-    const postPageVote = await voteForumPost({
+    await voteForumPost({
       pageId: createdPage.id!,
       userId: user.id,
       upvoted: undefined
+    });
+
+    const postPageVote = await getPostVote({
+      userId: user.id,
+      pageId: createdPage.id
     });
 
     expect(postPageVote).toStrictEqual({
