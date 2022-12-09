@@ -6,24 +6,17 @@ import type { SubMenu } from './floating-menu';
 
 const StyledMenu = styled(Paper)<{ type?: SubMenu }>`
   display: flex;
-  padding: ${({ theme }) => theme.spacing(0.75, 0.5)};
+  padding: ${({ theme }) => theme.spacing(0.5)};
+  border-radius: 4px;
   ${({ theme, type }) => type === 'defaultMenu' && theme.breakpoints.down('sm')} {
     width: 100vw;
     overflow-x: auto;
   }
 `;
 
-export function Menu({
-  className = '',
-  children,
-  type
-}: {
-  className?: string;
-  children: React.ReactNode;
-  type?: SubMenu;
-}) {
+export function Menu({ children, type }: { children: React.ReactNode; type?: SubMenu }) {
   return (
-    <StyledMenu className={className} elevation={8} type={type}>
+    <StyledMenu elevation={8} type={type}>
       {children}
     </StyledMenu>
   );

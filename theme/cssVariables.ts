@@ -12,10 +12,11 @@ function rgbFromHex(hex: string) {
 
 const globalCSS = css`
   :root {
-    ${Object.entries(colors.lightModeColors).map(
+    ${Object.entries(colors.colors).map(
       ([key, value]) => `
-      --bg-${key}: ${value};
-      --bg-${key}-rgb: ${rgbFromHex(value)};`
+      --prop-${key}: ${value.light};
+      --bg-${key}: ${value.light};
+      --bg-${key}-rgb: ${rgbFromHex(value.light)};`
     )}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
@@ -32,17 +33,6 @@ const globalCSS = css`
     --z-index-modal: 1300;
     --z-index-snackbar: 1400;
     --z-index-tooltip: 1500;
-
-    --prop-default: #fff;
-    --prop-gray: #e7e7e6;
-    --prop-turquoise: #c2dcf2;
-    --prop-orange: #f4d8d0;
-    --prop-yellow: #efe9cb;
-    --prop-teal: #d0f4f1;
-    --prop-blue: #c1e7f4;
-    --prop-purple: #d7d3f4;
-    --prop-red: #f2ccd6;
-    --prop-pink: #e8d3ed;
 
     --elevation-1: 0 2px 3px 0 rgba(0, 0, 0, 0.08);
     --elevation-2: 0 4px 6px 0 rgba(0, 0, 0, 0.12);
@@ -71,9 +61,12 @@ const globalCSS = css`
 
   /* dark theme */
   [data-theme='dark'] {
-    ${Object.entries(colors.darkModeColors)
-      .map(([key, value]) => `--bg-${key}: ${value};`)
-      .join('\n')}
+    ${Object.entries(colors.colors).map(
+      ([key, value]) => `
+      --prop-${key}: ${value.dark};
+      --bg-${key}: ${value.dark};
+      --bg-${key}-rgb: ${rgbFromHex(value.dark)};`
+    )}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};
     --input-border-hover: #ededed;

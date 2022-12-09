@@ -16,6 +16,7 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
+import { TextColorMenuDropdown } from '../textColor/MenuDropdown';
 
 import type { SubMenu } from './floating-menu';
 import { hasComponentInSchema } from './helper';
@@ -32,6 +33,7 @@ import {
   ItalicButton,
   ParagraphButton,
   StrikeButton,
+  TextColorButton,
   UnderlineButton
 } from './MenuButtons';
 import { MenuGroup } from './MenuGroup';
@@ -85,7 +87,6 @@ function MenuByType(props: MenuProps) {
             <Button
               {...bindTrigger(popupState)}
               endIcon={<ArrowDropDown />}
-              size='small'
               disableElevation
               variant='text'
               color='inherit'
@@ -106,9 +107,12 @@ function MenuByType(props: MenuProps) {
         <MenuGroup isLastGroup={inline}>
           <BoldButton />
           <ItalicButton />
-          <CodeButton />
-          <StrikeButton />
           <UnderlineButton />
+          <StrikeButton />
+          <CodeButton />
+          <TextColorMenuDropdown>
+            <TextColorButton />
+          </TextColorMenuDropdown>
           <FloatingLinkButton menuKey={pluginKey} />
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
           {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}

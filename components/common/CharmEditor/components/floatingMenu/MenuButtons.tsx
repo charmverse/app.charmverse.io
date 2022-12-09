@@ -2,7 +2,7 @@ import { blockquote, bold, code, history, italic, link, strike, underline } from
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import React, { useCallback } from 'react';
@@ -19,19 +19,18 @@ import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput 
 import { MenuButton } from './Icon';
 import {
   BoldIcon,
-  BulletListIcon,
   CodeIcon,
+  ComponentIcon,
   ItalicIcon,
   LinkIcon,
-  OrderedListIcon,
   ParagraphIcon,
-  RedoIcon,
-  TodoListIcon,
-  UndoIcon
+  UndoIcon,
+  HeadingIcon,
+  TextColorIcon,
+  UnderlineIcon,
+  StrikeThroughIcon
 } from './Icons';
-import type { HintPos } from './types';
 
-const { defaultKeys: orderedListKeys, queryIsOrderedListActive, toggleOrderedList } = orderedList;
 const { defaultKeys: italicKeys, queryIsItalicActive, toggleItalic } = italic;
 const { defaultKeys: historyKeys, undo, redo } = history;
 
@@ -43,26 +42,12 @@ const { defaultKeys: paragraphKeys, queryIsTopLevelParagraph, convertToParagraph
 const { defaultKeys: headingKeys, queryIsHeadingActive, toggleHeading } = heading;
 
 const { createLink, queryIsLinkActive } = link;
-const {
-  defaultKeys: bulletListKeys,
-  queryIsBulletListActive,
-  queryIsTodoListActive,
-  toggleBulletList,
-  toggleTodoList
-} = bulletList;
-
 interface ButtonProps {
   hints?: string[];
-  hintPos?: HintPos;
   children?: React.ReactNode;
 }
 
-export function BoldButton({
-  hints = ['Bold', boldKeys.toggleBold],
-  hintPos = 'top',
-  children = <BoldIcon fontSize={16} />,
-  ...props
-}: ButtonProps) {
+export function BoldButton({ hints = ['Bold', boldKeys.toggleBold], children = <BoldIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
     (e) => {
@@ -75,7 +60,6 @@ export function BoldButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsBoldActive()(view.state)}
@@ -88,13 +72,11 @@ export function BoldButton({
 
 export function InlineActionButton({
   hints = [],
-  hintPos = 'top',
   children,
   menuKey,
   enable,
   subMenu,
-  commandFn,
-  ...props
+  commandFn
 }: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey; enable: boolean }) {
   const view = useEditorViewContext();
 
@@ -122,7 +104,6 @@ export function InlineActionButton({
 
   return (
     <MenuButton
-      {...props}
       onMouseDown={onMouseDown}
       hints={hints}
       // Figure out when the button will be disabled
@@ -135,26 +116,20 @@ export function InlineActionButton({
 
 export function InlineCommentButton({
   hints = ['Comment'],
-  hintPos = 'top',
   children = (
-    <MessageOutlinedIcon
-      sx={{
-        fontSize: 12,
-        position: 'relative'
-      }}
-    />
+    <ComponentIcon>
+      <MessageOutlinedIcon sx={{ fontSize: 14 }} />
+    </ComponentIcon>
   ),
   menuKey,
-  enableComments,
-  ...props
+  enableComments
 }: ButtonProps & { menuKey: PluginKey; enableComments: boolean }) {
   return (
     <InlineActionButton
-      {...props}
       commandFn={createInlineComment}
       enable={enableComments}
       menuKey={menuKey}
-      hints={['Comment']}
+      hints={hints}
       subMenu='inlineCommentSubMenu'
     >
       {children}
@@ -164,26 +139,20 @@ export function InlineCommentButton({
 
 export function InlineVoteButton({
   hints = ['Poll'],
-  hintPos = 'top',
   children = (
-    <HowToVoteIcon
-      sx={{
-        fontSize: 12,
-        position: 'relative'
-      }}
-    />
+    <ComponentIcon>
+      <HowToVoteIcon sx={{ fontSize: 14 }} />
+    </ComponentIcon>
   ),
   menuKey,
-  enableVotes,
-  ...props
+  enableVotes
 }: ButtonProps & { menuKey: PluginKey; enableVotes: boolean }) {
   return (
     <InlineActionButton
-      {...props}
       commandFn={createInlineVote}
       enable={enableVotes}
       menuKey={menuKey}
-      hints={['Poll']}
+      hints={hints}
       subMenu='inlineVoteSubMenu'
     >
       {children}
@@ -193,9 +162,7 @@ export function InlineVoteButton({
 
 export function StrikeButton({
   hints = ['Strike', strikeKeys.toggleStrike],
-  hintPos = 'top',
-  children = <span style={{ textDecoration: 'line-through', fontSize: 18, marginLeft: 5, marginRight: 5 }}>S</span>,
-  ...props
+  children = <StrikeThroughIcon />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -209,7 +176,6 @@ export function StrikeButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsStrikeActive()(view.state)}
@@ -222,9 +188,7 @@ export function StrikeButton({
 
 export function UnderlineButton({
   hints = ['Underline', underlineKeys.toggleUnderline],
-  hintPos = 'top',
-  children = <span style={{ textDecoration: 'underline', fontSize: 18, marginLeft: 5, marginRight: 5 }}>U</span>,
-  ...props
+  children = <UnderlineIcon />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -238,7 +202,6 @@ export function UnderlineButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsUnderlineActive()(view.state)}
@@ -251,17 +214,11 @@ export function UnderlineButton({
 
 export function CalloutButton({
   hints = ['Callout', blockquote.defaultKeys.wrapIn],
-  hintPos = 'top',
   children = (
-    <ChatBubbleIcon
-      sx={{
-        fontSize: 12,
-        top: 2,
-        position: 'relative'
-      }}
-    />
-  ),
-  ...props
+    <ComponentIcon>
+      <ChatBubbleIcon sx={{ fontSize: 14, marginTop: '2px' }} />
+    </ComponentIcon>
+  )
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -275,7 +232,6 @@ export function CalloutButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={blockquote.commands.queryIsBlockquoteActive()(view.state)}
@@ -286,12 +242,7 @@ export function CalloutButton({
   );
 }
 
-export function ItalicButton({
-  hints = ['Italic', italicKeys.toggleItalic],
-  hintPos = 'top',
-  children = <ItalicIcon fontSize={16} />,
-  ...props
-}: ButtonProps) {
+export function ItalicButton({ hints = ['Italic', italicKeys.toggleItalic], children = <ItalicIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
     (e) => {
@@ -306,7 +257,6 @@ export function ItalicButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsItalicActive()(view.state)}
@@ -317,12 +267,7 @@ export function ItalicButton({
   );
 }
 
-export function UndoButton({
-  hints = ['Undo', historyKeys.undo],
-  hintPos = 'top',
-  children = <UndoIcon />,
-  ...props
-}: ButtonProps) {
+export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <UndoIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
     (e) => {
@@ -336,32 +281,7 @@ export function UndoButton({
     [view]
   );
   return (
-    <MenuButton {...props} onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !undo()(view.state)}>
-      {children}
-    </MenuButton>
-  );
-}
-
-export function RedoButton({
-  hints = ['Redo', historyKeys.redo],
-  hintPos = 'top',
-  children = <RedoIcon />,
-  ...props
-}: ButtonProps) {
-  const view = useEditorViewContext();
-  const onSelect = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (redo()(view.state, view.dispatch)) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
-      }
-    },
-    [view]
-  );
-  return (
-    <MenuButton {...props} onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !redo()(view.state)}>
+    <MenuButton onMouseDown={onSelect} hints={hints} isDisabled={!view.editable || !undo()(view.state)}>
       {children}
     </MenuButton>
   );
@@ -369,9 +289,7 @@ export function RedoButton({
 
 export function CodeButton({
   hints = ['Code', codeKeys.toggleCode],
-  hintPos = 'top',
-  children = <CodeIcon fontSize={16} />,
-  ...props
+  children = <CodeIcon fontSize={16} />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -387,7 +305,6 @@ export function CodeButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsCodeActive()(view.state)}
@@ -398,119 +315,10 @@ export function CodeButton({
   );
 }
 
-export function BulletListButton({
-  hints = ['BulletList', bulletListKeys.toggle],
-  hintPos = 'top',
-  children = <BulletListIcon />,
-  ...props
-}: ButtonProps) {
-  const view = useEditorViewContext();
-  const onSelect = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (toggleBulletList()(view.state, view.dispatch, view)) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
-      }
-    },
-    [view]
-  );
-  return (
-    <MenuButton
-      {...props}
-      onMouseDown={onSelect}
-      hints={hints}
-      isDisabled={!view.editable}
-      isActive={queryIsBulletListActive()(view.state) && !queryIsTodoListActive()(view.state)}
-    >
-      {children}
-    </MenuButton>
-  );
-}
-
-export function OrderedListButton({
-  hints = ['Ordered list', orderedListKeys.toggle],
-  hintPos = 'top',
-  children = <OrderedListIcon />,
-  ...props
-}: ButtonProps) {
-  const view = useEditorViewContext();
-  const onSelect = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (toggleOrderedList()(view.state, view.dispatch, view)) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
-      }
-    },
-    [view]
-  );
-  return (
-    <MenuButton
-      {...props}
-      onMouseDown={onSelect}
-      hints={hints}
-      isDisabled={!view.editable}
-      isActive={queryIsOrderedListActive()(view.state)}
-    >
-      {children}
-    </MenuButton>
-  );
-}
-
-export function TodoListButton({
-  hints = ['Todo list', bulletListKeys.toggleTodo],
-  hintPos = 'top',
-  children = <TodoListIcon />,
-  ...props
-}: ButtonProps) {
-  const view = useEditorViewContext();
-  const onSelect = useCallback(
-    (e) => {
-      e.preventDefault();
-
-      if (toggleTodoList()(view.state, view.dispatch, view)) {
-        if (view.dispatch as any) {
-          view.focus();
-        }
-      }
-    },
-    [view]
-  );
-  return (
-    <MenuButton
-      {...props}
-      onMouseDown={onSelect}
-      hints={hints}
-      isDisabled={!view.editable}
-      isActive={queryIsTodoListActive()(view.state)}
-    >
-      {children}
-    </MenuButton>
-  );
-}
-
 export function HeadingButton({
   level,
   hints = [`Heading ${level}`, headingKeys[`toH${level}`] ?? '1'],
-  hintPos = 'top',
-  children = (
-    <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fontSize={16}>
-      <text
-        x='12'
-        y='12'
-        stroke='currentColor'
-        textAnchor='middle'
-        alignmentBaseline='central'
-        dominantBaseline='middle'
-      >
-        H{level}
-      </text>
-    </svg>
-  ),
-  ...props
+  children = <HeadingIcon level={level} />
 }: ButtonProps & { level: number }) {
   const view = useEditorViewContext();
 
@@ -527,7 +335,6 @@ export function HeadingButton({
   );
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsHeadingActive(level)(view.state)}
@@ -540,9 +347,7 @@ export function HeadingButton({
 
 export function ParagraphButton({
   hints = ['Paragraph', paragraphKeys.convertToParagraph],
-  hintPos = 'top',
-  children = <ParagraphIcon fontSize={16} />,
-  ...props
+  children = <ParagraphIcon />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
@@ -559,7 +364,6 @@ export function ParagraphButton({
 
   return (
     <MenuButton
-      {...props}
       onMouseDown={onSelect}
       hints={hints}
       isActive={queryIsTopLevelParagraph()(view.state)}
@@ -572,7 +376,6 @@ export function ParagraphButton({
 
 export function FloatingLinkButton({
   hints = ['Create a link', floatingMenuKeys.toggleLink],
-  hintPos = 'top',
   children = <LinkIcon />,
   menuKey
 }: ButtonProps & { menuKey: PluginKey }) {
@@ -607,6 +410,15 @@ export function FloatingLinkButton({
       isActive={queryIsLinkActive()(view.state)}
       isDisabled={!view.editable || !createLink('')(view.state)}
     >
+      {children}
+    </MenuButton>
+  );
+}
+
+export function TextColorButton({ hints = ['Text color'], children = <TextColorIcon /> }: ButtonProps) {
+  const view = useEditorViewContext();
+  return (
+    <MenuButton hints={hints} isDisabled={!view.editable} isActive={false}>
       {children}
     </MenuButton>
   );
