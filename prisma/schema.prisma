@@ -1006,7 +1006,6 @@ model MemberPropertyPermission {
 // Begin Forum models
 model PostCategory {
   id      String @id @default(uuid()) @db.Uuid
-  color   String
   name    String
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -1073,7 +1072,6 @@ model PageCommentUpDownVote {
   @@index([commentId])
   @@index([pageId])
 }
-
 
 model UnstoppableDomain {
   id        String   @id @default(uuid()) @db.Uuid
