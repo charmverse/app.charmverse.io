@@ -21,9 +21,7 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/applications/{applicationId} - update an application', () => {
-
   it('should update the application and respond with 200', async () => {
-
     const submitterUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: false
@@ -37,10 +35,12 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       status: 'open',
       rewardAmount: 1,
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: nonAdminUserSpace.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: nonAdminUserSpace.id
+          }
+        ]
       }
     });
 
@@ -49,21 +49,21 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       message: "I'm volunteering for this as it's in my field of expertise"
     };
 
-    const createdApplication = (await request(baseUrl)
-      .post('/api/applications')
-      .set('Cookie', submitterCookie)
-      .send(creationContent)
-      .expect(201)).body;
+    const createdApplication = (
+      await request(baseUrl).post('/api/applications').set('Cookie', submitterCookie).send(creationContent).expect(201)
+    ).body;
 
     const update: Partial<ApplicationUpdateData> = {
       message: 'This is my new application message'
     };
 
-    const updatedApplication = (await request(baseUrl)
-      .put(`/api/applications/${createdApplication.id}`)
-      .set('Cookie', submitterCookie)
-      .send(update)
-      .expect(200)).body;
+    const updatedApplication = (
+      await request(baseUrl)
+        .put(`/api/applications/${createdApplication.id}`)
+        .set('Cookie', submitterCookie)
+        .send(update)
+        .expect(200)
+    ).body;
 
     expect(updatedApplication).toEqual(
       expect.objectContaining<Partial<Application>>({
@@ -71,11 +71,9 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
         message: update.message
       })
     );
-
   });
 
   it('should reject attempts to update an application that does not belong to the requester, and respond with 401', async () => {
-
     const { user: otherUser, space: otherSpace } = await generateUserAndSpaceWithApiToken();
 
     const submitterUser = await generateSpaceUser({
@@ -91,10 +89,12 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       status: 'open',
       rewardAmount: 1,
       permissions: {
-        submitter: [{
-          group: 'space',
-          id: otherSpace.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: otherSpace.id
+          }
+        ]
       }
     });
 
@@ -103,11 +103,9 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       message: "I'm volunteering for this as it's in my field of expertise"
     };
 
-    const createdApplication = (await request(baseUrl)
-      .post('/api/applications')
-      .set('Cookie', submitterCookie)
-      .send(creationContent)
-      .expect(201)).body;
+    const createdApplication = (
+      await request(baseUrl).post('/api/applications').set('Cookie', submitterCookie).send(creationContent).expect(201)
+    ).body;
 
     const update: Partial<ApplicationUpdateData> = {
       message: 'This is my new application message'
@@ -119,5 +117,4 @@ describe('PUT /api/applications/{applicationId} - update an application', () => 
       .send(update)
       .expect(401);
   });
-
 });

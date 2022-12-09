@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -32,16 +31,16 @@ interface Props {
   onChange: (action: RoleAction, member: Member) => void;
 }
 
-export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: Props) {
+export default function MemberRow({ isAdmin, isSpaceOwner, member, onChange }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const { members } = useMembers();
-  const totalAdmins = members.filter(_member => _member.isAdmin).length;
-  function handleMenuItemClick (action: RoleAction) {
+  const totalAdmins = members.filter((_member) => _member.isAdmin).length;
+  function handleMenuItemClick(action: RoleAction) {
     onChange(action, member);
     popupState.close();
   }
 
-  const actions = roleActions.filter(action => {
+  const actions = roleActions.filter((action) => {
     switch (action) {
       case 'makeAdmin':
         return isAdmin;
@@ -63,14 +62,17 @@ export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: 
         <Box display='flex' alignItems='center'>
           <Avatar name={member.username} avatar={member?.avatar} isNft={member?.hasNftAvatar} />
           <Box pl={2}>
-            <Typography variant='body1'><strong>{member.username}</strong></Typography>
+            <Typography variant='body1'>
+              <strong>{member.username}</strong>
+            </Typography>
           </Box>
-          <Box pl={2}>
-          </Box>
+          <Box pl={2}></Box>
         </Box>
       </TableCell>
       <TableCell>
-        <Typography minWidth={80} variant='body2'>{humanFriendlyDate(member.createdAt)}</Typography>
+        <Typography minWidth={80} variant='body2'>
+          {humanFriendlyDate(member.createdAt)}
+        </Typography>
       </TableCell>
       <TableCell>
         {actions.length > 0 ? (
@@ -123,12 +125,9 @@ export default function MemberRow ({ isAdmin, isSpaceOwner, member, onChange }: 
               ))}
             </Menu>
           </>
-        )
-          : (
-            <Typography color='secondary'>
-              {member.isAdmin ? 'admin' : 'member'}
-            </Typography>
-          )}
+        ) : (
+          <Typography color='secondary'>{member.isAdmin ? 'admin' : 'member'}</Typography>
+        )}
       </TableCell>
     </TableRow>
   );

@@ -6,7 +6,7 @@ import type { ProposalWithUsers } from './interface';
 import type { ProposalUserGroup } from './proposalStatusTransition';
 import { proposalStatusTransitionPermission } from './proposalStatusTransition';
 
-export async function validateProposalStatusTransition ({
+export async function validateProposalStatusTransition({
   proposal,
   newStatus,
   userId
@@ -18,11 +18,10 @@ export async function validateProposalStatusTransition ({
   const reviewerUserIds: string[] = [];
   const reviewerRoleIds: string[] = [];
 
-  proposal.reviewers.forEach(reviewer => {
+  proposal.reviewers.forEach((reviewer) => {
     if (reviewer.userId) {
       reviewerUserIds.push(reviewer.userId);
-    }
-    else if (reviewer.roleId) {
+    } else if (reviewer.roleId) {
       reviewerRoleIds.push(reviewer.roleId);
     }
   });
@@ -50,7 +49,7 @@ export async function validateProposalStatusTransition ({
     isCurrentUserProposalReviewer = Boolean(existingRole);
   }
 
-  const isCurrentUserProposalAuthor = proposal.authors.some(author => author.userId === userId);
+  const isCurrentUserProposalAuthor = proposal.authors.some((author) => author.userId === userId);
 
   const proposalUserGroups: ProposalUserGroup[] = [];
 
@@ -66,12 +65,14 @@ export async function validateProposalStatusTransition ({
 
   // Check if the current user (if an author of proposal) has the permission to update the status
   if (!isUserAuthorizedToUpdateProposalStatus && proposalUserGroups.includes('author')) {
-    isUserAuthorizedToUpdateProposalStatus = proposalStatusTransitionPermission[proposal.status]?.author?.includes(newStatus) ?? false;
+    isUserAuthorizedToUpdateProposalStatus =
+      proposalStatusTransitionPermission[proposal.status]?.author?.includes(newStatus) ?? false;
   }
 
   // Check if the current user (if an review of proposal) has the permission to update the status (only if its not attainable via being author. A proposal author can be a reviewer as well)
   if (!isUserAuthorizedToUpdateProposalStatus && proposalUserGroups.includes('reviewer')) {
-    isUserAuthorizedToUpdateProposalStatus = proposalStatusTransitionPermission[proposal.status]?.reviewer?.includes(newStatus) ?? false;
+    isUserAuthorizedToUpdateProposalStatus =
+      proposalStatusTransitionPermission[proposal.status]?.reviewer?.includes(newStatus) ?? false;
   }
 
   return isUserAuthorizedToUpdateProposalStatus;

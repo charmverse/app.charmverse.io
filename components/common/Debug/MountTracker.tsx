@@ -2,8 +2,15 @@ import { useEffect, useRef } from 'react';
 
 import log from 'lib/log';
 
-export function MountTracker ({ name, children, countRenders }: { name: string, children: JSX.Element, countRenders?: boolean }) {
-
+export function MountTracker({
+  name,
+  children,
+  countRenders
+}: {
+  name: string;
+  children: JSX.Element;
+  countRenders?: boolean;
+}) {
   const renders = useRef(0);
 
   if (countRenders) {

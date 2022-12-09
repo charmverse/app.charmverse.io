@@ -9,10 +9,9 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getNFTs);
+handler.get(getNFTs);
 
-async function getNFTs (req: NextApiRequest, res: NextApiResponse<NftData>) {
+async function getNFTs(req: NextApiRequest, res: NextApiResponse<NftData>) {
   const { tokenId, contractAddress } = req.query;
   const chainId = 1;
 

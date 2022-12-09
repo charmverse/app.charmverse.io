@@ -8,11 +8,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .put(updateMemberPropertyVisibilityHandler);
+handler.use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' })).put(updateMemberPropertyVisibilityHandler);
 
-async function updateMemberPropertyVisibilityHandler (req: NextApiRequest, res: NextApiResponse<{ success: 'ok' }>) {
+async function updateMemberPropertyVisibilityHandler(req: NextApiRequest, res: NextApiResponse<{ success: 'ok' }>) {
   const payload = req.body as UpdateMemberPropertyVisibilityPayload;
 
   await updateMemberPropertyVisibility(payload);

@@ -6,7 +6,7 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { ExtendedVote } from './interfaces';
 
-export async function getVote (id: string, userId: string): Promise<ExtendedVote | null> {
+export async function getVote(id: string, userId: string): Promise<ExtendedVote | null> {
   const vote = await prisma.vote.findUnique({
     where: {
       id
@@ -39,11 +39,13 @@ export async function getVote (id: string, userId: string): Promise<ExtendedVote
     delete (vote as any).userVotes;
   }
 
-  return vote ? {
-    ...vote,
-    aggregatedResult,
-    userChoice,
-    status: voteStatus,
-    totalVotes: userVotes.length
-  } : null;
+  return vote
+    ? {
+        ...vote,
+        aggregatedResult,
+        userChoice,
+        status: voteStatus,
+        totalVotes: userVotes.length
+      }
+    : null;
 }

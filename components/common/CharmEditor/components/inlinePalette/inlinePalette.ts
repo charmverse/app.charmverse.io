@@ -1,8 +1,10 @@
 import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { PluginKey } from '@bangle.dev/core';
 import { keymap } from '@bangle.dev/pm';
-import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
+import type { Node, Schema } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
@@ -11,18 +13,13 @@ import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { paletteMarkName, palettePluginKey, trigger } from './config';
 
-const {
-  decrementSuggestTooltipCounter,
-  incrementSuggestTooltipCounter,
-  queryIsSuggestTooltipActive
-} = suggestTooltip;
+const { decrementSuggestTooltipCounter, incrementSuggestTooltipCounter, queryIsSuggestTooltipActive } = suggestTooltip;
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {};
 
-function specFactory (): BaseRawMarkSpec {
-
+function specFactory(): BaseRawMarkSpec {
   const _spec = suggestTooltip.spec({ markName: paletteMarkName, trigger });
 
   return {
@@ -34,8 +31,7 @@ function specFactory (): BaseRawMarkSpec {
   };
 }
 
-function pluginsFactory () {
-
+function pluginsFactory() {
   const key = palettePluginKey;
   const markName = paletteMarkName;
   const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
@@ -43,7 +39,7 @@ function pluginsFactory () {
     placement: 'bottom-start'
   };
 
-  return ({ schema, specRegistry }: { schema: Schema, specRegistry: SpecRegistry }) => {
+  return ({ schema, specRegistry }: { schema: Schema; specRegistry: SpecRegistry }) => {
     const { trigger: _trigger } = specRegistry.options[markName];
     const suggestTooltipKey = new PluginKey('inlinePaletteTooltipKey');
 
@@ -64,18 +60,9 @@ function pluginsFactory () {
           view?.focus();
         });
         if (_key === 'UP') {
-          return decrementSuggestTooltipCounter(suggestTooltipKey)(
-            state,
-            dispatch,
-            view
-          );
-        }
-        else {
-          return incrementSuggestTooltipCounter(suggestTooltipKey)(
-            state,
-            dispatch,
-            view
-          );
+          return decrementSuggestTooltipCounter(suggestTooltipKey)(state, dispatch, view);
+        } else {
+          return incrementSuggestTooltipCounter(suggestTooltipKey)(state, dispatch, view);
         }
       };
     };
@@ -113,10 +100,7 @@ function pluginsFactory () {
       }),
 
       keymap({
-        [keybindings.toggleInlineCommandPalette.key]: (
-          state,
-          dispatch
-        ): boolean => {
+        [keybindings.toggleInlineCommandPalette.key]: (state, dispatch): boolean => {
           const { tr, schema: _schema, selection } = state;
 
           if (queryInlinePaletteActive(palettePluginKey)(state)) {
@@ -130,10 +114,7 @@ function pluginsFactory () {
           if (textBefore && !textBefore.endsWith(' ')) {
             tr.replaceSelectionWith(_schema.text(' '), false);
           }
-          tr.replaceSelectionWith(
-            _schema.text(_trigger, [mark, ...marks]),
-            false
-          );
+          tr.replaceSelectionWith(_schema.text(_trigger, [mark, ...marks]), false);
           dispatch?.(tr);
           return true;
         }
@@ -142,35 +123,31 @@ function pluginsFactory () {
   };
 }
 
-function getScrollContainer (view: EditorView) {
+function getScrollContainer(view: EditorView) {
   return view.dom.parentElement!;
 }
 
-export function getSuggestTooltipKey (key: PluginKey) {
+export function getSuggestTooltipKey(key: PluginKey) {
   return (state: EditorState) => {
     return key.getState(state).suggestTooltipKey as PluginKey;
   };
 }
 
-export function replaceSuggestionMarkWith (key: PluginKey, replaceWith: string, setSelection?:boolean): Command {
+export function replaceSuggestionMarkWith(key: PluginKey, maybeNode?: string | Node, setSelection?: boolean): Command {
   return (state, dispatch, view) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.replaceSuggestMarkWith(
-      suggestTooltipKey,
-      replaceWith,
-      setSelection
-    )(state, dispatch, view);
+    return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, maybeNode, setSelection)(state, dispatch, view);
   };
 }
 
-export function queryInlinePaletteActive (key: PluginKey) {
+export function queryInlinePaletteActive(key: PluginKey) {
   return (state: EditorState) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
     return queryIsSuggestTooltipActive(suggestTooltipKey)(state);
   };
 }
 
-export function queryInlinePaletteText (key: PluginKey) {
+export function queryInlinePaletteText(key: PluginKey) {
   return (state: EditorState) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
     return suggestTooltip.queryTriggerText(suggestTooltipKey)(state);

@@ -1,5 +1,4 @@
 import type { User, UserGnosisSafe, UserNotificationState, UserWallet } from '@prisma/client';
-import { getChainShortname } from 'connectors';
 import { ethers } from 'ethers';
 import groupBy from 'lodash/groupBy';
 import intersection from 'lodash/intersection';
@@ -9,11 +8,12 @@ import log from 'lib/log';
 
 import type { GnosisTransaction } from './gnosis';
 import { getTransactionsforSafes } from './gnosis';
+import { getFriendlyEthValue, getGnosisTransactionQueueUrl } from './utils';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
 
-type UserWithGnosisSafeState = User & { notificationState: UserNotificationState | null }
+type UserWithGnosisSafeState = User & { notificationState: UserNotificationState | null };
 interface ActionUser {
   address: string;
   user?: UserWithGnosisSafeState;
@@ -57,28 +57,12 @@ export interface GnosisSafeTasks {
   taskId: string;
 }
 
-function getFriendlyEthValue (value: string) {
-  const valueBigNumber = ethers.BigNumber.from(value);
-  const ethersValue = ethers.utils.formatEther(valueBigNumber);
-  const upperBound = ethers.BigNumber.from(ethers.utils.parseEther('0.001'));
-  if (valueBigNumber.gt(0) && valueBigNumber.lt(upperBound)) {
-    return '< 0.0001';
-  }
-  else {
-    return ethersValue;
-  }
-}
-
-function getGnosisTransactionUrl (address: string, chainId: number) {
-  return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
-}
-
-function getTaskDescription (transaction: GnosisTransaction): string {
+function getTaskDescription(transaction: GnosisTransaction): string {
   if (transaction.dataDecoded) {
     const data = transaction.dataDecoded as any;
     switch (data.method) {
       case 'multiSend': {
-        const actions = data.parameters[0].valueDecoded as { to: string, value: string }[];
+        const actions = data.parameters[0].valueDecoded as { to: string; value: string }[];
         return `MultiSend: ${actions.length} actions`;
       }
       case 'transfer': {
@@ -86,12 +70,18 @@ function getTaskDescription (transaction: GnosisTransaction): string {
           const recipient = data.parameters[0].value;
           const amount = data.parameters[1].value;
           return `Transfer: ${amount} to ${recipient}`;
-        }
-        catch (error) {
+        } catch (error) {
           log.error('Error parsing gnosis transfer', { error, data });
         }
         break;
       }
+
+      case 'swapOwner':
+        return 'Swap Owner';
+
+      case 'signMessage':
+        return 'Sign a message';
+
       case 'addOwnerWithThreshold': {
         // this is the JSON type in case we want it for something
         // const params = data.parameters as { name: '_threshold' | 'owner', value: string }[];
@@ -112,38 +102,38 @@ function getTaskDescription (transaction: GnosisTransaction): string {
       }
 
       default:
-        log.warn('Unknown transaction method', data.method);
+        log.warn(`Unknown transaction method: ${data.method}`, transaction);
+        return `Transaction method: ${data.method}`;
     }
-  }
-  else if (transaction.to && transaction.value) {
+  } else if (transaction.to && transaction.value) {
     return `Send ${getFriendlyEthValue(transaction.value)} ETH`;
   }
-  log.warn('Unknown transaction', transaction);
-  return 'N/A';
+  return 'Unknown transaction type';
 }
 
-type PaymentAction = { decodedValue: { to: string, value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
-type DeadlineAction = { name: 'deadline', type: 'uint256', value: number };
-type DataAction = { name: 'data', type: 'bytes[]', value: string[] };
+type PaymentAction = { decodedValue: { to: string; value: string }[] }; // TODO: find out the type and name of this action (it is used when there are multiple recipients)
+type DeadlineAction = { name: 'deadline'; type: 'uint256'; value: number };
+type DataAction = { name: 'data'; type: 'bytes[]'; value: string[] };
 type TransactionParameter = PaymentAction | DeadlineAction | DataAction;
 
-function getTaskActions (transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {
+function getTaskActions(transaction: GnosisTransaction, getRecipient: (address: string) => ActionUser): SendAction[] {
   const data = transaction.dataDecoded as any | undefined;
   const parameters: TransactionParameter[] = data?.parameters ?? [];
   // console.log('response', transaction);
   // console.log('data', data?.parameters);
-  const paymentActions = parameters
-    .filter((action): action is PaymentAction => !!(action as PaymentAction).decodedValue?.[0].to)
-    .map(action => action.decodedValue).flat()
-    || [];
+  const paymentActions =
+    parameters
+      .filter((action): action is PaymentAction => !!(action as PaymentAction).decodedValue?.[0].to)
+      .map((action) => action.decodedValue)
+      .flat() || [];
   // its possible for there to be data in 'valueDecoded' that is not a payment action. TODO: find out what other cases exist
   if (paymentActions.length > 0) {
     paymentActions.push({ to: transaction.to, value: transaction.value });
   }
-  const deadline = parameters.find(action => (action as DeadlineAction).name === 'deadline') as DeadlineAction;
+  const deadline = parameters.find((action) => (action as DeadlineAction).name === 'deadline') as DeadlineAction;
   const deadlineValue = deadline?.value ? new Date(deadline.value * 1000).toISOString() : undefined;
 
-  return paymentActions.map(action => ({
+  return paymentActions.map((action) => ({
     value: action.value,
     deadline: deadlineValue,
     friendlyValue: getFriendlyEthValue(action.value),
@@ -158,36 +148,43 @@ interface TransactionToTaskProps {
   wallets: (UserWallet & { user: UserWithGnosisSafeState })[];
 }
 
-function transactionToTask ({ myAddresses, transaction, safe, wallets }: TransactionToTaskProps): GnosisTransactionPopulated {
+function transactionToTask({
+  myAddresses,
+  transaction,
+  safe,
+  wallets
+}: TransactionToTaskProps): GnosisTransactionPopulated {
   const actions = getTaskActions(transaction, getRecipient);
-  const gnosisUrl = getGnosisTransactionUrl(transaction.safe, safe.chainId);
-  const confirmedAddresses = transaction.confirmations?.map(confirmation => confirmation.owner) ?? [];
+  const gnosisUrl = getGnosisTransactionQueueUrl(transaction.safe, safe.chainId);
+  const confirmedAddresses = transaction.confirmations?.map((confirmation) => confirmation.owner) ?? [];
   const myOwnedAddresses = intersection(myAddresses, safe.owners).length; // handle owner of multiple addresses in one safe
   // console.log('transaction', transaction);
   let actionLabel: string = '';
   if (transaction.confirmations && transaction.confirmations.length >= safe.threshold) {
     actionLabel = 'Execute';
-  }
-  else if (intersection(myAddresses, confirmedAddresses).length < myOwnedAddresses) {
+  } else if (intersection(myAddresses, confirmedAddresses).length < myOwnedAddresses) {
     actionLabel = 'Sign';
     if (transaction.confirmations && transaction.confirmations.length - safe.threshold === 1) {
       actionLabel = 'Execute';
     }
   }
 
-  function getRecipient (address: string) {
-    const user = wallets.find(w => w.address === address)?.user;
+  function getRecipient(address: string) {
+    const user = wallets.find((w) => w.address === address)?.user;
     return { address, user };
   }
 
-  const confirmations = transaction.confirmations?.map(confirmation => getRecipient(confirmation.owner)) ?? [];
+  const confirmations = transaction.confirmations?.map((confirmation) => getRecipient(confirmation.owner)) ?? [];
   const snoozedUsers: UserWithGnosisSafeState[] = [];
   wallets.forEach(({ user }) => {
     if (
-      user.notificationState
-      && user.notificationState.snoozedUntil !== null
-      && !confirmations.find(confirmation => wallets.some(w => w.userId === user.id && w.address === confirmation.address))
-      && user.notificationState.snoozedUntil.toString() > new Date().toString()) {
+      user.notificationState &&
+      user.notificationState.snoozedUntil !== null &&
+      !confirmations.find((confirmation) =>
+        wallets.some((w) => w.userId === user.id && w.address === confirmation.address)
+      ) &&
+      user.notificationState.snoozedUntil.toString() > new Date().toString()
+    ) {
       snoozedUsers.push(user);
     }
   });
@@ -218,36 +215,40 @@ interface TransactionsToTaskProps {
   wallets: (UserWallet & { user: UserWithGnosisSafeState })[];
 }
 
-function transactionsToTasks ({ transactions, safes, myUserId, wallets }: TransactionsToTaskProps): GnosisSafeTasks[] {
-  const myAddresses = (wallets.filter(wallet => wallet.userId === myUserId) ?? []).map(w => w.address);
-  const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>((acc, safe) => ({ ...acc, [safe.address]: safe }), {});
+function transactionsToTasks({ transactions, safes, myUserId, wallets }: TransactionsToTaskProps): GnosisSafeTasks[] {
+  const myAddresses = (wallets.filter((wallet) => wallet.userId === myUserId) ?? []).map((w) => w.address);
+  const safesByAddress = safes.reduce<Record<string, UserGnosisSafe>>(
+    (acc, safe) => ({ ...acc, [safe.address]: safe }),
+    {}
+  );
 
-  const mapped = transactions.map(transaction => transactionToTask({
-    myAddresses,
-    safe: safesByAddress[transaction.safe],
-    transaction,
-    wallets
-  }));
+  const mapped = transactions.map((transaction) =>
+    transactionToTask({
+      myAddresses,
+      safe: safesByAddress[transaction.safe],
+      transaction,
+      wallets
+    })
+  );
 
   return Object.values(groupBy(mapped, 'safeAddress'))
     .map<GnosisSafeTasks>((_transactions) => {
       const tasks = Object.values(groupBy(_transactions, 'nonce'))
-        .map<GnosisTask>(__transactions => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
+        .map<GnosisTask>((__transactions) => ({ nonce: __transactions[0].nonce, transactions: __transactions }))
         .sort((a, b) => a.nonce - b.nonce);
       const taskId = tasks[0].transactions[0].id;
       return {
         taskId,
         safeAddress: _transactions[0].safeAddress,
         safeName: _transactions[0].safeName,
-        safeUrl: getGnosisTransactionUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
+        safeUrl: getGnosisTransactionQueueUrl(_transactions[0].safeAddress, _transactions[0].safeChainId),
         tasks
       };
     })
-    .sort((safeA, safeB) => safeA.safeAddress > safeB.safeAddress ? -1 : 1);
+    .sort((safeA, safeB) => (safeA.safeAddress > safeB.safeAddress ? -1 : 1));
 }
 
-export async function getPendingGnosisTasks (myUserId: string) {
-
+export async function getPendingGnosisTasks(myUserId: string) {
   if (!providerKey) {
     log.warn('Skip gnosis request: Alchemy API Key is missing');
     return [];
@@ -264,7 +265,7 @@ export async function getPendingGnosisTasks (myUserId: string) {
 
   const transactions = await getTransactionsforSafes(safeOwner, safes);
 
-  const userAddresses = safes.map(safe => safe.owners).flat();
+  const userAddresses = safes.map((safe) => safe.owners).flat();
   const wallets = await prisma.userWallet.findMany({
     where: {
       address: {

@@ -5,11 +5,11 @@ import Switch from '../switch';
 import type { MenuOptionProps } from './menuItem';
 
 type SwitchOptionProps = MenuOptionProps & {
-    isOn: boolean;
-    icon?: React.ReactNode;
-}
+  isOn: boolean;
+  icon?: React.ReactNode;
+};
 
-function SwitchOption (props: SwitchOptionProps): JSX.Element {
+function SwitchOption(props: SwitchOptionProps): JSX.Element {
   const { name, icon, isOn } = props;
 
   return (
@@ -25,10 +25,7 @@ function SwitchOption (props: SwitchOptionProps): JSX.Element {
     >
       {icon ?? <div className='noicon' />}
       <div className='menu-name'>{name}</div>
-      <Switch
-        isOn={isOn}
-        onChanged={() => {}}
-      />
+      <Switch isOn={isOn} onChanged={() => {}} />
     </div>
   );
 }

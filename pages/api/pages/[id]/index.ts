@@ -1,4 +1,3 @@
-
 import type { Page } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -6,7 +5,15 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import {
+  ActionNotPermittedError,
+  hasAccessToSpace,
+  NotFoundError,
+  onError,
+  onNoMatch,
+  requireKeys,
+  requireUser
+} from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
@@ -27,7 +34,7 @@ handler
   .put(updatePageHandler)
   .delete(deletePage);
 
-async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session?.user?.id;
 
@@ -50,8 +57,7 @@ async function getPageRoute (req: NextApiRequest, res: NextApiResponse<IPageWith
   return res.status(200).json(page);
 }
 
-async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
-
+async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -60,8 +66,11 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     userId
   });
 
-  const updateContent = req.body as Partial<Page> ?? {};
-  if ((typeof updateContent.index === 'number' || updateContent.parentId !== undefined) && permissions.edit_position !== true) {
+  const updateContent = (req.body as Partial<Page>) ?? {};
+  if (
+    (typeof updateContent.index === 'number' || updateContent.parentId !== undefined) &&
+    permissions.edit_position !== true
+  ) {
     throw new ActionNotPermittedError('You do not have permission to reposition this page');
   }
   // Allow user with View & Comment permission to edit the page content
@@ -99,7 +108,9 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
     }
   }
 
-  const hasNewParentPage = (updateContent.parentId !== page.parentId && (typeof updateContent.parentId === 'string' || updateContent.parentId === null));
+  const hasNewParentPage =
+    updateContent.parentId !== page.parentId &&
+    (typeof updateContent.parentId === 'string' || updateContent.parentId === null);
 
   // Only perform validation if repositioning below another page
   if (hasNewParentPage && typeof updateContent.parentId === 'string') {
@@ -110,8 +121,10 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
 
     const newParentId = updateContent.parentId as string;
 
-    if (newParentId === pageId || flatChildren.some(p => p.id === newParentId)) {
-      throw new UndesirableOperationError(`You cannot reposition a page to be a child of ${newParentId === pageId ? 'itself' : 'one of its child pages'}`);
+    if (newParentId === pageId || flatChildren.some((p) => p.id === newParentId)) {
+      throw new UndesirableOperationError(
+        `You cannot reposition a page to be a child of ${newParentId === pageId ? 'itself' : 'one of its child pages'}`
+      );
     }
   }
 
@@ -122,10 +135,13 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   // Update page track profile and meta data state, unless it was content update
   if (!('content' in updateContent)) {
     updateTrackPageProfile(pageWithPermission.id);
-    relay.broadcast({
-      type: 'pages_meta_updated',
-      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
-    }, page.spaceId);
+    relay.broadcast(
+      {
+        type: 'pages_meta_updated',
+        payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+      },
+      page.spaceId
+    );
   }
 
   if (hasNewParentPage) {
@@ -136,7 +152,7 @@ async function updatePageHandler (req: NextApiRequest, res: NextApiResponse<IPag
   return res.status(200).json(pageWithPermission);
 }
 
-async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
+async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -170,10 +186,13 @@ async function deletePage (req: NextApiRequest, res: NextApiResponse<ModifyChild
   updateTrackPageProfile(pageId);
 
   if (pageToDelete) {
-    relay.broadcast({
-      type: 'pages_deleted',
-      payload: modifiedChildPageIds.map(id => ({ id }))
-    }, pageToDelete.spaceId);
+    relay.broadcast(
+      {
+        type: 'pages_deleted',
+        payload: modifiedChildPageIds.map((id) => ({ id }))
+      },
+      pageToDelete.spaceId
+    );
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });

@@ -7,4 +7,4 @@ export type NewSelectOptionType = {
 
 export type ExistingSelectOption = NewSelectOptionType & {
   id: string;
-}
+};

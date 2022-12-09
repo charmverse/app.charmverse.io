@@ -1,4 +1,3 @@
-
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
@@ -15,7 +14,7 @@ export const DOMAIN_BLACKLIST = [
   'u'
 ];
 
-export function isSpaceDomain (path?: string) {
+export function isSpaceDomain(path?: string) {
   if (!path) {
     return false;
   }
@@ -25,6 +24,9 @@ export function isSpaceDomain (path?: string) {
   return domain && !DOMAIN_BLACKLIST.includes(domain);
 }
 
-export function getSpaceDomainFromName (name: string) {
-  return name.replace(/[^\w\s-]/gu, '').replace(/\s/g, '-').toLowerCase();
+export function getSpaceDomainFromName(name: string) {
+  return name
+    .replace(/[^\w\s-]/gu, '')
+    .replace(/\s/g, '-')
+    .toLowerCase();
 }

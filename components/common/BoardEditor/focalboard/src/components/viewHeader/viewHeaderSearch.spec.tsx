@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -25,10 +24,10 @@ describe('components/viewHeader/ViewHeaderSearch', () => {
     users: {
       me: {
         id: 'user-id-1',
-        username: 'username_1' }
+        username: 'username_1'
+      }
     },
-    searchText: {
-    }
+    searchText: {}
   };
 
   const store = mockStateStore([], state);

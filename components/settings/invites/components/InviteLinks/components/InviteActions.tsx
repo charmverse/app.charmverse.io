@@ -29,8 +29,7 @@ const StyledMenu = styled((props: MenuProps) => (
   '& .MuiPaper-root': {
     borderRadius: 6,
     maxWidth: 260,
-    color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
     boxShadow:
       'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
     '& .MuiMenu-list': {
@@ -52,7 +51,7 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>
+export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>;
 
 interface InviteActionsProps {
   isAdmin: boolean;
@@ -62,7 +61,13 @@ interface InviteActionsProps {
   onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
 }
 
-function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
+function InviteActions({
+  isAdmin,
+  invitePopupState,
+  tokenGatePopupState,
+  onOpenInvitesClick,
+  onOpenTokenGateClick
+}: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -85,7 +90,6 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 
   return (
     <>
-
       <Tooltip title={!isAdmin ? 'Only workspace admins can create invite links' : ''} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
@@ -123,12 +127,7 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
             />
           </Box>
         </MenuItem>
-        <MenuItem
-          {...bindTrigger(tokenGatePopupState)}
-          onClick={handleTokenGate}
-          disableRipple
-          dense
-        >
+        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -145,4 +144,3 @@ function InviteActions ({ isAdmin, invitePopupState, tokenGatePopupState, onOpen
 }
 
 export default memo(InviteActions);
-

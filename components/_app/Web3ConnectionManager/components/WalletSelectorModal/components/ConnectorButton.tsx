@@ -22,16 +22,9 @@ type Props = {
   disabled: boolean;
   isActive: boolean;
   isLoading: boolean;
-}
+};
 
-function ConnectorButton ({
-  name,
-  onClick,
-  iconUrl,
-  disabled,
-  isActive,
-  isLoading
-}: Props) {
+function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
   return (
     <Button
       color='secondary'

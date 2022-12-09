@@ -8,32 +8,31 @@ export interface UpdateProfileItemRequest {
 }
 
 export class PagesApi {
-  getPages (spaceId: string) {
+  getPages(spaceId: string) {
     // meta=true - TEMP param to keep backward compatibility with old clients
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true });
   }
 
-  searchPages (spaceId: string, search: string) {
+  searchPages(spaceId: string, search: string) {
     // meta=true - TEMP param to keep backward compatibility with old clients
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { meta: true, search });
   }
 
-  getPage (pageIdOrPath: string, spaceId?: string) {
+  getPage(pageIdOrPath: string, spaceId?: string) {
     const query = spaceId ? `?spaceId=${spaceId}` : '';
     return http.GET<IPageWithPermissions>(`/api/pages/${pageIdOrPath}${query}`);
   }
 
-  updatePage (pageOpts: Partial<Page>) {
+  updatePage(pageOpts: Partial<Page>) {
     return http.PUT<IPageWithPermissions>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  getPageDetails (pageIdOrPath: string, spaceId?: string) {
+  getPageDetails(pageIdOrPath: string, spaceId?: string) {
     const query = spaceId ? `?spaceId=${spaceId}` : '';
     return http.GET<PageDetails>(`/api/pages/${pageIdOrPath}/details${query}`);
   }
 
-  convertToProposal (pageId: string) {
+  convertToProposal(pageId: string) {
     return http.POST<PageDetails>(`/api/pages/${pageId}/convert-to-proposal`);
   }
 }
-

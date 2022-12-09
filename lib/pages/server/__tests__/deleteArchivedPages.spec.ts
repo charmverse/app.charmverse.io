@@ -28,9 +28,13 @@ describe('deleteArchivedPages', () => {
       const thirdPage = await createPage({
         spaceId: space.id,
         createdBy: user.id,
-        deletedAt: new Date(DateTime.now().minus({
-          days: 31
-        }).toISO())
+        deletedAt: new Date(
+          DateTime.now()
+            .minus({
+              days: 31
+            })
+            .toISO()
+        )
       });
 
       // A block archived just now
@@ -52,9 +56,13 @@ describe('deleteArchivedPages', () => {
       const thirdBlock = await createBlock({
         spaceId: space.id,
         createdBy: user.id,
-        deletedAt: new Date(DateTime.now().minus({
-          days: 31
-        }).toISO()),
+        deletedAt: new Date(
+          DateTime.now()
+            .minus({
+              days: 31
+            })
+            .toISO()
+        ),
         rootId: v4()
       });
 
@@ -84,13 +92,13 @@ describe('deleteArchivedPages', () => {
         }
       });
 
-      const pageIds = new Set(pages.map(page => page.id));
-      const blockIds = new Set(blocks.map(block => block.id));
+      const pageIds = new Set(pages.map((page) => page.id));
+      const blockIds = new Set(blocks.map((block) => block.id));
 
       expect(pageIds.size).toBe(2);
       expect(blockIds.size).toBe(2);
-      expect([firstPage.id, secondPage.id].every(pageId => pageIds.has(pageId))).toBe(true);
-      expect([firstBlock.id, secondBlock.id].every(blockId => blockIds.has(blockId))).toBe(true);
+      expect([firstPage.id, secondPage.id].every((pageId) => pageIds.has(pageId))).toBe(true);
+      expect([firstBlock.id, secondBlock.id].every((blockId) => blockIds.has(blockId))).toBe(true);
     }
   });
 });

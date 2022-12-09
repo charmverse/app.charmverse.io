@@ -24,8 +24,11 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test('signup - allows user to sign up and create a workspace using Discord', async ({ loginPage, discordServer, signupPage }) => {
-
+test('signup - allows user to sign up and create a workspace using Discord', async ({
+  loginPage,
+  discordServer,
+  signupPage
+}) => {
   await loginPage.goto();
 
   const discordApiUrl = discordServer.host;
@@ -33,5 +36,4 @@ test('signup - allows user to sign up and create a workspace using Discord', asy
   await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
 
   await signupPage.waitForURL();
-
 });

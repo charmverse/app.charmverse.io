@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 
 import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
@@ -37,9 +36,7 @@ beforeAll(async () => {
 });
 
 describe('getSpaceMemberMetadata', () => {
-
   it('should retrieve admin user roles for single space', async () => {
-
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: u1Space1.id, memberId: user1.id });
 
     expect(metadataMap[u1Space1.id].roles.length).toBe(2);

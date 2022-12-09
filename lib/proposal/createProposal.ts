@@ -12,25 +12,26 @@ import { generateSyncProposalPermissions } from './syncProposalPermissions';
 type PageProps = 'createdBy' | 'spaceId';
 type OptionalPageProps = 'content' | 'contentText' | 'id' | 'title';
 
-type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps>
-  & Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
+type ProposalPageInput = Pick<Prisma.PageUncheckedCreateInput, PageProps> &
+  Partial<Pick<Prisma.PageUncheckedCreateInput, OptionalPageProps>>;
 
-type ProposalInput = { reviewers: { roleId?: string, userId?: string }[], categoryId: string | null };
+type ProposalInput = { reviewers: { roleId?: string; userId?: string }[]; categoryId: string | null };
 
-export async function createProposal (pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
-
+export async function createProposal(pageProps: ProposalPageInput, proposalProps?: ProposalInput) {
   const { createdBy, id: pageId, spaceId } = pageProps;
 
   const proposalId = pageId ?? uuid();
   const proposalStatus: ProposalStatus = 'private_draft';
 
-  const existingPage = pageId && await prisma.page.findUnique({
-    where: {
-      id: pageId
-    }
-  });
+  const existingPage =
+    pageId &&
+    (await prisma.page.findUnique({
+      where: {
+        id: pageId
+      }
+    }));
 
-  function upsertPage (): PrismaPromise<Page> {
+  function upsertPage(): PrismaPromise<Page> {
     if (existingPage) {
       return prisma.page.update({
         where: {
@@ -43,8 +44,7 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
           updatedBy: createdBy
         }
       });
-    }
-    else {
+    } else {
       return createPage({
         data: {
           proposalId,
@@ -76,13 +76,13 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
             userId: createdBy
           }
         },
-        ...proposalProps?.reviewers && {
+        ...(proposalProps?.reviewers && {
           reviewers: {
             createMany: {
               data: proposalProps.reviewers
             }
           }
-        }
+        })
       }
     }),
     upsertPage(),
@@ -103,13 +103,10 @@ export async function createProposal (pageProps: ProposalPageInput, proposalProp
 
   await prisma.$transaction([
     prisma.pagePermission.deleteMany(deleteArgs),
-    ...createArgs.map(args => (
-      prisma.pagePermission.create(args)
-    ))
+    ...createArgs.map((args) => prisma.pagePermission.create(args))
   ]);
 
   trackUserAction('new_proposal_created', { userId: createdBy, pageId: page.id, resourceId: proposal.id, spaceId });
 
   return { page, proposal, workspaceEvent };
 }
-

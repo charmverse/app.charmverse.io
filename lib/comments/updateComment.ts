@@ -3,8 +3,7 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { CommentUpdate, CommentWithUser } from './interfaces';
 
-export async function updateComment ({ content, id }: CommentUpdate): Promise<CommentWithUser> {
-
+export async function updateComment({ content, id }: CommentUpdate): Promise<CommentWithUser> {
   if (!content) {
     throw new InvalidInputError('Please provide a non empty input to update this comment.');
   }
@@ -36,5 +35,4 @@ export async function updateComment ({ content, id }: CommentUpdate): Promise<Co
   });
 
   return updated;
-
 }

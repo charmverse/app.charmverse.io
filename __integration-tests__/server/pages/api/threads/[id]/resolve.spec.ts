@@ -6,7 +6,11 @@ import { prisma } from 'db';
 import { upsertPermission } from 'lib/permissions/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateCommentWithThreadAndPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  generateCommentWithThreadAndPage,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from 'testing/setupDatabase';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;
@@ -31,9 +35,7 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/threads/{id} - update a comment', () => {
-
   it('should update the thread status if the user has the comment permissions, and respond 200', async () => {
-
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
@@ -53,7 +55,6 @@ describe('PUT /api/threads/{id} - update a comment', () => {
   });
 
   it('should fail if the user does not have comment permission and respond 401', async () => {
-
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: false
@@ -73,13 +74,10 @@ describe('PUT /api/threads/{id} - update a comment', () => {
       .send({ resolved: true })
       .expect(401);
   });
-
 });
 
 describe('DELETE /api/threads/{id} - delete a thread', () => {
-
   it('should delete the thread if the user has comment permissions it, and respond 200', async () => {
-
     const { thread, page, comment } = await generateCommentWithThreadAndPage({
       commentContent: 'Message',
       spaceId: nonAdminUserSpace.id,
@@ -91,11 +89,7 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl)
-      .delete(`/api/threads/${thread.id}`)
-      .set('Cookie', nonAdminCookie)
-      .send({})
-      .expect(200);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', nonAdminCookie).send({}).expect(200);
 
     const inexistentThread = await prisma.thread.findUnique({
       where: {
@@ -104,11 +98,9 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
     });
 
     expect(inexistentThread).toBeNull();
-
   });
 
   it('should fail if the user did not create the thread, and respond 401', async () => {
-
     const otherAdminUser = await generateSpaceUser({
       spaceId: nonAdminUserSpace.id,
       isAdmin: false
@@ -122,11 +114,6 @@ describe('DELETE /api/threads/{id} - delete a thread', () => {
       userId: nonAdminUser.id
     });
 
-    await request(baseUrl)
-      .delete(`/api/threads/${thread.id}`)
-      .set('Cookie', otherAdminCookie)
-      .send({})
-      .expect(401);
+    await request(baseUrl).delete(`/api/threads/${thread.id}`).set('Cookie', otherAdminCookie).send({}).expect(401);
   });
-
 });

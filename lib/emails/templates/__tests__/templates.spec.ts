@@ -1,8 +1,6 @@
-
 import { tasksRequiresYourAttention } from '../PendingTasks';
 
 describe('Email template unit tests', () => {
-
   it('Subject line should be formatted properly for one task', async () => {
     const subject = tasksRequiresYourAttention({ count: 1 });
     expect(subject).toEqual('1 task needs your attention');

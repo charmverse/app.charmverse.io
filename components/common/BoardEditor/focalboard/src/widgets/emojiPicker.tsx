@@ -6,18 +6,13 @@ import React from 'react';
 import 'emoji-mart/css/emoji-mart.css';
 
 type Props = {
-    onSelect: (emoji: string) => void;
-}
+  onSelect: (emoji: string) => void;
+};
 
-function EmojiPicker (props: Props): JSX.Element {
+function EmojiPicker(props: Props): JSX.Element {
   return (
-    <div
-      className='EmojiPicker'
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Picker
-        onSelect={(emoji: BaseEmoji) => props.onSelect(emoji.native)}
-      />
+    <div className='EmojiPicker' onClick={(e) => e.stopPropagation()}>
+      <Picker onSelect={(emoji: BaseEmoji) => props.onSelect(emoji.native)} />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
 import { domSerializationHelpers } from '@bangle.dev/core';
 
@@ -12,14 +11,11 @@ import { markName } from './emojiSuggest.constants';
 const defaultTrigger = ':';
 const name = 'emoji';
 
-export function specs () {
-  return [
-    emojiSpec(),
-    specMark()
-  ];
+export function specs() {
+  return [emojiSpec(), specMark()];
 }
 
-function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): RawSpecs {
+function emojiSpec({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): RawSpecs {
   const { parseDOM, toDOM } = domSerializationHelpers(name, {
     tag: 'span',
     parsingPriority: 51,
@@ -43,8 +39,9 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       atom: true,
       toDOM: (node) => {
         const twemojiImage = getTwitterEmoji(node.attrs.emoji);
-        return twemojiImage ? ['img', { src: twemojiImage,
-          style: 'width: 18px; height: 18px; position: relative; top: 4px;' }] : toDOM(node);
+        return twemojiImage
+          ? ['img', { src: twemojiImage, style: 'width: 18px; height: 18px; position: relative; top: 4px;' }]
+          : toDOM(node);
       },
       parseDOM,
       selectable: true
@@ -53,8 +50,7 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
       toMarkdown: (state, node) => {
         try {
           state.text(node.attrs.emoji);
-        }
-        catch (err) {
+        } catch (err) {
           log.warn('Conversion err', err);
         }
       }
@@ -62,7 +58,7 @@ function emojiSpec ({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): 
   };
 }
 
-function specMark ({
+function specMark({
   trigger = defaultTrigger
 }: {
   trigger?: string;

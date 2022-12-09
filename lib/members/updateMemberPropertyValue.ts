@@ -6,9 +6,9 @@ type UpdatePropertyInput = {
   spaceId: string;
   userId: string;
   updatedBy: string;
-}
+};
 
-export function updateMemberPropertyValue ({ data, userId, spaceId, updatedBy }: UpdatePropertyInput) {
+export function updateMemberPropertyValue({ data, userId, spaceId, updatedBy }: UpdatePropertyInput) {
   return prisma.memberPropertyValue.upsert({
     where: {
       memberPropertyId_spaceId_userId: {

@@ -18,15 +18,13 @@ const processConnectionError = (error: Error): ErrorInfo => {
     case UnsupportedChainIdError:
       return {
         title: 'Wrong network',
-        description:
-          'Please switch to a supported network, or connect to another wallet.'
+        description: 'Please switch to a supported network, or connect to another wallet.'
       };
     case UserRejectedRequestErrorInjected:
     case UserRejectedRequestErrorWalletConnect:
       return {
         title: 'Error connecting. Try again!',
-        description:
-          'Please authorize this website to access your Ethereum account.'
+        description: 'Please authorize this website to access your Ethereum account.'
       };
     case Error:
       return {
@@ -34,11 +32,10 @@ const processConnectionError = (error: Error): ErrorInfo => {
         description: error.message
       };
     default:
-      if ((<any> error).code === -32002) {
+      if ((<any>error).code === -32002) {
         return {
           title: 'Sign in to MetaMask',
-          description:
-            'Please make sure you are signed in.'
+          description: 'Please make sure you are signed in.'
         };
       }
       return {

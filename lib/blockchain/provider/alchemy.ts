@@ -3,7 +3,7 @@ import orderBy from 'lodash/orderBy';
 import { GET } from 'adapters/http';
 
 export const SupportedChainIds = [1, 4, 5, 137, 80001, 42161] as const;
-export type SupportedChainId = typeof SupportedChainIds[number]
+export type SupportedChainId = typeof SupportedChainIds[number];
 
 interface NftMedia {
   bytes: number;
@@ -76,22 +76,19 @@ export const getAddressNfts = async (address: string, chainId: SupportedChainId 
 };
 
 export const getNFTs = async (addresses: string[], chainId: SupportedChainId = 1) => {
-  const promises = addresses.map(address => getAddressNfts(address, chainId));
+  const promises = addresses.map((address) => getAddressNfts(address, chainId));
 
   const results = await Promise.allSettled(promises);
-  const nfts = results.reduce((acc: AlchemyNft[], res) => {
-    if (res.status === 'fulfilled') {
-      return [...acc, ...res.value];
-    }
-    else {
-      return acc;
-
-    }
-  }, [])
+  const nfts = results
+    .reduce((acc: AlchemyNft[], res) => {
+      if (res.status === 'fulfilled') {
+        return [...acc, ...res.value];
+      } else {
+        return acc;
+      }
+    }, [])
     // Filter out invalid NFTs
-    .filter(n => !!n.media?.length
-      && !!n.media[0].gateway
-      && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
+    .filter((n) => !!n.media?.length && !!n.media[0].gateway && !FILTERED_NFT_CONTRACTS.includes(n.contract.address));
 
   const sortedNfts = orderBy(nfts, (nft) => new Date(nft.timeLastUpdated), 'desc');
 
@@ -111,4 +108,3 @@ export const getOwners = async (contractAddress: string, tokenId: string, chainI
 
   return res.owners;
 };
-

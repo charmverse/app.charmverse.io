@@ -20,8 +20,8 @@ import undoManager from './undomanager';
 import { IDType, Utils } from './utils';
 
 export interface BlockChange {
-    block: Block;
-    newBlock: Block;
+  block: Block;
+  newBlock: Block;
 }
 
 //
@@ -33,7 +33,7 @@ class Mutator {
 
   private undoDisplayId?: string;
 
-  private beginUndoGroup (): string | undefined {
+  private beginUndoGroup(): string | undefined {
     if (this.undoGroupId) {
       Utils.assertFailure('UndoManager does not support nested groups');
       return undefined;
@@ -42,7 +42,7 @@ class Mutator {
     return this.undoGroupId;
   }
 
-  private endUndoGroup (groupId: string) {
+  private endUndoGroup(groupId: string) {
     if (this.undoGroupId !== groupId) {
       Utils.assertFailure('Mismatched groupId. UndoManager does not support nested groups');
       return;
@@ -50,12 +50,11 @@ class Mutator {
     this.undoGroupId = undefined;
   }
 
-  async performAsUndoGroup (actions: () => Promise<void>): Promise<void> {
+  async performAsUndoGroup(actions: () => Promise<void>): Promise<void> {
     const groupId = this.beginUndoGroup();
     try {
       await actions();
-    }
-    catch (err) {
+    } catch (err) {
       Utils.assertFailure(`ERROR: ${err}`);
     }
     if (groupId) {
@@ -63,7 +62,7 @@ class Mutator {
     }
   }
 
-  async updateBlock (newBlock: Block, oldBlock: Block, description: string): Promise<void> {
+  async updateBlock(newBlock: Block, oldBlock: Block, description: string): Promise<void> {
     const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock);
     await undoManager.perform(
       async () => {
@@ -77,7 +76,7 @@ class Mutator {
     );
   }
 
-  async updateBlocks (newBlocks: Block[], oldBlocks: Block[], description: string): Promise<void> {
+  async updateBlocks(newBlocks: Block[], oldBlocks: Block[], description: string): Promise<void> {
     if (newBlocks.length !== oldBlocks.length) {
       throw new Error('new and old blocks must have the same length when updating blocks');
     }
@@ -104,7 +103,12 @@ class Mutator {
   }
 
   // eslint-disable-next-line no-shadow
-  async insertBlock (block: Block, description = 'add', afterRedo?: (block: Block) => Promise<void>, beforeUndo?: (block: Block) => Promise<void>): Promise<Block> {
+  async insertBlock(
+    block: Block,
+    description = 'add',
+    afterRedo?: (block: Block) => Promise<void>,
+    beforeUndo?: (block: Block) => Promise<void>
+  ): Promise<Block> {
     return undoManager.perform(
       async () => {
         const jsonres = await charmClient.insertBlock(block, publishIncrementalUpdate);
@@ -122,7 +126,12 @@ class Mutator {
   }
 
   // eslint-disable-next-line no-shadow
-  async insertBlocks (blocks: Block[], description = 'add', afterRedo?: (blocks: Block[]) => Promise<void>, beforeUndo?: () => Promise<void>) {
+  async insertBlocks(
+    blocks: Block[],
+    description = 'add',
+    afterRedo?: (blocks: Block[]) => Promise<void>,
+    beforeUndo?: () => Promise<void>
+  ) {
     return undoManager.perform(
       async () => {
         const newBlocks = await charmClient.insertBlocks(blocks, publishIncrementalUpdate);
@@ -142,7 +151,12 @@ class Mutator {
     );
   }
 
-  async deleteBlock (block: Block, description?: string, beforeRedo?: () => Promise<void>, afterUndo?: () => Promise<void>) {
+  async deleteBlock(
+    block: Block,
+    description?: string,
+    beforeRedo?: () => Promise<void>,
+    afterUndo?: () => Promise<void>
+  ) {
     const actualDescription = description || `delete ${block.type}`;
 
     await undoManager.perform(
@@ -159,7 +173,7 @@ class Mutator {
     );
   }
 
-  async changeTitle (blockId: string, oldTitle: string, newTitle: string, description = 'change title') {
+  async changeTitle(blockId: string, oldTitle: string, newTitle: string, description = 'change title') {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(blockId, { title: newTitle }, publishIncrementalUpdate);
@@ -172,33 +186,50 @@ class Mutator {
     );
   }
 
-  async setDefaultTemplate (blockId: string, oldTemplateId: string, templateId: string, description = 'set default template') {
+  async setDefaultTemplate(
+    blockId: string,
+    oldTemplateId: string,
+    templateId: string,
+    description = 'set default template'
+  ) {
     await undoManager.perform(
       async () => {
-        await charmClient.patchBlock(blockId, { updatedFields: { defaultTemplateId: templateId } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          blockId,
+          { updatedFields: { defaultTemplateId: templateId } },
+          publishIncrementalUpdate
+        );
       },
       async () => {
-        await charmClient.patchBlock(blockId, { updatedFields: { defaultTemplateId: oldTemplateId } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          blockId,
+          { updatedFields: { defaultTemplateId: oldTemplateId } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async clearDefaultTemplate (blockId: string, oldTemplateId: string, description = 'set default template') {
+  async clearDefaultTemplate(blockId: string, oldTemplateId: string, description = 'set default template') {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(blockId, { updatedFields: { defaultTemplateId: '' } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(blockId, { updatedFields: { defaultTemplateId: oldTemplateId } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          blockId,
+          { updatedFields: { defaultTemplateId: oldTemplateId } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async changeIcon (blockId: string, oldIcon: string|undefined, icon: string, description = 'change icon') {
+  async changeIcon(blockId: string, oldIcon: string | undefined, icon: string, description = 'change icon') {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(blockId, { updatedFields: { icon } }, publishIncrementalUpdate);
@@ -211,7 +242,12 @@ class Mutator {
     );
   }
 
-  async changeHeaderImage (blockId: string, oldHeaderImage: string | undefined | null, headerImage: string | null, description = 'change cover') {
+  async changeHeaderImage(
+    blockId: string,
+    oldHeaderImage: string | undefined | null,
+    headerImage: string | null,
+    description = 'change cover'
+  ) {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(blockId, { updatedFields: { headerImage } }, publishIncrementalUpdate);
@@ -224,20 +260,33 @@ class Mutator {
     );
   }
 
-  async changeDescription (blockId: string, oldBlockDescription: PageContent|undefined, blockDescription: PageContent, description = 'change description') {
+  async changeDescription(
+    blockId: string,
+    oldBlockDescription: PageContent | undefined,
+    blockDescription: PageContent,
+    description = 'change description'
+  ) {
     await undoManager.perform(
       async () => {
-        await charmClient.patchBlock(blockId, { updatedFields: { description: blockDescription } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          blockId,
+          { updatedFields: { description: blockDescription } },
+          publishIncrementalUpdate
+        );
       },
       async () => {
-        await charmClient.patchBlock(blockId, { updatedFields: { description: oldBlockDescription } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          blockId,
+          { updatedFields: { description: oldBlockDescription } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async showDescription (boardId: string, oldShowDescription: boolean, showDescription = true, description?: string) {
+  async showDescription(boardId: string, oldShowDescription: boolean, showDescription = true, description?: string) {
     let actionDescription = description;
     if (!actionDescription) {
       actionDescription = showDescription ? 'show description' : 'hide description';
@@ -248,20 +297,33 @@ class Mutator {
         await charmClient.patchBlock(boardId, { updatedFields: { showDescription } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(boardId, { updatedFields: { showDescription: oldShowDescription } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          boardId,
+          { updatedFields: { showDescription: oldShowDescription } },
+          publishIncrementalUpdate
+        );
       },
       actionDescription,
       this.undoGroupId
     );
   }
 
-  async changeCardContentOrder (cardId: string, oldContentOrder:(string | string[])[], contentOrder: (string | string[])[], description = 'reorder'): Promise<void> {
+  async changeCardContentOrder(
+    cardId: string,
+    oldContentOrder: (string | string[])[],
+    contentOrder: (string | string[])[],
+    description = 'reorder'
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(cardId, { updatedFields: { contentOrder } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(cardId, { updatedFields: { contentOrder: oldContentOrder } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          cardId,
+          { updatedFields: { contentOrder: oldContentOrder } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
@@ -270,7 +332,12 @@ class Mutator {
 
   // Property Templates
 
-  async insertPropertyTemplate (board: Board, activeView: BoardView, index = -1, template?: IPropertyTemplate): Promise<string> {
+  async insertPropertyTemplate(
+    board: Board,
+    activeView: BoardView,
+    index = -1,
+    template?: IPropertyTemplate
+  ): Promise<string> {
     if (!activeView) {
       Utils.assertFailure('insertPropertyTemplate: no activeView');
       return '';
@@ -310,7 +377,7 @@ class Mutator {
     return newTemplate.id;
   }
 
-  async duplicatePropertyTemplate (board: Board, activeView: BoardView, propertyId: string) {
+  async duplicatePropertyTemplate(board: Board, activeView: BoardView, propertyId: string) {
     if (!activeView) {
       Utils.assertFailure('duplicatePropertyTemplate: no activeView');
       return;
@@ -348,7 +415,7 @@ class Mutator {
     await this.updateBlocks(changedBlocks, oldBlocks, description);
   }
 
-  async changePropertyTemplateOrder (board: Board, template: IPropertyTemplate, destIndex: number) {
+  async changePropertyTemplateOrder(board: Board, template: IPropertyTemplate, destIndex: number) {
     const templates = board.fields.cardProperties;
     const newValue = templates.slice();
 
@@ -362,7 +429,7 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'reorder properties');
   }
 
-  async deleteProperty (board: Board, views: BoardView[], cards: Card[], propertyId: string) {
+  async deleteProperty(board: Board, views: BoardView[], cards: Card[], propertyId: string) {
     const oldBlocks: Block[] = [board];
 
     const newBoard = createBoard({ block: board });
@@ -393,7 +460,12 @@ class Mutator {
 
   // Properties
 
-  async insertPropertyOption (board: Board, template: IPropertyTemplate, option: IPropertyOption, description = 'add option') {
+  async insertPropertyOption(
+    board: Board,
+    template: IPropertyTemplate,
+    option: IPropertyOption,
+    description = 'add option'
+  ) {
     Utils.assert(board.fields.cardProperties.includes(template));
 
     const newBoard = createBoard({ block: board });
@@ -403,7 +475,7 @@ class Mutator {
     await this.updateBlock(newBoard, board, description);
   }
 
-  async deletePropertyOption (board: Board, template: IPropertyTemplate, option: IPropertyOption) {
+  async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
     const newBoard = createBoard({ block: board });
     const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!;
     newTemplate.options = newTemplate.options.filter((o) => o.id !== option.id);
@@ -411,7 +483,12 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'delete option');
   }
 
-  async changePropertyOptionOrder (board: Board, template: IPropertyTemplate, option: IPropertyOption, destIndex: number) {
+  async changePropertyOptionOrder(
+    board: Board,
+    template: IPropertyTemplate,
+    option: IPropertyOption,
+    destIndex: number
+  ) {
     const srcIndex = template.options.indexOf(option);
     Utils.log(`srcIndex: ${srcIndex}, destIndex: ${destIndex}`);
 
@@ -422,7 +499,12 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'reorder options');
   }
 
-  async changePropertyOptionValue (board: Board, propertyTemplate: IPropertyTemplate, option: IPropertyOption, value: string) {
+  async changePropertyOptionValue(
+    board: Board,
+    propertyTemplate: IPropertyTemplate,
+    option: IPropertyOption,
+    value: string
+  ) {
     const oldBlocks: Block[] = [board];
 
     const newBoard = createBoard({ block: board });
@@ -436,7 +518,7 @@ class Mutator {
     return changedBlocks;
   }
 
-  async changePropertyOptionColor (board: Board, template: IPropertyTemplate, option: IPropertyOption, color: string) {
+  async changePropertyOptionColor(board: Board, template: IPropertyTemplate, option: IPropertyOption, color: string) {
     const newBoard = createBoard({ block: board });
     const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!;
     const newOption = newTemplate.options.find((o) => o.id === option.id)!;
@@ -444,7 +526,7 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'change option color');
   }
 
-  async changePropertyOption (board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
+  async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
     const newBoard = createBoard({ block: board });
     const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === template.id)!;
     const newOption = newTemplate.options.find((o) => o.id === updatedOption.id)!;
@@ -453,7 +535,13 @@ class Mutator {
     await this.updateBlock(newBoard, board, 'change property option');
   }
 
-  changePropertyValue (card: Card, propertyId: string, value?: string | string[], description = 'change property', mutate = true) {
+  changePropertyValue(
+    card: Card,
+    propertyId: string,
+    value?: string | string[],
+    description = 'change property',
+    mutate = true
+  ) {
     const oldValue = card.fields.properties[propertyId];
 
     // dont save anything if property value was not changed.
@@ -464,20 +552,24 @@ class Mutator {
     const newCard = createCard(card);
     if (value) {
       newCard.fields.properties[propertyId] = value;
-    }
-    else {
+    } else {
       delete newCard.fields.properties[propertyId];
     }
     if (mutate) {
       // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.EditCardProperty, {board: card.rootId, card: card.id})
       return this.updateBlock(newCard, card, description);
-    }
-    else {
+    } else {
       return { newBlock: newCard, block: card };
     }
   }
 
-  async changePropertyTypeAndName (board: Board, cards: Card[], propertyTemplate: IPropertyTemplate, newType: PropertyType, newName: string) {
+  async changePropertyTypeAndName(
+    board: Board,
+    cards: Card[],
+    propertyTemplate: IPropertyTemplate,
+    newType: PropertyType,
+    newName: string
+  ) {
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
       return;
     }
@@ -496,12 +588,13 @@ class Mutator {
     const newBlocks: Block[] = [newBoard];
 
     if (propertyTemplate.type !== newType) {
-      if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') { // If the old type was either select or multiselect
+      if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
+        // If the old type was either select or multiselect
         const isNewTypeSelectOrMulti = newType === 'select' || newType === 'multiSelect';
 
         for (const card of cards) {
           const oldValue = Array.isArray(card.fields.properties[propertyTemplate.id])
-            ? (card.fields.properties[propertyTemplate.id].length > 0 && card.fields.properties[propertyTemplate.id][0])
+            ? card.fields.properties[propertyTemplate.id].length > 0 && card.fields.properties[propertyTemplate.id][0]
             : card.fields.properties[propertyTemplate.id];
           if (oldValue) {
             const newValue = isNewTypeSelectOrMulti
@@ -511,8 +604,7 @@ class Mutator {
 
             if (newValue) {
               newCard.fields.properties[propertyTemplate.id] = newType === 'multiSelect' ? [newValue] : newValue;
-            }
-            else {
+            } else {
               // This was an invalid select option, so delete it
               delete newCard.fields.properties[propertyTemplate.id];
             }
@@ -525,8 +617,8 @@ class Mutator {
             newTemplate.options = propertyTemplate.options;
           }
         }
-      }
-      else if (newType === 'select' || newType === 'multiSelect') { // if the new type is either select or multiselect
+      } else if (newType === 'select' || newType === 'multiSelect') {
+        // if the new type is either select or multiselect
         // Map values to new template option IDs
         for (const card of cards) {
           const oldValue = card.fields.properties[propertyTemplate.id] as string;
@@ -556,20 +648,28 @@ class Mutator {
 
   // Views
 
-  async changeViewSortOptions (viewId: string, oldSortOptions: ISortOption[], sortOptions: ISortOption[]): Promise<void> {
+  async changeViewSortOptions(
+    viewId: string,
+    oldSortOptions: ISortOption[],
+    sortOptions: ISortOption[]
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { sortOptions } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { sortOptions: oldSortOptions } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { sortOptions: oldSortOptions } },
+          publishIncrementalUpdate
+        );
       },
       'sort',
       this.undoGroupId
     );
   }
 
-  async changeViewFilter (viewId: string, oldFilter: FilterGroup, filter: FilterGroup): Promise<void> {
+  async changeViewFilter(viewId: string, oldFilter: FilterGroup, filter: FilterGroup): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { filter } }, publishIncrementalUpdate);
@@ -582,7 +682,7 @@ class Mutator {
     );
   }
 
-  async changeViewGroupById (viewId: string, oldGroupById: string|undefined, groupById: string): Promise<void> {
+  async changeViewGroupById(viewId: string, oldGroupById: string | undefined, groupById: string): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { groupById } }, publishIncrementalUpdate);
@@ -595,20 +695,33 @@ class Mutator {
     );
   }
 
-  async changeViewDateDisplayPropertyId (viewId: string, oldDateDisplayPropertyId: string|undefined, dateDisplayPropertyId: string): Promise<void> {
+  async changeViewDateDisplayPropertyId(
+    viewId: string,
+    oldDateDisplayPropertyId: string | undefined,
+    dateDisplayPropertyId: string
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { dateDisplayPropertyId } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { dateDisplayPropertyId: oldDateDisplayPropertyId } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { dateDisplayPropertyId: oldDateDisplayPropertyId } },
+          publishIncrementalUpdate
+        );
       },
       'display by',
       this.undoDisplayId
     );
   }
 
-  async changeViewVisiblePropertiesOrder (view: BoardView, template: IPropertyTemplate, destIndex: number, description = 'change property order'): Promise<void> {
+  async changeViewVisiblePropertiesOrder(
+    view: BoardView,
+    template: IPropertyTemplate,
+    destIndex: number,
+    description = 'change property order'
+  ): Promise<void> {
     const oldVisiblePropertyIds = view.fields.visiblePropertyIds;
     const newOrder = oldVisiblePropertyIds.slice();
 
@@ -619,69 +732,117 @@ class Mutator {
 
     await undoManager.perform(
       async () => {
-        await charmClient.patchBlock(view.id, { updatedFields: { visiblePropertyIds: newOrder } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          view.id,
+          { updatedFields: { visiblePropertyIds: newOrder } },
+          publishIncrementalUpdate
+        );
       },
       async () => {
-        await charmClient.patchBlock(view.id, { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          view.id,
+          { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async changeViewVisibleProperties (viewId: string, oldVisiblePropertyIds: string[], visiblePropertyIds: string[], description = 'show / hide property'): Promise<void> {
+  async changeViewVisibleProperties(
+    viewId: string,
+    oldVisiblePropertyIds: string[],
+    visiblePropertyIds: string[],
+    description = 'show / hide property'
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { visiblePropertyIds } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async changeViewVisibleOptionIds (viewId: string, oldVisibleOptionIds: string[], visibleOptionIds: string[], description = 'reorder'): Promise<void> {
+  async changeViewVisibleOptionIds(
+    viewId: string,
+    oldVisibleOptionIds: string[],
+    visibleOptionIds: string[],
+    description = 'reorder'
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { visibleOptionIds } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { visibleOptionIds: oldVisibleOptionIds } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { visibleOptionIds: oldVisibleOptionIds } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async changeViewHiddenOptionIds (viewId: string, oldHiddenOptionIds: string[], hiddenOptionIds: string[], description = 'reorder'): Promise<void> {
+  async changeViewHiddenOptionIds(
+    viewId: string,
+    oldHiddenOptionIds: string[],
+    hiddenOptionIds: string[],
+    description = 'reorder'
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(viewId, { updatedFields: { hiddenOptionIds } }, publishIncrementalUpdate);
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { hiddenOptionIds: oldHiddenOptionIds } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { hiddenOptionIds: oldHiddenOptionIds } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async changeViewKanbanCalculations (viewId: string, oldCalculations: Record<string, KanbanCalculationFields>, calculations: Record<string, KanbanCalculationFields>, description = 'updated kanban calculations'): Promise<void> {
+  async changeViewKanbanCalculations(
+    viewId: string,
+    oldCalculations: Record<string, KanbanCalculationFields>,
+    calculations: Record<string, KanbanCalculationFields>,
+    description = 'updated kanban calculations'
+  ): Promise<void> {
     await undoManager.perform(
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { kanbanCalculations: calculations } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { kanbanCalculations: calculations } },
+          publishIncrementalUpdate
+        );
       },
       async () => {
-        await charmClient.patchBlock(viewId, { updatedFields: { kanbanCalculations: oldCalculations } }, publishIncrementalUpdate);
+        await charmClient.patchBlock(
+          viewId,
+          { updatedFields: { kanbanCalculations: oldCalculations } },
+          publishIncrementalUpdate
+        );
       },
       description,
       this.undoGroupId
     );
   }
 
-  async hideViewColumn (view: BoardView, columnOptionId: string): Promise<void> {
+  async hideViewColumn(view: BoardView, columnOptionId: string): Promise<void> {
     if (view.fields.hiddenOptionIds.includes(columnOptionId)) {
       return;
     }
@@ -692,7 +853,7 @@ class Mutator {
     await this.updateBlock(newView, view, 'hide column');
   }
 
-  async unhideViewColumn (view: BoardView, columnOptionId: string): Promise<void> {
+  async unhideViewColumn(view: BoardView, columnOptionId: string): Promise<void> {
     if (!view.fields.hiddenOptionIds.includes(columnOptionId)) {
       return;
     }
@@ -706,53 +867,52 @@ class Mutator {
     await this.updateBlock(newView, view, 'show column');
   }
 
-  changeViewCardOrder (view: BoardView, cardOrder: string[], description = 'reorder', mutate = true) {
+  changeViewCardOrder(view: BoardView, cardOrder: string[], description = 'reorder', mutate = true) {
     const newView = createBoardView(view);
     newView.fields.cardOrder = cardOrder;
     if (mutate) {
       return this.updateBlock(newView, view, description);
-    }
-    else {
+    } else {
       return { newBlock: newView, block: view };
     }
   }
 
   // Duplicate
 
-  async duplicateCard (
-    {
-      cardId,
-      board,
-      description = 'duplicate card',
-      asTemplate = false,
-      afterRedo,
-      beforeUndo,
-      cardPage
-    }: {
-          cardId: string;
-          board: Board;
-          cardPage: PageMeta;
-          description?: string;
-          asTemplate?: boolean;
-          afterRedo?: (newCardId: string) => Promise<void>;
-          beforeUndo?: () => Promise<void>;
-        }
-  ): Promise<[Block[], string]> {
+  async duplicateCard({
+    cardId,
+    board,
+    description = 'duplicate card',
+    asTemplate = false,
+    afterRedo,
+    beforeUndo,
+    cardPage
+  }: {
+    cardId: string;
+    board: Board;
+    cardPage: PageMeta;
+    description?: string;
+    asTemplate?: boolean;
+    afterRedo?: (newCardId: string) => Promise<void>;
+    beforeUndo?: () => Promise<void>;
+  }): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(cardId, 2);
     const pageDetails = await charmClient.pages.getPageDetails(cardId);
-    const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [Block[], Card, Record<string, string>];
+    const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
+      Block[],
+      Card,
+      Record<string, string>
+    ];
 
     const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
     Utils.log(`duplicateCard: duplicating ${newBlocks.length} blocks`);
     if (asTemplate === newCard.fields.isTemplate) {
       // Copy template
       newCard.title = `${cardPage.title} copy`;
-    }
-    else if (asTemplate) {
+    } else if (asTemplate) {
       // Template from card
       newCard.title = 'New card template';
-    }
-    else {
+    } else {
       // Card from template
       newCard.title = '';
     }
@@ -771,8 +931,7 @@ class Mutator {
         const card = respBlocks.find((block) => block.type === 'card');
         if (card) {
           await afterRedo?.(card.id);
-        }
-        else {
+        } else {
           Utils.logError('card not found for opening.');
         }
       },
@@ -781,7 +940,7 @@ class Mutator {
     return [newBlocks, newCard.id];
   }
 
-  async duplicateBoard (
+  async duplicateBoard(
     boardId: string,
     description = 'duplicate board',
     asTemplate = false,
@@ -789,18 +948,20 @@ class Mutator {
     beforeUndo?: () => Promise<void>
   ): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree(boardId, 3);
-    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [Block[], Board, Record<string, string>];
+    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [
+      Block[],
+      Board,
+      Record<string, string>
+    ];
     const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
     Utils.log(`duplicateBoard: duplicating ${newBlocks.length} blocks`);
 
     if (asTemplate === newBoard.fields.isTemplate) {
       newBoard.title = `${newBoard.title} copy`;
-    }
-    else if (asTemplate) {
+    } else if (asTemplate) {
       // Template from board
       newBoard.title = 'New board template';
-    }
-    else {
+    } else {
       // Board from template
     }
     newBoard.fields.isTemplate = asTemplate;
@@ -815,7 +976,7 @@ class Mutator {
     return [createdBlocks, createdBlocks[0].id];
   }
 
-  async duplicateFromRootBoard (
+  async duplicateFromRootBoard(
     boardId: string,
     description = 'duplicate board',
     asTemplate = false,
@@ -824,18 +985,20 @@ class Mutator {
   ): Promise<[Block[], string]> {
     const rootClient = new OctoClient(octoClient.serverUrl, '0');
     const blocks = await rootClient.getSubtree(boardId, 3, '0');
-    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [Block[], Board, Record<string, string>];
+    const [newBlocks1, newBoard] = OctoUtils.duplicateBlockTree(blocks, boardId) as [
+      Block[],
+      Board,
+      Record<string, string>
+    ];
     const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
     Utils.log(`duplicateBoard: duplicating ${newBlocks.length} blocks`);
 
     if (asTemplate === newBoard.fields.isTemplate) {
       newBoard.title = `${newBoard.title} copy`;
-    }
-    else if (asTemplate) {
+    } else if (asTemplate) {
       // Template from board
       newBoard.title = 'New board template';
-    }
-    else {
+    } else {
       // Board from template
     }
     newBoard.fields.isTemplate = asTemplate;
@@ -853,36 +1016,36 @@ class Mutator {
   // Other methods
 
   // Not a mutator, but convenient to put here since Mutator wraps OctoClient
-  async exportArchive (boardID?: string): Promise<Block[]> {
+  async exportArchive(boardID?: string): Promise<Block[]> {
     return octoClient.exportArchive(boardID);
   }
 
   // Not a mutator, but convenient to put here since Mutator wraps OctoClient
-  async importFullArchive (blocks: readonly Block[]): Promise<Response> {
+  async importFullArchive(blocks: readonly Block[]): Promise<Response> {
     return octoClient.importFullArchive(blocks);
   }
 
-  get canUndo (): boolean {
+  get canUndo(): boolean {
     return undoManager.canUndo;
   }
 
-  get canRedo (): boolean {
+  get canRedo(): boolean {
     return undoManager.canRedo;
   }
 
-  get undoDescription (): string | undefined {
+  get undoDescription(): string | undefined {
     return undoManager.undoDescription;
   }
 
-  get redoDescription (): string | undefined {
+  get redoDescription(): string | undefined {
     return undoManager.redoDescription;
   }
 
-  async undo () {
+  async undo() {
     await undoManager.undo();
   }
 
-  async redo () {
+  async redo() {
     await undoManager.redo();
   }
 }
@@ -891,4 +1054,3 @@ const mutator = new Mutator();
 export default mutator;
 
 export { mutator };
-

@@ -9,7 +9,7 @@ export enum ThreadStatus {
   closed
 }
 
-export type ThreadStatusType = keyof typeof ThreadStatus
+export type ThreadStatusType = keyof typeof ThreadStatus;
 
 export interface ThreadStatusUpdate {
   id: string;

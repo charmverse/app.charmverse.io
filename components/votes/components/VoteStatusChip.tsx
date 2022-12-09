@@ -2,7 +2,10 @@ import { Chip } from '@mui/material';
 import type { VoteStatus } from '@prisma/client';
 import type { ComponentProps } from 'react';
 
-const VoteStatusConfig: Record<VoteStatus | 'Draft' | 'Complete', { label: string, color: ComponentProps<typeof Chip>['color'] }> = {
+const VoteStatusConfig: Record<
+  VoteStatus | 'Draft' | 'Complete',
+  { label: string; color: ComponentProps<typeof Chip>['color'] }
+> = {
   Cancelled: {
     label: 'Cancelled',
     color: 'gray'
@@ -29,8 +32,9 @@ const VoteStatusConfig: Record<VoteStatus | 'Draft' | 'Complete', { label: strin
   }
 };
 
-export default function VoteStatusChip ({ status, ...props }: { status: VoteStatus | 'Draft' | 'Complete' } & ComponentProps<typeof Chip>) {
-  return (
-    <Chip {...props} color={VoteStatusConfig[status].color} label={VoteStatusConfig[status].label} />
-  );
+export default function VoteStatusChip({
+  status,
+  ...props
+}: { status: VoteStatus | 'Draft' | 'Complete' } & ComponentProps<typeof Chip>) {
+  return <Chip {...props} color={VoteStatusConfig[status].color} label={VoteStatusConfig[status].label} />;
 }

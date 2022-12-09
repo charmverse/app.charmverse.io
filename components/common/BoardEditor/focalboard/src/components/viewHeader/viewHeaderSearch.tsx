@@ -9,7 +9,7 @@ import { getSearchText, setSearchText } from '../../store/searchText';
 import Button from '../../widgets/buttons/button';
 import Editable from '../../widgets/editable';
 
-function ViewHeaderSearch (): JSX.Element {
+function ViewHeaderSearch(): JSX.Element {
   const searchText = useAppSelector<string>(getSearchText);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -81,10 +81,7 @@ function ViewHeaderSearch (): JSX.Element {
   }
   return (
     <Button onClick={() => setIsSearching(true)}>
-      <FormattedMessage
-        id='ViewHeader.search'
-        defaultMessage='Search'
-      />
+      <FormattedMessage id='ViewHeader.search' defaultMessage='Search' />
     </Button>
   );
 }

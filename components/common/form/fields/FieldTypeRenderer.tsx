@@ -8,62 +8,58 @@ import { MemberPropertyIcons } from 'components/members/components/MemberDirecto
 
 type Props = {
   type: FieldType;
-} & FieldProps & ControlFieldProps;
+} & FieldProps &
+  ControlFieldProps;
 
-export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(({
-  type,
-  options,
-  onCreateOption,
-  onDeleteOption,
-  onUpdateOption,
-  ...fieldProps }: Props, ref) => {
-  switch (type) {
-    case 'text':
-    case 'phone':
-    case 'url':
-    case 'name':
-    case 'email': {
-      return <TextInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
-    }
-    case 'text_multiline': {
-      return <TextInputField {...fieldProps} ref={ref} multiline rows={3} iconLabel={MemberPropertyIcons[type]} />;
-    }
-    case 'number': {
-      return <NumberInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
-    }
+export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
+  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
+    switch (type) {
+      case 'text':
+      case 'phone':
+      case 'url':
+      case 'name':
+      case 'email': {
+        return <TextInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+      }
+      case 'text_multiline': {
+        return <TextInputField {...fieldProps} ref={ref} multiline rows={3} iconLabel={MemberPropertyIcons[type]} />;
+      }
+      case 'number': {
+        return <NumberInputField {...fieldProps} ref={ref} iconLabel={MemberPropertyIcons[type]} />;
+      }
 
-    case 'select': {
-      return (
-        <SelectField
-          {...fieldProps}
-          ref={ref}
-          iconLabel={MemberPropertyIcons[type]}
-          options={options}
-          onCreateOption={onCreateOption}
-          onDeleteOption={onDeleteOption}
-          onUpdateOption={onUpdateOption}
-        />
-      );
+      case 'select': {
+        return (
+          <SelectField
+            {...fieldProps}
+            ref={ref}
+            iconLabel={MemberPropertyIcons[type]}
+            options={options}
+            onCreateOption={onCreateOption}
+            onDeleteOption={onDeleteOption}
+            onUpdateOption={onUpdateOption}
+          />
+        );
+      }
 
-    }
+      case 'multiselect': {
+        return (
+          <SelectField
+            {...fieldProps}
+            ref={ref}
+            multiselect
+            iconLabel={MemberPropertyIcons[type]}
+            options={options}
+            onCreateOption={onCreateOption}
+            onDeleteOption={onDeleteOption}
+            onUpdateOption={onUpdateOption}
+          />
+        );
+      }
 
-    case 'multiselect': {
-      return (
-        <SelectField
-          {...fieldProps}
-          ref={ref}
-          multiselect
-          iconLabel={MemberPropertyIcons[type]}
-          options={options}
-          onCreateOption={onCreateOption}
-          onDeleteOption={onDeleteOption}
-          onUpdateOption={onUpdateOption}
-        />
-      );
-    }
-
-    default: {
-      return null;
+      default: {
+        return null;
+      }
     }
   }
-});
+);

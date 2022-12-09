@@ -9,31 +9,31 @@ import { usePageDialog } from './hooks/usePageDialog';
 import PageDialog from './PageDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
-export default function PageDialogGlobal () {
+export default function PageDialogGlobal() {
   const [page, setPage] = useState<IPageWithPermissions | null>(null);
   const { bounties } = useBounties();
   const { props, hidePage } = usePageDialog();
   const { bountyId, hideToolsMenu, pageId, readOnly, toolbar } = props;
 
   // look up bounty by pageId or bountyId
-  const bounty = bounties.find(b => b.id === bountyId || b.page.id === pageId);
+  const bounty = bounties.find((b) => b.id === bountyId || b.page.id === pageId);
   const pageIdToFetch = bounty?.page.id || (pageId as string);
 
-  function closeDialog () {
+  function closeDialog() {
     hidePage();
   }
 
   useEffect(() => {
     if (pageIdToFetch) {
-      charmClient.pages.getPage(pageIdToFetch)
-        .then(_page => {
+      charmClient.pages
+        .getPage(pageIdToFetch)
+        .then((_page) => {
           setPage(_page);
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('Could not load page', error);
         });
-    }
-    else {
+    } else {
       setPage(null);
     }
   }, [pageIdToFetch]);

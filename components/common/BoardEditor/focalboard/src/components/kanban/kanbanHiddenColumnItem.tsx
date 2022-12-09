@@ -13,24 +13,27 @@ import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    activeView: BoardView;
-    group: BoardGroup;
-    intl: IntlShape;
-    readOnly: boolean;
-    onDrop: (card: Card) => void;
-}
+  activeView: BoardView;
+  group: BoardGroup;
+  intl: IntlShape;
+  readOnly: boolean;
+  onDrop: (card: Card) => void;
+};
 
-export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
+export default function KanbanHiddenColumnItem(props: Props): JSX.Element {
   const { activeView, intl, group } = props;
-  const [{ isOver }, drop] = useDrop<Card, any, { isOver: boolean }>(() => ({
-    accept: 'card',
-    collect: (monitor) => ({
-      isOver: monitor.isOver()
+  const [{ isOver }, drop] = useDrop<Card, any, { isOver: boolean }>(
+    () => ({
+      accept: 'card',
+      collect: (monitor) => ({
+        isOver: monitor.isOver()
+      }),
+      drop: (item) => {
+        props.onDrop(item);
+      }
     }),
-    drop: (item) => {
-      props.onDrop(item);
-    }
-  }), [props.onDrop]);
+    [props.onDrop]
+  );
 
   let className = 'octo-board-hidden-item';
   if (isOver) {
@@ -38,18 +41,9 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
   }
 
   return (
-    <div
-      ref={drop}
-      key={group.option.id || 'empty'}
-      className={className}
-    >
-      <MenuWrapper
-        disabled={props.readOnly}
-      >
-        <Label
-          key={group.option.id || 'empty'}
-          color={group.option.color}
-        >
+    <div ref={drop} key={group.option.id || 'empty'} className={className}>
+      <MenuWrapper disabled={props.readOnly}>
+        <Label key={group.option.id || 'empty'} color={group.option.color}>
           {group.option.value}
         </Label>
         <Menu>
@@ -65,4 +59,3 @@ export default function KanbanHiddenColumnItem (props: Props): JSX.Element {
     </div>
   );
 }
-

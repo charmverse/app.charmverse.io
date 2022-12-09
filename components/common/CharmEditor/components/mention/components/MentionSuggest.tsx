@@ -7,17 +7,18 @@ import { memo, useCallback, useEffect } from 'react';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 
-import type { SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
+export function MentionSuggest({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
@@ -26,13 +27,10 @@ export function MentionSuggest ({ pluginKey }: { pluginKey: PluginKey<MentionPlu
   return null;
 }
 
-function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
+function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { members } = useMembers();
   const view = useEditorViewContext();
-  const {
-    tooltipContentDOM,
-    suggestTooltipKey
-  } = usePluginState(pluginKey);
+  const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey);
   const { show: isVisible, triggerText, counter } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   const { pages } = usePages();
   const onSelectMention = useCallback(
@@ -43,14 +41,42 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
-  const filteredMembers = triggerText.length !== 0 ? members.filter(
-    member => (
-      member.username.toLowerCase().match(triggerText.toLowerCase()))
-  ) : members;
+  const filterByUserCustomName = (member: Member) =>
+    member.properties
+      .find((prop) => prop.type === 'name')
+      ?.value?.toString()
+      .toLowerCase()
+      .match(triggerText.toLowerCase());
 
-  const filteredPages = (Object.values(pages).filter((page) => page && page?.deletedAt === null && (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)));
-  const totalItems = (filteredMembers.length + filteredPages.length);
-  const roundedCounter = ((counter < 0 ? ((counter % totalItems) + totalItems) : counter) % totalItems);
+  const filterByDiscordName = (member: Member) =>
+    (member.profile?.social as Record<string, string>)?.discordUsername
+      ?.toString()
+      .toLowerCase()
+      .match(triggerText.toLowerCase());
+
+  const filterByUsername = (member: Member) => member.username.toLowerCase().match(triggerText.toLowerCase());
+
+  const filterByPath = (member: Member) => member.path?.toLowerCase().match(triggerText.toLowerCase());
+
+  const filteredMembers =
+    triggerText.length !== 0
+      ? members.filter(
+          (member) =>
+            filterByUserCustomName(member) ||
+            filterByDiscordName(member) ||
+            filterByUsername(member) ||
+            filterByPath(member)
+        )
+      : members;
+
+  const filteredPages = Object.values(pages).filter(
+    (page) =>
+      page &&
+      page?.deletedAt === null &&
+      (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)
+  );
+  const totalItems = filteredMembers.length + filteredPages.length;
+  const roundedCounter = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
   const selectedGroup = roundedCounter < filteredMembers.length ? 'members' : 'pages';
   const activeItemIndex = selectedGroup === 'members' ? roundedCounter : roundedCounter - filteredMembers.length;
 
@@ -76,7 +102,11 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
         }}
       >
         <GroupLabel>Members</GroupLabel>
-        {filteredMembers.length === 0 ? <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>No members found</Typography> : (
+        {filteredMembers.length === 0 ? (
+          <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>
+            No members found
+          </Typography>
+        ) : (
           <div>
             {filteredMembers.map((member, memberIndex) => {
               const isSelected = selectedGroup === 'members' ? activeItemIndex === memberIndex : false;
@@ -90,22 +120,23 @@ function MentionSuggestMenu ({ pluginKey }: { pluginKey: PluginKey }) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <UserDisplay
-                    fontSize={14}
-                    user={member}
-                    avatarSize='small'
-                  />
+                  <UserDisplay fontSize={14} user={member} avatarSize='small' />
                 </MenuItem>
               );
             })}
           </div>
         )}
-        <Divider sx={{
-          my: 1
-        }}
+        <Divider
+          sx={{
+            my: 1
+          }}
         />
         <GroupLabel>Pages</GroupLabel>
-        <PagesList activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1} pages={filteredPages as PageMeta[]} onSelectPage={(page) => onSelectMention(page.id, 'page')} />
+        <PagesList
+          activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1}
+          pages={filteredPages as PageMeta[]}
+          onSelectPage={(page) => onSelectMention(page.id, 'page')}
+        />
       </Box>
     </PopoverMenu>
   );

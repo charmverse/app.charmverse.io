@@ -1,5 +1,4 @@
-
 export interface BoardPagePermissionUpdated {
-    boardId: string;
-    permissionId: string;
+  boardId: string;
+  permissionId: string;
 }

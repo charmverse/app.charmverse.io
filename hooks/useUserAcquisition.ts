@@ -8,16 +8,14 @@ import { setCookie } from 'lib/utilities/browser';
 // 2 weeks maximum age
 const maxCookieAge = 14;
 
-export function useUserAcquisition () {
-
+export function useUserAcquisition() {
   const [refreshedData, setRefreshedData] = useState(false);
 
   const { user } = useUser();
 
   const router = useRouter();
 
-  function setReferrer () {
-
+  function setReferrer() {
     const currentReferrer = document.referrer;
 
     if (currentReferrer && !currentReferrer.match(window.location.origin)) {
@@ -25,19 +23,22 @@ export function useUserAcquisition () {
     }
   }
 
-  function setLandingPage () {
+  function setLandingPage() {
     const currentPage = window.location.href.split('?')[0];
 
     setCookie({ name: 'appLandingPage' as SignupCookieType, value: currentPage, expiresInDays: maxCookieAge });
   }
 
-  function setCampaign () {
+  function setCampaign() {
     const currentCampaign = router.query.utm_campaign;
 
     if (currentCampaign) {
-      setCookie({ name: 'appCampaign' as SignupCookieType, value: currentCampaign as string, expiresInDays: maxCookieAge });
+      setCookie({
+        name: 'appCampaign' as SignupCookieType,
+        value: currentCampaign as string,
+        expiresInDays: maxCookieAge
+      });
     }
-
   }
 
   /**
@@ -45,8 +46,7 @@ export function useUserAcquisition () {
    *
    * Otherwise, assigns the data
    */
-  function refreshSignupData () {
-
+  function refreshSignupData() {
     // Ensure this only runs once per session
     if (!user && !refreshedData) {
       setRefreshedData(true);
@@ -60,4 +60,3 @@ export function useUserAcquisition () {
     refreshSignupData
   };
 }
-

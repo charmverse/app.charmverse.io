@@ -9,9 +9,13 @@ import type { PageContent } from 'models';
 type CurrentPageData = {
   id: string;
   type: PageType;
-}
+};
 
-export async function updatePage (page: CurrentPageData, userId: string, updates: Prisma.PageUpdateInput): Promise<IPageWithPermissions> {
+export async function updatePage(
+  page: CurrentPageData,
+  userId: string,
+  updates: Prisma.PageUpdateInput
+): Promise<IPageWithPermissions> {
   const data: Prisma.PageUpdateInput = {
     updatedAt: new Date(),
     ...updates,
@@ -45,5 +49,4 @@ export async function updatePage (page: CurrentPageData, userId: string, updates
       }
     }
   });
-
 }

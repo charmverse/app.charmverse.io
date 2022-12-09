@@ -5,7 +5,7 @@ import log from 'lib/log';
 
 const discordBotToken = process.env.DISCORD_BOT_TOKEN as string;
 
-export async function authenticatedRequest<T> (endpoint: string) {
+export async function authenticatedRequest<T>(endpoint: string) {
   const discordApiHeaders: any = {
     headers: {
       Authorization: `Bot ${discordBotToken}`
@@ -17,7 +17,9 @@ export async function authenticatedRequest<T> (endpoint: string) {
 // requests per second = 35, timeUnit = 1sec
 const rateLimiter = RateLimit(30);
 
-export async function handleDiscordResponse<T> (endpoint: string): Promise<{ status: number, error: string, redirectLink?: string } | { status: 'success', data: T }> {
+export async function handleDiscordResponse<T>(
+  endpoint: string
+): Promise<{ status: number; error: string; redirectLink?: string } | { status: 'success'; data: T }> {
   try {
     await rateLimiter();
     const response = await authenticatedRequest<T>(endpoint);
@@ -26,8 +28,7 @@ export async function handleDiscordResponse<T> (endpoint: string): Promise<{ sta
       status: 'success',
       data: response
     };
-  }
-  catch (err: any) {
+  } catch (err: any) {
     log.warn('Error from Discord', err);
     // The bot token is invalid
     if (err.code === 0) {
@@ -47,17 +48,16 @@ export async function handleDiscordResponse<T> (endpoint: string): Promise<{ sta
     else if (err.code === 10004) {
       return {
         status: 400,
-        error: 'Unknown guild. Please make sure you\'re importing from the correct guild'
+        error: "Unknown guild. Please make sure you're importing from the correct guild"
       };
     }
     // Unknown user
     else if (err.code === 10013) {
       return {
         status: 400,
-        error: 'Unknown user. User doesn\'t exist in the guild'
+        error: "Unknown user. User doesn't exist in the guild"
       };
-    }
-    else {
+    } else {
       return {
         status: 500,
         error: 'Something went wrong. Please try again'

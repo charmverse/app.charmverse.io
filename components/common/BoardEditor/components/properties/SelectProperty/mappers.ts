@@ -3,7 +3,7 @@ import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMU
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
-export function mapSelectOptionToPropertyOption (option: SelectOptionType): IPropertyOption {
+export function mapSelectOptionToPropertyOption(option: SelectOptionType): IPropertyOption {
   return {
     id: option.id,
     value: option.name,
@@ -11,7 +11,7 @@ export function mapSelectOptionToPropertyOption (option: SelectOptionType): IPro
   };
 }
 
-export function mapPropertyOptionToSelectOption (option: IPropertyOption): SelectOptionType {
+export function mapPropertyOptionToSelectOption(option: IPropertyOption): SelectOptionType {
   return {
     id: option.id,
     name: option.value,

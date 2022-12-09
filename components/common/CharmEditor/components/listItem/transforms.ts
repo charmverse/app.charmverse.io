@@ -1,9 +1,4 @@
-import type {
-  Node,
-  NodeType,
-  Schema,
-  Selection,
-  Transaction } from '@bangle.dev/pm';
+import type { Node, NodeType, Schema, Selection, Transaction } from '@bangle.dev/pm';
 import {
   autoJoin,
   EditorState,
@@ -16,12 +11,7 @@ import {
 } from '@bangle.dev/pm';
 import { getListLiftTarget, mapChildren, mapSlice } from '@bangle.dev/utils';
 
-function liftListItem (
-  type: NodeType,
-  state: EditorState,
-  selection: Selection,
-  tr: Transaction
-) {
+function liftListItem(type: NodeType, state: EditorState, selection: Selection, tr: Transaction) {
   const { $from, $to } = selection;
   let listItem = type;
   if (!listItem) {
@@ -30,15 +20,9 @@ function liftListItem (
 
   let range = $from.blockRange(
     $to,
-    (node) => !!node.childCount
-      && !!node.firstChild
-      && node.firstChild.type === listItem
+    (node) => !!node.childCount && !!node.firstChild && node.firstChild.type === listItem
   );
-  if (
-    !range
-    || range.depth < 2
-    || $from.node(range.depth - 1).type !== listItem
-  ) {
+  if (!range || range.depth < 2 || $from.node(range.depth - 1).type !== listItem) {
     return tr;
   }
   const end = range.end;
@@ -50,25 +34,17 @@ function liftListItem (
         endOfList,
         end,
         endOfList,
-        new Slice(
-          Fragment.from(listItem.create(undefined, range.parent.copy())),
-          1,
-          0
-        ),
+        new Slice(Fragment.from(listItem.create(undefined, range.parent.copy())), 1, 0),
         1,
         true
       )
     );
-    range = new NodeRange(
-      tr.doc.resolve($from.pos),
-      tr.doc.resolve(endOfList),
-      range.depth
-    );
+    range = new NodeRange(tr.doc.resolve($from.pos), tr.doc.resolve(endOfList), range.depth);
   }
   return tr.lift(range, liftTarget(range)!).scrollIntoView();
 }
 // Function will lift list item following selection to level-1.
-export function liftFollowingList (
+export function liftFollowingList(
   type: NodeType,
   state: EditorState,
   from: number,
@@ -98,14 +74,10 @@ export function liftFollowingList (
   return tr;
 }
 // The function will list paragraphs in selection out to level 1 below root list.
-export function liftSelectionList (
-  type: NodeType | undefined,
-  state: EditorState,
-  tr: Transaction
-) {
+export function liftSelectionList(type: NodeType | undefined, state: EditorState, tr: Transaction) {
   const { from, to } = state.selection;
   const { paragraph } = state.schema.nodes;
-  const listCol: { node: Node, pos: number }[] = [];
+  const listCol: { node: Node; pos: number }[] = [];
   tr.doc.nodesBetween(from, to, (node, pos) => {
     if (node.type === paragraph) {
       listCol.push({ node, pos });
@@ -118,11 +90,8 @@ export function liftSelectionList (
       let end;
 
       if (_paragraph.node.textContent && _paragraph.node.textContent.length > 0) {
-        end = tr.doc.resolve(
-          tr.mapping.map(_paragraph.pos + _paragraph.node.textContent.length)
-        );
-      }
-      else {
+        end = tr.doc.resolve(tr.mapping.map(_paragraph.pos + _paragraph.node.textContent.length));
+      } else {
         end = tr.doc.resolve(tr.mapping.map(_paragraph.pos + 1));
       }
       const range = start.blockRange(end);
@@ -158,11 +127,7 @@ const getListType = (node: Node, schema: Schema): [NodeType, number] | null => {
     return match ? [listType.node, match[0].length] : lastMatch;
   }, null);
 };
-const extractListFromParagaph = (
-  type: NodeType,
-  node: Node,
-  schema: Schema
-) => {
+const extractListFromParagaph = (type: NodeType, node: Node, schema: Schema) => {
   const { hardBreak, bulletList, orderedList } = schema.nodes;
   const content = mapChildren(node.content, (_node) => _node);
   const listTypes = [bulletList, orderedList];
@@ -183,10 +148,7 @@ const extractListFromParagaph = (
 
       const listItemNode = listItem.createAndFill(
         undefined,
-        schema.nodes.paragraph.createChecked(
-          undefined,
-          newText.length ? schema.text(newText) : undefined
-        )
+        schema.nodes.paragraph.createChecked(undefined, newText.length ? schema.text(newText) : undefined)
       );
       if (!listItemNode) {
         return child;
@@ -264,17 +226,14 @@ const splitIntoParagraphs = (fragment: Fragment, schema: Schema) => {
   if (curChildren.length) {
     paragraphs.push(paragraph.createChecked(undefined, curChildren));
   }
-  return Fragment.from(
-    paragraphs.length ? paragraphs : [paragraph.createAndFill()!]
-  );
+  return Fragment.from(paragraphs.length ? paragraphs : [paragraph.createAndFill()!]);
 };
 export const splitParagraphs = (slice: Slice, schema: Schema) => {
   // exclude Text nodes with a code mark, since we transform those later
   // into a codeblock
   let hasCodeMark = false;
   slice.content.forEach((child) => {
-    hasCodeMark = hasCodeMark
-      || child.marks.some((mark) => mark.type === schema.marks.code);
+    hasCodeMark = hasCodeMark || child.marks.some((mark) => mark.type === schema.marks.code);
   });
   // slice might just be a raw text string
   if (schema.nodes.paragraph.validContent(slice.content) && !hasCodeMark) {
@@ -289,11 +248,7 @@ export const splitParagraphs = (slice: Slice, schema: Schema) => {
   });
 };
 // above will wrap everything in paragraphs for us
-export const upgradeTextToLists = (
-  type: NodeType,
-  slice: Slice,
-  schema: Schema
-) => {
+export const upgradeTextToLists = (type: NodeType, slice: Slice, schema: Schema) => {
   return mapSlice(slice, (node, _parent) => {
     if (node.type === schema.nodes.paragraph) {
       return extractListFromParagaph(type, node, schema);

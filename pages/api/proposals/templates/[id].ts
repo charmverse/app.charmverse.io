@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,11 +8,9 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .delete(deleteProposalTemplateController);
+handler.use(requireUser).delete(deleteProposalTemplateController);
 
-async function deleteProposalTemplateController (req: NextApiRequest, res: NextApiResponse) {
-
+async function deleteProposalTemplateController(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
   const templateId = req.query.id;
@@ -51,7 +48,6 @@ async function deleteProposalTemplateController (req: NextApiRequest, res: NextA
   });
 
   res.status(200).send({ success: true });
-
 }
 
 export default withSessionRoute(handler);

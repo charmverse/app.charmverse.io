@@ -1,4 +1,3 @@
-
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import React, { memo, useRef, useMemo, useState, useEffect } from 'react';
 
@@ -6,15 +5,15 @@ import type { Context } from './menu/menuContext';
 import { MenuContext, useMenuContext } from './menu/menuContext';
 
 type Props = {
-    children?: React.ReactNode;
-    stopPropagationOnToggle?: boolean;
-    className?: string;
-    disabled?: boolean;
-    isOpen?: boolean;
-    label?: string;
-}
+  children?: React.ReactNode;
+  stopPropagationOnToggle?: boolean;
+  className?: string;
+  disabled?: boolean;
+  isOpen?: boolean;
+  label?: string;
+};
 
-function MenuWrapper (props: Props) {
+function MenuWrapper(props: Props) {
   const node = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(Boolean(props.isOpen));
   const [, setAnchorEl] = useMenuContext();
@@ -24,17 +23,16 @@ function MenuWrapper (props: Props) {
   }
 
   const toggle = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
-
     if (props.disabled) {
       return;
     }
 
     /**
-         * This is only here so that we can toggle the menus in the sidebar, because the default behavior of the mobile
-         * version (ie the one that uses a modal) needs propagation to close the modal after selecting something
-         * We need to refactor this so that the modal is explicitly closed on toggle, but for now I am aiming to preserve the existing logic
-         * so as to not break other things
-        * */
+     * This is only here so that we can toggle the menus in the sidebar, because the default behavior of the mobile
+     * version (ie the one that uses a modal) needs propagation to close the modal after selecting something
+     * We need to refactor this so that the modal is explicitly closed on toggle, but for now I am aiming to preserve the existing logic
+     * so as to not break other things
+     * */
     if (props.stopPropagationOnToggle) {
       e.preventDefault();
       e.stopPropagation();
@@ -43,13 +41,11 @@ function MenuWrapper (props: Props) {
   };
 
   useEffect(() => {
-
     const close = (): void => {
       setOpen(false);
     };
 
     const closeOnBlur = (e: Event) => {
-
       if (e.target && node.current?.contains(e.target as Node)) {
         return;
       }
@@ -91,13 +87,7 @@ function MenuWrapper (props: Props) {
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
       {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
-      <div
-        role='button'
-        aria-label={props.label || 'menuwrapper'}
-        className={className}
-        onClick={toggle}
-        ref={node}
-      >
+      <div role='button' aria-label={props.label || 'menuwrapper'} className={className} onClick={toggle} ref={node}>
         {children ? Object.values(children)[0] : null}
         {children && !props.disabled && open ? Object.values(children)[1] : null}
       </div>
@@ -106,7 +96,7 @@ function MenuWrapper (props: Props) {
 }
 
 // create an anchorRef to pass down as context to the menu popper
-function MenuWithContext (props: Props) {
+function MenuWithContext(props: Props) {
   const [anchorRef, setAnchorRef] = useState<HTMLDivElement | null>(null);
   const value: Context = useMemo(() => [anchorRef, setAnchorRef], [anchorRef, setAnchorRef]);
   return (

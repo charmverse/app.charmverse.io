@@ -1,16 +1,25 @@
-import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
+import type { IdentityType } from '@prisma/client';
+
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
-import type { IdentityType } from 'models/User';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 
-export type SignupSource = 'twitter' | 'facebook' | 'linkedin' | 'youtube' | 'organic-search' | 'marketing-site' | 'direct' | 'other' | ''
+export type SignupSource =
+  | 'twitter'
+  | 'facebook'
+  | 'linkedin'
+  | 'youtube'
+  | 'organic-search'
+  | 'marketing-site'
+  | 'direct'
+  | 'other'
+  | '';
 
 export type SignupAnalytics = {
   signupLandingUrl: string;
   signupSource: SignupSource;
   signupCampaign: string;
-}
+};
 
 export interface UserSignupEvent extends BaseEventWithoutGroup, Partial<SignupAnalytics> {
   identityType: IdentityType;
@@ -25,7 +34,7 @@ export interface TokenGateVerificationEvent extends BaseEvent {
   result: 'pass' | 'fail';
 }
 
-export interface SpaceJoined extends BaseEvent{
+export interface SpaceJoined extends BaseEvent {
   source: 'invite_link' | TokenGateJoinType;
 }
 

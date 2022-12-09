@@ -23,7 +23,7 @@ interface Props {
   title: string;
 }
 
-export default function EmailWrapper (props: Props) {
+export default function EmailWrapper(props: Props) {
   return (
     <Mjml>
       <MjmlHead>
@@ -39,7 +39,6 @@ export default function EmailWrapper (props: Props) {
           <MjmlDivider cssClass='mjml-divider' />
           <MjmlText font-family={fontFamily} color={primaryTextColor} font-size='18px' line-height='26px' />
         </MjmlAttributes>
-
       </MjmlHead>
       <MjmlBody width={600} backgroundColor={lightGreyColor} css-class='mjml-root'>
         {props.children}

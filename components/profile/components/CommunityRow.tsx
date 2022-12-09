@@ -1,4 +1,3 @@
-
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ForumIcon from '@mui/icons-material/Forum';
@@ -35,7 +34,7 @@ export type CommunityDetails = UserCommunity & {
   bounties: ProfileBountyEvent[];
   joinDate: string;
   latestEventDate?: string;
-}
+};
 
 interface CommunityRowProps {
   community: CommunityDetails;
@@ -44,21 +43,23 @@ interface CommunityRowProps {
   onClick: () => void;
 }
 
-function CountIcon ({ label, icon, count }: { label: string, icon: ReactNode, count: number }) {
+function CountIcon({ label, icon, count }: { label: string; icon: ReactNode; count: number }) {
   if (count === 0) {
     return null;
   }
   return (
     <Tooltip title={label}>
       <Typography variant='subtitle2' sx={{ pr: 1, gap: 0.5, display: 'inline-flex', alignItems: 'center' }}>
-        <Box mt={0.5} sx={{ svg: { fontSize: '16px' } }}>{icon}</Box> {count}
+        <Box mt={0.5} sx={{ svg: { fontSize: '16px' } }}>
+          {icon}
+        </Box>{' '}
+        {count}
       </Typography>
     </Tooltip>
   );
 }
 
-function TaskTab ({ task, value, onClick }: { task: typeof TASK_TABS[number], value: number, onClick: () => void }) {
-
+function TaskTab({ task, value, onClick }: { task: typeof TASK_TABS[number]; value: number; onClick: () => void }) {
   return (
     <Tab
       iconPosition='start'
@@ -86,18 +87,14 @@ interface EventRowProps {
   createdAt: string;
 }
 
-function EventRow (event: EventRowProps) {
-
+function EventRow(event: EventRowProps) {
   return (
     <Stack flexDirection='row' gap={1}>
-      <Stack
-        flexDirection='row'
-        gap={1}
-        alignItems='center'
-        alignSelf='flex-start'
-      >
+      <Stack flexDirection='row' gap={1} alignItems='center' alignSelf='flex-start'>
         {event.icon}
-        <Typography variant='body2' color='secondary'>{event.eventNumber || ' '}.</Typography>
+        <Typography variant='body2' color='secondary'>
+          {event.eventNumber || ' '}.
+        </Typography>
       </Stack>
       <Stack
         gap={0.5}
@@ -113,89 +110,93 @@ function EventRow (event: EventRowProps) {
         <Typography variant='body2' sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {event.title}
         </Typography>
-        <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>{showDateWithMonthAndYear(event.createdAt, true)}</Typography>
+        <Typography variant='subtitle1' color='secondary' textAlign={{ sm: 'left', md: 'right' }} minWidth={100}>
+          {showDateWithMonthAndYear(event.createdAt, true)}
+        </Typography>
       </Stack>
     </Stack>
   );
 }
 
-function VotesPanel ({ events }: { events: DeepDaoVote[] }) {
-
+function VotesPanel({ events }: { events: DeepDaoVote[] }) {
   return (
     <>
-      {
-        events
-          .sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
-          .map((event, index) => (
-            <EventRow
-              key={event.voteId}
-              createdAt={event.createdAt}
-              title={event.title}
-              icon={event.successful
-                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
-                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
-              eventNumber={index + 1}
-            />
-          ))
-      }
+      {events
+        .sort((eventA, eventB) => (eventA.createdAt > eventB.createdAt ? -1 : 1))
+        .map((event, index) => (
+          <EventRow
+            key={event.voteId}
+            createdAt={event.createdAt}
+            title={event.title}
+            icon={
+              event.successful ? (
+                <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
+              ) : (
+                <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />
+              )
+            }
+            eventNumber={index + 1}
+          />
+        ))}
     </>
   );
 }
 
-function ProposalsPanel ({ events }: { events: DeepDaoProposal[] }) {
-
+function ProposalsPanel({ events }: { events: DeepDaoProposal[] }) {
   return (
     <>
-      {
-        events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
-          .map((event, index) => (
-            <EventRow
-              key={event.proposalId}
-              createdAt={event.createdAt}
-              title={event.title}
-              icon={event.outcome === event.voteChoice
-                ? <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
-                : <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />}
-              eventNumber={index + 1}
-            />
-          ))
-        }
+      {events
+        .sort((eventA, eventB) => (eventA.createdAt > eventB.createdAt ? -1 : 1))
+        .map((event, index) => (
+          <EventRow
+            key={event.proposalId}
+            createdAt={event.createdAt}
+            title={event.title}
+            icon={
+              event.outcome === event.voteChoice ? (
+                <ThumbUpIcon color='success' sx={{ fontSize: '16px' }} />
+              ) : (
+                <ThumbDownIcon color='error' sx={{ fontSize: '16px' }} />
+              )
+            }
+            eventNumber={index + 1}
+          />
+        ))}
     </>
   );
 }
 
-function BountyEventsPanel ({ events }: { events: ProfileBountyEvent[] }) {
+function BountyEventsPanel({ events }: { events: ProfileBountyEvent[] }) {
   return (
     <>
-      {
-        events.sort((eventA, eventB) => eventA.createdAt > eventB.createdAt ? -1 : 1)
-          .map((event, index) => (
-            <EventRow
-              key={event.bountyId}
-              createdAt={event.createdAt}
-              title={(
-                <>
-                  {bountyStatus(event.eventName)}:&nbsp;
-                  <Link href={event.bountyPath} color='inherit'>
-                    <strong>{event.bountyTitle || 'Untitled'}</strong>
-                  </Link>
-                  {event.hasCredential && (
-                    <Tooltip color='success' title='Verified with Collab.land'>
-                      <CheckIcon fontSize='small' />
-                    </Tooltip>
-                  )}
-                </>
-              )}
-              icon={null}
-              eventNumber={index + 1}
-            />
-          ))
-        }
+      {events
+        .sort((eventA, eventB) => (eventA.createdAt > eventB.createdAt ? -1 : 1))
+        .map((event, index) => (
+          <EventRow
+            key={event.bountyId}
+            createdAt={event.createdAt}
+            title={
+              <>
+                {bountyStatus(event.eventName)}:&nbsp;
+                <Link href={event.bountyPath} color='inherit'>
+                  <strong>{event.bountyTitle || 'Untitled'}</strong>
+                </Link>
+                {event.hasCredential && (
+                  <Tooltip color='success' title='Verified with Collab.land'>
+                    <CheckIcon fontSize='small' />
+                  </Tooltip>
+                )}
+              </>
+            }
+            icon={null}
+            eventNumber={index + 1}
+          />
+        ))}
     </>
   );
 }
 
-function bountyStatus (status: ProfileBountyEvent['eventName']) {
+function bountyStatus(status: ProfileBountyEvent['eventName']) {
   switch (status) {
     case 'bounty_created':
       return 'Created';
@@ -208,8 +209,7 @@ function bountyStatus (status: ProfileBountyEvent['eventName']) {
   }
 }
 
-export default function CommunityRow ({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
-
+export default function CommunityRow({ community, showVisibilityIcon, visible, onClick }: CommunityRowProps) {
   const hasVotes = community.votes.length > 0;
   const hasProposals = community.proposals.length > 0;
   const hasBounties = community.bounties.length > 0;
@@ -225,7 +225,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
     }
   }, [defaultTab]);
 
-  function toggleCollapse () {
+  function toggleCollapse() {
     if (isCollapsible) {
       setIsCollapsed(!isCollapsed);
     }
@@ -233,13 +233,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
 
   return (
     <ProfileItemContainer visible={visible}>
-      <Box
-        display='flex'
-        gap={2}
-        flexDirection='row'
-        alignItems='center'
-        onClick={toggleCollapse}
-      >
+      <Box display='flex' gap={2} flexDirection='row' alignItems='center' onClick={toggleCollapse}>
         <Avatar
           className='hidden-on-visible'
           avatar={community.logo}
@@ -247,12 +241,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
           variant='rounded'
           size='large'
         />
-        <Box
-          align-items='center'
-          display='flex'
-          justifyContent='space-between'
-          flexGrow={1}
-        >
+        <Box align-items='center' display='flex' justifyContent='space-between' flexGrow={1}>
           <Box className='hidden-on-visible'>
             <Typography
               sx={{
@@ -267,7 +256,8 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
             </Typography>
             {community.joinDate && (
               <Typography variant='subtitle2'>
-                {showDateWithMonthAndYear(community.joinDate)} - {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
+                {showDateWithMonthAndYear(community.joinDate)} -{' '}
+                {community.latestEventDate ? showDateWithMonthAndYear(community.latestEventDate) : 'Present'}
               </Typography>
             )}
             <CountIcon icon={<HowToVoteIcon />} label='Votes' count={community.votes.length} />
@@ -292,11 +282,7 @@ export default function CommunityRow ({ community, showVisibilityIcon, visible, 
                     }
                   }}
                 >
-                  {visible ? (
-                    <VisibilityIcon fontSize='small' />
-                  ) : (
-                    <VisibilityOffIcon fontSize='small' />
-                  )}
+                  {visible ? <VisibilityIcon fontSize='small' /> : <VisibilityOffIcon fontSize='small' />}
                 </IconButton>
               </Tooltip>
             )}

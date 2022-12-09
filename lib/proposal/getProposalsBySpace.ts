@@ -3,7 +3,10 @@ import { accessiblePagesByPermissionsQuery } from 'lib/pages/server';
 
 import type { ProposalWithUsers } from './interface';
 
-export async function getProposalsBySpace ({ spaceId, userId }: {
+export async function getProposalsBySpace({
+  spaceId,
+  userId
+}: {
   spaceId: string;
   userId: string;
 }): Promise<ProposalWithUsers[]> {
@@ -13,22 +16,25 @@ export async function getProposalsBySpace ({ spaceId, userId }: {
       page: {
         deletedAt: null,
         type: 'proposal',
-        OR: [{
-          permissions: accessiblePagesByPermissionsQuery({
-            spaceId,
-            userId
-          })
-        }, {
-          space: {
-            spaceRoles: {
-              some: {
-                spaceId,
-                userId,
-                isAdmin: true
+        OR: [
+          {
+            permissions: accessiblePagesByPermissionsQuery({
+              spaceId,
+              userId
+            })
+          },
+          {
+            space: {
+              spaceRoles: {
+                some: {
+                  spaceId,
+                  userId,
+                  isAdmin: true
+                }
               }
             }
           }
-        }]
+        ]
       }
     },
     include: {

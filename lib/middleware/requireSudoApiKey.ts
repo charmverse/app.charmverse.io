@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-export function requireSudoApiKey (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+export function requireSudoApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const { sudoApiKey } = req.query;
 
   const currentSudoKey = process.env.SUDO_API_KEY;

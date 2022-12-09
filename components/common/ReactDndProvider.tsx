@@ -6,11 +6,11 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 // ignore events inside prosemirror unless we are also inside an inline database
-function shouldIgnoreTarget (domNode: HTMLElement) {
+function shouldIgnoreTarget(domNode: HTMLElement) {
   return Boolean(domNode.closest?.('.ProseMirror') && !domNode.closest?.('.focalboard-body'));
 }
 // Prevent react-dnd from messing with prosemirror dnd. see: https://github.com/react-dnd/react-dnd-html5-backend/issues/7
-function ModifiedBackend (...args: any) {
+function ModifiedBackend(...args: any) {
   // @ts-ignore
   const instance = new HTML5Backend(...args);
 
@@ -26,7 +26,7 @@ function ModifiedBackend (...args: any) {
     'handleTopDrop',
     'handleTopDropCapture'
   ];
-  listeners.forEach(name => {
+  listeners.forEach((name) => {
     const original = instance[name];
     instance[name] = (e: any, ...extraArgs: any) => {
       if (!shouldIgnoreTarget(e.target)) {
@@ -38,7 +38,7 @@ function ModifiedBackend (...args: any) {
   return instance;
 }
 
-export default function ReactDndProvider ({ children }: { children: ReactNode }) {
+export default function ReactDndProvider({ children }: { children: ReactNode }) {
   if (isTouchScreen()) {
     return (
       <DndProvider
@@ -55,9 +55,5 @@ export default function ReactDndProvider ({ children }: { children: ReactNode })
       </DndProvider>
     );
   }
-  return (
-    <DndProvider backend={ModifiedBackend}>
-      {children}
-    </DndProvider>
-  );
+  return <DndProvider backend={ModifiedBackend}>{children}</DndProvider>;
 }

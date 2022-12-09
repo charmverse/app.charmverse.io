@@ -1,4 +1,3 @@
-
 import type { Space } from '@prisma/client';
 
 import { prisma } from 'db';
@@ -11,7 +10,7 @@ describe('verifyTokenGateMembership', () => {
   let user: LoggedInUser;
   let space: Space;
 
-  async function getSpaceUser () {
+  async function getSpaceUser() {
     return prisma.spaceRole.findUnique({
       where: {
         spaceUser: {
@@ -77,14 +76,13 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    const verifyJwtMock = jest.fn()
-      .mockResolvedValue({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      });
+    const verifyJwtMock = jest.fn().mockResolvedValue({
+      verified: true,
+      payload: {
+        orgId: space.id,
+        extraData: `{ "tokenGateId": "${tokenGate.id}" }`
+      }
+    });
 
     jest.mock('lit-js-sdk', () => ({
       verifyJwt: verifyJwtMock
@@ -93,10 +91,15 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id, userId: user.id, commit: true, tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }] });
+    await applyTokenGates({
+      spaceId: space.id,
+      userId: user.id,
+      commit: true,
+      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }]
+    });
     await deleteTokenGate(tokenGate.id);
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -116,7 +119,8 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    const verifyJwtMock = jest.fn()
+    const verifyJwtMock = jest
+      .fn()
       // verify to apply token gate
       .mockResolvedValueOnce({
         verified: true,
@@ -141,7 +145,8 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id,
+    await applyTokenGates({
+      spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
@@ -150,7 +155,7 @@ describe('verifyTokenGateMembership', () => {
       ]
     });
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     // do not verify token gates anymore
     verifyJwtMock.mockResolvedValue({ verified: false });
@@ -172,7 +177,8 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    const verifyJwtMock = jest.fn()
+    const verifyJwtMock = jest
+      .fn()
       // verify to apply token gate
       .mockResolvedValueOnce({
         verified: true,
@@ -197,7 +203,8 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id,
+    await applyTokenGates({
+      spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
@@ -206,7 +213,7 @@ describe('verifyTokenGateMembership', () => {
       ]
     });
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     verifyJwtMock.mockImplementation(({ jwt }) => {
       // verify only one of token gates
@@ -245,7 +252,8 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
-    const verifyJwtMock = jest.fn()
+    const verifyJwtMock = jest
+      .fn()
       // verify to apply token gate
       .mockResolvedValueOnce({
         verified: true,
@@ -270,7 +278,8 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id,
+    await applyTokenGates({
+      spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
@@ -279,7 +288,7 @@ describe('verifyTokenGateMembership', () => {
       ]
     });
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     verifyJwtMock.mockResolvedValue({ verified: false });
 
@@ -309,7 +318,8 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
-    const verifyJwtMock = jest.fn()
+    const verifyJwtMock = jest
+      .fn()
       // verify to apply token gate
       .mockResolvedValueOnce({
         verified: true,
@@ -334,7 +344,8 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id,
+    await applyTokenGates({
+      spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
@@ -344,7 +355,7 @@ describe('verifyTokenGateMembership', () => {
     });
     await deleteTokenGate(tokenGate1.id);
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     verifyJwtMock.mockResolvedValueOnce({
       verified: true,
@@ -384,7 +395,8 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role3.id });
 
-    const verifyJwtMock = jest.fn()
+    const verifyJwtMock = jest
+      .fn()
       // verify to apply token gate
       .mockResolvedValueOnce({
         verified: true,
@@ -409,7 +421,8 @@ describe('verifyTokenGateMembership', () => {
     const { verifyTokenGateMembership } = await import('lib/token-gates/verifyTokenGateMembership');
     const { applyTokenGates } = await import('lib/token-gates/applyTokenGates');
 
-    await applyTokenGates({ spaceId: space.id,
+    await applyTokenGates({
+      spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
@@ -418,7 +431,7 @@ describe('verifyTokenGateMembership', () => {
       ]
     });
 
-    const verifyUser = await getSpaceUser() as UserToVerifyMembership;
+    const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
     verifyJwtMock.mockImplementation(({ jwt }) => {
       // verify only one of token gates

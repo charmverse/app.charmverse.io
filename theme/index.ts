@@ -5,10 +5,18 @@ import { darken } from '@mui/system';
 import type { BrandColor } from './colors';
 import {
   backgroundColor,
-  backgroundColorDarkMode, backgroundDarkColor, backgroundDarkColorDarkMode, backgroundLightColor,
-  backgroundLightColorDarkMode, blueColor,
-  darkBlueColor, darkModeColors, lightModeColors, primaryTextColor,
-  primaryTextColorDarkMode, settingsHeaderBackgroundColor,
+  backgroundColorDarkMode,
+  backgroundDarkColor,
+  backgroundDarkColorDarkMode,
+  backgroundLightColor,
+  backgroundLightColorDarkMode,
+  blueColor,
+  darkBlueColor,
+  darkModeColors,
+  lightModeColors,
+  primaryTextColor,
+  primaryTextColorDarkMode,
+  settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
 import { darkTheme as darkThemeFocalBoard, lightTheme as lightThemeFocalBoard } from './focalboard/theme';
@@ -60,7 +68,6 @@ declare module '@mui/material/styles/createPalette' {
     twitter: Palette['primary'];
     white: Palette['primary'];
     quoteMarker: Palette['primary'];
-
   }
   interface TypeBackground {
     light: string;
@@ -87,7 +94,8 @@ declare module '@mui/material/SvgIcon' {
   export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
 }
 
-export const fontFamily = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+export const fontFamily =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 export const createThemeLightSensitive = (mode: PaletteMode) => {
   const contrastText = mode === 'dark' ? '#fff' : '#000';

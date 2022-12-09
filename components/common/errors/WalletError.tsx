@@ -1,4 +1,3 @@
-
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
@@ -8,18 +7,15 @@ import { useEffect, useState } from 'react';
 export type ErrorInfo = {
   title: string;
   description: string;
-}
+};
 
 type Props<ErrorType> = {
   error?: ErrorType;
   processError: (error: ErrorType) => ErrorInfo;
-}
+};
 
 // tailing comma for generics to sidestep the JSX ambiguity
-export default function Error<ErrorType> ({
-  error,
-  processError
-}: Props<ErrorType>) {
+export default function Error<ErrorType>({ error, processError }: Props<ErrorType>) {
   const [state, setState] = useState<ErrorInfo>({ title: '', description: '' });
 
   // delay the open of the Collapse from when the error has changed,

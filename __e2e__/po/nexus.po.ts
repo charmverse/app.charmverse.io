@@ -5,21 +5,20 @@ import { baseUrl } from 'config/constants';
 
 // capture actions on the pages in signup flow
 export class NexusPage {
-
   readonly page: Page;
 
   readonly logoutButton: Locator;
 
-  constructor (page: Page) {
+  constructor(page: Page) {
     this.page = page;
     this.logoutButton = page.locator('data-test=logout-button');
   }
 
-  async waitForURL () {
+  async waitForURL() {
     await this.page.waitForURL('**/nexus');
   }
 
-  async goto () {
+  async goto() {
     await this.page.goto(`${baseUrl}/nexus`);
   }
 }

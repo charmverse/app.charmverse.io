@@ -20,9 +20,27 @@ import messages_zhHant from '../i18n/zh_Hant.json';
 
 import { UserSettings } from './userSettings';
 
-const supportedLanguages = ['ca', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'oc', 'pt-br', 'ru', 'sv', 'tr', 'zh-cn', 'zh-tw'];
+const supportedLanguages = [
+  'ca',
+  'de',
+  'el',
+  'en',
+  'es',
+  'fr',
+  'id',
+  'it',
+  'ja',
+  'nl',
+  'oc',
+  'pt-br',
+  'ru',
+  'sv',
+  'tr',
+  'zh-cn',
+  'zh-tw'
+];
 
-export function getMessages (lang: string): { [key: string]: string } {
+export function getMessages(lang: string): { [key: string]: string } {
   switch (lang) {
     case 'ca':
       return messages_ca;
@@ -62,22 +80,20 @@ export function getMessages (lang: string): { [key: string]: string } {
       return messages_en;
   }
 }
-export function getCurrentLanguage (): string {
+export function getCurrentLanguage(): string {
   let lang = UserSettings.language;
   if (!lang) {
     if (supportedLanguages.includes(navigator.language)) {
       lang = navigator.language;
-    }
-    else if (supportedLanguages.includes(navigator.language.split(/[-_]/)[0])) {
+    } else if (supportedLanguages.includes(navigator.language.split(/[-_]/)[0])) {
       lang = navigator.language.split(/[-_]/)[0];
-    }
-    else {
+    } else {
       lang = 'en';
     }
   }
   return lang;
 }
 
-export function storeLanguage (lang: string): void {
+export function storeLanguage(lang: string): void {
   UserSettings.language = lang;
 }

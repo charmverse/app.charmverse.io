@@ -1,4 +1,3 @@
-
 import type { IPropertyTemplate } from './blocks/board';
 import { createFilterClause } from './blocks/filterClause';
 import { createFilterGroup } from './blocks/filterGroup';
@@ -19,17 +18,29 @@ describe('src/cardFilter', () => {
   const filterClause = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
   describe('verify isClauseMet method', () => {
     test('should be true with isNotEmpty clause', () => {
-      const filterClauseIsNotEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
       const result = CardFilter.isClauseMet(filterClauseIsNotEmpty, [], card1);
       expect(result).toBeTruthy();
     });
     test('should be false with isEmpty clause', () => {
-      const filterClauseIsEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isEmpty', values: ['Status'] });
+      const filterClauseIsEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isEmpty',
+        values: ['Status']
+      });
       const result = CardFilter.isClauseMet(filterClauseIsEmpty, [], card1);
       expect(result).toBeFalsy();
     });
     test('should be true with includes clause', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const result = CardFilter.isClauseMet(filterClauseIncludes, [], card1);
       expect(result).toBeTruthy();
     });
@@ -39,12 +50,20 @@ describe('src/cardFilter', () => {
       expect(result).toBeTruthy();
     });
     test('should be false with notIncludes clause', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const result = CardFilter.isClauseMet(filterClauseNotIncludes, [], card1);
       expect(result).toBeFalsy();
     });
     test('should be true with notIncludes and no values clauses', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: [] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: []
+      });
       const result = CardFilter.isClauseMet(filterClauseNotIncludes, [], card1);
       expect(result).toBeTruthy();
     });
@@ -59,25 +78,27 @@ describe('src/cardFilter', () => {
       expect(result).toBeTruthy();
     });
     test('should return true with or operation and 2 filterCause, one is false ', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseNotIncludes,
-          filterClause
-        ]
+        filters: [filterClauseNotIncludes, filterClause]
       });
       const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
       expect(result).toBeTruthy();
     });
     test('should return true with or operation and 2 filterCause, 1 filtergroup in filtergroup, one filterClause is false ', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const filterGroupInFilterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseNotIncludes,
-          filterClause
-        ]
+        filters: [filterClauseNotIncludes, filterClause]
       });
       const filterGroup = createFilterGroup({
         operation: 'or',
@@ -88,50 +109,58 @@ describe('src/cardFilter', () => {
       expect(result).toBeTruthy();
     });
     test('should return false with or operation and two filterCause, two are false ', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
-      const filterClauseEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isEmpty', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
+      const filterClauseEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isEmpty',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseNotIncludes,
-          filterClauseEmpty
-        ]
+        filters: [filterClauseNotIncludes, filterClauseEmpty]
       });
       const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
       expect(result).toBeFalsy();
     });
     test('should return false with and operation and 2 filterCause, one is false ', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'and',
-        filters: [
-          filterClauseNotIncludes,
-          filterClause
-        ]
+        filters: [filterClauseNotIncludes, filterClause]
       });
       const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
       expect(result).toBeFalsy();
     });
     test('should return true with and operation and 2 filterCause, two are true ', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'and',
-        filters: [
-          filterClauseIncludes,
-          filterClause
-        ]
+        filters: [filterClauseIncludes, filterClause]
       });
       const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
       expect(result).toBeTruthy();
     });
     test('should return true with or operation and 2 filterCause, 1 filtergroup in filtergroup, one filterClause is false ', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const filterGroupInFilterGroup = createFilterGroup({
         operation: 'and',
-        filters: [
-          filterClauseNotIncludes,
-          filterClause
-        ]
+        filters: [filterClauseNotIncludes, filterClause]
       });
       const filterGroup = createFilterGroup({
         operation: 'and',
@@ -144,13 +173,21 @@ describe('src/cardFilter', () => {
   });
   describe('verify propertyThatMeetsFilterClause method', () => {
     test('should return Utils.assertFailure and filterClause propertyId ', () => {
-      const filterClauseIsNotEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
       const result = CardFilter.propertyThatMeetsFilterClause(filterClauseIsNotEmpty, []);
       expect(mockedUtils.assertFailure).toBeCalledTimes(1);
       expect(result.id).toEqual(filterClauseIsNotEmpty.propertyId);
     });
     test('should return filterClause propertyId with non-select template and isNotEmpty clause ', () => {
-      const filterClauseIsNotEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIsNotEmpty.propertyId,
         name: 'template',
@@ -162,23 +199,33 @@ describe('src/cardFilter', () => {
       expect(result.value).toBeFalsy();
     });
     test('should return filterClause propertyId with select template , an option and isNotEmpty clause ', () => {
-      const filterClauseIsNotEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIsNotEmpty.propertyId,
         name: 'template',
         type: 'select',
-        options: [{
-          id: 'idOption',
-          value: '',
-          color: ''
-        }]
+        options: [
+          {
+            id: 'idOption',
+            value: '',
+            color: ''
+          }
+        ]
       };
       const result = CardFilter.propertyThatMeetsFilterClause(filterClauseIsNotEmpty, [templateFilter]);
       expect(result.id).toEqual(filterClauseIsNotEmpty.propertyId);
       expect(result.value).toEqual('idOption');
     });
     test('should return filterClause propertyId with select template , no option and isNotEmpty clause ', () => {
-      const filterClauseIsNotEmpty = createFilterClause({ propertyId: 'propertyId', condition: 'isNotEmpty', values: ['Status'] });
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'isNotEmpty',
+        values: ['Status']
+      });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIsNotEmpty.propertyId,
         name: 'template',
@@ -191,7 +238,11 @@ describe('src/cardFilter', () => {
     });
 
     test('should return filterClause propertyId with template, and includes clause with values', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIncludes.propertyId,
         name: 'template',
@@ -215,7 +266,11 @@ describe('src/cardFilter', () => {
       expect(result.value).toBeFalsy();
     });
     test('should return filterClause propertyId with template, and notIncludes clause', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: [] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: []
+      });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseNotIncludes.propertyId,
         name: 'template',
@@ -253,25 +308,27 @@ describe('src/cardFilter', () => {
       expect(result).toEqual({});
     });
     test('should return {} with filterGroup, or operation and no template', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseIncludes,
-          filterClause
-        ]
+        filters: [filterClauseIncludes, filterClause]
       });
       const result = CardFilter.propertiesThatMeetFilterGroup(filterGroup, []);
       expect(result).toEqual({});
     });
     test('should return a result with filterGroup, or operation and template', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseIncludes,
-          filterClause
-        ]
+        filters: [filterClauseIncludes, filterClause]
       });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIncludes.propertyId,
@@ -284,26 +341,28 @@ describe('src/cardFilter', () => {
       expect(result.propertyId).toEqual(filterClauseIncludes.values[0]);
     });
     test('should return {} with filterGroup, and operation and no template', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'and',
-        filters: [
-          filterClauseIncludes,
-          filterClause
-        ]
+        filters: [filterClauseIncludes, filterClause]
       });
       const result = CardFilter.propertiesThatMeetFilterGroup(filterGroup, []);
       expect(result).toEqual({});
     });
 
     test('should return a result with filterGroup, and operation and template', () => {
-      const filterClauseIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'includes', values: ['Status'] });
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'includes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'and',
-        filters: [
-          filterClauseIncludes,
-          filterClause
-        ]
+        filters: [filterClauseIncludes, filterClause]
       });
       const templateFilter: IPropertyTemplate = {
         id: filterClauseIncludes.propertyId,
@@ -318,13 +377,14 @@ describe('src/cardFilter', () => {
   });
   describe('verify applyFilterGroup method', () => {
     test('should return array with card1', () => {
-      const filterClauseNotIncludes = createFilterClause({ propertyId: 'propertyId', condition: 'notIncludes', values: ['Status'] });
+      const filterClauseNotIncludes = createFilterClause({
+        propertyId: 'propertyId',
+        condition: 'notIncludes',
+        values: ['Status']
+      });
       const filterGroup = createFilterGroup({
         operation: 'or',
-        filters: [
-          filterClauseNotIncludes,
-          filterClause
-        ]
+        filters: [filterClauseNotIncludes, filterClause]
       });
       const result = CardFilter.applyFilterGroup(filterGroup, [], [card1]);
       expect(result).toBeDefined();

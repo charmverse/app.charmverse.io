@@ -15,11 +15,11 @@ import Button from '../../widgets/buttons/button';
 import Comment from './comment';
 
 type Props = {
-    comments: readonly CommentBlock[];
-    rootId: string;
-    cardId: string;
-    readOnly: boolean;
-}
+  comments: readonly CommentBlock[];
+  rootId: string;
+  cardId: string;
+  readOnly: boolean;
+};
 
 const CommentsList = React.memo((props: Props) => {
   const { user } = useUser();
@@ -39,7 +39,7 @@ const CommentsList = React.memo((props: Props) => {
     comment.fields = { content };
     mutator.insertBlock(comment, 'add comment');
     // clear the editor
-    setEditorKey(key => key + 1);
+    setEditorKey((key) => key + 1);
   };
 
   const { comments } = props;
@@ -57,14 +57,17 @@ const CommentsList = React.memo((props: Props) => {
         />
       )}
 
-      {comments.slice(0).reverse().map((comment) => (
-        <Comment
-          key={comment.id}
-          comment={comment}
-          member={members.find(_member => _member.id === comment.createdBy)}
-          readOnly={props.readOnly}
-        />
-      ))}
+      {comments
+        .slice(0)
+        .reverse()
+        .map((comment) => (
+          <Comment
+            key={comment.id}
+            comment={comment}
+            member={members.find((_member) => _member.id === comment.createdBy)}
+            readOnly={props.readOnly}
+          />
+        ))}
 
       {/* horizontal divider below comments */}
       {!(comments.length === 0 && props.readOnly) && <hr className='CommentsList__divider' />}
@@ -80,8 +83,7 @@ interface NewCommentProps {
   onSubmit: (i: CommentBlock['fields']) => void;
 }
 
-export function NewCommentInput ({ initialValue = null, $key, username, avatar, onSubmit }: NewCommentProps) {
-
+export function NewCommentInput({ initialValue = null, $key, username, avatar, onSubmit }: NewCommentProps) {
   const intl = useIntl();
   const [newComment, setNewComment] = useState<CommentBlock['fields'] | null>(initialValue);
 
@@ -94,20 +96,17 @@ export function NewCommentInput ({ initialValue = null, $key, username, avatar, 
         onContentChange={({ doc, rawText }) => {
           setNewComment({ content: doc, contentText: rawText });
         }}
-        placeholderText={intl.formatMessage({ id: 'CardDetail.new-comment-placeholder', defaultMessage: 'Add a comment...' })}
+        placeholderText={intl.formatMessage({
+          id: 'CardDetail.new-comment-placeholder',
+          defaultMessage: 'Add a comment...'
+        })}
         style={{ fontSize: '14px' }}
         focusOnInit={false}
       />
 
       {newComment && (
-        <Button
-          filled={true}
-          onClick={() => onSubmit(newComment)}
-        >
-          <FormattedMessage
-            id='CommentsList.send'
-            defaultMessage='Send'
-          />
+        <Button filled={true} onClick={() => onSubmit(newComment)}>
+          <FormattedMessage id='CommentsList.send' defaultMessage='Send' />
         </Button>
       )}
     </div>

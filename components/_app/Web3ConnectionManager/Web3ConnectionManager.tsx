@@ -14,17 +14,16 @@ import useInactiveListener from './hooks/useInactiveListener';
 
 const Web3Connection = createContext({
   isWalletSelectorModalOpen: false,
-  openWalletSelectorModal: () => { },
-  closeWalletSelectorModal: () => { },
+  openWalletSelectorModal: () => {},
+  closeWalletSelectorModal: () => {},
   triedEager: false,
   isNetworkModalOpen: false,
-  openNetworkModal: () => { },
-  closeNetworkModal: () => { }
+  openNetworkModal: () => {},
+  closeNetworkModal: () => {},
+  isConnectingIdentity: false
 });
 
-function Web3ConnectionManager ({
-  children
-}: PropsWithChildren<any>) {
+function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
   const { connector, active } = useWeb3React();
   const {
     isOpen: isWalletSelectorModalOpen,
@@ -46,6 +45,9 @@ function Web3ConnectionManager ({
     }
   }, [activatingConnector, connector]);
 
+  // Used for connecting to unstoppable domains
+  const [isConnectingIdentity, setIsConnectingIdentity] = useState(false);
+
   // try to eagerly connect to an injected provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
 
@@ -53,11 +55,7 @@ function Web3ConnectionManager ({
   useInactiveListener(!triedEager || !!activatingConnector);
 
   useEffect(() => {
-    if (
-      triedEager
-      && !active
-      && (router.query.discordId || router.query.redirectUrl)
-    ) openWalletSelectorModal();
+    if (triedEager && !active && (router.query.discordId || router.query.redirectUrl)) openWalletSelectorModal();
   }, [triedEager, active, router.query]);
 
   return (
@@ -70,7 +68,8 @@ function Web3ConnectionManager ({
         triedEager,
         isNetworkModalOpen,
         openNetworkModal,
-        closeNetworkModal
+        closeNetworkModal,
+        isConnectingIdentity
       }}
     >
       {children}
@@ -80,12 +79,11 @@ function Web3ConnectionManager ({
           isModalOpen: isWalletSelectorModalOpen,
           openModal: openWalletSelectorModal,
           closeModal: closeWalletSelectorModal,
-          openNetworkModal
+          openNetworkModal,
+          setIsConnectingIdentity
         }}
       />
-      <NetworkModal
-        {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }}
-      />
+      <NetworkModal {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }} />
     </Web3Connection.Provider>
   );
 }

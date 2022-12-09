@@ -30,24 +30,22 @@ const StyledResizeHandle = styled(ResizableBox)`
     width: 75px;
     transform: none;
     margin-left: -33px;
-
   }
 
   .react-resizable-handle-sw,
   .react-resizable-handle-se {
     background-image: none;
     border-style: solid;
-    border-color:  ${({ theme }) => theme.palette.background.dark};
+    border-color: ${({ theme }) => theme.palette.background.dark};
     border-width: 0 3px 3px 0;
     bottom: 10px;
     display: inline-block;
     padding: 3px;
     background-color: transparent;
-    
   }
 
   .react-resizable-handle-w,
-  .react-resizable-handle-sw  {
+  .react-resizable-handle-sw {
     left: 10px;
   }
 
@@ -59,7 +57,6 @@ const StyledResizeHandle = styled(ResizableBox)`
   .react-resizable-handle-s {
     bottom: 10px;
   }
-
 `;
 
 export default memo(StyledResizeHandle);

@@ -73,7 +73,6 @@ beforeAll(async () => {
 
 describe('importWorkspacePages', () => {
   it('should import data from the export function into the target workspace', async () => {
-
     const { space: targetSpace } = await generateUserAndSpaceWithApiToken();
 
     const { data } = await exportWorkspacePages({
@@ -99,7 +98,6 @@ describe('importWorkspacePages', () => {
 
     expect(pages.length).toBe(totalSourcePages);
     expect(blocks.length).toBe(totalSourceBlocks);
-
   });
 
   it('should accept a filename as the source data input', async () => {

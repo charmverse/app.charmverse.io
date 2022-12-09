@@ -1,4 +1,3 @@
-
 import Mixpanel from 'mixpanel';
 
 let mixpanelInstance: Mixpanel.Mixpanel | null = null;
@@ -8,4 +7,3 @@ if (process.env.MIXPANEL_API_KEY) {
 }
 
 export const mixpanel = mixpanelInstance;
-

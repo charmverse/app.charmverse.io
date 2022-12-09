@@ -1,11 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-export function requireUser (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+export function requireUser(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   if (!req.session?.user) {
     res.status(401).send({ error: 'Please log in' });
-  }
-  else {
+  } else {
     next();
   }
 }
@@ -13,8 +12,7 @@ export function requireUser (req: NextApiRequest, res: NextApiResponse, next: Ne
 /**
  * Allow an endpoint to be consumed if it originates from a share page
  */
-export function requireUserOrSharePage (req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-
+export function requireUserOrSharePage(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const referer = req.headers.referer as string;
 
   const url = new URL(referer);
@@ -25,11 +23,9 @@ export function requireUserOrSharePage (req: NextApiRequest, res: NextApiRespons
 
   if (spaceDomain === 'share') {
     next();
-  }
-  else if (!req.session.user) {
+  } else if (!req.session.user) {
     res.status(401).send({ error: 'Please log in' });
-  }
-  else {
+  } else {
     next();
   }
 }

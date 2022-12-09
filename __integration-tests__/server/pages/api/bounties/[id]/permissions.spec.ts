@@ -22,9 +22,7 @@ beforeAll(async () => {
 });
 
 describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individual permissions for a bounty', () => {
-
   it('should return the bounty query and computed user permissions for a bounty and respond with 200', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const extraUserCookie = await loginUser(extraUser.id);
@@ -36,28 +34,25 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
       createdBy: nonAdminUser.id
     });
 
-    const { bountyPermissions, userPermissions } = (await request(baseUrl)
-      .get(`/api/bounties/${bounty.id}/permissions`)
-      .set('Cookie', extraUserCookie)
-      .expect(200)).body as AssignedBountyPermissions;
+    const { bountyPermissions, userPermissions } = (
+      await request(baseUrl).get(`/api/bounties/${bounty.id}/permissions`).set('Cookie', extraUserCookie).expect(200)
+    ).body as AssignedBountyPermissions;
 
     expect(bountyPermissions).toBeDefined();
     expect(userPermissions).toBeDefined();
 
     // Verify user permissions shape
-    typedKeys(userPermissions).forEach(key => {
+    typedKeys(userPermissions).forEach((key) => {
       expect(typeof userPermissions[key] as any).toEqual('boolean');
     });
 
     // Verify rollup across levels and assignments
-    typedKeys(BountyPermissionLevel).forEach(key => {
+    typedKeys(BountyPermissionLevel).forEach((key) => {
       expect(bountyPermissions[key]).toBeInstanceOf(Array);
     });
-
   });
 
   it('should respond with empty permissions if user does not have view permission', async () => {
-
     const extraUser = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: false });
 
     const extraUserCookie = await loginUser(extraUser.id);
@@ -70,25 +65,23 @@ describe('GET /api/bounties/{bountyId}/permissions - Return assigned and individ
       createdBy: nonAdminUser.id
     });
 
-    const { bountyPermissions, userPermissions } = (await request(baseUrl)
-      .get(`/api/bounties/${bounty.id}/permissions`)
-      .set('Cookie', extraUserCookie)
-      .expect(200)).body as AssignedBountyPermissions;
+    const { bountyPermissions, userPermissions } = (
+      await request(baseUrl).get(`/api/bounties/${bounty.id}/permissions`).set('Cookie', extraUserCookie).expect(200)
+    ).body as AssignedBountyPermissions;
 
     expect(bountyPermissions).toBeDefined();
     expect(userPermissions).toBeDefined();
 
     // Make sure access is full false
-    typedKeys(userPermissions).forEach(key => {
+    typedKeys(userPermissions).forEach((key) => {
       expect(userPermissions[key] as any).toBe(false);
     });
 
     // Make sure it's empty everywhere and doesn't leak info about roles
-    typedKeys(BountyPermissionLevel).forEach(key => {
+    typedKeys(BountyPermissionLevel).forEach((key) => {
       if (key !== 'creator') {
         expect(bountyPermissions[key].length).toBe(0);
       }
     });
   });
-
 });

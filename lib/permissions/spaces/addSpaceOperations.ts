@@ -13,18 +13,15 @@ import type { SpacePermissionFlags, SpacePermissionModification } from './interf
 import { SpacePermissionWithAssignee } from './interfaces';
 import { generateSpacePermissionQuery } from './utility';
 
-export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'> ({
+export async function addSpaceOperations<A extends AssignablePermissionGroups = 'any'>({
   forSpaceId,
   operations,
   roleId,
   spaceId,
   userId
 }: SpacePermissionModification<A>): Promise<SpacePermissionFlags> {
-
   // Make sure one group has been assigned, not more, not 0
-  if ((roleId && (spaceId || userId))
-  || (spaceId && userId)
-  || (!roleId && !spaceId && !userId)) {
+  if ((roleId && (spaceId || userId)) || (spaceId && userId) || (!roleId && !spaceId && !userId)) {
     throw new InvalidPermissionGranteeError();
   }
 
@@ -53,8 +50,7 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
     if (error) {
       throw new InsecureOperationError('Permissions cannot be assigned to users who are not a member of the space.');
     }
-  }
-  else if (group === 'role') {
+  } else if (group === 'role') {
     // Make sure this role is part of the target space
     const roleInSpace = await prisma.role.findUnique({
       where: {
@@ -64,9 +60,10 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
     if (!roleInSpace || roleInSpace.spaceId !== forSpaceId) {
       throw new InsecureOperationError('Permissions cannot be assigned to roles which do not belong to the space.');
     }
-  }
-  else if (group === 'space' && id !== forSpaceId) {
-    throw new InsecureOperationError('Space permissions cannot be assigned to a different space than the target space.');
+  } else if (group === 'space' && id !== forSpaceId) {
+    throw new InsecureOperationError(
+      'Space permissions cannot be assigned to a different space than the target space.'
+    );
   }
 
   const query = generateSpacePermissionQuery({
@@ -106,21 +103,27 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
         }
       },
       operations: deduplicatedOperations,
-      role: roleId ? {
-        connect: {
-          id: roleId
-        }
-      } : undefined,
-      user: userId ? {
-        connect: {
-          id: userId
-        }
-      } : undefined,
-      space: spaceId ? {
-        connect: {
-          id: spaceId
-        }
-      } : undefined
+      role: roleId
+        ? {
+            connect: {
+              id: roleId
+            }
+          }
+        : undefined,
+      user: userId
+        ? {
+            connect: {
+              id: userId
+            }
+          }
+        : undefined,
+      space: spaceId
+        ? {
+            connect: {
+              id: spaceId
+            }
+          }
+        : undefined
     },
     include: {
       role: true,
@@ -136,5 +139,4 @@ export async function addSpaceOperations<A extends AssignablePermissionGroups = 
   });
 
   return updatedGroupSpacePermissions;
-
 }

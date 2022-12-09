@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import type { CommonSpacesInput } from 'lib/members/interfaces';
 
-export async function getCommonSpaceIds ({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<string[]> {
+export async function getCommonSpaceIds({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<string[]> {
   if (!requestingUserId) {
     return [];
   }
@@ -29,5 +29,5 @@ export async function getCommonSpaceIds ({ memberId, requestingUserId, spaceId }
     select: { id: true }
   });
 
-  return commonSpaces.map(s => s.id);
+  return commonSpaces.map((s) => s.id);
 }

@@ -1,15 +1,23 @@
-
-import type { PagePermission, PagePermissionLevel, SpaceRole, PageOperations as PageOperationEnum, Role, Space, User, Page } from '@prisma/client';
+import type {
+  PagePermission,
+  PagePermissionLevel,
+  SpaceRole,
+  PageOperations as PageOperationEnum,
+  Role,
+  Space,
+  User,
+  Page
+} from '@prisma/client';
 
 import type { UserPermissionFlags } from '../interfaces';
 
-export type PageOperationType = keyof typeof PageOperationEnum
+export type PageOperationType = keyof typeof PageOperationEnum;
 
-export type PagePermissionLevelType = keyof typeof PagePermissionLevel
+export type PagePermissionLevelType = keyof typeof PagePermissionLevel;
 
-export type PagePermissionLevelWithoutCustom = Exclude<PagePermissionLevelType, 'custom'>
+export type PagePermissionLevelWithoutCustom = Exclude<PagePermissionLevelType, 'custom'>;
 
-export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>
+export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>;
 
 /**
  * Use for requesting all permissions for a page
@@ -31,10 +39,17 @@ export interface IPagePermissionUserRequest extends IPagePermissionRequest {
  * Provide one of userId, spaceId or roleId
  * @pageId can be passed in the body or externally
  */
-export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions' | 'userId' | 'spaceId' | 'roleId' | 'public' | 'pageId' | 'inheritedFromPermission' | 'id'>>
-export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inheritedFromPermission'>
+export type IPagePermissionToCreate = Pick<PagePermission, 'permissionLevel'> &
+  Partial<
+    Pick<
+      PagePermission,
+      'permissions' | 'userId' | 'spaceId' | 'roleId' | 'public' | 'pageId' | 'inheritedFromPermission' | 'id'
+    >
+  >;
+export type IPagePermissionToInherit = Pick<PagePermission, 'pageId' | 'inheritedFromPermission'>;
 
-export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> & Partial<Pick<PagePermission, 'permissions'>>
+export type IPagePermissionUpdate = Pick<PagePermission, 'permissionLevel'> &
+  Partial<Pick<PagePermission, 'permissions'>>;
 
 export interface IPagePermissionToDelete {
   permissionId: string;
@@ -46,7 +61,7 @@ export interface IPagePermissionWithSource extends PagePermission {
 
 export interface IPageWithNestedSpaceRole extends Page {
   space: {
-    spaceRoles: SpaceRole [];
+    spaceRoles: SpaceRole[];
   };
 }
 

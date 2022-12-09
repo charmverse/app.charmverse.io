@@ -8,7 +8,7 @@ import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testin
 import { deleteVote } from '../deleteVote';
 
 describe('deleteVote', () => {
-  it('should return null if vote doesn\'t exist', async () => {
+  it("should return null if vote doesn't exist", async () => {
     const vote = await deleteVote(v4(), v4());
     expect(vote).toBe(null);
   });
@@ -33,11 +33,13 @@ describe('deleteVote', () => {
     });
 
     await deleteVote(vote.id, user.id);
-    expect(await prisma.vote.findUnique({
-      where: {
-        id: vote.id
-      }
-    })).toBeFalsy();
+    expect(
+      await prisma.vote.findUnique({
+        where: {
+          id: vote.id
+        }
+      })
+    ).toBeFalsy();
   });
 
   it('should throw error if a proposal context vote is being deleted', async () => {

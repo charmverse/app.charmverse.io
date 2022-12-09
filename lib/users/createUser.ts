@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -10,18 +11,17 @@ import { sessionUserRelations } from 'lib/session/config';
 import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
 
-export async function createUserFromWallet (
+export async function createUserFromWallet(
   address: string,
   signupAnalytics: Partial<SignupAnalytics> = {},
   // An ID set by analytics tools to have pre signup user journey
-  preExistingId: string = v4()
+  preExistingId: string = v4(),
+  tx: Prisma.TransactionClient = prisma
 ): Promise<LoggedInUser> {
-
   const lowercaseAddress = address.toLowerCase();
 
-  const user = await prisma.user.findFirst({
+  const user = await tx.user.findFirst({
     where: {
       wallets: {
         some: {
@@ -34,17 +34,16 @@ export async function createUserFromWallet (
 
   if (user) {
     return user;
-  }
-  else {
+  } else {
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
     const userPath = username.replace('…', '-');
-    const isUserPathAvailable = await isProfilePathAvailable(userPath);
+    const isUserPathAvailable = await isProfilePathAvailable(userPath, undefined, tx);
 
-    const newUser = await prisma.user.create({
+    const newUser = await tx.user.create({
       data: {
         id: preExistingId,
-        identityType: IDENTITY_TYPES[0],
+        identityType: 'Wallet',
         username,
         path: isUserPathAvailable ? userPath : null,
         email: `${randomName()}@charmversetest.io`,
@@ -57,10 +56,9 @@ export async function createUserFromWallet (
       include: sessionUserRelations
     });
 
-    updateTrackUserProfile(newUser);
+    updateTrackUserProfile(newUser, tx);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
 
     return newUser;
-
   }
 }

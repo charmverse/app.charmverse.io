@@ -7,8 +7,7 @@ import { mapBountyPermissions } from './mapBountyPermissions';
 /**
  * Returns all existing permissions for a bounty, mapped to their level
  */
-export async function queryBountyPermissions ({ bountyId }: { bountyId: string }): Promise<BountyPermissions> {
-
+export async function queryBountyPermissions({ bountyId }: { bountyId: string }): Promise<BountyPermissions> {
   const bounty = await prisma.bounty.findUnique({
     where: {
       id: bountyId
@@ -31,7 +30,7 @@ export async function queryBountyPermissions ({ bountyId }: { bountyId: string }
 
   const mapped = mapBountyPermissions(permissions);
 
-  if (mapped.creator.every(p => p.id !== bounty.createdBy && p.group !== 'user')) {
+  if (mapped.creator.every((p) => p.id !== bounty.createdBy && p.group !== 'user')) {
     mapped.creator.push({
       id: bounty.createdBy,
       group: 'user'

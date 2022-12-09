@@ -9,8 +9,7 @@ import { copyAllPagePermissions } from '../actions/copyPermission';
 import { generateReplaceIllegalPermissions } from '../actions/replaceIllegalPermissions';
 import { upsertPermission } from '../actions/upsert-permission';
 
-export async function setupPermissionsAfterPageCreated (pageId: string): Promise<IPageWithPermissions> {
-
+export async function setupPermissionsAfterPageCreated(pageId: string): Promise<IPageWithPermissions> {
   // connect to page node from use pages (Removing iPageWithPermissions)
   return prisma.$transaction(async (tx) => {
     const page = await getPage(pageId, undefined, tx);
@@ -23,7 +22,7 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
     if (!page.parentId) {
       // Space id could be null
       if (page.spaceId) {
-        const space = await tx.space.findUnique({
+        const space = (await tx.space.findUnique({
           where: {
             id: page.spaceId
           },
@@ -31,15 +30,19 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
             defaultPagePermissionGroup: true,
             defaultPublicPages: true
           }
-        }) as Space;
+        })) as Space;
         if (space?.defaultPagePermissionGroup) {
           // Pass tx here for writes
-          await upsertPermission(pageId, {
-            permissionLevel: space.defaultPagePermissionGroup,
-            spaceId: page.spaceId
-          }, undefined, tx);
-        }
-        else {
+          await upsertPermission(
+            pageId,
+            {
+              permissionLevel: space.defaultPagePermissionGroup,
+              spaceId: page.spaceId
+            },
+            undefined,
+            tx
+          );
+        } else {
           await upsertPermission(
             pageId,
             {
@@ -52,14 +55,17 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
         }
 
         if (space.defaultPublicPages) {
-          await upsertPermission(pageId, {
-            permissionLevel: 'view',
-            public: true
-
-          }, undefined, tx);
+          await upsertPermission(
+            pageId,
+            {
+              permissionLevel: 'view',
+              public: true
+            },
+            undefined,
+            tx
+          );
         }
-      }
-      else {
+      } else {
         await upsertPermission(
           pageId,
           {
@@ -71,9 +77,8 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
           tx
         );
       }
-    }
-    else {
-      const parent = (await getPage(page.parentId, undefined, tx) as IPageWithPermissions);
+    } else {
+      const parent = (await getPage(page.parentId, undefined, tx)) as IPageWithPermissions;
 
       if (!parent) {
         await tx.page.update({
@@ -119,14 +124,18 @@ export async function setupPermissionsAfterPageCreated (pageId: string): Promise
     }
 
     // Add a full access permission for the creating user
-    await upsertPermission(page.id, {
-      permissionLevel: 'full_access',
-      userId: page.createdBy
-    }, undefined, tx);
+    await upsertPermission(
+      page.id,
+      {
+        permissionLevel: 'full_access',
+        userId: page.createdBy
+      },
+      undefined,
+      tx
+    );
 
-    const pageWithPermissions = await getPage(page.id, undefined, tx) as IPageWithPermissions;
+    const pageWithPermissions = (await getPage(page.id, undefined, tx)) as IPageWithPermissions;
 
     return pageWithPermissions;
   });
-
 }

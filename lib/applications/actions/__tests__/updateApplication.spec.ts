@@ -1,4 +1,3 @@
-
 import type { Application, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -21,9 +20,7 @@ beforeAll(async () => {
 });
 
 describe('updateApplication', () => {
-
   it('should only update the application message', async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -50,22 +47,18 @@ describe('updateApplication', () => {
     });
 
     // Make sure nothing changed
-    (Object.entries(updated)).forEach(entry => {
-
+    Object.entries(updated).forEach((entry) => {
       const [key, updatedValue] = entry;
 
       if (key !== 'message') {
         expect(updatedValue).toEqual(application[key as keyof Application]);
       }
-
     });
 
     expect(updated.message).toBe(newMessage);
-
   });
 
   it(`should fail if the new message has less than ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters`, async () => {
-
     const bounty = await createBounty({
       createdBy: user.id,
       spaceId: space.id
@@ -83,27 +76,20 @@ describe('updateApplication', () => {
         message: ''
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(StringTooShortError);
     }
-
   });
 
   it('should fail if the application does not exist', async () => {
-
     try {
       await updateApplication({
         applicationId: v4(),
         message: 'A valid application message'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
-
 });
-

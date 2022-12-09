@@ -2,7 +2,6 @@ import { uniqueValues, sortArrayByObjectProperty, flatArrayMap } from '../array'
 
 describe('uniqueValues', () => {
   it('should only return unique values', () => {
-
     const testValue = [1, 1, 1, 2];
 
     const uniqueElements = uniqueValues(testValue);
@@ -12,11 +11,9 @@ describe('uniqueValues', () => {
 });
 
 describe('sortArrayByObjectProperty', () => {
-
   const ordering = ['first', 'second', 'third'];
 
   const values = [
-
     {
       prop: 'third'
     },
@@ -29,12 +26,10 @@ describe('sortArrayByObjectProperty', () => {
     {
       prop: 'first'
     }
-
   ];
 
   // fourth is not defined
   const valuesWithInexistentOrdering = [
-
     {
       prop: 'third'
     },
@@ -53,7 +48,6 @@ describe('sortArrayByObjectProperty', () => {
   ];
 
   it('should order an array of objects, using the order of a property in a separate array', () => {
-
     const sorted = sortArrayByObjectProperty(values, 'prop', ordering);
 
     expect(sorted[0].prop).toBe('first');
@@ -63,11 +57,10 @@ describe('sortArrayByObjectProperty', () => {
   });
 
   it('should move items whose value is not in the ordering to the end of the array', () => {
-
     const sorted = sortArrayByObjectProperty(valuesWithInexistentOrdering, 'prop', ordering);
 
-    expect(sorted.slice(3).some(item => item.prop === 'fourth')).toBe(true);
-    expect(sorted.slice(3).some(item => item.prop === undefined)).toBe(true);
+    expect(sorted.slice(3).some((item) => item.prop === 'fourth')).toBe(true);
+    expect(sorted.slice(3).some((item) => item.prop === undefined)).toBe(true);
   });
 });
 
@@ -85,8 +78,6 @@ describe('flatArrayMap', () => {
     expect(flat.length).toBe(test.one.length + test.two.length + test.three.length);
 
     // Make sure values preserved (3 ones in our series)
-    expect(flat.filter(val => val !== 1).length).toBe(3);
-
+    expect(flat.filter((val) => val !== 1).length).toBe(3);
   });
-
 });

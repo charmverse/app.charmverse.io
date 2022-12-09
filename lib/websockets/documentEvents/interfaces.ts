@@ -22,7 +22,7 @@ export type RequestResendMessage = {
 export type ConfirmVersionMessage = {
   type: 'confirm_version';
   v: number;
-}
+};
 
 type StandardMessage = ConfirmVersionMessage | RequestResendMessage;
 
@@ -53,11 +53,11 @@ export type ProsemirrorJSONStep = {
   slice?: {
     content?: {
       type: string;
-      marks?: { type: string, attrs: any }[];
+      marks?: { type: string; attrs: any }[];
       text: string;
     }[];
   };
-}
+};
 
 export type ClientDiffMessage = {
   type: 'diff';
@@ -73,14 +73,15 @@ export type ClientSubscribeMessage = {
   type: 'subscribe';
   roomId: string;
   connection?: number;
-}
+};
 
 export type ClientUnsubscribeMessage = {
   type: 'unsubscribe';
   roomId: string;
-}
+};
 
-export type ClientMessage = StandardMessage
+export type ClientMessage =
+  | StandardMessage
   | ClientSubscribeMessage
   | ClientCheckVersionMessage
   | ClientDiffMessage
@@ -97,8 +98,8 @@ type ServerConnectionsMessage = {
 
 export type ServerDocDataMessage = {
   type: 'doc_data';
-  doc: { content: Node, v: number };
-  docInfo: { id: string, session_id: string, updated: any, version: number }; // TODO: do we need this?
+  doc: { content: Node; v: number };
+  docInfo: { id: string; session_id: string; updated: any; version: number }; // TODO: do we need this?
   time: number;
   m?: ClientDiffMessage[];
 };
@@ -111,9 +112,10 @@ export type ServerDiffMessage = {
 export type ServerErrorMessage = {
   type: 'error';
   message: string;
-}
+};
 
-export type ServerMessage = StandardMessage
+export type ServerMessage =
+  | StandardMessage
   | ServerConnectionsMessage
   | ServerDocDataMessage
   | ServerDiffMessage

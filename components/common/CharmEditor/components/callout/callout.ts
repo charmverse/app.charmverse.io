@@ -6,7 +6,7 @@ const name = 'blockquote';
 
 const defaultIcon = '😃';
 
-export function spec (): BaseRawNodeSpec {
+export function spec(): BaseRawNodeSpec {
   const _spec = quoteSpec();
   _spec.name = 'blockquote';
   _spec.schema.attrs = {
@@ -19,7 +19,7 @@ export function spec (): BaseRawNodeSpec {
   return _spec;
 }
 
-export function plugins (): RawPlugins {
+export function plugins(): RawPlugins {
   return [
     NodeView.createPlugin({
       name: 'blockquote',

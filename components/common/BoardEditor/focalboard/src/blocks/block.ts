@@ -1,45 +1,44 @@
-
 import difference from 'lodash/difference';
 
 import { Utils } from '../utils';
 
 const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const;
-type ContentBlockTypes = typeof contentBlockTypes[number]
-type BlockTypes = typeof blockTypes[number]
+type ContentBlockTypes = typeof contentBlockTypes[number];
+type BlockTypes = typeof blockTypes[number];
 
 interface BlockPatch {
-    spaceId?: string;
-    parentId?: string;
-    rootId?: string;
-    schema?: number;
-    type?: BlockTypes;
-    title?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updatedFields?: Record<string, any>;
-    deletedFields?: string[];
-    deletedAt?: number;
+  spaceId?: string;
+  parentId?: string;
+  rootId?: string;
+  schema?: number;
+  type?: BlockTypes;
+  title?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updatedFields?: Record<string, any>;
+  deletedFields?: string[];
+  deletedAt?: number;
 }
 
 interface Block {
-    id: string;
-    spaceId: string;
-    parentId: string;
-    rootId: string;
-    createdBy: string;
-    updatedBy: string;
-    schema: number;
-    type: BlockTypes;
-    title: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fields: Record<string, any>;
+  id: string;
+  spaceId: string;
+  parentId: string;
+  rootId: string;
+  createdBy: string;
+  updatedBy: string;
+  schema: number;
+  type: BlockTypes;
+  title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>;
 
-    createdAt: number;
-    updatedAt: number;
-    deletedAt: number | null;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt: number | null;
 }
 
-function createBlock (block?: Partial<Block>): Block {
+function createBlock(block?: Partial<Block>): Block {
   const now = Date.now();
   return {
     id: block?.id || Utils.createGuid(Utils.blockTypeToIDType(block?.type)),
@@ -61,7 +60,7 @@ function createBlock (block?: Partial<Block>): Block {
 // createPatchesFromBlock creates two BlockPatch instances, one that
 // contains the delta to update the block and another one for the undo
 // action, in case it happens
-function createPatchesFromBlocks (newBlock: Block, oldBlock: Block): BlockPatch[] {
+function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): BlockPatch[] {
   const newDeletedFields = difference(Object.keys(newBlock.fields), Object.keys(oldBlock.fields));
   const newUpdatedFields: Record<string, any> = {};
   const newUpdatedData: Record<string, any> = {};
@@ -106,4 +105,3 @@ function createPatchesFromBlocks (newBlock: Block, oldBlock: Block): BlockPatch[
 
 export type { ContentBlockTypes, BlockTypes, Block, BlockPatch };
 export { blockTypes, contentBlockTypes, createBlock, createPatchesFromBlocks };
-

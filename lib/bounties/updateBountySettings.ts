@@ -8,18 +8,21 @@ import { setBountyPermissions } from '../permissions/bounties';
 import { getBountyOrThrow } from './getBounty';
 import type { BountyUpdate } from './interfaces';
 
-export async function updateBountySettings ({
-  bountyId,
-  updateContent
-}: BountyUpdate): Promise<BountyWithDetails> {
-
-  if (updateContent.rewardAmount === null || (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0)) {
+export async function updateBountySettings({ bountyId, updateContent }: BountyUpdate): Promise<BountyWithDetails> {
+  if (
+    updateContent.rewardAmount === null ||
+    (typeof updateContent.rewardAmount === 'number' && updateContent.rewardAmount <= 0)
+  ) {
     throw new PositiveNumbersOnlyError();
   }
 
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (typeof updateContent.maxSubmissions === 'number' && bounty.maxSubmissions !== null && updateContent.maxSubmissions < countValidSubmissions(bounty.applications)) {
+  if (
+    typeof updateContent.maxSubmissions === 'number' &&
+    bounty.maxSubmissions !== null &&
+    updateContent.maxSubmissions < countValidSubmissions(bounty.applications)
+  ) {
     throw new InvalidInputError('New bounty cap cannot be lower than total of active and valid submissions.');
   }
   const [updatedBounty] = await prisma.$transaction([

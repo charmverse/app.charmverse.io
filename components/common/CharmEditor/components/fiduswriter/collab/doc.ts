@@ -1,22 +1,21 @@
-
 import type { Transaction } from '@bangle.dev/pm';
 import { Step, EditorState } from '@bangle.dev/pm';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 
 import log from 'lib/log';
-import type { ServerDocDataMessage, ClientDiffMessage, ClientSelectionMessage } from 'lib/websockets/documentEvents/interfaces';
+import type {
+  ServerDocDataMessage,
+  ClientDiffMessage,
+  ClientSelectionMessage
+} from 'lib/websockets/documentEvents/interfaces';
 
-import {
-  getSelectionUpdate,
-  updateCollaboratorSelection
-} from '../state_plugins';
+import { getSelectionUpdate, updateCollaboratorSelection } from '../state_plugins';
 
 import { Merge } from './merge';
 
 import type { ModCollab } from './index';
 
 export class ModCollabDoc {
-
   mod: ModCollab;
 
   unconfirmedDiffs: Record<string, ClientDiffMessage> = {};
@@ -39,29 +38,26 @@ export class ModCollabDoc {
 
   merge: Merge;
 
-  constructor (mod: ModCollab) {
+  constructor(mod: ModCollab) {
     mod.doc = this;
     this.mod = mod;
     this.merge = new Merge(mod);
   }
 
-  cancelCurrentlyCheckingVersion () {
+  cancelCurrentlyCheckingVersion() {
     this.currentlyCheckingVersion = false;
     window.clearTimeout(this.enableCheckVersion);
   }
 
-  checkVersion () {
+  checkVersion() {
     this.mod.editor.ws?.send(() => {
       if (this.currentlyCheckingVersion || !this.mod.editor.docInfo.version) {
         return false;
       }
       this.currentlyCheckingVersion = true;
-      this.enableCheckVersion = window.setTimeout(
-        () => {
-          this.currentlyCheckingVersion = false;
-        },
-        1000
-      );
+      this.enableCheckVersion = window.setTimeout(() => {
+        this.currentlyCheckingVersion = false;
+      }, 1000);
       if (this.mod.editor.ws?.socket.connected) {
         this.disableDiffSending();
       }
@@ -72,37 +68,33 @@ export class ModCollabDoc {
     });
   }
 
-  disableDiffSending () {
+  disableDiffSending() {
     this.awaitingDiffResponse = true;
     // If no answer has been received from the server within 2 seconds,
     // check the version
-    this.sendNextDiffTimer = window.setTimeout(
-      () => {
-        this.awaitingDiffResponse = false;
-        this.sendToCollaborators();
-      },
-      8000
-    );
+    this.sendNextDiffTimer = window.setTimeout(() => {
+      this.awaitingDiffResponse = false;
+      this.sendToCollaborators();
+    }, 8000);
   }
 
-  enableDiffSending () {
+  enableDiffSending() {
     window.clearTimeout(this.sendNextDiffTimer);
     this.awaitingDiffResponse = false;
     this.sendToCollaborators();
   }
 
-  receiveDocument (data: ServerDocDataMessage) {
+  receiveDocument(data: ServerDocDataMessage) {
     this.cancelCurrentlyCheckingVersion();
     if (this.mod.editor.docInfo.confirmedDoc) {
       log.debug('merge document updates');
       this.merge.adjustDocument(data);
-    }
-    else {
+    } else {
       this.loadDocument(data);
     }
   }
 
-  loadDocument ({ doc, time, docInfo }: ServerDocDataMessage) {
+  loadDocument({ doc, time, docInfo }: ServerDocDataMessage) {
     // Reset collaboration
     this.unconfirmedDiffs = {};
     if (this.awaitingDiffResponse) {
@@ -117,11 +109,10 @@ export class ModCollabDoc {
     this.mod.editor.docInfo.version = doc.v;
     this.mod.editor.docInfo.updated = new Date();
     const stateDoc = this.mod.editor.schema.nodeFromJSON(doc.content);
-    const plugins = this.mod.editor.statePlugins.map(plugin => {
+    const plugins = this.mod.editor.statePlugins.map((plugin) => {
       if (plugin[1]) {
         return plugin[0](plugin[1](doc));
-      }
-      else {
+      } else {
         return plugin[0]();
       }
     });
@@ -143,23 +134,15 @@ export class ModCollabDoc {
       // this.mod.editor.scrollIdIntoView(locationHash.slice(1));
     }
     this.mod.editor.waitingForDocument = false;
-
   }
 
-  sendToCollaborators () {
+  sendToCollaborators() {
     // Handle either doc change and comment updates OR caret update. Priority
     // for doc change/comment update.
     this.mod.editor.ws?.send(() => {
-      if (
-        this.awaitingDiffResponse
-                || this.mod.editor.waitingForDocument
-                || this.receiving
-      ) {
+      if (this.awaitingDiffResponse || this.mod.editor.waitingForDocument || this.receiving) {
         return false;
-      }
-      else if (
-        sendableSteps(this.mod.editor.view.state)
-      ) {
+      } else if (sendableSteps(this.mod.editor.view.state)) {
         this.disableDiffSending();
         const stepsToSend = sendableSteps(this.mod.editor.view.state);
 
@@ -180,9 +163,7 @@ export class ModCollabDoc {
         unconfirmedDiff.cid = this.mod.editor.client_id;
 
         if (stepsToSend) {
-          unconfirmedDiff.ds = stepsToSend.steps.map(
-            s => s.toJSON() as any
-          );
+          unconfirmedDiff.ds = stepsToSend.steps.map((s) => s.toJSON() as any);
         }
 
         this.unconfirmedDiffs[rid] = {
@@ -190,9 +171,7 @@ export class ModCollabDoc {
           ...unconfirmedDiff
         };
         return unconfirmedDiff;
-
-      }
-      else if (this.mod.editor.currentView && getSelectionUpdate(this.mod.editor.currentView.state)) {
+      } else if (this.mod.editor.currentView && getSelectionUpdate(this.mod.editor.currentView.state)) {
         const currentView = this.mod.editor.currentView;
         if (!currentView) {
           return false;
@@ -213,35 +192,29 @@ export class ModCollabDoc {
           anchor: selectionUpdate.anchor,
           head: selectionUpdate.head
         } as ClientSelectionMessage;
-      }
-      else {
+      } else {
         return false;
       }
     });
-
   }
 
-  receiveSelectionChange (data: ClientSelectionMessage) {
-    const participant = this.mod.participants.find(par => par.id === data.id);
+  receiveSelectionChange(data: ClientSelectionMessage) {
+    const participant = this.mod.participants.find((par) => par.id === data.id);
 
     if (!participant) {
       // participant is still unknown to us. Ignore
       return;
     }
-    const tr = updateCollaboratorSelection(
-      this.mod.editor.view.state,
-      participant,
-      data
-    );
+    const tr = updateCollaboratorSelection(this.mod.editor.view.state, participant, data);
     if (tr) {
       this.mod.editor.view.dispatch(tr);
     }
   }
 
-  receiveDiff (data: ClientDiffMessage, serverFix = false) {
-
+  receiveDiff(data: ClientDiffMessage, serverFix = false) {
     this.mod.editor.docInfo.version += 1;
-    if (data.ds && data.cid) { // document steps
+    if (data.ds && data.cid) {
+      // document steps
       this.applyDiffs(data.ds, data.cid);
     }
 
@@ -252,23 +225,19 @@ export class ModCollabDoc {
       // in case collaborators want to send something first.
       this.enableDiffSending();
       window.setTimeout(() => this.sendToCollaborators(), 500);
-
     }
   }
 
-  setConfirmedDoc (tr: Transaction, stepsLength: number) {
+  setConfirmedDoc(tr: Transaction, stepsLength: number) {
     // Find the latest version of the doc without any unconfirmed local changes
 
     const rebased = tr.getMeta('rebased');
     const docNumber = rebased + stepsLength;
 
-    this.mod.editor.docInfo.confirmedDoc = docNumber === tr.docs.length
-      ? tr.doc
-      : tr.docs[docNumber];
-
+    this.mod.editor.docInfo.confirmedDoc = docNumber === tr.docs.length ? tr.doc : tr.docs[docNumber];
   }
 
-  confirmDiff (requestId: number) {
+  confirmDiff(requestId: number) {
     const unconfirmedDiffs = this.unconfirmedDiffs[requestId];
     if (!unconfirmedDiffs) {
       return;
@@ -277,9 +246,7 @@ export class ModCollabDoc {
 
     const sentSteps = unconfirmedDiffs.ds; // document steps
     if (sentSteps) {
-      const ourIds = sentSteps.map(
-        _step => this.mod.editor.client_id
-      );
+      const ourIds = sentSteps.map((_step) => this.mod.editor.client_id);
       const tr = receiveTransaction(
         this.mod.editor.view.state,
         // @ts-ignore because `Step` is roughly the same as `ProsemirrorJSONStep`
@@ -294,20 +261,16 @@ export class ModCollabDoc {
     this.enableDiffSending();
   }
 
-  rejectDiff (requestId: number) {
+  rejectDiff(requestId: number) {
     delete this.unconfirmedDiffs[requestId];
     this.enableDiffSending();
   }
 
-  applyDiffs (diffs: any[], cid: number) {
+  applyDiffs(diffs: any[], cid: number) {
     this.receiving = true;
-    const steps = diffs.map(j => Step.fromJSON(this.mod.editor.schema, j));
-    const clientIds = diffs.map(_ => cid);
-    const tr = receiveTransaction(
-      this.mod.editor.view.state,
-      steps,
-      clientIds
-    );
+    const steps = diffs.map((j) => Step.fromJSON(this.mod.editor.schema, j));
+    const clientIds = diffs.map((_) => cid);
+    const tr = receiveTransaction(this.mod.editor.view.state, steps, clientIds);
     tr.setMeta('addToHistory', false);
     tr.setMeta('remote', true);
     this.mod.editor.view.dispatch(tr);

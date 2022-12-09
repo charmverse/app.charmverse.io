@@ -25,15 +25,19 @@ describe('sendNotification()', () => {
       approveSubmitters: false,
       title: 'My new bounty',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     await createApplication({

@@ -14,8 +14,7 @@ export interface Props {
 
 const MAX_CONCURRENT_STRATEGIES = 8;
 
-export default function InputVotingStrategies ({ onChange = () => {}, strategies }: Props) {
-
+export default function InputVotingStrategies({ onChange = () => {}, strategies }: Props) {
   const [value, setValue] = useState<SnapshotVotingStrategy[]>([strategies[0]]);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export default function InputVotingStrategies ({ onChange = () => {}, strategies
     <Box>
       <FieldLabel>Voting strategies (max. {MAX_CONCURRENT_STRATEGIES})</FieldLabel>
       <FormControl fullWidth>
-
         <Select
           value={value}
           multiple
@@ -36,23 +34,21 @@ export default function InputVotingStrategies ({ onChange = () => {}, strategies
               onChange(ev.target.value as any);
             }
           }}
-          renderValue={val => {
-            return (val as SnapshotVotingStrategy[])?.map(strat => strat.name).join(', ');
+          renderValue={(val) => {
+            return (val as SnapshotVotingStrategy[])?.map((strat) => strat.name).join(', ');
           }}
         >
-          {
-          strategies.map(strat => {
+          {strategies.map((strat) => {
             return (
               <MenuItem
-                disabled={value.length >= MAX_CONCURRENT_STRATEGIES && !value.find(selected => selected === strat)}
+                disabled={value.length >= MAX_CONCURRENT_STRATEGIES && !value.find((selected) => selected === strat)}
                 value={strat as any}
                 key={strat.name}
               >
                 {strat.name}
               </MenuItem>
             );
-          })
-        }
+          })}
         </Select>
       </FormControl>
     </Box>

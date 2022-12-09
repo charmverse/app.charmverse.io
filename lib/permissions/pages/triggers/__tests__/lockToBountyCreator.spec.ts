@@ -16,7 +16,6 @@ beforeAll(async () => {
 
 describe('lockToBountyCreator', () => {
   it('should upsert a full access permission for the bounty creator, and update all other permisssions to view-only', async () => {
-
     const submitterUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -30,34 +29,41 @@ describe('lockToBountyCreator', () => {
       chainId: 1,
       rewardToken: 'ETH',
       bountyPermissions: {
-        creator: [{
-          group: 'user',
-          id: user.id
-        }],
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        creator: [
+          {
+            group: 'user',
+            id: user.id
+          }
+        ],
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        permissionLevel: 'editor',
-        userId: user.id
-      },
-      {
-        permissionLevel: 'editor',
-        spaceId: space.id
-      }, {
-        permissionLevel: 'editor',
-        userId: submitterUser.id
-      }]
+      pagePermissions: [
+        {
+          permissionLevel: 'editor',
+          userId: user.id
+        },
+        {
+          permissionLevel: 'editor',
+          spaceId: space.id
+        },
+        {
+          permissionLevel: 'editor',
+          userId: submitterUser.id
+        }
+      ]
     });
 
     const { permissions } = await lockToBountyCreator({ pageId: bounty.page.id });
 
     expect(permissions.length).toBe(3);
-    expect(permissions.some(p => p.userId === user.id && p.permissionLevel === 'full_access'));
-    expect(permissions.some(p => p.userId === submitterUser.id && p.permissionLevel === 'view'));
-    expect(permissions.some(p => p.spaceId === space.id && p.permissionLevel === 'view'));
+    expect(permissions.some((p) => p.userId === user.id && p.permissionLevel === 'full_access'));
+    expect(permissions.some((p) => p.userId === submitterUser.id && p.permissionLevel === 'view'));
+    expect(permissions.some((p) => p.spaceId === space.id && p.permissionLevel === 'view'));
   });
 
   it('should throw an error if targeting a page without a bounty', async () => {

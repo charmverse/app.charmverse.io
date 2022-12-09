@@ -15,26 +15,29 @@ const handler = nc({
 
 handler.get(oauth);
 
-async function oauth (req: NextApiRequest, res: NextApiResponse) {
+async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query as {
     redirect: string;
     type: 'connect' | 'server' | 'login';
   };
-  const state = encodeURIComponent(JSON.stringify({
-    redirect: query.redirect,
-    type: query.type
-  }));
+  const state = encodeURIComponent(
+    JSON.stringify({
+      redirect: query.redirect,
+      type: query.type
+    })
+  );
 
   const discordQueryParams = [];
   if (query.type.match(/(connect|login)/)) {
     discordQueryParams.push(...['prompt=consent', 'scope=identify']);
-  }
-  else if (query.type === 'server') {
+  } else if (query.type === 'server') {
     discordQueryParams.push(...['scope=guilds%20bot', 'permissions=0']);
   }
 
   const domain = isProdEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
-  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(`${domain}/api/discord/callback`)}`;
+  const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(
+    `${domain}/api/discord/callback`
+  )}`;
   res.redirect(oauthUrl);
 }
 

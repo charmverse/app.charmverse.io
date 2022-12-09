@@ -1,6 +1,6 @@
 import { useLocalStorage } from 'hooks/useLocalStorage';
 
-export function usePendingLocalAction (actionKey: string, validityTime = 5000) {
+export function usePendingLocalAction(actionKey: string, validityTime = 5000) {
   const [value, setValue] = useLocalStorage<null | number>(actionKey, null);
 
   let isPendingAction = false;

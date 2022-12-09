@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -39,8 +38,7 @@ const ImageContainer = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
-export default function SignupPageContent () {
-
+export default function SignupPageContent() {
   const router = useRouter();
   const { user } = useUser();
 
@@ -75,9 +73,7 @@ export default function SignupPageContent () {
               <ImageContainer>
                 <Image src={gatesImage} />
               </ImageContainer>
-              <PrimaryButton size='large'>
-                Join an existing workspace
-              </PrimaryButton>
+              <PrimaryButton size='large'>Join an existing workspace</PrimaryButton>
             </AdventureCard>
           </Link>
         </Grid>

@@ -15,7 +15,6 @@ test.beforeAll(async () => {
 
 test.describe.serial('Add a new workspace from sidebar and load it', async () => {
   test('Fill the form and create a new space', async () => {
-
     // Arrange ------------------
     const userContext = await browser.newContext();
     const page = await userContext.newPage();
@@ -26,14 +25,12 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
       page,
       context: { address, privateKey },
       init: ({ Web3Mock, context }) => {
-
         Web3Mock.mock({
           blockchain: 'ethereum',
           accounts: {
             return: [context.address]
           }
         });
-
       }
     });
 
@@ -93,6 +90,4 @@ test.describe.serial('Add a new workspace from sidebar and load it', async () =>
     const sidebarSpaceName2 = await page.locator('data-test=sidebar-space-name').textContent();
     expect(sidebarSpaceName2).toBe(uniqueDomainName2);
   });
-
 });
-

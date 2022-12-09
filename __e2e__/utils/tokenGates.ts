@@ -3,7 +3,7 @@ import type { Space } from '@prisma/client';
 
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
-export async function generateAndMockTokenGateRequests ({
+export async function generateAndMockTokenGateRequests({
   space,
   userId,
   page,

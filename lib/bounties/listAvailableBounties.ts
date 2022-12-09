@@ -6,7 +6,7 @@ import { accessiblePagesByPermissionsQuery, includePagePermissions } from 'lib/p
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
 import { DataNotFoundError } from '../utilities/errors';
 
-export function generateAccessibleBountiesQuery ({ userId, spaceId }: { userId: string, spaceId: string }) {
+export function generateAccessibleBountiesQuery({ userId, spaceId }: { userId: string; spaceId: string }) {
   return [
     {
       space: {
@@ -24,43 +24,48 @@ export function generateAccessibleBountiesQuery ({ userId, spaceId }: { userId: 
     {
       permissions: {
         some: {
-          OR: [{
-            public: true
-          },
-          {
-            user: {
-              id: userId
-            }
-          },
-          {
-            role: {
-              spaceRolesToRole: {
-                some: {
-                  spaceRole: {
-                    spaceId,
+          OR: [
+            {
+              public: true
+            },
+            {
+              user: {
+                id: userId
+              }
+            },
+            {
+              role: {
+                spaceRolesToRole: {
+                  some: {
+                    spaceRole: {
+                      spaceId,
+                      userId
+                    }
+                  }
+                }
+              }
+            },
+            {
+              space: {
+                id: spaceId,
+                spaceRoles: {
+                  some: {
                     userId
                   }
                 }
               }
             }
-          },
-          {
-            space: {
-              id: spaceId,
-              spaceRoles: {
-                some: {
-                  userId
-                }
-              }
-            }
-          }]
+          ]
         }
-      } }
+      }
+    }
   ];
 }
 
-export async function listAvailableBounties ({ spaceId, userId }: AvailableResourcesRequest): Promise<BountyWithDetails[]> {
-
+export async function listAvailableBounties({
+  spaceId,
+  userId
+}: AvailableResourcesRequest): Promise<BountyWithDetails[]> {
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
@@ -77,27 +82,29 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
   // Make sure a requesting user has access to the space, otherwise treat them as a member of the public
   if (!userId || (userId && (await hasAccessToSpace({ userId, spaceId })).error !== undefined)) {
     // If public bounty board is disabled, return empty list, otherwise return bounties user can access all bounties
-    return !space.publicBountyBoard ? [] : prisma.bounty.findMany({
-      where: {
-        spaceId,
-        page: {
-          // Prevents returning bounties from other spaces
-          spaceId,
-          deletedAt: null,
-          permissions: {
-            some: {
-              public: true
+    return !space.publicBountyBoard
+      ? []
+      : (prisma.bounty.findMany({
+          where: {
+            spaceId,
+            page: {
+              // Prevents returning bounties from other spaces
+              spaceId,
+              deletedAt: null,
+              permissions: {
+                some: {
+                  public: true
+                }
+              }
+            }
+          },
+          include: {
+            applications: true,
+            page: {
+              include: includePagePermissions()
             }
           }
-        }
-      },
-      include: {
-        applications: true,
-        page: {
-          include: includePagePermissions()
-        }
-      }
-    }) as Promise<BountyWithDetails[]>;
+        }) as Promise<BountyWithDetails[]>);
   }
 
   return prisma.bounty.findMany({
@@ -141,5 +148,4 @@ export async function listAvailableBounties ({ spaceId, userId }: AvailableResou
       }
     }
   }) as Promise<BountyWithDetails[]>;
-
 }

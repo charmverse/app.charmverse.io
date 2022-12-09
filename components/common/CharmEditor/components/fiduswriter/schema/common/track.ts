@@ -2,28 +2,27 @@ import type { BaseRawMarkSpec } from '@bangle.dev/core';
 import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
 
 // for implementations of parseDOM by other components
-export function parseTracks (str: string) {
+export function parseTracks(str: string) {
   if (!str) {
     return [];
   }
-  let tracks: { user?: string, username?: string, date?: string }[];
+  let tracks: { user?: string; username?: string; date?: string }[];
   try {
     tracks = JSON.parse(str);
-  }
-  catch (error) {
+  } catch (error) {
     return [];
   }
   if (!Array.isArray(tracks)) {
     return [];
   }
   // ensure required fields are present
-  return tracks.filter(track => track.hasOwnProperty('user')
-      && track.hasOwnProperty('username')
-      && track.hasOwnProperty('date'));
+  return tracks.filter(
+    (track) => track.hasOwnProperty('user') && track.hasOwnProperty('username') && track.hasOwnProperty('date')
+  );
 }
 
 // for implementations of toDOM by other components
-export function addTracks (node: Node, attrs: { 'data-track'?: string }) {
+export function addTracks(node: Node, attrs: { 'data-track'?: string }) {
   if (node.attrs.track?.length) {
     attrs['data-track'] = JSON.stringify(node.attrs.track);
   }
@@ -49,7 +48,7 @@ export const deletion: BaseRawMarkSpec = {
     parseDOM: [
       {
         tag: 'span.deletion',
-        getAttrs (dom) {
+        getAttrs(dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
             user: dataset.user ?? '',
@@ -59,13 +58,16 @@ export const deletion: BaseRawMarkSpec = {
         }
       }
     ] as ParseRule[],
-    toDOM (node: Mark) {
-      return ['span', {
-        class: `deletion user-${node.attrs.user}`,
-        'data-user': node.attrs.user,
-        'data-username': node.attrs.username,
-        'data-date': node.attrs.date
-      }];
+    toDOM(node: Mark) {
+      return [
+        'span',
+        {
+          class: `deletion user-${node.attrs.user}`,
+          'data-user': node.attrs.user,
+          'data-username': node.attrs.username,
+          'data-date': node.attrs.date
+        }
+      ];
     }
   },
   markdown: {
@@ -78,21 +80,20 @@ export const deletion: BaseRawMarkSpec = {
   }
 } as const;
 
-function parseFormatList (str: string | undefined) {
+function parseFormatList(str: string | undefined) {
   if (!str) {
     return [];
   }
   let formatList: string[];
   try {
     formatList = JSON.parse(str);
-  }
-  catch (error) {
+  } catch (error) {
     return [];
   }
   if (!Array.isArray(formatList)) {
     return [];
   }
-  return formatList.filter(format => typeof (format) === 'string'); // ensure there are only strings in list
+  return formatList.filter((format) => typeof format === 'string'); // ensure there are only strings in list
 }
 
 export const formatChange: BaseRawMarkSpec = {
@@ -121,7 +122,7 @@ export const formatChange: BaseRawMarkSpec = {
     parseDOM: [
       {
         tag: 'span.format-change',
-        getAttrs (dom) {
+        getAttrs(dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
             user: dataset.user ?? '',
@@ -133,15 +134,18 @@ export const formatChange: BaseRawMarkSpec = {
         }
       }
     ] as ParseRule[],
-    toDOM (node: Mark) {
-      return ['span', {
-        class: `format-change user-${node.attrs.user}`,
-        'data-user': node.attrs.user,
-        'data-username': node.attrs.username,
-        'data-date': node.attrs.date,
-        'data-before': JSON.stringify(node.attrs.before),
-        'data-after': JSON.stringify(node.attrs.after)
-      }];
+    toDOM(node: Mark) {
+      return [
+        'span',
+        {
+          class: `format-change user-${node.attrs.user}`,
+          'data-user': node.attrs.user,
+          'data-username': node.attrs.username,
+          'data-date': node.attrs.date,
+          'data-before': JSON.stringify(node.attrs.before),
+          'data-after': JSON.stringify(node.attrs.after)
+        }
+      ];
     }
   },
   markdown: {
@@ -177,7 +181,7 @@ export const insertion: BaseRawMarkSpec = {
     parseDOM: [
       {
         tag: 'span.insertion',
-        getAttrs (dom) {
+        getAttrs(dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
             user: dataset.user ?? '',
@@ -190,7 +194,7 @@ export const insertion: BaseRawMarkSpec = {
       },
       {
         tag: 'span.approved-insertion',
-        getAttrs (dom) {
+        getAttrs(dom) {
           const dataset = (dom as HTMLElement).dataset;
           return {
             user: dataset.user ?? '',
@@ -202,13 +206,16 @@ export const insertion: BaseRawMarkSpec = {
         }
       }
     ] as ParseRule[],
-    toDOM (node: Mark) {
-      return ['span', {
-        class: node.attrs.approved ? 'approved-insertion' : `insertion user-${node.attrs.user}`,
-        'data-user': node.attrs.user,
-        'data-username': node.attrs.username,
-        'data-date': node.attrs.date
-      }];
+    toDOM(node: Mark) {
+      return [
+        'span',
+        {
+          class: node.attrs.approved ? 'approved-insertion' : `insertion user-${node.attrs.user}`,
+          'data-user': node.attrs.user,
+          'data-username': node.attrs.username,
+          'data-date': node.attrs.date
+        }
+      ];
     }
   },
   markdown: {

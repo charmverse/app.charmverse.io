@@ -1,4 +1,3 @@
-
 import type { JSXElementConstructor, ReactElement } from 'react';
 import type { RegisterOptions } from 'react-hook-form';
 
@@ -13,16 +12,16 @@ type Props = {
 type FieldRenderedConfig = {
   rules: RegisterOptions;
   renderer: (fieldProps: { field: ControlFieldProps }) => ReactElement<any, string | JSXElementConstructor<any>>;
-}
+};
 
-export function getFieldRendererConfig ({ type, ...fieldProps }: Props): FieldRenderedConfig {
+export function getFieldRendererConfig({ type, ...fieldProps }: Props): FieldRenderedConfig {
   return {
     rules: getFieldTypeRules(type),
     renderer: ({ field }: { field: ControlFieldProps }) => <FieldTypeRenderer {...field} {...fieldProps} type={type} />
   };
 }
 
-function getFieldTypeRules (type: FieldType): RegisterOptions {
+function getFieldTypeRules(type: FieldType): RegisterOptions {
   // return validation rules for field like email etc
   switch (type) {
     case 'number': {
@@ -42,7 +41,8 @@ function getFieldTypeRules (type: FieldType): RegisterOptions {
     case 'email': {
       return {
         required: false,
-        pattern: /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
+        pattern:
+          /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
       };
     }
 

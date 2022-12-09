@@ -25,8 +25,9 @@ const test = base.extend<Fixtures>({
   }
 });
 
-test('signup - not ignore the logic to redirect user after connect if the user has 0 spaces, and the redirect is to a join page', async ({ sandboxPage }) => {
-
+test('signup - not ignore the logic to redirect user after connect if the user has 0 spaces, and the redirect is to a join page', async ({
+  sandboxPage
+}) => {
   const { space } = await generateUserAndSpace({ isAdmin: true, spaceName: `space-${v4()}` });
 
   // mimic signup: create a user and a session
@@ -36,5 +37,4 @@ test('signup - not ignore the logic to redirect user after connect if the user h
   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/join?domain=${space.domain}`)}`);
 
   await sandboxPage.waitForURL(`**/join?domain=${space.domain}`);
-
 });

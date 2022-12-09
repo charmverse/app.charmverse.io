@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,10 +11,9 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
-  .post(requireKeys(['content', 'threadId'], 'body'), addCommentController);
+handler.use(requireUser).post(requireKeys(['content', 'threadId'], 'body'), addCommentController);
 
-async function addCommentController (req: NextApiRequest, res: NextApiResponse) {
+async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
   const { threadId, content } = req.body as CommentCreate;
   const userId = req.session.user.id;
 

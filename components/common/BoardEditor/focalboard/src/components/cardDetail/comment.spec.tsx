@@ -24,9 +24,7 @@ const member = { username: 'Test user', avatar: null };
 describe('components/cardDetail/comment', () => {
   const state = {
     users: {
-      workspaceUsers: [
-        { username: 'username_1' }
-      ]
+      workspaceUsers: [{ username: 'username_1' }]
     }
   };
   const store = mockStateStore([], state);
@@ -45,43 +43,37 @@ describe('components/cardDetail/comment', () => {
   });
 
   test('return comment', () => {
-    const { container } = render(wrapIntl(
-      <ReduxProvider store={store}>
-        <Comment
-          comment={comment}
-          member={member}
-          readOnly={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapIntl(
+        <ReduxProvider store={store}>
+          <Comment comment={comment} member={member} readOnly={false} />
+        </ReduxProvider>
+      )
+    );
     const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
     userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();
   });
 
   test('return comment readonly', () => {
-    const { container } = render(wrapIntl(
-      <ReduxProvider store={store}>
-        <Comment
-          comment={comment}
-          member={member}
-          readOnly={true}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapIntl(
+        <ReduxProvider store={store}>
+          <Comment comment={comment} member={member} readOnly={true} />
+        </ReduxProvider>
+      )
+    );
     expect(container).toMatchSnapshot();
   });
 
   test('return comment and delete comment', () => {
-    const { container } = render(wrapIntl(
-      <ReduxProvider store={store}>
-        <Comment
-          comment={comment}
-          member={member}
-          readOnly={false}
-        />
-      </ReduxProvider>
-    ));
+    const { container } = render(
+      wrapIntl(
+        <ReduxProvider store={store}>
+          <Comment comment={comment} member={member} readOnly={false} />
+        </ReduxProvider>
+      )
+    );
     const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
     userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();

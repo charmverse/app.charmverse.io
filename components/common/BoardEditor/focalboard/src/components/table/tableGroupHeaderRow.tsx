@@ -30,7 +30,7 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
-}
+};
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, groupByProperty } = props;
@@ -61,96 +61,89 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
     >
-      <div
-        className='octo-table-cell'
-        style={{ width: columnWidth(Constants.titleColumnId) }}
-      >
+      <div className='octo-table-cell' style={{ width: columnWidth(Constants.titleColumnId) }}>
         <IconButton
           icon={<ArrowDropDownOutlinedIcon fontSize='small' />}
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
           className='hello-world'
         />
 
-        {!group.option.id
-          && (
-            <Label
-              title={intl.formatMessage({
+        {!group.option.id && (
+          <Label
+            title={intl.formatMessage(
+              {
                 id: 'BoardComponent.no-property-title',
                 defaultMessage: 'Items with an empty {property} property will go here. This column cannot be removed.'
-              }, { property: groupByProperty?.name })}
-            >
-              <FormattedMessage
-                id='BoardComponent.no-property'
-                defaultMessage='No {property}'
-                values={{
-                  property: groupByProperty?.name
-                }}
-              />
-            </Label>
-          )}
-        {group.option.id
-          && (
-            <Label color={group.option.color}>
-              <Editable
-                value={groupTitle}
-                placeholderText='New Select'
-                onChange={setGroupTitle}
-                onSave={() => {
-                  if (groupTitle.trim() === '') {
-                    setGroupTitle(group.option.value);
-                  }
-                  props.propertyNameChanged(group.option, groupTitle);
-                }}
-                onCancel={() => {
+              },
+              { property: groupByProperty?.name }
+            )}
+          >
+            <FormattedMessage
+              id='BoardComponent.no-property'
+              defaultMessage='No {property}'
+              values={{
+                property: groupByProperty?.name
+              }}
+            />
+          </Label>
+        )}
+        {group.option.id && (
+          <Label color={group.option.color}>
+            <Editable
+              value={groupTitle}
+              placeholderText='New Select'
+              onChange={setGroupTitle}
+              onSave={() => {
+                if (groupTitle.trim() === '') {
                   setGroupTitle(group.option.value);
-                }}
-                readOnly={props.readOnly || !group.option.id}
-                spellCheck={true}
-              />
-            </Label>
-          )}
+                }
+                props.propertyNameChanged(group.option, groupTitle);
+              }}
+              onCancel={() => {
+                setGroupTitle(group.option.value);
+              }}
+              readOnly={props.readOnly || !group.option.id}
+              spellCheck={true}
+            />
+          </Label>
+        )}
       </div>
       <Button>{`${group.cards.length}`}</Button>
-      {!props.readOnly
-        && (
-          <>
-            <MenuWrapper>
-              <IconButton icon={<MoreHorizIcon fontSize='small' />} />
-              <Menu>
-                <Menu.Text
-                  id='hide'
-                  icon={<VisibilityOffOutlinedIcon fontSize='small' />}
-                  name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
-                  onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
-                />
-                {group.option.id
-                  && (
-                    <>
-                      <Menu.Text
-                        id='delete'
-                        icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-                        name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                        onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
-                      />
-                      <Menu.Separator />
-                      {Object.entries(Constants.menuColors).map(([key, color]) => (
-                        <Menu.Color
-                          key={key}
-                          id={key}
-                          name={color}
-                          onClick={() => mutator.changePropertyOptionColor(board, groupByProperty!, group.option, key)}
-                        />
-                      ))}
-                    </>
-                  )}
-              </Menu>
-            </MenuWrapper>
-            <IconButton
-              icon={<AddIcon fontSize='small' />}
-              onClick={() => props.addCard(group.option.id)}
-            />
-          </>
-        )}
+      {!props.readOnly && (
+        <>
+          <MenuWrapper>
+            <IconButton icon={<MoreHorizIcon fontSize='small' />} />
+            <Menu>
+              <Menu.Text
+                id='hide'
+                icon={<VisibilityOffOutlinedIcon fontSize='small' />}
+                name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
+                onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
+              />
+              {group.option.id && (
+                <>
+                  <Menu.Text
+                    id='delete'
+                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
+                    name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
+                    onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                  />
+                  <Menu.Separator />
+                  {Object.entries(Constants.menuColors).map(([key, color]) => (
+                    <Menu.Color
+                      key={key}
+                      id={key}
+                      name={color}
+                      onClick={() => mutator.changePropertyOptionColor(board, groupByProperty!, group.option, key)}
+                    />
+                  ))}
+                </>
+              )}
+            </Menu>
+          </MenuWrapper>
+          <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
+        </>
+      )}
     </div>
   );
 });

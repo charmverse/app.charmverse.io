@@ -1,4 +1,3 @@
-
 import { prisma } from 'db';
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
@@ -11,8 +10,7 @@ import * as mailer from 'lib/mailer';
 import { getProposalTasksFromWorkspaceEvents } from 'lib/proposal/getProposalTasksFromWorkspaceEvents';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
-export async function sendUserNotifications (): Promise<number> {
-
+export async function sendUserNotifications(): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
@@ -26,8 +24,7 @@ export async function sendUserNotifications (): Promise<number> {
 // note: the email only notifies the first task of each safe
 const getGnosisSafeTaskId = (task: GnosisSafeTasks) => task.tasks[0].transactions[0].id;
 
-export async function getNotifications (): Promise<(PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]> {
-
+export async function getNotifications(): Promise<(PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]> {
   // Get all the workspace events within the past day
   const workspaceEvents = await prisma.workspaceEvent.findMany({
     where: {
@@ -41,10 +38,7 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
 
   const usersWithSafes = await prisma.user.findMany({
     where: {
-      AND: [
-        { email: { not: null } },
-        { email: { not: '' } }
-      ]
+      AND: [{ email: { not: null } }, { email: { not: '' } }]
     },
     // select only the fields that are needed
     select: {
@@ -57,129 +51,157 @@ export async function getNotifications (): Promise<(PendingTasksProps & { unmark
   });
 
   // filter out users that have snoozed notifications
-  const activeUsersWithSafes = usersWithSafes.filter(user => {
+  const activeUsersWithSafes = usersWithSafes.filter((user) => {
     const snoozedUntil = user.notificationState?.snoozedUntil;
-    return (!snoozedUntil || snoozedUntil > new Date());
+    return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications = await Promise.all(activeUsersWithSafes.map(async user => {
-    const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
-    const discussionTasks = await getDiscussionTasks(user.id);
-    const voteTasks = await getVoteTasks(user.id);
-    const bountyTasks = await getBountyTasks(user.id);
+  const notifications = await Promise.all(
+    activeUsersWithSafes.map(async (user) => {
+      const gnosisSafeTasks = user.gnosisSafes.length > 0 ? await getPendingGnosisTasks(user.id) : [];
+      const discussionTasks = await getDiscussionTasks(user.id);
+      const voteTasks = await getVoteTasks(user.id);
+      const bountyTasks = await getBountyTasks(user.id);
 
-    const sentTasks = await prisma.userNotification.findMany({
-      where: {
-        taskId: {
-          in: [
-            ...gnosisSafeTasks.map(getGnosisSafeTaskId),
-            ...voteTasks.map(voteTask => voteTask.id),
-            ...workspaceEvents.map(workspaceEvent => workspaceEvent.id)
-          ]
+      const sentTasks = await prisma.userNotification.findMany({
+        where: {
+          taskId: {
+            in: [
+              ...gnosisSafeTasks.map(getGnosisSafeTaskId),
+              ...voteTasks.map((voteTask) => voteTask.id),
+              ...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)
+            ]
+          },
+          userId: user.id
         },
-        userId: user.id
-      },
-      select: {
-        taskId: true
-      }
-    });
+        select: {
+          taskId: true
+        }
+      });
 
-    const sentTaskIds = new Set(sentTasks.map(sentTask => sentTask.taskId));
+      const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
 
-    const voteTasksNotSent = voteTasks.filter(voteTask => !sentTaskIds.has(voteTask.id));
-    const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(gnosisSafeTask => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask)));
-    const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter(gnosisSafeTask => Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction));
-    const workspaceEventsNotSent = workspaceEvents.filter(workspaceEvent => !sentTaskIds.has(workspaceEvent.id));
-    const { proposalTasks = [], unmarkedWorkspaceEvents = [] } = workspaceEventsNotSent.length !== 0
-      ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent) : {};
+      const voteTasksNotSent = voteTasks.filter((voteTask) => !sentTaskIds.has(voteTask.id));
+      const gnosisSafeTasksNotSent = gnosisSafeTasks.filter(
+        (gnosisSafeTask) => !sentTaskIds.has(getGnosisSafeTaskId(gnosisSafeTask))
+      );
+      const myGnosisTasksNotSent = gnosisSafeTasksNotSent.filter((gnosisSafeTask) =>
+        Boolean(gnosisSafeTask.tasks[0].transactions[0].myAction)
+      );
+      const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
+      const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
+        workspaceEventsNotSent.length !== 0
+          ? await getProposalTasksFromWorkspaceEvents(user.id, workspaceEventsNotSent)
+          : {};
 
-    const totalTasks = myGnosisTasksNotSent.length
-      + discussionTasks.unmarked.length
-      + voteTasksNotSent.length
-      + proposalTasks.length
-      + bountyTasks.unmarked.length;
+      const totalTasks =
+        myGnosisTasksNotSent.length +
+        discussionTasks.unmarked.length +
+        voteTasksNotSent.length +
+        proposalTasks.length +
+        bountyTasks.unmarked.length;
 
-    log.debug('Found tasks for notification', {
-      notSent: myGnosisTasksNotSent.length
-       + voteTasksNotSent.length
-       + discussionTasks.unmarked.length
-       + proposalTasks.length
-       + bountyTasks.unmarked.length,
-      gnosisSafeTasks: gnosisSafeTasks.length,
-      myGnosisTasks: myGnosisTasksNotSent.length
-    });
+      log.debug('Found tasks for notification', {
+        notSent:
+          myGnosisTasksNotSent.length +
+          voteTasksNotSent.length +
+          discussionTasks.unmarked.length +
+          proposalTasks.length +
+          bountyTasks.unmarked.length,
+        gnosisSafeTasks: gnosisSafeTasks.length,
+        myGnosisTasks: myGnosisTasksNotSent.length
+      });
 
-    return {
-      user: user as PendingTasksProps['user'],
-      gnosisSafeTasks: myGnosisTasksNotSent,
-      totalTasks,
-      // Get only the unmarked discussion tasks
-      discussionTasks: discussionTasks.unmarked,
-      voteTasks: voteTasksNotSent,
-      proposalTasks,
-      unmarkedWorkspaceEvents,
-      bountyTasks: bountyTasks.unmarked
-    };
-  }));
+      return {
+        user: user as PendingTasksProps['user'],
+        gnosisSafeTasks: myGnosisTasksNotSent,
+        totalTasks,
+        // Get only the unmarked discussion tasks
+        discussionTasks: discussionTasks.unmarked,
+        voteTasks: voteTasksNotSent,
+        proposalTasks,
+        unmarkedWorkspaceEvents,
+        bountyTasks: bountyTasks.unmarked
+      };
+    })
+  );
 
-  return notifications.filter(notification => notification.totalTasks > 0);
+  return notifications.filter((notification) => notification.totalTasks > 0);
 }
 
-async function sendNotification (notification: PendingTasksProps & {
-  unmarkedWorkspaceEvents: string[];
-}) {
+async function sendNotification(
+  notification: PendingTasksProps & {
+    unmarkedWorkspaceEvents: string[];
+  }
+) {
   const template = emails.getPendingTasksEmail(notification);
   const { html, subject } = template;
 
   try {
     // remember that we sent these tasks
-    await prisma.$transaction(
-      [...notification.gnosisSafeTasks.map(task => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: getGnosisSafeTaskId(task),
-          channel: 'email',
-          type: 'multisig'
-        }
-      })), ...notification.proposalTasks.map(proposalTask => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: proposalTask.id,
-          channel: 'email',
-          type: 'proposal'
-        }
-      })), ...notification.unmarkedWorkspaceEvents.map(unmarkedWorkspaceEvent => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: unmarkedWorkspaceEvent,
-          channel: 'email',
-          type: 'proposal'
-        }
-      })), ...notification.voteTasks.map(voteTask => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: voteTask.id,
-          channel: 'email',
-          type: 'vote'
-        }
-      })), ...notification.discussionTasks.map(discussionTask => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
-          channel: 'email',
-          type: 'mention'
-        }
-      })), ...notification.bountyTasks.map(bountyTask => prisma.userNotification.create({
-        data: {
-          userId: notification.user.id,
-          taskId: bountyTask.id,
-          channel: 'email',
-          type: 'bounty'
-        }
-      }))]
-    );
-  }
-  catch (error) {
+    await prisma.$transaction([
+      ...notification.gnosisSafeTasks.map((task) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: getGnosisSafeTaskId(task),
+            channel: 'email',
+            type: 'multisig'
+          }
+        })
+      ),
+      ...notification.proposalTasks.map((proposalTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: proposalTask.id,
+            channel: 'email',
+            type: 'proposal'
+          }
+        })
+      ),
+      ...notification.unmarkedWorkspaceEvents.map((unmarkedWorkspaceEvent) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: unmarkedWorkspaceEvent,
+            channel: 'email',
+            type: 'proposal'
+          }
+        })
+      ),
+      ...notification.voteTasks.map((voteTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: voteTask.id,
+            channel: 'email',
+            type: 'vote'
+          }
+        })
+      ),
+      ...notification.discussionTasks.map((discussionTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? '',
+            channel: 'email',
+            type: 'mention'
+          }
+        })
+      ),
+      ...notification.bountyTasks.map((bountyTask) =>
+        prisma.userNotification.create({
+          data: {
+            userId: notification.user.id,
+            taskId: bountyTask.id,
+            channel: 'email',
+            type: 'bounty'
+          }
+        })
+      )
+    ]);
+  } catch (error) {
     log.error(`Updating notifications failed for the user ${notification.user.id}`, { error });
     return undefined;
   }

@@ -19,14 +19,16 @@ describe('getVote', () => {
     });
 
     const vote = await getVote(createdVote.id, user.id);
-    expect(vote).toMatchObject(expect.objectContaining({
-      id: createdVote.id,
-      userChoice: '1',
-      totalVotes: 1,
-      aggregatedResult: {
-        1: 1,
-        2: 0
-      }
-    }));
+    expect(vote).toMatchObject(
+      expect.objectContaining({
+        id: createdVote.id,
+        userChoice: '1',
+        totalVotes: 1,
+        aggregatedResult: {
+          1: 1,
+          2: 0
+        }
+      })
+    );
   });
 });

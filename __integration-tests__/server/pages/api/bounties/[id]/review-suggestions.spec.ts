@@ -21,9 +21,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty to new submissions and applications', () => {
-
   it('should return the now open and bounty respond with 200', async () => {
-
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
     const adminCookie = await loginUser(admin.id);
@@ -35,21 +33,21 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
       createdBy: nonAdminUser.id
     });
 
-    const result = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/review-suggestion`)
-      .set('Cookie', adminCookie)
-      .send({ decision: 'approve' })
-      .expect(200)).body as BountyWithDetails;
+    const result = (
+      await request(baseUrl)
+        .post(`/api/bounties/${bounty.id}/review-suggestion`)
+        .set('Cookie', adminCookie)
+        .send({ decision: 'approve' })
+        .expect(200)
+    ).body as BountyWithDetails;
 
     // Ensures we receive an object with this property
     expect(result.status).toBe('open');
     // Ensures the BountyWithDetails interface is returned, not just the bounty
     expect(result.applications).toBeInstanceOf(Array);
-
   });
 
   it('should delete the bounty if rejected and respond with 200', async () => {
-
     const admin = await generateSpaceUser({ spaceId: nonAdminUserSpace.id, isAdmin: true });
 
     const adminCookie = await loginUser(admin.id);
@@ -61,11 +59,13 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
       createdBy: nonAdminUser.id
     });
 
-    const result = (await request(baseUrl)
-      .post(`/api/bounties/${bounty.id}/review-suggestion`)
-      .set('Cookie', adminCookie)
-      .send({ decision: 'reject' })
-      .expect(200)).body;
+    const result = (
+      await request(baseUrl)
+        .post(`/api/bounties/${bounty.id}/review-suggestion`)
+        .set('Cookie', adminCookie)
+        .send({ decision: 'reject' })
+        .expect(200)
+    ).body;
 
     // Ensures we receive an object with this property
     expect(result.success).toBe(true);
@@ -77,10 +77,8 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
     });
 
     expect(bountyAfterProcessing).toBeNull();
-
   });
   it('should fail if the user is not a space admin and respond with 401', async () => {
-
     const bounty = await generateBounty({
       spaceId: nonAdminUserSpace.id,
       status: 'suggestion',
@@ -93,7 +91,5 @@ describe('POST /api/bounties/{submissionId}/close-submissions - close a bounty t
       .set('Cookie', nonAdminCookie)
       .send({ decision: 'approve' })
       .expect(401);
-
   });
-
 });

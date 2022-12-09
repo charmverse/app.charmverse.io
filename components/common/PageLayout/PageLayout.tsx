@@ -30,40 +30,48 @@ const openedMixin = (theme: Theme, sidebarWidth: number) => ({
   overflowX: 'hidden'
 });
 
-const closedMixin = (theme: Theme) => ({
-  transition: theme.transitions.create(['width'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
-  }),
-  overflowX: 'hidden',
-  width: 0
-}) as const;
+const closedMixin = (theme: Theme) =>
+  ({
+    transition: theme.transitions.create(['width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    }),
+    overflowX: 'hidden',
+    width: 0
+  } as const);
 
-export const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open' })<{ open: boolean, sidebarWidth: number }>`
-
+export const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open'
+})<{ open: boolean; sidebarWidth: number }>`
   background: transparent;
   box-shadow: none;
   color: inherit;
   z-index: var(--z-index-appBar);
-  transition: ${({ theme }) => theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen
-  })};
+  transition: ${({ theme }) =>
+    theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })};
 
-  ${({ open, sidebarWidth, theme }) => open ? `
+  ${({ open, sidebarWidth, theme }) =>
+    open
+      ? `
     margin-left: ${sidebarWidth}px;
     width: calc(100% - ${sidebarWidth}px);
     transition: ${theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen
-  })};
-  ` : ''}
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })};
+  `
+      : ''}
 `;
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'sidebarWidth' })
-  // @ts-ignore mixin isnt typesafe
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open' && prop !== 'sidebarWidth'
+})<{ open: boolean; sidebarWidth: number }>(
   // eslint-disable-next-line no-unexpected-multiline
-  <{ open: boolean, sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
+  // @ts-ignore mixin isnt typesafe
+  ({ sidebarWidth, theme, open }) => ({
     width: sidebarWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
@@ -76,7 +84,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' &&
       ...closedMixin(theme),
       '& .MuiDrawer-paper': closedMixin(theme)
     })
-  }));
+  })
+);
 
 export const HeaderSpacer = styled.div`
   min-height: ${headerHeight}px;
@@ -89,12 +98,11 @@ const LayoutContainer = styled.div`
 
 interface PageLayoutProps {
   children: React.ReactNode;
-  sidebar?: ((p: { closeSidebar: () => void }) => JSX.Element);
+  sidebar?: (p: { closeSidebar: () => void }) => JSX.Element;
   sidebarWidth?: number;
 }
 
-function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
-
+function PageLayout({ sidebarWidth = 300, children, sidebar: SidebarOverride }: PageLayoutProps) {
   const smallScreen = React.useMemo(() => isSmallScreen(), []);
   const [open, setOpen] = useLocalStorage('leftSidebar', !smallScreen);
   const { user } = useUser();
@@ -119,19 +127,14 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
               <PageDialogProvider>
                 <PageActionDisplayProvider>
                   <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
-                    <Header
-                      open={open}
-                      openSidebar={handleDrawerOpen}
-                    />
+                    <Header open={open} openSidebar={handleDrawerOpen} />
                   </AppBar>
-                  <Drawer
-                    sidebarWidth={sidebarWidth}
-                    variant='permanent'
-                    open={open}
-                  >
-                    {SidebarOverride
-                      ? <SidebarOverride closeSidebar={handleDrawerClose} />
-                      : <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />}
+                  <Drawer sidebarWidth={sidebarWidth} variant='permanent' open={open}>
+                    {SidebarOverride ? (
+                      <SidebarOverride closeSidebar={handleDrawerClose} />
+                    ) : (
+                      <Sidebar closeSidebar={handleDrawerClose} favorites={user?.favorites || []} />
+                    )}
                   </Drawer>
                   <PageContainer>
                     <HeaderSpacer />
@@ -142,7 +145,6 @@ function PageLayout ({ sidebarWidth = 300, children, sidebar: SidebarOverride }:
               </PageDialogProvider>
             </VotesProvider>
           </ThreadsProvider>
-
         </FocalboardViewsProvider>
       </LayoutContainer>
     </>

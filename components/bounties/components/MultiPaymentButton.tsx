@@ -13,9 +13,9 @@ export interface MultiPaymentResult {
 
 type Props = GnosisPaymentProps & {
   isLoading: boolean;
-}
+};
 
-export default function MultiPaymentButton ({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
+export default function MultiPaymentButton({ isLoading, chainId, safeAddress, transactions, onSuccess }: Props) {
   const { safe, makePayment } = useGnosisPayment({
     chainId,
     onSuccess,

@@ -11,10 +11,7 @@ import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
-type NextRouteHandler = (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => Promise<void>;
+type NextRouteHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 
 // eslint-disable-next-line no-use-before-define
 type Configure = (options: Options) => Handler;
@@ -25,17 +22,13 @@ type Options = {
 };
 
 const makeRouteHandler = (options: Options = {}): Handler => {
-  const route: NextRouteHandler = async function routeRequest (req, res) {
+  const route: NextRouteHandler = async function routeRequest(req, res) {
     // eslint-disable-next-line no-use-before-define
     const missing = missingEnvs();
     const userId = req.session.user.id;
     if (missing.length > 0) {
-      res
-        .status(500)
-        .json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
-    }
-    else {
-
+      res.status(500).json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
+    } else {
       const bucket = process.env.S3_UPLOAD_BUCKET;
 
       const filename = decodeURIComponent(req.query.filename as string);

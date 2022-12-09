@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { SpaceOperation } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -21,7 +20,6 @@ beforeAll(async () => {
 });
 
 describe('computeGroupSpacePermissions', () => {
-
   it('should return true only for permissions a space has been directly assigned', async () => {
     const { space: otherSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
@@ -39,7 +37,6 @@ describe('computeGroupSpacePermissions', () => {
 
     expect(computedPermissions.createPage).toBe(false);
     expect(computedPermissions.createBounty).toBe(true);
-
   });
 
   it('should return true only for permissions a role has been directly assigned', async () => {
@@ -115,15 +112,14 @@ describe('computeGroupSpacePermissions', () => {
     });
 
     // Check the object has no extra keys
-    (Object.keys(computedPermissions) as SpaceOperation[]).forEach(key => {
+    (Object.keys(computedPermissions) as SpaceOperation[]).forEach((key) => {
       expect(SpaceOperation[key]).toBeDefined();
     });
 
     // Check the object has no missing keys
-    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach(key => {
+    (Object.keys(SpaceOperation) as SpaceOperation[]).forEach((key) => {
       expect(computedPermissions[key]).toBeDefined();
     });
-
   });
 
   it('should return false for all permissions if a different space than the target space is provided', async () => {
@@ -229,10 +225,8 @@ describe('computeGroupSpacePermissions', () => {
         group: 'randomInvalidGroup' as any
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
-
 });

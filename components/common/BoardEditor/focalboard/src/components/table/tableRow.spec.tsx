@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import 'isomorphic-fetch';
 import { render } from '@testing-library/react';

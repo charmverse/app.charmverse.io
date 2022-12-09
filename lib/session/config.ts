@@ -1,4 +1,3 @@
-
 import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
 
 declare module 'iron-session' {
@@ -51,5 +50,10 @@ export const sessionUserRelations = {
   discordUser: true,
   telegramUser: true,
   notificationState: true,
-  wallets: true
+  wallets: true,
+  unstoppableDomains: {
+    select: {
+      domain: true
+    }
+  }
 } as const;

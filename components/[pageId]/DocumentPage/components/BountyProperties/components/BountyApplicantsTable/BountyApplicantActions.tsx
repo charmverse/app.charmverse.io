@@ -18,12 +18,11 @@ interface Props {
   expandRow: () => void;
 }
 
-export default function BountyApplicantActions ({ bounty, isExpanded, submission, expandRow }: Props) {
-
+export default function BountyApplicantActions({ bounty, isExpanded, submission, expandRow }: Props) {
   const { refreshBounty } = useBounties();
   const { showMessage } = useSnackbar();
 
-  async function recordTransaction (transactionId: string, chainId: number) {
+  async function recordTransaction(transactionId: string, chainId: number) {
     try {
       await charmClient.bounties.recordTransaction({
         applicationId: submission.id,
@@ -32,8 +31,7 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
       });
       await charmClient.bounties.markSubmissionAsPaid(submission.id);
       await refreshBounty(bounty.id);
-    }
-    catch (err: any) {
+    } catch (err: any) {
       showMessage(err.message || err, 'error');
     }
   }
@@ -41,7 +39,12 @@ export default function BountyApplicantActions ({ bounty, isExpanded, submission
   return (
     <Box display='flex' justifyContent='center' alignItems='center' width='100%'>
       {(submission.status === 'applied' || submission.status === 'review') && (
-        <Button color='primary' size='small' onClick={expandRow} sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}>
+        <Button
+          color='primary'
+          size='small'
+          onClick={expandRow}
+          sx={{ opacity: isExpanded ? 0 : 1, transition: 'opacity .2s' }}
+        >
           Review
         </Button>
       )}

@@ -22,7 +22,9 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
 
 export type ProposalUserGroup = 'reviewer' | 'author';
 
-export const proposalStatusTransitionPermission: Partial<Record<ProposalStatus, Partial<Record<ProposalUserGroup, ProposalStatus[]>>>> = {
+export const proposalStatusTransitionPermission: Partial<
+  Record<ProposalStatus, Partial<Record<ProposalUserGroup, ProposalStatus[]>>>
+> = {
   private_draft: {
     // Author of the proposal can move private_draft proposal to both draft and discussion
     // Reviewer of the proposal can't update the status of the proposal

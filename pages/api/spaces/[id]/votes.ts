@@ -8,11 +8,9 @@ import { getVotesBySpace } from 'lib/votes';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
-  .get(getVotes);
+handler.use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' })).get(getVotes);
 
-async function getVotes (req: NextApiRequest, res: NextApiResponse<Vote[]>) {
+async function getVotes(req: NextApiRequest, res: NextApiResponse<Vote[]>) {
   const spaceId = req.query.id as string;
   const { id: userId } = req.session.user;
 

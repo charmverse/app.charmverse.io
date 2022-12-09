@@ -18,20 +18,19 @@ const MembersContext = createContext<Readonly<Context>>({
   mutateMembers: () => Promise.resolve(undefined)
 });
 
-export function MembersProvider ({ children }: { children: ReactNode }) {
+export function MembersProvider({ children }: { children: ReactNode }) {
   const space = useCurrentSpace();
 
-  const { data: members, mutate: mutateMembers } = useSWR(() => space ? `members/${space?.id}` : null, () => {
-    return charmClient.members.getMembers(space!.id);
-  });
-
-  const value = useMemo(() => ({ members: members || [], mutateMembers }) as Context, [members]);
-
-  return (
-    <MembersContext.Provider value={value}>
-      {children}
-    </MembersContext.Provider>
+  const { data: members, mutate: mutateMembers } = useSWR(
+    () => (space ? `members/${space?.id}` : null),
+    () => {
+      return charmClient.members.getMembers(space!.id);
+    }
   );
+
+  const value = useMemo(() => ({ members: members || [], mutateMembers } as Context), [members]);
+
+  return <MembersContext.Provider value={value}>{children}</MembersContext.Provider>;
 }
 
 export const useMembers = () => useContext(MembersContext);

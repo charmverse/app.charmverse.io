@@ -1,24 +1,34 @@
 import { AvailableBountyPermissions, bountyPermissionMapping } from 'lib/permissions/bounties/client';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { AssignablePermissionGroupsWithPublic, BountyPagePermissionIntersection, BountyPagePermissionIntersectionQuery } from './interfaces';
+import type {
+  AssignablePermissionGroupsWithPublic,
+  BountyPagePermissionIntersection,
+  BountyPagePermissionIntersectionQuery
+} from './interfaces';
 import { AllowedPagePermissions } from './pages/available-page-permissions.class';
 import { permissionTemplates } from './pages/page-permission-mapping';
 
-export function compareBountyPagePermissions ({
-  bountyOperations, bountyPermissions, pageOperations, pagePermissions, roleups
+export function compareBountyPagePermissions({
+  bountyOperations,
+  bountyPermissions,
+  pageOperations,
+  pagePermissions,
+  roleups
 }: BountyPagePermissionIntersectionQuery): BountyPagePermissionIntersection {
-
   const permissionsMap: Record<
     string,
-    { bountyPermissions: AvailableBountyPermissions, pagePermissions: AllowedPagePermissions, group: AssignablePermissionGroupsWithPublic }> = {
-    };
+    {
+      bountyPermissions: AvailableBountyPermissions;
+      pagePermissions: AllowedPagePermissions;
+      group: AssignablePermissionGroupsWithPublic;
+    }
+  > = {};
 
   // Populate each bounty assignee
-  typedKeys(bountyPermissions).forEach(bountyPermissionLevel => {
-    bountyPermissions[bountyPermissionLevel]?.forEach(assignee => {
-
-      const mapKey = assignee.group === 'public' ? 'public' : assignee.id as string;
+  typedKeys(bountyPermissions).forEach((bountyPermissionLevel) => {
+    bountyPermissions[bountyPermissionLevel]?.forEach((assignee) => {
+      const mapKey = assignee.group === 'public' ? 'public' : (assignee.id as string);
 
       if (!permissionsMap[mapKey]) {
         permissionsMap[mapKey] = {
@@ -31,9 +41,22 @@ export function compareBountyPagePermissions ({
     });
   });
 
-  pagePermissions.forEach(permission => {
-    const targetGroup: AssignablePermissionGroupsWithPublic = permission.public ? 'public' : permission.spaceId ? 'space' : permission.roleId ? 'role' : 'user';
-    const mapKey = targetGroup === 'public' ? 'public' : (targetGroup === 'space' ? permission.spaceId : targetGroup === 'role' ? permission.roleId : permission.userId) as string;
+  pagePermissions.forEach((permission) => {
+    const targetGroup: AssignablePermissionGroupsWithPublic = permission.public
+      ? 'public'
+      : permission.spaceId
+      ? 'space'
+      : permission.roleId
+      ? 'role'
+      : 'user';
+    const mapKey =
+      targetGroup === 'public'
+        ? 'public'
+        : ((targetGroup === 'space'
+            ? permission.spaceId
+            : targetGroup === 'role'
+            ? permission.roleId
+            : permission.userId) as string);
 
     if (!permissionsMap[mapKey]) {
       permissionsMap[mapKey] = {
@@ -51,13 +74,11 @@ export function compareBountyPagePermissions ({
   };
 
   // Add role permissions to any user already in the map with this role
-  roleups.forEach(roleWithMembers => {
-
+  roleups.forEach((roleWithMembers) => {
     const rolePermissions = permissionsMap[roleWithMembers.id];
 
     if (rolePermissions) {
-      roleWithMembers.users.forEach(u => {
-
+      roleWithMembers.users.forEach((u) => {
         const roleUserPermissions = permissionsMap[u.id];
 
         roleUserPermissions?.bountyPermissions.addPermissions(rolePermissions.bountyPermissions.operationFlags);
@@ -66,22 +87,27 @@ export function compareBountyPagePermissions ({
     }
   });
 
-  typedKeys(permissionsMap).forEach(assigneeId => {
-    const { bountyPermissions: assigneeBountyPermissions, pagePermissions: assigneePagePermissions, group } = permissionsMap[assigneeId];
+  typedKeys(permissionsMap).forEach((assigneeId) => {
+    const {
+      bountyPermissions: assigneeBountyPermissions,
+      pagePermissions: assigneePagePermissions,
+      group
+    } = permissionsMap[assigneeId];
 
     const assignee = {
       group: group as Exclude<AssignablePermissionGroupsWithPublic, 'any'>,
       id: assigneeId
     };
 
-    if (assigneeBountyPermissions.hasPermissions(bountyOperations) && assigneePagePermissions.hasPermissions(pageOperations)) {
+    if (
+      assigneeBountyPermissions.hasPermissions(bountyOperations) &&
+      assigneePagePermissions.hasPermissions(pageOperations)
+    ) {
       intersection.hasPermissions.push(assignee);
-    }
-    else {
+    } else {
       intersection.missingPermissions.push(assignee);
     }
   });
 
   return intersection;
-
 }

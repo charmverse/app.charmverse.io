@@ -1,4 +1,3 @@
-
 import type { Vote } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -22,7 +21,7 @@ handler
   .use(requireKeys(['deadline', 'pageId', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
   .post(createVote);
 
-async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+async function getVoteById(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
   const userId = req.session.user.id;
   const vote = await getVoteService(voteId, userId);
@@ -32,7 +31,7 @@ async function getVoteById (req: NextApiRequest, res: NextApiResponse<Vote | { e
   return res.status(200).json(vote);
 }
 
-async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
+async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
   const pageId = newVote.pageId;
@@ -59,12 +58,21 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
 
   // User must be proposal author or a space admin to create a poll
   if (existingPage.type === 'proposal' && newVote.context === 'proposal') {
-    if (existingPage.proposal?.authors.every(a => a.userId !== userId) && (await hasAccessToSpace({
-      userId, spaceId: existingPage.spaceId, adminOnly: true })).error) {
-      throw new UnauthorisedActionError(`Cannot create poll as user ${userId} is not an author of the linked proposal.`);
+    if (
+      existingPage.proposal?.authors.every((a) => a.userId !== userId) &&
+      (
+        await hasAccessToSpace({
+          userId,
+          spaceId: existingPage.spaceId,
+          adminOnly: true
+        })
+      ).error
+    ) {
+      throw new UnauthorisedActionError(
+        `Cannot create poll as user ${userId} is not an author of the linked proposal.`
+      );
     }
-  }
-  else {
+  } else {
     const userPagePermissions = await computeUserPagePermissions({
       pageId,
       userId,
@@ -83,7 +91,13 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
   } as VoteDTO);
 
   if (vote.context === 'proposal') {
-    trackUserAction('new_vote_created', { userId, pageId, spaceId: vote.spaceId, resourceId: vote.id, platform: 'charmverse' });
+    trackUserAction('new_vote_created', {
+      userId,
+      pageId,
+      spaceId: vote.spaceId,
+      resourceId: vote.id,
+      platform: 'charmverse'
+    });
   }
 
   const [pageMeta, space] = await Promise.all([
@@ -92,10 +106,13 @@ async function createVote (req: NextApiRequest, res: NextApiResponse<ExtendedVot
   ]);
 
   if (pageMeta && space) {
-    relay.broadcast({
-      type: 'votes_created',
-      payload: [{ ...vote, page: pageMeta, space }]
-    }, vote.spaceId);
+    relay.broadcast(
+      {
+        type: 'votes_created',
+        payload: [{ ...vote, page: pageMeta, space }]
+      },
+      vote.spaceId
+    );
   }
 
   return res.status(201).json(vote);

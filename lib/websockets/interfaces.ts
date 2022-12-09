@@ -63,7 +63,7 @@ type VotesUpdated = {
 type ErrorMessage = {
   type: 'error';
   payload: string;
-}
+};
 
 type SubscribeToWorkspace = {
   type: 'subscribe';
@@ -74,7 +74,8 @@ type SubscribeToWorkspace = {
 
 export type ClientMessage = SubscribeToWorkspace;
 
-export type ServerMessage = BlocksUpdated
+export type ServerMessage =
+  | BlocksUpdated
   | BlocksCreated
   | BlocksDeleted
   | PagesMetaUpdated

@@ -3,22 +3,22 @@ import React from 'react';
 import { Utils } from '../../utils';
 
 type Props = {
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    onBlur?: (e: React.FocusEvent<HTMLButtonElement>) => void;
-    children?: React.ReactNode;
-    title?: string;
-    icon?: React.ReactNode;
-    filled?: boolean;
-    active?: boolean;
-    submit?: boolean;
-    emphasis?: string;
-    size?: string;
-    danger?: boolean;
-    className?: string;
-    rightIcon?: boolean;
-}
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLButtonElement>) => void;
+  children?: React.ReactNode;
+  title?: string;
+  icon?: React.ReactNode;
+  filled?: boolean;
+  active?: boolean;
+  submit?: boolean;
+  emphasis?: string;
+  size?: string;
+  danger?: boolean;
+  className?: string;
+  rightIcon?: boolean;
+};
 
-function Button ({ size = 'small', ...props }: Props): JSX.Element {
+function Button({ size = 'small', ...props }: Props): JSX.Element {
   const classNames: Record<string, boolean> = {
     Button: true,
     active: Boolean(props.active),

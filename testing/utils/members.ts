@@ -11,16 +11,23 @@ type GenerateMemberPropertyProps = {
   userId: string;
   options?: any;
   index?: number;
-}
+};
 
 type GenerateMemberPropertyValueProps = {
   memberPropertyId: string;
   spaceId: string;
   userId: string;
   value?: MemberPropertyValueType;
-}
+};
 
-export function generateMemberProperty ({ type = 'text', spaceId, userId, options, name, index }: GenerateMemberPropertyProps): Promise<MemberProperty> {
+export function generateMemberProperty({
+  type = 'text',
+  spaceId,
+  userId,
+  options,
+  name,
+  index
+}: GenerateMemberPropertyProps): Promise<MemberProperty> {
   return createMemberProperty({
     data: {
       name,
@@ -36,8 +43,11 @@ export function generateMemberProperty ({ type = 'text', spaceId, userId, option
   });
 }
 
-export function generateMemberPropertyValue ({
-  memberPropertyId, spaceId, userId, value
+export function generateMemberPropertyValue({
+  memberPropertyId,
+  spaceId,
+  userId,
+  value
 }: GenerateMemberPropertyValueProps): Promise<MemberPropertyValue> {
   return prisma.memberPropertyValue.create({
     data: {
@@ -49,4 +59,3 @@ export function generateMemberPropertyValue ({
     }
   });
 }
-

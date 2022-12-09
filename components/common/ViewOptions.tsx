@@ -8,20 +8,13 @@ export const StyledViewOptions = styled(Stack)`
   display: flex;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
-  .MuiInputLabel-root, .MuiSelect-select {
-    font-size: .85em;
+  .MuiInputLabel-root,
+  .MuiSelect-select {
+    font-size: 0.85em;
   }
 `;
 
-export function ViewOptions ({
-  children,
-  label,
-  sx = {}
-}: {
-  children: ReactNode;
-  label: string;
-  sx?: SxProps;
-}) {
+export function ViewOptions({ children, label, sx = {} }: { children: ReactNode; label: string; sx?: SxProps }) {
   return (
     <StyledViewOptions sx={sx}>
       <InputLabel>{label}</InputLabel>

@@ -4,7 +4,7 @@ import { IconButton } from '@mui/material';
 
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 
-export default function PageActionToggle () {
+export default function PageActionToggle() {
   const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
   const theme = useTheme();
   return (

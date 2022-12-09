@@ -20,33 +20,36 @@ interface Props {
   publicMode?: boolean;
 }
 
-export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
+export default function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages, getPagePermissions } = usePages();
   const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
-  const [initialBountyId, setInitialBountyId] = useState(router.query.bountyId as string || '');
-  function onClickDelete (bountyId: string) {
-    setBounties((_bounties) => _bounties.filter(_bounty => _bounty.id !== bountyId));
+  const [initialBountyId, setInitialBountyId] = useState((router.query.bountyId as string) || '');
+  function onClickDelete(bountyId: string) {
+    setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.id !== bountyId));
     deletePage({ pageId: bountyId });
   }
 
-  const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>((record, bounty) => {
-    record[bounty.status].push(bounty);
-    return record;
-  }, {
-    complete: [],
-    inProgress: [],
-    open: [],
-    paid: [],
-    suggestion: []
-  });
+  const bountiesGroupedByStatus = bounties.reduce<Record<BountyStatus, BountyWithDetails[]>>(
+    (record, bounty) => {
+      record[bounty.status].push(bounty);
+      return record;
+    },
+    {
+      complete: [],
+      inProgress: [],
+      open: [],
+      paid: [],
+      suggestion: []
+    }
+  );
 
-  function onClose () {
+  function onClose() {
     setUrlWithoutRerender(router.pathname, { bountyId: null });
   }
 
-  function showBounty (bounty: BountyWithDetails) {
+  function showBounty(bounty: BountyWithDetails) {
     setUrlWithoutRerender(router.pathname, { bountyId: bounty.id });
     if (bounty?.id) {
       showPage({
@@ -58,7 +61,7 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
   }
 
   useEffect(() => {
-    const bounty = bounties.find(b => b.id === initialBountyId) ?? null;
+    const bounty = bounties.find((b) => b.id === initialBountyId) ?? null;
     if (bounty) {
       showBounty(bounty);
       setInitialBountyId('');
@@ -70,7 +73,7 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
       {/* include ViewHeader to include the horizontal line */}
       <div className='ViewHeader' />
       <div className='octo-board-header'>
-        {bountyStatuses.map(bountyStatus => (
+        {bountyStatuses.map((bountyStatus) => (
           <Box className='octo-board-header-cell' key={bountyStatus}>
             <BountyStatusChip status={bountyStatus} />
             <Typography variant='body2' color='secondary' px={2}>
@@ -80,10 +83,11 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
         ))}
       </div>
       <div className='octo-board-body'>
-        {bountyStatuses.map(bountyStatus => (
+        {bountyStatuses.map((bountyStatus) => (
           <div className='octo-board-column' key={bountyStatus}>
-            {bountiesGroupedByStatus[bountyStatus].filter(bounty => Boolean(pages[bounty.page?.id])
-              && pages[bounty.page.id]?.deletedAt === null).map(bounty => (
+            {bountiesGroupedByStatus[bountyStatus]
+              .filter((bounty) => Boolean(pages[bounty.page?.id]) && pages[bounty.page.id]?.deletedAt === null)
+              .map((bounty) => (
                 <BountyCard
                   getPagePermissions={getPagePermissions}
                   onDelete={publicMode ? undefined : onClickDelete}
@@ -94,11 +98,10 @@ export default function BountiesKanbanView ({ bounties, publicMode }: Props) {
                     showBounty(bounty);
                   }}
                 />
-            ))}
+              ))}
           </div>
         ))}
       </div>
-
     </div>
   );
 }

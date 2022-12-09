@@ -5,7 +5,7 @@ import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import type { VoteTask } from './interfaces';
 
-export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
+export async function getVoteTasks(userId: string): Promise<VoteTask[]> {
   const votes = await prisma.vote.findMany({
     where: {
       space: {
@@ -32,11 +32,13 @@ export async function getVoteTasks (userId: string): Promise<VoteTask[]> {
   });
 
   const now = new Date();
-  const futureVotes = votes.filter(item => item.deadline > now).sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
-  const pastVotes = votes.filter(item => item.deadline <= now);
+  const futureVotes = votes
+    .filter((item) => item.deadline > now)
+    .sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
+  const pastVotes = votes.filter((item) => item.deadline <= now);
   const sortedVotes = [...futureVotes, ...pastVotes];
 
-  return sortedVotes.map(vote => {
+  return sortedVotes.map((vote) => {
     const voteStatus = calculateVoteStatus(vote);
     const userVotes = vote.userVotes;
     const { aggregatedResult, userChoice } = aggregateVoteResult({

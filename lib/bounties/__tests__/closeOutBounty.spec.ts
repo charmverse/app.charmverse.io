@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -18,7 +17,6 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   space = generated.space;
-
 });
 
 describe('closeOutBounty', () => {
@@ -75,14 +73,13 @@ describe('closeOutBounty', () => {
       userId: nonAdminUser.id
     });
 
-    const [applied, complete, paid] = await Promise.all([
-      bountyWithApplied, bountyWithComplete, bountyWithPaid
-    ].map(bounty => closeOutBounty(bounty.id)));
+    const [applied, complete, paid] = await Promise.all(
+      [bountyWithApplied, bountyWithComplete, bountyWithPaid].map((bounty) => closeOutBounty(bounty.id))
+    );
 
     expect(applied.applications[0].status).toBe('applied');
     expect(complete.applications[0].status).toBe('complete');
     expect(paid.applications[0].status).toBe('paid');
-
   });
 
   it('should update the bounty cap to the new number of accepted submissions', async () => {
@@ -124,12 +121,10 @@ describe('closeOutBounty', () => {
   // See rollupBountyStatus for how this works
 
   it('should fail if the bounty does not exist', async () => {
-
     try {
       await closeOutBounty(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });

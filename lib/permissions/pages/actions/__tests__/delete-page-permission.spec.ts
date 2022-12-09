@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -21,7 +20,6 @@ beforeAll(async () => {
 });
 
 describe('deletePagePermission', () => {
-
   it('should delete only the target permission for that page', async () => {
     const page = await createPage({
       createdBy: user.id,
@@ -29,13 +27,10 @@ describe('deletePagePermission', () => {
     });
 
     const rootPermissions = await Promise.all([
-      upsertPermission(
-        page.id,
-        {
-          permissionLevel: 'full_access',
-          userId: user.id
-        }
-      ),
+      upsertPermission(page.id, {
+        permissionLevel: 'full_access',
+        userId: user.id
+      }),
       upsertPermission(page.id, {
         permissionLevel: 'view',
         spaceId: space.id
@@ -51,7 +46,6 @@ describe('deletePagePermission', () => {
     });
 
     expect(remainingPermissions.length).toBe(1);
-
   });
 
   it('should delete any permissions on other pages inherited from it', async () => {
@@ -66,23 +60,17 @@ describe('deletePagePermission', () => {
       parentId: root.id
     });
 
-    const rootFullAccessPermission = await upsertPermission(
-      root.id,
-      {
-        permissionLevel: 'full_access',
-        userId: user.id
-      }
-    );
+    const rootFullAccessPermission = await upsertPermission(root.id, {
+      permissionLevel: 'full_access',
+      userId: user.id
+    });
 
     const childFullAccessPermission = await upsertPermission(child.id, rootFullAccessPermission.id);
 
-    const rootViewPermission = await upsertPermission(
-      root.id,
-      {
-        permissionLevel: 'view',
-        spaceId: space.id
-      }
-    );
+    const rootViewPermission = await upsertPermission(root.id, {
+      permissionLevel: 'view',
+      spaceId: space.id
+    });
 
     const childViewPermission = await upsertPermission(child.id, rootViewPermission);
 
@@ -95,21 +83,18 @@ describe('deletePagePermission', () => {
     });
 
     expect(remainingChildPermissions.length).toBe(1);
-
   });
 
   it('should throw an error if no permission exists', async () => {
     try {
       await deletePagePermission(v4());
       throw new ExpectedAnError();
-    }
-    catch (error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(PermissionNotFoundError);
     }
   });
 
   it('should delete an inherited permission from all child pages, but leave the parent pages that inherit this permission untouched', async () => {
-
     const rootPage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
@@ -150,7 +135,7 @@ describe('deletePagePermission', () => {
       upsertPermission(superNestedChildPage.id, rootPermissionId)
     ]);
 
-    const nestedChildWithPermissions = (await getPage(nestedChildPage.id) as IPageWithPermissions);
+    const nestedChildWithPermissions = (await getPage(nestedChildPage.id)) as IPageWithPermissions;
 
     await deletePagePermission(nestedChildWithPermissions.permissions[0].id);
 
@@ -173,11 +158,9 @@ describe('deletePagePermission', () => {
     const [rootWithPermissions, childWithPermissions] = (await Promise.all([
       getPage(rootPage.id),
       getPage(childPage.id)
-    ]) as IPageWithPermissions[]);
+    ])) as IPageWithPermissions[];
 
-    expect(rootWithPermissions.permissions.some(perm => perm.id === rootPermissionId));
-    expect(childWithPermissions.permissions.some(perm => perm.inheritedFromPermission === rootPermissionId));
-
+    expect(rootWithPermissions.permissions.some((perm) => perm.id === rootPermissionId));
+    expect(childWithPermissions.permissions.some((perm) => perm.inheritedFromPermission === rootPermissionId));
   });
-
 });

@@ -8,8 +8,7 @@ interface BountyReviewersProps {
   validSubmissions: number;
 }
 
-export default function BountySlots ({ maxSubmissions, validSubmissions }: BountyReviewersProps) {
-
+export default function BountySlots({ maxSubmissions, validSubmissions }: BountyReviewersProps) {
   const remainingSlots = maxSubmissions - validSubmissions;
 
   return (
@@ -19,15 +18,18 @@ export default function BountySlots ({ maxSubmissions, validSubmissions }: Bount
       </div>
 
       <Box display='flex' alignItems='center'>
-        {
-          remainingSlots <= 0 ? (
-            <Chip size='medium' sx={{ fontWeight: 'bold' }} label='FULL' variant='outlined' color='error' />
-          ) : (
-            <Chip size='medium' sx={{ fontWeight: 'bold' }} label={`${remainingSlots} ${conditionalPlural({ word: 'spot', count: remainingSlots })} left`} variant='outlined' color='primary' />
-          )
-        }
+        {remainingSlots <= 0 ? (
+          <Chip size='medium' sx={{ fontWeight: 'bold' }} label='FULL' variant='outlined' color='error' />
+        ) : (
+          <Chip
+            size='medium'
+            sx={{ fontWeight: 'bold' }}
+            label={`${remainingSlots} ${conditionalPlural({ word: 'spot', count: remainingSlots })} left`}
+            variant='outlined'
+            color='primary'
+          />
+        )}
       </Box>
-
     </Box>
   );
 }

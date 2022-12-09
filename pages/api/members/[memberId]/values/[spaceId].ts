@@ -15,7 +15,7 @@ handler
   .get(getMemberValuesHandler)
   .put(updateMemberPropertyValuesHandler);
 
-async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
+async function getMemberValuesHandler(req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
   const userId = req.session.user.id;
   const memberId = req.query.memberId as string;
   const spaceId = req.query.spaceId as string | undefined;
@@ -29,7 +29,7 @@ async function getMemberValuesHandler (req: NextApiRequest, res: NextApiResponse
   return res.status(200).json(propertyValues);
 }
 
-async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
+async function updateMemberPropertyValuesHandler(req: NextApiRequest, res: NextApiResponse<PropertyValue[]>) {
   const userId = req.session.user.id;
   const memberId = req.query.memberId as string;
   const spaceId = req.query.spaceId as string;
@@ -47,7 +47,12 @@ async function updateMemberPropertyValuesHandler (req: NextApiRequest, res: Next
 
   const data = req.body as UpdateMemberPropertyValuePayload[];
 
-  const updatedPropertyValues = await updateMemberPropertyValues({ userId: memberId, spaceId, updatedBy: userId, data });
+  const updatedPropertyValues = await updateMemberPropertyValues({
+    userId: memberId,
+    spaceId,
+    updatedBy: userId,
+    data
+  });
 
   return res.status(200).json(updatedPropertyValues);
 }

@@ -1,4 +1,3 @@
-
 import type { Bounty } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -18,14 +17,12 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getBounties)
-  .use(requireUser)
-  .post(createBountyController);
+handler.get(getBounties).use(requireUser).post(createBountyController);
 
-async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
+async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) {
   const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
 
-  const publicResourcesOnly = ((publicOnly as any) === 'true' || publicOnly === true);
+  const publicResourcesOnly = (publicOnly as any) === 'true' || publicOnly === true;
 
   // Session may be undefined as non-logged in users can access this endpoint
   const userId = req.session?.user?.id;
@@ -35,11 +32,9 @@ async function getBounties (req: NextApiRequest, res: NextApiResponse<Bounty[]>)
     userId: publicResourcesOnly ? undefined : userId
   });
   return res.status(200).json(bounties);
-
 }
 
-async function createBountyController (req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
-
+async function createBountyController(req: NextApiRequest, res: NextApiResponse<BountyWithDetails>) {
   const { spaceId, status } = req.body as BountyCreationData;
 
   const { id: userId } = req.session.user;
@@ -54,8 +49,7 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
     if (error) {
       throw error;
     }
-  }
-  else {
+  } else {
     const userPermissions = await computeSpacePermissions({
       allowAdminBypass: true,
       resourceId: spaceId as string,
@@ -74,16 +68,11 @@ async function createBountyController (req: NextApiRequest, res: NextApiResponse
   // add a little delay to capture the full bounty title after user has edited it
   setTimeout(() => {
     const { id, rewardAmount, rewardToken, page } = createdBounty;
-    collabland.createBountyCreatedCredential({ bountyId: id })
-      .catch(err => {
-        log.error('Error creating bounty created credential', err);
-      });
+    collabland.createBountyCreatedCredential({ bountyId: id }).catch((err) => {
+      log.error('Error creating bounty created credential', err);
+    });
 
-    trackUserAction(
-      'bounty_created',
-      { userId, spaceId, resourceId: id, rewardToken, rewardAmount, pageId: page.id }
-    );
-
+    trackUserAction('bounty_created', { userId, spaceId, resourceId: id, rewardToken, rewardAmount, pageId: page.id });
   }, 60 * 1000);
 
   logWorkspaceFirstBountyEvents(createdBounty);

@@ -1,4 +1,3 @@
-
 import type { InviteLinkToRole } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,12 +9,13 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser)
+handler
+  .use(requireUser)
   .use(requireKeys(['roleIds', 'spaceId'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true }))
   .post(updateInviteLinkRolesHandler);
 
-async function updateInviteLinkRolesHandler (req: NextApiRequest, res: NextApiResponse<InviteLinkToRole[]>) {
+async function updateInviteLinkRolesHandler(req: NextApiRequest, res: NextApiResponse<InviteLinkToRole[]>) {
   const { roleIds } = req.body as { roleIds: string[] };
   const inviteLinkId = req.query.id as string;
   const inviteLinkToRoles = await updateInviteLinkRoles(roleIds, inviteLinkId);

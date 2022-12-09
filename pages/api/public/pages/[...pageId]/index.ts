@@ -18,9 +18,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getPublicPage);
 
-function recurse (node: PageContent, cb: (node: PageContent) => void) {
+function recurse(node: PageContent, cb: (node: PageContent) => void) {
   if (node?.content) {
-    node?.content.forEach(childNode => {
+    node?.content.forEach((childNode) => {
       recurse(childNode, cb);
     });
   }
@@ -28,7 +28,7 @@ function recurse (node: PageContent, cb: (node: PageContent) => void) {
   cb(node);
 }
 
-async function filterPublicPages (pageIds: string[]) {
+async function filterPublicPages(pageIds: string[]) {
   // Check if the linked pages have public share access
   const publicPages = await prisma.pagePermission.findMany({
     where: {
@@ -44,7 +44,7 @@ async function filterPublicPages (pageIds: string[]) {
 
   // Filter the linked pages that is publicly available
   const publicPagesIds: string[] = [];
-  publicPages.forEach(publicPage => {
+  publicPages.forEach((publicPage) => {
     if (publicPage.public) {
       publicPagesIds.push(publicPage.pageId);
     }
@@ -53,7 +53,7 @@ async function filterPublicPages (pageIds: string[]) {
   return publicPagesIds;
 }
 
-async function extractPageArtifacts (linkedPageIds: string[]) {
+async function extractPageArtifacts(linkedPageIds: string[]) {
   const boards: Board[] = [];
   let views: BoardView[] = [];
   const cards: Card[] = [];
@@ -62,32 +62,33 @@ async function extractPageArtifacts (linkedPageIds: string[]) {
 
   const blocks = await prisma.block.findMany({
     where: {
-      OR: [{
-        id: {
-          in: publicPagesIds
+      OR: [
+        {
+          id: {
+            in: publicPagesIds
+          }
+        },
+        {
+          parentId: {
+            in: publicPagesIds
+          }
         }
-      }, {
-        parentId: {
-          in: publicPagesIds
-        }
-      }]
+      ]
     }
   });
 
   const linkedSourceIds: string[] = [];
 
-  blocks.forEach(block => {
+  blocks.forEach((block) => {
     if (block.type === 'board') {
       boards.push(block as unknown as Board);
-    }
-    else if (block.type === 'view') {
+    } else if (block.type === 'view') {
       const view = block as unknown as BoardView;
       views.push(view);
       if (view.fields?.linkedSourceId) {
         linkedSourceIds.push(view.fields.linkedSourceId);
       }
-    }
-    else if (block.type === 'card') {
+    } else if (block.type === 'card') {
       cards.push(block as unknown as Card);
     }
   });
@@ -96,19 +97,22 @@ async function extractPageArtifacts (linkedPageIds: string[]) {
 
   const extraBlocks = await prisma.block.findMany({
     where: {
-      OR: [{
-        id: {
-          in: publicLinkedSourceIds
+      OR: [
+        {
+          id: {
+            in: publicLinkedSourceIds
+          }
+        },
+        {
+          parentId: {
+            in: publicLinkedSourceIds
+          }
         }
-      }, {
-        parentId: {
-          in: publicLinkedSourceIds
-        }
-      }]
+      ]
     }
   });
 
-  views = views.filter(view => {
+  views = views.filter((view) => {
     // Don't show view for pages that are not publicly shared
     if (view.fields.linkedSourceId && !publicLinkedSourceIds.includes(view.fields.linkedSourceId)) {
       return false;
@@ -116,11 +120,10 @@ async function extractPageArtifacts (linkedPageIds: string[]) {
     return true;
   });
 
-  extraBlocks.forEach(block => {
+  extraBlocks.forEach((block) => {
     if (block.type === 'board') {
       boards.push(block as unknown as Board);
-    }
-    else if (block.type === 'card') {
+    } else if (block.type === 'card') {
       cards.push(block as unknown as Card);
     }
   });
@@ -132,8 +135,7 @@ async function extractPageArtifacts (linkedPageIds: string[]) {
   };
 }
 
-async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
-
+async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPageResponse>) {
   const { pageId: pageIdOrPath } = req.query as { pageId: string[] };
 
   const isPageId = typeof pageIdOrPath[0] === 'string' && isUUID(pageIdOrPath[0]);
@@ -182,8 +184,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
 
   if (computed.read !== true && page.type !== 'bounty') {
     throw new NotFoundError('Page not found');
-  }
-  else if (computed.read !== true && page.type === 'bounty' && !space.publicBountyBoard) {
+  } else if (computed.read !== true && page.type === 'bounty' && !space.publicBountyBoard) {
     throw new NotFoundError('Page not found');
   }
 
@@ -203,29 +204,28 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
       boardPages.push(boardPage);
     }
 
-    const card = await prisma.block.findFirst({
+    const card = (await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.id
       }
-    }) as unknown as Card;
+    })) as unknown as Card;
 
     if (card) {
       cards.push(card);
     }
 
-    const board = await prisma.block.findFirst({
+    const board = (await prisma.block.findFirst({
       where: {
         deletedAt: null,
         id: page.parentId
       }
-    }) as unknown as Board;
+    })) as unknown as Board;
 
     if (board) {
       boards.push(board);
     }
-  }
-  else if (page.type === 'page') {
+  } else if (page.type === 'page') {
     const linkedPageIds: string[] = [];
     recurse(page?.content as PageContent, (node) => {
       // Checking if all the mention attributes exist or not, and continue only if they exist
@@ -241,8 +241,7 @@ async function getPublicPage (req: NextApiRequest, res: NextApiResponse<PublicPa
     boards = linkedBoards;
     cards = linkedCards;
     views = linkedViews;
-  }
-  else if (page.type === 'inline_linked_board') {
+  } else if (page.type === 'inline_linked_board') {
     const { boards: linkedBoards, cards: linkedCards, views: linkedViews } = await extractPageArtifacts([page.id]);
     boards = linkedBoards;
     cards = linkedCards;

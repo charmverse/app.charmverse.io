@@ -10,9 +10,9 @@ import uniqBy from 'lodash/uniqBy';
 
 import log from 'lib/log';
 
-export type GnosisTransaction = SafeMultisigTransactionResponse;// AllTransactionsListResponse['results'][0];
+export type GnosisTransaction = SafeMultisigTransactionResponse; // AllTransactionsListResponse['results'][0];
 
-function getGnosisRPCUrl (chainId: number) {
+function getGnosisRPCUrl(chainId: number) {
   return getChainById(chainId)?.gnosisUrl;
 }
 
@@ -22,8 +22,7 @@ interface GetGnosisServiceProps {
   serviceUrl?: string;
 }
 
-function getGnosisService ({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
-
+function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
   const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
@@ -48,9 +47,9 @@ interface GetSafesForAddressProps {
   chainId: number;
 }
 
-export type SafeData = ({ chainId: number } & SafeInfoResponse);
+export type SafeData = { chainId: number } & SafeInfoResponse;
 
-export async function getSafesForAddress ({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
+export async function getSafesForAddress({ signer, chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
   const serviceUrl = getGnosisRPCUrl(chainId);
   if (!serviceUrl) {
     return [];
@@ -58,25 +57,29 @@ export async function getSafesForAddress ({ signer, chainId, address }: GetSafes
   const service = getGnosisService({ signer, serviceUrl });
   if (service) {
     const checksumAddress = getAddress(address); // convert to checksum address
-    return service.getSafesByOwner(checksumAddress)
-      .then(r => Promise.all(r.safes.map(safeAddr => {
-        return service.getSafeInfo(safeAddr)
-          .then(info => ({ ...info, chainId }));
-      })));
+    return service.getSafesByOwner(checksumAddress).then((r) =>
+      Promise.all(
+        r.safes.map((safeAddr) => {
+          return service.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
+        })
+      )
+    );
   }
   return [];
 }
 
-export async function getSafesForAddresses (signer: ethers.Signer, addresses: string[]) {
-  const safes = await Promise.all(Object.values(RPC).map(network => {
-    return Promise.all(addresses.map(address => getSafesForAddress({ signer, chainId: network.chainId, address })));
-  })).then(list => list.flat().flat());
+export async function getSafesForAddresses(signer: ethers.Signer, addresses: string[]) {
+  const safes = await Promise.all(
+    Object.values(RPC).map((network) => {
+      return Promise.all(addresses.map((address) => getSafesForAddress({ signer, chainId: network.chainId, address })));
+    })
+  ).then((list) => list.flat().flat());
 
   // de-dupe safes in case user has multiple addresses and they own the same safe
-  return uniqBy(safes, safe => safe.address);
+  return uniqBy(safes, (safe) => safe.address);
 }
 
-async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
+async function getTransactionsforSafe(signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
   const service = getGnosisService({ signer, chainId: wallet.chainId });
   if (service) {
     const transactions = await service.getPendingTransactions(wallet.address);
@@ -85,14 +88,13 @@ async function getTransactionsforSafe (signer: Signer, wallet: UserGnosisSafe): 
   return [];
 }
 
-export async function getTransactionsforSafes (signer: Signer, safes: UserGnosisSafe[]) {
+export async function getTransactionsforSafes(signer: Signer, safes: UserGnosisSafe[]) {
   const transactionList: SafeMultisigTransactionResponse[] = [];
   for (const safe of safes) {
     try {
       const transactions = await getTransactionsforSafe(signer, safe);
       transactionList.push(...transactions);
-    }
-    catch (e) {
+    } catch (e) {
       log.warn(`Error getting transactions for safe ${safe.address}`, e);
     }
   }

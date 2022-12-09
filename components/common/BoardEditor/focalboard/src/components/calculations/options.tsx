@@ -1,4 +1,3 @@
-
 import type { CSSObject } from '@emotion/serialize';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import type { IntlShape } from 'react-intl';
@@ -8,12 +7,12 @@ import Select, { components } from 'react-select';
 import { getSelectBaseStyle } from '../../theme';
 
 type Option = {
-    label: string;
-    value: string;
-    displayName: string;
-}
+  label: string;
+  value: string;
+  displayName: string;
+};
 
-export const Options:Record<string, Option> = {
+export const Options: Record<string, Option> = {
   none: { value: 'none', label: 'None', displayName: 'Calculate' },
   count: { value: 'count', label: 'Count', displayName: 'Count' },
   countEmpty: { value: 'countEmpty', label: 'Count Empty', displayName: 'Empty' },
@@ -39,53 +38,109 @@ export const Options:Record<string, Option> = {
 
 export const optionLabelString = (option: Option, intl: IntlShape): string => {
   switch (option.value) {
-    case 'none': return intl.formatMessage({ id: 'Calculations.Options.none.label', defaultMessage: 'None' });
-    case 'count': return intl.formatMessage({ id: 'Calculations.Options.count.label', defaultMessage: 'Count' });
-    case 'countValue': return intl.formatMessage({ id: 'Calculations.Options.countValue.label', defaultMessage: 'Count Value' });
-    case 'countChecked': return intl.formatMessage({ id: 'Calculations.Options.countChecked.label', defaultMessage: 'Count Checked' });
-    case 'percentChecked': return intl.formatMessage({ id: 'Calculations.Options.percentChecked.label', defaultMessage: 'Percent Checked' });
-    case 'percentUnchecked': return intl.formatMessage({ id: 'Calculations.Options.percentUnchecked.label', defaultMessage: 'Percent Unchecked' });
-    case 'countUnchecked': return intl.formatMessage({ id: 'Calculations.Options.countUnchecked.label', defaultMessage: 'Count Unchecked' });
-    case 'countUniqueValue': return intl.formatMessage({ id: 'Calculations.Options.countUniqueValue.label', defaultMessage: 'Count Unique Values' });
-    case 'sum': return intl.formatMessage({ id: 'Calculations.Options.sum.label', defaultMessage: 'Sum' });
-    case 'average': return intl.formatMessage({ id: 'Calculations.Options.average.label', defaultMessage: 'Average' });
-    case 'median': return intl.formatMessage({ id: 'Calculations.Options.median.label', defaultMessage: 'Median' });
-    case 'min': return intl.formatMessage({ id: 'Calculations.Options.min.label', defaultMessage: 'Min' });
-    case 'max': return intl.formatMessage({ id: 'Calculations.Options.max.label', defaultMessage: 'Max' });
-    case 'range': return intl.formatMessage({ id: 'Calculations.Options.range.label', defaultMessage: 'Range' });
-    case 'earliest': return intl.formatMessage({ id: 'Calculations.Options.earliest.label', defaultMessage: 'Earliest' });
-    case 'latest': return intl.formatMessage({ id: 'Calculations.Options.latest.label', defaultMessage: 'Latest' });
-    case 'dateRange': return intl.formatMessage({ id: 'Calculations.Options.dateRange.label', defaultMessage: 'Range' });
-    default: return option.label;
+    case 'none':
+      return intl.formatMessage({ id: 'Calculations.Options.none.label', defaultMessage: 'None' });
+    case 'count':
+      return intl.formatMessage({ id: 'Calculations.Options.count.label', defaultMessage: 'Count' });
+    case 'countValue':
+      return intl.formatMessage({ id: 'Calculations.Options.countValue.label', defaultMessage: 'Count Value' });
+    case 'countChecked':
+      return intl.formatMessage({ id: 'Calculations.Options.countChecked.label', defaultMessage: 'Count Checked' });
+    case 'percentChecked':
+      return intl.formatMessage({ id: 'Calculations.Options.percentChecked.label', defaultMessage: 'Percent Checked' });
+    case 'percentUnchecked':
+      return intl.formatMessage({
+        id: 'Calculations.Options.percentUnchecked.label',
+        defaultMessage: 'Percent Unchecked'
+      });
+    case 'countUnchecked':
+      return intl.formatMessage({ id: 'Calculations.Options.countUnchecked.label', defaultMessage: 'Count Unchecked' });
+    case 'countUniqueValue':
+      return intl.formatMessage({
+        id: 'Calculations.Options.countUniqueValue.label',
+        defaultMessage: 'Count Unique Values'
+      });
+    case 'sum':
+      return intl.formatMessage({ id: 'Calculations.Options.sum.label', defaultMessage: 'Sum' });
+    case 'average':
+      return intl.formatMessage({ id: 'Calculations.Options.average.label', defaultMessage: 'Average' });
+    case 'median':
+      return intl.formatMessage({ id: 'Calculations.Options.median.label', defaultMessage: 'Median' });
+    case 'min':
+      return intl.formatMessage({ id: 'Calculations.Options.min.label', defaultMessage: 'Min' });
+    case 'max':
+      return intl.formatMessage({ id: 'Calculations.Options.max.label', defaultMessage: 'Max' });
+    case 'range':
+      return intl.formatMessage({ id: 'Calculations.Options.range.label', defaultMessage: 'Range' });
+    case 'earliest':
+      return intl.formatMessage({ id: 'Calculations.Options.earliest.label', defaultMessage: 'Earliest' });
+    case 'latest':
+      return intl.formatMessage({ id: 'Calculations.Options.latest.label', defaultMessage: 'Latest' });
+    case 'dateRange':
+      return intl.formatMessage({ id: 'Calculations.Options.dateRange.label', defaultMessage: 'Range' });
+    default:
+      return option.label;
   }
 };
 
 export const optionDisplayNameString = (option: Option, intl: IntlShape): string => {
   switch (option.value) {
-    case 'none': return intl.formatMessage({ id: 'Calculations.Options.none.displayName', defaultMessage: 'Calculate' });
-    case 'count': return intl.formatMessage({ id: 'Calculations.Options.count.displayName', defaultMessage: 'Count' });
-    case 'countValue': return intl.formatMessage({ id: 'Calculations.Options.countValue.displayName', defaultMessage: 'Values' });
-    case 'countChecked': return intl.formatMessage({ id: 'Calculations.Options.countChecked.displayName', defaultMessage: 'Checked' });
-    case 'percentChecked': return intl.formatMessage({ id: 'Calculations.Options.percentChecked.displayName', defaultMessage: 'Checked' });
-    case 'percentUnchecked': return intl.formatMessage({ id: 'Calculations.Options.percentUnchecked.displayName', defaultMessage: 'Unchecked' });
-    case 'countUnchecked': return intl.formatMessage({ id: 'Calculations.Options.countUnchecked.displayName', defaultMessage: 'Unchecked' });
-    case 'countUniqueValue': return intl.formatMessage({ id: 'Calculations.Options.countUniqueValue.displayName', defaultMessage: 'Unique' });
-    case 'sum': return intl.formatMessage({ id: 'Calculations.Options.sum.displayName', defaultMessage: 'Sum' });
-    case 'average': return intl.formatMessage({ id: 'Calculations.Options.average.displayName', defaultMessage: 'Average' });
-    case 'median': return intl.formatMessage({ id: 'Calculations.Options.median.displayName', defaultMessage: 'Median' });
-    case 'min': return intl.formatMessage({ id: 'Calculations.Options.min.displayName', defaultMessage: 'Min' });
-    case 'max': return intl.formatMessage({ id: 'Calculations.Options.max.displayName', defaultMessage: 'Max' });
-    case 'range': return intl.formatMessage({ id: 'Calculations.Options.range.displayName', defaultMessage: 'Range' });
-    case 'earliest': return intl.formatMessage({ id: 'Calculations.Options.earliest.displayName', defaultMessage: 'Earliest' });
-    case 'latest': return intl.formatMessage({ id: 'Calculations.Options.latest.displayName', defaultMessage: 'Latest' });
-    case 'dateRange': return intl.formatMessage({ id: 'Calculations.Options.dateRange.displayName', defaultMessage: 'Range' });
-    default: return option.displayName;
+    case 'none':
+      return intl.formatMessage({ id: 'Calculations.Options.none.displayName', defaultMessage: 'Calculate' });
+    case 'count':
+      return intl.formatMessage({ id: 'Calculations.Options.count.displayName', defaultMessage: 'Count' });
+    case 'countValue':
+      return intl.formatMessage({ id: 'Calculations.Options.countValue.displayName', defaultMessage: 'Values' });
+    case 'countChecked':
+      return intl.formatMessage({ id: 'Calculations.Options.countChecked.displayName', defaultMessage: 'Checked' });
+    case 'percentChecked':
+      return intl.formatMessage({ id: 'Calculations.Options.percentChecked.displayName', defaultMessage: 'Checked' });
+    case 'percentUnchecked':
+      return intl.formatMessage({
+        id: 'Calculations.Options.percentUnchecked.displayName',
+        defaultMessage: 'Unchecked'
+      });
+    case 'countUnchecked':
+      return intl.formatMessage({ id: 'Calculations.Options.countUnchecked.displayName', defaultMessage: 'Unchecked' });
+    case 'countUniqueValue':
+      return intl.formatMessage({ id: 'Calculations.Options.countUniqueValue.displayName', defaultMessage: 'Unique' });
+    case 'sum':
+      return intl.formatMessage({ id: 'Calculations.Options.sum.displayName', defaultMessage: 'Sum' });
+    case 'average':
+      return intl.formatMessage({ id: 'Calculations.Options.average.displayName', defaultMessage: 'Average' });
+    case 'median':
+      return intl.formatMessage({ id: 'Calculations.Options.median.displayName', defaultMessage: 'Median' });
+    case 'min':
+      return intl.formatMessage({ id: 'Calculations.Options.min.displayName', defaultMessage: 'Min' });
+    case 'max':
+      return intl.formatMessage({ id: 'Calculations.Options.max.displayName', defaultMessage: 'Max' });
+    case 'range':
+      return intl.formatMessage({ id: 'Calculations.Options.range.displayName', defaultMessage: 'Range' });
+    case 'earliest':
+      return intl.formatMessage({ id: 'Calculations.Options.earliest.displayName', defaultMessage: 'Earliest' });
+    case 'latest':
+      return intl.formatMessage({ id: 'Calculations.Options.latest.displayName', defaultMessage: 'Latest' });
+    case 'dateRange':
+      return intl.formatMessage({ id: 'Calculations.Options.dateRange.displayName', defaultMessage: 'Range' });
+    default:
+      return option.displayName;
   }
 };
 
 export const optionsByType: Map<string, Option[]> = new Map([
-  ['common', [Options.none, Options.count, Options.countEmpty, Options.countNotEmpty, Options.percentEmpty,
-    Options.percentNotEmpty, Options.countValue, Options.countUniqueValue]],
+  [
+    'common',
+    [
+      Options.none,
+      Options.count,
+      Options.countEmpty,
+      Options.countNotEmpty,
+      Options.percentEmpty,
+      Options.percentNotEmpty,
+      Options.countValue,
+      Options.countUniqueValue
+    ]
+  ],
   ['checkbox', [Options.countChecked, Options.countUnchecked, Options.percentChecked, Options.percentUnchecked]],
   ['number', [Options.sum, Options.average, Options.median, Options.min, Options.max, Options.range]],
   ['date', [Options.earliest, Options.latest, Options.dateRange]],
@@ -95,7 +150,7 @@ export const optionsByType: Map<string, Option[]> = new Map([
 
 export const typesByOptions: Map<string, string[]> = generateTypesByOption();
 
-function generateTypesByOption (): Map<string, string[]> {
+function generateTypesByOption(): Map<string, string[]> {
   const mapping = new Map<string, string[]>();
 
   optionsByType.forEach((options, type) => {
@@ -146,7 +201,7 @@ const styles = {
   })
 };
 
-const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator (props) {
+const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator(props) {
   return (
     <components.DropdownIndicator {...props}>
       <ExpandLessIcon fontSize='small' />
@@ -156,19 +211,19 @@ const DropdownIndicator: typeof components.DropdownIndicator = function Dropdown
 
 // Calculation option props shared by all implementations of calculation options
 type CommonCalculationOptionProps = {
-    value: string;
-    menuOpen: boolean;
-    onClose?: () => void;
-    components?: { [key:string]: (props: any) => JSX.Element };
-    onChange: (data: any) => void;
-}
+  value: string;
+  menuOpen: boolean;
+  onClose?: () => void;
+  components?: { [key: string]: (props: any) => JSX.Element };
+  onChange: (data: any) => void;
+};
 
 // Props used by the base calculation option component
 type BaseCalculationOptionProps = CommonCalculationOptionProps & {
-    options: Option[];
-}
+  options: Option[];
+};
 
-function CalculationOptions (props: BaseCalculationOptionProps): JSX.Element {
+function CalculationOptions(props: BaseCalculationOptionProps): JSX.Element {
   const intl = useIntl();
 
   return (
@@ -205,7 +260,4 @@ function CalculationOptions (props: BaseCalculationOptionProps): JSX.Element {
 
 export { CalculationOptions };
 
-export type {
-  Option,
-  CommonCalculationOptionProps
-};
+export type { Option, CommonCalculationOptionProps };

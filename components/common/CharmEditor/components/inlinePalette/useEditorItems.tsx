@@ -1,4 +1,3 @@
-
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
@@ -18,8 +17,13 @@ import { items as textItems } from './editorItems/text';
 import { PaletteItem } from './paletteItem';
 import type { PaletteItemTypeNoGroup } from './paletteItem';
 
-export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
-    { disableNestedPage: boolean, nestedPagePluginKey?: PluginKey<NestedPagePluginState> }) {
+export function useEditorItems({
+  disableNestedPage,
+  nestedPagePluginKey
+}: {
+  disableNestedPage: boolean;
+  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+}) {
   const { addNestedPage } = useNestedPage();
   const space = useCurrentSpace();
   const { user } = useUser();
@@ -29,21 +33,29 @@ export function useEditorItems ({ disableNestedPage, nestedPagePluginKey }:
   const pageType = currentPageId ? pages[currentPageId]?.type : undefined;
 
   const paletteItems = useMemo(() => {
-
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
       ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
-      ['database', (user && space && !disableNestedPage) ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType }) : []],
+      [
+        'database',
+        user && space && !disableNestedPage
+          ? databaseItems({ addNestedPage, currentPageId, userId: user.id, space, pageType })
+          : []
+      ],
       ['media', mediaItems()],
       ['embed', embedItems()],
       ['advanced blocks', advancedBlocks()]
     ];
 
-    const itemList = itemGroups.map(([group, items]) => (
-      items.map(item => PaletteItem.create({
-        ...item,
-        group
-      }))
-    )).flat();
+    const itemList = itemGroups
+      .map(([group, items]) =>
+        items.map((item) =>
+          PaletteItem.create({
+            ...item,
+            group
+          })
+        )
+      )
+      .flat();
 
     return itemList;
   }, [addNestedPage, currentPageId, user, space]);

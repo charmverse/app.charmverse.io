@@ -10,7 +10,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
-function VisibilityViewIcon ({
+function VisibilityViewIcon({
   view,
   ...props
 }: {
@@ -18,15 +18,14 @@ function VisibilityViewIcon ({
 } & SVGProps<any>) {
   if (view === 'gallery') {
     return <GalleryIcon {...props} />;
-  }
-  else if (view === 'table') {
+  } else if (view === 'table') {
     return <TableIcon {...props} />;
   }
 
-  return <PersonIcon {...props as any} />;
+  return <PersonIcon {...(props as any)} />;
 }
 
-function MemberPropertyVisibilityView ({
+function MemberPropertyVisibilityView({
   view,
   enabledViews,
   memberPropertyId,
@@ -42,12 +41,13 @@ function MemberPropertyVisibilityView ({
 
   return (
     <Tooltip title={!disabled ? `Property is ${isDisabled ? 'invisible' : 'visible'} in ${view} view` : ''}>
-      <Typography sx={{
-        display: 'flex',
-        alignItems: 'center',
-        color: isDisabled ? 'action.disabled' : 'inherit',
-        cursor: disabled ? 'initial' : 'pointer'
-      }}
+      <Typography
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          color: isDisabled ? 'action.disabled' : 'inherit',
+          cursor: disabled ? 'initial' : 'pointer'
+        }}
       >
         <VisibilityViewIcon
           view={view}
@@ -68,11 +68,7 @@ function MemberPropertyVisibilityView ({
   );
 }
 
-export function MemberPropertyVisibility ({
-  property
-}: {
-  property: MemberPropertyWithPermissions;
-}) {
+export function MemberPropertyVisibility({ property }: { property: MemberPropertyWithPermissions }) {
   const enabledViews = property.enabledViews;
   if (MEMBER_PROPERTY_CONFIG[property.type]?.unhideable) {
     return null;

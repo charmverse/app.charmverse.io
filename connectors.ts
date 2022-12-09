@@ -36,8 +36,7 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction.mainnet.gnosis.io',
@@ -53,8 +52,7 @@ const RPC = {
       symbol: 'BNB',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
+      logoURI: 'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
     },
     rpcUrls: ['https://bsc-dataseed.binance.org'],
     blockExplorerUrls: ['https://bscscan.com'],
@@ -70,8 +68,7 @@ const RPC = {
       symbol: 'MATIC',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
@@ -87,8 +84,7 @@ const RPC = {
       symbol: 'AVAX',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png?1604021818'
+      logoURI: 'https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png?1604021818'
     },
     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     blockExplorerUrls: ['https://snowtrace.io'],
@@ -104,8 +100,7 @@ const RPC = {
       symbol: 'XDAI',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
+      logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
     },
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
@@ -121,8 +116,7 @@ const RPC = {
       symbol: 'FTM',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4001/small/Fantom.png?1558015016'
+      logoURI: 'https://assets.coingecko.com/coins/images/4001/small/Fantom.png?1558015016'
     },
     rpcUrls: ['https://rpc.ftm.tools'],
     blockExplorerUrls: ['https://ftmscan.com'],
@@ -137,8 +131,7 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
@@ -154,8 +147,7 @@ const RPC = {
       symbol: 'CELO',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
+      logoURI: 'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
     },
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
@@ -170,8 +162,7 @@ const RPC = {
       symbol: 'ONE',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
+      logoURI: 'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
     },
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
@@ -186,8 +177,7 @@ const RPC = {
       symbol: 'ONE',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
+      logoURI: 'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
     },
     rpcUrls: ['https://api.s0.ps.hmny.io'],
     blockExplorerUrls: ['https://explorer.ps.hmny.io/'],
@@ -202,8 +192,7 @@ const RPC = {
       symbol: 'ETH',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI:
-        'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
     },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
@@ -211,7 +200,6 @@ const RPC = {
     iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'gor'
-
   },
   MUMBAI: {
     chainId: 80001,
@@ -221,8 +209,7 @@ const RPC = {
       symbol: 'MATIC',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
@@ -238,8 +225,7 @@ const RPC = {
       symbol: 'OP',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI:
-        'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     rpcUrls: ['https://mainnet.optimism.io'],
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
@@ -253,9 +239,9 @@ export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC);
 
-export function getChainShortname (chainId: string | number): string {
+export function getChainShortname(chainId: string | number): string {
   const parsedChainId = parseInt(chainId.toString());
-  return RPCList.find(chain => chain.chainId === parsedChainId)?.shortName ?? '';
+  return RPCList.find((chain) => chain.chainId === parsedChainId)?.shortName ?? '';
 }
 
 export type CryptoCurrency = typeof RPC[Blockchain]['nativeCurrency']['symbol'];
@@ -270,9 +256,11 @@ export const TokenLogoPaths = Object.values(RPC).reduce((acc, chain) => {
   return acc;
 }, {} as Record<CryptoCurrency, string>);
 
-export const CryptoCurrencies = uniqueValues<CryptoCurrency>(RPCList.map(chain => {
-  return chain.nativeCurrency.symbol as CryptoCurrency;
-}));
+export const CryptoCurrencies = uniqueValues<CryptoCurrency>(
+  RPCList.map((chain) => {
+    return chain.nativeCurrency.symbol as CryptoCurrency;
+  })
+);
 
 export const FiatCurrencyList = {
   USD: 'US Dollar',
@@ -296,8 +284,8 @@ export interface IPairQuote extends ICurrencyPair {
   source?: string;
 }
 
-export function getChainById (chainId: number): IChainDetails | undefined {
-  return RPCList.find(rpc => rpc.chainId === chainId);
+export function getChainById(chainId: number): IChainDetails | undefined {
+  return RPCList.find((rpc) => rpc.chainId === chainId);
 }
 
 const supportedChains: Blockchain[] = [
@@ -344,7 +332,7 @@ const walletLink = new WalletLinkConnector({
  * @param chainId
  * @returns The native crypto of a chain. If the chain is not found, returns an empty list
  */
-export function getCryptos (chainId: number): (string | CryptoCurrency)[] {
+export function getCryptos(chainId: number): (string | CryptoCurrency)[] {
   const chain = getChainById(chainId);
 
   if (!chain) {
@@ -352,17 +340,18 @@ export function getCryptos (chainId: number): (string | CryptoCurrency)[] {
   }
 
   return [chain.nativeCurrency.symbol];
-
 }
 
-export function getChainExplorerLink (chainId: string | number, transactionOrContractId: string, endpoint: 'transaction' | 'address' = 'transaction'): string {
-
+export function getChainExplorerLink(
+  chainId: string | number,
+  transactionOrContractId: string,
+  endpoint: 'transaction' | 'address' = 'transaction'
+): string {
   chainId = chainId.toString();
 
   const path = endpoint === 'transaction' ? 'tx' : 'token';
 
   switch (chainId) {
-
     case '1':
       return `https://etherscan.io/${path}/${transactionOrContractId}`;
 

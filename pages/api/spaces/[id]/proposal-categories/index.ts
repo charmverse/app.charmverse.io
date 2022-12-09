@@ -15,7 +15,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createCategory);
 
-async function getCategories (req: NextApiRequest, res: NextApiResponse<ProposalCategory[]>) {
+async function getCategories(req: NextApiRequest, res: NextApiResponse<ProposalCategory[]>) {
   const spaceId = req.query.id as string;
 
   const categories = await getProposalCategoriesBySpace(spaceId);
@@ -23,7 +23,7 @@ async function getCategories (req: NextApiRequest, res: NextApiResponse<Proposal
   return res.status(200).json(categories);
 }
 
-async function createCategory (req: NextApiRequest, res: NextApiResponse<ProposalCategory>) {
+async function createCategory(req: NextApiRequest, res: NextApiResponse<ProposalCategory>) {
   const spaceId = req.query.id as string;
   const categoryData = req.body as Omit<ProposalCategory, 'id' | 'spaceId'>;
 

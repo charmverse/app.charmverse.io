@@ -9,9 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
 
-export function MemberDirectorySearchBar ({ onChange }: {
-  onChange: Dispatch<SetStateAction<Member[]>>;
-}) {
+export function MemberDirectorySearchBar({ onChange }: { onChange: Dispatch<SetStateAction<Member[]>> }) {
   const { members } = useMembers();
   const space = useCurrentSpace();
 
@@ -19,12 +17,16 @@ export function MemberDirectorySearchBar ({ onChange }: {
     onChange(members);
   }, [members]);
 
-  const debouncedSearchMembers = useMemo(() => debounce(async (searchedContent: string) => {
-    if (space) {
-      const searchResult = await charmClient.members.getMembers(space.id, searchedContent);
-      onChange(searchResult);
-    }
-  }, 1000), []);
+  const debouncedSearchMembers = useMemo(
+    () =>
+      debounce(async (searchedContent: string) => {
+        if (space) {
+          const searchResult = await charmClient.members.getMembers(space.id, searchedContent);
+          onChange(searchResult);
+        }
+      }, 1000),
+    []
+  );
 
   return (
     <TextField
@@ -37,13 +39,16 @@ export function MemberDirectorySearchBar ({ onChange }: {
         const search = e.target.value;
         if (search.length !== 0) {
           debouncedSearchMembers(search);
-        }
-        else {
+        } else {
           onChange(members);
         }
       }}
       InputProps={{
-        endAdornment: <InputAdornment position='end'><SearchIcon color='secondary' /></InputAdornment>
+        endAdornment: (
+          <InputAdornment position='end'>
+            <SearchIcon color='secondary' />
+          </InputAdornment>
+        )
       }}
     />
   );

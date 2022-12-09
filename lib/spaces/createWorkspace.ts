@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { generateDefaultPostCategoriesInput } from 'lib/forums/categories/generateDefaultPostCategories';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -16,10 +17,10 @@ import { generateDefaultCategoriesInput } from 'lib/proposal/generateDefaultCate
 
 type CreateSpaceProps = {
   spaceData: Prisma.SpaceCreateInput;
-userId:string;
+  userId: string;
 };
 
-export async function createWorkspace ({ spaceData, userId }: CreateSpaceProps) {
+export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
   const space = await prisma.space.create({ data: spaceData, include: { pages: true } });
 
   // Create all page content in a single transaction
@@ -34,10 +35,11 @@ export async function createWorkspace ({ spaceData, userId }: CreateSpaceProps) 
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
 
   await prisma.$transaction([
-    ...seedPagesTransactionInput.blocksToCreate.map(input => prisma.block.create({ data: input })),
-    ...seedPagesTransactionInput.pagesToCreate.map(input => createPage({ data: input })),
+    ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
+    ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input })),
     prisma.proposalCategory.createMany({ data: defaultCategories }),
-    prisma.memberProperty.createMany({ data: defaultProperties })
+    prisma.memberProperty.createMany({ data: defaultProperties }),
+    prisma.postCategory.createMany({ data: generateDefaultPostCategoriesInput(space.id) })
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({

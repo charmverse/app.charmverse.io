@@ -8,4 +8,3 @@ export * from './requireSuperApiKey';
 export * from './requireSudoApiKey';
 export * from '../users/hasAccessToSpace';
 export * from './requireSpaceMembership';
-

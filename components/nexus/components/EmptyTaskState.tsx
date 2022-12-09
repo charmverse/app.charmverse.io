@@ -1,10 +1,8 @@
-
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Card, Typography } from '@mui/material';
 
-export function EmptyTaskState ({ taskType }: { taskType: string }) {
+export function EmptyTaskState({ taskType }: { taskType: string }) {
   return (
-
     <Card variant='outlined'>
       <Box p={3} textAlign='center'>
         <TaskOutlinedIcon />

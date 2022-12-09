@@ -12,13 +12,8 @@ import {
   selectedChangeBlockSpec
 } from './plugin';
 
-export function activateTrack (view: EditorView, type: string, pos: number) {
-
-  const tr = setSelectedChanges(
-    view.state,
-    type,
-    pos
-  );
+export function activateTrack(view: EditorView, type: string, pos: number) {
+  const tr = setSelectedChanges(view.state, type, pos);
 
   if (tr) {
     view.dispatch(tr);
@@ -27,27 +22,26 @@ export function activateTrack (view: EditorView, type: string, pos: number) {
       // use a library to scroll since charmeditor is inside a container element
       try {
         scrollIntoView(selectedMark, { scrollMode: 'if-needed', behavior: 'smooth' });
-      }
-      catch (err) {
+      } catch (err) {
         // sometimes invalid target when removing elements
       }
     }
   }
 }
 
-export function getSelectedChanges (state: EditorState) {
+export function getSelectedChanges(state: EditorState) {
   const keyState = key.getState(state) as { decos: typeof DecorationSet.empty } | undefined;
   const decos = keyState?.decos ?? DecorationSet.empty;
 
-  const insertion = decos.find(undefined, undefined, spec => spec === selectedInsertionSpec)[0];
-  const deletion = decos.find(undefined, undefined, spec => spec === selectedDeletionSpec)[0];
-  const formatChange = decos.find(undefined, undefined, spec => spec === selectedChangeFormatSpec)[0];
-  const blockChange = decos.find(undefined, undefined, spec => spec === selectedChangeBlockSpec)[0];
+  const insertion = decos.find(undefined, undefined, (spec) => spec === selectedInsertionSpec)[0];
+  const deletion = decos.find(undefined, undefined, (spec) => spec === selectedDeletionSpec)[0];
+  const formatChange = decos.find(undefined, undefined, (spec) => spec === selectedChangeFormatSpec)[0];
+  const blockChange = decos.find(undefined, undefined, (spec) => spec === selectedChangeBlockSpec)[0];
 
   return { insertion, deletion, format_change: formatChange, block_change: blockChange };
 }
 
-export function setSelectedChanges (state: EditorState, type: string, pos: number) {
+export function setSelectedChanges(state: EditorState, type: string, pos: number) {
   const tr = state.tr;
   const node = tr.doc.nodeAt(pos);
   if (!node) {
@@ -55,7 +49,7 @@ export function setSelectedChanges (state: EditorState, type: string, pos: numbe
   }
   const mark = node.attrs.track
     ? node.attrs.track.find((t: TrackAttribute) => t.type === type)
-    : node.marks.find(m => m.type.name === type);
+    : node.marks.find((m) => m.type.name === type);
   if (!mark) {
     return;
   }
@@ -65,26 +59,30 @@ export function setSelectedChanges (state: EditorState, type: string, pos: numbe
   let spec;
   if (type === 'insertion') {
     spec = selectedInsertionSpec;
-  }
-  else if (type === 'deletion') {
+  } else if (type === 'deletion') {
     spec = selectedDeletionSpec;
-  }
-  else if (type === 'format_change') {
+  } else if (type === 'format_change') {
     spec = selectedChangeFormatSpec;
-  }
-  else if (type === 'block_change') {
+  } else if (type === 'block_change') {
     spec = selectedChangeBlockSpec;
   }
   const decoType = node?.isInline ? Decoration.inline : Decoration.node;
   if (selectedChange) {
-    decos = decos.add(tr.doc, [decoType(selectedChange.from, selectedChange.to, {
-      class: `selected-${type}`
-    }, spec)]);
+    decos = decos.add(tr.doc, [
+      decoType(
+        selectedChange.from,
+        selectedChange.to,
+        {
+          class: `selected-${type}`
+        },
+        spec
+      )
+    ]);
   }
   return tr.setMeta(key, { decos }).setMeta('track', true);
 }
 
-export function deactivateAllSelectedChanges (tr: Transaction) {
+export function deactivateAllSelectedChanges(tr: Transaction) {
   const pluginState = {
     decos: DecorationSet.empty
   };
@@ -92,9 +90,9 @@ export function deactivateAllSelectedChanges (tr: Transaction) {
 }
 
 // From https://discuss.prosemirror.net/t/expanding-the-selection-to-the-active-mark/478/2 with some bugs fixed
-export function getFromToMark (doc: Node, pos: number, mark: Mark) {
-  const $pos = doc.resolve(pos); const
-    parent = $pos.parent;
+export function getFromToMark(doc: Node, pos: number, mark: Mark) {
+  const $pos = doc.resolve(pos);
+  const parent = $pos.parent;
   const start = parent.childAfter($pos.parentOffset);
   if (!start.node) {
     return null;

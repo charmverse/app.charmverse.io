@@ -64,12 +64,7 @@ describe('/components/viewMenu', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Router history={history}>
-          <ViewMenu
-            board={board}
-            activeView={activeView}
-            views={views}
-            readOnly={false}
-          />
+          <ViewMenu board={board} activeView={activeView} views={views} readOnly={false} />
         </Router>
       </ReduxProvider>
     );
@@ -85,12 +80,7 @@ describe('/components/viewMenu', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Router history={history}>
-          <ViewMenu
-            board={board}
-            activeView={activeView}
-            views={views}
-            readOnly={true}
-          />
+          <ViewMenu board={board} activeView={activeView} views={views} readOnly={true} />
         </Router>
       </ReduxProvider>
     );

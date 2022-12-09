@@ -23,57 +23,50 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test(
-  'login - allows user to login and see their workspace',
-  async ({ discordServer, loginPage }) => {
+test('login - allows user to login and see their workspace', async ({ discordServer, loginPage }) => {
+  const discordUserId = discordServer.discordUserId;
+  const { user, space, page } = await generateUserAndSpace();
+  await createDiscordUser({ userId: user.id, discordUserId });
 
-    const discordUserId = discordServer.discordUserId;
-    const { user, space, page } = await generateUserAndSpace();
-    await createDiscordUser({ userId: user.id, discordUserId });
+  await loginPage.goto();
 
-    await loginPage.goto();
+  const discordApiUrl = discordServer.host;
+  const discordWebsiteUrl = await loginPage.getDiscordUrl();
+  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
 
-    const discordApiUrl = discordServer.host;
-    const discordWebsiteUrl = await loginPage.getDiscordUrl();
-    await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
+  // should auto redirect to workspace
+  await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
+});
 
-    // should auto redirect to workspace
-    await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
-  }
-);
+test('login - allows user to login and see their workspace even when a wallet is connected (regression check)', async ({
+  discordServer,
+  loginPage
+}) => {
+  const discordUserId = discordServer.discordUserId;
+  const { address, user, space, page } = await generateUserAndSpace();
+  await createDiscordUser({ userId: user.id, discordUserId });
 
-test(
-  'login - allows user to login and see their workspace even when a wallet is connected (regression check)',
-  async ({ discordServer, loginPage }) => {
+  await mockWeb3({
+    page: loginPage.page,
+    context: { address, privateKey: false },
+    init: ({ Web3Mock, context }) => {
+      Web3Mock.mock({
+        blockchain: 'ethereum',
+        accounts: {
+          return: [context.address]
+        }
+      });
+    }
+  });
 
-    const discordUserId = discordServer.discordUserId;
-    const { address, user, space, page } = await generateUserAndSpace();
-    await createDiscordUser({ userId: user.id, discordUserId });
+  await loginPage.goto();
 
-    await mockWeb3({
-      page: loginPage.page,
-      context: { address, privateKey: false },
-      init: ({ Web3Mock, context }) => {
+  await expect(loginPage.verifyWalletButton).toBeVisible();
 
-        Web3Mock.mock({
-          blockchain: 'ethereum',
-          accounts: {
-            return: [context.address]
-          }
-        });
+  const discordApiUrl = discordServer.host;
+  const discordWebsiteUrl = await loginPage.getDiscordUrl();
+  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
 
-      }
-    });
-
-    await loginPage.goto();
-
-    await expect(loginPage.verifyWalletButton).toBeVisible();
-
-    const discordApiUrl = discordServer.host;
-    const discordWebsiteUrl = await loginPage.getDiscordUrl();
-    await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
-
-    // should auto redirect to workspace
-    await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
-  }
-);
+  // should auto redirect to workspace
+  await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
+});

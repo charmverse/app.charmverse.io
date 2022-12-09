@@ -8,15 +8,14 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 if (isTestEnv) {
-  handler
-    .post(login);
+  handler.post(login);
 }
 
 export type TestLoginRequest = {
   userId: string;
-}
+};
 
-async function login (req: NextApiRequest, res: NextApiResponse) {
+async function login(req: NextApiRequest, res: NextApiResponse) {
   const { userId } = req.body as TestLoginRequest;
 
   req.session.user = { id: userId };

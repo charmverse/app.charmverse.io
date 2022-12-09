@@ -2,7 +2,6 @@ import type { SigningConditions } from 'lit-js-sdk';
 import type * as React from 'react';
 
 declare module 'lit-share-modal-v3-react-17' {
-
   export type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'>;
 
   interface Token {
@@ -22,7 +21,7 @@ declare module 'lit-share-modal-v3-react-17' {
     defaultTokens?: Token[];
     injectCSS?: boolean;
     permanentDefault?: boolean;
-    onUnifiedAccessControlConditionsSelected (result: ConditionsModalResult): void;
+    onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
   }
 
   declare const ShareModal: React.FC<ShareModalProps>;

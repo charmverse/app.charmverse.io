@@ -14,8 +14,11 @@ import { mapBountyPermissions } from './mapBountyPermissions';
  * @param param0
  * @returns
  */
-export async function removeBountyPermissionGroup ({ assignee, level, resourceId }: BountyPermissionAssignment): Promise<BountyPermissions> {
-
+export async function removeBountyPermissionGroup({
+  assignee,
+  level,
+  resourceId
+}: BountyPermissionAssignment): Promise<BountyPermissions> {
   if (!assigneeGroupIsValid(assignee.group)) {
     throw new InvalidInputError(`Invalid permission assignee group: '${assignee.group}'`);
   }
@@ -34,46 +37,56 @@ export async function removeBountyPermissionGroup ({ assignee, level, resourceId
   };
 
   const query: Prisma.BountyPermissionWhereUniqueInput = {
-    public_bountyId_permissionLevel: assignee.group === 'public' ? {
-      public: true,
-      ...repeatedQueryInput
-    } : undefined,
-    roleId_bountyId_permissionLevel: assignee.group === 'role' ? {
-      roleId: assignee.id as string,
-      ...repeatedQueryInput
-    } : undefined,
-    userId_bountyId_permissionLevel: assignee.group === 'user' ? {
-      userId: assignee.id as string,
-      ...repeatedQueryInput
-    } : undefined,
-    spaceId_bountyId_permissionLevel: assignee.group === 'space' ? {
-      spaceId: assignee.id as string,
-      ...repeatedQueryInput
-    } : undefined
+    public_bountyId_permissionLevel:
+      assignee.group === 'public'
+        ? {
+            public: true,
+            ...repeatedQueryInput
+          }
+        : undefined,
+    roleId_bountyId_permissionLevel:
+      assignee.group === 'role'
+        ? {
+            roleId: assignee.id as string,
+            ...repeatedQueryInput
+          }
+        : undefined,
+    userId_bountyId_permissionLevel:
+      assignee.group === 'user'
+        ? {
+            userId: assignee.id as string,
+            ...repeatedQueryInput
+          }
+        : undefined,
+    spaceId_bountyId_permissionLevel:
+      assignee.group === 'space'
+        ? {
+            spaceId: assignee.id as string,
+            ...repeatedQueryInput
+          }
+        : undefined
   };
 
   try {
     await prisma.bountyPermission.delete({
       where: query
     });
-  }
-  catch {
+  } catch {
     // Prisma will throw an error if there is nothing to delete. Catch it here so we can continue
   }
 
-  const bounty = await prisma.bounty.findUnique({
+  const bounty = (await prisma.bounty.findUnique({
     where: {
       id: resourceId
     },
     select: {
       permissions: true
     }
-  }) as { permissions: BountyPermission[] };
+  })) as { permissions: BountyPermission[] };
 
   if (!bounty) {
     throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
   }
 
   return mapBountyPermissions(bounty.permissions);
-
 }

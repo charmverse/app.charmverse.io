@@ -43,23 +43,37 @@ beforeAll(async () => {
 
 describe('updateMemberPropertyVisibility', () => {
   it('Should throw undesirable state error if unhideable property is updated ', async () => {
-    await expect(updateMemberPropertyVisibility({ memberPropertyId: property1.id, view: 'gallery', visible: false })).rejects.toBeInstanceOf(UndesirableOperationError);
+    await expect(
+      updateMemberPropertyVisibility({ memberPropertyId: property1.id, view: 'gallery', visible: false })
+    ).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 
   it('Should remove table view from enabledViews if visible is false ', async () => {
-    const memberProperty = await updateMemberPropertyVisibility({ memberPropertyId: property2.id, view: 'table', visible: false });
+    const memberProperty = await updateMemberPropertyVisibility({
+      memberPropertyId: property2.id,
+      view: 'table',
+      visible: false
+    });
 
-    expect(memberProperty).toEqual(expect.objectContaining({
-      enabledViews: expect.arrayContaining(['gallery', 'profile'])
-    }));
+    expect(memberProperty).toEqual(
+      expect.objectContaining({
+        enabledViews: expect.arrayContaining(['gallery', 'profile'])
+      })
+    );
   });
 
   it('Should add gallery view to enabledViews if visible is true ', async () => {
     await updateMemberPropertyVisibility({ memberPropertyId: property3.id, view: 'gallery', visible: false });
-    const memberProperty = await updateMemberPropertyVisibility({ memberPropertyId: property3.id, view: 'gallery', visible: true });
+    const memberProperty = await updateMemberPropertyVisibility({
+      memberPropertyId: property3.id,
+      view: 'gallery',
+      visible: true
+    });
 
-    expect(memberProperty).toEqual(expect.objectContaining({
-      enabledViews: expect.arrayContaining(['table', 'gallery', 'profile'])
-    }));
+    expect(memberProperty).toEqual(
+      expect.objectContaining({
+        enabledViews: expect.arrayContaining(['table', 'gallery', 'profile'])
+      })
+    );
   });
 });

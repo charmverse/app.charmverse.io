@@ -14,7 +14,8 @@ import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
 
-export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
+export interface IInputSearchCryptoProps
+  extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: CryptoCurrency) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;
   defaultValue?: CryptoCurrency | string;
@@ -27,7 +28,7 @@ export interface IInputSearchCryptoProps extends Omit<Partial<AutocompleteProps<
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
 
-export function InputSearchCrypto ({
+export function InputSearchCrypto({
   hideBackdrop,
   onNewPaymentMethod: _onNewPaymentMethod,
   onChange = () => {},
@@ -39,7 +40,6 @@ export function InputSearchCrypto ({
   disabled,
   readOnly
 }: IInputSearchCryptoProps) {
-
   const [inputValue, setInputValue] = useState('');
 
   const [value, setValue] = useState(defaultValue);
@@ -58,7 +58,7 @@ export function InputSearchCrypto ({
     }
   }, [cryptoList, parentValue]);
 
-  function emitValue (received: string) {
+  function emitValue(received: string) {
     if (received && cryptoList.includes(received as CryptoCurrency)) {
       setValue(received);
       onChange(received as CryptoCurrency);
@@ -67,7 +67,7 @@ export function InputSearchCrypto ({
 
   const cryptoOptions = uniq([...cryptoList, ADD_NEW_CUSTOM]);
 
-  function onNewPaymentMethod (method: PaymentMethod) {
+  function onNewPaymentMethod(method: PaymentMethod) {
     ERC20PopupState.close();
     if (_onNewPaymentMethod) {
       _onNewPaymentMethod(method);
@@ -83,8 +83,7 @@ export function InputSearchCrypto ({
             if (reason === 'selectOption') {
               ERC20PopupState.open();
             }
-          }
-          else {
+          } else {
             emitValue(_value as any);
           }
         }}
@@ -111,35 +110,40 @@ export function InputSearchCrypto ({
               </Box>
             );
           }
-          const tokenInfo = getTokenAndChainInfoFromPayments({ methods: paymentMethods, chainId: 1, symbolOrAddress: option });
+          const tokenInfo = getTokenAndChainInfoFromPayments({
+            methods: paymentMethods,
+            chainId: 1,
+            symbolOrAddress: option
+          });
 
           return (
-            <Box component='li' sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }} {...props}>
+            <Box
+              component='li'
+              sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }}
+              {...props}
+            >
               <Box display='inline-block' width={20}>
                 <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
               </Box>
-              <Box component='span'>
-                {tokenInfo.tokenSymbol}
-              </Box>
-              <Box component='span'>
-                {tokenInfo.tokenName}
-              </Box>
+              <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+              <Box component='span'>{tokenInfo.tokenName}</Box>
             </Box>
           );
         }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-          />
-        )}
+        renderInput={(params) => <TextField {...params} />}
         disabled={disabled}
         readOnly={readOnly}
       />
 
-      <Modal title='Add a custom ERC20 token' hideBackdrop={hideBackdrop} open={ERC20PopupState.isOpen} onClose={ERC20PopupState.close} size='500px'>
+      <Modal
+        title='Add a custom ERC20 token'
+        hideBackdrop={hideBackdrop}
+        open={ERC20PopupState.isOpen}
+        onClose={ERC20PopupState.close}
+        size='500px'
+      >
         <CustomERCTokenForm defaultChainId={chainId} onSubmit={onNewPaymentMethod} />
       </Modal>
     </>
   );
 }
-

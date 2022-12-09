@@ -15,9 +15,7 @@ beforeAll(async () => {
 });
 
 describe('removeSpaceOperations', () => {
-
   it('should remove the target operation from the stored operations for that group', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -35,21 +33,20 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    const spacePermission = await prisma.spacePermission.findUnique({
+    const spacePermission = (await prisma.spacePermission.findUnique({
       where: {
         userId_forSpaceId: {
           forSpaceId: space.id,
           userId: extraUser.id
         }
       }
-    }) as SpacePermission;
+    })) as SpacePermission;
 
     expect(spacePermission.operations.length).toBe(1);
     expect(spacePermission.operations[0]).toBe('createBounty');
   });
 
   it('should delete a permission if it will have 0 operations after the operation is removed', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -77,11 +74,9 @@ describe('removeSpaceOperations', () => {
     });
 
     expect(inexistentPermission).toBeNull();
-
   });
 
   it('should remove a permission from actions group can perform', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -103,7 +98,6 @@ describe('removeSpaceOperations', () => {
   });
 
   it('should return the current set of operations if no change happened', async () => {
-
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -127,10 +121,8 @@ describe('removeSpaceOperations', () => {
       userId: extraUser.id
     });
 
-    (Object.keys(initialResult) as SpaceOperation[]).forEach(op => {
+    (Object.keys(initialResult) as SpaceOperation[]).forEach((op) => {
       expect(duplicateDeleteResult[op]).toEqual(initialResult[op]);
     });
-
   });
-
 });

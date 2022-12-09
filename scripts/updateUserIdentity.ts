@@ -1,9 +1,9 @@
+import { IdentityType } from '@prisma/client';
 import getENSName from 'lib/blockchain/getENSName';
-import { IdentityType, IDENTITY_TYPES } from 'models';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import { TelegramAccount } from 'pages/api/telegram/connect';
-import { shortenHex } from 'lib/utilities/strings';
 import log from 'lib/log';
+import { shortenHex } from 'lib/utilities/strings';
+import { TelegramAccount } from 'pages/api/telegram/connect';
 import { prisma } from '../db';
 
 (async () => {
@@ -56,14 +56,14 @@ import { prisma } from '../db';
             id: user.id
           },
           data: {
-            identityType: IDENTITY_TYPES[0],
+            identityType: 'Wallet',
             // @ts-ignore
             username: user.ensName || shortenHex(user.wallets[0].address)
           }
         });
       }
 
-      let identityType: IdentityType = IDENTITY_TYPES[0];
+      let identityType: IdentityType = 'Wallet';
       const discordAccount = user.discordUser ? user.discordUser.account as Partial<DiscordAccount> : null;
       const telegramAccount = user.telegramUser ? user.telegramUser.account as Partial<TelegramAccount> : null;
 
@@ -75,11 +75,11 @@ import { prisma } from '../db';
                             && telegramAccount.username === user.username
                             && user.telegramUser
                             && user.telegramUser.createdAt > user.discordUser.createdAt
-          ? IDENTITY_TYPES[2] : IDENTITY_TYPES[1];
+          ? 'Telegram' : 'Discord';
       }
       else if (telegramAccount
         && (telegramAccount.username === user.username || user.username === `${telegramAccount.first_name} ${telegramAccount.last_name}`)) {
-        identityType = IDENTITY_TYPES[2];
+        identityType = 'Telegram';
       }
       if (identityType === 'Discord') {
         identityTypes.discord += 1;

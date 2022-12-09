@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { User } from '@prisma/client';
 
 import Avatar from 'components/common/Avatar';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import type { User } from 'models';
 
 export const StyledRow = styled(Box)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -32,8 +32,8 @@ interface Props {
   onRemove: (id: string) => void;
 }
 
-export default function MemberRow ({ member, isEditable, onRemove }: Props) {
-  function removeMember () {
+export default function MemberRow({ member, isEditable, onRemove }: Props) {
+  function removeMember() {
     onRemove(member.id);
   }
 

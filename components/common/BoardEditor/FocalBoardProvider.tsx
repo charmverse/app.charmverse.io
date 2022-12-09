@@ -12,7 +12,7 @@ import { useAppDispatch } from './focalboard/src/store/hooks';
 import { initialLoad } from './focalboard/src/store/initialLoad';
 
 // load focalboard data when a workspace is selected
-function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
+function FocalBoardWatcher({ children }: { children: JSX.Element }) {
   const dispatch = useAppDispatch();
   const space = useCurrentSpace();
 
@@ -26,7 +26,7 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   }, [space?.id]);
 
   const handleBlockUpdates = useCallback((value: WebSocketPayload<'blocks_updated' | 'blocks_created'>) => {
-    publishIncrementalUpdate(value instanceof Array ? value : [value] as any);
+    publishIncrementalUpdate(value instanceof Array ? value : ([value] as any));
   }, []);
 
   const handleBlockDeletes = useCallback((value: WebSocketPayload<'blocks_deleted'>) => {
@@ -48,13 +48,10 @@ function FocalBoardWatcher ({ children }: { children: JSX.Element }) {
   return children;
 }
 
-export default function FocalBoardProvider ({ children }: { children: JSX.Element }) {
-
+export default function FocalBoardProvider({ children }: { children: JSX.Element }) {
   return (
     <ReduxProvider store={store}>
-      <FocalBoardWatcher>
-        {children}
-      </FocalBoardWatcher>
+      <FocalBoardWatcher>{children}</FocalBoardWatcher>
     </ReduxProvider>
   );
 }

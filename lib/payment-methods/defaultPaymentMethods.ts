@@ -3,7 +3,10 @@ import type { PaymentMethod, Space } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' | 'tokenLogo' | 'tokenSymbol' | 'tokenName' | 'tokenDecimals'> [] = [
+const defaultPaymentMethods: Pick<
+  PaymentMethod,
+  'chainId' | 'contractAddress' | 'tokenLogo' | 'tokenSymbol' | 'tokenName' | 'tokenDecimals'
+>[] = [
   // ethereum
   {
     chainId: 1,
@@ -39,10 +42,17 @@ const defaultPaymentMethods: Pick<PaymentMethod, 'chainId' | 'contractAddress' |
  *
  * @createdBy Defaults to the space creator
  */
-export async function setupDefaultPaymentMethods ({ createdBy, spaceIdOrSpace }:
-    { createdBy?: string, spaceIdOrSpace: string | Pick<Space, 'id' | 'createdBy'> }): Promise<PaymentMethod[]> {
-
-  const space: Pick<Space, 'id' | 'createdBy'> | null = typeof spaceIdOrSpace === 'string' ? await prisma.space.findUnique({ where: { id: spaceIdOrSpace } }) : spaceIdOrSpace;
+export async function setupDefaultPaymentMethods({
+  createdBy,
+  spaceIdOrSpace
+}: {
+  createdBy?: string;
+  spaceIdOrSpace: string | Pick<Space, 'id' | 'createdBy'>;
+}): Promise<PaymentMethod[]> {
+  const space: Pick<Space, 'id' | 'createdBy'> | null =
+    typeof spaceIdOrSpace === 'string'
+      ? await prisma.space.findUnique({ where: { id: spaceIdOrSpace } })
+      : spaceIdOrSpace;
 
   if (!space) {
     throw new DataNotFoundError(`Space with id ${spaceIdOrSpace} not found`);
@@ -51,7 +61,7 @@ export async function setupDefaultPaymentMethods ({ createdBy, spaceIdOrSpace }:
   const creatorId = createdBy ?? space.createdBy;
 
   const paymentMethodList = await prisma.$transaction(
-    defaultPaymentMethods.map(paymentMethod => {
+    defaultPaymentMethods.map((paymentMethod) => {
       return prisma.paymentMethod.upsert({
         where: {
           spaceId_chainId_contractAddress: {

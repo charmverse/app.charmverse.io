@@ -15,9 +15,15 @@ const handler = nc({
   onNoMatch
 });
 
-const createDiscussionTask = (
-  { pageTitle, spaceName, mentionText }: { spaceName: string, mentionText: string, pageTitle: string }
-): DiscussionTask => {
+const createDiscussionTask = ({
+  pageTitle,
+  spaceName,
+  mentionText
+}: {
+  spaceName: string;
+  mentionText: string;
+  pageTitle: string;
+}): DiscussionTask => {
   return {
     mentionId: v4(),
     createdAt: new Date().toISOString(),
@@ -50,7 +56,17 @@ const createDiscussionTask = (
   };
 };
 
-const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: { voteTitle: string, deadline: VoteTask['deadline'], spaceName: string, pageTitle: string }): VoteTask => {
+const createVoteTasks = ({
+  voteTitle,
+  deadline,
+  pageTitle,
+  spaceName
+}: {
+  voteTitle: string;
+  deadline: VoteTask['deadline'];
+  spaceName: string;
+  pageTitle: string;
+}): VoteTask => {
   return {
     deadline,
     id: v4(),
@@ -68,7 +84,12 @@ const createVoteTasks = ({ voteTitle, deadline, pageTitle, spaceName }: { voteTi
   } as any;
 };
 
-const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId'>): ProposalTask => {
+const createProposalTasks = ({
+  action,
+  pageTitle,
+  spaceName,
+  status
+}: Omit<ProposalTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId'>): ProposalTask => {
   return {
     id: v4(),
     action,
@@ -81,7 +102,12 @@ const createProposalTasks = ({ action, pageTitle, spaceName, status }: Omit<Prop
   };
 };
 
-const createBountyTask = ({ action, pageTitle, spaceName, status }: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
+const createBountyTask = ({
+  action,
+  pageTitle,
+  spaceName,
+  status
+}: Omit<BountyTask, 'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate'>): BountyTask => {
   return {
     id: v4(),
     action,
@@ -138,7 +164,7 @@ const templates = {
           spaceName: 'CharmVerse'
         }),
         createDiscussionTask({
-          mentionText: 'Let\'s have a meeting @ghostpepper',
+          mentionText: "Let's have a meeting @ghostpepper",
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
@@ -155,25 +181,26 @@ const templates = {
       ],
       voteTasks: [
         createVoteTasks({
-          deadline: new Date(Date.now() + (12 * 60 * 60 * 1000)),
+          deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
           pageTitle: 'This is a really really long vote title',
           spaceName: 'This is a really really long space name',
-          voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
+          voteTitle:
+            'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
         createVoteTasks({
-          deadline: new Date(Date.now() + (26 * 60 * 60 * 1000)),
+          deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
         createVoteTasks({
-          deadline: new Date(Date.now() + (32 * 60 * 60 * 1000)),
+          deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse',
-          voteTitle: 'Let\'s vote'
+          voteTitle: "Let's vote"
         }),
         createVoteTasks({
-          deadline: new Date(Date.now() + (52 * 60 * 60 * 1000)),
+          deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
@@ -181,52 +208,60 @@ const templates = {
       ],
       gnosisSafeTasks: [
         {
-          tasks: [{
-            nonce: 3,
-            transactions: [{
-              id: '123',
-              actions: [],
-              date: new Date().toISOString(),
-              confirmations: [],
-              isExecuted: false,
-              description: 'Send .02 ETH',
-              gnosisUrl: 'https://gnosis.com',
-              myAction: 'Sign',
-              myActionUrl: 'https://gnosis.com',
+          tasks: [
+            {
               nonce: 3,
-              safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-              safeName: 'My Personal Safe',
-              threshold: 2,
-              snoozedUsers: [],
-              safeChainId: 1
-            }]
-          }],
+              transactions: [
+                {
+                  id: '123',
+                  actions: [],
+                  date: new Date().toISOString(),
+                  confirmations: [],
+                  isExecuted: false,
+                  description: 'Send .02 ETH',
+                  gnosisUrl: 'https://gnosis.com',
+                  myAction: 'Sign',
+                  myActionUrl: 'https://gnosis.com',
+                  nonce: 3,
+                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+                  safeName: 'My Personal Safe',
+                  threshold: 2,
+                  snoozedUsers: [],
+                  safeChainId: 1
+                }
+              ]
+            }
+          ],
           safeAddress: '0x123',
           safeName: 'My Personal Safe',
           safeUrl: 'https://app.charmverse.io',
           taskId: '1'
         },
         {
-          tasks: [{
-            nonce: 7,
-            transactions: [{
-              id: '123',
-              actions: [],
-              date: new Date().toISOString(),
-              confirmations: [],
-              isExecuted: false,
-              description: 'Send 10 ETH',
-              gnosisUrl: 'https://gnosis.com',
-              myAction: 'Sign',
-              myActionUrl: 'https://gnosis.com',
+          tasks: [
+            {
               nonce: 7,
-              safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-              safeName: 'Work Safe',
-              threshold: 2,
-              snoozedUsers: [],
-              safeChainId: 1
-            }]
-          }],
+              transactions: [
+                {
+                  id: '123',
+                  actions: [],
+                  date: new Date().toISOString(),
+                  confirmations: [],
+                  isExecuted: false,
+                  description: 'Send 10 ETH',
+                  gnosisUrl: 'https://gnosis.com',
+                  myAction: 'Sign',
+                  myActionUrl: 'https://gnosis.com',
+                  nonce: 7,
+                  safeAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+                  safeName: 'Work Safe',
+                  threshold: 2,
+                  snoozedUsers: [],
+                  safeChainId: 1
+                }
+              ]
+            }
+          ],
           safeAddress: '0x456',
           safeName: 'Work Safe',
           safeUrl: 'https://app.charmverse.io',
@@ -238,7 +273,6 @@ const templates = {
 };
 
 handler.get(async (req, res) => {
-
   const renderedEmails = Object.entries(templates).map(([description, output]) => ({
     ...output(),
     description
@@ -251,7 +285,9 @@ handler.get(async (req, res) => {
         <hr style="border-color: #eee" />
       </div>
     </h1>
-    ${renderedEmails.map(({ description, subject, html }) => `
+    ${renderedEmails
+      .map(
+        ({ description, subject, html }) => `
       <div style="margin: 20px">
         <div style="max-width: 1024px; margin: 0 auto">
           <h2>
@@ -262,16 +298,17 @@ handler.get(async (req, res) => {
           </h3>
         </div>
       </div>
-      <div style="margin-bottom: 20px">${html}</div>`).join('<hr>')}
+      <div style="margin-bottom: 20px">${html}</div>`
+      )
+      .join('<hr>')}
   `;
 
   const wrapped = wrapHtml(tpl);
 
   res.status(200).send(wrapped);
-
 });
 
-function wrapHtml (html: string) {
+function wrapHtml(html: string) {
   return `<html><head><meta charset="UTF-8"></head><body style="font-size: 13px; font-family: arial,sans-serif">${html}</body></html>`;
 }
 

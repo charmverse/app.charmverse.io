@@ -39,18 +39,10 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   join_date: <CalendarMonthIcon fontSize='small' />
 };
 
-export function MemberPropertyItem ({
-  type,
-  name
-}: {
-  type: MemberPropertyType;
-  name?: string;
-}) {
+export function MemberPropertyItem({ type, name }: { type: MemberPropertyType; name?: string }) {
   return (
     <>
-      <ListItemIcon>
-        {MemberPropertyIcons[type]}
-      </ListItemIcon>
+      <ListItemIcon>{MemberPropertyIcons[type]}</ListItemIcon>
       <ListItemText
         sx={{
           '& span': {

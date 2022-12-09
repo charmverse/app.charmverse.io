@@ -1,15 +1,14 @@
-import type { Node, NodeSpec } from 'prosemirror-model';
+import type { DOMOutputSpec, Mark, Node, NodeSpec } from 'prosemirror-model';
 import { Schema } from 'prosemirror-model';
 
-export function parseDiff (str: string) {
+export function parseDiff(str: string) {
   if (!str) {
     return [];
   }
   let tracks;
   try {
     tracks = JSON.parse(str);
-  }
-  catch (error) {
+  } catch (error) {
     return [];
   }
   if (!Array.isArray(tracks)) {
@@ -26,41 +25,35 @@ export const createDiffSchema = function (docSchema: Schema) {
       return;
     }
     const attrs = nodeType.attrs;
-    specNodes = specNodes.update(
-      nodeTypeName,
-      {
-
-        ...nodeType,
-        attrs: { diffdata: { default: [] }, ...attrs },
-        toDOM (node: Node) {
-          if (nodeType.toDOM) {
-            let dom = nodeType.toDOM(node) as unknown as any[];
-            if (node.attrs.diffdata && node.attrs.diffdata.length) {
-              if (dom[1].class) {
-                dom[1].class = `${dom[1].class} ${node.attrs.diffdata[0].type}`;
-              }
-              else {
-                dom[1].class = node.attrs.diffdata[0].type;
-              }
-              dom = [
-                dom[0],
-                { 'data-diffdata': JSON.stringify(node.attrs.diffdata), ...dom[1] },
-                dom[2]
-              ];
+    specNodes = specNodes.update(nodeTypeName, {
+      ...nodeType,
+      attrs: { diffdata: { default: [] }, ...attrs },
+      toDOM(node: Node) {
+        if (nodeType.toDOM) {
+          let dom = nodeType.toDOM(node) as unknown as any[];
+          if (node.attrs.diffdata && node.attrs.diffdata.length) {
+            if (dom[1].class) {
+              dom[1].class = `${dom[1].class} ${node.attrs.diffdata[0].type}`;
+            } else {
+              dom[1].class = node.attrs.diffdata[0].type;
             }
-            return dom;
+            dom = [dom[0], { 'data-diffdata': JSON.stringify(node.attrs.diffdata), ...dom[1] }, dom[2]];
           }
-          return null;
-        },
-        parseDOM: nodeType.parseDOM?.map(tag => ({
-          tag: tag.tag,
-          getAttrs (dom: HTMLElement) {
-            const _attrs = tag.getAttrs?.(dom);
-            return { diffdata: parseDiff(dom.dataset.diffdata || ''), ..._attrs };
+          return dom as unknown as DOMOutputSpec;
+        }
+        return 'span';
+      },
+      parseDOM: nodeType.parseDOM?.map((tag) => ({
+        tag: tag.tag,
+        getAttrs(dom: HTMLElement | string) {
+          if (typeof dom === 'string') {
+            return {};
           }
-        }))
-      }
-    );
+          const _attrs = tag.getAttrs?.(dom);
+          return { diffdata: parseDiff(dom.dataset.diffdata || ''), ..._attrs };
+        }
+      }))
+    });
   });
 
   const diffdata = {
@@ -77,13 +70,18 @@ export const createDiffSchema = function (docSchema: Schema) {
       to: {
         default: ''
       },
-      markOnly: false
+      markOnly: {
+        default: false
+      }
     },
     inclusive: false,
     parseDOM: [
       {
         tag: 'span.diff',
-        getAttrs (dom: HTMLElement) {
+        getAttrs(dom: HTMLElement | string) {
+          if (typeof dom === 'string') {
+            return {};
+          }
           return {
             diff: dom.dataset.diff,
             steps: dom.dataset.steps
@@ -91,15 +89,18 @@ export const createDiffSchema = function (docSchema: Schema) {
         }
       }
     ],
-    toDOM (node: Node) {
-      return ['span', {
-        class: `diff ${node.attrs.diff}`,
-        'data-diff': node.attrs.diff,
-        'data-steps': node.attrs.steps,
-        'data-from': node.attrs.from,
-        'data-to': node.attrs.to,
-        'data-markOnly': node.attrs.markOnly
-      }];
+    toDOM(node: Mark): DOMOutputSpec {
+      return [
+        'span',
+        {
+          class: `diff ${node.attrs.diff}`,
+          'data-diff': node.attrs.diff,
+          'data-steps': node.attrs.steps,
+          'data-from': node.attrs.from,
+          'data-to': node.attrs.to,
+          'data-markOnly': node.attrs.markOnly
+        }
+      ];
     }
   };
 
@@ -112,15 +113,17 @@ export const createDiffSchema = function (docSchema: Schema) {
   // Since editable false PM Editor treats anchor tag as a normal a tag
   // and redirects
   const linkMarkSpec = spec.marks.get('link');
-  spec.marks = spec.marks.update(
-    'link',
-    { ...linkMarkSpec,
-      toDOM: (node: Node) => {
-        const dom = linkMarkSpec.toDOM(node);
+  spec.marks = spec.marks.update('link', {
+    ...linkMarkSpec,
+    toDOM: (node: Mark) => {
+      const dom = linkMarkSpec?.toDOM?.(node, true);
+      if (dom instanceof Array) {
+        // @ts-ignore readonly prop
         dom[0] = 'span';
-        return dom;
-      } }
-  );
+      }
+      return dom || 'span';
+    }
+  });
 
   return new Schema(spec);
 };

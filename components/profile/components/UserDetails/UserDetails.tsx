@@ -5,6 +5,7 @@ import type { SxProps } from '@mui/material';
 import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
+import type { IdentityType } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -23,8 +24,7 @@ import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortenHex } from 'lib/utilities/strings';
-import type { IdentityType, LoggedInUser } from 'models';
-import { IDENTITY_TYPES } from 'models';
+import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -55,13 +55,14 @@ const StyledStack = styled(Stack)`
   ${hoverIconsStyle()}
 `;
 
-function EditIconContainer ({ children, readOnly, onClick, ...props }: { children: ReactNode, readOnly?: boolean, onClick: IconButtonProps['onClick'] } & IconButtonProps) {
+function EditIconContainer({
+  children,
+  readOnly,
+  onClick,
+  ...props
+}: { children: ReactNode; readOnly?: boolean; onClick: IconButtonProps['onClick'] } & IconButtonProps) {
   return (
-    <StyledStack
-      direction='row'
-      spacing={1}
-      alignItems='center'
-    >
+    <StyledStack direction='row' spacing={1} alignItems='center'>
       {children}
       {!readOnly && (
         <IconButton onClick={onClick} {...props} className='icons'>
@@ -72,7 +73,7 @@ function EditIconContainer ({ children, readOnly, onClick, ...props }: { childre
   );
 }
 
-function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
+function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
   const { account } = useWeb3AuthSig();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
@@ -96,7 +97,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
     setTimeout(() => setIsPersonalLinkCopied(false), 1000);
   };
 
-  const socialDetails: Social = userDetails?.social as Social ?? {
+  const socialDetails: Social = (userDetails?.social as Social) ?? {
     twitterURL: '',
     githubURL: '',
     discordUsername: '',
@@ -111,41 +112,50 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
     const types: IntegrationModel[] = [];
     if (user?.wallets.length !== 0) {
       types.push({
-        type: IDENTITY_TYPES[0],
+        type: 'Wallet',
         username: ENSName || user.wallets[0].address,
-        isInUse: user.identityType === IDENTITY_TYPES[0],
-        icon: getIdentityIcon(IDENTITY_TYPES[0])
+        isInUse: user.identityType === 'Wallet',
+        icon: getIdentityIcon('Wallet')
       });
     }
 
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
-        type: IDENTITY_TYPES[1],
+        type: 'Discord',
         username: discordAccount.username || '',
-        isInUse: user.identityType === IDENTITY_TYPES[1],
-        icon: getIdentityIcon(IDENTITY_TYPES[1])
+        isInUse: user.identityType === 'Discord',
+        icon: getIdentityIcon('Discord')
       });
     }
 
     if (user?.telegramUser && user.telegramUser.account) {
       const telegramAccount = user.telegramUser.account as Partial<TelegramAccount>;
       types.push({
-        type: IDENTITY_TYPES[2],
+        type: 'Telegram',
         username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
-        isInUse: user.identityType === IDENTITY_TYPES[2],
-        icon: getIdentityIcon(IDENTITY_TYPES[2])
+        isInUse: user.identityType === 'Telegram',
+        icon: getIdentityIcon('Telegram')
       });
     }
 
     if (user) {
       types.push({
-        type: IDENTITY_TYPES[3],
-        username: user.identityType === IDENTITY_TYPES[3] && user.username ? user.username : '',
-        isInUse: user.identityType === IDENTITY_TYPES[3],
-        icon: getIdentityIcon(IDENTITY_TYPES[3])
+        type: 'RandomName',
+        username: user.identityType === 'RandomName' && user.username ? user.username : '',
+        isInUse: user.identityType === 'RandomName',
+        icon: getIdentityIcon('RandomName')
       });
     }
+
+    user.unstoppableDomains?.forEach(({ domain }) => {
+      types.push({
+        type: 'UnstoppableDomain',
+        username: domain,
+        isInUse: user.identityType === 'UnstoppableDomain' && user.username === domain,
+        icon: getIdentityIcon('UnstoppableDomain')
+      });
+    });
 
     return types;
   }, [user]);
@@ -168,11 +178,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
         />
         <Grid container direction='column' spacing={0.5}>
           <Grid item>
-            <EditIconContainer
-              data-testid='edit-identity'
-              readOnly={readOnly}
-              onClick={identityModalState.open}
-            >
+            <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
               <Typography variant='h1'>{user?.username}</Typography>
             </EditIconContainer>
@@ -181,13 +187,12 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             <Grid item>
               <EditIconContainer readOnly={readOnly} onClick={userPathModalState.open}>
                 <Typography>
-                  {hostname}/u/<Link external href={userLink} target='_blank'>{userPath}</Link>
+                  {hostname}/u/
+                  <Link external href={userLink} target='_blank'>
+                    {userPath}
+                  </Link>
                 </Typography>
-                <Tooltip
-                  placement='top'
-                  title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'}
-                  arrow
-                >
+                <Tooltip placement='top' title={isPersonalLinkCopied ? 'Copied' : 'Click to copy link'} arrow>
                   <Box sx={{ display: 'grid' }}>
                     <CopyToClipboard text={userLink} onCopy={onLinkCopy}>
                       <IconButton>
@@ -202,17 +207,13 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
           <Grid item mt={1} height={40}>
             <EditIconContainer onClick={socialModalState.open} readOnly={readOnly} data-testid='edit-social'>
               <SocialIcons social={socialDetails} />
-              {!readOnly && (
-                <StyledDivider orientation='vertical' flexItem />
-              )}
+              {!readOnly && <StyledDivider orientation='vertical' flexItem />}
             </EditIconContainer>
           </Grid>
           <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
             <EditIconContainer readOnly={readOnly} onClick={descriptionModalState.open} data-testid='edit-description'>
               <span>
-                {
-                  userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')
-                }
+                {userDetails?.description || (readOnly ? '' : 'Tell the world a bit more about yourself ...')}
               </span>
             </EditIconContainer>
           </Grid>
@@ -220,7 +221,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             <EditIconContainer readOnly={readOnly} onClick={timezoneModalState.open} data-testid='edit-timezone'>
               <TimezoneDisplay
                 timezone={userDetails?.timezone}
-                defaultValue={(readOnly ? 'N/A' : 'Update your timezone')}
+                defaultValue={readOnly ? 'N/A' : 'Update your timezone'}
               />
             </EditIconContainer>
           </Grid>
@@ -232,11 +233,11 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
             save={(id: string, identityType: IdentityType) => {
-              const username: string = identityType === IDENTITY_TYPES[0] ? (ENSName || shortenHex(id)) : id;
+              const username: string = identityType === 'Wallet' ? ENSName || shortenHex(id) : id;
               handleUserUpdate({ username, identityType });
             }}
             identityTypes={identityTypes}
-            identityType={(user?.identityType || IDENTITY_TYPES[0]) as IdentityType}
+            identityType={(user?.identityType || 'Wallet') as IdentityType}
             username={user?.username || ''}
           />
           <DescriptionModal
@@ -259,7 +260,7 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
                 path
               });
               // @ts-ignore - not sure why types are wrong
-              updateUser(_user => ({ ..._user, path }));
+              updateUser((_user) => ({ ..._user, path }));
               userPathModalState.close();
             }}
             currentValue={user.path}
@@ -276,22 +277,20 @@ function UserDetails ({ readOnly, user, updateUser, sx = {} }: UserDetailsProps)
             }}
             social={socialDetails}
           />
-          {
-            timezoneModalState.isOpen && (
-              <TimezoneModal
-                isOpen={timezoneModalState.isOpen}
-                close={timezoneModalState.close}
-                onSave={async (timezone) => {
-                  await charmClient.updateUserDetails({
-                    timezone
-                  });
-                  mutate();
-                  timezoneModalState.close();
-                }}
-                initialTimezone={userDetails?.timezone}
-              />
-            )
-          }
+          {timezoneModalState.isOpen && (
+            <TimezoneModal
+              isOpen={timezoneModalState.isOpen}
+              close={timezoneModalState.close}
+              onSave={async (timezone) => {
+                await charmClient.updateUserDetails({
+                  timezone
+                });
+                mutate();
+                timezoneModalState.close();
+              }}
+              initialTimezone={userDetails?.timezone}
+            />
+          )}
         </>
       )}
     </>

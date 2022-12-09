@@ -1,4 +1,3 @@
-
 import '@testing-library/jest-dom';
 import { act, render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -47,15 +46,13 @@ describe('components/viewTitle', () => {
   test('should match snapshot', async () => {
     let container;
     await act(async () => {
-      const result = render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={false}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      const result = render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -64,15 +61,13 @@ describe('components/viewTitle', () => {
   test('should match snapshot readonly', async () => {
     let container;
     await act(async () => {
-      const result = render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={true}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      const result = render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={true} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -82,15 +77,13 @@ describe('components/viewTitle', () => {
     board.fields.showDescription = true;
     let container;
     await act(async () => {
-      const result = render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={false}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      const result = render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -103,15 +96,13 @@ describe('components/viewTitle', () => {
     board.fields.showDescription = false;
     let container;
     await act(async () => {
-      const result = render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={false}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      const result = render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -124,15 +115,13 @@ describe('components/viewTitle', () => {
     board.fields.icon = '';
     let container;
     await act(async () => {
-      const result = render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={false}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      const result = render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
@@ -143,15 +132,13 @@ describe('components/viewTitle', () => {
 
   test('change title', async () => {
     await act(async () => {
-      render(wrapIntl(
-        <ReduxProvider store={store}>
-          <ViewTitle
-            board={board}
-            readOnly={false}
-            setPage={() => {}}
-          />
-        </ReduxProvider>
-      ));
+      render(
+        wrapIntl(
+          <ReduxProvider store={store}>
+            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+          </ReduxProvider>
+        )
+      );
     });
     const titleInput = screen.getAllByRole('textbox')[0];
     userEvent.type(titleInput, 'other title');

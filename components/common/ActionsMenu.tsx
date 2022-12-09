@@ -29,7 +29,7 @@ interface ActionsMenuProps {
   children?: ReactNode;
 }
 
-export default function ActionsMenu ({ onClick, children }: ActionsMenuProps) {
+export default function ActionsMenu({ onClick, children }: ActionsMenuProps) {
   return (
     <StyledActionsMenu className='actions-menu' onClick={onClick}>
       <MoreHorizIcon color='secondary' fontSize='small' />

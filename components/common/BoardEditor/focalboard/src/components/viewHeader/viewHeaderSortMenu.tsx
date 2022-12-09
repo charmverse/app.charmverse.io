@@ -14,31 +14,33 @@ import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 
 type Props = {
-    properties: readonly IPropertyTemplate[];
-    activeView: BoardView;
-    orderedCards: Card[];
-}
+  properties: readonly IPropertyTemplate[];
+  activeView: BoardView;
+  orderedCards: Card[];
+};
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const hasSort = activeView.fields.sortOptions?.length > 0;
   const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
 
-  const sortChanged = useCallback((propertyId: string) => {
-    let newSortOptions: ISortOption[] = [];
-    if (activeView.fields.sortOptions && activeView.fields.sortOptions[0] && activeView.fields.sortOptions[0].propertyId === propertyId) {
-      // Already sorting by name, so reverse it
-      newSortOptions = [
-        { propertyId, reversed: !activeView.fields.sortOptions[0].reversed }
-      ];
-    }
-    else {
-      newSortOptions = [
-        { propertyId, reversed: false }
-      ];
-    }
-    mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, newSortOptions);
-  }, [activeView.id, activeView.fields.sortOptions]);
+  const sortChanged = useCallback(
+    (propertyId: string) => {
+      let newSortOptions: ISortOption[] = [];
+      if (
+        activeView.fields.sortOptions &&
+        activeView.fields.sortOptions[0] &&
+        activeView.fields.sortOptions[0].propertyId === propertyId
+      ) {
+        // Already sorting by name, so reverse it
+        newSortOptions = [{ propertyId, reversed: !activeView.fields.sortOptions[0].reversed }];
+      } else {
+        newSortOptions = [{ propertyId, reversed: false }];
+      }
+      mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, newSortOptions);
+    },
+    [activeView.id, activeView.fields.sortOptions]
+  );
 
   const onManualSort = useCallback(() => {
     // This sets the manual card order to the currently displayed order
@@ -56,47 +58,33 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   return (
     <MenuWrapper>
       <Button color={hasSort ? 'primary' : 'secondary'} variant='text' size='small' sx={{ minWidth: 0 }}>
-        <FormattedMessage
-          id='ViewHeader.sort'
-          defaultMessage='Sort'
-        />
+        <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
       </Button>
       <Menu>
-        {(activeView.fields.sortOptions?.length > 0)
-                && (
-                  <>
-                    <Menu.Text
-                      id='manual'
-                      name='Manual'
-                      onClick={onManualSort}
-                    />
+        {activeView.fields.sortOptions?.length > 0 && (
+          <>
+            <Menu.Text id='manual' name='Manual' onClick={onManualSort} />
 
-                    <Menu.Text
-                      id='revert'
-                      name='Revert'
-                      onClick={onRevertSort}
-                    />
+            <Menu.Text id='revert' name='Revert' onClick={onRevertSort} />
 
-                    <Menu.Separator />
-                  </>
-                )}
+            <Menu.Separator />
+          </>
+        )}
 
         {sortDisplayOptions?.map((option) => {
           let rightIcon: JSX.Element | undefined;
           if (activeView.fields.sortOptions?.length > 0) {
             const sortOption = activeView.fields.sortOptions[0];
             if (sortOption.propertyId === option.id) {
-              rightIcon = sortOption.reversed ? <ArrowDownwardOutlinedIcon fontSize='small' /> : <ArrowUpwardOutlinedIcon fontSize='small' />;
+              rightIcon = sortOption.reversed ? (
+                <ArrowDownwardOutlinedIcon fontSize='small' />
+              ) : (
+                <ArrowUpwardOutlinedIcon fontSize='small' />
+              );
             }
           }
           return (
-            <Menu.Text
-              key={option.id}
-              id={option.id}
-              name={option.name}
-              rightIcon={rightIcon}
-              onClick={sortChanged}
-            />
+            <Menu.Text key={option.id} id={option.id} name={option.name} rightIcon={rightIcon} onClick={sortChanged} />
           );
         })}
       </Menu>

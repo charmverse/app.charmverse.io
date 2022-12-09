@@ -10,12 +10,13 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ padding?: string, size: ModalSize }>`
+const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: ${({ size }) => size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size === 'small' ? defaultSize : size};
+  width: ${({ size }) =>
+    size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size === 'small' ? defaultSize : size};
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.spacing(1)};
   box-shadow: ${({ theme }) => theme.shadows[15]};
@@ -37,7 +38,6 @@ const ScrollableModalContainer = styled(ModalContainer)`
 `;
 
 const StyledDialogTitle = styled(MuiDialogTitle)`
-  font-weight: 700;
   padding-left: 0;
   padding-right: 0;
   padding-top: 0;
@@ -57,7 +57,7 @@ const ScrollableContainer = styled.div`
 
 export enum ModalPosition {
   center,
-  top,
+  top
 }
 
 export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onClose' | 'title'> & {
@@ -69,7 +69,14 @@ export type ModalProps = Omit<ComponentProps<typeof MuiModal>, 'children' | 'onC
   onClose: () => void;
 };
 
-export function Modal ({ children, noPadding, position = ModalPosition.center, size = defaultSize, title, ...props }: ModalProps) {
+export function Modal({
+  children,
+  noPadding,
+  position = ModalPosition.center,
+  size = defaultSize,
+  title,
+  ...props
+}: ModalProps) {
   return (
     <MuiModal {...props}>
       <div>
@@ -86,12 +93,16 @@ export function Modal ({ children, noPadding, position = ModalPosition.center, s
   );
 }
 
-export function ScrollableModal ({ children, size = defaultSize, title, ...props }: ModalProps) {
+export function ScrollableModal({ children, size = defaultSize, title, ...props }: ModalProps) {
   return (
     <MuiModal {...props}>
       <div>
         <ScrollableModalContainer size={size}>
-          {title && <Box px={4}><DialogTitle>{title}</DialogTitle></Box>}
+          {title && (
+            <Box px={4}>
+              <DialogTitle>{title}</DialogTitle>
+            </Box>
+          )}
           <ScrollableContainer>{children}</ScrollableContainer>
         </ScrollableModalContainer>
       </div>
@@ -99,7 +110,7 @@ export function ScrollableModal ({ children, size = defaultSize, title, ...props
   );
 }
 
-export function DialogTitle ({ children, onClose, sx }: { children: ReactNode, onClose?: () => void, sx?: any }) {
+export function DialogTitle({ children, onClose, sx }: { children: ReactNode; onClose?: () => void; sx?: any }) {
   return (
     <StyledDialogTitle sx={sx}>
       {children}

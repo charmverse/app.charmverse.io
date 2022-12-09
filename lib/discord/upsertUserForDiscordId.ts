@@ -1,7 +1,6 @@
 import { prisma } from 'db';
-import { IDENTITY_TYPES } from 'models';
 
-export async function upsertUserForDiscordId (discordId: string) {
+export async function upsertUserForDiscordId(discordId: string) {
   const existingDiscordUser = await prisma.discordUser.findFirst({
     where: {
       discordId
@@ -19,7 +18,7 @@ export async function upsertUserForDiscordId (discordId: string) {
       discordId,
       user: {
         create: {
-          identityType: IDENTITY_TYPES[1],
+          identityType: 'Discord',
           username: discordId,
           path: null
         }

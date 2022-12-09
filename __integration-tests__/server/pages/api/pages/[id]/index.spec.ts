@@ -13,9 +13,7 @@ const updateContent = {
 };
 
 describe('PUT /api/pages/{id} - update page', () => {
-
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-
     const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const template = await createProposalTemplate({
@@ -25,15 +23,12 @@ describe('PUT /api/pages/{id} - update page', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const body = (await request(baseUrl)
-      .put(`/api/pages/${template.id}`)
-      .set('Cookie', adminCookie)
-      .send(updateContent)
-      .expect(200)).body as IPageWithPermissions;
+    const body = (
+      await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(200)
+    ).body as IPageWithPermissions;
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-
     const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const template = await createProposalTemplate({
@@ -43,11 +38,6 @@ describe('PUT /api/pages/{id} - update page', () => {
 
     const adminCookie = await loginUser(nonAdminUser.id);
 
-    await request(baseUrl)
-      .put(`/api/pages/${template.id}`)
-      .set('Cookie', adminCookie)
-      .send(updateContent)
-      .expect(401);
+    await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(401);
   });
-
 });

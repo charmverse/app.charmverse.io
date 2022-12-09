@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 
-export async function updateInviteLinkRoles (roleIds: string[], inviteLinkId: string) {
+export async function updateInviteLinkRoles(roleIds: string[], inviteLinkId: string) {
   const roleIdsSet = new Set(roleIds);
 
   const inviteLinkRoles = await prisma.inviteLinkToRole.findMany({
@@ -12,13 +12,15 @@ export async function updateInviteLinkRoles (roleIds: string[], inviteLinkId: st
     }
   });
 
-  const inviteLinkRoleIds = new Set(inviteLinkRoles.map(role => role.roleId));
-  const inviteLinkRoleIdsToAdd = roleIds.filter(roleId => !inviteLinkRoleIds.has(roleId));
-  const inviteLinkRoleIdsToRemove = Array.from(inviteLinkRoleIds).filter(inviteLinkRoleId => !roleIdsSet.has(inviteLinkRoleId));
+  const inviteLinkRoleIds = new Set(inviteLinkRoles.map((role) => role.roleId));
+  const inviteLinkRoleIdsToAdd = roleIds.filter((roleId) => !inviteLinkRoleIds.has(roleId));
+  const inviteLinkRoleIdsToRemove = Array.from(inviteLinkRoleIds).filter(
+    (inviteLinkRoleId) => !roleIdsSet.has(inviteLinkRoleId)
+  );
 
   if (inviteLinkRoleIdsToAdd.length !== 0) {
     await prisma.inviteLinkToRole.createMany({
-      data: inviteLinkRoleIdsToAdd.map(inviteLinkRoleIdToAdd => ({
+      data: inviteLinkRoleIdsToAdd.map((inviteLinkRoleIdToAdd) => ({
         roleId: inviteLinkRoleIdToAdd,
         inviteLinkId
       }))

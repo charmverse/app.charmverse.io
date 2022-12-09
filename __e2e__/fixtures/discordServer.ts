@@ -11,14 +11,13 @@ import { createServer } from '../utils/mockServer';
 export type DiscordServerDetails = {
   discordUserId: string;
   host: string;
-}
+};
 
 // kind of hacky way to extract the interface for fixture
 type DiscordServer = Fixtures<{ discordServer: DiscordServerDetails }>['discordServer'];
 
 // eslint-disable-next-line no-empty-pattern
 export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
-
   const discordUserId = uuid();
 
   // Start the server.
@@ -29,7 +28,7 @@ export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
     ctx.body = { access_token: '123' };
   });
 
-  router.get('/users/@me', ctx => {
+  router.get('/users/@me', (ctx) => {
     ctx.body = {
       id: discordUserId,
       username: 'disc0rd_user'
@@ -45,11 +44,11 @@ export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
   });
 
   // Cleanup.
-  await new Promise(done => {
+  await new Promise((done) => {
     server.close(done);
   });
 };
 
-function getServerHost (server: Server) {
+function getServerHost(server: Server) {
   return `http://localhost:${(server.address() as AddressInfo).port}`;
 }

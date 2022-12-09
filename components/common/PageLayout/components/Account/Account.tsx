@@ -1,4 +1,3 @@
-
 import styled from '@emotion/styled';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -39,7 +38,8 @@ const StyledButtonGroup = styled(ButtonGroup)`
     background-color: ${({ theme }) => theme.palette.action.selected};
     color: ${({ theme }) => theme.palette.text.primary};
     &:hover {
-      background-color: ${({ theme }) => alpha(theme.palette.action.selected, theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity)};
+      background-color: ${({ theme }) =>
+        alpha(theme.palette.action.selected, theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity)};
     }
     border-radius: 10px;
     border-width: 0;
@@ -50,7 +50,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-function Account (): JSX.Element {
+function Account(): JSX.Element {
   const { error, account, chainId } = useWeb3React();
 
   const { openNetworkModal } = useContext(Web3Connection);
@@ -95,7 +95,7 @@ function Account (): JSX.Element {
     );
   }
 
-  const isConnectedWithWallet = (account && chainId);
+  const isConnectedWithWallet = account && chainId;
   const chain = chainId ? getChainById(chainId) : null;
 
   return (
@@ -112,10 +112,14 @@ function Account (): JSX.Element {
         )}
         <AccountButton
           href='/profile'
-          sx={isConnectedWithWallet ? ({
-            borderTopLeftRadius: '0 !important',
-            borderBottomLeftRadius: '0 !important'
-          }) : {}}
+          sx={
+            isConnectedWithWallet
+              ? {
+                  borderTopLeftRadius: '0 !important',
+                  borderBottomLeftRadius: '0 !important'
+                }
+              : {}
+          }
           endIcon={<Avatar avatar={user?.avatar} name={user?.username || ''} isNft={hasNftAvatar(user)} size='small' />}
         >
           {user?.username}

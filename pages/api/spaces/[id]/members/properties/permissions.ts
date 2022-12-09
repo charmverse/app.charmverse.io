@@ -14,7 +14,10 @@ handler
   .post(createMemberPropertyPermissionHandler)
   .delete(deleteMemberPropertyPermissionHandler);
 
-async function createMemberPropertyPermissionHandler (req: NextApiRequest, res: NextApiResponse<MemberPropertyPermissionWithRole>) {
+async function createMemberPropertyPermissionHandler(
+  req: NextApiRequest,
+  res: NextApiResponse<MemberPropertyPermissionWithRole>
+) {
   const permissionData = req.body as CreateMemberPropertyPermissionInput;
 
   const permission = await createMemberPropertyPermission(permissionData);
@@ -22,7 +25,7 @@ async function createMemberPropertyPermissionHandler (req: NextApiRequest, res: 
   return res.status(201).json(permission);
 }
 
-async function deleteMemberPropertyPermissionHandler (req: NextApiRequest, res: NextApiResponse) {
+async function deleteMemberPropertyPermissionHandler(req: NextApiRequest, res: NextApiResponse) {
   const { permissionId } = req.body as { permissionId: string };
 
   await deleteMemberPropertyPermission(permissionId);

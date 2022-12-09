@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,17 +13,15 @@ handler
   .post(provisionToken)
   .delete(invalidateToken);
 
-async function provisionToken (req: NextApiRequest, res: NextApiResponse) {
-
+async function provisionToken(req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.body;
 
   const spaceToken = await provisionApiKey(spaceId);
 
   return res.status(200).json(spaceToken);
-
 }
 
-async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {
+async function invalidateToken(req: NextApiRequest, res: NextApiResponse) {
   const { spaceId } = req.body;
   await prisma.spaceApiToken.delete({
     where: {
@@ -35,7 +32,6 @@ async function invalidateToken (req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).send({
     success: true
   });
-
 }
 
 export default handler;

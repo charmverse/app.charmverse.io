@@ -1,4 +1,3 @@
-
 import { getGroupsWithOperations } from '../mapping';
 
 describe('getGroupsWithOperations', () => {

@@ -16,7 +16,6 @@ beforeAll(async () => {
 });
 
 describe('getSpacesByName', () => {
-
   it('should return matched spaces using its name', async () => {
     const [result] = await getSpacesByName(space.name);
     expect(result?.id).toBe(space.id);

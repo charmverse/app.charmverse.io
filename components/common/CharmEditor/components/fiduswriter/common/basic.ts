@@ -1,9 +1,8 @@
-
 /**
  * Turn string literals into single line, removing spaces at start of line
  */
 
-export function noSpaceTmp (...values: any) {
+export function noSpaceTmp(...values: any) {
   const tmpStrings = Array.from(values.shift());
 
   let combined = '';
@@ -17,7 +16,7 @@ export function noSpaceTmp (...values: any) {
   }
 
   let out = '';
-  combined.split('\n').forEach(line => {
+  combined.split('\n').forEach((line) => {
     out += line.replace(/^\s*/g, '');
   });
   return out;

@@ -1,16 +1,15 @@
-
 import type { PageType } from '@prisma/client';
 
 import type { BaseEventWithoutGroup } from './BaseEvent';
 import type { PageEvent } from './PageEvent';
 
-type CustomPageType = 'settings' | 'proposals_list' | 'bounties_list' | 'nexus' | 'profile' | 'integrations'
+type CustomPageType = 'settings' | 'proposals_list' | 'bounties_list' | 'nexus' | 'profile' | 'integrations';
 
 type CustomPageViewEvent = BaseEventWithoutGroup & {
   pageId?: string;
   spaceId?: string;
   type: CustomPageType;
-}
+};
 
 type PageTypeEvent = PageEvent & {
   type: PageType;

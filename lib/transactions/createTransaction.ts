@@ -3,7 +3,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { TransactionCreationData } from './interface';
 
-export async function createTransaction ({ applicationId, chainId, transactionId }: TransactionCreationData) {
+export async function createTransaction({ applicationId, chainId, transactionId }: TransactionCreationData) {
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId

@@ -13,7 +13,7 @@ type Props = {
   isEditable?: boolean;
 };
 
-export function SelectOptionItem ({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {
+export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {
   const readOnly = !onChange && !onDelete;
 
   return (
@@ -23,7 +23,12 @@ export function SelectOptionItem ({ option, onChange, onDelete, onToggleOptionEd
 
         {!readOnly && (
           <Box position='absolute' right='5px'>
-            <SelectOptionEdit option={option} onChange={onChange} onDelete={onDelete} onToggleOptionEdit={onToggleOptionEdit} />
+            <SelectOptionEdit
+              option={option}
+              onChange={onChange}
+              onDelete={onDelete}
+              onToggleOptionEdit={onToggleOptionEdit}
+            />
           </Box>
         )}
       </Stack>

@@ -1,7 +1,6 @@
-
 import type { STSClientConfig } from '@aws-sdk/client-sts';
 
-export function getS3ClientConfig () {
+export function getS3ClientConfig() {
   const config: STSClientConfig = {
     region: process.env.S3_UPLOAD_REGION
   };

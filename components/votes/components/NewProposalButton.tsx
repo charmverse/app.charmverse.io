@@ -20,7 +20,7 @@ import { addPage } from 'lib/pages/addPage';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function NewProposalButton ({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
+export default function NewProposalButton({ mutateProposals }: { mutateProposals: KeyedMutator<ProposalWithUsers[]> }) {
   const router = useRouter();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
@@ -38,21 +38,20 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
 
   useEffect(() => {
     if (pages) {
-      setProposalTemplates(Object.values(pages).filter(p => p?.type === 'proposal_template') as PageMeta[]);
+      setProposalTemplates(Object.values(pages).filter((p) => p?.type === 'proposal_template') as PageMeta[]);
     }
-
   }, [pages]);
 
   const canCreateProposal = !!userSpacePermissions?.createVote;
 
-  async function deleteProposalTemplate (templateId: string) {
+  async function deleteProposalTemplate(templateId: string) {
     await charmClient.deletePage(templateId);
-    setProposalTemplates(proposalTemplates.filter(p => p.id !== templateId));
+    setProposalTemplates(proposalTemplates.filter((p) => p.id !== templateId));
 
     mutatePagesRemove([templateId]);
   }
 
-  async function createProposalFromTemplate (templateId: string) {
+  async function createProposalFromTemplate(templateId: string) {
     if (currentSpace) {
       const newProposal = await charmClient.proposals.createProposalFromTemplate({
         spaceId: currentSpace.id,
@@ -64,14 +63,14 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       setUrlWithoutRerender(router.pathname, { id: newProposal.id });
       showPage({
         pageId: newProposal.id,
-        onClose () {
+        onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
         }
       });
     }
   }
 
-  async function createProposalTemplate () {
+  async function createProposalTemplate() {
     if (currentSpace) {
       const newTemplate = await charmClient.proposals.createProposalTemplate({ spaceId: currentSpace.id });
 
@@ -79,14 +78,14 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
       showPage({
         pageId: newTemplate.id,
-        onClose () {
+        onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
         }
       });
     }
   }
 
-  async function onClickCreate () {
+  async function onClickCreate() {
     if (currentSpace && user) {
       const { page: newPage } = await addPage({
         spaceId: currentSpace.id,
@@ -100,7 +99,7 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
       mutate();
       showPage({
         pageId: newPage.id,
-        onClose () {
+        onClose() {
           setUrlWithoutRerender(router.pathname, { id: null });
           mutateProposals();
         }
@@ -110,7 +109,6 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
   }
 
   return (
-
     <>
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
@@ -129,10 +127,12 @@ export default function NewProposalButton ({ mutateProposals }: { mutateProposal
         createTemplate={createProposalTemplate}
         editTemplate={(pageId) => {
           setUrlWithoutRerender(router.pathname, { id: pageId });
-          showPage({ pageId,
-            onClose () {
+          showPage({
+            pageId,
+            onClose() {
               setUrlWithoutRerender(router.pathname, { id: null });
-            } });
+            }
+          });
         }}
         deleteTemplate={deleteProposalTemplate}
         pages={proposalTemplates}

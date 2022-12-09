@@ -36,17 +36,19 @@ const SidebarContent = styled.div`
   border-bottom: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
 `;
 
-export default function SourceSelection (props: Props) {
+export default function SourceSelection(props: Props) {
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
 
   const { pages } = usePages();
-  const boardPages = Object.values(pages).filter(p => p?.type === 'board').filter(isTruthy);
+  const boardPages = Object.values(pages)
+    .filter((p) => p?.type === 'board')
+    .filter(isTruthy);
 
-  function openSidebar () {
+  function openSidebar() {
     setSidebarState(!sidebarState ? 'select-source' : null);
   }
 
-  function closeSidebar () {
+  function closeSidebar() {
     setSidebarState(null);
   }
 
@@ -55,7 +57,9 @@ export default function SourceSelection (props: Props) {
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
         <Stack alignItems='center' spacing={0}>
           <HelpOutlineIcon color='secondary' fontSize='large' />
-          <Typography color='secondary'><strong>No data source</strong></Typography>
+          <Typography color='secondary'>
+            <strong>No data source</strong>
+          </Typography>
           <Typography display='flex' alignItems='center' color='secondary' variant='body2'>
             <Button
               color='secondary'
@@ -66,7 +70,8 @@ export default function SourceSelection (props: Props) {
               disabled={props.readOnly}
             >
               Select a data source
-            </Button>to continue
+            </Button>
+            to continue
           </Typography>
         </Stack>
       </Box>
@@ -79,11 +84,13 @@ export default function SourceSelection (props: Props) {
             </IconButton>
           </Box>
           <SidebarContent>
-            <PagesList pages={boardPages} onSelectPage={page => props.onSelectSource({ boardId: page.id })} />
+            <PagesList pages={boardPages} onSelectPage={(page) => props.onSelectSource({ boardId: page.id })} />
           </SidebarContent>
           {props.showCreateDatabase && (
             <MenuItem onClick={props.onCreateDatabase}>
-              <ListItemIcon><AddIcon color='secondary' /></ListItemIcon>
+              <ListItemIcon>
+                <AddIcon color='secondary' />
+              </ListItemIcon>
               <Typography variant='body2' color='secondary'>
                 New database
               </Typography>

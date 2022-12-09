@@ -11,11 +11,14 @@ describe('generateBoard', () => {
     const pages = await prisma.page.findMany({
       where: {
         spaceId: space.id,
-        OR: [{
-          id: board.id
-        }, {
-          parentId: board.id
-        }]
+        OR: [
+          {
+            id: board.id
+          },
+          {
+            parentId: board.id
+          }
+        ]
       },
       select: {
         id: true,
@@ -24,8 +27,8 @@ describe('generateBoard', () => {
       }
     });
 
-    const boardPage = pages.find(page => page.id === board.id && page.type === 'board');
-    const cardPages = pages.filter(page => page.parentId === board.id && page.type === 'card');
+    const boardPage = pages.find((page) => page.id === board.id && page.type === 'board');
+    const cardPages = pages.filter((page) => page.parentId === board.id && page.type === 'card');
 
     const blocks = await prisma.block.findMany({
       where: {
@@ -33,9 +36,9 @@ describe('generateBoard', () => {
       }
     });
 
-    const boardBlocks = blocks.filter(b => b.type === 'board');
-    const viewBlocks = blocks.filter(b => b.type === 'view');
-    const cardBlocks = blocks.filter(b => b.type === 'card');
+    const boardBlocks = blocks.filter((b) => b.type === 'board');
+    const viewBlocks = blocks.filter((b) => b.type === 'view');
+    const cardBlocks = blocks.filter((b) => b.type === 'card');
 
     // 1 board plus 2 nested cards
     expect(pages.length).toBe(3);
@@ -52,10 +55,10 @@ describe('generateBoard', () => {
     expect(cardBlocks.length).toBe(2);
 
     // Ensure the board ids and card ids match their respective pages
-    expect(pages.some(p => p.id === boardBlocks[0].id)).toBe(true);
+    expect(pages.some((p) => p.id === boardBlocks[0].id)).toBe(true);
 
-    cardBlocks.forEach(card => {
-      expect(pages.some(p => p.id === card.id)).toBe(true);
+    cardBlocks.forEach((card) => {
+      expect(pages.some((p) => p.id === card.id)).toBe(true);
     });
   });
 
@@ -69,11 +72,14 @@ describe('generateBoard', () => {
     const pages = await prisma.page.findMany({
       where: {
         spaceId: space.id,
-        OR: [{
-          id: board.id
-        }, {
-          parentId: board.id
-        }]
+        OR: [
+          {
+            id: board.id
+          },
+          {
+            parentId: board.id
+          }
+        ]
       },
       select: {
         id: true,
@@ -82,8 +88,8 @@ describe('generateBoard', () => {
       }
     });
 
-    const boardPage = pages.find(page => page.id === board.id && page.type === 'board');
-    const cardPages = pages.filter(page => page.parentId === board.id && page.type === 'card');
+    const boardPage = pages.find((page) => page.id === board.id && page.type === 'board');
+    const cardPages = pages.filter((page) => page.parentId === board.id && page.type === 'card');
 
     const blocks = await prisma.block.findMany({
       where: {
@@ -91,9 +97,9 @@ describe('generateBoard', () => {
       }
     });
 
-    const boardBlocks = blocks.filter(b => b.type === 'board');
-    const viewBlocks = blocks.filter(b => b.type === 'view');
-    const cardBlocks = blocks.filter(b => b.type === 'card');
+    const boardBlocks = blocks.filter((b) => b.type === 'board');
+    const viewBlocks = blocks.filter((b) => b.type === 'view');
+    const cardBlocks = blocks.filter((b) => b.type === 'card');
 
     // 1 board plus X nested cards
     expect(pages.length).toBe(cardsToCreate + 1);
@@ -110,10 +116,10 @@ describe('generateBoard', () => {
     expect(cardBlocks.length).toBe(cardsToCreate);
 
     // Ensure the board ids and card ids match their respective pages
-    expect(pages.some(p => p.id === boardBlocks[0].id)).toBe(true);
+    expect(pages.some((p) => p.id === boardBlocks[0].id)).toBe(true);
 
-    cardBlocks.forEach(card => {
-      expect(pages.some(p => p.id === card.id)).toBe(true);
+    cardBlocks.forEach((card) => {
+      expect(pages.some((p) => p.id === card.id)).toBe(true);
     });
   });
 

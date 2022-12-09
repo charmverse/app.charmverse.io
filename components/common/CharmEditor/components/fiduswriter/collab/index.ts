@@ -11,7 +11,6 @@ export type FrontendParticipant = Participant & {
 };
 
 export class ModCollab {
-
   // @ts-ignore set inside constructor of ModCollabColors
   colors: ModCollabColors;
 
@@ -28,7 +27,7 @@ export class ModCollab {
 
   collaborativeMode: boolean = false;
 
-  constructor (editor: FidusEditor) {
+  constructor(editor: FidusEditor) {
     editor.mod.collab = this;
     this.editor = editor;
 
@@ -38,18 +37,17 @@ export class ModCollab {
     new ModCollabColors(this);
   }
 
-  updateParticipantList (participantArray: (Participant & { sessionIds?: string[] })[]): FrontendParticipant[] {
+  updateParticipantList(participantArray: (Participant & { sessionIds?: string[] })[]): FrontendParticipant[] {
     const allSessionIds: string[] = [];
     const participantObj: Record<string, FrontendParticipant> = {};
 
-    participantArray.forEach(participant => {
+    participantArray.forEach((participant) => {
       if (participant.session_id) {
         const entry = participantObj[participant.id];
         allSessionIds.push(participant.session_id);
         if (entry) {
           entry.sessionIds.push(participant.session_id);
-        }
-        else {
+        } else {
           participant.sessionIds = [participant.session_id];
           delete participant.session_id;
           participantObj[participant.id] = participant as FrontendParticipant;
@@ -63,12 +61,9 @@ export class ModCollab {
     }
     // Check if each of the old session IDs is still present in last update.
     // If not, remove the corresponding carets if any.
-    this.sessionIds.forEach(sessionId => {
+    this.sessionIds.forEach((sessionId) => {
       if (!allSessionIds.includes(sessionId)) {
-        const tr = removeCollaboratorSelection(
-          this.editor.view.state,
-          { session_id: sessionId }
-        );
+        const tr = removeCollaboratorSelection(this.editor.view.state, { session_id: sessionId });
         if (tr) {
           this.editor.view.dispatch(tr);
         }
@@ -77,11 +72,10 @@ export class ModCollab {
     this.sessionIds = allSessionIds;
     if (participantArray.length > 1) {
       this.collaborativeMode = true;
-    }
-    else if (participantArray.length === 1) {
+    } else if (participantArray.length === 1) {
       this.collaborativeMode = false;
     }
-    this.participants.forEach(participant => {
+    this.participants.forEach((participant) => {
       this.colors.ensureUserColor(participant.id, participant.name);
     });
 

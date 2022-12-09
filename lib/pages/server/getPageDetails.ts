@@ -5,8 +5,7 @@ import { prisma } from 'db';
 
 import type { PageDetails } from '../interfaces';
 
-export async function getPageDetails (pageIdOrPath: string, spaceId?: string): Promise<PageDetails | null> {
-
+export async function getPageDetails(pageIdOrPath: string, spaceId?: string): Promise<PageDetails | null> {
   const isValidUUid = validate(pageIdOrPath);
 
   // We need a spaceId if looking up by path
@@ -14,12 +13,14 @@ export async function getPageDetails (pageIdOrPath: string, spaceId?: string): P
     return null;
   }
 
-  const searchQuery: Prisma.PageWhereInput = isValidUUid ? {
-    id: pageIdOrPath
-  } : {
-    path: pageIdOrPath,
-    spaceId
-  };
+  const searchQuery: Prisma.PageWhereInput = isValidUUid
+    ? {
+        id: pageIdOrPath
+      }
+    : {
+        path: pageIdOrPath,
+        spaceId
+      };
 
   return prisma.page.findFirst({
     where: searchQuery,
@@ -31,4 +32,3 @@ export async function getPageDetails (pageIdOrPath: string, spaceId?: string): P
     }
   });
 }
-

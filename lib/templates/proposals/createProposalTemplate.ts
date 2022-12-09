@@ -18,10 +18,12 @@ export interface CreateProposalTemplateInput {
   reviewers?: ProposalReviewerInput[];
 }
 
-export async function createProposalTemplate ({
-  spaceId, userId, pageContent, reviewers
+export async function createProposalTemplate({
+  spaceId,
+  userId,
+  pageContent,
+  reviewers
 }: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
-
   const proposalId = v4();
 
   return createPage({
@@ -61,7 +63,7 @@ export async function createProposalTemplate ({
           },
           reviewers: {
             createMany: {
-              data: (reviewers ?? []).map(r => {
+              data: (reviewers ?? []).map((r) => {
                 return {
                   roleId: r.group === 'role' ? r.id : undefined,
                   userId: r.group === 'user' ? r.id : undefined

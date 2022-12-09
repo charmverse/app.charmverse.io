@@ -15,7 +15,7 @@ const submissionStatusAfterDecision: Record<ReviewDecision, ApplicationStatus> =
  * Accept, reject or request changes for the work
  * @returns
  */
-export async function reviewSubmission ({ submissionId, decision, userId }: SubmissionReview): Promise<Application> {
+export async function reviewSubmission({ submissionId, decision, userId }: SubmissionReview): Promise<Application> {
   const submission = await getApplication(submissionId);
 
   if (!submission) {
@@ -36,7 +36,7 @@ export async function reviewSubmission ({ submissionId, decision, userId }: Subm
     throw new InvalidInputError(`Decision ${decision} is invalid`);
   }
 
-  const updated = await prisma.application.update({
+  const updated = (await prisma.application.update({
     where: {
       id: submission.id
     },
@@ -44,7 +44,7 @@ export async function reviewSubmission ({ submissionId, decision, userId }: Subm
       status: correspondingSubmissionStatus,
       reviewedBy: userId
     }
-  }) as Application;
+  })) as Application;
 
   return updated;
 }

@@ -11,7 +11,7 @@ export interface UpdateProposalRequest {
   categoryId?: string | null;
 }
 
-export async function updateProposal ({
+export async function updateProposal({
   proposalId,
   authors,
   reviewers,
@@ -40,7 +40,7 @@ export async function updateProposal ({
       }
     });
     await tx.proposalAuthor.createMany({
-      data: authors.map(author => ({ proposalId, userId: author }))
+      data: authors.map((author) => ({ proposalId, userId: author }))
     });
     await tx.proposalReviewer.deleteMany({
       where: {
@@ -48,7 +48,7 @@ export async function updateProposal ({
       }
     });
     await tx.proposalReviewer.createMany({
-      data: reviewers.map(reviewer => ({
+      data: reviewers.map((reviewer) => ({
         proposalId,
         userId: reviewer.group === 'user' ? reviewer.id : null,
         roleId: reviewer.group === 'role' ? reviewer.id : null
@@ -63,7 +63,6 @@ export async function updateProposal ({
     for (const arg of createArgs) {
       await tx.pagePermission.create(arg);
     }
-
   });
 
   return prisma.proposal.findUnique({

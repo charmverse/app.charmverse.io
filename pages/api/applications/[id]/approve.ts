@@ -1,4 +1,3 @@
-
 import type { Application } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -16,11 +15,9 @@ import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(approveUserApplication);
+handler.use(requireUser).post(approveUserApplication);
 
-async function approveUserApplication (req: NextApiRequest, res: NextApiResponse<Application>) {
+async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: applicationId } = req.query;
   const { id: userId } = req.session.user;
 
@@ -58,16 +55,24 @@ async function approveUserApplication (req: NextApiRequest, res: NextApiResponse
   await rollupBountyStatus(approvedApplication.bountyId);
 
   // dont wait for API response
-  collabland.createBountyStartedCredential({
-    bountyId: approvedApplication.bountyId,
-    userId: approvedApplication.createdBy
-  })
-    .catch(error => {
+  collabland
+    .createBountyStartedCredential({
+      bountyId: approvedApplication.bountyId,
+      userId: approvedApplication.createdBy
+    })
+    .catch((error) => {
       log.error('Error creating collabland VC', error);
     });
 
   const { id: bountyId, rewardAmount, rewardToken, spaceId, page } = application.bounty;
-  trackUserAction('bounty_application_accepted', { userId, spaceId, rewardAmount, pageId: page?.id || '', rewardToken, resourceId: bountyId });
+  trackUserAction('bounty_application_accepted', {
+    userId,
+    spaceId,
+    rewardAmount,
+    pageId: page?.id || '',
+    rewardToken,
+    resourceId: bountyId
+  });
 
   return res.status(200).json(approvedApplication);
 }

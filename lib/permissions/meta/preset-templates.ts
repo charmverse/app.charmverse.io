@@ -66,7 +66,7 @@ export const configurationModeDescription: Record<SpacePermissionConfigurationMo
 /**
  * Returns a tuple with what the user can and cannot do as a list of strings
  */
-export function getTemplateExplanation (template: SpacePermissionConfigurationMode): [string[], string[]] {
+export function getTemplateExplanation(template: SpacePermissionConfigurationMode): [string[], string[]] {
   const canAndCannot: [string[], string[]] = [[], []];
 
   if (template === 'custom') {
@@ -77,15 +77,13 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
 
   // Handle space operations
   for (const [operation, can] of Object.entries(templateData.spaceOperations) as [SpaceOperation, boolean][]) {
-
     const qualifier = can ? 'can' : 'cannot';
 
     const sentence = `Workspace members ${qualifier} ${spaceOperationLabels[operation].toLowerCase()}.`;
 
     if (can) {
       canAndCannot[0].push(sentence);
-    }
-    else {
+    } else {
       canAndCannot[1].push(sentence);
     }
   }
@@ -94,18 +92,16 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
   const { defaultPagePermissionGroup } = templateData.pagePermissionDefaults;
 
   if (defaultPagePermissionGroup === 'full_access') {
-    canAndCannot[0].push('Workspace members can view, edit, comment on, share and delete new top-level pages by default.');
-  }
-  else if (defaultPagePermissionGroup === 'editor') {
+    canAndCannot[0].push(
+      'Workspace members can view, edit, comment on, share and delete new top-level pages by default.'
+    );
+  } else if (defaultPagePermissionGroup === 'editor') {
     canAndCannot[0].push('Workspace members can view, edit and comment on new top-level pages by default.');
     canAndCannot[1].push('Workspace members cannot share or delete new top-level pages by default.');
-
-  }
-  else if (defaultPagePermissionGroup === 'view_comment') {
+  } else if (defaultPagePermissionGroup === 'view_comment') {
     canAndCannot[0].push('Workspace members can view and comment on new top-level pages by default.');
     canAndCannot[1].push('Workspace members cannot edit, share or delete new top-level pages by default.');
-  }
-  else if (templateData.pagePermissionDefaults.defaultPagePermissionGroup === 'view') {
+  } else if (templateData.pagePermissionDefaults.defaultPagePermissionGroup === 'view') {
     canAndCannot[0].push('Workspace members can view new top-level pages by default.');
     canAndCannot[1].push('Workspace members cannot comment on, edit, share or delete new top-level pages by default.');
   }
@@ -115,8 +111,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
 
   if (defaultPublicPages) {
     canAndCannot[0].push('Anyone can see new top-level pages by default.');
-  }
-  else {
+  } else {
     canAndCannot[1].push('Anyone outside the workspace cannot see new top-level pages by default.');
   }
 
@@ -125,8 +120,7 @@ export function getTemplateExplanation (template: SpacePermissionConfigurationMo
 
   if (publicBountyBoard) {
     canAndCannot[0].push('Anyone can see bounties and bounty suggestions visible to workspace members.');
-  }
-  else {
+  } else {
     canAndCannot[1].push('Anyone outside the workspace cannot see bounties and bounty suggestions.');
   }
 

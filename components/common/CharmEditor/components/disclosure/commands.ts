@@ -1,4 +1,3 @@
-
 import type { Command, Node } from '@bangle.dev/pm';
 import { Fragment, TextSelection } from '@bangle.dev/pm';
 import { findParentNodeOfTypeClosestToPos } from '@bangle.dev/utils';
@@ -22,12 +21,12 @@ export const backspaceCmd: Command = (state, dispatch) => {
   if ($cursor.parentOffset === 0 && disclosureNode && summaryNode) {
     const nodes: Node[] = [];
 
-    summaryNode.node.descendants(node => {
+    summaryNode.node.descendants((node) => {
       nodes.push(node);
       return false;
     });
 
-    disclosureNode.node.descendants(node => {
+    disclosureNode.node.descendants((node) => {
       if (node.type.name !== 'disclosureSummary') {
         nodes.push(node);
       }

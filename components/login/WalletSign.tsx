@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/system';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,7 +21,7 @@ interface Props {
   loading?: boolean;
 }
 
-export function WalletSign ({
+export function WalletSign({
   signSuccess,
   buttonStyle,
   buttonSize,
@@ -30,7 +30,6 @@ export function WalletSign ({
   enableAutosign = true,
   loading
 }: Props) {
-
   const {
     account,
     sign,
@@ -38,7 +37,8 @@ export function WalletSign ({
     walletAuthSignature,
     verifiableWalletDetected,
     connectWallet,
-    connectWalletModalIsOpen
+    connectWalletModalIsOpen,
+    isConnectingIdentity
   } = useWeb3AuthSig();
   const { isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
@@ -55,35 +55,38 @@ export function WalletSign ({
   }, [isWalletSelectorModalOpen]);
 
   useEffect(() => {
-    if (userClickedConnect.current && !isSigning && enableAutosign && verifiableWalletDetected) {
+    if (
+      userClickedConnect.current &&
+      !isSigning &&
+      enableAutosign &&
+      verifiableWalletDetected &&
+      !isConnectingIdentity
+    ) {
       userClickedConnect.current = false;
       generateWalletAuth();
     }
-  }, [verifiableWalletDetected]);
+  }, [verifiableWalletDetected, isConnectingIdentity]);
 
-  async function generateWalletAuth () {
-
+  async function generateWalletAuth() {
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
-
       signSuccess(walletAuthSignature);
-    }
-    else {
+    } else {
       sign()
         .then(signSuccess)
-        .catch(error => {
+        .catch((error) => {
           log.error('Error requesting wallet signature in login page', error);
           showMessage('Wallet signature failed', 'warning');
         });
     }
   }
 
-  if (!verifiableWalletDetected) {
+  if (!verifiableWalletDetected || isConnectingIdentity) {
     return (
       <ButtonComponent
         data-test='connect-wallet-button'
         sx={buttonStyle}
         size={buttonSize ?? 'large'}
-        loading={connectWalletModalIsOpen}
+        loading={connectWalletModalIsOpen || isConnectingIdentity}
         onClick={() => {
           userClickedConnect.current = true;
           connectWallet();
@@ -96,7 +99,15 @@ export function WalletSign ({
   }
 
   return (
-    <ButtonComponent data-test='verify-wallet-button' sx={buttonStyle} size={buttonSize ?? 'large'} onClick={generateWalletAuth} disabled={showLoadingState} loading={showLoadingState} variant={buttonOutlined ? 'outlined' : undefined}>
+    <ButtonComponent
+      data-test='verify-wallet-button'
+      sx={buttonStyle}
+      size={buttonSize ?? 'large'}
+      onClick={generateWalletAuth}
+      disabled={showLoadingState}
+      loading={showLoadingState}
+      variant={buttonOutlined ? 'outlined' : undefined}
+    >
       Verify wallet
     </ButtonComponent>
   );

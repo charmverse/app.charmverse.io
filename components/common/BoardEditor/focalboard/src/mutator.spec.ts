@@ -1,4 +1,3 @@
-
 import 'isomorphic-fetch';
 import mutator from './mutator';
 import { FetchMock } from './test/fetchMock';

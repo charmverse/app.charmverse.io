@@ -17,15 +17,19 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty2',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const application = await createApplication({
@@ -37,7 +41,6 @@ describe('getBountyTasks', () => {
     const bountyTasks = await getBountyTasks(user.id);
 
     expect(bountyTasks.unmarked).toEqual([]);
-
   });
 
   it('Should not get bounties if user does not have permissions', async () => {
@@ -51,15 +54,19 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty2',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'view'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'view'
+        }
+      ]
     });
 
     const bountyTasks = await getBountyTasks(user.id);
@@ -79,15 +86,19 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const inProgressBounty2 = await generateBounty({
@@ -98,15 +109,19 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty2',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const application = await createApplication({
@@ -125,18 +140,20 @@ describe('getBountyTasks', () => {
 
     const bountyTasks = await getBountyTasks(user.id);
 
-    expect(bountyTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: inProgressBounty.status,
-        action: 'application_approved',
-        id: `${inProgressBounty.id}.${application.id}.application_approved`
-      }),
-      expect.objectContaining({
-        status: inProgressBounty2.status,
-        action: 'application_rejected',
-        id: `${inProgressBounty2.id}.${application2.id}.application_rejected`
-      })
-    ]));
+    expect(bountyTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: inProgressBounty.status,
+          action: 'application_approved',
+          id: `${inProgressBounty.id}.${application.id}.application_approved`
+        }),
+        expect.objectContaining({
+          status: inProgressBounty2.status,
+          action: 'application_rejected',
+          id: `${inProgressBounty2.id}.${application2.id}.application_rejected`
+        })
+      ])
+    );
   });
 
   it('Should only return 2 bounties with 2 different actions for one reviewer', async () => {
@@ -151,16 +168,20 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty',
       bountyPermissions: {
-        reviewer: [{
-          group: 'user',
-          id: user.id,
-          roleId: 'space'
-        }]
+        reviewer: [
+          {
+            group: 'user',
+            id: user.id,
+            roleId: 'space'
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const inProgressBounty2 = await generateBounty({
@@ -171,16 +192,20 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty2',
       bountyPermissions: {
-        reviewer: [{
-          group: 'user',
-          id: user.id,
-          roleId: 'space'
-        }]
+        reviewer: [
+          {
+            group: 'user',
+            id: user.id,
+            roleId: 'space'
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const application = await createApplication({
@@ -199,18 +224,20 @@ describe('getBountyTasks', () => {
 
     const bountyTasks = await getBountyTasks(user.id);
 
-    expect(bountyTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: inProgressBounty.status,
-        action: 'work_submitted',
-        id: `${inProgressBounty.id}.${application.id}.work_submitted`
-      }),
-      expect.objectContaining({
-        status: inProgressBounty2.status,
-        action: 'payment_needed',
-        id: `${inProgressBounty2.id}.${application2.id}.payment_needed`
-      })
-    ]));
+    expect(bountyTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: inProgressBounty.status,
+          action: 'work_submitted',
+          id: `${inProgressBounty.id}.${application.id}.work_submitted`
+        }),
+        expect.objectContaining({
+          status: inProgressBounty2.status,
+          action: 'payment_needed',
+          id: `${inProgressBounty2.id}.${application2.id}.payment_needed`
+        })
+      ])
+    );
   });
 
   it('Should only return 1 suggested bounty', async () => {
@@ -225,15 +252,19 @@ describe('getBountyTasks', () => {
       approveSubmitters: false,
       title: 'My new bounty',
       bountyPermissions: {
-        submitter: [{
-          group: 'space',
-          id: space.id
-        }]
+        submitter: [
+          {
+            group: 'space',
+            id: space.id
+          }
+        ]
       },
-      pagePermissions: [{
-        userId: user.id,
-        permissionLevel: 'full_access'
-      }]
+      pagePermissions: [
+        {
+          userId: user.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const application = await createApplication({
@@ -245,12 +276,14 @@ describe('getBountyTasks', () => {
 
     const bountyTasks = await getBountyTasks(user.id);
 
-    expect(bountyTasks.unmarked).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        status: inProgressBounty.status,
-        action: 'suggested_bounty',
-        id: `${inProgressBounty.id}.${application.id}.suggested_bounty`
-      })
-    ]));
+    expect(bountyTasks.unmarked).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          status: inProgressBounty.status,
+          action: 'suggested_bounty',
+          id: `${inProgressBounty.id}.${application.id}.suggested_bounty`
+        })
+      ])
+    );
   });
 });

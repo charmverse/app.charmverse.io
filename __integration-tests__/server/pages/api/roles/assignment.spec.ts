@@ -7,9 +7,7 @@ import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/roles/assignment - Assign a user to a role', () => {
-
   it('should succeed if the requesting user is a space admin, and respond 201', async () => {
-
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -28,18 +26,14 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const updatedRole = (await request(baseUrl)
-      .post('/api/roles/assignment')
-      .set('Cookie', adminCookie)
-      .send(roleAssignment)
-      .expect(201)).body as RoleWithMembers;
+    const updatedRole = (
+      await request(baseUrl).post('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(201)
+    ).body as RoleWithMembers;
 
     expect(updatedRole.users[0].id).toBe(extraUser.id);
-
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
-
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -58,19 +52,12 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
 
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
-    await request(baseUrl)
-      .post('/api/roles/assignment')
-      .set('Cookie', nonAdminCookie)
-      .send(roleAssignment)
-      .expect(401);
+    await request(baseUrl).post('/api/roles/assignment').set('Cookie', nonAdminCookie).send(roleAssignment).expect(401);
   });
-
 });
 
 describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
-
   it('should succeed if the requesting user is a space admin, and respond 200', async () => {
-
     const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -91,18 +78,14 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
 
     const adminCookie = await loginUser(adminUser.id);
 
-    const updatedRole = (await request(baseUrl)
-      .delete('/api/roles/assignment')
-      .set('Cookie', adminCookie)
-      .send(roleAssignment)
-      .expect(200)).body as RoleWithMembers;
+    const updatedRole = (
+      await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200)
+    ).body as RoleWithMembers;
 
     expect(updatedRole.users.length).toBe(0);
-
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
-
     const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
     const extraUser = await generateSpaceUser({
       spaceId: space.id,
@@ -127,5 +110,4 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
       .send(roleAssignment)
       .expect(401);
   });
-
 });

@@ -1,12 +1,4 @@
-import {
-  bold,
-  code,
-  hardBreak,
-  italic,
-  link,
-  strike,
-  underline
-} from '@bangle.dev/base-components';
+import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
 
 import type { PageContent } from 'models';
@@ -19,11 +11,7 @@ import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc';
 import * as emoji from './components/emojiSuggest';
-import {
-  deletion,
-  insertion,
-  formatChange
-} from './components/fiduswriter/schema/common/track';
+import { deletion, insertion, formatChange } from './components/fiduswriter/schema/common/track';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -41,7 +29,8 @@ import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
-import * as tweet from './components/tweet/tweet';
+import * as tweet from './components/tweet/tweetSpec';
+import * as video from './components/video/videoSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -91,5 +80,6 @@ export const specRegistry = new SpecRegistry([
   inlineDatabase.spec(),
   deletion,
   insertion,
-  formatChange
+  formatChange,
+  video.spec()
 ]);

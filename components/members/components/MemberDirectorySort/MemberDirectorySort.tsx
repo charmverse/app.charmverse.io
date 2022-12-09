@@ -7,7 +7,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 
 import { MemberPropertyIcons } from '../MemberDirectoryProperties/MemberPropertyItem';
 
-export function MemberDirectorySort ({
+export function MemberDirectorySort({
   setSortedProperty,
   sortedProperty,
   view
@@ -17,8 +17,10 @@ export function MemberDirectorySort ({
   setSortedProperty: Dispatch<SetStateAction<string>>;
 }) {
   const { properties = [] } = useMemberProperties();
-  const sortableProperties = properties.filter(property => property.enabledViews.includes(view)
-    && !['profile_pic', 'role', 'select', 'multi-select'].includes(property.type));
+  const sortableProperties = properties.filter(
+    (property) =>
+      property.enabledViews.includes(view) && !['profile_pic', 'role', 'select', 'multi-select'].includes(property.type)
+  );
 
   return (
     <ViewOptions label='Sort'>
@@ -30,18 +32,14 @@ export function MemberDirectorySort ({
         }}
         renderValue={(value) => value}
       >
-        {
-          sortableProperties
-            .sort((propA, propB) => propA.name > propB.name ? 1 : -1)
-            .map(property => (
-              <MenuItem key={property.name} value={property.name}>
-                <ListItemIcon>
-                  {MemberPropertyIcons[property.type]}
-                </ListItemIcon>
-                <Typography>{property.name}</Typography>
-              </MenuItem>
-            ))
-        }
+        {sortableProperties
+          .sort((propA, propB) => (propA.name > propB.name ? 1 : -1))
+          .map((property) => (
+            <MenuItem key={property.name} value={property.name}>
+              <ListItemIcon>{MemberPropertyIcons[property.type]}</ListItemIcon>
+              <Typography>{property.name}</Typography>
+            </MenuItem>
+          ))}
       </Select>
     </ViewOptions>
   );

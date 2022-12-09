@@ -38,34 +38,27 @@ interface Props {
   bounty: BountyWithDetails;
 }
 
-function extractWalletErrorMessage (error: any): string {
-  if ((error)?.code === 'INSUFFICIENT_FUNDS') {
+function extractWalletErrorMessage(error: any): string {
+  if (error?.code === 'INSUFFICIENT_FUNDS') {
     return 'You do not have sufficient funds to perform this transaction';
-  }
-  else if ((error)?.code === 4001) {
+  } else if (error?.code === 4001) {
     return 'You rejected the transaction';
-  }
-  else if ((error)?.code === -32602) {
+  } else if (error?.code === -32602) {
     return 'A valid recipient must be provided';
-  }
-  else if ((error)?.reason) {
+  } else if (error?.reason) {
     return error.reason;
-  }
-  else if ((error)?.message) {
+  } else if (error?.message) {
     return error.message;
-  }
-  else if (typeof error === 'object') {
+  } else if (typeof error === 'object') {
     return JSON.stringify(error);
-  }
-  else if (typeof error === 'string') {
+  } else if (typeof error === 'string') {
     return error;
-  }
-  else {
+  } else {
     return 'An unknown error occurred';
   }
 }
 
-function SafeMenuItem ({
+function SafeMenuItem({
   label,
   safeInfo,
   bounty,
@@ -83,7 +76,7 @@ function SafeMenuItem ({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: transactions.map(getTransaction => getTransaction(safeInfo.address))
+    transactions: transactions.map((getTransaction) => getTransaction(safeInfo.address))
   });
 
   return (
@@ -93,24 +86,26 @@ function SafeMenuItem ({
         onClick();
         try {
           await makePayment();
-        }
-        catch (error: any) {
+        } catch (error: any) {
           const errorMessage = extractWalletErrorMessage(error);
 
           if (errorMessage === 'underlying network changed') {
-            onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
-          }
-          else {
+            onError(
+              "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
+              'warning'
+            );
+          } else {
             onError(errorMessage);
           }
         }
       }}
-    >{label}
+    >
+      {label}
     </MenuItem>
   );
 }
 
-export default function BountyPaymentButton ({
+export default function BountyPaymentButton({
   receiver,
   bounty,
   amount,
@@ -133,22 +128,22 @@ export default function BountyPaymentButton ({
   };
 
   const { data: safeInfos } = useSWR(
-    (signer && account) ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
+    signer && account ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
   );
 
-  const safeDataRecord = safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
-    if (!record[userGnosisSafe.address]) {
-      record[userGnosisSafe.address] = userGnosisSafe;
-    }
-    return record;
-  }, {}) ?? {};
+  const safeDataRecord =
+    safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+      if (!record[userGnosisSafe.address]) {
+        record[userGnosisSafe.address] = userGnosisSafe;
+      }
+      return record;
+    }, {}) ?? {};
 
   const [paymentMethods] = usePaymentMethods();
 
   const makePayment = async () => {
-
     if (!chainIdToUse) {
       onError('Please provide a chainId');
       return;
@@ -169,9 +164,7 @@ export default function BountyPaymentButton ({
     }
 
     try {
-
       if (chainToUse.chainId !== currentUserChain.chainId) {
-
         await switchActiveNetwork(chainToUse.chainId);
       }
 
@@ -184,13 +177,12 @@ export default function BountyPaymentButton ({
         });
 
         onSuccess(tx.hash, chainToUse.chainId);
-      }
-      else if (isValidChainAddress(tokenSymbolOrAddress)) {
+      } else if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, web3signer);
 
-        const paymentMethod = paymentMethods.find(method => (
-          method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
-        ));
+        const paymentMethod = paymentMethods.find(
+          (method) => method.contractAddress === tokenSymbolOrAddress || method.id === tokenSymbolOrAddress
+        );
         let tokenDecimals = paymentMethod?.tokenDecimals;
 
         if (typeof tokenDecimals !== 'number') {
@@ -200,9 +192,10 @@ export default function BountyPaymentButton ({
               contractAddress: tokenSymbolOrAddress
             });
             tokenDecimals = tokenInfo.decimals;
-          }
-          catch (error) {
-            onError(`Token information is missing. Please go to payment methods to configure this payment method using contract address ${tokenSymbolOrAddress} on ${chainToUse.chainName}`);
+          } catch (error) {
+            onError(
+              `Token information is missing. Please go to payment methods to configure this payment method using contract address ${tokenSymbolOrAddress} on ${chainToUse.chainName}`
+            );
             return;
           }
         }
@@ -220,18 +213,18 @@ export default function BountyPaymentButton ({
         // transfer token
         const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
         onSuccess(tx.hash, chainToUse!.chainId);
-      }
-      else {
+      } else {
         onError('Please provide a valid contract address');
       }
-    }
-    catch (err: any) {
+    } catch (err: any) {
       const errorMessage = extractWalletErrorMessage(err);
 
       if (errorMessage === 'underlying network changed') {
-        onError("You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction", 'warning');
-      }
-      else {
+        onError(
+          "You've changed your active network.\r\nRe-select 'Make payment' to complete this transaction",
+          'warning'
+        );
+      } else {
         onError(errorMessage);
       }
     }
@@ -249,8 +242,7 @@ export default function BountyPaymentButton ({
           if (!hasSafes) {
             onClick();
             makePayment();
-          }
-          else {
+          } else {
             handleClick(e);
           }
         }}
@@ -258,13 +250,10 @@ export default function BountyPaymentButton ({
         Send Payment
       </Button>
       {hasSafes && (
-        <Menu
-          id='bounty-payment'
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>Connected wallet</MenuItem>
+        <Menu id='bounty-payment' anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
+            Connected wallet
+          </MenuItem>
           <MenuItem
             dense
             onClick={() => {
@@ -276,9 +265,10 @@ export default function BountyPaymentButton ({
             {shortenHex(account ?? '')}
           </MenuItem>
           <Divider />
-          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>Gnosis wallets</MenuItem>
-          {
-          safeInfos?.map(safeInfo => (
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
+            Gnosis wallets
+          </MenuItem>
+          {safeInfos?.map((safeInfo) => (
             <SafeMenuItem
               key={safeInfo.address}
               bounty={bounty}
@@ -290,8 +280,7 @@ export default function BountyPaymentButton ({
               onError={onError}
               safeInfo={safeInfo}
             />
-          ))
-        }
+          ))}
         </Menu>
       )}
     </>

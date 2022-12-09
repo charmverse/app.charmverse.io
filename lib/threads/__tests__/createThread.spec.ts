@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -18,9 +17,7 @@ beforeAll(async () => {
 });
 
 describe('createThread', () => {
-
   it('should create a thread and return it with comments as well as the page space ID, and the user for each comment', async () => {
-
     const firstComment = 'First';
 
     const page = await createPage({
@@ -45,7 +42,6 @@ describe('createThread', () => {
   });
 
   it('should fail if the page does not exist', async () => {
-
     try {
       await createThread({
         comment: 'Some content',
@@ -54,14 +50,12 @@ describe('createThread', () => {
         context: 'context'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });
 
   it('should fail if the comment is empty', async () => {
-
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -75,14 +69,12 @@ describe('createThread', () => {
         context: 'context'
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
 
   it('should fail if the context is empty', async () => {
-
     const page = await createPage({
       createdBy: user.id,
       spaceId: space.id
@@ -96,11 +88,8 @@ describe('createThread', () => {
         context: null as any
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
   });
-
 });
-

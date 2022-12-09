@@ -1,5 +1,31 @@
 name: 'Build application'
 
+inputs:
+  NEXT_PUBLIC_APP_ENV:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_DD_RUM_APP_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_TELEGRAM_BOT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_WEBSOCKETS_HOST:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
+    description: "..."
+    required: false
+
 runs:
   using: 'composite'
   steps:
@@ -14,7 +40,8 @@ runs:
       uses: actions/cache@v3
       with:
         path: .next
-        key: nextjs-build-${{ github.sha }}
+        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+        key: nextjs-build-${{ github.sha }}-${{ inputs.NEXT_PUBLIC_APP_ENV }}
 
     # Re-build prisma types which are cached inside of node_modules
     - name: Re-build Prisma types
@@ -25,3 +52,12 @@ runs:
       shell: bash
       if: steps.cache_build.outputs.cache-hit != 'true'
       run: npm run build
+      env:
+        NEXT_PUBLIC_APP_ENV: ${{ inputs.NEXT_PUBLIC_APP_ENV }}
+        NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
+        NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ inputs.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
+        NEXT_PUBLIC_DD_RUM_APP_ID: ${{ inputs.NEXT_PUBLIC_DD_RUM_APP_ID }}
+        NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
+        NEXT_PUBLIC_WEBSOCKETS_HOST: ${{ inputs.NEXT_PUBLIC_WEBSOCKETS_HOST }}
+        NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
+        NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}

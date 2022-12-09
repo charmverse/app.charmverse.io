@@ -3,10 +3,10 @@ import { createBlock } from './block';
 import type { ContentBlock } from './contentBlock';
 
 type CheckboxBlock = ContentBlock & {
-    type: 'checkbox';
-}
+  type: 'checkbox';
+};
 
-function createCheckboxBlock (block?: Block): CheckboxBlock {
+function createCheckboxBlock(block?: Block): CheckboxBlock {
   return {
     ...createBlock(block),
     type: 'checkbox'

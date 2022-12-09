@@ -34,12 +34,27 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  message: yup.string().required('Please enter a proposal.').min(MINIMUM_APPLICATION_MESSAGE_CHARACTERS, `Application proposal must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`)
+  message: yup
+    .string()
+    .required('Please enter a proposal.')
+    .min(
+      MINIMUM_APPLICATION_MESSAGE_CHARACTERS,
+      `Application proposal must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`
+    )
 });
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit, bountyId, proposal, mode = 'create', alwaysExpanded, expandedOnLoad }: IApplicationFormProps) {
+export default function ApplicationInput({
+  readOnly = false,
+  onCancel,
+  onSubmit,
+  bountyId,
+  proposal,
+  mode = 'create',
+  alwaysExpanded,
+  expandedOnLoad
+}: IApplicationFormProps) {
   const { refreshBounty } = useBounties();
   const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
   const { user } = useUser();
@@ -55,14 +70,14 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
     mode: 'onChange',
     defaultValues: {
       // Default to saved message in local storage
-      message: proposal?.message as string ?? applicationMessage
+      message: (proposal?.message as string) ?? applicationMessage
     },
     resolver: yupResolver(schema)
   });
 
   const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
-  async function submitted (proposalToSave: Application) {
+  async function submitted(proposalToSave: Application) {
     if (mode === 'create') {
       proposalToSave.bountyId = bountyId;
       proposalToSave.status = 'applied';
@@ -72,15 +87,13 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
       }
       refreshBounty(bountyId);
       setApplicationMessage('');
-    }
-    else if (mode === 'update') {
+    } else if (mode === 'update') {
       await charmClient.bounties.updateApplication(proposal?.id as string, proposalToSave);
       if (onSubmit) {
         onSubmit(proposalToSave);
       }
       refreshBounty(bountyId);
     }
-
   }
 
   return (
@@ -117,10 +130,12 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
         {proposal && proposal.status === 'applied' && proposal.createdBy === user?.id && (
           <BountyApplicantStatus submission={proposal} />
         )}
-
       </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
-        <form onSubmit={handleSubmit(formValue => submitted(formValue as Application))} style={{ margin: 'auto', width: '100%' }}>
+        <form
+          onSubmit={handleSubmit((formValue) => submitted(formValue as Application))}
+          style={{ margin: 'auto', width: '100%' }}
+        >
           <Grid container direction='column' spacing={3}>
             <Grid item>
               <TextField
@@ -145,22 +160,13 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
                   });
                 }}
               />
-              {
-                errors?.message && (
-                  <Alert severity='error'>
-                    {errors.message.message}
-                  </Alert>
-                )
-              }
-
+              {errors?.message && <Alert severity='error'>{errors.message.message}</Alert>}
             </Grid>
 
             {!readOnly && (
               <Grid item display='flex' gap={1}>
-                <Button
-                  disabled={!isValid}
-                  type='submit'
-                >{mode === 'create' ? ' Submit' : 'Update'}
+                <Button disabled={!isValid} type='submit'>
+                  {mode === 'create' ? ' Submit' : 'Update'}
                 </Button>
                 <Button
                   onClick={() => {
@@ -169,16 +175,14 @@ export default function ApplicationInput ({ readOnly = false, onCancel, onSubmit
                   }}
                   variant='outlined'
                   color='secondary'
-                >Cancel
+                >
+                  Cancel
                 </Button>
               </Grid>
             )}
           </Grid>
-
         </form>
-
       </Collapse>
     </Stack>
   );
 }
-

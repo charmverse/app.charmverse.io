@@ -1,16 +1,15 @@
-
 type CallbackType<T> = (value: T) => void;
 
 export class PubSub<T, V> {
   subscribers = new Map<T, CallbackType<V>[]>();
 
-  constructor () {
+  constructor() {
     this.subscribe = this.subscribe.bind(this);
     this.unsubscribe = this.unsubscribe.bind(this);
     this.publish = this.publish.bind(this);
   }
 
-  subscribe<E extends T = T, S extends V = V> (type: E, callback: CallbackType<S>) {
+  subscribe<E extends T = T, S extends V = V>(type: E, callback: CallbackType<S>) {
     if (!this.subscribers.has(type)) {
       this.subscribers.set(type, []);
     }
@@ -20,7 +19,7 @@ export class PubSub<T, V> {
     return () => this.unsubscribe(type, callback as any);
   }
 
-  unsubscribe (type: T, callback: CallbackType<V>) {
+  unsubscribe(type: T, callback: CallbackType<V>) {
     if (!this.subscribers.has(type)) {
       return;
     }
@@ -29,7 +28,7 @@ export class PubSub<T, V> {
     this.subscribers.set(type, callbacks);
   }
 
-  publish (type: T, value: V) {
+  publish(type: T, value: V) {
     this.subscribers.get(type)?.forEach((cb) => cb(value));
   }
 }

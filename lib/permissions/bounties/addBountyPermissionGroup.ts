@@ -10,12 +10,11 @@ import { assigneeGroupIsValid } from '../validateAssigneeGroup';
 import type { BountyPermissionAssignment, BountyPermissions } from './interfaces';
 import { mapBountyPermissions } from './mapBountyPermissions';
 
-export async function addBountyPermissionGroup ({
+export async function addBountyPermissionGroup({
   assignee,
   level,
   resourceId
 }: BountyPermissionAssignment): Promise<BountyPermissions> {
-
   if (BountyPermissionLevel[level] === undefined) {
     throw new InvalidInputError(`Invalid permission level: '${level}'`);
   }
@@ -48,9 +47,10 @@ export async function addBountyPermissionGroup ({
   }
 
   if (assignee.group === 'space' && bounty.spaceId !== assignee.id) {
-    throw new InsecureOperationError('You cannot assign permissions to a different space than the one the bounty belongs to.');
-  }
-  else if (assignee.group === 'role') {
+    throw new InsecureOperationError(
+      'You cannot assign permissions to a different space than the one the bounty belongs to.'
+    );
+  } else if (assignee.group === 'role') {
     const role = await prisma.role.findUnique({
       where: {
         id: assignee.id
@@ -62,12 +62,12 @@ export async function addBountyPermissionGroup ({
 
     if (!role) {
       throw new DataNotFoundError(`Role with id ${assignee.id} not found`);
+    } else if (role.spaceId !== bounty.spaceId) {
+      throw new InsecureOperationError(
+        'You cannot assign permissions to a different space from the one this bounty belongs to.'
+      );
     }
-    else if (role.spaceId !== bounty.spaceId) {
-      throw new InsecureOperationError('You cannot assign permissions to a different space from the one this bounty belongs to.');
-    }
-  }
-  else if (assignee.group === 'user') {
+  } else if (assignee.group === 'user') {
     const { error } = await hasAccessToSpace({
       spaceId: bounty.spaceId,
       adminOnly: false,
@@ -75,22 +75,20 @@ export async function addBountyPermissionGroup ({
     });
 
     if (error) {
-      throw new InsecureOperationError('You cannot assign permissions to a user who is not a member of the space the bounty belongs to');
+      throw new InsecureOperationError(
+        'You cannot assign permissions to a user who is not a member of the space the bounty belongs to'
+      );
     }
   }
 
-  const existingPermission = bounty.permissions.find(p => {
-
+  const existingPermission = bounty.permissions.find((p) => {
     if (assignee.group === 'space') {
       return p.spaceId === assignee.id && p.permissionLevel === level;
-    }
-    else if (assignee.group === 'role') {
+    } else if (assignee.group === 'role') {
       return p.roleId === assignee.id && p.permissionLevel === level;
-    }
-    else if (assignee.group === 'user') {
+    } else if (assignee.group === 'user') {
       return p.userId === assignee.id && p.permissionLevel === level;
-    }
-    else if (assignee.group === 'public') {
+    } else if (assignee.group === 'public') {
       return p.public === true && p.permissionLevel === level;
     }
 
@@ -108,21 +106,30 @@ export async function addBountyPermissionGroup ({
         id: resourceId
       }
     },
-    user: assignee.group === 'user' ? {
-      connect: {
-        id: assignee.id
-      }
-    } : undefined,
-    role: assignee.group === 'role' ? {
-      connect: {
-        id: assignee.id
-      }
-    } : undefined,
-    space: assignee.group === 'space' ? {
-      connect: {
-        id: assignee.id
-      }
-    } : undefined
+    user:
+      assignee.group === 'user'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined,
+    role:
+      assignee.group === 'role'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined,
+    space:
+      assignee.group === 'space'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined
   };
 
   const newPermission = await prisma.bountyPermission.create({
@@ -137,5 +144,4 @@ export async function addBountyPermissionGroup ({
   });
 
   return mapBountyPermissions(newPermission.bounty.permissions);
-
 }

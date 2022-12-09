@@ -1,4 +1,3 @@
-
 import type { PaymentMethod, Prisma } from '@prisma/client';
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -16,11 +15,15 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireSpaceMembership())
   .get(listPaymentMethods)
-  .use(requireKeys<PaymentMethod>(['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'], 'body'))
+  .use(
+    requireKeys<PaymentMethod>(
+      ['chainId', 'spaceId', 'tokenSymbol', 'tokenName', 'tokenDecimals', 'walletType'],
+      'body'
+    )
+  )
   .post(createPaymentMethod);
 
-async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<PaymentMethod []>) {
-
+async function listPaymentMethods(req: NextApiRequest, res: NextApiResponse<PaymentMethod[]>) {
   const { spaceId } = req.query;
 
   const paymentMethods = await prisma.paymentMethod.findMany({
@@ -31,8 +34,7 @@ async function listPaymentMethods (req: NextApiRequest, res: NextApiResponse<Pay
   return res.status(200).json(paymentMethods);
 }
 
-async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<PaymentMethod>) {
-
+async function createPaymentMethod(req: NextApiRequest, res: NextApiResponse<PaymentMethod>) {
   const {
     chainId,
     contractAddress,
@@ -76,19 +78,16 @@ async function createPaymentMethod (req: NextApiRequest, res: NextApiResponse<Pa
   };
 
   try {
-
     const paymentMethod = await prisma.paymentMethod.create({ data: paymentMethodToCreate });
 
     return res.status(200).json(paymentMethod);
-  }
-  catch (err) {
+  } catch (err) {
     // P2002 is thrown by prisma when a duplicate write fails
     if ((err as PrismaClientKnownRequestError).code === 'P2002') {
       throw new InvalidInputError('A payment method with this contract address and chain ID already exists.');
     }
     throw err;
   }
-
 }
 
 export default withSessionRoute(handler);

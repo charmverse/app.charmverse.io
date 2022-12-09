@@ -1,4 +1,3 @@
-
 import type { Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -19,9 +18,7 @@ beforeAll(async () => {
 });
 
 describe('addComment', () => {
-
   it('should return the created comment along with the user', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -43,7 +40,6 @@ describe('addComment', () => {
   });
 
   it('should fail if the comment content is empty', async () => {
-
     const { thread } = await generateCommentWithThreadAndPage({
       commentContent: 'First',
       spaceId: space.id,
@@ -57,15 +53,12 @@ describe('addComment', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(InvalidInputError);
     }
-
   });
 
   it('should fail if the thread does not exist', async () => {
-
     try {
       await addComment({
         content: 'New content',
@@ -73,11 +66,9 @@ describe('addComment', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
 
   it('should fail if the page does not exist', async () => {
@@ -100,12 +91,8 @@ describe('addComment', () => {
         userId: user.id
       });
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-
   });
-
 });
-

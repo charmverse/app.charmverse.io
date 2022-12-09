@@ -15,27 +15,32 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { configurationModeDescription, configurationModeName, getTemplateExplanation } from 'lib/permissions/meta/preset-templates';
+import {
+  configurationModeDescription,
+  configurationModeName,
+  getTemplateExplanation
+} from 'lib/permissions/meta/preset-templates';
 
 interface Props {
   permissionModeSelected?: (mode: SpacePermissionConfigurationMode) => void;
 }
 
-export default function PermissionConfigurationMode ({ permissionModeSelected = () => null }: Props) {
+export default function PermissionConfigurationMode({ permissionModeSelected = () => null }: Props) {
   const space = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const isAdmin = useIsAdmin();
 
-  const [selectedConfigurationMode, setSelectedConfigurationMode] = useState<SpacePermissionConfigurationMode>(space?.permissionConfigurationMode ?? 'custom');
+  const [selectedConfigurationMode, setSelectedConfigurationMode] = useState<SpacePermissionConfigurationMode>(
+    space?.permissionConfigurationMode ?? 'custom'
+  );
 
   const [isUpdatingPermissionMode, setIsUpdatingPermissionMode] = useState(false);
   const [touched, setTouched] = useState<boolean>(false);
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-permission-mode' });
 
-  async function updateSettings () {
-
+  async function updateSettings() {
     if (space) {
       setIsUpdatingPermissionMode(true);
       const updatedSpace = await charmClient.setSpacePermissionMode({
@@ -91,9 +96,7 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
               sx: { width: 300 }
             }}
           >
-            {
-            (Object.keys(SpacePermissionConfigurationMode) as SpacePermissionConfigurationMode[]).map(mode => {
-
+            {(Object.keys(SpacePermissionConfigurationMode) as SpacePermissionConfigurationMode[]).map((mode) => {
               const label = configurationModeName[mode];
               const isSelected = selectedConfigurationMode === mode;
               const description = configurationModeDescription[mode];
@@ -109,69 +112,65 @@ export default function PermissionConfigurationMode ({ permissionModeSelected = 
                     setTouched(true);
                   }}
                 >
-                  <StyledListItemText
-                    primary={label}
-                    secondary={description}
-                  />
+                  <StyledListItemText primary={label} secondary={description} />
                 </MenuItem>
               );
-            })
-          }
-
+            })}
           </Menu>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Typography
             variant='body2'
-            sx={{ height: '100%',
+            sx={{
+              height: '100%',
               justifyContent: 'center',
               display: 'flex',
               flexDirection: 'column',
               margin: {
                 xs: '10px 0',
                 sm: 0
-              } }}
+              }
+            }}
           >
             {configurationModeDescription[selectedConfigurationMode]}
           </Typography>
         </Grid>
       </Grid>
-      {
-        selectedConfigurationMode !== 'custom' && (
-          <Grid container item xs>
-            <Grid item sm={firstGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
-
-              {
-              templateExplanation[0].map(canDo => (
-                <Grid key={canDo} item xs={12} display='flex'>
-                  <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
-                  <Typography variant='caption'>{canDo}</Typography>
-                </Grid>
-              ))
-            }
-
-            </Grid>
-            <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
-              {
-              templateExplanation[1].map(cannotDo => (
-                <Grid key={cannotDo} item xs={12} display='flex'>
-                  <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
-                  <Typography variant='caption'>{cannotDo}</Typography>
-                </Grid>
-              ))
-            }
-            </Grid>
+      {selectedConfigurationMode !== 'custom' && (
+        <Grid container item xs>
+          <Grid item sm={firstGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
+            {templateExplanation[0].map((canDo) => (
+              <Grid key={canDo} item xs={12} display='flex'>
+                <DoneIcon color='success' sx={{ fontSize: '18px', mr: 0.5 }} />
+                <Typography variant='caption'>{canDo}</Typography>
+              </Grid>
+            ))}
           </Grid>
-        )
-      }
-
-      {
-        isAdmin && (
-          <Grid item xs>
-            <Button onClick={() => updateSettings()} disabled={!settingsChanged} type='submit' variant='contained' color='primary' sx={{ mr: 1 }}>Save</Button>
+          <Grid container item sm={secondGridSmallColumnWidth} xs={12} sx={{ pr: 2 }}>
+            {templateExplanation[1].map((cannotDo) => (
+              <Grid key={cannotDo} item xs={12} display='flex'>
+                <CloseIcon color='error' sx={{ fontSize: '18px', mr: 0.5 }} />
+                <Typography variant='caption'>{cannotDo}</Typography>
+              </Grid>
+            ))}
           </Grid>
-        )
-      }
+        </Grid>
+      )}
+
+      {isAdmin && (
+        <Grid item xs>
+          <Button
+            onClick={() => updateSettings()}
+            disabled={!settingsChanged}
+            type='submit'
+            variant='contained'
+            color='primary'
+            sx={{ mr: 1 }}
+          >
+            Save
+          </Button>
+        </Grid>
+      )}
     </Grid>
   );
 }

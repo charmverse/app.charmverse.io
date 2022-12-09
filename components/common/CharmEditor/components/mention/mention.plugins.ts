@@ -10,7 +10,7 @@ import { mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 import type { MentionPluginState } from './mention.interfaces';
 import { selectMention } from './mention.utils';
 
-export function mentionPlugins ({
+export function mentionPlugins({
   key,
   markName = mentionSuggestMarkName,
   tooltipRenderOpts = {
@@ -30,14 +30,14 @@ export function mentionPlugins ({
     new Plugin({
       key,
       state: {
-        init () {
+        init() {
           return {
             tooltipContentDOM: tooltipDOMSpec.contentDOM,
             markName,
             suggestTooltipKey
           };
         },
-        apply (_, pluginState) {
+        apply(_, pluginState) {
           return pluginState;
         }
       }
@@ -46,7 +46,7 @@ export function mentionPlugins ({
       key: suggestTooltipKey,
       markName,
       trigger: mentionTrigger,
-      onEnter (state, dispatch, view) {
+      onEnter(state, dispatch, view) {
         const selectedMenuItem = document.querySelector('.mention-selected');
         const value = selectedMenuItem?.getAttribute('data-value');
         const type = selectedMenuItem?.getAttribute('data-type');

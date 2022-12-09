@@ -7,24 +7,17 @@ import Button from 'components/common/Button';
 import MenuWrapper from '../menuWrapper';
 
 type Props = {
-    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-    children?: React.ReactNode;
-    text: React.ReactNode;
-}
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  children?: React.ReactNode;
+  text: React.ReactNode;
+};
 
-function ButtonWithMenu (props: Props): JSX.Element {
+function ButtonWithMenu(props: Props): JSX.Element {
   return (
-    <Button
-      disableElevation
-      size='small'
-      onClick={props.onClick}
-    >
+    <Button disableElevation size='small' onClick={props.onClick}>
       {props.text}
       <MenuWrapper stopPropagationOnToggle={true}>
-        <Box
-          sx={{ pl: 1 }}
-          className='button-dropdown'
-        >
+        <Box sx={{ pl: 1 }} className='button-dropdown'>
           <ArrowDropDownOutlinedIcon fontSize='small' />
         </Box>
         {props.children}

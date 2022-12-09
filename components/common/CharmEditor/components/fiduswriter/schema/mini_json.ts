@@ -2,7 +2,7 @@
 import type { Mark, Node } from '@bangle.dev/pm';
 import { isEqual } from 'lodash';
 
-export function toMiniJSON (node: Node) {
+export function toMiniJSON(node: Node) {
   // Similar to the ProseMirror internal toJSON function,
   // but leaving out attributes that have default values and dealing with
   // attributes that are objects.
@@ -19,11 +19,11 @@ export function toMiniJSON (node: Node) {
     }
   }
   if (node.content.size) {
-    obj.content = node.content.content.map(childNode => toMiniJSON(childNode));
+    obj.content = node.content.content.map((childNode) => toMiniJSON(childNode));
   }
 
   if (node.marks.length) {
-    obj.marks = node.marks.map(mark => toMiniMarkJSON(mark));
+    obj.marks = node.marks.map((mark) => toMiniMarkJSON(mark));
   }
 
   if (node.text) {
@@ -33,7 +33,7 @@ export function toMiniJSON (node: Node) {
   return obj;
 }
 
-function toMiniMarkJSON (mark: Mark) {
+function toMiniMarkJSON(mark: Mark) {
   // Adapted from https://github.com/ProseMirror/prosemirror-model/blob/6d970507cd0da48653d3b72f2731a71a144a364b/src/mark.js#L76-L83
   const obj = { type: mark.type.name };
   for (const attr in mark.attrs) {

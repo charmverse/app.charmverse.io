@@ -6,8 +6,10 @@ import type { PageProperty } from './interfaces';
  * @param props
  * @param cardPropertySchema Custom properties for cards are defined in a parent board
  */
-export function mapProperties (properties: Record<string, string | number>, cardPropertySchema: PageProperty []): Record<string, string | number> {
-
+export function mapProperties(
+  properties: Record<string, string | number>,
+  cardPropertySchema: PageProperty[]
+): Record<string, string | number> {
   if (!properties) {
     return {};
   }
@@ -17,7 +19,7 @@ export function mapProperties (properties: Record<string, string | number>, card
   const mappedValueToReturn: Record<string, string | number> = {};
 
   for (const property of keysToMap) {
-    const propertySchema = cardPropertySchema.find(cardProp => cardProp.name === property);
+    const propertySchema = cardPropertySchema.find((cardProp) => cardProp.name === property);
 
     if (!propertySchema) {
       throw new InvalidCustomPropertyKeyError({ key: property, boardSchema: cardPropertySchema });
@@ -26,12 +28,11 @@ export function mapProperties (properties: Record<string, string | number>, card
     let value = properties[property];
 
     if (propertySchema.type === 'select' || propertySchema.type === 'multiSelect') {
-      const matchedOption = propertySchema.options.find(option => option.value === value);
+      const matchedOption = propertySchema.options.find((option) => option.value === value);
 
       if (!matchedOption) {
         throw new InvalidCustomPropertyValueError({ key: property, value, boardSchema: cardPropertySchema });
-      }
-      else {
+      } else {
         value = matchedOption.id;
       }
     }
@@ -40,5 +41,4 @@ export function mapProperties (properties: Record<string, string | number>, card
   }
 
   return mappedValueToReturn;
-
 }

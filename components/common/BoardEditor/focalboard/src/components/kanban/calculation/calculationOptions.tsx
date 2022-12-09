@@ -1,20 +1,15 @@
-
 import type { IPropertyTemplate, PropertyType } from '../../../blocks/board';
-import type {
-  CommonCalculationOptionProps } from '../../calculations/options';
-import {
-  CalculationOptions,
-  optionsByType
-} from '../../calculations/options';
+import type { CommonCalculationOptionProps } from '../../calculations/options';
+import { CalculationOptions, optionsByType } from '../../calculations/options';
 
 import type { OptionProps } from './kanbanOption';
 import { Option } from './kanbanOption';
 
 type Props = CommonCalculationOptionProps & {
-    cardProperties: IPropertyTemplate[];
-    onChange: (data: { calculation: string, propertyId: string }) => void;
-    property: IPropertyTemplate;
-}
+  cardProperties: IPropertyTemplate[];
+  onChange: (data: { calculation: string; propertyId: string }) => void;
+  property: IPropertyTemplate;
+};
 
 // contains mapping of property types which are effectly the same as other property type.
 const equivalentPropertyType = new Map<PropertyType, PropertyType>([
@@ -22,56 +17,55 @@ const equivalentPropertyType = new Map<PropertyType, PropertyType>([
   ['updatedTime', 'date']
 ]);
 
-export function getEquivalentPropertyType (propertyType: PropertyType): PropertyType {
+export function getEquivalentPropertyType(propertyType: PropertyType): PropertyType {
   return equivalentPropertyType.get(propertyType) || propertyType;
 }
 
-export function KanbanCalculationOptions (props: Props): JSX.Element {
+export function KanbanCalculationOptions(props: Props): JSX.Element {
   const options: OptionProps[] = [];
 
-    // Show common options, first,
-    // followed by type-specific functions
-    optionsByType.get('common')!.forEach((typeOption) => {
-      if (typeOption.value !== 'none') {
-        options.push({
-          ...typeOption,
-          cardProperties: props.cardProperties,
-          onChange: props.onChange,
-          activeValue: props.value,
-          activeProperty: props.property
-        });
-      }
+  // Show common options, first,
+  // followed by type-specific functions
+  optionsByType.get('common')!.forEach((typeOption) => {
+    if (typeOption.value !== 'none') {
+      options.push({
+        ...typeOption,
+        cardProperties: props.cardProperties,
+        onChange: props.onChange,
+        activeValue: props.value,
+        activeProperty: props.property
+      });
+    }
+  });
+
+  const seen: Record<string, boolean> = {};
+  props.cardProperties.forEach((property) => {
+    // skip already processed property types
+    if (seen[getEquivalentPropertyType(property.type)]) {
+      return;
+    }
+
+    (optionsByType.get(property.type) || []).forEach((typeOption) => {
+      options.push({
+        ...typeOption,
+        cardProperties: props.cardProperties,
+        onChange: props.onChange,
+        activeValue: props.value,
+        activeProperty: props.property!
+      });
     });
 
-    const seen: Record<string, boolean> = {};
-    props.cardProperties.forEach((property) => {
-      // skip already processed property types
-      if (seen[getEquivalentPropertyType(property.type)]) {
-        return;
-      }
+    seen[getEquivalentPropertyType(property.type)] = true;
+  });
 
-      (optionsByType.get(property.type) || [])
-        .forEach((typeOption) => {
-          options.push({
-            ...typeOption,
-            cardProperties: props.cardProperties,
-            onChange: props.onChange,
-            activeValue: props.value,
-            activeProperty: props.property!
-          });
-        });
-
-      seen[getEquivalentPropertyType(property.type)] = true;
-    });
-
-    return (
-      <CalculationOptions
-        value={props.value}
-        menuOpen={props.menuOpen}
-        onClose={props.onClose}
-        onChange={props.onChange}
-        options={options}
-        components={{ Option }}
-      />
-    );
+  return (
+    <CalculationOptions
+      value={props.value}
+      menuOpen={props.menuOpen}
+      onClose={props.onClose}
+      onChange={props.onChange}
+      options={options}
+      components={{ Option }}
+    />
+  );
 }

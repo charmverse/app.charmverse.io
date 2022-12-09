@@ -34,8 +34,7 @@ describe('components/viewHeader/viewHeader', () => {
         username: 'username_1'
       }
     },
-    searchText: {
-    },
+    searchText: {},
     boards: {
       current: board
     },

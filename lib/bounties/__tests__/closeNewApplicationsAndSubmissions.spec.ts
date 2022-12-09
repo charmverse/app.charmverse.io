@@ -15,7 +15,6 @@ beforeAll(async () => {
 
   nonAdminUser = generated.user;
   space = generated.space;
-
 });
 
 describe('lockApplicationAndSubmissions', () => {
@@ -34,12 +33,10 @@ describe('lockApplicationAndSubmissions', () => {
   });
 
   it('should fail if the bounty does not exist', async () => {
-
     try {
       await lockApplicationAndSubmissions(v4());
       throw new ExpectedAnError();
-    }
-    catch (err) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
   });

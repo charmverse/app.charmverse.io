@@ -1,4 +1,3 @@
-
 export interface UserCommunity {
   id: string;
   name: string;

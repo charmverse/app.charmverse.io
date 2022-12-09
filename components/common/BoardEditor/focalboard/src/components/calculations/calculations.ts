@@ -1,4 +1,3 @@
-
 import { Duration } from 'luxon';
 import type { IntlShape } from 'react-intl';
 
@@ -10,22 +9,22 @@ import type { DateProperty } from '../properties/dateRange/dateRange';
 
 const ROUNDED_DECIMAL_PLACES = 2;
 
-function getCardProperty (card: Card, property: IPropertyTemplate): string | string[] | number {
+function getCardProperty(card: Card, property: IPropertyTemplate): string | string[] | number {
   if (property.id === Constants.titleColumnId) {
     return card.title;
   }
 
   switch (property.type) {
-    case ('createdBy'): {
+    case 'createdBy': {
       return card.createdBy;
     }
-    case ('createdTime'): {
+    case 'createdTime': {
       return fixTimestampToMinutesAccuracy(card.createdAt);
     }
-    case ('updatedBy'): {
+    case 'updatedBy': {
       return card.updatedBy;
     }
-    case ('updatedTime'): {
+    case 'updatedTime': {
       return fixTimestampToMinutesAccuracy(card.updatedAt);
     }
     default: {
@@ -34,88 +33,85 @@ function getCardProperty (card: Card, property: IPropertyTemplate): string | str
   }
 }
 
-function fixTimestampToMinutesAccuracy (timestamp: number) {
+function fixTimestampToMinutesAccuracy(timestamp: number) {
   // For timestamps that are formatted as hour/minute strings on the UI, we throw away the (milli)seconds
   // so that things like counting unique values work intuitively
   return timestamp - (timestamp % 60000);
 }
 
-function cardsWithValue (cards: readonly Card[], property: IPropertyTemplate): Card[] {
-  return cards
-    .filter((card) => Boolean(getCardProperty(card, property)));
+function cardsWithValue(cards: readonly Card[], property: IPropertyTemplate): Card[] {
+  return cards.filter((card) => Boolean(getCardProperty(card, property)));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function count (cards: readonly Card[], property: IPropertyTemplate): string {
+function count(cards: readonly Card[], property: IPropertyTemplate): string {
   return String(cards.length);
 }
 
-function countEmpty (cards: readonly Card[], property: IPropertyTemplate): string {
+function countEmpty(cards: readonly Card[], property: IPropertyTemplate): string {
   return String(cards.length - cardsWithValue(cards, property).length);
 }
 
 // return count of card which have this property value as not null \\ undefined \\ ''
-function countNotEmpty (cards: readonly Card[], property: IPropertyTemplate): string {
+function countNotEmpty(cards: readonly Card[], property: IPropertyTemplate): string {
   return String(cardsWithValue(cards, property).length);
 }
 
-function percentEmpty (cards: readonly Card[], property: IPropertyTemplate): string {
+function percentEmpty(cards: readonly Card[], property: IPropertyTemplate): string {
   if (cards.length === 0) {
     return '';
   }
   return `${String((((cards.length - cardsWithValue(cards, property).length) / cards.length) * 100).toFixed(0))}%`;
 }
 
-function percentNotEmpty (cards: readonly Card[], property: IPropertyTemplate): string {
+function percentNotEmpty(cards: readonly Card[], property: IPropertyTemplate): string {
   if (cards.length === 0) {
     return '';
   }
   return `${String(((cardsWithValue(cards, property).length / cards.length) * 100).toFixed(0))}%`;
 }
 
-function countValueHelper (cards: readonly Card[], property: IPropertyTemplate): number {
+function countValueHelper(cards: readonly Card[], property: IPropertyTemplate): number {
   let values = 0;
 
   if (property.type === 'multiSelect') {
-    cardsWithValue(cards, property)
-      .forEach((card) => {
-        values += (getCardProperty(card, property) as string[]).length;
-      });
-  }
-  else {
+    cardsWithValue(cards, property).forEach((card) => {
+      values += (getCardProperty(card, property) as string[]).length;
+    });
+  } else {
     values = cardsWithValue(cards, property).length;
   }
 
   return values;
 }
 
-function countValue (cards: readonly Card[], property: IPropertyTemplate): string {
+function countValue(cards: readonly Card[], property: IPropertyTemplate): string {
   return String(countValueHelper(cards, property));
 }
 
-function countChecked (cards: readonly Card[], property: IPropertyTemplate): string {
+function countChecked(cards: readonly Card[], property: IPropertyTemplate): string {
   return countValue(cards, property);
 }
 
-function countUnchecked (cards: readonly Card[], property: IPropertyTemplate): string {
+function countUnchecked(cards: readonly Card[], property: IPropertyTemplate): string {
   return String(cards.length - countValueHelper(cards, property));
 }
 
-function percentChecked (cards: readonly Card[], property: IPropertyTemplate): string {
+function percentChecked(cards: readonly Card[], property: IPropertyTemplate): string {
   const total = cards.length;
   const checked = countValueHelper(cards, property);
 
   return `${String(Math.round((checked * 100) / total))}%`;
 }
 
-function percentUnchecked (cards: readonly Card[], property: IPropertyTemplate): string {
+function percentUnchecked(cards: readonly Card[], property: IPropertyTemplate): string {
   const total = cards.length;
   const checked = countValueHelper(cards, property);
 
   return `${String(Math.round(((total - checked) * 100) / total))}%`;
 }
 
-function countUniqueValue (cards: readonly Card[], property: IPropertyTemplate): string {
+function countUniqueValue(cards: readonly Card[], property: IPropertyTemplate): string {
   const valueMap: Map<string | string[], boolean> = new Map();
 
   cards.forEach((card) => {
@@ -127,8 +123,7 @@ function countUniqueValue (cards: readonly Card[], property: IPropertyTemplate):
 
     if (property.type === 'multiSelect') {
       (value as string[]).forEach((v) => valueMap.set(v, true));
-    }
-    else {
+    } else {
       valueMap.set(String(value), true);
     }
   });
@@ -136,18 +131,17 @@ function countUniqueValue (cards: readonly Card[], property: IPropertyTemplate):
   return String(valueMap.size);
 }
 
-function sum (cards: readonly Card[], property: IPropertyTemplate): string {
+function sum(cards: readonly Card[], property: IPropertyTemplate): string {
   let result = 0;
 
-  cardsWithValue(cards, property)
-    .forEach((card) => {
-      result += parseFloat(getCardProperty(card, property) as string);
-    });
+  cardsWithValue(cards, property).forEach((card) => {
+    result += parseFloat(getCardProperty(card, property) as string);
+  });
 
   return String(Utils.roundTo(result, ROUNDED_DECIMAL_PLACES));
 }
 
-function average (cards: readonly Card[], property: IPropertyTemplate): string {
+function average(cards: readonly Card[], property: IPropertyTemplate): string {
   const numCards = cardsWithValue(cards, property).length;
   if (numCards === 0) {
     return '0';
@@ -158,22 +152,21 @@ function average (cards: readonly Card[], property: IPropertyTemplate): string {
   return String(Utils.roundTo(avg, ROUNDED_DECIMAL_PLACES));
 }
 
-function median (cards: readonly Card[], property: IPropertyTemplate): string {
-  const sorted = cardsWithValue(cards, property)
-    .sort((a, b) => {
-      if (!getCardProperty(a, property)) {
-        return 1;
-      }
+function median(cards: readonly Card[], property: IPropertyTemplate): string {
+  const sorted = cardsWithValue(cards, property).sort((a, b) => {
+    if (!getCardProperty(a, property)) {
+      return 1;
+    }
 
-      if (!getCardProperty(b, property)) {
-        return -1;
-      }
+    if (!getCardProperty(b, property)) {
+      return -1;
+    }
 
-      const aValue = parseFloat(getCardProperty(a, property) as string || '0');
-      const bValue = parseFloat(getCardProperty(b, property) as string || '0');
+    const aValue = parseFloat((getCardProperty(a, property) as string) || '0');
+    const bValue = parseFloat((getCardProperty(b, property) as string) || '0');
 
-      return aValue - bValue;
-    });
+    return aValue - bValue;
+  });
 
   if (sorted.length === 0) {
     return '0';
@@ -183,17 +176,16 @@ function median (cards: readonly Card[], property: IPropertyTemplate): string {
 
   if (sorted.length % 2 === 0) {
     const val1 = parseFloat(getCardProperty(sorted[sorted.length / 2], property) as string);
-    const val2 = parseFloat(getCardProperty(sorted[(sorted.length / 2) - 1], property) as string);
+    const val2 = parseFloat(getCardProperty(sorted[sorted.length / 2 - 1], property) as string);
     result = (val1 + val2) / 2;
-  }
-  else {
+  } else {
     result = parseFloat(getCardProperty(sorted[Math.floor(sorted.length / 2)], property) as string);
   }
 
   return String(Utils.roundTo(result, ROUNDED_DECIMAL_PLACES));
 }
 
-function min (cards: readonly Card[], property: IPropertyTemplate): string {
+function min(cards: readonly Card[], property: IPropertyTemplate): string {
   let result = Number.POSITIVE_INFINITY;
   cards.forEach((card) => {
     if (!getCardProperty(card, property)) {
@@ -207,7 +199,7 @@ function min (cards: readonly Card[], property: IPropertyTemplate): string {
   return String(result === Number.POSITIVE_INFINITY ? '0' : String(Utils.roundTo(result, ROUNDED_DECIMAL_PLACES)));
 }
 
-function max (cards: readonly Card[], property: IPropertyTemplate): string {
+function max(cards: readonly Card[], property: IPropertyTemplate): string {
   let result = Number.NEGATIVE_INFINITY;
   cards.forEach((card) => {
     if (!getCardProperty(card, property)) {
@@ -221,11 +213,11 @@ function max (cards: readonly Card[], property: IPropertyTemplate): string {
   return String(result === Number.NEGATIVE_INFINITY ? '0' : String(Utils.roundTo(result, ROUNDED_DECIMAL_PLACES)));
 }
 
-function range (cards: readonly Card[], property: IPropertyTemplate): string {
+function range(cards: readonly Card[], property: IPropertyTemplate): string {
   return `${min(cards, property)} - ${max(cards, property)}`;
 }
 
-function earliest (cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
+function earliest(cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
   const result = earliestEpoch(cards, property);
   if (result === Number.POSITIVE_INFINITY) {
     return '';
@@ -234,7 +226,7 @@ function earliest (cards: readonly Card[], property: IPropertyTemplate, intl: In
   return property.type === 'date' ? Utils.displayDate(date, intl) : Utils.displayDateTime(date, intl);
 }
 
-function earliestEpoch (cards: readonly Card[], property: IPropertyTemplate): number {
+function earliestEpoch(cards: readonly Card[], property: IPropertyTemplate): number {
   let result = Number.POSITIVE_INFINITY;
   cards.forEach((card) => {
     const timestamps = getTimestampsFromPropertyValue(getCardProperty(card, property));
@@ -245,7 +237,7 @@ function earliestEpoch (cards: readonly Card[], property: IPropertyTemplate): nu
   return result;
 }
 
-function latest (cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
+function latest(cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
   const result = latestEpoch(cards, property);
   if (result === Number.NEGATIVE_INFINITY) {
     return '';
@@ -254,7 +246,7 @@ function latest (cards: readonly Card[], property: IPropertyTemplate, intl: Intl
   return property.type === 'date' ? Utils.displayDate(date, intl) : Utils.displayDateTime(date, intl);
 }
 
-function latestEpoch (cards: readonly Card[], property: IPropertyTemplate): number {
+function latestEpoch(cards: readonly Card[], property: IPropertyTemplate): number {
   let result = Number.NEGATIVE_INFINITY;
   cards.forEach((card) => {
     const timestamps = getTimestampsFromPropertyValue(getCardProperty(card, property));
@@ -265,7 +257,7 @@ function latestEpoch (cards: readonly Card[], property: IPropertyTemplate): numb
   return result;
 }
 
-function getTimestampsFromPropertyValue (value: number | string | string[]): number[] {
+function getTimestampsFromPropertyValue(value: number | string | string[]): number[] {
   if (typeof value === 'number') {
     return [value];
   }
@@ -273,8 +265,7 @@ function getTimestampsFromPropertyValue (value: number | string | string[]): num
     let property: DateProperty;
     try {
       property = JSON.parse(value);
-    }
-    catch {
+    } catch {
       return [];
     }
     return [property.from, property.to].flatMap((e) => {
@@ -284,7 +275,7 @@ function getTimestampsFromPropertyValue (value: number | string | string[]): num
   return [];
 }
 
-function dateRange (cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
+function dateRange(cards: readonly Card[], property: IPropertyTemplate, intl: IntlShape): string {
   const resultEarliest = earliestEpoch(cards, property);
   if (resultEarliest === Number.POSITIVE_INFINITY) {
     return '';

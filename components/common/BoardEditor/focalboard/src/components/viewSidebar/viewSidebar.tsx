@@ -5,7 +5,16 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
-import { Box, ClickAwayListener, Collapse, IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
+import {
+  Box,
+  ClickAwayListener,
+  Collapse,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Typography
+} from '@mui/material';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 
@@ -41,13 +50,12 @@ type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by';
 
 const initialState: SidebarView = 'view-options';
 
-function ViewOptionsSidebar (props: Props) {
-
+function ViewOptionsSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
 
   const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
 
-  function goBack () {
+  function goBack() {
     setSidebarView(initialState);
   }
 
@@ -58,15 +66,20 @@ function ViewOptionsSidebar (props: Props) {
     }
   }, [props.isOpen]);
 
-  const currentGroup = props.board.fields.cardProperties.find(prop => prop.id === props.groupByProperty?.id)?.name;
+  const currentGroup = props.board.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
   const currentLayout = props.view.fields.viewType;
   const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
-  const currentProperties = visiblePropertyIds.filter(id => props.board.fields.cardProperties.some(c => c.id === id)).length;
+  const currentProperties = visiblePropertyIds.filter((id) =>
+    props.board.fields.cardProperties.some((c) => c.id === id)
+  ).length;
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
-      <Collapse in={props.isOpen} orientation='horizontal' sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}>
-
+      <Collapse
+        in={props.isOpen}
+        orientation='horizontal'
+        sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
+      >
         <StyledSidebar>
           {sidebarView === 'view-options' && (
             <>
@@ -121,15 +134,21 @@ function ViewOptionsSidebar (props: Props) {
   );
 }
 
-function MenuRow ({ icon, title, value, onClick }: { icon: JSX.Element, title: string, value?: string, onClick: () => void }) {
+function MenuRow({
+  icon,
+  title,
+  value,
+  onClick
+}: {
+  icon: JSX.Element;
+  title: string;
+  value?: string;
+  onClick: () => void;
+}) {
   return (
     <MenuItem dense onClick={onClick}>
-      <ListItemIcon>
-        {icon}
-      </ListItemIcon>
-      <ListItemText>
-        {title}
-      </ListItemText>
+      <ListItemIcon>{icon}</ListItemIcon>
+      <ListItemText>{title}</ListItemText>
       <Typography component='div' color='secondary' variant='body2' sx={{ display: 'flex', alignItems: 'center' }}>
         {value}
         <ArrowRightIcon />
@@ -138,8 +157,15 @@ function MenuRow ({ icon, title, value, onClick }: { icon: JSX.Element, title: s
   );
 }
 
-export function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar : () => void, goBack?: () => void, title: string }) {
-
+export function SidebarHeader({
+  closeSidebar,
+  goBack,
+  title
+}: {
+  closeSidebar: () => void;
+  goBack?: () => void;
+  title: string;
+}) {
   return (
     <Box px={2} pt={1} pb={1} display='flex' justifyContent='space-between' alignItems='center'>
       <Box display='flex' alignItems='center' gap={1}>
@@ -148,7 +174,9 @@ export function SidebarHeader ({ closeSidebar, goBack, title }: { closeSidebar :
             <BackIcon fontSize='small' color='secondary' />
           </IconButton>
         )}
-        <Typography fontWeight='bold' variant='body2'>{title}</Typography>
+        <Typography fontWeight='bold' variant='body2'>
+          {title}
+        </Typography>
       </Box>
       <IconButton onClick={closeSidebar} size='small'>
         <CloseIcon fontSize='small' />

@@ -1,20 +1,16 @@
 import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
-import type {
-  Command,
-  EditorState, MarkType, Schema } from '@bangle.dev/pm';
-import { Fragment, keymap,
-  Node,
-  Plugin,
-  PluginKey,
-  Selection
-} from '@bangle.dev/pm';
+import type { MarkType, Schema } from '@bangle.dev/pm';
+import { Fragment, keymap, Node } from '@bangle.dev/pm';
 import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
 import { tooltipPlacement } from '@bangle.dev/tooltip';
-import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/tooltip-placement';
-import { triggerInputRule } from '@bangle.dev/tooltip/trigger-input-rule';
+import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+import type { Command, EditorState } from 'prosemirror-state';
+import { Plugin, PluginKey, Selection } from 'prosemirror-state';
 
 import log from 'lib/log';
+
+import { triggerInputRule } from './trigger-input-rule';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -36,7 +32,7 @@ export const defaultKeys = {
   left: undefined
 };
 
-function specFactory ({
+function specFactory({
   markName,
   trigger,
   markColor
@@ -65,15 +61,19 @@ function specFactory ({
       },
       attrs: {
         trigger: { default: trigger }
+      },
+      markdown: {
+        toMarkdown: {
+          open: '',
+          close: '',
+          mixable: true
+        }
       }
     }
   };
 }
 
-export type SuggestTooltipRenderOpts = Omit<
-  TooltipRenderOpts,
-  'getReferenceElement'
->;
+export type SuggestTooltipRenderOpts = Omit<TooltipRenderOpts, 'getReferenceElement'>;
 
 interface PluginsOptions {
   key?: PluginKey;
@@ -88,8 +88,7 @@ interface PluginsOptions {
   onArrowLeft?: Command;
   onArrowRight?: Command;
 }
-export interface SuggestTooltipPluginState {
-
+export interface PluginState {
   triggerText: string;
   show: boolean;
   counter: number;
@@ -97,7 +96,7 @@ export interface SuggestTooltipPluginState {
   markName: string;
 }
 
-function pluginsFactory ({
+function pluginsFactory({
   key = new PluginKey('suggest_tooltip'),
   markName,
   trigger,
@@ -119,14 +118,10 @@ function pluginsFactory ({
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
-      new Plugin<SuggestTooltipPluginState, Schema>({
+      new Plugin<PluginState>({
         key,
-        // filterTransaction: (tr, state) => {
-
-        //   return true;
-        // },
         state: {
-          init (_, _state) {
+          init(_, _state) {
             return {
               trigger,
               markName,
@@ -135,7 +130,7 @@ function pluginsFactory ({
               counter: 0
             };
           },
-          apply (tr, pluginState, _oldState, newState) {
+          apply(tr, pluginState, _oldState, newState) {
             const meta = tr.getMeta(key);
             if (meta === undefined) {
               return pluginState;
@@ -189,12 +184,7 @@ function pluginsFactory ({
           getReferenceElement: referenceElement(key, (state: EditorState) => {
             const markType = schema.marks[markName];
             const { selection } = state;
-            return findFirstMarkPosition(
-              markType,
-              state.doc,
-              selection.from - 1,
-              selection.to
-            );
+            return findFirstMarkPosition(markType, state.doc, selection.from - 1, selection.to);
           })
         }
       }),
@@ -204,8 +194,8 @@ function pluginsFactory ({
         markName,
         key
       }),
-      keybindings
-        && keymap(
+      keybindings &&
+        keymap(
           createObject([
             [keybindings.select, filter(isActiveCheck, onEnter)],
             [keybindings.up, filter(isActiveCheck, onArrowUp)],
@@ -219,9 +209,9 @@ function pluginsFactory ({
   };
 }
 
-export function referenceElement (
+export function referenceElement(
   pluginKey: PluginKey,
-  getActiveMarkPos: (state: EditorState) => { start: number, end: number }
+  getActiveMarkPos: (state: EditorState) => { start: number; end: number }
 ): GetReferenceElementFunction {
   return (view) => {
     return {
@@ -253,17 +243,9 @@ export function referenceElement (
   };
 }
 
-function tooltipController ({
-  key,
-  trigger,
-  markName
-}: {
-  key: PluginKey;
-  trigger?: string;
-  markName: string;
-}) {
+function tooltipController({ key, trigger, markName }: { key: PluginKey; trigger?: string; markName: string }) {
   return new Plugin({
-    view () {
+    view() {
       return {
         update: (view, lastState) => {
           const { state } = view;
@@ -272,11 +254,11 @@ function tooltipController ({
           }
           const markType = state.schema.marks[markName];
           if (
-            lastState.doc.eq(state.doc)
-            && state.selection.eq(lastState && lastState.selection)
+            lastState.doc.eq(state.doc) &&
+            state.selection.eq(lastState && lastState.selection) &&
             // This is a shorthand for checking if the stored mark  of `markType`
             // has changed within the last step. If it has we need to update the state
-            && isStoredMark(state, markType) === isStoredMark(lastState, markType)
+            isStoredMark(state, markType) === isStoredMark(lastState, markType)
           ) {
             return;
           }
@@ -293,8 +275,9 @@ function tooltipController ({
           }
 
           if (!isMarkActive) {
+            const keyState = key.getState(state);
             // performance optimization to prevent unnecessary dispatches
-            if (key.getState(state).show === true) {
+            if (keyState?.show === true) {
               hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
             }
             return;
@@ -306,11 +289,11 @@ function tooltipController ({
   });
 }
 
-function isStoredMark (state: EditorState, markType: MarkType) {
+function isStoredMark(state: EditorState, markType: MarkType) {
   return state && state.storedMarks && markType.isInSet(state.storedMarks);
 }
 
-function isSuggestMarkActive (markName: string) {
+function isSuggestMarkActive(markName: string) {
   return (state: EditorState) => {
     const { from, to } = state.selection;
 
@@ -319,11 +302,7 @@ function isSuggestMarkActive (markName: string) {
   };
 }
 
-function doesQueryHaveTrigger (
-  state: EditorState,
-  markType: MarkType,
-  trigger: string
-) {
+function doesQueryHaveTrigger(state: EditorState, markType: MarkType, trigger: string) {
   const { nodeBefore } = state.selection.$from;
 
   // nodeBefore in a new line (a new paragraph) is null
@@ -343,33 +322,25 @@ function doesQueryHaveTrigger (
   return textContent.includes(trigger);
 }
 
-export function renderSuggestionsTooltip (key: PluginKey, value: Record<string, any>): Command {
+export function renderSuggestionsTooltip(key: PluginKey, value: Record<string, any>): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'RENDER_TOOLTIP', value })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'RENDER_TOOLTIP', value }).setMeta('addToHistory', false));
     }
     return true;
   };
 }
 
-export function hideSuggestionsTooltip (key: PluginKey): Command {
+export function hideSuggestionsTooltip(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'HIDE_TOOLTIP' })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'HIDE_TOOLTIP' }).setMeta('addToHistory', false));
     }
     return true;
   };
 }
 
-function getTriggerText (state: EditorState, markName: string, trigger?: string) {
+function getTriggerText(state: EditorState, markName: string, trigger?: string) {
   const markType = state.schema.marks[markName];
 
   const { nodeBefore } = state.selection.$from;
@@ -388,7 +359,7 @@ function getTriggerText (state: EditorState, markName: string, trigger?: string)
 
   const textContent = nodeBefore.textContent || '';
   const text = textContent
-  // eslint-disable-next-line no-control-regex
+    // eslint-disable-next-line no-control-regex
     .replace(/^([^\x00-\xFF]|[\s\n])+/g, '');
 
   if (trigger) {
@@ -399,20 +370,28 @@ function getTriggerText (state: EditorState, markName: string, trigger?: string)
 
 /** Commands */
 
-export function queryTriggerText (key: PluginKey) {
+export function queryTriggerText(key: PluginKey) {
   return (state: EditorState) => {
-    const { trigger, markName } = key.getState(state);
+    const keyState = key.getState(state);
+    if (!keyState) {
+      return '';
+    }
+    const { trigger, markName } = keyState;
     return getTriggerText(state, markName, trigger);
   };
 }
 
-export function queryIsSuggestTooltipActive (key: PluginKey) {
+export function queryIsSuggestTooltipActive(key: PluginKey) {
   return (state: EditorState) => {
-    return key.getState(state) && key.getState(state).show;
+    const keyState = key.getState(state);
+    if (keyState) {
+      return keyState.show;
+    }
+    return false;
   };
 }
 
-export function replaceSuggestMarkWith (
+export function replaceSuggestMarkWith(
   key: PluginKey,
   maybeNode?: string | Node | Fragment,
   setSelection?: boolean
@@ -422,12 +401,7 @@ export function replaceSuggestMarkWith (
     const { schema } = state;
     const markType = schema.marks[markName];
     const { selection } = state;
-    const queryMark = findFirstMarkPosition(
-      markType,
-      state.doc,
-      selection.from - 1,
-      selection.to
-    );
+    const queryMark = findFirstMarkPosition(markType, state.doc, selection.from - 1, selection.to);
 
     if (!queryMark || queryMark.start === -1) {
       return false;
@@ -447,31 +421,27 @@ export function replaceSuggestMarkWith (
 
       const isInputFragment = maybeNode instanceof Fragment;
 
-      let node: Node;
+      let node: any;
       try {
-        node = maybeNode instanceof Node || isInputFragment
-          ? maybeNode
-          : typeof maybeNode === 'string'
+        node =
+          maybeNode instanceof Node || isInputFragment
+            ? maybeNode
+            : typeof maybeNode === 'string'
             ? state.schema.text(maybeNode)
             : Node.fromJSON(state.schema, maybeNode);
-      }
-      catch (e) {
+      } catch (e) {
         log.error('suggest-tooltip error', e);
         return tr;
       }
       if (node.isText) {
         tr = tr.replaceWith(start, start, node);
-      }
-      else if (node.isBlock) {
+      } else if (node.isBlock) {
         tr = safeInsert(node)(tr);
         if (setSelection) {
           tr = tr.setSelection(Selection.near(tr.doc.resolve(start + 1)));
         }
-      }
-      else if (node.isInline || isInputFragment) {
-        const fragment = isInputFragment
-          ? node
-          : Fragment.fromArray([node, state.schema.text(' ')]);
+      } else if (node.isInline || isInputFragment) {
+        const fragment = isInputFragment ? node : Fragment.fromArray([node, state.schema.text(' ')]);
 
         tr = tr.replaceWith(start, start, fragment);
         // This problem affects Chrome v58+. See: https://github.com/ProseMirror/prosemirror/issues/710
@@ -483,9 +453,7 @@ export function replaceSuggestMarkWith (
         }
 
         // Placing cursor after node + space.
-        tr = tr.setSelection(
-          Selection.near(tr.doc.resolve(start + (fragment as Fragment).size))
-        );
+        tr = tr.setSelection(Selection.near(tr.doc.resolve(start + (fragment as Fragment).size)));
 
         return tr;
       }
@@ -504,25 +472,16 @@ export function replaceSuggestMarkWith (
   };
 }
 
-export function removeSuggestMark (key: PluginKey): Command {
+export function removeSuggestMark(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     const { markName } = key.getState(state);
     const { schema, selection } = state;
     const markType = schema.marks[markName];
 
-    const queryMark = findFirstMarkPosition(
-      markType,
-      state.doc,
-      selection.from - 1,
-      selection.to
-    );
+    const queryMark = findFirstMarkPosition(markType, state.doc, selection.from - 1, selection.to);
 
     const { start, end } = queryMark;
-    if (
-      start === -1
-      && state.storedMarks
-      && markType.isInSet(state.storedMarks)
-    ) {
+    if (start === -1 && state.storedMarks && markType.isInSet(state.storedMarks)) {
       if (dispatch) {
         dispatch(state.tr.removeStoredMark(markType));
       }
@@ -556,56 +515,37 @@ export function removeSuggestMark (key: PluginKey): Command {
   };
 }
 
-export function incrementSuggestTooltipCounter (key: PluginKey): Command {
+export function incrementSuggestTooltipCounter(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'INCREMENT_COUNTER' })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'INCREMENT_COUNTER' }).setMeta('addToHistory', false));
     }
     return true;
   };
 }
 
-export function decrementSuggestTooltipCounter (key: PluginKey): Command {
+export function decrementSuggestTooltipCounter(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'DECREMENT_COUNTER' })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'DECREMENT_COUNTER' }).setMeta('addToHistory', false));
     }
     return true;
   };
 }
 
-export function resetSuggestTooltipCounter (key: PluginKey): Command {
+export function resetSuggestTooltipCounter(key: PluginKey): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'RESET_COUNTER' })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'RESET_COUNTER' }).setMeta('addToHistory', false));
     }
     return true;
   };
 }
 
-export function updateSuggestTooltipCounter (
-  key: PluginKey,
-  counter: number
-): Command {
+export function updateSuggestTooltipCounter(key: PluginKey, counter: number): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
-      dispatch(
-        state.tr
-          .setMeta(key, { type: 'UPDATE_COUNTER', value: counter })
-          .setMeta('addToHistory', false)
-      );
+      dispatch(state.tr.setMeta(key, { type: 'UPDATE_COUNTER', value: counter }).setMeta('addToHistory', false));
     }
     return true;
   };

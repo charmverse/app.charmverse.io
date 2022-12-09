@@ -1,4 +1,3 @@
-
 import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
@@ -11,7 +10,12 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentViewDisplayBy, getCurrentViewGroupBy, getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import {
+  getCurrentViewDisplayBy,
+  getCurrentViewGroupBy,
+  getSortedViews,
+  getView
+} from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -22,7 +26,6 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
 });
 
 const StylesContainer = styled.div<{ containerWidth?: number }>`
-
   .BoardComponent {
     overflow: visible;
   }
@@ -96,12 +99,12 @@ interface DatabaseView {
   source: 'board_page';
 }
 
-export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
+export default function DatabaseView({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
 
-  const views = allViews.filter(view => view.parentId === pageId);
+  const views = allViews.filter((view) => view.parentId === pageId);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
 
@@ -112,12 +115,12 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getSortedBoards);
-  const board = boards.find(b => b.id === pageId);
+  const board = boards.find((b) => b.id === pageId);
 
   // TODO: Handle for other sources in future like workspace users
   const currentPagePermissions = getPagePermissions(pageId || '');
 
-  function showCard (cardId: string | null) {
+  function showCard(cardId: string | null) {
     setShownCardId(cardId);
   }
 
@@ -127,7 +130,8 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
     return updatedPage;
   }, 500);
 
-  const readOnly = typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+  const readOnly =
+    typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
 
   if (!board) {
     return null;
@@ -159,7 +163,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
             setCurrentViewId(viewId);
           }}
           onDeleteView={(viewId: string) => {
-            setCurrentViewId(views.filter(view => view.id !== viewId)?.[0]?.id ?? null);
+            setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
           }}
           hideBanner
           readOnly={readOnly}
@@ -175,12 +179,7 @@ export default function DatabaseView ({ containerWidth, readOnly: readOnlyOverri
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
-          <CardDialog
-            key={shownCardId}
-            cardId={shownCardId}
-            onClose={() => showCard(null)}
-            readOnly={readOnly}
-          />
+          <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => showCard(null)} readOnly={readOnly} />
         </RootPortal>
       )}
       <FocalBoardPortal />

@@ -5,19 +5,20 @@ import { includePagePermissions } from 'lib/pages/server';
 
 import { getBountyOrThrow } from './getBounty';
 
-export async function closeOutBounty (bountyId: string): Promise<BountyWithDetails> {
-
+export async function closeOutBounty(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
   const validSubmissions = countValidSubmissions(bounty.applications);
 
-  const applicationsToReject = bounty.applications.filter(app => {
-    return app.status === 'inProgress' || app.status === 'review';
-  }).map(app => app.id);
+  const applicationsToReject = bounty.applications
+    .filter((app) => {
+      return app.status === 'inProgress' || app.status === 'review';
+    })
+    .map((app) => app.id);
 
   await prisma.application.updateMany({
     where: {
-      OR: applicationsToReject.map(appId => {
+      OR: applicationsToReject.map((appId) => {
         return { id: appId };
       })
     },

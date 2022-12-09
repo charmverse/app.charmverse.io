@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,21 +9,21 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .get(getUserPoaps);
+handler.use(requireUser).get(getUserPoaps);
 
-async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<ExtendedPoap[]>) {
-  const hiddenPoapIDs: string[] = (await prisma.profileItem.findMany({
-    where: {
-      userId: req.session.user.id,
-      isHidden: true,
-      type: 'poap'
-    },
-    select: {
-      id: true
-    }
-  })).map(p => p.id);
+async function getUserPoaps(req: NextApiRequest, res: NextApiResponse<ExtendedPoap[]>) {
+  const hiddenPoapIDs: string[] = (
+    await prisma.profileItem.findMany({
+      where: {
+        userId: req.session.user.id,
+        isHidden: true,
+        type: 'poap'
+      },
+      select: {
+        id: true
+      }
+    })
+  ).map((p) => p.id);
 
   const wallets = await prisma.userWallet.findMany({
     where: {
@@ -32,8 +31,8 @@ async function getUserPoaps (req: NextApiRequest, res: NextApiResponse<ExtendedP
     }
   });
 
-  const poaps = await getPOAPs(wallets.map(w => w.address));
-  const poapsWithHidden = poaps.map(poap => ({
+  const poaps = await getPOAPs(wallets.map((w) => w.address));
+  const poapsWithHidden = poaps.map((poap) => ({
     ...poap,
     isHidden: hiddenPoapIDs.includes(poap.id)
   }));

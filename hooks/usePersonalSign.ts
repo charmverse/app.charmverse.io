@@ -3,21 +3,16 @@ import useSWRImmtable from 'swr/immutable';
 
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 
-const sign = async (_: unknown, library: Web3Provider, account: string): Promise<string> => library
-  .getSigner(account)
-  .signMessage('Please sign this message to verify your address');
+const sign = async (_: unknown, library: Web3Provider, account: string): Promise<string> =>
+  library.getSigner(account).signMessage('Please sign this message to verify your address');
 
 const usePersonalSign = () => {
   const { library, account } = useWeb3AuthSig();
 
-  const { data, mutate, isValidating, error } = useSWRImmtable(
-    ['sign', library, account],
-    sign,
-    {
-      revalidateOnMount: false,
-      shouldRetryOnError: false
-    }
-  );
+  const { data, mutate, isValidating, error } = useSWRImmtable(['sign', library, account], sign, {
+    revalidateOnMount: false,
+    shouldRetryOnError: false
+  });
 
   const removeError = () => mutate((_) => _, false);
 

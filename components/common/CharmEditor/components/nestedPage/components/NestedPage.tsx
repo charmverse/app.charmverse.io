@@ -19,13 +19,11 @@ const NestedPageContainer = styled(Link)`
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-
     .actions-menu {
       opacity: 0;
     }
 
     &:hover {
-
       background-color: ${({ theme }) => theme.palette.background.light};
 
       .actions-menu {
@@ -35,7 +33,7 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-export default function NestedPage ({ node }: NodeViewProps) {
+export default function NestedPage({ node }: NodeViewProps) {
   const space = useCurrentSpace();
   const { pages } = usePages();
   const nestedPage = pages[node.attrs.id];
@@ -47,13 +45,20 @@ export default function NestedPage ({ node }: NodeViewProps) {
   const fullPath = `${window.location.origin}/${appPath}`;
 
   return (
-    <NestedPageContainer data-test={`nested-page-${nestedPage?.id}`} href={nestedPage ? `/${appPath}` : ''} color='inherit' data-id={`page-${nestedPage?.id}`} data-title={nestedPage?.title} data-path={fullPath}>
+    <NestedPageContainer
+      data-test={`nested-page-${nestedPage?.id}`}
+      href={nestedPage ? `/${appPath}` : ''}
+      color='inherit'
+      data-id={`page-${nestedPage?.id}`}
+      data-title={nestedPage?.title}
+      data-path={fullPath}
+    >
       <div>
-        {nestedPage && <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />}
+        {nestedPage && (
+          <PageIcon isEditorEmpty={!nestedPage.hasContent} icon={nestedPage.icon} pageType={nestedPage.type} />
+        )}
       </div>
-      <Typography fontWeight={600}>
-        {nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}
-      </Typography>
+      <Typography fontWeight={600}>{nestedPage ? nestedPage.title || 'Untitled' : 'Page not found'}</Typography>
     </NestedPageContainer>
   );
 }

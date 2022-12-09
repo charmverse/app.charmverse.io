@@ -1,4 +1,3 @@
-
 import type { Page } from '@prisma/client';
 import { useCallback, useEffect, useRef } from 'react';
 
@@ -12,11 +11,11 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import type { Card } from '../../blocks/card';
 
 type Props = {
-    card: Card;
-    readOnly: boolean;
-}
+  card: Card;
+  readOnly: boolean;
+};
 
-function CardDetail (props: Props): JSX.Element|null {
+function CardDetail(props: Props): JSX.Element | null {
   const { card, readOnly } = props;
 
   const mounted = useRef(false);
@@ -35,14 +34,16 @@ function CardDetail (props: Props): JSX.Element|null {
     return updatedPage;
   }, 500);
 
-  const setPage = useCallback(async (updates: Partial<Page>) => {
-    if (mounted.current) {
-      debouncedPageUpdate({ id: card.id, ...updates } as Partial<Page>)
-        .catch((err: any) => {
+  const setPage = useCallback(
+    async (updates: Partial<Page>) => {
+      if (mounted.current) {
+        debouncedPageUpdate({ id: card.id, ...updates } as Partial<Page>).catch((err: any) => {
           log.error('Error saving page', err);
         });
-    }
-  }, [card]);
+      }
+    },
+    [card]
+  );
 
   const parentProposalId = findParentOfType({ pageId: card.id, pageType: 'proposal', pageMap: pages });
 
@@ -50,14 +51,7 @@ function CardDetail (props: Props): JSX.Element|null {
   if (!card || !page) {
     return null;
   }
-  return (
-    <DocumentPage
-      page={page}
-      setPage={setPage}
-      readOnly={readOnly}
-      parentProposalId={parentProposalId}
-    />
-  );
+  return <DocumentPage page={page} setPage={setPage} readOnly={readOnly} parentProposalId={parentProposalId} />;
 }
 
 export default CardDetail;

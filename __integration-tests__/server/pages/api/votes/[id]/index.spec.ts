@@ -39,7 +39,7 @@ describe('GET /api/votes/[id] - Get a single vote', () => {
     await request(baseUrl).get(`/api/votes/${vote.id}`).set('Cookie', userCookie).expect(200);
   });
 
-  it('Should fail if vote doesn\'t exist and respond 404', async () => {
+  it("Should fail if vote doesn't exist and respond 404", async () => {
     await request(baseUrl).get(`/api/votes/${v4()}`).set('Cookie', userCookie).expect(404);
   });
 });
@@ -51,11 +51,13 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
-      pagePermissions: [{
-        permissionLevel: 'custom',
-        permissions: ['create_poll'],
-        userId: nonAdminUser.id
-      }]
+      pagePermissions: [
+        {
+          permissionLevel: 'custom',
+          permissions: ['create_poll'],
+          userId: nonAdminUser.id
+        }
+      ]
     });
 
     const targetVote = await createVote({
@@ -66,9 +68,12 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
-      status: 'Cancelled'
-    })
+    await request(baseUrl)
+      .put(`/api/votes/${targetVote.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({
+        status: 'Cancelled'
+      })
       .expect(200);
   });
 
@@ -88,9 +93,12 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', adminCookie).send({
-      status: 'Cancelled'
-    })
+    await request(baseUrl)
+      .put(`/api/votes/${targetVote.id}`)
+      .set('Cookie', adminCookie)
+      .send({
+        status: 'Cancelled'
+      })
       .expect(200);
   });
 
@@ -110,9 +118,12 @@ describe('PUT /api/votes/[id] - Update a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).put(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
-      status: 'Cancelled'
-    })
+    await request(baseUrl)
+      .put(`/api/votes/${targetVote.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({
+        status: 'Cancelled'
+      })
       .expect(401);
   });
 });
@@ -124,11 +135,13 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
     const votePage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
-      pagePermissions: [{
-        permissionLevel: 'custom',
-        permissions: ['create_poll'],
-        userId: nonAdminUser.id
-      }]
+      pagePermissions: [
+        {
+          permissionLevel: 'custom',
+          permissions: ['create_poll'],
+          userId: nonAdminUser.id
+        }
+      ]
     });
 
     const targetVote = await createVote({
@@ -139,8 +152,7 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie)
-      .expect(200);
+    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).expect(200);
   });
 
   it('Should update vote if the user is an admin of the page space and respond 200', async () => {
@@ -159,9 +171,12 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', adminCookie).send({
-      status: 'Cancelled'
-    })
+    await request(baseUrl)
+      .delete(`/api/votes/${targetVote.id}`)
+      .set('Cookie', adminCookie)
+      .send({
+        status: 'Cancelled'
+      })
       .expect(200);
   });
 
@@ -181,9 +196,12 @@ describe('DELETE /api/votes/[id] - Delete a single vote', () => {
       userVotes: ['3']
     });
 
-    await request(baseUrl).delete(`/api/votes/${targetVote.id}`).set('Cookie', nonAdminCookie).send({
-      status: 'Cancelled'
-    })
+    await request(baseUrl)
+      .delete(`/api/votes/${targetVote.id}`)
+      .set('Cookie', nonAdminCookie)
+      .send({
+        status: 'Cancelled'
+      })
       .expect(401);
   });
 });

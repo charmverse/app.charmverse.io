@@ -44,10 +44,12 @@ describe('Update proposal specific data', () => {
     await updateProposal({
       proposalId: proposal.id,
       authors: [author2.id],
-      reviewers: [{
-        group: 'user',
-        id: reviewer1.id
-      }]
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewer1.id
+        }
+      ]
     });
 
     const [proposalReviewer1, proposalReviewer2, proposalAuthor1, proposalAuthor2] = await Promise.all([
@@ -105,18 +107,21 @@ describe('Update proposal specific data', () => {
 
     const proposal = pageWithProposal.proposal as ProposalWithUsers;
 
-    await expect(updateProposal({
-      proposalId: proposal.id,
-      authors: [],
-      reviewers: [{
-        group: 'user',
-        id: reviewer1.id
-      }]
-    })).rejects.toBeInstanceOf(InvalidStateError);
+    await expect(
+      updateProposal({
+        proposalId: proposal.id,
+        authors: [],
+        reviewers: [
+          {
+            group: 'user',
+            id: reviewer1.id
+          }
+        ]
+      })
+    ).rejects.toBeInstanceOf(InvalidStateError);
   });
 
   it('Should assign the correct permissions when updating proposal authors and reviewers', async () => {
-
     const status: ProposalStatus = 'discussion';
 
     // Create a test proposal first
@@ -131,13 +136,15 @@ describe('Update proposal specific data', () => {
     const proposal = await updateProposal({
       proposalId: pageWithProposal.proposalId as string,
       authors: [author1.id, author2.id],
-      reviewers: [{
-        group: 'user',
-        id: reviewer1.id
-      }]
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewer1.id
+        }
+      ]
     });
 
-    const { permissions } = await getPage(proposal.id) as IPageWithPermissions;
+    const { permissions } = (await getPage(proposal.id)) as IPageWithPermissions;
 
     const permissionTemplate = proposalPermissionMapping[status];
 
@@ -145,20 +152,29 @@ describe('Update proposal specific data', () => {
       // Check all authors have a permission
       proposal.authors.forEach((author) => {
         if (author.userId) {
-          expect(permissions.some(p => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)).toBe(true);
+          expect(
+            permissions.some((p) => p.userId === author.userId && p.permissionLevel === permissionTemplate.author)
+          ).toBe(true);
         }
       });
     }
 
     if (permissionTemplate.reviewer) {
       proposal.reviewers.forEach((reviewer) => {
-        expect(permissions.some(p => (reviewer.userId ? p.userId === reviewer.userId : p.roleId === reviewer.roleId)
-        && p.permissionLevel === permissionTemplate.author)).toBe(true);
+        expect(
+          permissions.some(
+            (p) =>
+              (reviewer.userId ? p.userId === reviewer.userId : p.roleId === reviewer.roleId) &&
+              p.permissionLevel === permissionTemplate.author
+          )
+        ).toBe(true);
       });
     }
 
     if (permissionTemplate.community) {
-      expect(permissions.some(p => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)).toBe(true);
+      expect(
+        permissions.some((p) => p.spaceId === proposal.spaceId && p.permissionLevel === permissionTemplate.community)
+      ).toBe(true);
     }
   });
 });

@@ -1,4 +1,3 @@
-
 import type { PagePermissionLevel, User } from '@prisma/client';
 import { PageOperations } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -16,9 +15,7 @@ beforeAll(async () => {
 });
 
 describe('computeUserPagePermissions', () => {
-
   it('should return the correct permissions for a user by combining all permissions they are eligible for', async () => {
-
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page = await createPage({
@@ -47,8 +44,8 @@ describe('computeUserPagePermissions', () => {
 
     const assignedPermissionLevels: PagePermissionLevel[] = ['view', 'view_comment'];
 
-    assignedPermissionLevels.forEach(group => {
-      permissionTemplates[group].forEach(op => {
+    assignedPermissionLevels.forEach((group) => {
+      permissionTemplates[group].forEach((op) => {
         expect(permissions[op]).toBe(true);
       });
     });
@@ -58,7 +55,6 @@ describe('computeUserPagePermissions', () => {
   });
 
   it('should return full permissions if the user is an admin of the space linked to the page', async () => {
-
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const page = await createPage({
@@ -72,14 +68,12 @@ describe('computeUserPagePermissions', () => {
       userId: adminUser.id
     });
 
-    (Object.keys(PageOperations) as PageOperationType[]).forEach(op => {
+    (Object.keys(PageOperations) as PageOperationType[]).forEach((op) => {
       expect(permissions[op]).toBe(true);
     });
-
   });
 
   it('should return only permissions an admin user has been explicity assigned if allowAdminBypass is set to false', async () => {
-
     const { user: adminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const page = await createPage({
@@ -100,15 +94,13 @@ describe('computeUserPagePermissions', () => {
       allowAdminBypass: false
     });
 
-    (Object.keys(PageOperations) as PageOperationType[]).forEach(op => {
+    (Object.keys(PageOperations) as PageOperationType[]).forEach((op) => {
       if (op === 'read') {
         expect(permissions.read).toBe(true);
-      }
-      else {
+      } else {
         expect(permissions[op]).toBe(false);
       }
     });
-
   });
 
   it('should return empty permissions if the page does not exist', async () => {
@@ -119,14 +111,12 @@ describe('computeUserPagePermissions', () => {
       userId: user.id
     });
 
-    (Object.keys(PageOperations) as PageOperationType[]).forEach(op => {
+    (Object.keys(PageOperations) as PageOperationType[]).forEach((op) => {
       expect(permissions[op]).toBe(false);
     });
-
   });
 
   it('should return only public permissions if no user is provided', async () => {
-
     const { user: nonAdminUser, space: localSpace } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const page = await createPage({
@@ -150,13 +140,11 @@ describe('computeUserPagePermissions', () => {
       pageId: page.id
     });
 
-    permissionTemplates.view.forEach(op => {
+    permissionTemplates.view.forEach((op) => {
       expect(permissions[op]).toBe(true);
     });
 
     expect(permissions.grant_permissions).toBe(false);
     expect(permissions.edit_content).toBe(false);
-
   });
-
 });

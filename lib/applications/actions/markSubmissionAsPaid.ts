@@ -5,7 +5,7 @@ import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 
 import { getApplication } from '../getApplication';
 
-export async function markSubmissionAsPaid (submissionId: string) {
+export async function markSubmissionAsPaid(submissionId: string) {
   const submission = await getApplication(submissionId);
 
   if (!submission) {
@@ -16,12 +16,12 @@ export async function markSubmissionAsPaid (submissionId: string) {
     throw new WrongStateError('Submissions must be completed for you to make payment');
   }
 
-  return await prisma.application.update({
+  return (await prisma.application.update({
     where: {
       id: submission.id
     },
     data: {
       status: 'paid'
     }
-  }) as Application;
+  })) as Application;
 }

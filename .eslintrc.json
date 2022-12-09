@@ -12,7 +12,8 @@
     "plugin:react/recommended",
     "airbnb",
     "plugin:@next/next/recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -50,7 +51,7 @@
           "requireLast": true
         },
         "singleline": {
-          "delimiter": "comma",
+          "delimiter": "semi",
           "requireLast": false
         },
         "multilineDetection": "brackets"
@@ -63,10 +64,6 @@
     "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
-    "brace-style": [
-      "error",
-      "stroustrup"
-    ],
     "class-methods-use-this": "off",
     "comma-dangle": [
       "error",
@@ -164,14 +161,6 @@
         ]
       }
     ],
-    "react/jsx-indent": [
-      2,
-      2,
-      {
-        "checkAttributes": true,
-        "indentLogicalExpressions": true
-      }
-    ],
     "react/jsx-no-bind": "off",
     "react/jsx-one-expression-per-line": "off",
     "react/jsx-props-no-spreading": "off",
@@ -181,10 +170,6 @@
     "react/react-in-jsx-scope": "off",
     "react/self-closing-comp": "off",
     "react/state-in-constructor": "off",
-    "space-before-function-paren": [
-      "error",
-      "always"
-    ],
     "prefer-spread": "off",
     "no-bitwise": "warn",
     "no-undef": "off",
@@ -192,6 +177,18 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error"
+    "@typescript-eslint/no-shadow": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto",
+        "printWidth": 120,
+        "singleQuote": true,
+        "tabWidth": 2,
+        "useTabs": false,
+        "trailingComma": "none",
+        "jsxSingleQuote": true
+      }
+    ]
   }
 }

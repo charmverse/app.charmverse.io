@@ -1,6 +1,6 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
-export function AggregatedDataItem ({ value, label }: { value: number, label: string }) {
+export function AggregatedDataItem({ value, label }: { value: number; label: string }) {
   return (
     <Paper
       sx={{
@@ -21,24 +21,31 @@ export function AggregatedDataItem ({ value, label }: { value: number, label: st
         sx={{
           fontWeight: 500
         }}
-      > {label}
+      >
+        {' '}
+        {label}
       </Typography>
-      <Typography sx={{
-        fontSize: {
-          xs: '1.5rem',
-          sm: '1.75rem'
-        },
-        fontWeight: 'bold'
-      }}
+      <Typography
+        sx={{
+          fontSize: {
+            xs: '1.5rem',
+            sm: '1.75rem'
+          },
+          fontWeight: 'bold'
+        }}
       >
         {value}
       </Typography>
-
     </Paper>
   );
 }
 
-export default function AggregatedData ({ totalBounties, totalCommunities, totalProposals, totalVotes }: {
+export default function AggregatedData({
+  totalBounties,
+  totalCommunities,
+  totalProposals,
+  totalVotes
+}: {
   totalCommunities: number;
   totalProposals: number;
   totalVotes: number;

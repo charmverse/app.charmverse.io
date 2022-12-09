@@ -7,20 +7,17 @@ import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 export class SpaceEventHandler {
-
   socketEvent = 'message';
 
-  constructor (private socket: Socket) {
+  constructor(private socket: Socket) {
     this.socket = socket;
   }
 
-  init () {
-
-    this.socket.on(this.socketEvent, async message => {
+  init() {
+    this.socket.on(this.socketEvent, async (message) => {
       try {
         await this.onMessage(message);
-      }
-      catch (error) {
+      } catch (error) {
         log.error('Error handling workspace socket message', error);
       }
     });
@@ -28,7 +25,7 @@ export class SpaceEventHandler {
     this.socket.emit(this.socketEvent, { type: 'welcome' });
   }
 
-  async onMessage (message: ClientMessage) {
+  async onMessage(message: ClientMessage) {
     if (message.type === 'subscribe') {
       try {
         const { userId: decryptedUserId } = await unsealData<SealedUserId>(message.payload.authToken, {
@@ -41,16 +38,14 @@ export class SpaceEventHandler {
             roomId: message.payload.spaceId
           });
         }
-      }
-      catch (error) {
+      } catch (error) {
         log.error('Error subscribing user to space events', { error });
         this.sendError('Error subscribing to workspace');
       }
     }
   }
 
-  sendError (message: string) {
+  sendError(message: string) {
     this.socket.emit(this.socketEvent, { type: 'error', message });
   }
-
 }

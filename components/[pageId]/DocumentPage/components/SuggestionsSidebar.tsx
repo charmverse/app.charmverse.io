@@ -15,7 +15,7 @@ import { useUser } from 'hooks/useUser';
 
 import { NoCommentsMessage } from './CommentsSidebar';
 
-export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, state: EditorState | null }) {
+export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; state: EditorState | null }) {
   const view = useEditorViewContext();
 
   const { user } = useUser();
@@ -23,29 +23,33 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
 
   // listen to changes on the doc like when suggestions are added/deleted
   useEffect(() => {
-    const marks = getEventsFromDoc({ state: view.state }).map(r => r.marks).flat();
+    const marks = getEventsFromDoc({ state: view.state })
+      .map((r) => r.marks)
+      .flat();
     setSuggestions(marks);
   }, [view.state.doc]);
 
   // listen to changes from selection (see CharmEditor)
   useEffect(() => {
     if (state) {
-      const marks = getEventsFromDoc({ state }).map(r => r.marks).flat();
+      const marks = getEventsFromDoc({ state })
+        .map((r) => r.marks)
+        .flat();
       setSuggestions(marks);
     }
   }, [state]);
 
   // console.log('suggestions', suggestions);
 
-  function clickAcceptAll () {
+  function clickAcceptAll() {
     acceptAll(view);
   }
 
-  function clickRejectAll () {
+  function clickRejectAll() {
     rejectAll(view);
   }
 
-  function highlightMark (mark: TrackedEvent) {
+  function highlightMark(mark: TrackedEvent) {
     activateTrack(view, mark.type, mark.pos);
   }
 
@@ -53,16 +57,30 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
     <>
       {!readOnly && suggestions.length > 0 && (
         <Box display='flex' gap={1} flexDirection='row'>
-          <Button size='small' startIcon={<Check />} disableElevation variant='text' color='secondary' onClick={clickAcceptAll}>
+          <Button
+            size='small'
+            startIcon={<Check />}
+            disableElevation
+            variant='text'
+            color='secondary'
+            onClick={clickAcceptAll}
+          >
             Accept All
           </Button>
-          <Button size='small' startIcon={<Close />} disableElevation variant='text' color='secondary' onClick={clickRejectAll}>
+          <Button
+            size='small'
+            startIcon={<Close />}
+            disableElevation
+            variant='text'
+            color='secondary'
+            onClick={clickRejectAll}
+          >
             Reject All
           </Button>
         </Box>
       )}
       <Stack gap={2}>
-        {suggestions.map(mark => (
+        {suggestions.map((mark) => (
           <div onClick={() => highlightMark(mark)} key={mark.pos}>
             <SuggestionCard
               key={mark.pos + mark.type}
@@ -75,7 +93,7 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
       </Stack>
       {suggestions.length === 0 && (
         <NoCommentsMessage
-          icon={(
+          icon={
             <RateReviewOutlined
               fontSize='large'
               color='secondary'
@@ -84,7 +102,7 @@ export function SuggestionsSidebar ({ readOnly, state }: { readOnly: boolean, st
                 width: '2em'
               }}
             />
-          )}
+          }
           message='No suggestions yet'
         />
       )}

@@ -13,7 +13,7 @@ type IContext = {
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
   showMessage: (msg: string, newSeverity?: AlertColor) => void;
   handleClose: SnackbarProps['onClose'];
-}
+};
 
 export const SnackbarContext = createContext<Readonly<IContext>>({
   handleClose: () => {},
@@ -28,7 +28,7 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   showMessage: () => {}
 });
 
-export function SnackbarProvider ({ children }: { children: ReactNode }) {
+export function SnackbarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const [actions, setActions] = useState<ReactNode[]>([]);
   const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });
@@ -47,34 +47,33 @@ export function SnackbarProvider ({ children }: { children: ReactNode }) {
     setIsOpen(false);
   };
 
-  const value: IContext = useMemo(() => ({
-    isOpen,
-    handleClose,
-    showMessage: (msg: string, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
-      newSeverity = newSeverity ?? 'info';
-      handleClick();
-      if (anchorOrigin) {
-        setOrigin(anchorOrigin);
-      }
-      setSeverity(newSeverity);
-      setMessage(msg);
-    },
-    actions,
-    message,
-    origin,
-    severity,
-    setActions,
-    setOrigin,
-    setSeverity,
-    setIsOpen,
-    setMessage
-  }), [isOpen, message, origin, severity]);
-
-  return (
-    <SnackbarContext.Provider value={value}>
-      {children}
-    </SnackbarContext.Provider>
+  const value: IContext = useMemo(
+    () => ({
+      isOpen,
+      handleClose,
+      showMessage: (msg: string, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
+        newSeverity = newSeverity ?? 'info';
+        handleClick();
+        if (anchorOrigin) {
+          setOrigin(anchorOrigin);
+        }
+        setSeverity(newSeverity);
+        setMessage(msg);
+      },
+      actions,
+      message,
+      origin,
+      severity,
+      setActions,
+      setOrigin,
+      setSeverity,
+      setIsOpen,
+      setMessage
+    }),
+    [isOpen, message, origin, severity]
   );
+
+  return <SnackbarContext.Provider value={value}>{children}</SnackbarContext.Provider>;
 }
 
 export const useSnackbar = () => useContext(SnackbarContext);

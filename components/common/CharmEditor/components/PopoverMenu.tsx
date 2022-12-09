@@ -19,7 +19,7 @@ const StyledPaper = styled(Paper)<{ maxheight: string }>`
   padding: 0 5px;
 `;
 
-export default function PopoverMenu ({ children, container, maxHeight = '40vh', isOpen, width = 250, onClose }: Props) {
+export default function PopoverMenu({ children, container, maxHeight = '40vh', isOpen, width = 250, onClose }: Props) {
   if (!isOpen) {
     return null;
   }

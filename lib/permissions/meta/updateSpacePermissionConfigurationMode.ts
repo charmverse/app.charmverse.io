@@ -9,10 +9,14 @@ import { addSpaceOperations, removeSpaceOperations } from '../spaces';
 import type { SpacePermissionConfigurationUpdate } from './interfaces';
 import { permissionTemplates } from './preset-templates';
 
-export async function updateSpacePermissionConfigurationMode ({ permissionConfigurationMode, spaceId }:
-  SpacePermissionConfigurationUpdate): Promise<Space> {
+export async function updateSpacePermissionConfigurationMode({
+  permissionConfigurationMode,
+  spaceId
+}: SpacePermissionConfigurationUpdate): Promise<Space> {
   if (!SpacePermissionConfigurationMode[permissionConfigurationMode]) {
-    throw new InvalidInputError(`Please provide a valid configuration mode from "${Object.keys(SpacePermissionConfigurationMode)}"`);
+    throw new InvalidInputError(
+      `Please provide a valid configuration mode from "${Object.keys(SpacePermissionConfigurationMode)}"`
+    );
   }
 
   let space = await prisma.space.findUnique({
@@ -25,7 +29,10 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
     throw new DataNotFoundError(`Space with id ${spaceId} not found`);
   }
 
-  const updatedDefaults = permissionConfigurationMode === 'custom' ? {} : permissionTemplates[permissionConfigurationMode].pagePermissionDefaults;
+  const updatedDefaults =
+    permissionConfigurationMode === 'custom'
+      ? {}
+      : permissionTemplates[permissionConfigurationMode].pagePermissionDefaults;
 
   space = await prisma.space.update({
     where: {
@@ -38,12 +45,11 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
   });
 
   if (permissionConfigurationMode !== 'custom') {
-
     const template = permissionTemplates[permissionConfigurationMode];
 
     const toAdd: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === true)
-      .map(tuple => tuple[0]);
+      .map((tuple) => tuple[0]);
 
     if (toAdd.length > 0) {
       await addSpaceOperations({
@@ -54,7 +60,7 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
     }
     const toRemove: SpaceOperation[] = (Object.entries(template.spaceOperations) as [SpaceOperation, boolean][])
       .filter(([op, value]) => value === false)
-      .map(tuple => tuple[0]);
+      .map((tuple) => tuple[0]);
 
     if (toRemove.length > 0) {
       await removeSpaceOperations({
@@ -66,5 +72,4 @@ export async function updateSpacePermissionConfigurationMode ({ permissionConfig
   }
 
   return space;
-
 }

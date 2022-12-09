@@ -1,4 +1,3 @@
-
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -39,7 +38,7 @@ describe('src/components/gallery/GalleryCard', () => {
   const contentComment = TestBlockFactory.createComment(card);
   contentComment.id = 'contentId-Comment';
 
-  let store:MockStoreEnhanced<unknown, unknown>;
+  let store: MockStoreEnhanced<unknown, unknown>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,8 +48,7 @@ describe('src/components/gallery/GalleryCard', () => {
     beforeEach(() => {
       const state = {
         contents: {
-          contents: {
-          }
+          contents: {}
         },
         cards: {
           cards: {
@@ -64,65 +62,78 @@ describe('src/components/gallery/GalleryCard', () => {
       store = mockStateStore([], state);
     });
     test('should match snapshot', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[{ id: card.id, name: 'testTemplateProperty', type: 'text', options: [{ id: '1', value: 'testValue', color: 'blue' }] }]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[
+                {
+                  id: card.id,
+                  name: 'testTemplateProperty',
+                  type: 'text',
+                  options: [{ id: '1', value: 'testValue', color: 'blue' }]
+                }
+              ]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       expect(container).toMatchSnapshot();
     });
     test('return GalleryCard and click on it', () => {
       const mockedOnClick = jest.fn();
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={mockedOnClick}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={mockedOnClick}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const galleryCardElement = container.querySelector('.GalleryCard');
       userEvent.click(galleryCardElement!);
       expect(mockedOnClick).toBeCalledTimes(1);
     });
     test('return GalleryCard and delete card', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       const buttonDelete = screen.getByRole('button', { name: 'Delete' });
@@ -133,22 +144,24 @@ describe('src/components/gallery/GalleryCard', () => {
     });
 
     test('return GalleryCard and duplicate card', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       const buttonDuplicate = screen.getByRole('button', { name: 'Duplicate' });
@@ -158,22 +171,24 @@ describe('src/components/gallery/GalleryCard', () => {
       expect(mockedMutator.duplicateCard).toBeCalledWith(card.id, board);
     });
     test('return GalleryCard and copy link', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       const buttonCopyLink = screen.getByRole('button', { name: 'Copy link' });
@@ -182,22 +197,24 @@ describe('src/components/gallery/GalleryCard', () => {
       expect(mockedUtils.copyTextToClipboard).toBeCalledTimes(1);
     });
     test('return GalleryCard and cancel', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       const buttonCancel = screen.getByRole('button', { name: 'Cancel' });
@@ -226,22 +243,24 @@ describe('src/components/gallery/GalleryCard', () => {
       store = mockStateStore([], state);
     });
     test('should match snapshot', async () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       await act(async () => {
         const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
         userEvent.click(buttonElement);
@@ -275,22 +294,24 @@ describe('src/components/gallery/GalleryCard', () => {
       store = mockStateStore([], state);
     });
     test('should match snapshot with only first image', async () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       await act(async () => {
         const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
         userEvent.click(buttonElement);
@@ -319,43 +340,47 @@ describe('src/components/gallery/GalleryCard', () => {
       store = mockStateStore([], state);
     });
     test('should match snapshot', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       expect(container).toMatchSnapshot();
     });
     test('return GalleryCard with content readonly', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={true}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={true}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       expect(container).toMatchSnapshot();
     });
   });
@@ -382,43 +407,47 @@ describe('src/components/gallery/GalleryCard', () => {
       store = mockStateStore([], state);
     });
     test('should match snapshot', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={false}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={false}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       const buttonElement = screen.getByRole('button', { name: 'menuwrapper' });
       userEvent.click(buttonElement);
       expect(container).toMatchSnapshot();
     });
     test('return GalleryCard with contents readonly', () => {
-      const { container } = render(wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <GalleryCard
-            board={board}
-            card={card}
-            onClick={jest.fn()}
-            visiblePropertyTemplates={[]}
-            visibleTitle={true}
-            isSelected={true}
-            visibleBadges={false}
-            readOnly={true}
-            isManualSort={true}
-            onDrop={jest.fn()}
-          />
-        </ReduxProvider>
-      ));
+      const { container } = render(
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              visibleBadges={false}
+              readOnly={true}
+              isManualSort={true}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
+        )
+      );
       expect(container).toMatchSnapshot();
     });
   });
