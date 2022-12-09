@@ -41,7 +41,7 @@ export function useGoogleAuth() {
       }
 
       const loggedInUser = await charmClient.profile.loginWithGoogle({
-        accessToken: credential?.accessToken as string
+        accessToken: credential?.idToken as string
       });
 
       return { user: loggedInUser, identityType: 'Google' };

@@ -1,4 +1,3 @@
-import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -9,11 +8,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
 import type { IdentityType } from '@prisma/client';
 import * as React from 'react';
+import { useState } from 'react';
 
 import Button from 'components/common/Button';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models/User';
@@ -21,24 +21,25 @@ import type { LoggedInUser } from 'models/User';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { WalletSign } from './WalletSign';
 
-// Google client setup end
-const emails = ['username@gmail.com', 'user02@gmail.com'];
 export type AnyIdLogin = { identityType: IdentityType; user: LoggedInUser };
 export type AnyIdFunction = () => Promise<AnyIdLogin>;
-export interface SimpleDialogProps {
+export interface DialogProps {
   open: boolean;
   selectedValue: string;
   onClose: (value: string) => void;
 }
 
-function SimpleDialog(props: SimpleDialogProps) {
+function LoginHandler(props: DialogProps) {
   const { onClose, selectedValue, open } = props;
   const { loginFromWeb3Account } = useUser();
+
+  const { showMessage } = useSnackbar();
 
   const { loginWithGoogle } = useGoogleAuth();
 
   async function handleLogin(loggedInUser: AnyIdLogin) {
-    log.debug('\r\nSuccess !!🚀🚀🚀', loggedInUser);
+    showMessage(`Logged in with ${loggedInUser.identityType}. Redirecting you now`, 'success');
+    window.location.reload();
   }
 
   const handleClose = () => {
@@ -80,9 +81,9 @@ function SimpleDialog(props: SimpleDialogProps) {
   );
 }
 
-export default function SimpleDialogDemo() {
-  const [open, setOpen] = React.useState(true);
-  const [selectedValue, setSelectedValue] = React.useState(emails[1]);
+export function Login() {
+  const [open, setOpen] = useState(true);
+  const [selectedValue, setSelectedValue] = useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -98,15 +99,7 @@ export default function SimpleDialogDemo() {
       <Button onClick={handleClickOpen} size='large' primary>
         Connect
       </Button>
-      <SimpleDialog selectedValue={selectedValue} open={open} onClose={handleClose} />
+      <LoginHandler selectedValue={selectedValue} open={open} onClose={handleClose} />
     </div>
-  );
-}
-
-export function Login() {
-  return (
-    <Box>
-      <SimpleDialogDemo></SimpleDialogDemo>
-    </Box>
   );
 }
