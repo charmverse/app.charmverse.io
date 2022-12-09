@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 
 import PostCategoryInput from './components/PostCategoriesInput';
 
@@ -15,14 +16,16 @@ interface PostPropertiesProps {
 
 export default function PostProperties({ postId, readOnly }: PostPropertiesProps) {
   const currentSpace = useCurrentSpace();
-  const { data: post, mutate, isValidating } = useSWR(`post/${postId}`, () => charmClient.forum.getForumPost(postId));
+  const { data: page, mutate, isValidating } = useSWR(`post/${postId}`, () => charmClient.forum.getForumPost(postId));
   const { data: categories } = useSWR(currentSpace ? `spaces/${currentSpace.id}/post-categories` : null, () =>
     charmClient.forum.listPostCategories(currentSpace!.id)
   );
 
-  const postStatus = post?.status;
+  const { user } = useUser();
 
-  const postCategory = categories?.find((category) => category.id === post?.categoryId);
+  const postStatus = page?.post.status;
+
+  const postCategory = categories?.find((category) => category.id === page?.post.categoryId);
 
   async function updateForumPost(_postCategory: PostCategory | null) {
     await charmClient.forum.updateForumPost(postId, {
@@ -61,7 +64,7 @@ export default function PostProperties({ postId, readOnly }: PostPropertiesProps
           onChange={updateForumPost}
         />
       </Stack>
-      {postStatus !== 'published' && !isValidating && (
+      {postStatus !== 'published' && !isValidating && page?.createdBy === user?.id && (
         <Button
           sx={{
             width: 'fit-content'

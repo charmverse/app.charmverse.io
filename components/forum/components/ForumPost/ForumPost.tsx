@@ -57,8 +57,8 @@ export default function ForumPost({
   const [pagePost, setPagePost] = useState(post);
   const { id: postId } = pagePost;
   const currentUpvotedStatus = pagePost.upvoted;
-  const { showPage } = usePageDialog();
   const router = useRouter();
+  const { showPage } = usePageDialog();
 
   async function votePost(newUpvotedStatus?: boolean) {
     await charmClient.forum.votePost({
@@ -101,10 +101,10 @@ export default function ForumPost({
           showPage({
             pageId: postId,
             onClose() {
-              setUrlWithoutRerender(router.pathname, { postId: null });
+              setUrlWithoutRerender(router.pathname, { pageId: null });
             }
           });
-          setUrlWithoutRerender(router.pathname, { postId });
+          setUrlWithoutRerender(router.pathname, { pageId: postId });
         }}
       >
         <CardContent>
@@ -131,8 +131,8 @@ export default function ForumPost({
                 {relativeTime}
               </Box>
             </Stack>
+            <PostVote votePost={votePost} {...pagePost} />
           </Box>
-          <PostVote votePost={votePost} {...pagePost} />
         </CardContent>
       </CardActionArea>
     </Card>

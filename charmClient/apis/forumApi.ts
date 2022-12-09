@@ -9,7 +9,7 @@ import type {
   UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
@@ -27,7 +27,7 @@ export class ForumApi {
   }
 
   getForumPost(postId: string) {
-    return http.GET<Post>(`/api/forums/posts/${postId}`);
+    return http.GET<ForumPostPageWithoutVote>(`/api/forums/posts/${postId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {

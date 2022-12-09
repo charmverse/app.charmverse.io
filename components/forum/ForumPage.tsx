@@ -20,9 +20,9 @@ export default function ForumPage() {
   const router = useRouter();
 
   const currentSpace = useCurrentSpace();
-  const { showPage } = usePageDialog();
   const { categories } = useForumCategories();
   const categoryIds = router.query.categoryIds ?? [];
+  const { showPage } = usePageDialog();
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
@@ -46,15 +46,15 @@ export default function ForumPage() {
   }
 
   useEffect(() => {
-    if (typeof router.query.postId === 'string') {
+    if (typeof router.query.pageId === 'string') {
       showPage({
-        pageId: router.query.postId,
+        pageId: router.query.pageId,
         onClose() {
-          setUrlWithoutRerender(router.pathname, { postId: null });
+          setUrlWithoutRerender(router.pathname, { pageId: null });
         }
       });
     }
-  }, [router.query.postId]);
+  }, [router.query.pageId]);
 
   return (
     <CenteredPageContent>

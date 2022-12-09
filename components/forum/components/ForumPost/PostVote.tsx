@@ -24,7 +24,11 @@ export function PostVote({
         sx={{
           fill: upvoted === true ? theme.palette.success.main : ''
         }}
-        onClick={() => votePost(upvoted === undefined || upvoted === false ? true : undefined)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          votePost(upvoted === undefined || upvoted === false ? true : undefined);
+        }}
       />
       <Typography>{upvotes - downvotes}</Typography>
       <SouthIcon
@@ -32,7 +36,11 @@ export function PostVote({
         sx={{
           fill: upvoted === false ? theme.palette.error.main : ''
         }}
-        onClick={() => votePost(upvoted === undefined || upvoted === true ? false : undefined)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          votePost(upvoted === undefined || upvoted === true ? false : undefined);
+        }}
       />
     </Box>
   );

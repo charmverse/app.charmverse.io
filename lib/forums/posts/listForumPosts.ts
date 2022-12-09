@@ -63,7 +63,7 @@ export async function listForumPosts(
     ? { categoryId: null }
     : {};
 
-  postPropsQuery.status = 'published';
+  // postPropsQuery.status = 'published';
 
   const pages = await prisma.page.findMany({
     ...orderQuery,

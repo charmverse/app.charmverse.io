@@ -12,17 +12,17 @@ handler.use(requireUser).put(publishForumPostHandler);
 
 // TODO - Update posts
 async function publishForumPostHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { postId } = req.query as any as { postId: string };
+  const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId,
+    postId: pageId,
     userId
   });
 
-  await publishForumPost(postId);
+  await publishForumPost(pageId);
 
-  res.status(200).json({});
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);
