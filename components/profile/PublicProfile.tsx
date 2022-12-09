@@ -32,6 +32,7 @@ function transformNft(nft: NftData): Collectable {
   const tokenId = nft.tokenId.startsWith('0x') ? parseInt(nft.tokenId, 16) : nft.tokenId;
   return {
     type: 'nft',
+    contract: nft.contract,
     date: nft.timeLastUpdated,
     id: nft.id,
     image: nft.image ?? nft.imageThumb,
@@ -211,6 +212,27 @@ export default function PublicProfile(props: UserDetailsProps) {
     }
   }, [collabError]);
 
+  function groupBy<T>(arr: T[], fn: (item: T) => any) {
+    return arr.reduce<Record<string, T[]>>((prev, curr) => {
+      const groupKey = fn(curr);
+      const group = prev[groupKey] || [];
+      group.push(curr);
+      return { ...prev, [groupKey]: group };
+    }, {});
+  }
+
+  const groups = groupBy(collectables, (collectable) => collectable.contract);
+
+  const collection: Collectable[][] = [];
+  const notCollection: Collectable[][] = [];
+  Object.entries(groups).forEach(([key, value]) => {
+    if (value.length > 1) {
+      collection.push(value);
+    } else {
+      notCollection.push(value);
+    }
+  });
+
   return (
     <Stack spacing={2}>
       <UserDetails {...props} />
@@ -244,17 +266,37 @@ export default function PublicProfile(props: UserDetailsProps) {
 
         {collectables.length > 0 ? (
           <>
-            <SectionHeader title='NFTs & POAPs' count={collectables.length} />
+            <SectionHeader title='NFT Collections' count={collection.length} />
+            {collection.map((collectable) => (
+              <div key={collectable[0].id}>
+                <p>collection title {collectable[0].title}</p>
+                <Stack gap={2} mb={2}>
+                  {collectable.map((item) => (
+                    // <p key={item.id}>{item.title}</p>
+                    <CollectableRow
+                      key={item.id}
+                      showVisibilityIcon={!readOnly}
+                      visible={!item.isHidden}
+                      onClick={() => {
+                        toggleCollectibleVisibility(item);
+                      }}
+                      collectable={item}
+                    />
+                  ))}
+                </Stack>
+              </div>
+            ))}
+            <SectionHeader title='NFTs & POAPs' count={notCollection.length} />
             <Stack gap={2} mb={2}>
-              {collectables.map((collectable) => (
+              {notCollection.map((collectable) => (
                 <CollectableRow
-                  key={collectable.id}
+                  key={collectable[0].id}
                   showVisibilityIcon={!readOnly}
-                  visible={!collectable.isHidden}
+                  visible={!collectable[0].isHidden}
                   onClick={() => {
-                    toggleCollectibleVisibility(collectable);
+                    toggleCollectibleVisibility(collectable[0]);
                   }}
-                  collectable={collectable}
+                  collectable={collectable[0]}
                 />
               ))}
             </Stack>
