@@ -89,6 +89,7 @@ export class WebSocketConnector {
     this.receiveData = receiveData;
     this.onError = onError;
     this.socket = io(socketHost, {
+      transports: ['websocket'],
       withCredentials: true,
       auth: {
         authToken
