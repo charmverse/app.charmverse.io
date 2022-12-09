@@ -5,7 +5,7 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 
 import { ViewOptions } from 'components/common/ViewOptions';
-import { useForumFilters } from 'hooks/useForumFilters';
+import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
 export type FilterProps = {
@@ -16,8 +16,8 @@ export type FilterProps = {
   sort?: any;
 };
 
-export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
-  const { categories, error } = useForumFilters();
+export default function ForumFilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+  const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
   //   const defaultValue = sortList[0];

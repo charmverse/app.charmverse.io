@@ -6,31 +6,75 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
-import { useForumFilters } from 'hooks/useForumFilters';
 import isAdmin from 'hooks/useIsAdmin';
 
-import { FilterCategory } from './FilterCategory';
-import type { FilterProps } from './FilterSelect';
+import { ForumFilterCategory } from './ForumFilterCategory';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
-export default function FilterList({ selectedCategory }: FilterProps) {
-  const { getLinkUrl, categories, sortList, error } = useForumFilters();
-  const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
-  const currentSpace = useCurrentSpace();
+function ForumFilterListLink({ category, label }: { label: string; category?: PostCategory }) {
+  const { deleteForumCategory, updateForumCategory } = useForumCategories();
+  const router = useRouter();
+  const selectedCategory = router.query.categoryIds as string;
   const admin = isAdmin();
+
+  return (
+    <MenuItem
+      dense
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}
+    >
+      <Link
+        href={`/${router.query.domain}/forum${category ? `?categoryIds=${category.id}` : ''}`}
+        sx={{
+          cursor: 'pointer',
+          wordBreak: 'break-all',
+          pr: 3.5,
+          width: '100%'
+        }}
+      >
+        <Typography
+          color='initial'
+          fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
+        >
+          {label}
+        </Typography>
+      </Link>
+      {admin && category && (
+        <span className='icons'>
+          <ForumFilterCategory
+            category={category as PostCategory}
+            onChange={updateForumCategory}
+            onDelete={deleteForumCategory}
+          />
+        </span>
+      )}
+    </MenuItem>
+  );
+}
+
+export default function ForumFilterList() {
+  const { categories, error } = useForumCategories();
+  const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
+  const admin = isAdmin();
+  const router = useRouter();
+  const selectedCategory = router.query.categoryIds as string;
   const [forumCategoryName, setForumCategoryName] = useState('');
-  const { createForumCategory, deleteForumCategory, updateForumCategory } = useForumCategories();
+  const { createForumCategory } = useForumCategories();
 
   function createCategory() {
     createForumCategory(forumCategoryName);
@@ -40,10 +84,6 @@ export default function FilterList({ selectedCategory }: FilterProps) {
 
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
-  }
-
-  if (!currentSpace) {
-    return null;
   }
 
   return (
@@ -78,54 +118,10 @@ export default function FilterList({ selectedCategory }: FilterProps) {
                 <Divider sx={{ pt: '10px', mb: '10px' }} />
         */}
         <Stack mb={2}>
-          {[{ id: 'all-categories', name: 'All categories' }, ...(categories ?? [])]?.map((category) => (
+          <ForumFilterListLink label='All categories' />
+          {categories.map((category) => (
             <StyledBox key={category.id}>
-              <MenuItem
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Link
-                  href={{
-                    pathname: `/${currentSpace!.domain}/forum`,
-                    query:
-                      category.id !== 'all-categories'
-                        ? {
-                            categoryIds: category.id
-                          }
-                        : {}
-                  }}
-                  sx={{
-                    cursor: 'pointer',
-                    wordBreak: 'break-all',
-                    pr: 3.5
-                  }}
-                >
-                  <Typography
-                    color='initial'
-                    fontWeight={
-                      (category.id === 'all-categories' && selectedCategory === undefined) ||
-                      selectedCategory === category.id
-                        ? 'bold'
-                        : 'initial'
-                    }
-                  >
-                    {category.name}
-                  </Typography>
-                </Link>
-                {admin && category.id !== 'all-categories' && (
-                  <Box className='icons'>
-                    <FilterCategory
-                      category={category as PostCategory}
-                      onChange={updateForumCategory}
-                      onDelete={deleteForumCategory}
-                    />
-                  </Box>
-                )}
-              </MenuItem>
+              <ForumFilterListLink label={category.name} category={category} />
             </StyledBox>
           ))}
         </Stack>
@@ -137,6 +133,7 @@ export default function FilterList({ selectedCategory }: FilterProps) {
           startIcon={<AddIcon />}
           onClick={addCategoryPopupState.open}
           variant='outlined'
+          size='small'
         >
           Add category
         </Button>
@@ -152,6 +149,7 @@ export default function FilterList({ selectedCategory }: FilterProps) {
           sx={{
             mb: 1
           }}
+          autoFocus
           fullWidth
           value={forumCategoryName}
           onChange={(e) => {
@@ -165,7 +163,7 @@ export default function FilterList({ selectedCategory }: FilterProps) {
         />
         <Button
           disabled={
-            forumCategoryName.length === 0 || categories?.find((category) => category.name === forumCategoryName)
+            forumCategoryName.length === 0 || categories.find((category) => category.name === forumCategoryName)
           }
           onClick={createCategory}
         >

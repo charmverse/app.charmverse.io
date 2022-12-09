@@ -22,15 +22,13 @@ describe('updatePostCategory', () => {
     const postCategory = await createPostCategory(createInput);
 
     const update: PostCategoryUpdate = {
-      name: 'Updated Category',
-      color: '#FFFFFF'
+      name: 'Updated Category'
     };
 
     const updatedPostCategory = await updatePostCategory(postCategory.id, update);
 
     expect(updatedPostCategory.id).toBe(postCategory.id);
     expect(updatedPostCategory.name).toBe(update.name);
-    expect(updatedPostCategory.color).toBe(update.color);
   });
 
   it('should fail to update a post category name if one with the same name already exists in this space', async () => {

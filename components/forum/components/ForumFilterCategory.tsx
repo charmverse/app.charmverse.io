@@ -13,7 +13,7 @@ type Props = {
   onDelete: (category: PostCategory) => void;
 };
 
-export function FilterCategory({ category, onChange, onDelete }: Props) {
+export function ForumFilterCategory({ category, onChange, onDelete }: Props) {
   const [tempName, setTempName] = useState(category.name || '');
 
   useEffect(() => {

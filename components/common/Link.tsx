@@ -1,5 +1,3 @@
-import type { UrlObject } from 'node:url';
-
 import styled from '@emotion/styled';
 import type { LinkProps } from '@mui/material';
 import MuiLink from '@mui/material/Link';
@@ -36,7 +34,7 @@ const StyledMuiLink = styled(MuiLink)`
 
 interface Props extends Omit<LinkProps, 'href'> {
   external?: boolean;
-  href?: string | UrlObject;
+  href?: string;
 }
 
 export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
@@ -45,7 +43,7 @@ export default function Link({ external, href, onClick, children, color = 'prima
   }
 
   return external ? (
-    <StyledMuiLink href={href as string} color={color} rel='noreferrer' underline='none' {...restProps}>
+    <StyledMuiLink href={href} color={color} rel='noreferrer' underline='none' {...restProps}>
       {children}
     </StyledMuiLink>
   ) : (
