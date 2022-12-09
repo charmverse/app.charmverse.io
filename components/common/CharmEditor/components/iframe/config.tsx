@@ -20,11 +20,23 @@ export const embeds = {
     placeholder: 'https://www.airtable.com/...',
     text: 'Insert an Airtable embed'
   },
+  dune: {
+    iconUrl: '/images/dune_logo_bw.png',
+    name: 'Dune',
+    placeholder: 'https://dune.com/embeds/...',
+    text: 'Insert analytics from Dune'
+  },
   figma: {
     icon: FiFigma,
     name: 'Figma',
-    placeholder: 'https://www.figma.com/file...',
+    placeholder: 'https://www.figma.com/file/...',
     text: 'Insert a Figma embed'
+  },
+  typeform: {
+    iconUrl: '/images/typeform_logo.png',
+    name: 'Typeform',
+    placeholder: 'https://typeform.com/to/...',
+    text: 'Insert a typeform embed'
   }
 };
 

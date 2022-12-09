@@ -48,7 +48,7 @@ export function deleteNode(tr: Transaction, node: Node, nodePos: number, map: Ma
   } else if (node.type === tr.doc.type.schema.nodes.listItem) {
     const state = EditorState.create({
       doc: tr.doc,
-      selection: Selection.findFrom(tr.doc.resolve(newNodePos), 1)
+      selection: Selection.findFrom(tr.doc.resolve(newNodePos), 1) || undefined
     });
     liftListItem(node.type)(state, (newTr) => {
       newTr.steps.forEach((step) => {

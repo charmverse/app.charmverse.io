@@ -2,12 +2,13 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import Alert from '@mui/material/Alert';
 import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
@@ -16,6 +17,7 @@ import { DialogTitle, Modal } from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import log from 'lib/log';
+import { BrowserPopupError } from 'lib/utilities/errors';
 
 import ConnectorButton from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
@@ -40,6 +42,8 @@ function WalletSelectorModal({
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
   const { showMessage } = useSnackbar();
+
+  const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
 
   // initialize metamask onboarding
   const onboarding = useRef<MetaMaskOnboarding>();
@@ -68,6 +72,12 @@ function WalletSelectorModal({
   }, [active]);
 
   useEffect(() => {
+    if (!isModalOpen) {
+      setUAuthPopupError(null);
+    }
+  }, [isModalOpen]);
+
+  useEffect(() => {
     if (error instanceof UnsupportedChainIdError) {
       closeModal();
       openNetworkModal();
@@ -78,13 +88,13 @@ function WalletSelectorModal({
   const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
   log.debug('UAuth meta', { redirectUri, clientID });
 
-  const uauth = new UAuth({
-    clientID,
-    redirectUri,
-    scope: 'openid wallet'
-  });
-
   async function handleAuth() {
+    const uauth = new UAuth({
+      clientID,
+      redirectUri,
+      scope: 'openid wallet'
+    });
+
     setIsConnectingIdentity(true);
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
@@ -93,6 +103,9 @@ function WalletSelectorModal({
       // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
       window.location.reload();
     } catch (err) {
+      if ((err as Error).message.match('failed to be constructed')) {
+        setUAuthPopupError(new BrowserPopupError());
+      }
       setIsConnectingIdentity(false);
       log.error(err);
     }
@@ -150,6 +163,12 @@ function WalletSelectorModal({
             isActive={connector === walletLink}
             isLoading={activatingConnector === walletLink}
           />
+          {uAuthPopupError && (
+            <Alert severity='warning'>
+              Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
+              browser.
+            </Alert>
+          )}
         </Grid>
         <Grid item>
           <Typography variant='caption' align='center'>

@@ -55,6 +55,7 @@ export class FidusEditor {
   // @ts-ignore gets defined in initEditor
   mod: EditorModules = {};
 
+  // @ts-ignore gets defined in initEditor
   schema: EditorState['schema'];
 
   statePlugins: [any, any][] = [];

@@ -444,7 +444,7 @@ function CharmEditor({
 
   function getPlugins() {
     return charmEditorPlugins({
-      onContentChange: (view: EditorView, prevDoc: Node<any>) => {
+      onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
       },
       onSelectionSet,

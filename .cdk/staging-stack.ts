@@ -85,6 +85,11 @@ export class CdkDeployStack extends Stack {
         value: '1',
       },
       {
+        namespace: 'aws:autoscaling:asg',
+        optionName: 'Custom Availability Zones',
+        value: 'us-east-1a,us-east-1b,us-east-1c',
+      },
+      {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
         value: 't3.micro',
@@ -103,11 +108,21 @@ export class CdkDeployStack extends Stack {
       }
     ];
 
+    // add ddenabled tag to instance to enable datadog aws integration.
+    if (process.env.DDENABLED === "true") {
+        resourceTags.push(
+          {
+            key: 'ddenabled',
+            value: 'true'
+          }
+        )
+    }
+
     // Create an Elastic Beanstalk environment to run the application
     const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
-      solutionStackName: '64bit Amazon Linux 2 v3.4.13 running Docker',
+      solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       versionLabel: appVersionProps.ref,

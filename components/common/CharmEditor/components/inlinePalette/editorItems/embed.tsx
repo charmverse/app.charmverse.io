@@ -3,6 +3,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import TwitterIcon from '@mui/icons-material/Twitter';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
+import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
 import { palettePluginKey } from '../config';
@@ -12,12 +13,10 @@ import type { PaletteItemTypeNoGroup } from '../paletteItem';
 const iconSize = 30;
 
 function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
-  const Icon = embeds[type].icon;
-
   return {
     uid: type,
     title: embeds[type].name,
-    icon: <Icon style={{ fontSize: iconSize }} />,
+    icon: <EmbedIcon {...embeds[type]} size='large' />,
     keywords: ['iframe'],
     description: embeds[type].text,
     editorExecuteCommand: () => {
@@ -55,7 +54,9 @@ export function items(): PaletteItemTypeNoGroup[] {
   return [
     iframeEmbedType('embed'),
     iframeEmbedType('airtable'),
+    iframeEmbedType('dune'),
     iframeEmbedType('figma'),
+    iframeEmbedType('typeform'),
     {
       uid: 'price',
       title: 'Crypto price',

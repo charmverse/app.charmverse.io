@@ -112,7 +112,6 @@ function ContainerPlugin({ type, contentDOM }: { type: string; contentDOM: DOMOu
             view,
             destroy() {
               this.contentDOM = undefined;
-              this.dom = undefined;
             }
           };
         }
