@@ -4,12 +4,11 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
-import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
@@ -18,11 +17,6 @@ import { PostVote } from './PostVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
-  setPosts: Dispatch<
-    SetStateAction<PaginatedPostList<{
-      user?: Member | undefined;
-    }> | null>
-  >;
 };
 
 const maxCharactersInPost = 140;
@@ -51,13 +45,13 @@ export default function ForumPost({
   title,
   contentText,
   galleryImage,
-  post,
-  setPosts
+  post
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
-  const { id: postId } = post;
-  const currentUpvotedStatus = post.upvoted;
+  const [pagePost, setPagePost] = useState(post);
+  const { id: postId } = pagePost;
+  const currentUpvotedStatus = pagePost.upvoted;
 
   async function votePost(newUpvotedStatus?: boolean) {
     await charmClient.forum.votePost({
@@ -65,48 +59,31 @@ export default function ForumPost({
       upvoted: newUpvotedStatus
     });
 
-    setPosts((postPages) => {
-      return postPages
-        ? {
-            cursor: postPages.cursor,
-            data: postPages.data.map((page) => {
-              if (page.postId === postId) {
-                const forumPostPageVote: ForumPostPageVote = {
-                  downvotes: post.downvotes,
-                  upvotes: post.upvotes,
-                  upvoted: newUpvotedStatus
-                };
+    const forumPostPageVote: ForumPostPageVote = {
+      downvotes: pagePost.downvotes,
+      upvotes: pagePost.upvotes,
+      upvoted: newUpvotedStatus
+    };
 
-                if (newUpvotedStatus === true) {
-                  forumPostPageVote.upvotes += 1;
-                  if (currentUpvotedStatus === false) {
-                    forumPostPageVote.downvotes -= 1;
-                  }
-                } else if (newUpvotedStatus === false) {
-                  forumPostPageVote.downvotes += 1;
-                  if (currentUpvotedStatus === true) {
-                    forumPostPageVote.upvotes -= 1;
-                  }
-                } else if (currentUpvotedStatus === true) {
-                  forumPostPageVote.upvotes -= 1;
-                } else {
-                  forumPostPageVote.downvotes -= 1;
-                }
+    if (newUpvotedStatus === true) {
+      forumPostPageVote.upvotes += 1;
+      if (currentUpvotedStatus === false) {
+        forumPostPageVote.downvotes -= 1;
+      }
+    } else if (newUpvotedStatus === false) {
+      forumPostPageVote.downvotes += 1;
+      if (currentUpvotedStatus === true) {
+        forumPostPageVote.upvotes -= 1;
+      }
+    } else if (currentUpvotedStatus === true) {
+      forumPostPageVote.upvotes -= 1;
+    } else {
+      forumPostPageVote.downvotes -= 1;
+    }
 
-                return {
-                  ...page,
-                  post: {
-                    ...page.post,
-                    ...forumPostPageVote,
-                    upvoted: newUpvotedStatus
-                  }
-                };
-              }
-              return page;
-            }),
-            hasNext: postPages.hasNext
-          }
-        : null;
+    setPagePost({
+      ...pagePost,
+      ...forumPostPageVote
     });
   }
 
@@ -137,7 +114,7 @@ export default function ForumPost({
                 {relativeTime}
               </Box>
             </Box>
-            <PostVote votePost={votePost} {...post} />
+            <PostVote votePost={votePost} {...pagePost} />
           </Box>
         </CardContent>
       </CardActionArea>
