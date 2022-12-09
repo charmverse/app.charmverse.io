@@ -31,26 +31,17 @@ export function useGoogleAuth() {
       const auth = getAuth(firebaseApp);
       auth.languageCode = 'en';
 
-      console.log('Authed, getting creds', auth);
       const result = await signInWithPopup(auth, provider);
 
       // This gives you a Google Access Token. You can use it to access the Google API.
       const credential = GoogleAuthProvider.credentialFromResult(result);
 
       if (!credential) {
-        console.log(new ExternalServiceError(`Could not authenticate with Google`));
+        throw new ExternalServiceError(`Could not authenticate with Google`);
       }
 
-      const token = credential?.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-
-      console.log({ 'Printed token': token, user });
-
       const loggedInUser = await charmClient.profile.loginWithGoogle({
-        ...credential,
-        email: user.email,
-        refresh_token: user.refreshToken
+        accessToken: credential?.accessToken as string
       });
 
       return { user: loggedInUser, identityType: 'Google' };

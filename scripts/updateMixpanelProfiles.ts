@@ -82,7 +82,8 @@ async function updateMixpanelUserProfiles() {
       discordUser: true,
       telegramUser: true,
       notificationState: true,
-      wallets: true
+      wallets: true,
+      googleAccounts: true
     }
   });
 

@@ -14,9 +14,12 @@ import type { IdentityType } from '@prisma/client';
 import * as React from 'react';
 
 import Button from 'components/common/Button';
+import { useUser } from 'hooks/useUser';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models/User';
 
 import { useGoogleAuth } from './hooks/useGoogleAuth';
+import { WalletSign } from './WalletSign';
 
 // Google client setup end
 const emails = ['username@gmail.com', 'user02@gmail.com'];
@@ -30,6 +33,7 @@ export interface SimpleDialogProps {
 
 function SimpleDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
+  const { loginFromWeb3Account } = useUser();
 
   const { loginWithGoogle } = useGoogleAuth();
 
@@ -40,26 +44,30 @@ function SimpleDialog(props: SimpleDialogProps) {
   const handleClose = () => {
     onClose(selectedValue);
   };
-  const handleListItemClick = (value: string) => {
-    onClose(value);
-  };
+
+  async function handleGoogleLogin() {
+    const user = await loginWithGoogle();
+    handleLogin(user);
+  }
+
+  async function handleWalletSign(signature: AuthSig) {
+    const user = await loginFromWeb3Account(signature);
+    handleLogin({ identityType: 'Wallet', user });
+  }
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Login</DialogTitle>
       <List sx={{ pt: 0 }}>
-        <ListItem button onClick={() => loginWithGoogle().then(handleLogin)}>
-          <ListItemAvatar>
-            <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-              <PersonIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary='Login with Google' />
+        {/** Web 3 login methods */}
+        <ListItem>
+          <WalletSign signSuccess={handleWalletSign} />
         </ListItem>
-      </List>
-      <DialogTitle>With web 2</DialogTitle>
-      <List sx={{ pt: 0 }}>
-        <ListItem button onClick={() => loginWithGoogle().then(handleLogin)}>
+
+        <hr />
+
+        {/* Google login method */}
+        <ListItem button onClick={handleGoogleLogin}>
           <ListItemAvatar>
             <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
               <PersonIcon />
@@ -87,12 +95,8 @@ export default function SimpleDialogDemo() {
 
   return (
     <div>
-      <Typography variant='subtitle1' component='div'>
-        Selected: {selectedValue}
-      </Typography>
-      <br />
-      <Button variant='outlined' onClick={handleClickOpen}>
-        Open simple dialog
+      <Button onClick={handleClickOpen} size='large' primary>
+        Connect
       </Button>
       <SimpleDialog selectedValue={selectedValue} open={open} onClose={handleClose} />
     </div>
@@ -102,10 +106,6 @@ export default function SimpleDialogDemo() {
 export function Login() {
   return (
     <Box>
-      <Button size='large' primary>
-        Connect with any ID
-      </Button>
-
       <SimpleDialogDemo></SimpleDialogDemo>
     </Box>
   );
