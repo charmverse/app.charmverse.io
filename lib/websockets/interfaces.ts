@@ -60,9 +60,12 @@ type VotesUpdated = {
   payload: ExtendedVote[];
 };
 
-type PostCreated = {
-  type: 'post_created';
-  payload: Post & { page: Page | null };
+type PostPublished = {
+  type: 'post_published';
+  payload: {
+    categoryId: string | null;
+    createdBy: string;
+  };
 };
 
 type ErrorMessage = {
@@ -90,7 +93,7 @@ export type ServerMessage =
   | VotesCreated
   | VotesDeleted
   | VotesUpdated
-  | PostCreated;
+  | PostPublished;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

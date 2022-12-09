@@ -138,10 +138,10 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       if (post) {
         relay.broadcast(
           {
-            type: 'post_created',
+            type: 'post_published',
             payload: {
-              ...post,
-              page: pageWithPermissions
+              categoryId: post.categoryId,
+              createdBy: userId
             }
           },
           page.spaceId

@@ -125,13 +125,9 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       });
   }
 
-  const handleNewPostEvent = useCallback(
-    (postWithPage: WebSocketPayload<'post_created'>) => {
-      if (
-        user &&
-        postWithPage.page?.createdBy !== user.id &&
-        (categoryId ? postWithPage.categoryId === categoryId : true)
-      ) {
+  const handlePostPublishEvent = useCallback(
+    (postWithPage: WebSocketPayload<'post_published'>) => {
+      if (user && postWithPage?.createdBy !== user.id && (categoryId ? postWithPage.categoryId === categoryId : true)) {
         setActions([
           <Button
             key='reload'
@@ -162,11 +158,11 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   );
 
   useEffect(() => {
-    const unsubscribeFromNewPost = subscribe('post_created', handleNewPostEvent);
+    const unsubscribeFromNewPost = subscribe('post_published', handlePostPublishEvent);
     return () => {
       unsubscribeFromNewPost();
     };
-  }, [handleNewPostEvent]);
+  }, [handlePostPublishEvent]);
 
   useEffect(() => {
     if (
