@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
@@ -16,13 +17,15 @@ const LetterIcon = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 2px;
-  height: 20px;
-  width: 20px;
+  height: 22px;
+  width: 22px;
   font-weight: 700;
+  font-size: 16px;
+  ${({ theme }) => (theme.palette.mode === 'dark' ? '' : 'border: 1px solid var(--bg-gray);')};
 `;
 
-function getCSSColor(color: string) {
-  return colors[color as BrandColor] ? `var(--prop-${color})` : undefined;
+function getCSSColor(type: 'bg' | 'text', color: string) {
+  return colors[color as BrandColor] ? `var(--${type}-${color})` : undefined;
 }
 
 export function TextColorMenuDropdown({ children }: Props) {
@@ -34,7 +37,7 @@ export function TextColorMenuDropdown({ children }: Props) {
         <GroupLabel>Color</GroupLabel>
         {colorOptions.map((color) => (
           <MenuItem dense key={color}>
-            <ListItemIcon sx={{ color: getCSSColor(color) }}>
+            <ListItemIcon sx={{ color: getCSSColor('text', color) }}>
               <LetterIcon>A</LetterIcon>
             </ListItemIcon>
             <ListItemText>{capitalize(color)}</ListItemText>
@@ -44,7 +47,7 @@ export function TextColorMenuDropdown({ children }: Props) {
         {colorOptions.map((color) => (
           <MenuItem dense key={color}>
             <ListItemIcon>
-              <LetterIcon style={{ backgroundColor: getCSSColor(color) }}>A</LetterIcon>
+              <LetterIcon style={{ backgroundColor: getCSSColor('bg', color) }}>A</LetterIcon>
             </ListItemIcon>
             <ListItemText sx={{ pr: 2 }}>{capitalize(color)} background</ListItemText>
           </MenuItem>

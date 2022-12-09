@@ -16,7 +16,7 @@ const StyledMenuButton = styled(ListItemButton)<{ active: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing(0.5)};
+  padding: ${({ theme }) => theme.spacing(0.75, 0.5)};
   ${(props) => (props.active ? 'color: var(--primary-color);' : '')}
 
   & svg {

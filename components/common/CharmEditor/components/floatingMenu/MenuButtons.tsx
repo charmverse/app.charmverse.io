@@ -2,16 +2,15 @@ import { blockquote, bold, code, history, italic, link, strike, underline } from
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
+import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import React, { useCallback } from 'react';
 
-import * as bulletList from '../bulletList';
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
 import { createInlineVote } from '../inlineVote';
-import * as orderedList from '../orderedList';
 import paragraph from '../paragraph';
 
 import type { SubMenu } from './floating-menu';
@@ -420,6 +419,7 @@ export function TextColorButton({ hints = ['Text color'], children = <TextColorI
   return (
     <MenuButton hints={hints} isDisabled={!view.editable} isActive={false}>
       {children}
+      <KeyboardArrowDown sx={{ fontSize: 16 }} />
     </MenuButton>
   );
 }

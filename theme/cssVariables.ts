@@ -14,9 +14,9 @@ const globalCSS = css`
   :root {
     ${Object.entries(colors.colors).map(
       ([key, value]) => `
-      --prop-${key}: ${value.light};
       --bg-${key}: ${value.light};
-      --bg-${key}-rgb: ${rgbFromHex(value.light)};`
+      --bg-${key}-rgb: ${rgbFromHex(value.light)};
+      --text-${key}: ${value.dark};`
     )}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
@@ -63,9 +63,9 @@ const globalCSS = css`
   [data-theme='dark'] {
     ${Object.entries(colors.colors).map(
       ([key, value]) => `
-      --prop-${key}: ${value.dark};
       --bg-${key}: ${value.dark};
-      --bg-${key}-rgb: ${rgbFromHex(value.dark)};`
+      --bg-${key}-rgb: ${rgbFromHex(value.dark)};
+      --text-${key}: ${value.dark};`
     )}
     --input-bg: ${colors.inputBackgroundDarkMode};
     --input-border: ${colors.inputBorderDarkMode};

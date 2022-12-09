@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unused-prop-types */
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
+import { usePluginState } from '@bangle.dev/react';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { bindTrigger } from 'material-ui-popup-state';
@@ -86,11 +86,10 @@ function MenuByType(props: MenuProps) {
           <Tooltip title={<Typography component='div'>Turn into</Typography>}>
             <Button
               {...bindTrigger(popupState)}
-              endIcon={<ArrowDropDown />}
+              endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
               disableElevation
               variant='text'
               color='inherit'
-              padding='0'
               sx={{ padding: 0 }}
             >
               {activeItem}
@@ -110,12 +109,14 @@ function MenuByType(props: MenuProps) {
           <UnderlineButton />
           <StrikeButton />
           <CodeButton />
-          <TextColorMenuDropdown>
-            <TextColorButton />
-          </TextColorMenuDropdown>
           <FloatingLinkButton menuKey={pluginKey} />
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
           {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
+        </MenuGroup>
+        <MenuGroup>
+          <TextColorMenuDropdown>
+            <TextColorButton />
+          </TextColorMenuDropdown>
         </MenuGroup>
         {!inline && (
           <MenuGroup isLastGroup>
