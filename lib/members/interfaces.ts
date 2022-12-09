@@ -36,7 +36,7 @@ export type Member = Omit<User, 'addresses'> & {
   joinDate: string;
   hasNftAvatar?: boolean;
   profile: UserDetails | null;
-  properties: PropertyValue[];
+  properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
 };
 
