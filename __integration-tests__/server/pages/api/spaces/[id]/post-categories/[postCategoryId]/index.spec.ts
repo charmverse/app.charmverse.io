@@ -49,7 +49,6 @@ describe('PUT /api/spaces/[id]/post-categories/[postCategoryId] - Update a post 
 
     expect(updatedPostCategory.name).toBe(updateInput.name);
     expect(updatedPostCategory.spaceId).toBe(firstSpace.id);
-    expect(updatedPostCategory.color).toBe(postCategory.color);
   });
 
   it('should fail to update the post category if the user is not a space admin, responding with 401', async () => {

@@ -43,3 +43,13 @@ blockquote .bangle-nv-child-container {
 .telegram-login-CharmverseBot {
   width: 100%;
 }
+
+// fix for Autofill by Safari turning background yellow - https://stackoverflow.com/questions/41871618/how-to-change-safari-autofill-yellow-background-color
+// Note: we use --bg-gray instead of --bg-input since it is an opaque color
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 60px var(--bg-gray) inset !important;
+  background-clip: content-box !important;
+}

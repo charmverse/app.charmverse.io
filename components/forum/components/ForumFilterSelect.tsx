@@ -5,20 +5,19 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 
 import { ViewOptions } from 'components/common/ViewOptions';
-import { useForumFilters } from 'hooks/useForumFilters';
+import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
 export type FilterProps = {
   selectedCategory?: CategoryIdQuery;
   categoryIdSelected: (categoryId: CategoryIdQuery) => void;
-
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;
 };
 
-export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
-  const { categories, error } = useForumFilters();
+export default function ForumFilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+  const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
   //   const defaultValue = sortList[0];

@@ -1,8 +1,13 @@
-import type { PostCategory } from '@prisma/client';
+import type { PageComment, PostCategory } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from 'lib/forums/categories/updatePostCategory';
+import type {
+  CreatePostCommentInput,
+  PostCommentWithVote,
+  UpdatePostCommentInput
+} from 'lib/forums/comments/interface';
 import type { PaginatedPostList, ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
 
 export class ForumApi {
@@ -14,6 +19,14 @@ export class ForumApi {
     return http.GET(`/api/spaces/${spaceId}/post-categories`);
   }
 
+  listPostComments(postId: string): Promise<PostCommentWithVote[]> {
+    return http.GET(`/api/forums/posts/${postId}/comments`);
+  }
+
+  createPostComment(postId: string, body: CreatePostCommentInput): Promise<PostCommentWithVote> {
+    return http.POST(`/api/forums/posts/${postId}/comments`, body);
+  }
+
   createPostCategory(spaceId: string, category: CreatePostCategoryInput): Promise<PostCategory> {
     return http.POST(`/api/spaces/${spaceId}/post-categories`, category);
   }
@@ -21,13 +34,24 @@ export class ForumApi {
   updatePostCategory({
     spaceId,
     id,
-    color,
     name
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
-    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
+  }
+
+  updatePostComment({
+    postId,
+    commentId,
+    ...body
+  }: UpdatePostCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
+    return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}`, body);
   }
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
-    return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
+    return http.DELETE(`/api/spaces/${spaceId}/post-categories/${id}`);
+  }
+
+  deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
+    return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }
 }

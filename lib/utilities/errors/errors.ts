@@ -157,3 +157,13 @@ export class DataConflictError extends SystemError {
     });
   }
 }
+
+export class BrowserPopupError extends SystemError {
+  constructor(message = 'Popup could not be opened') {
+    super({
+      message,
+      errorType: 'Unknown',
+      severity: 'warning'
+    });
+  }
+}
