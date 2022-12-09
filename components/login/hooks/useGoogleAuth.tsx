@@ -1,15 +1,12 @@
-/* eslint-disable import/order */
-/* eslint-disable no-console */
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
 import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { googleOAuthWebClientConfig } from 'config/constants';
 import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
 
-import charmClient from 'charmClient';
 import type { AnyIdLogin } from '../Login';
 
 export function useGoogleAuth() {
@@ -49,7 +46,6 @@ export function useGoogleAuth() {
       // ...
     } catch (error: any) {
       if (error instanceof SystemError) {
-        console.log('SYSTEM Error', error);
         throw error;
       }
 
@@ -60,7 +56,7 @@ export function useGoogleAuth() {
       const email = error?.customData?.email;
       // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
-      console.warn({ errorCode, errorMessage, email, receivedCreds: credential });
+      log.debug({ errorCode, errorMessage, email, receivedCreds: credential });
       // ...
     }
 
