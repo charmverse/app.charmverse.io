@@ -34,10 +34,9 @@ export class ForumApi {
   updatePostCategory({
     spaceId,
     id,
-    color,
     name
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
-    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
   }
 
   updatePostComment({

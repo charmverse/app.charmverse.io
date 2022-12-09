@@ -49,7 +49,6 @@ export function useForumCategories() {
       const updatedCategory = await charmClient.forum.updatePostCategory({
         spaceId: currentSpace.id,
         id: option.id,
-        color: option.color,
         name: option.name
       });
 
