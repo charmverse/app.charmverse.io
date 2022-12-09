@@ -182,9 +182,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      <Box ref={createPostBoxRef}>
-        <CreateForumPost />
-      </Box>
+      <CreateForumPost ref={createPostBoxRef} />
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
 
       {posts?.data.map((post) => (

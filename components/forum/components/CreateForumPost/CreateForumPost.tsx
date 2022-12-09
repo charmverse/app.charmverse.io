@@ -3,20 +3,18 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
-import { useCallback, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 
 import Button from 'components/common/Button';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';
 
-export default function CreateForumPost() {
+const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const [userSpacePermissions] = useCurrentSpacePermissions();
   const { showPage } = usePageDialog();
   const [createPageLoading, setCreatePageLoading] = useState(false);
 
@@ -35,7 +33,7 @@ export default function CreateForumPost() {
   }, [currentSpace, user]);
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }}>
+    <Card variant='outlined' sx={{ mb: '15px' }} ref={ref}>
       <CardActionArea disabled={createPageLoading} onClick={addPageCb}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
@@ -51,4 +49,6 @@ export default function CreateForumPost() {
       </CardActionArea>
     </Card>
   );
-}
+});
+
+export default CreateForumPost;
