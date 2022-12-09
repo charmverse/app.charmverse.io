@@ -24,15 +24,16 @@ export interface ListForumPostsRequest {
   count?: number;
   sort?: string;
 }
-
-export async function listForumPosts({
-  spaceId,
-  page = 0,
-  sort,
-  // Count is the number of posts we want per page
-  count = defaultPostsPerResult,
-  categoryIds
-}: ListForumPostsRequest): Promise<PaginatedPostList> {
+export async function listForumPosts(
+  {
+    spaceId,
+    page = 0,
+    // Count is the number of posts we want per page
+    count = defaultPostsPerResult,
+    categoryIds
+  }: ListForumPostsRequest,
+  userId: string
+): Promise<PaginatedPostList> {
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
@@ -64,7 +65,7 @@ export async function listForumPosts({
 
   postPropsQuery.status = 'published';
 
-  const posts = (await prisma.page.findMany({
+  const pages = await prisma.page.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
@@ -74,12 +75,18 @@ export async function listForumPosts({
       post: postPropsQuery
     },
     include: {
+      upDownVotes: {
+        select: {
+          upvoted: true,
+          createdBy: true
+        }
+      },
       post: true
     }
-  })) as ForumPostPage[];
+  });
 
   const hasNext =
-    posts.length === 0
+    pages.length === 0
       ? false
       : (
           await prisma.page.findMany({
@@ -91,7 +98,20 @@ export async function listForumPosts({
         ).length === 1;
 
   const response: PaginatedPostList = {
-    data: posts,
+    data: pages.map((_page) => {
+      const { upDownVotes, post, ...rest } = _page;
+      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
+      const forumPostPage: ForumPostPage = {
+        ...rest,
+        post: {
+          ...post!,
+          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
+          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
+          upvoted: userVote ? userVote.upvoted : undefined
+        }
+      };
+      return forumPostPage;
+    }),
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

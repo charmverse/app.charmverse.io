@@ -56,6 +56,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('airtable'),
     iframeEmbedType('dune'),
     iframeEmbedType('figma'),
+    iframeEmbedType('typeform'),
     {
       uid: 'price',
       title: 'Crypto price',

@@ -6,14 +6,18 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
+
+import { PostVote } from './PostVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
@@ -45,13 +49,50 @@ export default function ForumPost({
   title,
   contentText,
   galleryImage,
-  postId,
+  post,
   headerImage
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
+  const [pagePost, setPagePost] = useState(post);
+  const { id: postId } = pagePost;
+  const currentUpvotedStatus = pagePost.upvoted;
   const { showPage } = usePageDialog();
   const router = useRouter();
+
+  async function votePost(newUpvotedStatus?: boolean) {
+    await charmClient.forum.votePost({
+      postId,
+      upvoted: newUpvotedStatus
+    });
+
+    const forumPostPageVote: ForumPostPageVote = {
+      downvotes: pagePost.downvotes,
+      upvotes: pagePost.upvotes,
+      upvoted: newUpvotedStatus
+    };
+
+    if (newUpvotedStatus === true) {
+      forumPostPageVote.upvotes += 1;
+      if (currentUpvotedStatus === false) {
+        forumPostPageVote.downvotes -= 1;
+      }
+    } else if (newUpvotedStatus === false) {
+      forumPostPageVote.downvotes += 1;
+      if (currentUpvotedStatus === true) {
+        forumPostPageVote.upvotes -= 1;
+      }
+    } else if (currentUpvotedStatus === true) {
+      forumPostPageVote.upvotes -= 1;
+    } else {
+      forumPostPageVote.downvotes -= 1;
+    }
+
+    setPagePost({
+      ...pagePost,
+      ...forumPostPageVote
+    });
+  }
 
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
@@ -91,6 +132,7 @@ export default function ForumPost({
               </Box>
             </Stack>
           </Box>
+          <PostVote votePost={votePost} {...pagePost} />
         </CardContent>
       </CardActionArea>
     </Card>

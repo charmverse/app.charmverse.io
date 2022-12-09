@@ -59,6 +59,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.2",
     "@aws-sdk/client-s3": "^3.67.0",
+    "@aws-sdk/client-sqs": "^3.223.0",
     "@aws-sdk/client-sts": "^3.67.0",
     "@aws-sdk/lib-storage": "^3.67.0",
     "@bangle.dev/base-components": "^0.31.6",
