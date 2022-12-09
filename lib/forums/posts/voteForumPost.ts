@@ -2,37 +2,23 @@ import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { prisma } from 'db';
 
+import { getForumPost } from './getForumPost';
 import type { ForumPostPageVote } from './interfaces';
 
 export async function voteForumPost({
   upvoted,
   userId,
-  postId
+  pageId
 }: {
-  postId: string;
+  pageId: string;
   userId: string;
   upvoted?: boolean;
 }): Promise<ForumPostPageVote> {
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId
-    },
-    select: {
-      page: {
-        select: {
-          spaceId: true,
-          createdBy: true,
-          id: true
-        }
-      }
-    }
-  });
+  const page = await getForumPost(pageId);
 
-  if (!post || !post.page) {
-    throw new PageNotFoundError(postId);
+  if (!page || !page.post) {
+    throw new PageNotFoundError(pageId);
   }
-
-  const pageId = post.page.id;
 
   if (upvoted === undefined) {
     await prisma.pageUpDownVote.delete({
@@ -62,7 +48,7 @@ export async function voteForumPost({
     });
   }
 
-  const page = await prisma.page.findUnique({
+  const pageWithVotes = await prisma.page.findUnique({
     where: {
       id: pageId
     },
@@ -76,11 +62,11 @@ export async function voteForumPost({
     }
   });
 
-  if (page) {
-    const userVoted = page.upDownVotes.find((vote) => vote.createdBy === userId);
+  if (pageWithVotes) {
+    const userVoted = pageWithVotes.upDownVotes.find((vote) => vote.createdBy === userId);
     return {
-      downvotes: page.upDownVotes.filter((vote) => !vote.upvoted).length,
-      upvotes: page.upDownVotes.filter((vote) => vote.upvoted).length,
+      downvotes: pageWithVotes.upDownVotes.filter((vote) => !vote.upvoted).length,
+      upvotes: pageWithVotes.upDownVotes.filter((vote) => vote.upvoted).length,
       upvoted: userVoted !== undefined ? userVoted.upvoted : undefined
     };
   }

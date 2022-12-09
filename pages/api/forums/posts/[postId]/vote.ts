@@ -16,7 +16,7 @@ async function voteForumPostHandler(req: NextApiRequest, res: NextApiResponse<Fo
   const { upvoted } = req.body;
 
   const forumPostPageVote = await voteForumPost({
-    postId,
+    pageId: postId,
     userId,
     upvoted
   });
