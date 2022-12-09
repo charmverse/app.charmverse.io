@@ -34,10 +34,9 @@ export class ForumApi {
   updatePostCategory({
     spaceId,
     id,
-    color,
     name
   }: PostCategoryUpdate & Pick<PostCategory, 'spaceId' | 'id'>): Promise<PostCategory> {
-    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { color, name });
+    return http.PUT(`/api/spaces/${spaceId}/post-categories/${id}`, { name });
   }
 
   updatePostComment({
@@ -49,7 +48,7 @@ export class ForumApi {
   }
 
   deletePostCategory({ id, spaceId }: Pick<PostCategory, 'spaceId' | 'id'>): Promise<void> {
-    return http.GET(`/api/spaces/${spaceId}/post-categories/${id}`);
+    return http.DELETE(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {

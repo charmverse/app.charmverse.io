@@ -6,11 +6,11 @@ import { useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useForumFilters } from 'hooks/useForumFilters';
+import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
-import DesktopFilterMenu from './components/Filters/FilterList';
-import MobileFilterMenu from './components/Filters/FilterSelect';
+import DesktopFilterMenu from './components/ForumFilterList';
+import MobileFilterMenu from './components/ForumFilterSelect';
 import ForumPosts from './components/ForumPosts';
 
 export default function ForumPage() {
@@ -18,9 +18,8 @@ export default function ForumPage() {
   const router = useRouter();
 
   const currentSpace = useCurrentSpace();
-  const { categories } = useForumFilters();
-
-  const [categoryId, setCategoryId] = useState<CategoryIdQuery>(router.query.categoryIds as CategoryIdQuery);
+  const { categories } = useForumCategories();
+  const categoryIds = router.query.categoryIds ?? [];
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
@@ -31,18 +30,15 @@ export default function ForumPage() {
         pathname,
         query: { categoryIds: null }
       });
-      setCategoryId(categoryId);
     } else if (typeof categoryId === 'string' && categories?.some((c) => c.id === categoryId)) {
       router.push({
         pathname,
         query: { categoryIds: categoryId }
       });
-      setCategoryId(categoryId);
     } else {
       router.push({
         pathname
       });
-      setCategoryId(undefined);
     }
   }
 
@@ -70,12 +66,12 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ xs: 'block', lg: 'none' }}>
-            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
+            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
           </Box>
-          <ForumPosts search={search} categoryId={categoryId} />
+          <ForumPosts search={search} categoryId={categoryIds} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <DesktopFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
+          <DesktopFilterMenu />
         </Grid>
       </Grid>
     </CenteredPageContent>

@@ -29,18 +29,15 @@ beforeAll(async () => {
   const createInput: Prisma.PostCategoryCreateManyInput[] = [
     {
       name: 'Category 1',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     },
     {
       name: 'Category 2',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     },
     {
       name: 'Category 3',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     }
   ];
 
@@ -67,7 +64,6 @@ describe('POST /api/spaces/[id]/post-categories - Create a post category', () =>
 
     expect(postCategory.name).toBe(createInput.name);
     expect(postCategory.spaceId).toBe(firstSpace.id);
-    expect(postCategory.color).toBeDefined();
   });
 
   it('should fail to create the post category if the user is not a space admin, responding with 401', async () => {
