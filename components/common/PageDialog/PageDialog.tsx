@@ -14,6 +14,7 @@ import RootPortal from 'components/common/BoardEditor/focalboard/src/components/
 import Button from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import type { BountyWithDetails } from 'lib/bounties';
 import log from 'lib/log';
 import type { PageMeta, PageUpdates } from 'lib/pages';
@@ -38,16 +39,17 @@ export default function PageDialog(props: Props) {
   const router = useRouter();
   const { refreshBounty, setBounties } = useBounties();
   const { currentPageId, setCurrentPageId, updatePage, getPagePermissions, deletePage, pages } = usePages();
-  const pagePermission = page ? getPagePermissions(page.id, page.type === 'post' ? page : undefined) : null;
+  const pagePermission = page ? getPagePermissions(page.id) : null;
   // extract domain from shared pages: /share/<domain>/<page_path>
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = router.route.startsWith('/share') ? `/share/${domain}/${page?.path}` : `/${domain}/${page?.path}`;
+  const { user } = useUser();
 
   const ogCurrentPageId = useMemo(() => currentPageId, []);
 
   const parentProposalId = findParentOfType({ pageId: ogCurrentPageId, pageType: 'proposal', pageMap: pages });
 
-  const readOnlyPage = readOnly || !pagePermission?.edit_content;
+  const readOnlyPage = page?.type !== 'post' ? readOnly || !pagePermission?.edit_content : page?.createdBy !== user?.id;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
