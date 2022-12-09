@@ -25,6 +25,9 @@ inputs:
   NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
     description: "..."
     required: false
+  NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG:
+    description: "..."
+    required: false
 
 runs:
   using: 'composite'
