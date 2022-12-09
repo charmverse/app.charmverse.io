@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import type { ElementType } from 'react';
 import { useState, memo } from 'react';
 
 import BlockAligner from '../BlockAligner';
@@ -12,22 +11,22 @@ import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';
-import type { IframeNodeAttrs, EmbedType } from './config';
+import type { IframeNodeAttrs, Embed, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
-import { convertFigmaToEmbedUrl, convertAirtableToEmbedUrl, extractEmbedType } from './utils';
+import { extractEmbedType } from './utils';
 
 function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
   const attrs = node.attrs as IframeNodeAttrs;
 
   const [height, setHeight] = useState(attrs.height);
 
+  const config = embeds[attrs.type as EmbedType] || embeds.embed;
+
   // If there are no source for the node, return the image select component
   if (!attrs.src) {
     if (readOnly) {
       return <div />;
     }
-    const config = embeds[attrs.type as EmbedType] || embeds.embed;
-
     return (
       <MediaSelectionPopup
         node={node}
@@ -54,8 +53,15 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
                 }
               } else {
                 const embedType = extractEmbedType(urlToEmbed);
+                const newConfig = embeds[embedType] as Embed;
+                const width = attrs.width;
+                let _height = attrs.height;
+                if (width && _height && newConfig.heightRatio) {
+                  _height = width / newConfig.heightRatio;
+                }
                 updateAttrs({
                   src: urlToEmbed,
+                  height: _height,
                   type: embedType
                 });
               }
@@ -67,12 +73,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
     );
   }
 
-  let embeddableSrc = attrs.src;
-  if (attrs.type === 'figma') {
-    embeddableSrc = convertFigmaToEmbedUrl(attrs.src);
-  } else if (attrs.type === 'airtable') {
-    embeddableSrc = convertAirtableToEmbedUrl(attrs.src);
-  }
+  const embeddableSrc = (config as Embed).convertURLToEmbed?.(attrs.src) || attrs.src;
 
   if (readOnly) {
     return (
