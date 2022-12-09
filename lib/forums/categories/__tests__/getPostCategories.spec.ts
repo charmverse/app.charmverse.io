@@ -12,18 +12,15 @@ describe('getPostCategories', () => {
     const createInput: Prisma.PostCategoryCreateManyInput[] = [
       {
         name: 'Category 1',
-        spaceId: space.id,
-        color: '#000000'
+        spaceId: space.id
       },
       {
         name: 'Category 2',
-        spaceId: space.id,
-        color: '#000000'
+        spaceId: space.id
       },
       {
         name: 'Category 3',
-        spaceId: space.id,
-        color: '#000000'
+        spaceId: space.id
       }
     ];
 
