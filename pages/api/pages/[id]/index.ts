@@ -132,17 +132,14 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   const { content, contentText, ...updatedPageMeta } = updateContent;
 
-  // Update page track profile and meta data state, unless it was content update
-  if (!('content' in updateContent)) {
-    updateTrackPageProfile(pageWithPermission.id);
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
-      },
-      page.spaceId
-    );
-  }
+  updateTrackPageProfile(pageWithPermission.id);
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+    },
+    page.spaceId
+  );
 
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
