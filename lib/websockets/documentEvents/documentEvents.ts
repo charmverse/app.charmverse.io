@@ -8,7 +8,6 @@ import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
@@ -524,15 +523,16 @@ export class DocumentEventHandler {
 
     log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
 
+    const contentText = room.node.textContent;
     // check if content is empty only if it got changed
-    const hasContent = room.node.textContent.length > 0;
+    const hasContent = contentText.length > 0;
     const galleryImage = room.doc.type === 'card' ? getPreviewImageFromContent(room.doc.content) : null;
 
     await prisma.page.update({
       where: { id: room.doc.id },
       data: {
         content: room.doc.content,
-        contentText: room.node.textContent,
+        contentText,
         hasContent,
         galleryImage,
         version: room.doc.version,

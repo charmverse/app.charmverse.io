@@ -50,8 +50,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
-  data.hasContent = !checkIsContentEmpty(data.content as PageContent);
-
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
