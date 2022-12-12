@@ -5,6 +5,7 @@ import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
@@ -24,7 +25,9 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
-  const updatedPost = await updateForumPost(userId, pageId, req.body);
+  const payload: UpdateForumPostInput = req.body;
+
+  const updatedPost = await updateForumPost(userId, pageId, payload);
 
   res.status(200).json(updatedPost);
 }
