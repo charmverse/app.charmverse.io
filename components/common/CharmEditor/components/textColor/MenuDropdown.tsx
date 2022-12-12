@@ -1,5 +1,5 @@
+import { useEditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
@@ -9,6 +9,9 @@ import type { BrandColor } from 'theme/colors';
 import { colors } from 'theme/colors';
 
 import { GroupLabel } from '../PopoverMenu';
+
+import type { TextColorAttrs } from './config';
+import { executeWithUserInput } from './textColorCommands';
 
 type Props = { children: ReactNode };
 
@@ -30,13 +33,20 @@ function getCSSColor(type: 'bg' | 'text', color: string) {
 
 export function TextColorMenuDropdown({ children }: Props) {
   const menuState = usePopupState({ variant: 'popover', popupId: 'textColorMenu' });
+  const view = useEditorViewContext();
   const colorOptions = ['default'].concat(Object.keys(colors));
+
+  function setColor(attrs: TextColorAttrs) {
+    executeWithUserInput(view.state, view.dispatch, view, attrs);
+    view.focus();
+  }
+
   return (
     <>
       <Menu {...bindMenu(menuState)} sx={{ maxHeight: 500 }} MenuListProps={{ sx: { p: 0 } }}>
         <GroupLabel>Color</GroupLabel>
         {colorOptions.map((color) => (
-          <MenuItem dense key={color}>
+          <MenuItem dense key={color} onClick={() => setColor({ color })}>
             <ListItemIcon sx={{ color: getCSSColor('text', color) }}>
               <LetterIcon>A</LetterIcon>
             </ListItemIcon>
@@ -45,7 +55,7 @@ export function TextColorMenuDropdown({ children }: Props) {
         ))}
         <GroupLabel>Background</GroupLabel>
         {colorOptions.map((color) => (
-          <MenuItem dense key={color}>
+          <MenuItem dense key={color} onClick={() => setColor({ bgColor: color })}>
             <ListItemIcon>
               <LetterIcon style={{ backgroundColor: getCSSColor('bg', color) }}>A</LetterIcon>
             </ListItemIcon>

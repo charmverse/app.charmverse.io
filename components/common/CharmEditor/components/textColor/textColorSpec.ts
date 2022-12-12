@@ -1,7 +1,8 @@
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
 import type { Mark } from 'prosemirror-model';
 
-const markName = 'textColor';
+import type { TextColorAttrs } from './config';
+import { markName } from './config';
 
 export function spec(): BaseRawMarkSpec {
   return {
@@ -30,12 +31,12 @@ export function spec(): BaseRawMarkSpec {
         }
       ],
       toDOM(node: Mark) {
-        const { color, bgColor } = node.attrs;
+        const { color, bgColor } = node.attrs as TextColorAttrs;
         let style = '';
         if (color) {
-          style += `color: ${color};`;
+          style += `color: var(--text-${color});`;
         } else if (bgColor) {
-          style += `background-color: ${color};`;
+          style += `background-color: var(--bg-${bgColor});`;
         }
         return ['span', { 'data-color': color, 'data-bg-color': bgColor, style }, 0];
       }
