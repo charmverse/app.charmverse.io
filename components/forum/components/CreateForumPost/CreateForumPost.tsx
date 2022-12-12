@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
+import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -12,6 +13,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export default function CreateForumPost() {
   const { user } = useUser();
@@ -20,6 +22,7 @@ export default function CreateForumPost() {
   const { showPage } = usePageDialog();
   const [createPageLoading, setCreatePageLoading] = useState(false);
   const [pageTitle, setPageTitle] = useState('');
+  const router = useRouter();
 
   const addPageCb = useCallback(async () => {
     if (user && currentSpace) {
@@ -30,8 +33,12 @@ export default function CreateForumPost() {
         spaceId: currentSpace.id,
         title: pageTitle
       });
+      setUrlWithoutRerender(router.pathname, { pageId: page.id });
       showPage({
-        pageId: page.id
+        pageId: page.id,
+        onClose() {
+          setUrlWithoutRerender(router.pathname, { pageId: null });
+        }
       });
       setPageTitle('');
       setCreatePageLoading(false);
@@ -46,7 +53,7 @@ export default function CreateForumPost() {
             <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
             <TextField
               variant='outlined'
-              placeholder='Create post'
+              placeholder='Title of your post...'
               value={pageTitle}
               fullWidth
               onChange={(e) => {
