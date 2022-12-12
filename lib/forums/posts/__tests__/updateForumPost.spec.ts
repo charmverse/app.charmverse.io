@@ -67,7 +67,11 @@ describe('updateForumPost', () => {
       ...postUpdate
     };
 
-    const updatedForumPost = await updateForumPost(createdPage.id, user.id, groupedUpdate as any);
+    const updatedForumPost = await updateForumPost({
+      postId: createdPage.id,
+      userId: user.id,
+      ...(groupedUpdate as any)
+    });
 
     // ---------------------- Make sure data was preserved ----------------------
     typedKeys(droppedPageUpdate).forEach((key) => {
@@ -115,9 +119,9 @@ describe('updateForumPost', () => {
       categoryId: otherSpaceCategory.id
     };
 
-    await expect(updateForumPost(createdPage.id, user.id, postUpdate as any)).rejects.toBeInstanceOf(
-      InsecureOperationError
-    );
+    await expect(
+      updateForumPost({ postId: createdPage.id, userId: user.id, ...(postUpdate as any) })
+    ).rejects.toBeInstanceOf(InsecureOperationError);
   });
 
   it('should fail to update if the post is locked', async () => {
@@ -144,7 +148,7 @@ describe('updateForumPost', () => {
       title: 'New post title'
     };
 
-    await expect(updateForumPost(createdPage.id, user.id, pageUpdate)).rejects.toBeInstanceOf(
+    await expect(updateForumPost({ ...pageUpdate, userId: user.id, postId: createdPage.id })).rejects.toBeInstanceOf(
       UndesirableOperationError
     );
   });
