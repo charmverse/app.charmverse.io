@@ -1,13 +1,10 @@
 import type { PostCategory } from '@prisma/client';
 
 import { prisma } from 'db';
-import { stringToColor } from 'lib/utilities/strings';
 
-export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'> & Partial<Pick<PostCategory, 'color'>>;
+export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'>;
 
-export function createPostCategory({ name, spaceId, color }: CreatePostCategoryInput) {
-  const categoryColour = color ?? stringToColor(name);
-
+export function createPostCategory({ name, spaceId }: CreatePostCategoryInput) {
   return prisma.postCategory.create({
     data: {
       name,
@@ -15,8 +12,7 @@ export function createPostCategory({ name, spaceId, color }: CreatePostCategoryI
         connect: {
           id: spaceId
         }
-      },
-      color: categoryColour
+      }
     }
   });
 }

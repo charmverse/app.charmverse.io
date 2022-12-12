@@ -1,6 +1,5 @@
 import Alert from '@mui/material/Alert';
 import { Box } from '@mui/system';
-import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
