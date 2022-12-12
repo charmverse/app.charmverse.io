@@ -1,3 +1,5 @@
+// @ref: https://github.com/chanzuckerberg/czi-prosemirror/blob/master/src/TextColorMarkSpec.js
+
 import type { BaseRawMarkSpec } from '@bangle.dev/core';
 import type { Mark } from 'prosemirror-model';
 

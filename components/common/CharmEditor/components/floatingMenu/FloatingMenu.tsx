@@ -18,8 +18,7 @@ import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalet
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 import { TextColorMenuDropdown } from '../textColor/MenuDropdown';
 
-import type { SubMenu } from './floating-menu';
-import { hasComponentInSchema } from './helper';
+import type { SubMenu, toggleSubMenu } from './floating-menu';
 import { LinkSubMenu } from './LinkSubMenu';
 import { Menu } from './Menu';
 import {
@@ -96,6 +95,7 @@ function MenuByType(props: MenuProps) {
             </Button>
           </Tooltip>
           <InlineCommandPalette
+            menuKey={pluginKey}
             nestedPagePluginKey={nestedPagePluginKey}
             disableNestedPage={disableNestedPage}
             externalPopupState={popupState}

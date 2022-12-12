@@ -1,3 +1,5 @@
+// @ref: https://github.com/chanzuckerberg/czi-prosemirror/blob/master/src/applyMark.js
+
 import type { MarkType, Node } from 'prosemirror-model';
 import type { SelectionRange, TextSelection, Transaction } from 'prosemirror-state';
 

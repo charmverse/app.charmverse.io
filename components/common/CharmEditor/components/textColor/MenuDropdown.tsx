@@ -38,12 +38,12 @@ export function TextColorMenuDropdown({ children }: Props) {
 
   function setColor(attrs: TextColorAttrs) {
     executeWithUserInput(view.state, view.dispatch, view, attrs);
-    view.focus();
+    menuState.close();
   }
 
   return (
     <>
-      <Menu {...bindMenu(menuState)} sx={{ maxHeight: 500 }} MenuListProps={{ sx: { p: 0 } }}>
+      <Menu {...bindMenu(menuState)} sx={{ maxHeight: 400 }} MenuListProps={{ sx: { p: 0 } }}>
         <GroupLabel>Color</GroupLabel>
         {colorOptions.map((color) => (
           <MenuItem dense key={color} onClick={() => setColor({ color })}>
