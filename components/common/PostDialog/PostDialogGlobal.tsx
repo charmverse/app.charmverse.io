@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 
 import { usePostDialog } from './hooks/usePostDialog';
@@ -9,7 +9,7 @@ import PostDialog from './PostDialog';
 
 // a wrapper of page dialog that uses usePageDialogHook
 export default function PostDialogGlobal() {
-  const [page, setPage] = useState<ForumPostPageWithoutVote | null>(null);
+  const [page, setPage] = useState<ForumPostPage | null>(null);
   const { props, hidePost } = usePostDialog();
   const { postId } = props;
 

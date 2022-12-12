@@ -5,13 +5,13 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
+import charmClient from 'charmClient';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -19,7 +19,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { PageActions } from '../PageActions';
 
 interface Props {
-  page?: ForumPostPageWithoutVote | null;
+  page?: ForumPostPage | null;
   onClose: () => void;
 }
 
@@ -27,7 +27,6 @@ export default function PostDialog(props: Props) {
   const { page } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'post-dialog' });
-  const { updatePage, deletePage } = usePages();
   const { user } = useUser();
   const router = useRouter();
 
@@ -48,7 +47,7 @@ export default function PostDialog(props: Props) {
 
   async function onClickDelete() {
     if (page) {
-      await deletePage({ pageId: page.id });
+      await charmClient.forum.deleteForumPost(page.id);
       onClose();
     }
   }
@@ -59,7 +58,9 @@ export default function PostDialog(props: Props) {
   }
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
-    await updatePage(updates);
+    if (page) {
+      await charmClient.forum.updateForumPost(page.id, updates);
+    }
   }, 500);
 
   const setPage = useCallback(
@@ -87,7 +88,6 @@ export default function PostDialog(props: Props) {
                   user?.id === page.createdBy
                     ? () => {
                         onClickDelete();
-                        onClose();
                       }
                     : undefined
                 }
@@ -109,7 +109,30 @@ export default function PostDialog(props: Props) {
           }
           onClose={onClose}
         >
-          {page && <DocumentPage insideModal page={page} setPage={setPage} />}
+          {page && (
+            <DocumentPage
+              insideModal
+              page={{
+                ...page,
+                permissions:
+                  user?.id === page.createdBy
+                    ? [
+                        {
+                          id: '',
+                          userId: user.id,
+                          pageId: page.id,
+                          permissionLevel: 'full_access',
+                          spaceId: null,
+                          roleId: null,
+                          permissions: [],
+                          public: false
+                        }
+                      ]
+                    : []
+              }}
+              setPage={setPage}
+            />
+          )}
         </Dialog>
       )}
     </RootPortal>

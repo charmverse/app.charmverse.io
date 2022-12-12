@@ -14,6 +14,7 @@ export type UpdateForumPostInput = Partial<
 
 export async function updateForumPost(
   postId: string,
+  userId: string,
   { content, contentText, categoryId, title, galleryImage, headerImage }: UpdateForumPostInput
 ): Promise<ForumPostPage> {
   if (categoryId) {
@@ -71,5 +72,6 @@ export async function updateForumPost(
       await tx.post.update({ where: { id: postId }, data: { category: { disconnect: true } } });
     }
   });
-  return getForumPost(postId) as Promise<ForumPostPage>;
+
+  return getForumPost({ userId, postId });
 }

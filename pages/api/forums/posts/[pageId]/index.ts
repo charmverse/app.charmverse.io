@@ -1,16 +1,14 @@
-import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
-import type { ForumPostPage, ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,7 +24,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
-  const updatedPost = await updateForumPost(pageId, req.body);
+  const updatedPost = await updateForumPost(userId, pageId, req.body);
 
   res.status(200).json(updatedPost);
 }
@@ -45,11 +43,11 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   res.status(200).end();
 }
 
-async function getForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPageWithoutVote>) {
+async function getForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
   const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost(pageId);
+  const page = await getForumPost({ userId, postId: pageId });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);

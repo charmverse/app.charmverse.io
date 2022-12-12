@@ -1,4 +1,4 @@
-import type { PageComment, Post, PostCategory } from '@prisma/client';
+import type { PageComment, PostCategory } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -9,7 +9,7 @@ import type {
   UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage, ForumPostPageWithoutVote } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
@@ -22,12 +22,16 @@ export class ForumApi {
     return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}`, payload);
   }
 
+  deleteForumPost(postId: string) {
+    return http.DELETE(`/api/forums/posts/${postId}`);
+  }
+
   publishForumPost(postId: string) {
     return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}/publish`);
   }
 
   getForumPost(postId: string) {
-    return http.GET<ForumPostPageWithoutVote>(`/api/forums/posts/${postId}`);
+    return http.GET<ForumPostPage>(`/api/forums/posts/${postId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {

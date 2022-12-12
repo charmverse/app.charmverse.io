@@ -72,7 +72,8 @@ export interface DocumentPageProps {
 function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-  const pagePermissions = getPagePermissions(page.id);
+  // For post we would artificially construct the permissions
+  const pagePermissions = getPagePermissions(page.id, page.type === 'post' ? page : undefined);
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = usePrimaryCharmEditor();
@@ -101,6 +102,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   }, [page.bountyId]);
 
   const cannotComment = readOnly || !pagePermissions?.comment;
+
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');

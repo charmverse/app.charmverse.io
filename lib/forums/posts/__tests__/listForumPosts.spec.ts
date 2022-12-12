@@ -4,12 +4,12 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPage, ForumPostPageWithoutVote } from '../interfaces';
+import type { ForumPostPage, ForumPostPage } from '../interfaces';
 import { defaultPostsPerResult, listForumPosts } from '../listForumPosts';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPageWithoutVote[];
+let spacePosts: ForumPostPage[];
 
 // Test a space with 16 forum posts
 beforeAll(async () => {
