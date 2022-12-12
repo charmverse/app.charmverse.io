@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 
 export async function deleteForumPost(postId: string) {
-  return prisma.page.delete({
+  await prisma.post.delete({
     where: {
       id: postId
     }

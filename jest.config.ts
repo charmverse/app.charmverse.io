@@ -1,3 +1,5 @@
+import path from 'path';
+
 import createJestConfig from 'testing/createJestConfig';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
@@ -27,7 +29,7 @@ export const jestConfig = {
   testEnvironment: 'jest-environment-node',
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
+  testMatch: [path.join(__dirname, '**/lib/**/*.spec.ts')],
 
   testTimeout: 30000,
   transform: {

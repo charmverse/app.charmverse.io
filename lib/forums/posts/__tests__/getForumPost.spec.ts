@@ -2,6 +2,7 @@ import type { Post, Space, User } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { PageNotFoundError } from 'lib/pages/server';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createForumPost } from '../createForumPost';
@@ -28,7 +29,9 @@ describe('getForumPost', () => {
       categoryId: null
     });
 
-    expect(createdPage).toMatchObject(
+    const retrievedPost = await getForumPost({ postId: createdPage.id });
+
+    expect(retrievedPost).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
         id: expect.any(String),
         postId: expect.any(String),
@@ -41,10 +44,6 @@ describe('getForumPost', () => {
         })
       })
     );
-
-    const retrievedPost = await getForumPost({ postId: createdPage.id });
-
-    expect(retrievedPost).toMatchObject(expect.objectContaining(createdPage));
   });
 
   it('should return null if the page does not have the type "post", or it does not exist', async () => {
@@ -69,12 +68,6 @@ describe('getForumPost', () => {
       }
     });
 
-    const result = await getForumPost({ postId: page.id });
-
-    expect(result).toBeNull();
-
-    const inexistentPage = await getForumPost({ postId: v4() });
-
-    expect(inexistentPage).toBeNull();
+    await expect(getForumPost({ postId: page.id })).rejects.toBeInstanceOf(PageNotFoundError);
   });
 });
