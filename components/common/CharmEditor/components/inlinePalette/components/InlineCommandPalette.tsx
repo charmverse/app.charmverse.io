@@ -200,7 +200,12 @@ export default function InlineCommandPalette({
         }
       ]}
     >
-      <ClickAwayListener onClickAway={() => closePalette()}>
+      <ClickAwayListener
+        onClickAway={() => {
+          closePalette();
+          dismissPalette();
+        }}
+      >
         <Grow
           in={true}
           style={{
