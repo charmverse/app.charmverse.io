@@ -272,7 +272,7 @@ export default function PublicProfile(props: UserDetailsProps) {
             <SectionHeader title='NFT Collections' count={collection.length} />
 
             {collection.map((collectable) => (
-              <Accordion key={collectable[0].id} sx={{ my: 4 }}>
+              <Accordion key={collectable[0].id} sx={{ my: 2 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Box display='flex' sx={{ my: 1, width: '100%' }} alignItems='center'>
                     <AvatarGroup sx={{ mr: 2 }}>
