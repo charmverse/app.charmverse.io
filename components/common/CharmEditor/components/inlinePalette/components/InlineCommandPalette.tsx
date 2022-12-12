@@ -169,12 +169,15 @@ export default function InlineCommandPalette({
   function handleListKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
-      dismissPalette();
-      closePalette();
+      close();
     } else if (event.key === 'Escape') {
-      dismissPalette();
-      closePalette();
+      close();
     }
+  }
+
+  function close() {
+    dismissPalette();
+    closePalette();
   }
 
   const filteredPaletteGroupItemsRecord =
@@ -200,12 +203,7 @@ export default function InlineCommandPalette({
         }
       ]}
     >
-      <ClickAwayListener
-        onClickAway={() => {
-          closePalette();
-          dismissPalette();
-        }}
-      >
+      <ClickAwayListener onClickAway={() => close()}>
         <Grow
           in={true}
           style={{
@@ -217,7 +215,7 @@ export default function InlineCommandPalette({
               autoFocusItem={isInlineCommandVisible || isVisible}
               onKeyDown={(e) => {
                 handleListKeyDown(e);
-                closePalette();
+                close();
               }}
               sx={{ py: 0 }}
             >
@@ -267,18 +265,4 @@ function strMatch(a: string | string[], b: string): boolean {
 
   a = a.toLocaleLowerCase();
   return a.includes(b) || b.includes(a);
-}
-
-// returning -1 means keep order [a, b]
-// returning 1 means reverse order ie [b, a]
-function fieldExistenceSort(a: Record<string, any>, b: Record<string, any>, field: string, reverse = false) {
-  if (a[field] && !b[field]) {
-    return reverse ? 1 : -1;
-  }
-
-  if (b[field] && !a[field]) {
-    return reverse ? -1 : 1;
-  }
-
-  return 0;
 }
