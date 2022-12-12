@@ -3,7 +3,7 @@ import { PageNotFoundError } from 'lib/pages/server';
 
 import type { ForumPostPage } from './interfaces';
 
-export async function getForumPost({ postId, userId }: { userId: string; postId: string }): Promise<ForumPostPage> {
+export async function getForumPost({ postId, userId }: { userId?: string; postId: string }): Promise<ForumPostPage> {
   const forumPage = await prisma.page.findFirst({
     where: { id: postId, type: 'post' },
     include: {

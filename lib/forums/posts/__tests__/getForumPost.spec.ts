@@ -42,7 +42,7 @@ describe('getForumPost', () => {
       })
     );
 
-    const retrievedPost = await getForumPost(createdPage.id);
+    const retrievedPost = await getForumPost({ postId: createdPage.id });
 
     expect(retrievedPost).toMatchObject(expect.objectContaining(createdPage));
   });
@@ -69,11 +69,11 @@ describe('getForumPost', () => {
       }
     });
 
-    const result = await getForumPost(page.id);
+    const result = await getForumPost({ postId: page.id });
 
     expect(result).toBeNull();
 
-    const inexistentPage = await getForumPost(v4());
+    const inexistentPage = await getForumPost({ postId: v4() });
 
     expect(inexistentPage).toBeNull();
   });

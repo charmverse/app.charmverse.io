@@ -6,7 +6,7 @@ import { InsecureOperationError } from 'lib/utilities/errors';
 import { getForumPost } from './getForumPost';
 
 export async function checkPostAccess({ postId, userId }: { postId: string; userId: string }) {
-  const page = await getForumPost(postId);
+  const page = await getForumPost({ postId, userId });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(postId);

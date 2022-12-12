@@ -6,3 +6,4 @@ export type ForumPostContent = {
 };
 export type ForumPostPageVote = { upvotes: number; downvotes: number; upvoted?: boolean };
 export type ForumPostPage = Page & { post: Post & ForumPostPageVote };
+export type ForumPostPageWithoutVotes = Page & { post: Post };

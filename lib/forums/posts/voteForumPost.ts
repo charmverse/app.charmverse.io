@@ -13,7 +13,7 @@ export async function voteForumPost({
   userId: string;
   upvoted?: boolean;
 }) {
-  const page = await getForumPost(pageId);
+  const page = await getForumPost({ postId: pageId, userId });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);
