@@ -8,7 +8,7 @@ import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -19,7 +19,7 @@ export default function CreateForumPost() {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const { showPage } = usePageDialog();
+  const { showPost } = usePostDialog();
   const [createPageLoading, setCreatePageLoading] = useState(false);
   const [pageTitle, setPageTitle] = useState('');
   const router = useRouter();
@@ -34,8 +34,8 @@ export default function CreateForumPost() {
         title: pageTitle
       });
       setUrlWithoutRerender(router.pathname, { pageId: page.id });
-      showPage({
-        pageId: page.id,
+      showPost({
+        postId: page.id,
         onClose() {
           setUrlWithoutRerender(router.pathname, { pageId: null });
         }

@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
@@ -58,7 +58,7 @@ export default function ForumPost({
   const { id: postId } = pagePost;
   const currentUpvotedStatus = pagePost.upvoted;
   const router = useRouter();
-  const { showPage } = usePageDialog();
+  const { showPost } = usePostDialog();
 
   async function votePost(newUpvotedStatus?: boolean) {
     await charmClient.forum.votePost({
@@ -98,8 +98,8 @@ export default function ForumPost({
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
         onClick={() => {
-          showPage({
-            pageId: postId,
+          showPost({
+            postId,
             onClose() {
               setUrlWithoutRerender(router.pathname, { pageId: null });
             }

@@ -4,8 +4,8 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
@@ -22,7 +22,7 @@ export default function ForumPage() {
   const currentSpace = useCurrentSpace();
   const { categories } = useForumCategories();
   const categoryIds = router.query.categoryIds ?? [];
-  const { showPage } = usePageDialog();
+  const { showPost } = usePostDialog();
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
@@ -47,8 +47,8 @@ export default function ForumPage() {
 
   useEffect(() => {
     if (typeof router.query.pageId === 'string') {
-      showPage({
-        pageId: router.query.pageId,
+      showPost({
+        postId: router.query.pageId,
         onClose() {
           setUrlWithoutRerender(router.pathname, { pageId: null });
         }
