@@ -31,7 +31,7 @@ export function plugins({
       }
 
       if (readOnly) {
-        if (enableComments) {
+        if (enableComments && !state.selection.empty) {
           return 'commentOnlyMenu';
         }
         return null;
