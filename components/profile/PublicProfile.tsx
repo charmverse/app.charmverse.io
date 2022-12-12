@@ -1,4 +1,8 @@
-import { Chip, Divider, Stack, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Chip, Divider, Stack, Typography, Box, AvatarGroup, Avatar } from '@mui/material';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import { useEffect } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -93,7 +97,6 @@ export default function PublicProfile(props: UserDetailsProps) {
   });
 
   collectables.sort((itemA, itemB) => (new Date(itemB.date) > new Date(itemA.date) ? 1 : -1));
-
   async function toggleCommunityVisibility(community: CommunityDetails) {
     await charmClient.profile.updateProfileItem({
       profileItems: [
@@ -267,27 +270,60 @@ export default function PublicProfile(props: UserDetailsProps) {
         {collectables.length > 0 ? (
           <>
             <SectionHeader title='NFT Collections' count={collection.length} />
+
             {collection.map((collectable) => (
-              <div key={collectable[0].id}>
-                <p>collection title {collectable[0].title}</p>
-                <Stack gap={2} mb={2}>
-                  {collectable.map((item) => (
-                    // <p key={item.id}>{item.title}</p>
-                    <CollectableRow
-                      key={item.id}
-                      showVisibilityIcon={!readOnly}
-                      visible={!item.isHidden}
-                      onClick={() => {
-                        toggleCollectibleVisibility(item);
-                      }}
-                      collectable={item}
-                    />
-                  ))}
-                </Stack>
-              </div>
+              <Accordion key={collectable[0].id} sx={{ my: 4 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Box display='flex' sx={{ my: 1, width: '100%' }} alignItems='center'>
+                    <AvatarGroup sx={{ mr: 2 }}>
+                      {collectable.map((item) => (
+                        <Avatar key={item.id} src={item.image} />
+                      ))}
+                    </AvatarGroup>
+                    <Typography fontWeight='bold' fontSize='xs'>
+                      {collectable[0].title} and more
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box
+                    display='grid'
+                    sx={{
+                      gridTemplateColumns: {
+                        xs: 'repeat(1, 1fr)',
+                        sm: 'repeat(2, 1fr)',
+                        md: 'repeat(4, 1fr)'
+                      }
+                    }}
+                    gap={2}
+                  >
+                    {collectable.map((item) => (
+                      <CollectableRow
+                        key={item.id}
+                        showVisibilityIcon={!readOnly}
+                        visible={!item.isHidden}
+                        onClick={() => {
+                          toggleCollectibleVisibility(item);
+                        }}
+                        collectable={item}
+                      />
+                    ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
             ))}
             <SectionHeader title='NFTs & POAPs' count={notCollection.length} />
-            <Stack gap={2} mb={2}>
+            <Box
+              display='grid'
+              sx={{
+                gridTemplateColumns: {
+                  xs: 'repeat(1, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(4, 1fr)'
+                }
+              }}
+              gap={2}
+            >
               {notCollection.map((collectable) => (
                 <CollectableRow
                   key={collectable[0].id}
@@ -299,7 +335,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                   collectable={collectable[0]}
                 />
               ))}
-            </Stack>
+            </Box>
           </>
         ) : null}
         {/* <CollablandCredentials error={collabError} /> */}
