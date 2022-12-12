@@ -12,6 +12,8 @@ import type { IdentityType } from '@prisma/client';
 import * as React from 'react';
 import { useState } from 'react';
 
+import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
+import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -58,23 +60,30 @@ function LoginHandler(props: DialogProps) {
 
   return (
     <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Login</DialogTitle>
-      <List sx={{ pt: 0 }}>
+      <List sx={{ pt: 0, maxWidth: '400px' }}>
+        <ListItem>
+          <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+        </ListItem>
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSign signSuccess={handleWalletSign} />
+          <WalletSelector />
+          {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
 
-        <hr />
+        <ListItem>
+          <DialogTitle textAlign='left'>Connect Account</DialogTitle>
+        </ListItem>
 
         {/* Google login method */}
-        <ListItem button onClick={handleGoogleLogin}>
-          <ListItemAvatar>
-            <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-              <PersonIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary='Login with Google' />
+        <ListItem>
+          <ConnectorButton
+            onClick={handleGoogleLogin}
+            name='Connect with Google'
+            iconUrl='Google_G.png'
+            disabled={false}
+            isActive={false}
+            isLoading={false}
+          />
         </ListItem>
       </List>
     </Dialog>

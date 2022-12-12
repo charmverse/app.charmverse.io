@@ -1,3 +1,5 @@
-import WalletSelectorModal from './WalletSelectorModal';
+import { WalletSelectorModal } from './WalletSelectorModal';
+
+export { WalletSelector } from './WalletSelectorModal';
 
 export default WalletSelectorModal;

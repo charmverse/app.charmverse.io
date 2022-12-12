@@ -24,7 +24,7 @@ type Props = {
   isLoading: boolean;
 };
 
-function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
+export function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
   return (
     <Button
       color='secondary'
@@ -48,5 +48,3 @@ function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading
     </Button>
   );
 }
-
-export default ConnectorButton;
