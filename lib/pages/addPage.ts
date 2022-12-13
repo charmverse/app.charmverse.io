@@ -42,7 +42,7 @@ export async function addPage({
   const pageProperties: Partial<Page> = {
     id: pageId,
     boardId: isBoardPage ? pageId : undefined,
-    content: undefined as any,
+    content: undefined,
     contentText: '',
     createdAt: new Date(),
     createdBy,

@@ -48,7 +48,9 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
         }}
       >
         <Typography
-          color='initial'
+          sx={{
+            color: 'text.primary'
+          }}
           fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
         >
           {label}
@@ -71,8 +73,6 @@ export default function ForumFilterList() {
   const { categories, error } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
-  const router = useRouter();
-  const selectedCategory = router.query.categoryIds as string;
   const [forumCategoryName, setForumCategoryName] = useState('');
   const { createForumCategory } = useForumCategories();
 
@@ -134,6 +134,7 @@ export default function ForumFilterList() {
           onClick={addCategoryPopupState.open}
           variant='outlined'
           size='small'
+          disabledTooltip="You don't have permission to add category"
         >
           Add category
         </Button>

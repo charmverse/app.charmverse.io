@@ -1,5 +1,5 @@
 import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
-import type { NodeViewProps, RawPlugins } from '@bangle.dev/core';
+import type { RawPlugins } from '@bangle.dev/core';
 import { BangleEditorState, NodeView, Plugin } from '@bangle.dev/core';
 import { markdownSerializer } from '@bangle.dev/markdown';
 import type { EditorState, EditorView } from '@bangle.dev/pm';

@@ -30,7 +30,7 @@ export function PageActions({
   onClickDuplicate,
   children
 }: {
-  page: PageMeta;
+  page: Omit<PageMeta, 'permissions'>;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   onClickDuplicate?: VoidFunction;

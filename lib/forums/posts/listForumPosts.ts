@@ -53,17 +53,17 @@ export async function listForumPosts(
     }
   };
 
-  const postPropsQuery: Prisma.PageWhereInput = {
-    post: categoryIds
-      ? {
-          categoryId: {
-            in: categoryIds
-          }
+  const postPropsQuery: Prisma.PostWhereInput = categoryIds
+    ? {
+        categoryId: {
+          in: categoryIds
         }
-      : categoryIds === null
-      ? { categoryId: null }
-      : undefined
-  };
+      }
+    : categoryIds === null
+    ? { categoryId: null }
+    : {};
+
+  // postPropsQuery.status = 'published';
 
   const pages = await prisma.page.findMany({
     ...orderQuery,
@@ -72,7 +72,7 @@ export async function listForumPosts(
     where: {
       type: 'post',
       spaceId,
-      ...postPropsQuery
+      post: postPropsQuery
     },
     include: {
       upDownVotes: {
@@ -93,7 +93,7 @@ export async function listForumPosts(
             ...orderQuery,
             skip: toSkip + count,
             take: 1,
-            where: { type: 'post', spaceId, ...postPropsQuery }
+            where: { type: 'post', spaceId, post: postPropsQuery }
           })
         ).length === 1;
 

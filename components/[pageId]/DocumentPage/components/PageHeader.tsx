@@ -4,7 +4,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { ChangeEvent } from 'react';
+import type { PageType } from '@prisma/client';
 import { memo } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
@@ -62,9 +62,10 @@ interface PageHeaderProps {
   title: string;
   setPage: (p: Partial<Page>) => void;
   updatedAt: string;
+  pageType: PageType;
 }
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
+function PageHeader({ pageType, headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
   function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
@@ -115,20 +116,22 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
             </Menu>
           </MenuWrapper>
         )}
-        <Controls className='page-controls'>
-          {!readOnly && !icon && (
-            <PageControlItem onClick={addPageIcon}>
-              <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
-              Add icon
-            </PageControlItem>
-          )}
-          {!readOnly && !headerImage && (
-            <PageControlItem onClick={addPageHeader}>
-              <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
-              Add cover
-            </PageControlItem>
-          )}
-        </Controls>
+        {pageType !== 'post' && (
+          <Controls className='page-controls'>
+            {!readOnly && !icon && (
+              <PageControlItem onClick={addPageIcon}>
+                <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
+                Add icon
+              </PageControlItem>
+            )}
+            {!readOnly && !headerImage && (
+              <PageControlItem onClick={addPageHeader}>
+                <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
+                Add cover
+              </PageControlItem>
+            )}
+          </Controls>
+        )}
       </EditorHeader>
       <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
     </>

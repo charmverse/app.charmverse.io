@@ -50,8 +50,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
 
-  data.hasContent = !checkIsContentEmpty(data.content as PageContent);
-
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
   // We now need to specify this as a ParentPage.connect prisma argument instead of a raw string
@@ -122,6 +120,32 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       },
       page.spaceId
     );
+
+    if (newPageToNotify.type === 'post') {
+      const post = await prisma.post.create({
+        data: {
+          page: {
+            connect: {
+              id: newPageToNotify.id
+            }
+          },
+          status: 'draft'
+        }
+      });
+
+      if (post) {
+        relay.broadcast(
+          {
+            type: 'post_published',
+            payload: {
+              categoryId: post.categoryId,
+              createdBy: userId
+            }
+          },
+          page.spaceId
+        );
+      }
+    }
 
     res.status(201).json(pageWithPermissions);
   } catch (error) {

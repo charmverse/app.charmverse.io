@@ -30,16 +30,17 @@ function PostCategoryOption({ props, category }: PostCategoryOptionProps) {
 type Props = {
   disabled?: boolean;
   options: PostCategory[];
-  onChange: (value: PostCategory[]) => void;
+  onChange: (value: PostCategory | null) => void;
+  value: PostCategory | null;
 };
 
-export default function PostCategoryInput({ disabled, options, onChange }: Props) {
+export default function PostCategoryInput({ disabled, options, onChange, value }: Props) {
   return (
     <Autocomplete
+      value={value}
       disabled={disabled}
       selectOnFocus
       clearOnBlur
-      multiple
       filterSelectedOptions
       sx={{ minWidth: 150, width: '100%' }}
       options={options}
