@@ -19,6 +19,7 @@ import { useBounties } from 'hooks/useBounties';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { usePrimaryCharmEditor } from 'hooks/usePrimaryCharmEditor';
+import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
@@ -71,11 +72,12 @@ export interface DocumentPageProps {
 function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProposalId }: DocumentPageProps) {
   const { pages, getPagePermissions } = usePages();
   const { cancelVote, castVote, deleteVote, votes, isLoading } = useVotes();
-  const pagePermissions = getPagePermissions(page.id);
-
+  // For post we would artificially construct the permissions
+  const pagePermissions = getPagePermissions(page.id, page.type === 'post' ? page : undefined);
   const { draftBounty } = useBounties();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps } = usePrimaryCharmEditor();
+  const { user } = useUser();
 
   // Only populate bounty permission data if this is a bounty page
   const [bountyPermissions, setBountyPermissions] = useState<AssignedBountyPermissions | null>(null);
@@ -100,6 +102,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
   }, [page.bountyId]);
 
   const cannotComment = readOnly || !pagePermissions?.comment;
+
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && pagePermissions?.comment;
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
@@ -183,6 +186,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
+                pageType={page.type}
                 headerImage={page.headerImage}
                 // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
                 // key={page.title}
@@ -244,7 +248,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
                   )}
-                  {page.postId && <PostProperties pageId={page.id} postId={page.postId} readOnly={readOnly} />}
+                  {page.postId && <PostProperties postId={page.postId} readOnly={page.createdBy !== user?.id} />}
                   {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}

@@ -12,10 +12,16 @@ export type UpdateForumPostInput = Partial<
   }
 >;
 
-export async function updateForumPost(
-  postId: string,
-  { content, contentText, categoryId, title, galleryImage, headerImage }: UpdateForumPostInput
-): Promise<ForumPostPage> {
+export async function updateForumPost({
+  userId,
+  postId,
+  content,
+  contentText,
+  categoryId,
+  title,
+  galleryImage,
+  headerImage
+}: UpdateForumPostInput & { postId: string; userId: string }): Promise<ForumPostPage> {
   if (categoryId) {
     const [page, category] = await Promise.all([
       prisma.page.findUnique({
@@ -71,5 +77,6 @@ export async function updateForumPost(
       await tx.post.update({ where: { id: postId }, data: { category: { disconnect: true } } });
     }
   });
-  return getForumPost(postId) as Promise<ForumPostPage>;
+
+  return getForumPost({ userId, postId });
 }

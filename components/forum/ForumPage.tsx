@@ -2,12 +2,14 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
+import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import DesktopFilterMenu from './components/ForumFilterList';
 import MobileFilterMenu from './components/ForumFilterSelect';
@@ -20,6 +22,7 @@ export default function ForumPage() {
   const currentSpace = useCurrentSpace();
   const { categories } = useForumCategories();
   const categoryIds = router.query.categoryIds ?? [];
+  const { showPost } = usePostDialog();
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
@@ -41,6 +44,17 @@ export default function ForumPage() {
       });
     }
   }
+
+  useEffect(() => {
+    if (typeof router.query.pageId === 'string') {
+      showPost({
+        postId: router.query.pageId,
+        onClose() {
+          setUrlWithoutRerender(router.pathname, { pageId: null });
+        }
+      });
+    }
+  }, [router.query.pageId]);
 
   return (
     <CenteredPageContent>

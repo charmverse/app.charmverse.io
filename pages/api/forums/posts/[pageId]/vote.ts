@@ -10,17 +10,17 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(voteForumPostHandler);
 
 async function voteForumPostHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { postId } = req.query as any as { postId: string };
+  const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
 
   await voteForumPost({
-    pageId: postId,
+    pageId,
     userId,
     upvoted
   });
 
-  res.status(200).json({});
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);

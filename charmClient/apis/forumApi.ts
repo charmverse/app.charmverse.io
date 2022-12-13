@@ -8,12 +8,30 @@ import type {
   PostCommentWithVote,
   UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
-import type { ForumPostPageVote } from 'lib/forums/posts/interfaces';
+import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
 export class ForumApi {
   listForumPosts({ spaceId, count, page, sort, categoryIds }: ListForumPostsRequest): Promise<PaginatedPostList> {
     return http.GET('/api/forums/posts', { spaceId, sort, categoryIds, count, page });
+  }
+
+  updateForumPost(postId: string, payload: UpdateForumPostInput) {
+    return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}`, payload);
+  }
+
+  deleteForumPost(postId: string) {
+    return http.DELETE(`/api/forums/posts/${postId}`);
+  }
+
+  publishForumPost(postId: string) {
+    return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}/publish`);
+  }
+
+  getForumPost(postId: string) {
+    return http.GET<ForumPostPage>(`/api/forums/posts/${postId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
@@ -54,6 +72,10 @@ export class ForumApi {
 
   votePost({ postId, upvoted }: { upvoted?: boolean; postId: string }) {
     return http.PUT(`/api/forums/posts/${postId}/vote`, { upvoted });
+  }
+
+  createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
+    return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
   }
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
