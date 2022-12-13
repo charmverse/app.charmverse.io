@@ -48,10 +48,12 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       return;
     }
     setIsOpen(false);
-    setOrigin({
-      horizontal: 'left',
-      vertical: 'bottom'
-    });
+    setTimeout(() => {
+      setOrigin({
+        horizontal: 'left',
+        vertical: 'bottom'
+      });
+    }, 500);
   };
 
   const value = useMemo<IContext>(

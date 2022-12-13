@@ -44,7 +44,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const createPostBoxRef = useRef<HTMLDivElement>(null);
-  const { setActions, showMessage, setOrigin } = useSnackbar();
+  const { setActions, showMessage, setOrigin, handleClose } = useSnackbar();
 
   // Re-enable sorting later on
 
@@ -139,12 +139,13 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
           <Button
             key='reload'
             variant='outlined'
-            onClick={() => {
+            onClick={(e: Event) => {
               if (createPostBoxRef.current) {
                 createPostBoxRef.current.scrollIntoView({
                   behavior: 'smooth'
                 });
                 loadMorePosts(true);
+                handleClose?.(e, 'timeout');
               }
             }}
             size='small'
