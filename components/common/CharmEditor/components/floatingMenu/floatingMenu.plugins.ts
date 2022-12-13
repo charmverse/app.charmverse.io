@@ -23,7 +23,6 @@ export function plugins({
     key,
     calculateType: (state) => {
       if (
-        state.selection.empty ||
         (state.selection as NodeSelection)?.node?.type?.name.match(
           /(image)|(cryptoPrice)|(iframe)|(page)|(pdf)|(mention)|(tabIndent)|(codeBlock)/
         )
@@ -31,11 +30,10 @@ export function plugins({
         return null;
       }
 
-      if (readOnly && enableComments) {
-        return 'commentOnlyMenu';
-      }
-
       if (readOnly) {
+        if (enableComments && !state.selection.empty) {
+          return 'commentOnlyMenu';
+        }
         return null;
       }
 
@@ -70,6 +68,9 @@ export function plugins({
           // We are not inside a paragraph, so dont show floating menu
           return null;
         }
+      }
+      if (state.selection.empty) {
+        return null;
       }
 
       return 'defaultMenu';
