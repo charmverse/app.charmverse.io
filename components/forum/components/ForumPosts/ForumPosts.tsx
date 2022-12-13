@@ -1,14 +1,17 @@
+import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import Alert from '@mui/material/Alert';
+import { IconButton, Stack } from '@mui/material';
+import type { AlertProps } from '@mui/material/Alert';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import { Box } from '@mui/system';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
@@ -25,6 +28,10 @@ interface ForumPostsProps {
 }
 
 const resultsPerQuery = 10;
+
+const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
 
 // Add a manual delay so the user sees the post loading skeleton
 const generatePostRefreshTimeout = () => {
@@ -44,8 +51,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const createPostBoxRef = useRef<HTMLDivElement>(null);
-  const { setActions, showMessage, setOrigin, handleClose } = useSnackbar();
-
+  const [isOpen, setIsOpen] = useState(false);
   // Re-enable sorting later on
 
   // const querySort = query.sort;
@@ -135,31 +141,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         postWithPage?.createdBy !== user.id &&
         (currentCategoryId ? postWithPage.categoryId === currentCategoryId : true)
       ) {
-        setActions([
-          <Button
-            key='reload'
-            variant='outlined'
-            onClick={(e: Event) => {
-              if (createPostBoxRef.current) {
-                createPostBoxRef.current.scrollIntoView({
-                  behavior: 'smooth'
-                });
-                loadMorePosts(true);
-                handleClose?.(e, 'timeout');
-              }
-            }}
-            size='small'
-            startIcon={<ReplayIcon fontSize='small' />}
-            color='inherit'
-          >
-            Fetch
-          </Button>
-        ]);
-        setOrigin({
-          horizontal: 'center',
-          vertical: 'top'
-        });
-        showMessage('New posts ready to view');
+        setIsOpen(true);
       }
     },
     [user, categoryId]
@@ -194,6 +176,53 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       ))}
       {isLoadingMore && <ForumPostSkeleton />}
       <Box ref={ref}>{posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}</Box>
+      <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
+        <Snackbar
+          open={isOpen}
+          autoHideDuration={10000}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top'
+          }}
+          onClose={() => setIsOpen(false)}
+          sx={{
+            '& .MuiAlert-action': {
+              alignItems: 'center',
+              gap: 1
+            }
+          }}
+        >
+          <Alert
+            action={[
+              <Button
+                key='reload'
+                variant='outlined'
+                onClick={() => {
+                  if (createPostBoxRef.current) {
+                    createPostBoxRef.current.scrollIntoView({
+                      behavior: 'smooth'
+                    });
+                    loadMorePosts(true);
+                    setIsOpen(false);
+                  }
+                }}
+                size='small'
+                startIcon={<ReplayIcon fontSize='small' />}
+                color='inherit'
+              >
+                Fetch
+              </Button>,
+              <IconButton key='clear' onClick={() => setIsOpen(false)} color='inherit'>
+                <ClearIcon fontSize='small' />
+              </IconButton>
+            ]}
+            severity='info'
+            sx={{ width: '100%', alignItems: 'center' }}
+          >
+            New posts ready to view
+          </Alert>
+        </Snackbar>
+      </Stack>
     </>
   );
 }

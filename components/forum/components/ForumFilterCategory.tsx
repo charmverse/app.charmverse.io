@@ -28,36 +28,37 @@ export function ForumFilterCategory({ category, onChange, onDelete }: Props) {
 
   const popupContent = useMemo(
     () => (
-      <Stack>
-        <MenuList>
-          <Stack p={1}>
-            <FieldLabel variant='subtitle2'>Category name</FieldLabel>
-            <TextField
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              autoFocus
-              onKeyDown={(e) => {
-                e.stopPropagation();
-                if (e.code === 'Enter') {
-                  onSave();
-                }
-              }}
-            />
-          </Stack>
-          {!!onDelete && (
-            <MenuItem
-              onClick={() => {
-                onDelete(category);
-              }}
-            >
-              <ListItemIcon>
-                <DeleteOutlinedIcon fontSize='small' />
-              </ListItemIcon>
-              <Typography variant='subtitle1'>Delete</Typography>
-            </MenuItem>
-          )}
-        </MenuList>
-      </Stack>
+      <MenuList>
+        <Stack p={1}>
+          <FieldLabel variant='subtitle2'>Category name</FieldLabel>
+          <TextField
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            autoFocus
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.code === 'Enter') {
+                onSave();
+              }
+            }}
+          />
+        </Stack>
+        {!!onDelete && (
+          <MenuItem
+            onClick={() => {
+              onDelete(category);
+            }}
+            sx={{
+              py: 1
+            }}
+          >
+            <ListItemIcon>
+              <DeleteOutlinedIcon fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>Delete</Typography>
+          </MenuItem>
+        )}
+      </MenuList>
     ),
     [category, tempName]
   );
