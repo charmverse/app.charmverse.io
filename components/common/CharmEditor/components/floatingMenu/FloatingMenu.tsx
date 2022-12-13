@@ -16,9 +16,9 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
 import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
-import { TextColorMenuDropdown } from '../textColor/MenuDropdown';
+import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
-import type { SubMenu, toggleSubMenu } from './floating-menu';
+import type { SubMenu } from './floating-menu';
 import { LinkSubMenu } from './LinkSubMenu';
 import { Menu } from './Menu';
 import {
@@ -53,8 +53,6 @@ export default function FloatingMenuComponent(props: MenuProps) {
   const menuState = usePluginState(props.pluginKey);
   const renderElement = MenuByType({ ...props });
   return renderElement ? reactDOM.createPortal(renderElement, menuState.tooltipContentDOM) : null;
-
-  // return <FloatingMenu menuKey={pluginKey} renderMenuType={} />;
 }
 
 function MenuByType(props: MenuProps) {
@@ -71,7 +69,7 @@ function MenuByType(props: MenuProps) {
 
   if ((type as FloatingMenuVariant) === 'commentOnlyMenu' && pagePermissions?.comment) {
     return (
-      <Menu>
+      <Menu menuKey={pluginKey}>
         <InlineCommentButton enableComments menuKey={pluginKey} />
         {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
       </Menu>
@@ -80,7 +78,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'defaultMenu') {
     return (
-      <Menu type={type}>
+      <Menu menuKey={pluginKey} type={type}>
         <MenuGroup>
           <Tooltip title={<Typography component='div'>Turn into</Typography>}>
             <Button
@@ -132,14 +130,14 @@ function MenuByType(props: MenuProps) {
   }
   if (type === 'linkSubMenu') {
     return (
-      <Menu>
+      <Menu menuKey={pluginKey}>
         <LinkSubMenu showMessage={showMessage} />
       </Menu>
     );
   }
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
-      <Menu>
+      <Menu menuKey={pluginKey}>
         <InlineCommentSubMenu pluginKey={pluginKey} />
       </Menu>
     );
@@ -147,7 +145,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'inlineVoteSubMenu' && !inline) {
     return (
-      <Menu>
+      <Menu menuKey={pluginKey}>
         <InlineVoteSubMenu pluginKey={pluginKey} />
       </Menu>
     );
