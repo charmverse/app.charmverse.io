@@ -63,7 +63,7 @@ export const shortenHex = (hex: string = '', length = 4): string => {
  * Leaves other characters unchanged
  * @param input
  */
-export function upperCaseFirstCharacter(input: string): string {
+export function capitalize(input: string): string {
   if (!input) {
     return '';
   }
@@ -89,19 +89,19 @@ export function humaniseList({
   capitaliseFirstCharacter: boolean;
 }): string {
   if (content.length === 1) {
-    return capitaliseFirstCharacter ? upperCaseFirstCharacter(content[0]) : content[0];
+    return capitaliseFirstCharacter ? capitalize(content[0]) : content[0];
   } else if (content.length === 0) {
     return '';
   } else if (content.length === 2) {
     return capitaliseFirstCharacter
-      ? `${upperCaseFirstCharacter(content[0])} ${conjunction} ${upperCaseFirstCharacter(content[1])}`
+      ? `${capitalize(content[0])} ${conjunction} ${capitalize(content[1])}`
       : `${content[0]} ${conjunction} ${content[1]}`;
   }
 
   const last = content.pop();
   const formatted = content.map((item) => {
     if (capitaliseFirstCharacter) {
-      return upperCaseFirstCharacter(item);
+      return capitalize(item);
     }
     return item.trim();
   });

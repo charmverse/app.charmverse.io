@@ -1,4 +1,4 @@
-import type { PostCategory, Space } from '@prisma/client';
+import type { Space } from '@prisma/client';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -16,35 +16,30 @@ describe('updatePostCategory', () => {
   it('should update a post category', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'Test Category',
-      spaceId: space.id,
-      color: '#000000'
+      spaceId: space.id
     };
 
     const postCategory = await createPostCategory(createInput);
 
     const update: PostCategoryUpdate = {
-      name: 'Updated Category',
-      color: '#FFFFFF'
+      name: 'Updated Category'
     };
 
     const updatedPostCategory = await updatePostCategory(postCategory.id, update);
 
     expect(updatedPostCategory.id).toBe(postCategory.id);
     expect(updatedPostCategory.name).toBe(update.name);
-    expect(updatedPostCategory.color).toBe(update.color);
   });
 
   it('should fail to update a post category name if one with the same name already exists in this space', async () => {
     const createInput: CreatePostCategoryInput = {
       name: 'First Category',
-      spaceId: space.id,
-      color: '#000000'
+      spaceId: space.id
     };
 
     const secondCreateInput: CreatePostCategoryInput = {
       name: 'Second Category',
-      spaceId: space.id,
-      color: '#000000'
+      spaceId: space.id
     };
 
     await createPostCategory(createInput);

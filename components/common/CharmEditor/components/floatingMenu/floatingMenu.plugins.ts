@@ -1,13 +1,14 @@
 import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
 import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
-import { floatingMenu } from '@bangle.dev/react-menu';
 import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
+
+import { floatingMenu } from './floating-menu';
 
 export function plugins({
   key,
@@ -18,11 +19,10 @@ export function plugins({
   readOnly?: boolean;
   enableComments?: boolean;
 }) {
-  const menuPlugins = floatingMenu.plugins({
+  const menuPlugins = floatingMenu({
     key,
     calculateType: (state) => {
       if (
-        state.selection.empty ||
         (state.selection as NodeSelection)?.node?.type?.name.match(
           /(image)|(cryptoPrice)|(iframe)|(page)|(pdf)|(mention)|(tabIndent)|(codeBlock)/
         )
@@ -30,11 +30,10 @@ export function plugins({
         return null;
       }
 
-      if (readOnly && enableComments) {
-        return 'commentOnlyMenu';
-      }
-
       if (readOnly) {
+        if (enableComments && !state.selection.empty) {
+          return 'commentOnlyMenu';
+        }
         return null;
       }
 
@@ -69,6 +68,9 @@ export function plugins({
           // We are not inside a paragraph, so dont show floating menu
           return null;
         }
+      }
+      if (state.selection.empty) {
+        return null;
       }
 
       return 'defaultMenu';

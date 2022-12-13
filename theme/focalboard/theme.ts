@@ -3,25 +3,22 @@ import {
   darkTheme as originalDarkTheme,
   lightTheme as originalLightTheme
 } from 'components/common/BoardEditor/focalboard/src/theme';
-import type { BrandColorScheme } from 'theme/colors';
-import { darkModeColors, lightModeColors } from 'theme/colors';
+import { colors } from 'theme/colors';
 
 /**
  * Automatically generate property names that are in sync with our brand colours
  */
-function renameColorsForFocalboard(colorScheme: BrandColorScheme): Record<string, string> {
-  return Object.entries(colorScheme).reduce((computedColorScheme, color) => {
-    const propName = color[0];
-    const capitalisedPropName = `prop${propName.slice(0, 1).toUpperCase()}${propName.slice(1)}`;
+function renameColorsForFocalboard(colorMode: 'light' | 'dark'): Record<string, string> {
+  return Object.entries(colors).reduce((computedColorScheme, [color, value]) => {
+    const capitalisedPropName = `prop${color.slice(0, 1).toUpperCase()}${color.slice(1)}`;
 
-    // eslint-disable-next-line prefer-destructuring
-    computedColorScheme[capitalisedPropName] = color[1];
+    computedColorScheme[capitalisedPropName] = value[colorMode];
 
     return computedColorScheme;
   }, <any>{});
 }
 
-const darkFocalboardBrandColors = renameColorsForFocalboard(darkModeColors);
+const darkFocalboardBrandColors = renameColorsForFocalboard('dark');
 
 export const darkTheme: Theme = {
   ...originalDarkTheme,
@@ -29,7 +26,7 @@ export const darkTheme: Theme = {
   ...darkFocalboardBrandColors
 };
 
-const lightFocalboardBrandColors = renameColorsForFocalboard(lightModeColors);
+const lightFocalboardBrandColors = renameColorsForFocalboard('light');
 
 export const lightTheme: Theme = {
   ...originalLightTheme,

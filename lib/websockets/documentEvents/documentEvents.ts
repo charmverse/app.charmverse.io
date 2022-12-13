@@ -4,6 +4,7 @@ import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import { getLogger } from 'lib/log/prefix';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
@@ -11,6 +12,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocketData } from '../authentication';
+import { relay } from '../relay';
 
 import type {
   Participant,
@@ -39,6 +41,9 @@ type DocumentRoom = {
     id: string;
     version: number;
     content: any;
+    type: string;
+    galleryImage: string | null;
+    hasContent: boolean;
     diffs: ClientDiffMessage[];
   };
   lastSavedVersion?: number;
@@ -69,6 +74,14 @@ export class DocumentEventHandler {
     return this.socket.data as SocketSessionData;
   }
 
+  getSessionMeta() {
+    const session = this.socket.data as SocketSessionData;
+    return {
+      userId: session.user?.id,
+      pageId: session.documentId
+    };
+  }
+
   setSession(data: Partial<SocketSessionData>) {
     Object.assign(this.socket.data, data);
   }
@@ -96,13 +109,12 @@ export class DocumentEventHandler {
   }
 
   init() {
-    const session = this.getSession();
-
     this.socket.on(this.socketEvent, async (message) => {
       try {
         await this.onMessage(message);
       } catch (error) {
-        log.error('Error handling document event', { userId: session.user.id, error });
+        const logData = this.getSessionMeta();
+        log.error('Error handling document event', { ...logData, error });
       }
     });
 
@@ -111,7 +123,8 @@ export class DocumentEventHandler {
       try {
         this.onClose();
       } catch (error) {
-        log.error('Error handling web socket disconnect', { userId: session.user.id, error });
+        const logData = this.getSessionMeta();
+        log.error('Error handling web socket disconnect', { ...logData, error });
       }
     });
 
@@ -119,6 +132,7 @@ export class DocumentEventHandler {
   }
 
   async onMessage(message: WrappedSocketMessage<ClientMessage>) {
+    const logData = this.getSessionMeta();
     // log.debug('Received message:', { message, messages: this.messages });
 
     if (message.type === 'request_resend') {
@@ -131,17 +145,17 @@ export class DocumentEventHandler {
       return;
     } else if (message.c < this.messages.client + 1) {
       // Receive a message already received at least once. Ignore.
-      log.debug(`Ignore duplicate ${message.type} message from client`);
+      log.debug(`Ignore duplicate ${message.type} message from client`, logData);
       return;
     } else if (message.c > this.messages.client + 1) {
-      log.debug('Request resent of lost messages from client');
+      log.debug('Request resent of lost messages from client', logData);
       this.sendMessage({ type: 'request_resend', from: this.messages.client });
       return;
     } else if (message.s < this.messages.server) {
       /* Message was sent either simultaneously with message from server
          or a message from the server previously sent never arrived.
          Resend the messages the client missed. */
-      log.debug('Resend messages to client');
+      log.debug('Resend messages to client', logData);
       this.messages.client += 1;
       await this.resendMessages(message.s);
       await this.rejectMessage(message);
@@ -155,7 +169,7 @@ export class DocumentEventHandler {
     } catch (error) {
       log.error('Error handling socket message', {
         error: (error as any).stack || error,
-        userId: this.getSession().user.id
+        ...logData
       });
     }
   }
@@ -175,7 +189,7 @@ export class DocumentEventHandler {
     }
 
     if (!docRooms.has(session.documentId)) {
-      log.debug('Ignore message from closed document', { pageId: session.documentId });
+      log.debug('Ignore message from closed document', { pageId: session.documentId, userId: session.user.id });
       return;
     }
 
@@ -199,7 +213,7 @@ export class DocumentEventHandler {
         break;
 
       default:
-        log.debug('Unhandled socket message type', message);
+        log.debug(`Unhandled socket message type: "${message.type}"`, message);
     }
   }
 
@@ -241,6 +255,9 @@ export class DocumentEventHandler {
           doc: {
             id: page.id,
             content,
+            type: page.type,
+            galleryImage: page.galleryImage,
+            hasContent: page.hasContent,
             version: page.version,
             diffs: page.diffs.map((diff) => diff.data as unknown as ClientDiffMessage)
           },
@@ -307,16 +324,17 @@ export class DocumentEventHandler {
     const room = this.getDocumentRoomOrThrow();
     const clientV = message.v;
     const serverV = room.doc.version;
-    log.debug('Handling change event', { userId: this.getSession().user.id, clientV, serverV });
+    log.debug('Handling change event', { userId: this.getSession().user.id, pageId: room.doc.id, clientV, serverV });
     if (clientV === serverV) {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
 
-        const updatedNode = applyStepsToNode(message.ds, room.node);
-        if (updatedNode) {
+        try {
+          const updatedNode = applyStepsToNode(message.ds, room.node);
           room.node = updatedNode;
-        } else {
+          room.doc.content = updatedNode.toJSON();
+        } catch (error) {
           this.unfixable();
           const patchError = { type: 'patch_error' } as const;
           this.sendMessage(patchError);
@@ -324,7 +342,6 @@ export class DocumentEventHandler {
           this.resetCollaboration(patchError);
           return;
         }
-        room.doc.content = updatedNode.toJSON();
       }
       room.doc.diffs.push(message);
       room.doc.diffs = room.doc.diffs.slice(this.historyLength);
@@ -392,6 +409,11 @@ export class DocumentEventHandler {
 
   async sendDocument(messages?: ClientDiffMessage[]) {
     const session = this.getSession();
+
+    if (!session.documentId) {
+      log.error('Cannot send document - session is missing documentId', { session });
+      return;
+    }
 
     const page = await prisma.page.findUniqueOrThrow({
       where: { id: session.documentId },
@@ -506,17 +528,39 @@ export class DocumentEventHandler {
 
     log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
 
-    await prisma.page.update({
+    const contentText = room.node.textContent;
+    // check if content is empty only if it got changed
+    const hasContent = contentText.length > 0;
+    const galleryImage = room.doc.type === 'card' ? getPreviewImageFromContent(room.doc.content) : null;
+
+    const res = await prisma.page.update({
       where: { id: room.doc.id },
       data: {
         content: room.doc.content,
-        contentText: room.node.textContent,
+        contentText,
+        hasContent,
+        galleryImage,
         version: room.doc.version,
         updatedAt: new Date(),
         updatedBy: userId
+      },
+      select: {
+        spaceId: true
       }
     });
 
     room.lastSavedVersion = room.doc.version;
+
+    if (galleryImage !== room.doc.galleryImage || hasContent !== room.doc.hasContent) {
+      room.doc.galleryImage = galleryImage;
+      room.doc.hasContent = hasContent;
+      relay.broadcast(
+        {
+          type: 'pages_meta_updated',
+          payload: [{ galleryImage, hasContent, spaceId: res.spaceId, id: room.doc.id }]
+        },
+        res.spaceId
+      );
+    }
   }
 }

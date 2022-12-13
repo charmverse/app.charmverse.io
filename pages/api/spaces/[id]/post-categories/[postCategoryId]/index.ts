@@ -31,7 +31,7 @@ async function deletePostCategoryController(req: NextApiRequest, res: NextApiRes
     }
   });
 
-  return res.status(200).json({});
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

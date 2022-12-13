@@ -114,7 +114,7 @@
 }
 
 .ProseMirror th {
-  background-color: var(--prop-gray);
+  background-color: var(--bg-gray);
 }
 
 .ProseMirror .tableWrapper {
@@ -447,7 +447,7 @@ details {
 
     &::-webkit-details-marker,
     &::marker {
-      color: var(--prop-gray);
+      color: var(--bg-gray);
       display: none;
     }
 
@@ -556,7 +556,7 @@ details {
 .ProseMirror[data-placeholder]::before {
   display: block;
   height: 0;
-  color: var(--prop-gray);
+  color: var(--bg-gray);
   content: attr(data-placeholder);
   pointer-events: none;
   position: relative;

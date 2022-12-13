@@ -13,7 +13,7 @@ type GetOrganizationsResponse = ApiResponse<{
   resources: DeepDaoOrganizationDetails[];
 }>;
 
-export const { DEEPDAO_API_KEY, DEEP_DAO_BASE_URL } = process.env;
+export const { DEEPDAO_API_KEY, DEEPDAO_BASE_URL } = process.env;
 
 export async function getParticipationScore(
   address: string,
@@ -27,7 +27,7 @@ export async function getParticipationScore(
     return null;
   }
 
-  return fetch<GetParticipationScoreResponse>(`${DEEP_DAO_BASE_URL}/v0.1/people/participation_score/${address}`, {
+  return fetch<GetParticipationScoreResponse>(`${DEEPDAO_BASE_URL}/v0.1/people/participation_score/${address}`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken
@@ -44,7 +44,7 @@ export async function getProfile(address: string, apiToken = DEEPDAO_API_KEY): P
     return null;
   }
 
-  return fetch<GetProfileResponse>(`${DEEP_DAO_BASE_URL}/v0.1/people/profile/${address}`, {
+  return fetch<GetProfileResponse>(`${DEEPDAO_BASE_URL}/v0.1/people/profile/${address}`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken
@@ -58,7 +58,7 @@ export async function getAllOrganizations(apiToken = DEEPDAO_API_KEY): Promise<G
     return { data: { resources: [], totalResources: 0 } };
   }
 
-  return fetch<GetOrganizationsResponse>(`${DEEP_DAO_BASE_URL}/v0.1/organizations`, {
+  return fetch<GetOrganizationsResponse>(`${DEEPDAO_BASE_URL}/v0.1/organizations`, {
     method: 'GET',
     headers: {
       'x-api-key': apiToken

@@ -1,15 +1,10 @@
 import type { User } from '@prisma/client';
-import { mockWalletSignature } from '__e2e__/utils/web3';
-import { ethers, Wallet } from 'ethers';
-import { SiweMessage } from 'lit-siwe';
 
 import { prisma } from 'db';
-import { paramToHumanFormat } from 'lib/metrics/mixpanel/utils';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ProofParams, UnstoppableDomainsAuthSig } from '../unstoppableDomains';
-import { assignUnstoppableDomainAsUserIdentity, verifyUnstoppableDomainsSignature } from '../unstoppableDomains';
+import { assignUnstoppableDomainAsUserIdentity } from '../unstoppableDomains';
 
 // TODO - Add in a real signature we can reverify once we've built replay attack protection
 

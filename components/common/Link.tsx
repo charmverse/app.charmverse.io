@@ -32,8 +32,9 @@ const StyledMuiLink = styled(MuiLink)`
   }
 `;
 
-interface Props extends LinkProps {
+interface Props extends Omit<LinkProps, 'href'> {
   external?: boolean;
+  href?: string;
 }
 
 export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {

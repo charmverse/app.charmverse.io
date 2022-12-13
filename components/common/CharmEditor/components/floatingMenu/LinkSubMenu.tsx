@@ -1,7 +1,6 @@
 import { link } from '@bangle.dev/base-components';
 import type { EditorView } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
-import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -94,7 +93,7 @@ function LinkMenu({
           e.preventDefault();
         }}
       />
-      <MenuButton disableButton={isSavedDisabled} hints={['Save']}>
+      <MenuButton isDisabled={isSavedDisabled} hints={['Save']}>
         <SaveIcon
           color={!isSavedDisabled ? 'inherit' : 'disabled'}
           sx={{

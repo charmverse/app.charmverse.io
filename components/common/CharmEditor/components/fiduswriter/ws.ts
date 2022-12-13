@@ -230,7 +230,12 @@ export class WebSocketConnector {
       } else if ((error as any).code === 'parser error') {
         // ignore error - seems to happen on deploy
       } else {
-        log.warn(`[ws${namespace}] Connection error`, { error });
+        log.error(`[ws${namespace}] Connection error`, {
+          error,
+          client: this.messages.client,
+          server: this.messages.server,
+          toSend: this.messagesToSend.length
+        });
         this.onError(error);
       }
     });

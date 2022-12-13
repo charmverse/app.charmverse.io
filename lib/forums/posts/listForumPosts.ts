@@ -24,15 +24,16 @@ export interface ListForumPostsRequest {
   count?: number;
   sort?: string;
 }
-
-export async function listForumPosts({
-  spaceId,
-  page = 0,
-  sort,
-  // Count is the number of posts we want per page
-  count = defaultPostsPerResult,
-  categoryIds
-}: ListForumPostsRequest): Promise<PaginatedPostList> {
+export async function listForumPosts(
+  {
+    spaceId,
+    page = 0,
+    // Count is the number of posts we want per page
+    count = defaultPostsPerResult,
+    categoryIds
+  }: ListForumPostsRequest,
+  userId: string
+): Promise<PaginatedPostList> {
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
@@ -52,46 +53,65 @@ export async function listForumPosts({
     }
   };
 
-  const postPropsQuery: Prisma.PageWhereInput = {
-    post: categoryIds
-      ? {
-          categoryId: {
-            in: categoryIds
-          }
+  const postPropsQuery: Prisma.PostWhereInput = categoryIds
+    ? {
+        categoryId: {
+          in: categoryIds
         }
-      : categoryIds === null
-      ? { categoryId: null }
-      : undefined
-  };
+      }
+    : categoryIds === null
+    ? { categoryId: null }
+    : {};
 
-  const posts = (await prisma.page.findMany({
+  // postPropsQuery.status = 'published';
+
+  const pages = await prisma.page.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
     where: {
       type: 'post',
       spaceId,
-      ...postPropsQuery
+      post: postPropsQuery
     },
     include: {
+      upDownVotes: {
+        select: {
+          upvoted: true,
+          createdBy: true
+        }
+      },
       post: true
     }
-  })) as ForumPostPage[];
+  });
 
   const hasNext =
-    posts.length === 0
+    pages.length === 0
       ? false
       : (
           await prisma.page.findMany({
             ...orderQuery,
             skip: toSkip + count,
             take: 1,
-            where: { type: 'post', spaceId, ...postPropsQuery }
+            where: { type: 'post', spaceId, post: postPropsQuery }
           })
         ).length === 1;
 
   const response: PaginatedPostList = {
-    data: posts,
+    data: pages.map((_page) => {
+      const { upDownVotes, post, ...rest } = _page;
+      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
+      const forumPostPage: ForumPostPage = {
+        ...rest,
+        post: {
+          ...post!,
+          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
+          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
+          upvoted: userVote ? userVote.upvoted : undefined
+        }
+      };
+      return forumPostPage;
+    }),
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

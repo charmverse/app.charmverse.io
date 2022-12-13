@@ -4,12 +4,12 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPage } from '../interfaces';
+import type { ForumPostPageWithoutVotes } from '../interfaces';
 import { defaultPostsPerResult, listForumPosts } from '../listForumPosts';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPage[];
+let spacePosts: ForumPostPageWithoutVotes[];
 
 // Test a space with 16 forum posts
 beforeAll(async () => {
@@ -26,7 +26,7 @@ beforeAll(async () => {
 
 describe('listForumPosts', () => {
   it(`should return ${defaultPostsPerResult} posts by default`, async () => {
-    const posts = await listForumPosts({ spaceId: space.id });
+    const posts = await listForumPosts({ spaceId: space.id }, user.id);
 
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
@@ -52,7 +52,7 @@ describe('listForumPosts', () => {
       categoryId: category.id
     });
 
-    const foundPosts = await listForumPosts({ spaceId: extraSpace.id, count: 10 });
+    const foundPosts = await listForumPosts({ spaceId: extraSpace.id, count: 10 }, user.id);
 
     expect(foundPosts.data).toHaveLength(posts.length + categoryPosts.length);
 
@@ -64,13 +64,16 @@ describe('listForumPosts', () => {
     // With 40 posts, we should have 3 pages
     const resultsPerQuery = 19;
 
-    const firstResult = await listForumPosts({ spaceId: space.id, count: resultsPerQuery });
+    const firstResult = await listForumPosts({ spaceId: space.id, count: resultsPerQuery }, user.id);
 
     expect(firstResult.data).toHaveLength(resultsPerQuery);
     expect(firstResult.cursor).toBe(1);
     expect(firstResult.hasNext).toBe(true);
 
-    const secondResult = await listForumPosts({ spaceId: space.id, count: resultsPerQuery, page: firstResult.cursor });
+    const secondResult = await listForumPosts(
+      { spaceId: space.id, count: resultsPerQuery, page: firstResult.cursor },
+      user.id
+    );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
     expect(secondResult.cursor).toBe(2);
     expect(secondResult.hasNext).toBe(true);
@@ -78,7 +81,10 @@ describe('listForumPosts', () => {
     // What should be left for third query after executing the query twice
     const expectedRemainingData = spacePosts.length - resultsPerQuery * 2;
 
-    const thirdResult = await listForumPosts({ spaceId: space.id, count: resultsPerQuery, page: secondResult.cursor });
+    const thirdResult = await listForumPosts(
+      { spaceId: space.id, count: resultsPerQuery, page: secondResult.cursor },
+      user.id
+    );
     expect(thirdResult.data).toHaveLength(expectedRemainingData);
     expect(thirdResult.cursor).toBe(0);
     expect(thirdResult.hasNext).toBe(false);
@@ -122,22 +128,28 @@ describe('listForumPosts', () => {
 
     // Test querying for posts in category 1 + 2 -------------------------------
 
-    let firstResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      categoryIds: [category1.id, category2.id]
-    });
+    let firstResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryIds: [category1.id, category2.id]
+      },
+      user.id
+    );
 
     expect(firstResult.data).toHaveLength(resultsPerQuery);
     expect(firstResult.cursor).toBe(1);
     expect(firstResult.hasNext).toBe(true);
 
-    let secondResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      page: firstResult.cursor,
-      categoryIds: [category1.id, category2.id]
-    });
+    let secondResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        page: firstResult.cursor,
+        categoryIds: [category1.id, category2.id]
+      },
+      user.id
+    );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
     expect(secondResult.cursor).toBe(0);
     expect(secondResult.hasNext).toBe(false);
@@ -146,43 +158,55 @@ describe('listForumPosts', () => {
 
     resultsPerQuery = 5;
 
-    firstResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      categoryIds: [category3.id]
-    });
+    firstResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryIds: [category3.id]
+      },
+      user.id
+    );
 
     expect(firstResult.data).toHaveLength(resultsPerQuery);
     expect(firstResult.cursor).toBe(1);
     expect(firstResult.hasNext).toBe(true);
 
-    secondResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      page: firstResult.cursor,
-      categoryIds: [category3.id]
-    });
+    secondResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        page: firstResult.cursor,
+        categoryIds: [category3.id]
+      },
+      user.id
+    );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
     expect(secondResult.cursor).toBe(0);
     expect(secondResult.hasNext).toBe(false);
 
     // Test querying for uncategorised posts -------------------------------
-    firstResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      categoryIds: null
-    });
+    firstResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        categoryIds: null
+      },
+      user.id
+    );
 
     expect(firstResult.data).toHaveLength(resultsPerQuery);
     expect(firstResult.cursor).toBe(1);
     expect(firstResult.hasNext).toBe(true);
 
-    secondResult = await listForumPosts({
-      spaceId: extraSpace.id,
-      count: resultsPerQuery,
-      page: firstResult.cursor,
-      categoryIds: null
-    });
+    secondResult = await listForumPosts(
+      {
+        spaceId: extraSpace.id,
+        count: resultsPerQuery,
+        page: firstResult.cursor,
+        categoryIds: null
+      },
+      user.id
+    );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
     expect(secondResult.cursor).toBe(0);
     expect(secondResult.hasNext).toBe(false);

@@ -5,20 +5,19 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 
 import { ViewOptions } from 'components/common/ViewOptions';
-import { useForumFilters } from 'hooks/useForumFilters';
+import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
 export type FilterProps = {
   selectedCategory?: CategoryIdQuery;
   categoryIdSelected: (categoryId: CategoryIdQuery) => void;
-
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;
 };
 
-export default function FilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
-  const { categories, error } = useForumFilters();
+export default function ForumFilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+  const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
   //   const defaultValue = sortList[0];
@@ -33,7 +32,7 @@ export default function FilterSelect({ categoryIdSelected, selectedCategory = 'n
   // }, [querySort]);
 
   if (error) {
-    return <Alert severity='error'>An error occured while loading the categories</Alert>;
+    return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
 
   return (
@@ -51,12 +50,16 @@ export default function FilterSelect({ categoryIdSelected, selectedCategory = 'n
       </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={selectedCategory}
+          value={selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
           onChange={(e) => {
             categoryIdSelected(e.target.value);
           }}
         >
-          <MenuItem value='none'>All categories</MenuItem>
+          <MenuItem value='all-category'>
+            <Typography sx={{ fontWeight: selectedCategory?.length === 0 ? 'bold' : 'initial' }} color='inherit'>
+              All categories
+            </Typography>
+          </MenuItem>
           {categories?.map((category) => (
             <MenuItem key={category.id} value={category.id}>
               <Typography
