@@ -12,8 +12,6 @@ export const greyColor2 = '#aaa';
 export const darkGreyColor = '#696773';
 export const greyColor = '#525252';
 
-// main theme colors - inspired by Notion
-
 // light mode
 export const primaryTextColor = '#37352f';
 export const backgroundColor = '#fff';
@@ -36,36 +34,49 @@ export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackg
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
 
-export type BrandColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
+export const colors = {
+  gray: {
+    dark: '#757570',
+    light: '#E7E7E6'
+  },
+  orange: {
+    dark: '#C44F1C',
+    light: '#F4D8D0'
+  },
+  yellow: {
+    dark: '#81730E',
+    light: '#EFE9CB'
+  },
+  teal: {
+    dark: '#007C8F',
+    light: '#D0F4F1'
+  },
+  blue: {
+    dark: '#007CAD',
+    light: '#C1E7F4'
+  },
+  turquoise: {
+    dark: '#4273C2',
+    light: '#C2DCF2'
+  },
+  purple: {
+    dark: '#8742FF',
+    light: '#D7D3F4'
+  },
+  pink: {
+    dark: '#925E9C',
+    light: '#E8D3ED'
+  },
+  red: {
+    dark: '#D53474',
+    light: '#F2CCD6'
+  }
+};
+
+export type BrandColor = keyof typeof colors;
 export type SupportedColor = BrandColor | 'default';
 
-export type BrandColorScheme = Record<BrandColor, string>;
-
-export const darkModeColors: BrandColorScheme = {
-  gray: '#757570', // Dark Gray
-  turquoise: '#4273C2', // Dark Turquoise
-  orange: '#C44F1C', // Dark Orange
-  yellow: '#81730E', // Dark Yellow
-  teal: '#007C8F', // Dark Teal
-  blue: '#007CAD', // Dark Blue
-  purple: '#8742FF', // Dark Purple
-  red: '#D53474', // Dark Red
-  pink: '#925E9C' // Dark Pink
-};
-
-export const lightModeColors: BrandColorScheme = {
-  gray: '#E7E7E6', // Light Gray
-  turquoise: '#C2DCF2', // Light Turquoise
-  orange: '#F4D8D0', // Light Orange
-  yellow: '#EFE9CB', // Light Yellow
-  teal: '#D0F4F1', // Light Teal
-  blue: '#C1E7F4', // Light Blue
-  purple: '#D7D3F4', // Light Purple
-  red: '#F2CCD6', // Light Red
-  pink: '#E8D3ED' // Light Pink
-};
-
-export const brandColorNames = Object.keys(darkModeColors) as BrandColor[];
+export const brandColorNames = Object.keys(colors) as BrandColor[];
 
 export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',

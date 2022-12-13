@@ -135,38 +135,6 @@ export function setTheme(theme: Theme | null): Theme {
   document.documentElement.style.setProperty('--sidebar-white-logo', consolidatedTheme.sidebarWhiteLogo);
   document.documentElement.style.setProperty('--link-visited-color-rgb', consolidatedTheme.linkVisited);
 
-  const mainBgColor = color(
-    `rgb(${getComputedStyle(document.documentElement).getPropertyValue('--center-channel-bg-rgb')})`
-  );
-
-  if (Utils.isFocalboardPlugin()) {
-    let fixedTheme = lightTheme;
-    if (mainBgColor.isDark()) {
-      fixedTheme = darkTheme;
-    }
-    consolidatedTheme.propDefault = fixedTheme.propDefault;
-    consolidatedTheme.propGray = fixedTheme.propGray;
-    consolidatedTheme.propTurquoise = fixedTheme.propTurquoise;
-    consolidatedTheme.propOrange = fixedTheme.propOrange;
-    consolidatedTheme.propYellow = fixedTheme.propYellow;
-    consolidatedTheme.propTeal = fixedTheme.propTeal;
-    consolidatedTheme.propBlue = fixedTheme.propBlue;
-    consolidatedTheme.propPurple = fixedTheme.propPurple;
-    consolidatedTheme.propPink = fixedTheme.propPink;
-    consolidatedTheme.propRed = fixedTheme.propRed;
-  }
-
-  document.documentElement.style.setProperty('--prop-default', consolidatedTheme.propDefault);
-  document.documentElement.style.setProperty('--prop-gray', consolidatedTheme.propGray);
-  document.documentElement.style.setProperty('--prop-turquoise', consolidatedTheme.propTurquoise);
-  document.documentElement.style.setProperty('--prop-orange', consolidatedTheme.propOrange);
-  document.documentElement.style.setProperty('--prop-yellow', consolidatedTheme.propYellow);
-  document.documentElement.style.setProperty('--prop-teal', consolidatedTheme.propTeal);
-  document.documentElement.style.setProperty('--prop-blue', consolidatedTheme.propBlue);
-  document.documentElement.style.setProperty('--prop-purple', consolidatedTheme.propPurple);
-  document.documentElement.style.setProperty('--prop-pink', consolidatedTheme.propPink);
-  document.documentElement.style.setProperty('--prop-red', consolidatedTheme.propRed);
-
   return consolidatedTheme;
 }
 

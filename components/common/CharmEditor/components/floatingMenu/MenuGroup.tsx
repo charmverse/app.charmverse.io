@@ -7,8 +7,6 @@ const StyledMenuGroup = styled.div<{ keepBorder: boolean }>`
     props.keepBorder &&
     `
     border-right: 1.5px solid ${props.theme.palette.divider};
-    padding-right: ${props.theme.spacing(0.5)};
-    margin-right: ${props.theme.spacing(0.5)};
   `}
 `;
 
