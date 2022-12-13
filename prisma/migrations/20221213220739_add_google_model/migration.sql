@@ -1,7 +1,12 @@
+-- AlterEnum
+ALTER TYPE "IdentityType" ADD VALUE 'Google';
+
 -- CreateTable
 CREATE TABLE "GoogleAccount" (
     "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "avatarUrl" TEXT NOT NULL,
     "userId" UUID NOT NULL,
 
     CONSTRAINT "GoogleAccount_pkey" PRIMARY KEY ("id")
