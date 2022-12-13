@@ -51,6 +51,12 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
         autoHideDuration={autoHideDuration}
         anchorOrigin={originProp ?? origin}
         onClose={handleClose}
+        sx={{
+          '& .MuiAlert-action': {
+            alignItems: 'center',
+            gap: 1
+          }
+        }}
       >
         <Alert
           action={[

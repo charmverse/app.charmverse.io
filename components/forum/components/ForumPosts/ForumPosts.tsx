@@ -1,13 +1,22 @@
-import Alert from '@mui/material/Alert';
+import ClearIcon from '@mui/icons-material/Clear';
+import ReplayIcon from '@mui/icons-material/Replay';
+import { IconButton, Stack } from '@mui/material';
+import type { AlertProps } from '@mui/material/Alert';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import { Box } from '@mui/system';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
+import { useUser } from 'hooks/useUser';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { Member } from 'lib/members/interfaces';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import CreateForumPost from '../CreateForumPost';
 import ForumPost from '../ForumPost/ForumPost';
@@ -19,6 +28,10 @@ interface ForumPostsProps {
 }
 
 const resultsPerQuery = 10;
+
+const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
 
 // Add a manual delay so the user sees the post loading skeleton
 const generatePostRefreshTimeout = () => {
@@ -37,7 +50,8 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
-
+  const createPostBoxRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   // Re-enable sorting later on
 
   // const querySort = query.sort;
@@ -54,13 +68,14 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   // }, [querySort]);
 
   const { members } = useMembers();
-
+  const { user } = useUser();
   const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { subscribe } = useWebSocketClient();
 
-  function loadMorePosts() {
+  function loadMorePosts(refetch = false) {
     setIsLoadingMore(true);
 
     charmClient.forum
@@ -68,7 +83,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         spaceId: currentSpace!.id,
         categoryIds: categoryId,
         count: resultsPerQuery,
-        page: posts?.cursor
+        page: refetch ? undefined : posts?.cursor
       })
       .then((foundPosts) => {
         if (error) {
@@ -78,12 +93,10 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         // UX improvement: add a delay so the user sees the post loading skeleton
         setTimeout(() => {
           setPosts((_prevList) => {
-            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
-
-            if (!_prevList) {
+            if (!_prevList || refetch) {
               return foundPosts;
             }
-
+            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
             _prevList.cursor = foundPosts.cursor;
 
             const previousDataToKeep = !_prevList
@@ -103,8 +116,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
                 });
 
             _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
-              const user = members.find((member) => member.id === post.createdBy);
-              return { ...post, user };
+              return { ...post, user: members.find((member) => member.id === post.createdBy) };
             });
             _prevList.hasNext = foundPosts.hasNext;
 
@@ -121,6 +133,29 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       });
   }
 
+  const currentCategoryId =
+    typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;
+
+  const handlePostPublishEvent = useCallback(
+    (postWithPage: WebSocketPayload<'post_published'>) => {
+      if (
+        user &&
+        postWithPage?.createdBy !== user.id &&
+        (currentCategoryId ? postWithPage.categoryId === currentCategoryId : true)
+      ) {
+        setIsOpen(true);
+      }
+    },
+    [user, categoryId]
+  );
+
+  useEffect(() => {
+    const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
+    return () => {
+      unsubscribeFromPostPublishEvent();
+    };
+  }, [handlePostPublishEvent]);
+
   useEffect(() => {
     if (
       currentSpace &&
@@ -135,7 +170,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      <CreateForumPost />
+      <CreateForumPost ref={createPostBoxRef} />
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
       {posts?.data.map((post) => (
         <ForumPost key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
@@ -143,6 +178,53 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       {isLoadingMore && <ForumPostSkeleton />}
       {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
       <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
+      <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
+        <Snackbar
+          open={isOpen}
+          autoHideDuration={10000}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top'
+          }}
+          onClose={() => setIsOpen(false)}
+          sx={{
+            '& .MuiAlert-action': {
+              alignItems: 'center',
+              gap: 1
+            }
+          }}
+        >
+          <Alert
+            action={[
+              <Button
+                key='reload'
+                variant='outlined'
+                onClick={() => {
+                  if (createPostBoxRef.current) {
+                    createPostBoxRef.current.scrollIntoView({
+                      behavior: 'smooth'
+                    });
+                    loadMorePosts(true);
+                    setIsOpen(false);
+                  }
+                }}
+                size='small'
+                startIcon={<ReplayIcon fontSize='small' />}
+                color='inherit'
+              >
+                Fetch
+              </Button>,
+              <IconButton key='clear' onClick={() => setIsOpen(false)} color='inherit'>
+                <ClearIcon fontSize='small' />
+              </IconButton>
+            ]}
+            severity='info'
+            sx={{ width: '100%', alignItems: 'center' }}
+          >
+            New posts ready to view
+          </Alert>
+        </Snackbar>
+      </Stack>
     </>
   );
 }

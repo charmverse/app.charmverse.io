@@ -121,6 +121,32 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       page.spaceId
     );
 
+    if (newPageToNotify.type === 'post') {
+      const post = await prisma.post.create({
+        data: {
+          page: {
+            connect: {
+              id: newPageToNotify.id
+            }
+          },
+          status: 'draft'
+        }
+      });
+
+      if (post) {
+        relay.broadcast(
+          {
+            type: 'post_published',
+            payload: {
+              categoryId: post.categoryId,
+              createdBy: userId
+            }
+          },
+          page.spaceId
+        );
+      }
+    }
+
     res.status(201).json(pageWithPermissions);
   } catch (error) {
     log.warn('Deleting page because page permissions failed. TODO: create permissions with page in one transaction', {

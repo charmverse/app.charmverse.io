@@ -11,6 +11,7 @@ type IContext = {
   setMessage: Dispatch<SetStateAction<string | null>>;
   severity: AlertColor;
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
+  setActions: Dispatch<SetStateAction<ReactNode[]>>;
   showMessage: (msg: string, newSeverity?: AlertColor) => void;
   handleClose: SnackbarProps['onClose'];
 };
@@ -25,7 +26,8 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   setMessage: () => {},
   setSeverity: () => {},
   severity: 'info',
-  showMessage: () => {}
+  showMessage: () => {},
+  setActions: () => {}
 });
 
 export function SnackbarProvider({ children }: { children: ReactNode }) {
@@ -43,11 +45,10 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     if (reason === 'clickaway') {
       return;
     }
-
     setIsOpen(false);
   };
 
-  const value: IContext = useMemo(
+  const value = useMemo<IContext>(
     () => ({
       isOpen,
       handleClose,
@@ -65,7 +66,6 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       origin,
       severity,
       setActions,
-      setOrigin,
       setSeverity,
       setIsOpen,
       setMessage
