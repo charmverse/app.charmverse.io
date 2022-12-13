@@ -178,6 +178,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       {isLoadingMore && <ForumPostSkeleton />}
       {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
       <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
+
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
         <Snackbar
           open={isOpen}
