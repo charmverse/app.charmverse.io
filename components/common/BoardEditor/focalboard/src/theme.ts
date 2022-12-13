@@ -212,10 +212,6 @@ export function getSelectBaseStyle() {
       ...provided,
       display: 'none'
     }),
-    clearIndicator: (provided: CSSObject): CSSObject => ({
-      ...provided,
-      display: 'none'
-    }),
     menu: (provided: CSSObject): CSSObject => ({
       ...provided,
       width: 'unset',
@@ -230,9 +226,9 @@ export function getSelectBaseStyle() {
     control: (): CSSObject => ({
       border: 0,
       width: '100%',
-      margin: '4px 0 0 0'
+      margin: '4px 0 0 0',
 
-      // display: 'flex',
+      display: 'flex'
       // marginTop: 0,
     }),
     valueContainer: (provided: CSSObject): CSSObject => ({
