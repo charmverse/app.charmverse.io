@@ -32,7 +32,7 @@ export default function ForumFilterSelect({ categoryIdSelected, selectedCategory
   // }, [querySort]);
 
   if (error) {
-    return <Alert severity='error'>An error occured while loading the categories</Alert>;
+    return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
 
   return (
@@ -50,12 +50,16 @@ export default function ForumFilterSelect({ categoryIdSelected, selectedCategory
       </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={selectedCategory}
+          value={selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
           onChange={(e) => {
             categoryIdSelected(e.target.value);
           }}
         >
-          <MenuItem value='none'>All categories</MenuItem>
+          <MenuItem value='all-category'>
+            <Typography sx={{ fontWeight: selectedCategory?.length === 0 ? 'bold' : 'initial' }} color='inherit'>
+              All categories
+            </Typography>
+          </MenuItem>
           {categories?.map((category) => (
             <MenuItem key={category.id} value={category.id}>
               <Typography

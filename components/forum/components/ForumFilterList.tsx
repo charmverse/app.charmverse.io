@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
@@ -48,7 +49,9 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
         }}
       >
         <Typography
-          color='initial'
+          sx={{
+            color: 'text.primary'
+          }}
           fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
         >
           {label}
@@ -134,6 +137,7 @@ export default function ForumFilterList() {
           onClick={addCategoryPopupState.open}
           variant='outlined'
           size='small'
+          disabledTooltip="You don't have permission to add category"
         >
           Add category
         </Button>
