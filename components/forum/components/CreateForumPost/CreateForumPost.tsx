@@ -4,7 +4,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -15,7 +15,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export default function CreateForumPost() {
+const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -46,7 +46,7 @@ export default function CreateForumPost() {
   }, [currentSpace, user, pageTitle]);
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }}>
+    <Card variant='outlined' sx={{ mb: '15px' }} ref={ref}>
       <CardActionArea disabled={createPageLoading || !userSpacePermissions?.createPage}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
@@ -76,4 +76,6 @@ export default function CreateForumPost() {
       </CardActionArea>
     </Card>
   );
-}
+});
+
+export default CreateForumPost;

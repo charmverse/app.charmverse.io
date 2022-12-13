@@ -16,7 +16,7 @@ export default function ForumPage() {
 
   return (
     <PostDialogProvider>
-      <ForumPageComponent />;
+      <ForumPageComponent />
       <PostDialogGlobal />
     </PostDialogProvider>
   );
