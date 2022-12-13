@@ -68,9 +68,9 @@ describe('updateForumPost', () => {
     };
 
     const updatedForumPost = await updateForumPost({
+      ...(groupedUpdate as any),
       postId: createdPage.id,
-      userId: user.id,
-      ...(groupedUpdate as any)
+      userId: user.id
     });
 
     // ---------------------- Make sure data was preserved ----------------------
