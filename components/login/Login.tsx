@@ -61,18 +61,17 @@ function LoginHandler(props: DialogProps) {
   return (
     <Dialog onClose={handleClose} open={open}>
       <List sx={{ pt: 0, maxWidth: '400px' }}>
-        <ListItem>
-          <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
-        </ListItem>
+        <DialogTitle textAlign='left'>Connect Wallet</DialogTitle>
+
         {/** Web 3 login methods */}
         <ListItem>
           <WalletSelector />
           {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
 
-        <ListItem>
-          <DialogTitle textAlign='left'>Connect Account</DialogTitle>
-        </ListItem>
+        <DialogTitle sx={{ mt: -1 }} textAlign='left'>
+          Connect Account
+        </DialogTitle>
 
         {/* Google login method */}
         <ListItem>
