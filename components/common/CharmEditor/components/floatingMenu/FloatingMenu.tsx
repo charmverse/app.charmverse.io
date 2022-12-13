@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unused-prop-types */
-import { usePluginState } from '@bangle.dev/react';
+import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -66,10 +67,16 @@ function MenuByType(props: MenuProps) {
   const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting;
   const [activeItem, setActiveItem] = useState('Text');
   const handleActiveItem = (item: string) => setActiveItem(item);
+  const view = useEditorViewContext();
+
+  function hideMenu() {
+    popupState.close();
+    selectionTooltip.hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
+  }
 
   if ((type as FloatingMenuVariant) === 'commentOnlyMenu' && pagePermissions?.comment) {
     return (
-      <Menu menuKey={pluginKey}>
+      <Menu hideMenu={hideMenu}>
         <InlineCommentButton enableComments menuKey={pluginKey} />
         {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
       </Menu>
@@ -78,7 +85,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'defaultMenu') {
     return (
-      <Menu menuKey={pluginKey} type={type}>
+      <Menu hideMenu={hideMenu} type={type}>
         <MenuGroup>
           <Tooltip title={<Typography component='div'>Turn into</Typography>}>
             <Button
@@ -130,14 +137,14 @@ function MenuByType(props: MenuProps) {
   }
   if (type === 'linkSubMenu') {
     return (
-      <Menu menuKey={pluginKey}>
+      <Menu hideMenu={hideMenu}>
         <LinkSubMenu showMessage={showMessage} />
       </Menu>
     );
   }
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
-      <Menu menuKey={pluginKey}>
+      <Menu hideMenu={hideMenu}>
         <InlineCommentSubMenu pluginKey={pluginKey} />
       </Menu>
     );
@@ -145,7 +152,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'inlineVoteSubMenu' && !inline) {
     return (
-      <Menu menuKey={pluginKey}>
+      <Menu hideMenu={hideMenu}>
         <InlineVoteSubMenu pluginKey={pluginKey} />
       </Menu>
     );
