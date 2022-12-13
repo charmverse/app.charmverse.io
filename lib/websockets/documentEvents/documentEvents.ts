@@ -4,6 +4,7 @@ import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import { getLogger } from 'lib/log/prefix';
+import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
@@ -11,6 +12,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocketData } from '../authentication';
+import { relay } from '../relay';
 
 import type {
   Participant,
@@ -39,6 +41,9 @@ type DocumentRoom = {
     id: string;
     version: number;
     content: any;
+    type: string;
+    galleryImage: string | null;
+    hasContent: boolean;
     diffs: ClientDiffMessage[];
   };
   lastSavedVersion?: number;
@@ -250,6 +255,9 @@ export class DocumentEventHandler {
           doc: {
             id: page.id,
             content,
+            type: page.type,
+            galleryImage: page.galleryImage,
+            hasContent: page.hasContent,
             version: page.version,
             diffs: page.diffs.map((diff) => diff.data as unknown as ClientDiffMessage)
           },
@@ -520,17 +528,39 @@ export class DocumentEventHandler {
 
     log.debug('Saving document to db', { version: room.doc.version, pageId: room.doc.id });
 
-    await prisma.page.update({
+    const contentText = room.node.textContent;
+    // check if content is empty only if it got changed
+    const hasContent = contentText.length > 0;
+    const galleryImage = room.doc.type === 'card' ? getPreviewImageFromContent(room.doc.content) : null;
+
+    const res = await prisma.page.update({
       where: { id: room.doc.id },
       data: {
         content: room.doc.content,
-        contentText: room.node.textContent,
+        contentText,
+        hasContent,
+        galleryImage,
         version: room.doc.version,
         updatedAt: new Date(),
         updatedBy: userId
+      },
+      select: {
+        spaceId: true
       }
     });
 
     room.lastSavedVersion = room.doc.version;
+
+    if (galleryImage !== room.doc.galleryImage || hasContent !== room.doc.hasContent) {
+      room.doc.galleryImage = galleryImage;
+      room.doc.hasContent = hasContent;
+      relay.broadcast(
+        {
+          type: 'pages_meta_updated',
+          payload: [{ galleryImage, hasContent, spaceId: res.spaceId, id: room.doc.id }]
+        },
+        res.spaceId
+      );
+    }
   }
 }
