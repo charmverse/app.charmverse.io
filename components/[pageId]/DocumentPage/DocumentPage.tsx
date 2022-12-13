@@ -186,6 +186,7 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
+                pageType={page.type}
                 headerImage={page.headerImage}
                 // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
                 // key={page.title}

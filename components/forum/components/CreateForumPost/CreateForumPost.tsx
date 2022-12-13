@@ -28,7 +28,7 @@ export default function CreateForumPost() {
     if (user && currentSpace) {
       setCreatePageLoading(true);
       const page = await charmClient.forum.createForumPost({
-        content: { type: 'doc' },
+        content: null,
         contentText: '',
         spaceId: currentSpace.id,
         title: pageTitle
