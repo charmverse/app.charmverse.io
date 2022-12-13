@@ -86,7 +86,9 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
         page: refetch ? undefined : posts?.cursor
       })
       .then((foundPosts) => {
-        setError(null);
+        if (error) {
+          setError(null);
+        }
 
         // UX improvement: add a delay so the user sees the post loading skeleton
         setTimeout(() => {
@@ -158,7 +160,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
     if (
       currentSpace &&
       members &&
-      members?.length > 0 &&
+      members.length > 0 &&
       !isLoadingMore &&
       (!posts || (posts.hasNext && bottomPostReached))
     ) {
@@ -170,12 +172,13 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
     <>
       <CreateForumPost ref={createPostBoxRef} />
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
-
       {posts?.data.map((post) => (
         <ForumPost key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
       ))}
       {isLoadingMore && <ForumPostSkeleton />}
-      <Box ref={ref}>{posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}</Box>
+      {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
+      <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
+
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
         <Snackbar
           open={isOpen}
