@@ -1,4 +1,4 @@
-import type { Block, Page, Post } from '@prisma/client';
+import type { Block } from '@prisma/client';
 
 import type { PageMeta } from 'lib/pages';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';

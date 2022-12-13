@@ -5,6 +5,7 @@ import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { publishForumPost } from 'lib/forums/posts/publishForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,7 +21,20 @@ async function publishForumPostHandler(req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  await publishForumPost(pageId);
+  const updatedPost = await publishForumPost(pageId);
+
+  if (updatedPost.page) {
+    relay.broadcast(
+      {
+        type: 'post_published',
+        payload: {
+          createdBy: updatedPost.page.createdBy,
+          categoryId: updatedPost.categoryId
+        }
+      },
+      updatedPost.page.spaceId
+    );
+  }
 
   res.status(200).end();
 }

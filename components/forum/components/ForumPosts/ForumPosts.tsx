@@ -44,7 +44,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const createPostBoxRef = useRef<HTMLDivElement>(null);
-  const { setActions, showMessage, setOrigin, setIsOpen } = useSnackbar();
+  const { setActions, showMessage, setOrigin } = useSnackbar();
 
   // Re-enable sorting later on
 
@@ -125,9 +125,16 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       });
   }
 
+  const currentCategoryId =
+    typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;
+
   const handlePostPublishEvent = useCallback(
     (postWithPage: WebSocketPayload<'post_published'>) => {
-      if (user && postWithPage?.createdBy !== user.id && (categoryId ? postWithPage.categoryId === categoryId : true)) {
+      if (
+        user &&
+        postWithPage?.createdBy !== user.id &&
+        (currentCategoryId ? postWithPage.categoryId === currentCategoryId : true)
+      ) {
         setActions([
           <Button
             key='reload'
@@ -158,9 +165,9 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   );
 
   useEffect(() => {
-    const unsubscribeFromNewPost = subscribe('post_published', handlePostPublishEvent);
+    const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
     return () => {
-      unsubscribeFromNewPost();
+      unsubscribeFromPostPublishEvent();
     };
   }, [handlePostPublishEvent]);
 

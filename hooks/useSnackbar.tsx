@@ -47,11 +47,11 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     if (reason === 'clickaway') {
       return;
     }
+    setIsOpen(false);
     setOrigin({
       horizontal: 'left',
       vertical: 'bottom'
     });
-    setIsOpen(false);
   };
 
   const value = useMemo<IContext>(
