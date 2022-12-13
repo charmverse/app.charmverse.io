@@ -93,7 +93,7 @@ function LinkMenu({
           e.preventDefault();
         }}
       />
-      <MenuButton disableButton={isSavedDisabled} hints={['Save']}>
+      <MenuButton isDisabled={isSavedDisabled} hints={['Save']}>
         <SaveIcon
           color={!isSavedDisabled ? 'inherit' : 'disabled'}
           sx={{
