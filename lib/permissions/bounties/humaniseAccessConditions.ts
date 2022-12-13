@@ -2,7 +2,7 @@ import type { Bounty } from '@prisma/client';
 
 import type { RoleupWithMembers } from 'lib/roles/interfaces';
 
-import { humaniseList, upperCaseFirstCharacter } from '../../utilities/strings';
+import { humaniseList, capitalize } from '../../utilities/strings';
 import type { TargetPermissionGroup } from '../interfaces';
 
 import type { HumanisedBountyAccessSummary, SupportedHumanisedAccessConditions } from './interfaces';
@@ -100,7 +100,7 @@ export function humaniseBountyAccessConditions({
         assignedRoleNames.length === 1 &&
         totalSubmitters === 0
       ) {
-        result.phrase = `Applications to this bounty are reserved to workspace members with the ${upperCaseFirstCharacter(
+        result.phrase = `Applications to this bounty are reserved to workspace members with the ${capitalize(
           assignedRoleNames[0]
         )} role.`;
       }
@@ -108,7 +108,7 @@ export function humaniseBountyAccessConditions({
       else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length === 1) {
         result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace member${
           totalSubmitters > 1 ? 's' : ''
-        } with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
+        } with the ${capitalize(assignedRoleNames[0])} role.`;
       } else if (!hasSpacePermission && bounty.approveSubmitters && assignedRoleNames.length > 1) {
         result.phrase = `Applications to this bounty are reserved to the ${totalSubmitters} workspace member${
           totalSubmitters > 1 ? 's' : ''
@@ -121,13 +121,13 @@ export function humaniseBountyAccessConditions({
         assignedRoleNames.length === 1 &&
         totalSubmitters === 0
       ) {
-        result.phrase = `Submissions to this bounty are reserved to workspace members with the ${upperCaseFirstCharacter(
+        result.phrase = `Submissions to this bounty are reserved to workspace members with the ${capitalize(
           assignedRoleNames[0]
         )} role.`;
       } else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length === 1) {
         result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace member${
           totalSubmitters > 1 ? 's' : ''
-        } with the ${upperCaseFirstCharacter(assignedRoleNames[0])} role.`;
+        } with the ${capitalize(assignedRoleNames[0])} role.`;
       } else if (!hasSpacePermission && !bounty.approveSubmitters && assignedRoleNames.length > 1) {
         result.phrase = `Submissions to this bounty are reserved to the ${totalSubmitters} workspace member${
           totalSubmitters > 1 ? 's' : ''
@@ -144,7 +144,7 @@ export function humaniseBountyAccessConditions({
         }
       } else if (assignedRoleNames.length > 0 && assignedReviewerUserCount === 0) {
         if (assignedRoleNames.length === 1) {
-          result.phrase = `There is 1 role (${upperCaseFirstCharacter(
+          result.phrase = `There is 1 role (${capitalize(
             assignedRoleNames[0]
           )}) assigned to review work for this bounty.`;
         } else {

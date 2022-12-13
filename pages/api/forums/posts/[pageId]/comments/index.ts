@@ -14,21 +14,21 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(getPostCommentsHandler).post(createPostCommentHandler);
 
 async function getPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
-  const { postId } = req.query as any as { postId: string };
+  const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
 
-  const postCommentsWithVotes = await getPostComments({ postId, userId });
+  const postCommentsWithVotes = await getPostComments({ postId: pageId, userId });
 
   res.status(200).json(postCommentsWithVotes);
 }
 
 async function createPostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote>) {
-  const { postId } = req.query as any as { postId: string };
+  const { pageId } = req.query as any as { pageId: string };
   const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
 
   const page = await checkPostAccess({
-    postId,
+    postId: pageId,
     userId
   });
 
@@ -36,7 +36,7 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new UndesirableOperationError("Can't create comment on drafted posts");
   }
 
-  const postComment = await createPostComment({ postId, userId, ...body });
+  const postComment = await createPostComment({ postId: pageId, userId, ...body });
 
   res.status(200).json({
     ...postComment,

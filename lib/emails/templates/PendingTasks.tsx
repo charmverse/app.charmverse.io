@@ -12,7 +12,7 @@ import type { ProposalTask } from 'lib/proposal/getProposalTasksFromWorkspaceEve
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { shortenHex } from 'lib/utilities/strings';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { darkModeColors, greyColor2, lightModeColors } from 'theme/colors';
+import { colors, greyColor2 } from 'theme/colors';
 
 import { EmailWrapper, Feedback, Footer, Header } from './components';
 
@@ -263,7 +263,7 @@ function VoteTaskMjml({ task }: { task: VoteTask }) {
       </div>
       <div
         style={{
-          color: darkModeColors.red,
+          color: colors.red.dark,
           fontSize: 14,
           fontWeight: 'bold'
         }}
@@ -296,7 +296,7 @@ function ProposalTaskMjml({ task }: { task: ProposalTask }) {
           alignItems: 'center',
           height: '24px',
           borderRadius: '16px',
-          backgroundColor: lightModeColors[ProposalStatusColors[task.status]],
+          backgroundColor: colors[ProposalStatusColors[task.status]].light,
           fontWeight: 500
         }}
       >
@@ -328,7 +328,7 @@ function BountyTaskMjml({ task }: { task: BountyTask }) {
           alignItems: 'center',
           height: '24px',
           borderRadius: '16px',
-          backgroundColor: lightModeColors[BOUNTY_STATUS_COLORS[task.status]],
+          backgroundColor: colors[BOUNTY_STATUS_COLORS[task.status]].light,
           fontWeight: 500
         }}
       >
