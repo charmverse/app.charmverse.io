@@ -50,7 +50,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithP
     userId
   });
 
-  if (permissions.read !== true) {
+  if (page.type !== 'post' && permissions.read !== true) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
 

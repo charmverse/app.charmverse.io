@@ -42,7 +42,7 @@ export async function createForumPost({
     data: {
       id: postId,
       title,
-      content: content as Prisma.InputJsonObject,
+      content: (content ?? undefined) as Prisma.InputJsonObject,
       contentText,
       updatedBy: createdBy,
       galleryImage,

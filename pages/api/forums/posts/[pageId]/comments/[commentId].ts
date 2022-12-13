@@ -16,12 +16,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(updatePostCommentHandler).delete(deletePostCommentHandler);
 
 async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PageComment>) {
-  const { postId, commentId } = req.query as any as { postId: string; commentId: string };
+  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
   const body = req.body as UpdatePostCommentInput;
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId,
+    postId: pageId,
     userId
   });
 
@@ -37,17 +37,17 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
 }
 
 async function deletePostCommentHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { postId, commentId } = req.query as any as { postId: string; commentId: string };
+  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId,
+    postId: pageId,
     userId
   });
 
   await deletePostComment({ commentId, userId });
 
-  res.status(200).json({});
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);

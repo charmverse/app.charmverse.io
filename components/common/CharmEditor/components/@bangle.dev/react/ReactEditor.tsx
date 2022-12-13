@@ -68,7 +68,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const { data: authResponse } = useSWRImmutable(useSockets ? user?.id : null, () => charmClient.socket()); // refresh when user
 
     pmViewOpts ||= {};
-    pmViewOpts.editable = () => !isLoadingRef.current;
+    pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
 
     const editorViewPayloadRef = useRef({
       state,
