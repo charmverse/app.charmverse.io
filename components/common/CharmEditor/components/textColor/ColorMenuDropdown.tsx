@@ -5,13 +5,13 @@ import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/ho
 import type { ReactNode } from 'react';
 
 import { capitalize } from 'lib/utilities/strings';
-import type { BrandColor } from 'theme/colors';
 import { colors } from 'theme/colors';
 
 import { GroupLabel } from '../PopoverMenu';
 
 import type { TextColorAttrs } from './config';
 import { executeWithUserInput } from './textColorCommands';
+import { getCSSColor } from './textColorUtils';
 
 type Props = { children: ReactNode };
 
@@ -26,10 +26,6 @@ const LetterIcon = styled.div`
   font-size: 16px;
   ${({ theme }) => (theme.palette.mode === 'dark' ? '' : 'border: 1px solid var(--bg-gray);')};
 `;
-
-function getCSSColor(type: 'bg' | 'text', color: string) {
-  return colors[color as BrandColor] ? `var(--${type}-${color})` : undefined;
-}
 
 export function TextColorMenuDropdown({ children }: Props) {
   const menuState = usePopupState({ variant: 'popover', popupId: 'textColorMenu' });

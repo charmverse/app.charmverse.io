@@ -6,12 +6,14 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
+import { Box } from '@mui/material';
 import React, { useCallback } from 'react';
 
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
 import { createInlineVote } from '../inlineVote';
 import paragraph from '../paragraph';
+import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 
 import type { SubMenu } from './floating-menu';
 import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floating-menu';
@@ -414,11 +416,20 @@ export function FloatingLinkButton({
   );
 }
 
-export function TextColorButton({ hints = ['Text color'], children = <TextColorIcon /> }: ButtonProps) {
+export function TextColorButton({ hints = ['Text color'], children }: ButtonProps) {
   const view = useEditorViewContext();
+  const activeColor = queryActiveColor()(view.state);
+  let sx = {};
+  if (activeColor?.color) {
+    sx = { color: getCSSColor('text', activeColor.color) };
+  } else if (activeColor?.bgColor) {
+    sx = { backgroundColor: getCSSColor('bg', activeColor.bgColor), borderRadius: 1 };
+  }
   return (
-    <MenuButton hints={hints} isDisabled={!view.editable} isActive={false}>
-      {children}
+    <MenuButton hints={hints} isDisabled={!view.editable}>
+      <Box sx={sx}>
+        <TextColorIcon />
+      </Box>
       <KeyboardArrowDown sx={{ fontSize: 16 }} />
     </MenuButton>
   );
