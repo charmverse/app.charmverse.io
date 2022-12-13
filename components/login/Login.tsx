@@ -17,13 +17,14 @@ import { ConnectorButton } from 'components/_app/Web3ConnectionManager/component
 import Button from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { LoggedInUser } from 'models/User';
 
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { WalletSign } from './WalletSign';
 
-export type AnyIdLogin = { identityType: IdentityType; user: LoggedInUser };
+export type AnyIdLogin = { identityType: IdentityType; user: LoggedInUser; displayName: string };
 export type AnyIdFunction = () => Promise<AnyIdLogin>;
 export interface DialogProps {
   open: boolean;
@@ -38,9 +39,9 @@ function LoginHandler(props: DialogProps) {
   const { showMessage } = useSnackbar();
 
   const { loginWithGoogle } = useGoogleAuth();
-
+  const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
-    showMessage(`Logged in with ${loggedInUser.identityType}. Redirecting you now`, 'success');
+    showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
 
@@ -49,13 +50,13 @@ function LoginHandler(props: DialogProps) {
   };
 
   async function handleGoogleLogin() {
-    const user = await loginWithGoogle();
-    handleLogin(user);
+    const googleLoginResult = await loginWithGoogle();
+    // handleLogin(googleLoginResult);
   }
 
   async function handleWalletSign(signature: AuthSig) {
     const user = await loginFromWeb3Account(signature);
-    handleLogin({ identityType: 'Wallet', user });
+    handleLogin({ identityType: 'Wallet', user, displayName: signature.address });
   }
 
   return (
@@ -65,7 +66,12 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSelector />
+          {!verifiableWalletDetected ? (
+            <WalletSelector />
+          ) : (
+            <WalletSign signSuccess={handleWalletSign} enableAutosign />
+          )}
+
           {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
 

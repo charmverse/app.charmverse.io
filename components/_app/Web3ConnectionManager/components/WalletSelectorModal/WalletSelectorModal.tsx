@@ -38,6 +38,7 @@ export function WalletSelector() {
   } = useContext(Web3Connection);
   const { error } = useWeb3React();
   const { active, activate, connector, setError } = useWeb3React();
+
   const { showMessage } = useSnackbar();
 
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
@@ -85,9 +86,8 @@ export function WalletSelector() {
 
   const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
   const redirectUri = typeof window === 'undefined' ? '' : window.location.origin;
-  log.debug('UAuth meta', { redirectUri, clientID });
 
-  async function handleAuth() {
+  async function handleUnstoppableDomainsLogin() {
     const uauth = new UAuth({
       clientID,
       redirectUri,
@@ -155,11 +155,11 @@ export function WalletSelector() {
         <Grid item xs={12}>
           <ConnectorButton
             name='Unstoppable Domains'
-            onClick={handleAuth}
+            onClick={handleUnstoppableDomainsLogin}
             iconUrl='unstoppable-domains.png'
-            disabled={connector === walletLink || !!activatingConnector}
-            isActive={connector === walletLink}
-            isLoading={activatingConnector === walletLink}
+            disabled={false}
+            isActive={false}
+            isLoading={isConnectingIdentity}
           />
           {uAuthPopupError && (
             <Alert severity='warning'>

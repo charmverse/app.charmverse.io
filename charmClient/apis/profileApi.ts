@@ -1,9 +1,9 @@
 import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
+import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
-import type { LoginWithGoogleRequest } from 'pages/api/google/login';
 import type { UnstoppableDomainsLoginRequest } from 'pages/api/unstoppable-domains/login';
 
 export interface UpdateProfileItemRequest {

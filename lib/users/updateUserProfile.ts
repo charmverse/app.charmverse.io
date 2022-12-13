@@ -31,7 +31,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
     const googleAccount = await prisma.googleAccount.findFirst({
       where: {
         userId,
-        email: username
+        name: username
       }
     });
 

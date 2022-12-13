@@ -1,19 +1,20 @@
-import type { User } from '@prisma/client';
 import type { TokenPayload } from 'google-auth-library';
 import { OAuth2Client } from 'google-auth-library';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
 
 import { googleOAuthClientId, googleOAuthClientSecret } from 'config/constants';
 import { prisma } from 'db';
-import { onError, onNoMatch } from 'lib/middleware';
-import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InsecureOperationError, InvalidInputError, SystemError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const googleOAuthClient = new OAuth2Client(googleOAuthClientId, googleOAuthClientSecret);
+
+export type LoginWithGoogleRequest = {
+  accessToken: string;
+  displayName: string;
+  avatarUrl: string;
+};
 
 // https://developers.google.com/people/quickstart/nodejs
 async function verifyToken(idToken: string): Promise<TokenPayload> {
@@ -35,9 +36,13 @@ async function verifyToken(idToken: string): Promise<TokenPayload> {
   }
   return payload;
 }
-export async function loginWithGoogle(idToken: string): Promise<LoggedInUser> {
+export async function loginWithGoogle({
+  accessToken,
+  displayName,
+  avatarUrl
+}: LoginWithGoogleRequest): Promise<LoggedInUser> {
   try {
-    const verified = await verifyToken(idToken);
+    const verified = await verifyToken(accessToken);
 
     const email = verified.email;
 
@@ -67,6 +72,8 @@ export async function loginWithGoogle(idToken: string): Promise<LoggedInUser> {
 
     const createdGoogleAccount = await prisma.googleAccount.create({
       data: {
+        name: displayName,
+        avatarUrl,
         email,
         user: existingUser
           ? {
@@ -77,7 +84,7 @@ export async function loginWithGoogle(idToken: string): Promise<LoggedInUser> {
           : {
               create: {
                 identityType: 'Google',
-                username: email
+                username: displayName
               }
             }
       }
@@ -85,7 +92,7 @@ export async function loginWithGoogle(idToken: string): Promise<LoggedInUser> {
 
     return getUserProfile('id', createdGoogleAccount.userId);
   } catch (err) {
-    if (err! instanceof SystemError) {
+    if (err instanceof SystemError === false) {
       throw new InsecureOperationError(`Could not verify the Google ID token that was provided`);
     }
 

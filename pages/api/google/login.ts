@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { loginWithGoogle } from 'lib/google/loginWithGoogle';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { saveSession } from 'lib/middleware/saveSession';
@@ -10,14 +11,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys(['accessToken'], 'body')).post(loginWithGoogleController);
 
-export type LoginWithGoogleRequest = {
-  accessToken: string;
-};
-
 async function loginWithGoogleController(req: NextApiRequest, res: NextApiResponse) {
-  const { accessToken } = req.body as LoginWithGoogleRequest;
+  const loginRequest = req.body as LoginWithGoogleRequest;
 
-  const loggedInUser = await loginWithGoogle(accessToken as string);
+  const loggedInUser = await loginWithGoogle(loginRequest);
 
   await saveSession({ req, userId: loggedInUser.id });
 

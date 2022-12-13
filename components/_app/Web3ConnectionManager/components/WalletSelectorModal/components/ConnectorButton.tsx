@@ -43,7 +43,7 @@ export function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, is
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
-        <ImageIcon src={`/images/walletLogos/${iconUrl}`} />
+        <ImageIcon style={{ marginLeft: 3 }} src={`/images/walletLogos/${iconUrl}`} />
       </ButtonContent>
     </Button>
   );

@@ -37,11 +37,15 @@ export function useGoogleAuth() {
         throw new ExternalServiceError(`Could not authenticate with Google`);
       }
 
+      const displayName = result.user.displayName ?? (result.user.email as string);
+
       const loggedInUser = await charmClient.profile.loginWithGoogle({
-        accessToken: credential?.idToken as string
+        accessToken: credential?.idToken as string,
+        displayName,
+        avatarUrl: result.user.photoURL as string
       });
 
-      return { user: loggedInUser, identityType: 'Google' };
+      return { user: loggedInUser, identityType: 'Google', displayName };
 
       // ...
     } catch (error: any) {
@@ -57,10 +61,10 @@ export function useGoogleAuth() {
       // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
       log.debug({ errorCode, errorMessage, email, receivedCreds: credential });
+
+      throw error;
       // ...
     }
-
-    return null as any;
   }
 
   return { loginWithGoogle };

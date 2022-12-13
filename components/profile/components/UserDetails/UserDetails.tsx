@@ -151,9 +151,9 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     user?.googleAccounts?.forEach((acc) => {
       types.push({
         type: 'Google',
-        username: acc.email,
+        username: acc.name,
         icon: getIdentityIcon('Google'),
-        isInUse: user.identityType === 'Google' && user.username === acc.email
+        isInUse: user.identityType === 'Google' && user.username === acc.name
       });
     });
 

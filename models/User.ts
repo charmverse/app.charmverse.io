@@ -19,7 +19,7 @@ export interface LoggedInUser extends User {
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: { address: string }[];
   unstoppableDomains: Pick<UnstoppableDomain, 'domain'>[];
-  googleAccounts: Pick<GoogleAccount, 'email'>[];
+  googleAccounts: Pick<GoogleAccount, 'email' | 'name'>[];
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;
