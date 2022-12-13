@@ -142,7 +142,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
       ))}
       {isLoadingMore && <ForumPostSkeleton />}
       {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
-      <Box ref={ref} sx={{ display: isLoadingMore ? 'none' : 'block' }} />
+      <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
     </>
   );
 }
