@@ -191,13 +191,12 @@ export default function InlineCommandPalette({
       placement='bottom-start'
       modifiers={[
         {
+          // ref: https://popper.js.org/docs/v2/modifiers/prevent-overflow/
           name: 'preventOverflow',
           enabled: true,
           options: {
             altAxis: true,
-            altBoundary: true,
             tether: true,
-            rootBoundary: 'document',
             padding: 8
           }
         }
