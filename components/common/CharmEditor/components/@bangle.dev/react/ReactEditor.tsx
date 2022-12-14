@@ -97,6 +97,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
 
     function onError(error: Error) {
       showMessage(error.message, 'error');
+      log.error('[ws/ceditor]: Error message displayed to user', { error });
     }
 
     useEffect(() => {

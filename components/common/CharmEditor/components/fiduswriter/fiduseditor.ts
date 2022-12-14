@@ -113,7 +113,6 @@ export class FidusEditor {
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
-      editor: this,
       anythingToSend: () => Boolean(sendableSteps(view.state)),
       authToken,
       initialMessage: () => {
