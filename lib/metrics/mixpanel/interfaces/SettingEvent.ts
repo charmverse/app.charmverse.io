@@ -11,7 +11,29 @@ export type AddAGate = BaseEvent & {
   accesType: string | string[];
 };
 
+type AddRoleEvent = BaseEvent & {
+  name: string;
+};
+
+type UpdateRoleEvent = BaseEvent & {
+  name: string;
+  createPage: boolean;
+  createBounty: boolean;
+  createVote: boolean;
+};
+
+type TokenGateUpdateEvent = BaseEvent & {
+  roles: number;
+};
+
 export type SettingEventMap = {
   add_invite_link: AddInviteLink;
+  delete_invite_link: BaseEvent;
   add_a_gate: AddAGate;
+  add_role: AddRoleEvent;
+  delete_role: BaseEvent;
+  update_role_permissions: UpdateRoleEvent;
+  assign_member_role: BaseEvent;
+  unassign_member_role: BaseEvent;
+  update_token_gate_roles: TokenGateUpdateEvent;
 };
