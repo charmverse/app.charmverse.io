@@ -11,15 +11,11 @@ import {
 } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { prisma } from 'db';
-import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
-import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
-import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { isTruthy } from 'lib/utilities/types';
 import type {
@@ -33,97 +29,20 @@ import type {
   Page,
   PageContent,
   TableNode,
-  TableRowNode,
-  TextContent
+  TableRowNode
 } from 'models';
 
-import type {
-  BlockObjectResponse,
-  GetDatabaseResponse,
-  GetPageResponse,
-  NotionImage,
-  RichTextItemResponse
-} from './types';
+import { convertPropertyType } from './convertPropertyType';
+import { convertRichText } from './convertRichText';
+import { createPrismaPage } from './createPrismaPage';
+import { getPersistentImageUrl } from './getPersistentImageUrl';
+import { populateFailedImportRecord } from './populateFailedImportRecord';
+import { fetchNotionPages } from './recursivelyFetchNotionPages';
+import type { BlockObjectResponse, GetDatabaseResponse, GetPageResponse, RichTextItemResponse } from './types';
 
 // Limit the highest number of pages that can be imported
-const IMPORTED_PAGES_LIMIT = 10000;
 const BLOCKS_FETCHED_PER_REQUEST = 100;
 const MAX_CHILD_BLOCK_DEPTH = 10;
-
-function convertRichText(richTexts: RichTextItemResponse[]): {
-  contents: (TextContent | MentionNode)[];
-  inlineLinkedPages: MentionNode[];
-} {
-  const contents: (TextContent | MentionNode)[] = [];
-  const inlineLinkedPages: MentionNode[] = [];
-
-  richTexts.forEach((richText) => {
-    const marks: { type: string; attrs?: Record<string, string> }[] = [];
-    if (richText.type !== 'mention') {
-      if (richText.annotations.strikethrough) {
-        marks.push({ type: 'strike' });
-      }
-
-      if (richText.annotations.bold) {
-        marks.push({ type: 'bold' });
-      }
-
-      if (richText.annotations.italic) {
-        marks.push({ type: 'italic' });
-      }
-
-      if (richText.annotations.underline) {
-        marks.push({ type: 'underline' });
-      }
-
-      if (richText.annotations.code) {
-        marks.push({ type: 'code' });
-      }
-
-      if (richText.href) {
-        marks.push({
-          type: 'link',
-          attrs: {
-            href: richText.href
-          }
-        });
-      }
-
-      if (richText.plain_text) {
-        contents.push({
-          type: 'text',
-          text: richText.plain_text,
-          marks
-        });
-      }
-    } else if (richText.mention?.type === 'page') {
-      const inlineLinkedPage: MentionNode = {
-        type: 'mention',
-        attrs: {
-          type: 'page',
-          value: richText.mention.page.id
-        }
-      };
-      contents.push(inlineLinkedPage);
-      inlineLinkedPages.push(inlineLinkedPage);
-    } else if (richText.mention?.type === 'database') {
-      const inlineLinkedPage: MentionNode = {
-        type: 'mention',
-        attrs: {
-          type: 'page',
-          value: richText.mention.database.id
-        }
-      };
-      contents.push(inlineLinkedPage);
-      inlineLinkedPages.push(inlineLinkedPage);
-    }
-  });
-
-  return {
-    contents,
-    inlineLinkedPages
-  };
-}
 
 interface ChildBlockListResponse {
   request: ListBlockChildrenParameters;
@@ -498,31 +417,6 @@ async function populateDoc(
   await recurse(_parentNode, _block, _parentInfo);
 }
 
-function convertPropertyType(propertyType: string): PropertyType | null {
-  switch (propertyType) {
-    case 'email':
-    case 'number':
-    case 'url':
-    case 'select':
-    case 'checkbox':
-    case 'date':
-      return propertyType;
-    case 'multi_select':
-      return 'multiSelect';
-    case 'rich_text':
-      return 'text';
-    case 'created_time':
-      return 'createdTime';
-    case 'updated_time':
-      return 'updatedTime';
-    case 'phone_number':
-      return 'phone';
-    default: {
-      return null;
-    }
-  }
-}
-
 type CreatePageInput = {
   id: string;
   content?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
@@ -537,71 +431,6 @@ type CreatePageInput = {
   cardId?: string;
 };
 // &  {userId: string, spaceId: string, pageId: string, title: string};
-
-async function createPrismaPage({
-  id,
-  content = {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: []
-      }
-    ]
-  },
-  headerImage = null,
-  icon,
-  spaceId,
-  title,
-  type = 'page',
-  createdBy,
-  boardId,
-  parentId,
-  cardId
-}: CreatePageInput) {
-  const pageToCreate: Prisma.PageCreateInput = {
-    id,
-    content,
-    // TODO: Generate content text
-    contentText: '',
-    createdAt: new Date(),
-    author: {
-      connect: {
-        id: createdBy
-      }
-    },
-    updatedAt: new Date(),
-    updatedBy: createdBy,
-    path: getPagePath(),
-    space: {
-      connect: {
-        id: spaceId || undefined
-      }
-    },
-    autoGenerated: true,
-    headerImage,
-    icon,
-    title: title || '',
-    type,
-    boardId,
-    parentId
-  };
-
-  if (type === 'card' && cardId) {
-    pageToCreate.card = {
-      connect: {
-        id: cardId
-      }
-    };
-  }
-
-  // eslint-disable-next-line
-  let page = await createPage({ data: pageToCreate });
-
-  page = await setupPermissionsAfterPageCreated(page.id);
-
-  return page;
-}
 
 function convertToPlainText(chunks: { plain_text: string }[]) {
   return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
@@ -651,59 +480,15 @@ export async function importFromWorkspace({
       blocks: [string, number][][];
     }
   > = {};
-  const notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
   const notion = new Client({
     auth: accessToken
   });
 
-  let searchResult = await notion.search({
-    page_size: BLOCKS_FETCHED_PER_REQUEST
-  });
-
   // Store all the blocks the integration has access to
-  const notionPages = searchResult.results as (GetPageResponse | GetDatabaseResponse)[];
-  // Store all the pages/databases the integration fetched in a record
-  // While there are more pages the integration has access to
-  while (searchResult.has_more && searchResult.next_cursor && notionPages.length < IMPORTED_PAGES_LIMIT) {
-    searchResult = await notion.search({
-      page_size: BLOCKS_FETCHED_PER_REQUEST,
-      start_cursor: searchResult.next_cursor
-    });
-    notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
-  }
-
-  notionPages.forEach((notionPage) => {
-    // This would ideally decrease the amount of api requests made to fetch a page/database
-    notionPagesRecord[notionPage.id] = notionPage;
+  const { notionPages, notionPagesRecord } = await fetchNotionPages({
+    accessToken
   });
-
-  function populateFailedImportRecord(
-    failedImportBlocks: [string, number][][],
-    block: GetPageResponse | GetDatabaseResponse
-  ) {
-    let title = '';
-    // Database
-    if (block.object === 'database') {
-      title = convertToPlainText(block.title);
-    } else if (block.parent.type === 'database_id') {
-      // Focalboard cards
-      title = convertToPlainText(
-        (Object.values(block.properties).find((property) => property.type === 'title') as any).title
-      );
-    }
-    // Regular page
-    else {
-      title = convertToPlainText((block.properties.title as any)[block.properties.title.type]);
-    }
-    failedImportsRecord[block.id] = {
-      pageId: block.id,
-      /* eslint react/forbid-prop-types: 0 */
-      type: block.object,
-      title,
-      blocks: failedImportBlocks
-    };
-  }
 
   async function retrieveNotionPage(notionPageId: string) {
     // If the page doesn't exist in the cache fetch it
@@ -743,7 +528,7 @@ export async function importFromWorkspace({
         throw new Error();
       }
     } catch (err: any) {
-      populateFailedImportRecord(failedImportBlocks, notionPage);
+      failedImportsRecord[notionPage.id] = populateFailedImportRecord(failedImportBlocks, notionPage);
       log.debug(`[notion] Failed to create page in memory ${notionPage.id}`);
     }
     if (index % 10 === 0) {
@@ -1003,7 +788,10 @@ export async function importFromWorkspace({
                   }
                 } catch (_) {
                   log.debug('Error on creating child page');
-                  populateFailedImportRecord(_failedImportBlocks, notionPagesRecord[block.id]);
+                  failedImportsRecord[notionPagesRecord[block.id].id] = populateFailedImportRecord(
+                    _failedImportBlocks,
+                    notionPagesRecord[block.id]
+                  );
                 }
               },
               onLinkToPage: async (linkedPageId, parentNode, inlineLink) => {
@@ -1030,7 +818,10 @@ export async function importFromWorkspace({
                     }
                   } catch (_) {
                     log.debug('Error on creating child page');
-                    populateFailedImportRecord(_failedImportBlocks, notionPagesRecord[linkedPageId]);
+                    failedImportsRecord[notionPagesRecord[linkedPageId].id] = populateFailedImportRecord(
+                      _failedImportBlocks,
+                      notionPagesRecord[linkedPageId]
+                    );
                   }
                 }
 
@@ -1230,7 +1021,10 @@ export async function importFromWorkspace({
     } catch (_) {
       log.debug(`Error creating charmverse database page ${notionPageId}`);
       if (!failedImportsRecord[notionPageId]) {
-        populateFailedImportRecord([], notionPagesRecord[notionPageId]);
+        failedImportsRecord[notionPagesRecord[notionPageId].id] = populateFailedImportRecord(
+          [],
+          notionPagesRecord[notionPageId]
+        );
       }
     }
   }
@@ -1245,7 +1039,10 @@ export async function importFromWorkspace({
     } catch (_) {
       log.debug(`Error creating charmverse page ${notionPageId}`);
       if (!failedImportsRecord[notionPageId]) {
-        populateFailedImportRecord([], notionPagesRecord[notionPageId]);
+        failedImportsRecord[notionPagesRecord[notionPageId].id] = populateFailedImportRecord(
+          [],
+          notionPagesRecord[notionPageId]
+        );
       }
     }
   }
@@ -1351,21 +1148,4 @@ export async function importFromWorkspace({
   });
 
   return Object.values(failedImportsRecord).slice(0, 25);
-}
-
-// if image is stored in notion s3, it will expire so we need to re-upload it to our s3
-function getPersistentImageUrl({ image, spaceId }: { image: NotionImage; spaceId: string }): Promise<string | null> {
-  const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
-  const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
-  if (url && isNotionS3) {
-    const pathInS3 = getFilePath({ url, spaceId });
-    return uploadUrlToS3({ pathInS3, url })
-      .then((r) => r.url)
-      .catch((error) => {
-        log.warn('could not upload image to s3', { error });
-        return url;
-      });
-  } else {
-    return Promise.resolve(url);
-  }
 }
