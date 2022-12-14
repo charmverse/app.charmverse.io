@@ -411,20 +411,21 @@ function CharmEditor({
     }
   }, 1000);
 
-  const sendPageEvent = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+  const sendPageEvent = debounce(() => {
     if (currentSpace && pageType) {
       charmClient.track.trackAction('edit_page', {
-        pageId: _pageId,
+        pageId,
         spaceId: currentSpace.id
       });
     }
-  }, 1000);
+  }, 10000);
 
   const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
     if (pageId && prevDoc) {
       onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
+      sendPageEvent();
     }
     if (onContentChange) {
       onContentChange({ doc, rawText });
