@@ -127,10 +127,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             setIsLoading(false);
             isLoadingRef.current = false;
             const schema = _editor.view.state.schema;
-            let doc = _editor.view.state.doc;
-            if (page.content) {
-              doc = schema.nodeFromJSON(page.content);
-            }
+            const doc = schema.nodeFromJSON(page.content);
+
             const stateConfig = {
               schema,
               doc,
