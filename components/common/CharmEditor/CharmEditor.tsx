@@ -411,6 +411,15 @@ function CharmEditor({
     }
   }, 1000);
 
+  const sendPageEvent = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
+    if (currentSpace && pageType) {
+      charmClient.track.trackAction('edit_page', {
+        pageId: _pageId,
+        spaceId: currentSpace.id
+      });
+    }
+  }, 1000);
+
   const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;

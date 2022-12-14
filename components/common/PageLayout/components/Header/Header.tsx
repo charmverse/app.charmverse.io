@@ -109,6 +109,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       linkElement.click();
 
       URL.revokeObjectURL(downloadLink);
+
+      charmClient.track.trackAction('export_page_markdown', {
+        pageId: page.id,
+        spaceId: page.spaceId
+      });
     }
   }
 
