@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Chip, Divider, Stack, Typography, Box, AvatarGroup, Avatar } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
@@ -13,12 +14,32 @@ import type { ExtendedPoap, NftData } from 'lib/blockchain/interfaces';
 
 import AggregatedData from './components/AggregatedData';
 import type { Collectable } from './components/CollectibleRow';
-import CollectableRow from './components/CollectibleRow';
+import { CollectibleIndividual, CollectibleCollection } from './components/CollectibleRow';
 import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
+
+const StyledBox = styled(Box)`
+  /* display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; */
+  /* > {
+    &:hover {
+      flex-grow: 4;
+      transition: all 2s;
+    } */
+  }
+  /* display: grid;
+  > {
+    &:hover {
+      grid-column: span 2;
+      grid-column-start: 1;
+      grid-column-end: -1;
+    }
+  } */
+`;
 
 function transformPoap(poap: ExtendedPoap): Collectable {
   return {
@@ -269,8 +290,7 @@ export default function PublicProfile(props: UserDetailsProps) {
 
         {collectables.length > 0 ? (
           <>
-            <SectionHeader title='NFT Collections' count={collection.length} />
-
+            <SectionHeader title='NFTs & POAPs' count={notCollection.length} />
             {collection.map((collectable) => (
               <Accordion key={collectable[0].id} sx={{ my: 2 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -298,7 +318,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                     gap={2}
                   >
                     {collectable.map((item) => (
-                      <CollectableRow
+                      <CollectibleCollection
                         key={item.id}
                         showVisibilityIcon={!readOnly}
                         visible={!item.isHidden}
@@ -312,20 +332,20 @@ export default function PublicProfile(props: UserDetailsProps) {
                 </AccordionDetails>
               </Accordion>
             ))}
-            <SectionHeader title='NFTs & POAPs' count={notCollection.length} />
-            <Box
+            <StyledBox
               display='grid'
               sx={{
                 gridTemplateColumns: {
                   xs: 'repeat(1, 1fr)',
                   sm: 'repeat(2, 1fr)',
-                  md: 'repeat(4, 1fr)'
+                  md: 'repeat(4, 1fr)',
+                  lg: 'repeat(5, 1fr)'
                 }
               }}
               gap={2}
             >
               {notCollection.map((collectable) => (
-                <CollectableRow
+                <CollectibleIndividual
                   key={collectable[0].id}
                   showVisibilityIcon={!readOnly}
                   visible={!collectable[0].isHidden}
@@ -335,7 +355,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                   collectable={collectable[0]}
                 />
               ))}
-            </Box>
+            </StyledBox>
           </>
         ) : null}
         {/* <CollablandCredentials error={collabError} /> */}

@@ -7,6 +7,28 @@ import { Box } from '@mui/system';
 import Avatar from 'components/common/Avatar';
 import { showDateWithMonthAndYear } from 'lib/utilities/dates';
 
+const StyledAvatar = styled(Avatar)`
+  margin: 0 auto;
+`;
+
+const StyledCard = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  &:hover {
+    z-index: 10000;
+    background-color: #fff;
+    -ms-transform: scale(1.5);
+    -moz-transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+    -o-transform: scale(1.5);
+    transform: scale(1.5);
+    transition: all 1s;
+  }
+`;
 export interface Collectable {
   contract?: string;
   title: string;
@@ -40,7 +62,7 @@ export const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stac
     transition: ${({ theme }) => `${theme.transitions.duration.short}ms opacity ${theme.transitions.easing.easeInOut}`};
   }
 `;
-export default function CollectibleRow({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
+export function CollectibleCollection({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
   return (
     <Card sx={{ p: 4 }}>
       <ProfileItemContainer visible={visible} display='flex' gap={2} flexDirection='column' alignItems='center'>
@@ -80,5 +102,47 @@ export default function CollectibleRow({ onClick, collectable, visible, showVisi
         )}
       </ProfileItemContainer>
     </Card>
+  );
+}
+export function CollectibleIndividual({ onClick, collectable, visible, showVisibilityIcon }: ProfileItemProps) {
+  return (
+    <StyledCard sx={{ p: 3 }}>
+      <ProfileItemContainer visible={visible} gap={2}>
+        <Link className='hidden-on-visible' href={collectable.link} target='_blank'>
+          <StyledAvatar sx={{ width: 75, height: 75 }} isNft={collectable.type === 'nft'} avatar={collectable.image} />
+        </Link>
+        <Stack className='hidden-on-visible'>
+          <Typography fontWeight='bold' fontSize='xs'>
+            {collectable.title}
+          </Typography>
+          <Typography variant='subtitle2'>{showDateWithMonthAndYear(collectable.date) ?? '?'}</Typography>
+        </Stack>
+        {showVisibilityIcon && (
+          <Box>
+            <IconButton
+              size='small'
+              className='action'
+              sx={{
+                opacity: {
+                  md: 0,
+                  sm: 1
+                }
+              }}
+              onClick={onClick}
+            >
+              {visible ? (
+                <Tooltip title={`Hide ${collectable.type.toUpperCase()} from profile`}>
+                  <VisibilityIcon fontSize='small' />
+                </Tooltip>
+              ) : (
+                <Tooltip title={`Show ${collectable.type.toUpperCase()} in profile`}>
+                  <VisibilityOffIcon fontSize='small' />
+                </Tooltip>
+              )}
+            </IconButton>
+          </Box>
+        )}
+      </ProfileItemContainer>
+    </StyledCard>
   );
 }
