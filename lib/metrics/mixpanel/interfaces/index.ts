@@ -18,5 +18,5 @@ export interface MixpanelUserProfile {
 }
 
 export type MixpanelEventMap = UserEventMap & ProposalEventMap & PageEventMap & BountyEventMap & SettingEventMap;
-
+export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;
