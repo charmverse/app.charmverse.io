@@ -25,6 +25,8 @@ export interface PageEventMap {
   restore_page: PageEvent;
   edit_page: PageEvent;
   create_page: PageTypeEvent;
+  export_page_markdown: PageEvent;
+  export_page_csv: PageEvent;
 }
 
-export type PageEventNames = keyof PageEventMap;
+export type PageEventName = keyof PageEventMap;

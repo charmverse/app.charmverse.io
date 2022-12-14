@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
@@ -88,7 +88,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     }
   }
 
-  trackPageAction(archive ? 'archive_page' : 'restore_page', { userId, pageId });
+  trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId: pageSpaceId.spaceId, pageId });
 
   const deletedAt = archive ? new Date() : null;
 
