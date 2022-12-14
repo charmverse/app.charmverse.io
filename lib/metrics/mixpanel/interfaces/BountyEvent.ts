@@ -1,5 +1,4 @@
-import type { PageEvent } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-
+import type { PageEvent } from './PageEvent';
 import type { ResourceEvent } from './ResourceEvent';
 
 type BountyEvent = ResourceEvent & PageEvent;

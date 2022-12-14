@@ -1,6 +1,7 @@
 import { prisma } from 'db';
-import type { PageEventNames } from 'lib/metrics/mixpanel/interfaces/PageEvents';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+
+import type { PageEventNames } from './interfaces/PageEvent';
+import { trackUserAction } from './trackUserAction';
 
 export async function trackPageAction(
   eventName: PageEventNames,
