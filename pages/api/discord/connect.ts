@@ -14,6 +14,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
+import { updateUserDiscordSocial } from 'pages/api/discord/updateUserDiscordSocial';
 
 const handler = nc({
   onError,
@@ -108,6 +109,7 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   });
 
   const spacesWithDiscord = spaceRoles.map((role) => role.space).filter((space) => space.discordServerId);
+  await updateUserDiscordSocial({ userId, discordUsername: discordAccount.username });
 
   // If the workspace is connected with a discord server
   for (const space of spacesWithDiscord) {
