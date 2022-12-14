@@ -87,6 +87,31 @@ export function items(): PaletteItemTypeNoGroup[] {
       }
     },
     {
+      uid: 'nft',
+      title: 'OpenSea NFT',
+      icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
+      description: 'Embed an NFT on OpenSea',
+      editorExecuteCommand: () => {
+        return (state, dispatch, view) => {
+          if (view) {
+            // Execute the animation
+            rafCommandExec(view!, (_state, _dispatch) => {
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.nft.create(undefined, undefined, [tooltipMark]);
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
       uid: 'tweet',
       title: 'Tweet',
       keywords: ['twitter', 'elon'],

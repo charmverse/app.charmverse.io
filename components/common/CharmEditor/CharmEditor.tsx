@@ -59,6 +59,8 @@ import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import * as nft from './components/nft/nft';
+import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
@@ -217,6 +219,7 @@ export function charmEditorPlugins({
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     disclosure.plugins(),
+    nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
     videoPlugins(),
@@ -595,6 +598,9 @@ function CharmEditor({
           }
           case 'tweet': {
             return <TweetNodeView {...allProps} />;
+          }
+          case 'nft': {
+            return <NFTNodeView {...allProps} />;
           }
           case 'video': {
             return <VideoNodeView {...allProps} />;
