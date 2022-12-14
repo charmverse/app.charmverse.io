@@ -43,7 +43,7 @@ async function addSpacePermissionsController(req: NextApiRequest, res: NextApiRe
 
   // tracking
   if (req.body.roleId) {
-    const role = await prisma?.role.findFirst({
+    const role = await prisma.role.findFirst({
       where: {
         id: req.body.roleId
       }
