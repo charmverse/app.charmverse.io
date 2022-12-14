@@ -48,4 +48,33 @@ describe('updateUserProfile', () => {
       expect(updatedUser[key]).toEqual(update[key]);
     });
   });
+
+  it('should update the user avatar to the Google avatar when switching to a Google identity', async () => {
+    const { user } = await generateUserAndSpaceWithApiToken();
+
+    const googleAccount = await prisma.googleAccount.create({
+      data: {
+        email: `acc-${v4()}@google.com`,
+        name: `test name`,
+        avatarUrl: `https://example.com/photourl.png`,
+        user: {
+          connect: {
+            id: user.id
+          }
+        }
+      }
+    });
+
+    const update: Partial<User> = {
+      identityType: 'Google',
+      username: googleAccount.name
+    };
+
+    const updatedUser = await updateUserProfile(user.id, update);
+
+    // Preserved values
+    expect(updatedUser.username).toBe(googleAccount.name);
+    expect(updatedUser.identityType).toBe('Google');
+    expect(updatedUser.avatar).toBe(googleAccount.avatarUrl);
+  });
 });

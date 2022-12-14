@@ -60,6 +60,8 @@ describe('PUT /api/profile - Update user profile', () => {
     const googleAccount = await prisma.googleAccount.create({
       data: {
         email: `acc-${v4()}@google.com`,
+        name: `test name`,
+        avatarUrl: `https://example.com/photourl.png`,
         user: {
           connect: {
             id: user.id
@@ -79,6 +81,7 @@ describe('PUT /api/profile - Update user profile', () => {
 
     expect(updatedProfile.username).toBe(googleAccount.email);
     expect(updatedProfile.identityType).toBe('Google');
+    expect(updatedProfile.avatar).toBe(googleAccount.avatarUrl);
   });
 
   it('should refuse to update a users profile to a Google Account not registered to their account, responding with 401', async () => {

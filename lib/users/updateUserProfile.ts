@@ -1,5 +1,6 @@
 import type { User } from '@prisma/client';
 
+import updated from 'components/common/CharmEditor/components/paragraph';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, MissingDataError } from 'lib/utilities/errors';
@@ -9,6 +10,8 @@ import { getUserProfile } from './getUser';
 
 export async function updateUserProfile(userId: string, update: Partial<User>): Promise<LoggedInUser> {
   const { username, identityType } = update;
+
+  let avatar = update.avatar;
 
   if ((identityType && !username) || (!identityType && username)) {
     throw new MissingDataError(`Username is required along with identity type`);
@@ -40,6 +43,8 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
         `Cannot switch to Google Account ${username} for user ${userId} as it is not registered`
       );
     }
+
+    avatar = googleAccount.avatarUrl;
   }
   await prisma.user.update({
     where: {
@@ -47,7 +52,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
     },
     include: sessionUserRelations,
     data: {
-      avatar: update.avatar,
+      avatar,
       avatarChain: update.avatarChain,
       avatarContract: update.avatarContract,
       avatarTokenId: update.avatarTokenId,
