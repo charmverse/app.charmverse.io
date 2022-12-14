@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
