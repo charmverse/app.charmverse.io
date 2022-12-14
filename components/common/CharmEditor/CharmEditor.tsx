@@ -390,14 +390,14 @@ function CharmEditor({
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
-      charmClient
+      charmClient.comments
         .resolveMultipleThreads({
           threadIds: deletedThreadIds,
           pageId: _pageId
         })
         .then(() => {
-          charmClient
-            .getPageThreads(_pageId)
+          charmClient.comments
+            .getThreads(_pageId)
             .then((threads) => {
               mutate(`pages/${_pageId}/threads`, threads);
             })

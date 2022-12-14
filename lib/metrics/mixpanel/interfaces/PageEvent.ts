@@ -25,6 +25,8 @@ export interface PageEventMap {
   restore_page: PageEvent;
   edit_page: PageEvent;
   create_page: PageTypeEvent;
+  page_comment_created: PageEvent;
+  page_comment_resolved: PageEvent;
 }
 
 export type PageEventNames = keyof PageEventMap;

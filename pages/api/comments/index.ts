@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -22,7 +23,8 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
       id: threadId
     },
     select: {
-      pageId: true
+      pageId: true,
+      spaceId: true
     }
   });
 
@@ -44,6 +46,12 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     threadId,
     userId,
     content
+  });
+
+  trackUserAction('page_comment_created', {
+    pageId: thread.pageId,
+    userId,
+    spaceId: thread.spaceId
   });
 
   return res.status(201).json(createdComment);
