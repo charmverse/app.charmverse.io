@@ -16,10 +16,14 @@ import type { SuggestionPluginState } from './suggestions.plugins';
 
 export default function SuggestionsPopup({
   pluginKey,
-  readOnly
+  readOnly,
+  pageId,
+  spaceId
 }: {
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
+  pageId: string;
+  spaceId: string;
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, rowPos } = usePluginState(pluginKey) as SuggestionPluginState;
@@ -58,6 +62,8 @@ export default function SuggestionsPopup({
               <ThreadContainer key={suggestion.pos + suggestion.type} elevation={4} sx={{ background: 'transparent' }}>
                 <SuggestionCard
                   {...suggestion}
+                  pageId={pageId}
+                  spaceId={spaceId}
                   active={false}
                   readOnly={readOnly}
                   isOwner={suggestion.data.user === user?.id}

@@ -25,6 +25,11 @@ export interface PageEventMap {
   restore_page: PageEvent;
   edit_page: PageEvent;
   create_page: PageTypeEvent;
+  page_comment_created: PageEvent;
+  page_comment_resolved: PageEvent;
+  poll_created: PageEvent;
+  page_suggestion_created: PageEvent;
+  page_suggestion_accepted: PageEvent;
   export_page_markdown: PageEvent;
   export_page_csv: PageEvent;
 }
