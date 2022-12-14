@@ -129,7 +129,7 @@ export class ModCollabDoc {
     };
 
     // Set document in prosemirror
-    this.mod.editor.view.setProps({ state: EditorState.create(stateConfig) });
+    this.mod.editor.view.updateState(EditorState.create(stateConfig));
     this.mod.editor.view.setProps({ nodeViews: {} }); // Needed to initialize nodeViews in plugins
     // Set initial confirmed doc
     this.mod.editor.docInfo.confirmedDoc = this.mod.editor.view.state.doc;
@@ -137,6 +137,10 @@ export class ModCollabDoc {
     if (locationHash.length) {
       // this.mod.editor.scrollIdIntoView(locationHash.slice(1));
     }
+
+    // scroll to top in case we had to reset the content due to large payload
+    this.mod.editor.view.dispatch(this.mod.editor.view.state.tr.scrollIntoView());
+
     this.mod.editor.waitingForDocument = false;
   }
 
