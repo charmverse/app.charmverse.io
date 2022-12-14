@@ -1,6 +1,8 @@
 import { Plugin } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 
+import log from 'lib/log';
+
 const maxByteSize = 1000000; // 1MB
 
 export function plugins({ onError }: { onError: (error: Error) => void }) {
