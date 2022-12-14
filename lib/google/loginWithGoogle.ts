@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { googleOAuthClientId, googleOAuthClientSecret } from 'config/constants';
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
+import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InsecureOperationError, InvalidInputError, SystemError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
@@ -53,15 +54,25 @@ export async function loginWithGoogle({
     const googleAccount = await prisma.googleAccount.findUnique({
       where: {
         email
-      },
-      include: {
-        user: true
       }
     });
 
-    // No GoogleUser details provided
     if (googleAccount) {
-      return getUserProfile('id', googleAccount.userId);
+      if (googleAccount.name !== displayName || googleAccount.avatarUrl !== avatarUrl) {
+        await prisma.googleAccount.update({
+          where: {
+            id: googleAccount.id
+          },
+          data: {
+            avatarUrl,
+            name: displayName
+          }
+        });
+
+        return updateUserProfile(googleAccount.userId, { identityType: 'Google', username: displayName });
+      } else {
+        return getUserProfile('id', googleAccount.userId);
+      }
     }
 
     const existingUser = await prisma.user.findFirst({
@@ -84,7 +95,8 @@ export async function loginWithGoogle({
           : {
               create: {
                 identityType: 'Google',
-                username: displayName
+                username: displayName,
+                avatar: avatarUrl
               }
             }
       }

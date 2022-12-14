@@ -51,7 +51,7 @@ function LoginHandler(props: DialogProps) {
 
   async function handleGoogleLogin() {
     const googleLoginResult = await loginWithGoogle();
-    // handleLogin(googleLoginResult);
+    handleLogin(googleLoginResult);
   }
 
   async function handleWalletSign(signature: AuthSig) {
