@@ -1,0 +1,28 @@
+service: charmverse
+
+frameworkVersion: '3'
+
+# Create an optimized package for our functions
+package:
+  individually: true
+
+plugins:
+  - serverless-lift
+  - serverless-plugin-typescript
+  - serverless-plugin-optimize
+
+# This uses the lift plugin to generate our SQS setup in AWS
+# Based on https://github.com/getlift/lift/blob/master/docs/queue.md
+constructs:
+  webhook-queue:
+    type: queue
+    # Setup the queue as FIFO (First in - First out queue)
+    fifo: true
+    # maxRetries: 5 <-- Adjust retries attempt if the job fails, default to 3
+    worker:
+      # Function responsible for handle messages in the queue
+      handler: serverless/webhookWorker.handler
+
+provider:
+  name: aws
+  runtime: nodejs14.x

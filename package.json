@@ -230,6 +230,7 @@
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
     "@types/autosuggest-highlight": "^3.2.0",
+    "@types/aws-lambda": "^8.10.109",
     "@types/color": "^3.0.3",
     "@types/diff": "^5.0.2",
     "@types/emoji-mart": "^3.0.9",
@@ -276,6 +277,9 @@
     "prettier": "^2.8.0",
     "prisma": "^4.4.0",
     "sass": "^1.49.0",
+    "serverless-lift": "^1.21.0",
+    "serverless-plugin-optimize": "^4.2.1-rc.1",
+    "serverless-plugin-typescript": "^2.1.4",
     "supertest": "^6.2.2",
     "ts-jest": "^28.0.5",
     "webpack": "^5.73.0"
