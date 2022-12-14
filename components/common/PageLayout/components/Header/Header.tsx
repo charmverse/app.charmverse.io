@@ -334,9 +334,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
-  } else if (isBasePageDatabase) {
+  } else if (isBasePageDatabase && basePage) {
     pageOptionsList = (
-      <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage?.id} closeMenu={closeMenu} />
+      <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
     );
   }
 
