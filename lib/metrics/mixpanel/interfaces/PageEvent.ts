@@ -27,6 +27,7 @@ export interface PageEventMap {
   create_page: PageTypeEvent;
   page_comment_created: PageEvent;
   page_comment_resolved: PageEvent;
+  poll_created: PageEvent;
 }
 
 export type PageEventNames = keyof PageEventMap;
