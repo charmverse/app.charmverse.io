@@ -10,6 +10,7 @@ import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -411,6 +412,22 @@ function CharmEditor({
     }
   }, 1000);
 
+  const sendPageEvent = throttle(() => {
+    if (currentSpace && pageType) {
+      if (enableSuggestingMode) {
+        charmClient.track.trackAction('page_suggestion_created', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      } else {
+        charmClient.track.trackAction('edit_page', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      }
+    }
+  }, 1000);
+
   const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
     const doc = view.state.doc.toJSON() as PageContent;
     const rawText = view.state.doc.textContent as string;
@@ -446,6 +463,7 @@ function CharmEditor({
     return charmEditorPlugins({
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
+        sendPageEvent();
       },
       onSelectionSet,
       readOnly,

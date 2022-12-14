@@ -37,7 +37,6 @@ type EditorProps = {
   docId: string;
   enableSuggestionMode: boolean;
   onDocLoaded?: () => void;
-  onSuggestionCreated: () => void;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
 };
 
@@ -84,16 +83,7 @@ export class FidusEditor {
 
   onParticipantUpdate: NonNullable<EditorProps['onParticipantUpdate']> = () => {};
 
-  onSuggestionCreated: NonNullable<EditorProps['onSuggestionCreated']> = () => {};
-
-  constructor({
-    user,
-    docId,
-    enableSuggestionMode,
-    onDocLoaded,
-    onParticipantUpdate,
-    onSuggestionCreated
-  }: EditorProps) {
+  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate }: EditorProps) {
     this.user = user;
     if (onDocLoaded) {
       this.onDocLoaded = onDocLoaded;
@@ -103,8 +93,6 @@ export class FidusEditor {
     }
 
     this.enableSuggestionMode = enableSuggestionMode;
-
-    this.onSuggestionCreated = onSuggestionCreated;
 
     this.docInfo = {
       id: docId,
@@ -296,9 +284,6 @@ export class FidusEditor {
         view.updateState(newState);
         if (tr.steps.length) {
           this.docInfo.updated = new Date();
-          if (this.enableSuggestionMode) {
-            this.onSuggestionCreated();
-          }
         }
         this.mod.collab.doc.sendToCollaborators();
       }

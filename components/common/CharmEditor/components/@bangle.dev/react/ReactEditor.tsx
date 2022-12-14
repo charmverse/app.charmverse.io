@@ -120,14 +120,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
               isLoadingRef.current = false;
               // console.log('set is loading false');
             },
-            onSuggestionCreated: throttle(() => {
-              if (spaceId) {
-                charmClient.track.trackAction('page_suggestion_created', {
-                  pageId,
-                  spaceId
-                });
-              }
-            }, 60000),
             onParticipantUpdate
           });
           fEditor.init(_editor.view, authResponse.authToken, onError);
@@ -138,8 +130,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             setIsLoading(false);
             isLoadingRef.current = false;
             const schema = _editor.view.state.schema;
-            const doc = schema.nodeFromJSON(page.content);
-
+            let doc = _editor.view.state.doc;
+            if (page.content) {
+              doc = schema.nodeFromJSON(page.content);
+            }
             const stateConfig = {
               schema,
               doc,

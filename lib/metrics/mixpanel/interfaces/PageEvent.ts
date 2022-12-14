@@ -30,6 +30,8 @@ export interface PageEventMap {
   poll_created: PageEvent;
   page_suggestion_created: PageEvent;
   page_suggestion_accepted: PageEvent;
+  export_page_markdown: PageEvent;
+  export_page_csv: PageEvent;
 }
 
-export type PageEventNames = keyof PageEventMap;
+export type PageEventName = keyof PageEventMap;
