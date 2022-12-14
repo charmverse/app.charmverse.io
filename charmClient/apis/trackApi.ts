@@ -31,6 +31,6 @@ export class TrackApi {
       timestamp: now
     };
 
-    return http.POST<{ success: 'ok' }>(`/api/events`, { event, ...payload });
+    return http.POST(`/api/events`, { event, ...payload });
   }
 }
