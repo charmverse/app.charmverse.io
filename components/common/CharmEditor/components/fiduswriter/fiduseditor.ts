@@ -1,5 +1,4 @@
 import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
-import throttle from 'lodash/throttle';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
@@ -105,7 +104,7 @@ export class FidusEditor {
 
     this.enableSuggestionMode = enableSuggestionMode;
 
-    this.onSuggestionCreated = throttle(onSuggestionCreated, 60000);
+    this.onSuggestionCreated = onSuggestionCreated;
 
     this.docInfo = {
       id: docId,

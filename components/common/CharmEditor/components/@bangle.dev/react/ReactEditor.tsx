@@ -4,6 +4,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import throttle from 'lodash/throttle';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
@@ -119,14 +120,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
               isLoadingRef.current = false;
               // console.log('set is loading false');
             },
-            onSuggestionCreated: () => {
+            onSuggestionCreated: throttle(() => {
               if (spaceId) {
                 charmClient.track.trackAction('page_suggestion_created', {
                   pageId,
                   spaceId
                 });
               }
-            },
+            }, 60000),
             onParticipantUpdate
           });
           fEditor.init(_editor.view, authResponse.authToken, onError);
