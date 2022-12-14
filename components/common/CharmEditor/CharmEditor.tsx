@@ -499,6 +499,7 @@ function CharmEditor({
   return (
     <StyledReactBangleEditor
       pageId={pageId}
+      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
@@ -627,15 +628,27 @@ function CharmEditor({
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >
-            {pageActionDisplay === 'suggestions' && (
-              <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
+            {pageActionDisplay === 'suggestions' && currentSpace && (
+              <SuggestionsSidebar
+                pageId={pageId}
+                spaceId={currentSpace.id}
+                readOnly={!pagePermissions?.edit_content}
+                state={suggestionState}
+              />
             )}
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
             {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
+          {currentSpace && (
+            <SuggestionsPopup
+              pageId={pageId}
+              spaceId={currentSpace.id}
+              pluginKey={suggestionsPluginKey}
+              readOnly={readOnly}
+            />
+          )}
         </>
       )}
       {!readOnly && <DevTools />}

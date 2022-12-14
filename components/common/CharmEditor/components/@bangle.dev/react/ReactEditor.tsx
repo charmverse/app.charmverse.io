@@ -25,6 +25,7 @@ import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;
+  spaceId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
   className?: string;
@@ -41,6 +42,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   (
     {
       pageId,
+      spaceId,
       state,
       children,
       isContentControlled,
@@ -116,6 +118,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
               setIsLoading(false);
               isLoadingRef.current = false;
               // console.log('set is loading false');
+            },
+            onSuggestionCreated: () => {
+              if (spaceId) {
+                charmClient.track.trackAction('page_suggestion_created', {
+                  pageId,
+                  spaceId
+                });
+              }
             },
             onParticipantUpdate
           });
