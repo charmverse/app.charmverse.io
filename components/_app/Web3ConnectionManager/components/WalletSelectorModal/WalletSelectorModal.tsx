@@ -8,7 +8,7 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { injected, walletConnect, walletLink } from 'connectors';
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
@@ -192,4 +192,4 @@ function resetWalletConnector(connector: AbstractConnector) {
   }
 }
 
-export default memo(WalletSelectorModal);
+export default WalletSelectorModal;
