@@ -10,6 +10,7 @@ import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -390,14 +391,14 @@ function CharmEditor({
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
-      charmClient
+      charmClient.comments
         .resolveMultipleThreads({
           threadIds: deletedThreadIds,
           pageId: _pageId
         })
         .then(() => {
-          charmClient
-            .getPageThreads(_pageId)
+          charmClient.comments
+            .getThreads(_pageId)
             .then((threads) => {
               mutate(`pages/${_pageId}/threads`, threads);
             })
@@ -408,6 +409,22 @@ function CharmEditor({
         .catch((err) => {
           log.warn('Failed to auto resolve threads', err);
         });
+    }
+  }, 1000);
+
+  const sendPageEvent = throttle(() => {
+    if (currentSpace && pageType) {
+      if (enableSuggestingMode) {
+        charmClient.track.trackAction('page_suggestion_created', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      } else {
+        charmClient.track.trackAction('edit_page', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      }
     }
   }, 1000);
 
@@ -446,6 +463,7 @@ function CharmEditor({
     return charmEditorPlugins({
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
+        sendPageEvent();
       },
       onSelectionSet,
       readOnly,
@@ -499,6 +517,7 @@ function CharmEditor({
   return (
     <StyledReactBangleEditor
       pageId={pageId}
+      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
@@ -627,15 +646,27 @@ function CharmEditor({
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >
-            {pageActionDisplay === 'suggestions' && (
-              <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
+            {pageActionDisplay === 'suggestions' && currentSpace && (
+              <SuggestionsSidebar
+                pageId={pageId}
+                spaceId={currentSpace.id}
+                readOnly={!pagePermissions?.edit_content}
+                state={suggestionState}
+              />
             )}
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
             {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
+          {currentSpace && (
+            <SuggestionsPopup
+              pageId={pageId}
+              spaceId={currentSpace.id}
+              pluginKey={suggestionsPluginKey}
+              readOnly={readOnly}
+            />
+          )}
         </>
       )}
       {!readOnly && <DevTools />}

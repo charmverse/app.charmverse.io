@@ -282,7 +282,7 @@ export class FidusEditor {
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
         const { state: newState } = view.state.applyTransaction(trackedTr);
         view.updateState(newState);
-        if (tr.steps) {
+        if (tr.steps.length) {
           this.docInfo.updated = new Date();
         }
         this.mod.collab.doc.sendToCollaborators();

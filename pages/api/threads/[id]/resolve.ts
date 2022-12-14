@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -51,6 +52,13 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
       id: threadId,
       status: req.body.resolved === true ? 'closed' : 'open'
     });
+    if (req.body.resolved) {
+      trackUserAction('page_comment_resolved', {
+        pageId: thread.pageId,
+        userId,
+        spaceId: thread.spaceId
+      });
+    }
     return res.status(200).json(updated);
   }
   // Empty update for now as we are only updating the resolved status

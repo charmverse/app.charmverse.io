@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -30,6 +31,12 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     context,
     pageId,
     userId
+  });
+
+  trackUserAction('page_comment_created', {
+    pageId,
+    userId,
+    spaceId: newThread.spaceId
   });
 
   return res.status(201).json(newThread);

@@ -2,8 +2,9 @@ import type { Prisma, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import log from 'lib/log';
-import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import type { LoggedInUser } from 'models';
+
+import { mixpanel } from './mixpanel';
 
 export async function updateTrackUserProfile(user: LoggedInUser, tx: Prisma.TransactionClient = prisma) {
   const spaceIds = user.spaceRoles.map((sr) => sr.spaceId);

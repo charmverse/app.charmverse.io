@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
@@ -38,6 +40,23 @@ async function addSpacePermissionsController(req: NextApiRequest, res: NextApiRe
     // Unwind operations and assigned group
     ...req.body
   });
+
+  // tracking
+  if (req.body.roleId) {
+    const role = await prisma.role.findFirst({
+      where: {
+        id: req.body.roleId
+      }
+    });
+    if (role) {
+      trackUserAction('update_role_permissions', {
+        spaceId: spaceId as string,
+        userId,
+        name: role.name,
+        ...updatedPermissions
+      });
+    }
+  }
 
   return res.status(201).json(updatedPermissions);
 }

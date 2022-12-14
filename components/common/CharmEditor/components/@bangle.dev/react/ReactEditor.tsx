@@ -4,6 +4,7 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
+import throttle from 'lodash/throttle';
 import type { RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
@@ -25,6 +26,7 @@ import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;
+  spaceId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
   className?: string;
@@ -41,6 +43,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   (
     {
       pageId,
+      spaceId,
       state,
       children,
       isContentControlled,
@@ -127,8 +130,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
             setIsLoading(false);
             isLoadingRef.current = false;
             const schema = _editor.view.state.schema;
-            const doc = schema.nodeFromJSON(page.content);
-
+            let doc = _editor.view.state.doc;
+            if (page.content) {
+              doc = schema.nodeFromJSON(page.content);
+            }
             const stateConfig = {
               schema,
               doc,
