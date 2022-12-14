@@ -12,6 +12,8 @@ import type {
   WrappedSocketMessage
 } from 'lib/websockets/documentEvents/interfaces';
 
+import type { FidusEditor } from '../fiduseditor';
+
 const gettext = (text: string) => text;
 
 const namespace = '/ceditor';
@@ -25,6 +27,7 @@ type WrappedMessage = WrappedSocketMessage<ClientMessage | ServerMessage>;
 type WebSocketConnectorProps = {
   authToken: string;
   anythingToSend: () => boolean;
+  editor: FidusEditor;
   onError: (error: Error) => void;
   sendMessage?: (message: string) => void;
   initialMessage: () => ClientSubscribeMessage;
@@ -74,6 +77,7 @@ export class WebSocketConnector {
   constructor({
     anythingToSend,
     authToken,
+    editor,
     sendMessage,
     initialMessage,
     resubscribed,
@@ -82,6 +86,7 @@ export class WebSocketConnector {
     onError
   }: WebSocketConnectorProps) {
     this.anythingToSend = anythingToSend;
+    this.editor = editor;
     this.sendMessage = sendMessage;
     this.initialMessage = initialMessage;
     this.resubscribed = resubscribed;
@@ -143,7 +148,7 @@ export class WebSocketConnector {
       if (data.type === 'request_resend') {
         this.resendMessages(data.from);
       } else if (data.s < expectedServer) {
-        log.debug('[charm ws] ignore old message');
+        log.debug('[charm ws] ignore old message', data);
         // Receive a message already received at least once. Ignore.
       } else if (data.s > expectedServer) {
         // console.log('[charm ws] resend messages');
@@ -190,8 +195,13 @@ export class WebSocketConnector {
       }
     });
 
-    this.socket.on('disconnect', (...args) => {
-      // console.log('socket disconnected', args);
+    this.socket.on('disconnect', (reason, data) => {
+      const payloadTooBig = (data as any)?.context?.code === 1009;
+      if (payloadTooBig) {
+        this.onError(new Error('Document content size too large, please try pasting smaller portions'));
+        this.editor.waitingForDocument = true;
+        this.send(this.restartMessage);
+      }
     });
 
     this.socket.on('connect', () => {
