@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
+import { useRef } from 'react';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -23,6 +24,7 @@ const StyledContainer = styled.div`
 `;
 
 export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const attrs = node.attrs as Partial<NodeAttrs>;
 
   // If there are no source for the node, return the image select component
@@ -56,14 +58,16 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
     }
   }
   function initStyles() {
-    setCSSOverrides();
+    if (ref.current) {
+      setCSSOverrides(ref.current);
+    }
   }
 
   return (
     <>
-      <Script src={widgetJS} onReady={initStyles} />
+      <Script id='opensea-script' src={widgetJS} onLoad={initStyles} />
       <BlockAligner onDelete={deleteNode}>
-        <StyledContainer>
+        <StyledContainer ref={ref}>
           {/* @ts-ignore nft-card element is from OpenSea */}
           <nft-card contractAddress={attrs.contract} tokenId={attrs.token}></nft-card>
         </StyledContainer>

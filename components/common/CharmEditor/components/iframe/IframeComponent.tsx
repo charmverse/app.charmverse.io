@@ -5,6 +5,7 @@ import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
+import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/nftUtils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';
@@ -37,11 +38,18 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
         <Box py={3}>
           <MediaUrlInput
             onSubmit={(urlToEmbed) => {
+              const nftAttrs = extractNFTAttrs(urlToEmbed);
               const tweetAttrs = extractTweetAttrs(urlToEmbed);
               const isYoutube = extractYoutubeLinkType(urlToEmbed);
               if (isYoutube) {
                 const pos = getPos();
                 const _node = view.state.schema.nodes.video.createAndFill({ src: urlToEmbed });
+                if (_node) {
+                  view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
+                }
+              } else if (nftAttrs) {
+                const pos = getPos();
+                const _node = view.state.schema.nodes.nft.createAndFill(nftAttrs);
                 if (_node) {
                   view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
                 }

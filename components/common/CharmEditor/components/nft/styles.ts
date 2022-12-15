@@ -25,25 +25,26 @@ const css = `
   }
 `;
 // override css to support dark mode
-export function setCSSOverrides() {
+export function setCSSOverrides(container: HTMLDivElement) {
   try {
     // main card
-    adjustShadowRootStyles(['nft-card'], css);
+    adjustShadowRootStyles(container, ['nft-card'], css);
     // card contents
-    adjustShadowRootStyles(['nft-card', 'nft-card-front'], css);
+    adjustShadowRootStyles(container, ['nft-card', 'nft-card-front'], css);
     // status pill
-    adjustShadowRootStyles(['nft-card', 'nft-card-front', 'pill-element'], css);
+    adjustShadowRootStyles(container, ['nft-card', 'nft-card-front', 'pill-element'], css);
   } catch (error) {
     // silently fail
+    // console.log('Could not inject CSS', error);
   }
 }
 
 // main function - https://stackoverflow.com/questions/47625017/override-styles-in-a-shadow-root-element
-function adjustShadowRootStyles(hostsSelectorList: readonly string[], styles: string): void {
+function adjustShadowRootStyles(container: HTMLElement, hostsSelectorList: readonly string[], styles: string): void {
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(styles);
 
-  queryShadowRootDeep(hostsSelectorList, 20, (error, shadowRoot) => {
+  queryShadowRootDeep(container, hostsSelectorList, 40, (error, shadowRoot) => {
     if (shadowRoot) {
       shadowRoot.adoptedStyleSheets = [...shadowRoot.adoptedStyleSheets, sheet];
     }
@@ -52,6 +53,7 @@ function adjustShadowRootStyles(hostsSelectorList: readonly string[], styles: st
 
 // A helper function
 function queryShadowRootDeep(
+  container: HTMLElement,
   hostsSelectorList: readonly string[],
   triesLeft: number,
   callback: (err: Error | null, elm?: ShadowRoot) => void
@@ -59,7 +61,7 @@ function queryShadowRootDeep(
   let element: ShadowRoot | null | undefined;
 
   hostsSelectorList.forEach((selector: string) => {
-    const root = element ?? document;
+    const root = element ?? container;
     element = root.querySelector(selector)?.shadowRoot;
   });
 
@@ -68,6 +70,6 @@ function queryShadowRootDeep(
   } else if (triesLeft === 0) {
     callback(new Error(`Cannot find a shadowRoot of this chain: ${hostsSelectorList.join(', ')}`));
   } else {
-    setTimeout(() => queryShadowRootDeep(hostsSelectorList, triesLeft - 1, callback), 50);
+    setTimeout(() => queryShadowRootDeep(container, hostsSelectorList, triesLeft - 1, callback), 50);
   }
 }
