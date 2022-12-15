@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -37,7 +38,21 @@ async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  return res.status(201).json({ ok: true });
+  const { spaceId } = await prisma.page.findFirstOrThrow({
+    where: {
+      id: pageId
+    }
+  });
+
+  threadIds.forEach(() => {
+    trackUserAction('page_comment_resolved', {
+      pageId,
+      userId,
+      spaceId
+    });
+  });
+
+  return res.status(201).end();
 }
 
 export default withSessionRoute(handler);

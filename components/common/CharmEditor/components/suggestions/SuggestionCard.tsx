@@ -3,6 +3,7 @@ import { Check, Close } from '@mui/icons-material';
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { memo, useMemo } from 'react';
 
+import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
@@ -65,9 +66,9 @@ const ACTIONS: Record<string, string> = {
 const containerNodeTypes = ['listItem', 'columnBlock', 'disclosureSummary'];
 
 // isOwner allows owners to always delete their own suggestions
-type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean };
+type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: string; spaceId: string };
 
-function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type }: Props) {
+function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
   const view = useEditorViewContext();
   const { members } = useMembers();
   // get parentNode for lists
@@ -78,6 +79,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
 
   function acceptOne(_type: string, _pos: number) {
     accept(_type, _pos, view);
+    charmClient.track.trackAction('page_suggestion_accepted', { pageId, spaceId });
   }
 
   function rejectOne(_type: string, _pos: number) {
