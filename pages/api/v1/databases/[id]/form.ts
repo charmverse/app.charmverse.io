@@ -39,7 +39,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   const spaceId = req.authorizedSpaceId;
   const body: AddFormResponseInput = req.body;
 
-  await validateFormRequestInput({ spaceId, databaseId: id as string, data: body });
+  await validateFormRequestInput({ spaceId, databaseIdOrPath: id as string, data: body });
   const card = await createFormResposnseCard({
     spaceId,
     databaseIdorPath: id as string,

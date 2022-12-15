@@ -1,17 +1,15 @@
-import { prisma } from 'db';
 import { getDatabaseDetails } from 'lib/pages/GetDatabaseDetails';
 import { DatabasePageNotFoundError } from 'lib/public-api/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 
 export async function validateFormRequestInput({
   spaceId,
-  databaseId,
+  databaseIdOrPath,
   data
 }: {
   spaceId: string;
-  databaseId: string;
+  databaseIdOrPath: string;
   data: AddFormResponseInput;
 }) {
   let invalidData = false;
@@ -27,14 +25,10 @@ export async function validateFormRequestInput({
     throw new InvalidInputError(`Invalid input data`);
   }
 
-  if (!isUUID(databaseId)) {
-    throw new InvalidInputError(`Invalid database id: ${databaseId}`);
-  }
-
-  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseId });
+  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdOrPath });
 
   if (!board) {
-    throw new DatabasePageNotFoundError(databaseId);
+    throw new DatabasePageNotFoundError(databaseIdOrPath);
   }
 
   return true;

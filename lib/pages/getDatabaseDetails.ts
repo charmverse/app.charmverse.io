@@ -27,7 +27,6 @@ export async function getDatabaseDetails({ idOrPath, spaceId }: { idOrPath: stri
   if (!dbId) {
     return null;
   }
-
   return prisma.block.findFirst({
     where: {
       type: 'board',
