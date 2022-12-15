@@ -12,8 +12,8 @@ export function extractAttrsFromUrl(url: string): NodeAttrs | null {
   }
   return {
     chain: 1,
-    contract: match[1],
-    token: match[2]
+    contract: match[2],
+    token: match[3]
   };
 }
 
