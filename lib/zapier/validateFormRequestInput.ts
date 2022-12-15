@@ -18,7 +18,8 @@ export async function validateFormRequestInput({
   } else if (Array.isArray(data)) {
     invalidData = !data.every((entry) => entry.question && 'answer' in entry);
   } else if (typeof data !== 'string') {
-    invalidData = !data.all_responses;
+    const isDictObject = Object.values(data).every((value) => typeof value === 'string');
+    invalidData = !isDictObject && !data.all_responses;
   }
 
   if (invalidData) {

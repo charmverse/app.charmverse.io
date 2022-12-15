@@ -8,6 +8,16 @@ export function parseFormData(data: AddFormResponseInput): FormResponse[] {
       return data.filter((entry) => entry.question);
     }
 
+    if (typeof data !== 'string' && !data.all_responses) {
+      // Object with questions as keys and answers as values
+      const isValid = Object.values(data).every((value) => typeof value === 'string');
+      if (!isValid) {
+        return [];
+      }
+
+      return Object.entries(data).map(([question, answer]) => ({ question, answer }));
+    }
+
     const questionsStr = typeof data === 'string' ? data : data.all_responses;
     const questionsArr = questionsStr.split('### ').filter(Boolean);
 
