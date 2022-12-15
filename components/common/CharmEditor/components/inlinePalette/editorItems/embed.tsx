@@ -6,7 +6,6 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
-import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
@@ -19,7 +18,7 @@ function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
     icon: <EmbedIcon {...embeds[type]} size='large' />,
     keywords: ['iframe'],
     description: embeds[type].text,
-    editorExecuteCommand: () => {
+    editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         if (view) {
           rafCommandExec(view, (_state, _dispatch) => {
@@ -68,7 +67,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'Crypto price',
       icon: <InsertChartIcon sx={{ fontSize: iconSize }} />,
       description: 'Display a crypto price',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
             // Execute the animation
@@ -92,7 +91,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['twitter', 'elon'],
       icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
             // Execute the animation

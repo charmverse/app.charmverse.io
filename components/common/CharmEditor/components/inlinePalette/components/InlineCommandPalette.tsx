@@ -14,7 +14,6 @@ import { useMemo, useCallback, useEffect, useState } from 'react';
 
 import type { NestedPagePluginState } from '../../nestedPage';
 import { GroupLabel } from '../../PopoverMenu';
-import { palettePluginKey } from '../config';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
 import { PaletteItem, PALETTE_ITEM_REGULAR_TYPE } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
