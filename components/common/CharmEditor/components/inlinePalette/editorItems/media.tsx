@@ -16,7 +16,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'Image',
       icon: <ImageIcon sx={{ fontSize: iconSize }} />,
       description: 'Insert a image block in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
@@ -46,7 +46,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'Video',
       icon: <VideoLibraryIcon sx={{ fontSize: iconSize }} />,
       description: 'Insert a video block in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {
@@ -73,7 +73,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'PDF',
       icon: <PictureAsPdfIcon sx={{ fontSize: iconSize }} />,
       description: 'Insert a PDF block in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
             // let the node view know to show the tooltip by default

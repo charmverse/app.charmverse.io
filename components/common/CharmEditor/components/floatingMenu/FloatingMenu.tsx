@@ -48,7 +48,7 @@ type MenuProps = {
   pagePermissions?: IPagePermissionFlags;
   nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
-  palettePluginKey: PluginKey;
+  palettePluginKey?: PluginKey;
 };
 
 export default function FloatingMenuComponent(props: MenuProps) {
@@ -95,7 +95,7 @@ function MenuByType(props: MenuProps) {
   if (type === 'defaultMenu') {
     return (
       <Menu hideMenu={hideMenu} type={type}>
-        {!inline && (
+        {!inline && palettePluginKey && (
           <MenuGroup>
             <Tooltip title={<Typography component='div'>Turn into</Typography>}>
               <Button
