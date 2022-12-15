@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -57,15 +57,16 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
       );
     }
   }
-  function initStyles() {
+
+  useEffect(() => {
     if (ref.current) {
       setCSSOverrides(ref.current);
     }
-  }
+  }, [ref]);
 
   return (
     <>
-      <Script id='opensea-script' src={widgetJS} onLoad={initStyles} />
+      <Script id='opensea-script' src={widgetJS} />
       <BlockAligner onDelete={deleteNode}>
         <StyledContainer ref={ref}>
           {/* @ts-ignore nft-card element is from OpenSea */}
