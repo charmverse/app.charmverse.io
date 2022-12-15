@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { getDatabaseDetails } from 'lib/pages/GetDatabaseDetails';
+import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utilities/errors';
