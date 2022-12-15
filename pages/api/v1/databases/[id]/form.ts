@@ -40,7 +40,12 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   const body: AddFormResponseInput = req.body;
 
   await validateFormRequestInput({ spaceId, databaseId: id as string, data: body });
-  const card = await createFormResposnseCard({ spaceId, databaseId: id as string, data: body, userId: req.botUser.id });
+  const card = await createFormResposnseCard({
+    spaceId,
+    databaseIdorPath: id as string,
+    data: body,
+    userId: req.botUser.id
+  });
 
   return res.status(201).json(card);
 }

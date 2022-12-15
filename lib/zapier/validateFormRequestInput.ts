@@ -1,4 +1,5 @@
 import { prisma } from 'db';
+import { getDatabaseDetails } from 'lib/pages/GetDatabaseDetails';
 import { DatabasePageNotFoundError } from 'lib/public-api/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
@@ -30,13 +31,7 @@ export async function validateFormRequestInput({
     throw new InvalidInputError(`Invalid database id: ${databaseId}`);
   }
 
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: databaseId,
-      spaceId
-    }
-  });
+  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseId });
 
   if (!board) {
     throw new DatabasePageNotFoundError(databaseId);

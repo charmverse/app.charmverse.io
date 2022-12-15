@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { getDatabaseDetails } from 'lib/pages/GetDatabaseDetails';
 import type { FormResponseProperty } from 'lib/pages/interfaces';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -9,27 +10,22 @@ import { parseFormData } from 'lib/zapier/parseFormData';
 
 export async function createFormResposnseCard({
   spaceId,
-  databaseId,
+  databaseIdorPath,
   userId,
   data
 }: {
   spaceId: string;
-  databaseId: string;
+  databaseIdorPath: string;
   userId: string;
   data: AddFormResponseInput;
 }) {
+  // Parse qnswer / question pairs
   const formResponses = parseFormData(data);
   if (!formResponses.length) {
     throw new InvalidInputError('There are no form responses to create');
   }
 
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: databaseId,
-      spaceId
-    }
-  });
+  const board = await getDatabaseDetails({ spaceId, idOrPath: databaseIdorPath });
 
   if (!board) {
     throw new InvalidInputError('Database not found');
@@ -40,13 +36,14 @@ export async function createFormResposnseCard({
   const existingResponseProperties: FormResponseProperty[] =
     cardProperties.filter((p: FormResponseProperty) => p.isQuestion) || [];
 
+  // Map properties, create new onses for non-existing questions
   const { newProperties, mappedProperties } = mapAndCreateProperties(formResponses, existingResponseProperties);
 
   if (newProperties.length) {
     // Save new question properties
     await prisma.block.update({
       where: {
-        id: databaseId
+        id: board.id
       },
       data: {
         fields: {
@@ -57,10 +54,11 @@ export async function createFormResposnseCard({
     });
   }
 
+  // Create card with form response entry
   const card = await createDatabaseCardPage({
     title: 'Form Response',
     properties: mappedProperties,
-    boardId: databaseId,
+    boardId: board.id,
     spaceId,
     createdBy: userId
   });
