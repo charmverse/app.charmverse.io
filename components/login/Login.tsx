@@ -39,7 +39,7 @@ function LoginHandler(props: DialogProps) {
   const { showMessage } = useSnackbar();
 
   const { loginWithGoogle } = useGoogleAuth();
-  const { verifiableWalletDetected } = useWeb3AuthSig();
+  const { verifiableWalletDetected, closeWalletSelector } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
@@ -55,7 +55,9 @@ function LoginHandler(props: DialogProps) {
   }
 
   async function handleWalletSign(signature: AuthSig) {
+    closeWalletSelector();
     const user = await loginFromWeb3Account(signature);
+
     handleLogin({ identityType: 'Wallet', user, displayName: signature.address });
   }
 
@@ -66,14 +68,15 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          {!verifiableWalletDetected ? (
-            <WalletSelector />
-          ) : (
-            <WalletSign signSuccess={handleWalletSign} enableAutosign />
-          )}
+          <WalletSelector />
 
           {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
+        {verifiableWalletDetected && (
+          <ListItem>
+            <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWalletSign} enableAutosign />
+          </ListItem>
+        )}
 
         <DialogTitle sx={{ mt: -1 }} textAlign='left'>
           Connect Account

@@ -18,6 +18,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import log from 'lib/log';
+import { isSmallScreen } from 'lib/utilities/browser';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
 import { Web3Connection, Web3ConnectionManager } from '../../Web3ConnectionManager';
@@ -40,6 +41,8 @@ export function WalletSelector() {
   const { active, activate, connector, setError } = useWeb3React();
 
   const { showMessage } = useSnackbar();
+
+  const isMobile = isSmallScreen();
 
   const [uAuthPopupError, setUAuthPopupError] = useState<BrowserPopupError | null>(null);
 
@@ -114,24 +117,26 @@ export function WalletSelector() {
     <div>
       <ErrorComponent error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <ConnectorButton
-            name={
-              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                ? 'MetaMask'
-                : 'Install MetaMask'
-            }
-            onClick={
-              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                ? () => handleConnect(injected)
-                : handleOnboarding
-            }
-            iconUrl='metamask.png'
-            disabled={connector === injected || !!activatingConnector}
-            isActive={connector === injected}
-            isLoading={activatingConnector === injected}
-          />
-        </Grid>
+        {!isMobile && (
+          <Grid item xs={12}>
+            <ConnectorButton
+              name={
+                typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
+                  ? 'MetaMask'
+                  : 'Install MetaMask'
+              }
+              onClick={
+                typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
+                  ? () => handleConnect(injected)
+                  : handleOnboarding
+              }
+              iconUrl='metamask.png'
+              disabled={connector === injected || !!activatingConnector}
+              isActive={connector === injected}
+              isLoading={activatingConnector === injected}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
@@ -142,16 +147,18 @@ export function WalletSelector() {
             isLoading={activatingConnector === walletConnect}
           />
         </Grid>
-        <Grid item xs={12}>
-          <ConnectorButton
-            name='Coinbase Wallet'
-            onClick={() => handleConnect(walletLink)}
-            iconUrl='coinbasewallet.png'
-            disabled={connector === walletLink || !!activatingConnector}
-            isActive={connector === walletLink}
-            isLoading={activatingConnector === walletLink}
-          />
-        </Grid>
+        {!isMobile && (
+          <Grid item xs={12}>
+            <ConnectorButton
+              name='Coinbase Wallet'
+              onClick={() => handleConnect(walletLink)}
+              iconUrl='coinbasewallet.png'
+              disabled={connector === walletLink || !!activatingConnector}
+              isActive={connector === walletLink}
+              isLoading={activatingConnector === walletLink}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <ConnectorButton
             name='Unstoppable Domains'

@@ -104,7 +104,6 @@ export function WalletSign({
       sx={buttonStyle}
       size={buttonSize ?? 'large'}
       onClick={generateWalletAuth}
-      disabled={showLoadingState}
       loading={showLoadingState}
       variant={buttonOutlined ? 'outlined' : undefined}
     >
