@@ -132,7 +132,12 @@ function Editable(props: EditableProps, ref: React.Ref<Focusable>): JSX.Element 
     }
   });
 
-  return <input {...elementProps} ref={elementRef} />;
+  // prevent propagation of paste events, which get caught by CharmEditor
+  function disablePropagation(e: React.ClipboardEvent<ElementType>) {
+    e.stopPropagation();
+  }
+
+  return <input {...elementProps} onPaste={disablePropagation} ref={elementRef} />;
 }
 
 export default forwardRef(Editable);
