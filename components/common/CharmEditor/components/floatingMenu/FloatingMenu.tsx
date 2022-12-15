@@ -86,20 +86,20 @@ function MenuByType(props: MenuProps) {
   if (type === 'defaultMenu') {
     return (
       <Menu hideMenu={hideMenu} type={type}>
-        <MenuGroup>
-          <Tooltip title={<Typography component='div'>Turn into</Typography>}>
-            <Button
-              {...bindTrigger(popupState)}
-              endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
-              disableElevation
-              variant='text'
-              color='inherit'
-              sx={{ padding: 0 }}
-            >
-              {activeItem}
-            </Button>
-          </Tooltip>
-          {!inline && (
+        {!inline && (
+          <MenuGroup>
+            <Tooltip title={<Typography component='div'>Turn into</Typography>}>
+              <Button
+                {...bindTrigger(popupState)}
+                endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
+                disableElevation
+                variant='text'
+                color='inherit'
+                sx={{ padding: 0 }}
+              >
+                {activeItem}
+              </Button>
+            </Tooltip>
             <InlineCommandPalette
               menuKey={pluginKey}
               nestedPagePluginKey={nestedPagePluginKey}
@@ -108,8 +108,8 @@ function MenuByType(props: MenuProps) {
               size='small'
               handleActiveItem={handleActiveItem}
             />
-          )}
-        </MenuGroup>
+          </MenuGroup>
+        )}
         <MenuGroup isLastGroup={inline}>
           <BoldButton />
           <ItalicButton />
@@ -120,11 +120,13 @@ function MenuByType(props: MenuProps) {
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
           {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
         </MenuGroup>
-        <MenuGroup>
-          <TextColorMenuDropdown>
-            <TextColorButton />
-          </TextColorMenuDropdown>
-        </MenuGroup>
+        {!inline && (
+          <MenuGroup>
+            <TextColorMenuDropdown>
+              <TextColorButton />
+            </TextColorMenuDropdown>
+          </MenuGroup>
+        )}
         {!inline && (
           <MenuGroup isLastGroup>
             <ParagraphButton />
