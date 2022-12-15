@@ -1,6 +1,6 @@
 import { capitalize } from 'lodash';
 
-import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
+import type { MixpanelEventName } from './interfaces';
 
 // format event_name to Event name
 export function eventNameToHumanFormat(eventName: MixpanelEventName) {

@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import type { Board } from 'components/common/BoardEditor/focalboard/src/blocks/board';
 import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
@@ -34,7 +35,7 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 interface Props {
   closeMenu: () => void;
-  pageId?: string;
+  pageId: string;
   pagePermissions?: IPagePermissionFlags;
 }
 
@@ -78,17 +79,17 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
       viewId: view.id
     })
   );
-  const cardPages: CardPage[] = cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page);
+  const cardPages: CardPage[] = cards
+    .map((card) => ({ card, page: pages[card.id] } as CardPage))
+    .filter(({ page }) => !!page);
 
   const sortedCardPages = sortCards(cardPages, board, view, members);
 
   async function onDeletePage() {
-    if (pageId) {
-      await deletePage({
-        pageId
-      });
-      closeMenu();
-    }
+    await deletePage({
+      pageId
+    });
+    closeMenu();
   }
 
   const exportCsv = () => {
@@ -102,6 +103,10 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
     onExportCsvTrigger(board, view, _cards, intl);
     closeMenu();
+    const spaceId = pages[pageId]?.spaceId;
+    if (spaceId) {
+      charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
+    }
   };
 
   function onCopyLink() {
