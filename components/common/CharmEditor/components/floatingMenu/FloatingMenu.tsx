@@ -99,14 +99,16 @@ function MenuByType(props: MenuProps) {
               {activeItem}
             </Button>
           </Tooltip>
-          <InlineCommandPalette
-            menuKey={pluginKey}
-            nestedPagePluginKey={nestedPagePluginKey}
-            disableNestedPage={disableNestedPage}
-            externalPopupState={popupState}
-            size='small'
-            handleActiveItem={handleActiveItem}
-          />
+          {!inline && (
+            <InlineCommandPalette
+              menuKey={pluginKey}
+              nestedPagePluginKey={nestedPagePluginKey}
+              disableNestedPage={disableNestedPage}
+              externalPopupState={popupState}
+              size='small'
+              handleActiveItem={handleActiveItem}
+            />
+          )}
         </MenuGroup>
         <MenuGroup isLastGroup={inline}>
           <BoldButton />
