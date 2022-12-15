@@ -48,6 +48,7 @@ type MenuProps = {
   pagePermissions?: IPagePermissionFlags;
   nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
+  palettePluginKey?: PluginKey;
 };
 
 export default function FloatingMenuComponent(props: MenuProps) {
@@ -57,8 +58,16 @@ export default function FloatingMenuComponent(props: MenuProps) {
 }
 
 function MenuByType(props: MenuProps) {
-  const { pluginKey, inline, pagePermissions, enableComments, enableVoting, nestedPagePluginKey, disableNestedPage } =
-    props;
+  const {
+    palettePluginKey,
+    pluginKey,
+    inline,
+    pagePermissions,
+    enableComments,
+    enableVoting,
+    nestedPagePluginKey,
+    disableNestedPage
+  } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
   const { showMessage } = useSnackbar();
 
@@ -86,7 +95,7 @@ function MenuByType(props: MenuProps) {
   if (type === 'defaultMenu') {
     return (
       <Menu hideMenu={hideMenu} type={type}>
-        {!inline && (
+        {!inline && palettePluginKey && (
           <MenuGroup>
             <Tooltip title={<Typography component='div'>Turn into</Typography>}>
               <Button
@@ -101,6 +110,7 @@ function MenuByType(props: MenuProps) {
               </Button>
             </Tooltip>
             <InlineCommandPalette
+              palettePluginKey={palettePluginKey}
               menuKey={pluginKey}
               nestedPagePluginKey={nestedPagePluginKey}
               disableNestedPage={disableNestedPage}
