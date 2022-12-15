@@ -635,6 +635,7 @@ function CharmEditor({
       }}
     >
       <floatingMenu.FloatingMenu
+        palettePluginKey={inlinePalettePluginKey}
         // disable comments and polls in suggestions mode since they dont interact well
         enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
