@@ -21,7 +21,7 @@ constructs:
     # maxRetries: 5 <-- Adjust retries attempt if the job fails, default to 3
     worker:
       # Function responsible for handle messages in the queue
-      handler: serverless/webhookWorker.handler
+      handler: serverless/handler.webhookWorker
 
 provider:
   name: aws

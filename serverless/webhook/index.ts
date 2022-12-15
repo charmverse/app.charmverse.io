@@ -3,7 +3,7 @@ import type { Context, SQSEvent, SQSHandler } from 'aws-lambda';
 /**
  * SQS worker logic goes there
  */
-export const handler: SQSHandler = async (event: SQSEvent, context: Context) => {
+const webhookWorker: SQSHandler = (event: SQSEvent, context: Context) => {
   // SQS may be invoked with multiple messages
   for (const message of event.Records) {
     const bodyData = JSON.parse(message.body); // Message body
@@ -15,3 +15,5 @@ export const handler: SQSHandler = async (event: SQSEvent, context: Context) => 
     // Expects 200 back
   }
 };
+
+export default webhookWorker;
