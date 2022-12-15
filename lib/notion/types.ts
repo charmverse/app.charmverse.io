@@ -1,3 +1,6 @@
+import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { Page, Prisma } from '@prisma/client';
+
 export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
 export type ApiColor = 'default' & BaseApiColor & `${BaseApiColor}_background`;
 
@@ -1115,3 +1118,24 @@ export type BlockObjectResponse =
       has_children: boolean;
       archived: boolean;
     };
+
+export type CreatePageInput = {
+  id: string;
+  content?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
+  headerImage?: string | null;
+  icon?: string | null;
+  spaceId: string;
+  title: string;
+  type?: Page['type'];
+  createdBy: string;
+  boardId?: string;
+  parentId?: string | null;
+  cardId?: string;
+};
+
+export interface ChildBlockListResponse {
+  request: ListBlockChildrenParameters;
+  results: BlockObjectResponse[];
+  next_cursor: string | null;
+}
+export type BlockWithChildren = BlockObjectResponse & { children: string[]; pageId: string };
