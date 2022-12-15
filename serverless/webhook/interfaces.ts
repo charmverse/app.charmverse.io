@@ -116,5 +116,7 @@ export type WebhookPayload<T = WebhookEventNames> = {
 //   createdAt: new Date().toISOString(),
 //   event: {
 //     name: WebhookEventNames.BountyCompleted,
-//   },
+//     bounty,
+//     user
+//   }
 // }
