@@ -10,6 +10,8 @@ import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constan
 
 import { floatingMenu } from './floating-menu';
 
+const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase';
+
 export function plugins({
   key,
   readOnly,
@@ -22,11 +24,8 @@ export function plugins({
   const menuPlugins = floatingMenu({
     key,
     calculateType: (state) => {
-      if (
-        (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(pdf)|(mention)|(tabIndent)|(codeBlock)/
-        )
-      ) {
+      const nodeName = (state.selection as NodeSelection)?.node?.type?.name;
+      if (blacklistedComponents.includes(nodeName)) {
         return null;
       }
 

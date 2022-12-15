@@ -6,6 +6,7 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
+import { OpenSeaIcon } from '../../nft/config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
@@ -76,6 +77,32 @@ export function items(): PaletteItemTypeNoGroup[] {
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
                 _dispatch(_state.tr.replaceSelectionWith(node));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
+      uid: 'nft',
+      title: 'OpenSea NFT',
+      keywords: ['web3'],
+      icon: <EmbedIcon icon={OpenSeaIcon} size='large' />,
+      description: 'Embed an NFT on OpenSea',
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          if (view) {
+            // Execute the animation
+            rafCommandExec(view!, (_state, _dispatch) => {
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.nft.create(undefined, undefined, [tooltipMark]);
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);
