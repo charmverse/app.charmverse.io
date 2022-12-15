@@ -96,7 +96,6 @@ const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
-const inlinePalettePluginKey = new PluginKey('inlinePalette');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -161,7 +160,7 @@ export function charmEditorPlugins({
     mentionPlugins({
       key: mentionPluginKey
     }),
-    inlinePalettePlugins({ key: inlinePalettePluginKey }),
+    inlinePalettePlugins(),
     bold.plugins(),
     bulletList.plugins(),
     code.plugins(),
@@ -647,11 +646,7 @@ function CharmEditor({
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlineCommandPalette
-        nestedPagePluginKey={nestedPagePluginKey}
-        disableNestedPage={disableNestedPage}
-        palettePluginKey={inlinePalettePluginKey}
-      />
+      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
       {children}
       {!disablePageSpecificFeatures && (
         <>
