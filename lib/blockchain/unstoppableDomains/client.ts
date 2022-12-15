@@ -1,4 +1,4 @@
-import type { UnstoppableDomainsAuthSig } from './server';
+import type { UnstoppableDomainsAuthSig } from './interfaces';
 
 export function extractProofParams(authSig: UnstoppableDomainsAuthSig) {
   const proof = authSig.idToken.proof;
