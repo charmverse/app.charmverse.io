@@ -89,6 +89,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     {
       uid: 'nft',
       title: 'OpenSea NFT',
+      keywords: ['web3'],
       icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
       description: 'Embed an NFT on OpenSea',
       editorExecuteCommand: () => {

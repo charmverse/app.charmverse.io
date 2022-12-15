@@ -1,11 +1,7 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
-import { useRef } from 'react';
-
-import log from 'lib/log';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -14,25 +10,10 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 import type { NodeAttrs } from './nftSpec';
 import { extractAttrsFromUrl } from './nftUtils';
+import { setCSSOverrides } from './styles';
 
 // OpenSea embed plugin: https://github.com/ProjectOpenSea/embeddable-nfts
 export const widgetJS = 'https://unpkg.com/embeddable-nfts/dist/nft-card.min.js';
-
-type TweetOptions = {
-  theme?: 'dark' | 'light';
-};
-
-declare global {
-  interface Window {
-    twttr: {
-      widgets: {
-        // @ref https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference
-        createTweet: (id: string, el: HTMLElement, options: TweetOptions) => void;
-        // createTimeline - we might want this in the future?
-      };
-    };
-  }
-}
 
 const StyledContainer = styled.div`
   nft-card > div,
@@ -54,12 +35,12 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
         <MediaSelectionPopup
           node={node}
           icon={<TwitterIcon fontSize='small' />}
-          buttonText='Embed a Tweet'
+          buttonText='Embed an NFT'
           onDelete={deleteNode}
         >
           <Box py={3}>
             <MediaUrlInput
-              helperText='Works with links to Tweets'
+              helperText='Works with Ethereum network NFTs'
               isValid={(url) => extractAttrsFromUrl(url) !== null}
               onSubmit={(url) => {
                 const _attrs = extractAttrsFromUrl(url);
@@ -67,39 +48,15 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
                   updateAttrs(_attrs);
                 }
               }}
-              placeholder='https://twitter.com...'
+              placeholder='https://opensea.io/assets/ethereum/0x...'
             />
           </Box>
         </MediaSelectionPopup>
       );
     }
   }
-
-  // override css to support dark mode
-  function setCSSOverrides() {
-    try {
-      // main card
-      adjustShadowRootStyles(['nft-card'], '.card { background: var(--background-paper); width: 100% !important; }');
-      // card contents
-      adjustShadowRootStyles(
-        ['nft-card', 'nft-card-front'],
-        '.card-front { background: var(--background-paper); } .asset-link { color: var(--primary-text); } info-button { display: none; } .asset-image-container { border-color: var(--bg-gray); }'
-      );
-      // status pill
-      adjustShadowRootStyles(
-        ['nft-card', 'nft-card-front', 'pill-element'],
-        '.pill { border-color: var(--bg-gray) !important; }'
-      );
-    } catch (error) {
-      // silently fail
-    }
-  }
-
   function initStyles() {
-    setTimeout(setCSSOverrides, 20);
-    setTimeout(setCSSOverrides, 100);
-    setTimeout(setCSSOverrides, 500);
-    setTimeout(setCSSOverrides, 1000);
+    setCSSOverrides();
   }
 
   return (
@@ -113,32 +70,4 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
       </BlockAligner>
     </>
   );
-}
-
-// main function - https://stackoverflow.com/questions/47625017/override-styles-in-a-shadow-root-element
-function adjustShadowRootStyles(hostsSelectorList: readonly string[], styles: string): void {
-  const sheet = new CSSStyleSheet();
-  sheet.replaceSync(styles);
-
-  const shadowRoot = queryShadowRootDeep(hostsSelectorList);
-  shadowRoot.adoptedStyleSheets = [...shadowRoot.adoptedStyleSheets, sheet];
-}
-
-// A helper function
-function queryShadowRootDeep(hostsSelectorList: readonly string[]): ShadowRoot | never {
-  let element: ShadowRoot | null | undefined;
-
-  hostsSelectorList.forEach((selector: string) => {
-    const root = element ?? document;
-    element = root.querySelector(selector)?.shadowRoot;
-    if (!element)
-      throw new Error(
-        `Cannot find a shadowRoot element with selector "${selector}". The selectors chain is: ${hostsSelectorList.join(
-          ', '
-        )}`
-      );
-  });
-
-  if (!element) throw new Error(`Cannot find a shadowRoot of this chain: ${hostsSelectorList.join(', ')}`);
-  return element;
 }
