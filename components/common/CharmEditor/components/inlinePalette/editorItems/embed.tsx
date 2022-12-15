@@ -6,6 +6,7 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
+import { OpenSeaIcon } from '../../nft/config';
 import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
@@ -90,7 +91,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       uid: 'nft',
       title: 'OpenSea NFT',
       keywords: ['web3'],
-      icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
+      icon: <EmbedIcon icon={OpenSeaIcon} size='large' />,
       description: 'Embed an NFT on OpenSea',
       editorExecuteCommand: () => {
         return (state, dispatch, view) => {

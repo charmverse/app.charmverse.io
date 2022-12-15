@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
 import { useEffect, useRef } from 'react';
@@ -7,8 +6,10 @@ import { useEffect, useRef } from 'react';
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
+import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
+import { OpenSeaIcon } from './config';
 import type { NodeAttrs } from './nftSpec';
 import { extractAttrsFromUrl } from './nftUtils';
 import { setCSSOverrides } from './styles';
@@ -36,13 +37,13 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
       return (
         <MediaSelectionPopup
           node={node}
-          icon={<TwitterIcon fontSize='small' />}
+          icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
           buttonText='Embed an NFT'
           onDelete={deleteNode}
         >
           <Box py={3}>
             <MediaUrlInput
-              helperText='Works with Ethereum network NFTs'
+              helperText='Works with NFTs on Ethereum mainnet'
               isValid={(url) => extractAttrsFromUrl(url) !== null}
               onSubmit={(url) => {
                 const _attrs = extractAttrsFromUrl(url);

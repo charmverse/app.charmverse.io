@@ -46,7 +46,24 @@ const config = {
     _config.resolve.alias.canvas = false;
     _config.module.rules.push({
       test: /\.svg$/,
-      use: ['@svgr/webpack']
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: {
+            svgoConfig: {
+              // dont remove viewBox which allows svg to scale properly
+              plugins: [
+                {
+                  name: 'preset-default',
+                  params: {
+                    overrides: { removeViewBox: false }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
     });
     // check for nodejs runtime. see https://github.com/vercel/next.js/issues/36237#issuecomment-1117694528
     if (nextRuntime === 'nodejs') {

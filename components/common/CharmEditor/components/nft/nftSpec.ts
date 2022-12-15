@@ -2,7 +2,7 @@ import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 import type { supportedChainIds } from 'connectors';
 
-export const name = 'nft';
+import { name } from './config';
 
 export type NodeAttrs = {
   chain: typeof supportedChainIds[number];

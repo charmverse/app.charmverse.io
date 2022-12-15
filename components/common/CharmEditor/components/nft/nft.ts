@@ -3,7 +3,7 @@ import type { EditorView, Slice } from '@bangle.dev/pm';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
 
-import { name } from './nftSpec';
+import { name } from './config';
 import { extractAttrsFromEmbedCode } from './nftUtils';
 
 // inject a tweet node when pasting twitter url
