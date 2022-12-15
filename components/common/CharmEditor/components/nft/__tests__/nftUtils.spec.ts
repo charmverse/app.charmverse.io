@@ -4,6 +4,7 @@ const extractionCases = [
   {
     url: 'https://opensea.io/fr/assets/ethereum/0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21/1273',
     result: {
+      chain: 1,
       contract: '0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21',
       token: '1273'
     }
@@ -11,6 +12,7 @@ const extractionCases = [
   {
     url: 'https://opensea.io/assets/ethereum/0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21/1273',
     result: {
+      chain: 1,
       contract: '0x1185e1eef5d34fdac843bb6b15fd9ac588a3ab21',
       token: '1273'
     }
