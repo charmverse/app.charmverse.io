@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import {
   ActionNotPermittedError,
@@ -179,7 +179,6 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
-  trackPageAction('delete_page', { userId, pageId });
   updateTrackPageProfile(pageId);
 
   if (pageToDelete) {
@@ -190,6 +189,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
       },
       pageToDelete.spaceId
     );
+    trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });

@@ -4,6 +4,7 @@ import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { activateTrack } from 'components/common/CharmEditor/components/fiduswriter/state_plugins/track/helpers';
 import { acceptAll } from 'components/common/CharmEditor/components/fiduswriter/track/acceptAll';
@@ -15,7 +16,17 @@ import { useUser } from 'hooks/useUser';
 
 import { NoCommentsMessage } from './CommentsSidebar';
 
-export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; state: EditorState | null }) {
+export function SuggestionsSidebar({
+  readOnly,
+  state,
+  pageId,
+  spaceId
+}: {
+  readOnly: boolean;
+  state: EditorState | null;
+  pageId: string;
+  spaceId: string;
+}) {
   const view = useEditorViewContext();
 
   const { user } = useUser();
@@ -43,6 +54,7 @@ export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; sta
 
   function clickAcceptAll() {
     acceptAll(view);
+    charmClient.track.trackAction('page_suggestion_accepted', { pageId, spaceId });
   }
 
   function clickRejectAll() {
@@ -85,6 +97,8 @@ export function SuggestionsSidebar({ readOnly, state }: { readOnly: boolean; sta
             <SuggestionCard
               key={mark.pos + mark.type}
               {...mark}
+              pageId={pageId}
+              spaceId={spaceId}
               readOnly={readOnly}
               isOwner={mark.data.user === user?.id}
             />
