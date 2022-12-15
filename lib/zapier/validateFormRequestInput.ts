@@ -1,4 +1,4 @@
-import { getDatabaseDetails } from 'lib/pages/GetDatabaseDetails';
+import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { DatabasePageNotFoundError } from 'lib/public-api/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';

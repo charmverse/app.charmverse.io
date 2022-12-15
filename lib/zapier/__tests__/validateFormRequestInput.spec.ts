@@ -25,7 +25,7 @@ describe('validateFormRequestInput', () => {
     });
 
     expect(() =>
-      validateFormRequestInput({ spaceId: space.id, databaseId: db.id, data: '###Question\n\nAnswer' })
+      validateFormRequestInput({ spaceId: space.id, databaseIdOrPath: db.id, data: '###Question\n\nAnswer' })
     ).not.toThrow();
   });
 
@@ -39,7 +39,7 @@ describe('validateFormRequestInput', () => {
     expect(() =>
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: db.id,
+        databaseIdOrPath: db.id,
         data: { all_responses: '###Question\n\nAnswer' }
       })
     ).not.toThrow();
@@ -55,7 +55,7 @@ describe('validateFormRequestInput', () => {
     expect(() =>
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: db.id,
+        databaseIdOrPath: db.id,
         data: [
           { question: 'Question', answer: 'Answer' },
           { question: 'Question 2', answer: 'Answer 2' }
@@ -74,14 +74,14 @@ describe('validateFormRequestInput', () => {
     await expect(
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: db.id,
+        databaseIdOrPath: db.id,
         data: ''
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
     await expect(
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: db.id,
+        databaseIdOrPath: db.id,
         data: {} as any
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -89,7 +89,7 @@ describe('validateFormRequestInput', () => {
     await expect(
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: db.id,
+        databaseIdOrPath: db.id,
         data: [{ question: 'Question' }, { random: 'test' }] as any
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -99,7 +99,7 @@ describe('validateFormRequestInput', () => {
     await expect(
       validateFormRequestInput({
         spaceId: space.id,
-        databaseId: v4(),
+        databaseIdOrPath: v4(),
         data: '###Question\n\nAnswer'
       })
     ).rejects.toBeInstanceOf(DatabasePageNotFoundError);
