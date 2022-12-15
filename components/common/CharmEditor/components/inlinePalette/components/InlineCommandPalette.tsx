@@ -60,6 +60,7 @@ interface InlineCommentGroupProps {
   externalPopupState?: PopupState;
   size?: InlinePaletteSize;
   handleActiveItem?: (item: string) => void;
+  palettePluginKey: PluginKey;
 }
 
 export default function InlineCommandPalette({
@@ -68,7 +69,8 @@ export default function InlineCommandPalette({
   disableNestedPage = false,
   externalPopupState,
   size = 'big',
-  handleActiveItem
+  handleActiveItem,
+  palettePluginKey
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();

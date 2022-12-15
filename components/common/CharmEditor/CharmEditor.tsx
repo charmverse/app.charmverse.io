@@ -647,7 +647,11 @@ function CharmEditor({
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
+      <InlineCommandPalette
+        nestedPagePluginKey={nestedPagePluginKey}
+        disableNestedPage={disableNestedPage}
+        palettePluginKey={inlinePalettePluginKey}
+      />
       {children}
       {!disablePageSpecificFeatures && (
         <>
