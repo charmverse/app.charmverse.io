@@ -79,7 +79,7 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
       }}
     >
       {children}
-      <WalletSelectorModal />
+      <WalletSelectorModal loginSuccess={() => null} />
       <NetworkModal {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }} />
     </Web3Connection.Provider>
   );

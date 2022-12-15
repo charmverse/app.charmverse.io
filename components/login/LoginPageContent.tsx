@@ -5,23 +5,16 @@ import Typography from '@mui/material/Typography';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import splashImage from 'public/images/artwork/world.png';
 
 import { Login } from './Login';
-import { WalletSign } from './WalletSign';
 
 export const Container = styled(Box)`
   max-width: 100%;
   width: 1170px;
   margin: 0 auto;
 `;
-
-interface Props {
-  walletSigned: (authSig: AuthSig) => void;
-}
-
-export function LoginPageContent({ walletSigned }: Props) {
+export function LoginPageContent() {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (

@@ -13,24 +13,28 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
-import { DialogTitle, Modal } from 'components/common/Modal';
+import { Modal } from 'components/common/Modal';
+import type { AnyIdPostLoginHandler } from 'components/login/Login';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
+import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
 import log from 'lib/log';
 import { isSmallScreen } from 'lib/utilities/browser';
 import { BrowserPopupError } from 'lib/utilities/errors';
 
-import { Web3Connection, Web3ConnectionManager } from '../../Web3ConnectionManager';
+import { Web3Connection } from '../../Web3ConnectionManager';
 
 import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
-export function WalletSelector() {
+interface Props {
+  loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
+}
+
+export function WalletSelector({ loginSuccess }: Props) {
   const {
     setActivatingConnector,
     isWalletSelectorModalOpen,
-    openWalletSelectorModal,
     closeWalletSelectorModal,
     openNetworkModal,
     setIsConnectingIdentity,
@@ -101,7 +105,11 @@ export function WalletSelector() {
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
       showMessage(`Logged in with Unstoppable Domains. Redirecting you now.`, 'success');
-      await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      const user = await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+
+      const domain = extractDomainFromProof(authSig);
+
+      loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
       // This component is above all our data providers in the hierarchy, so we can just reload to open the app with a logged in cookie
       window.location.reload();
     } catch (err) {
@@ -196,22 +204,11 @@ function resetWalletConnector(connector: AbstractConnector) {
     connector.walletConnectProvider = undefined;
   }
 }
-
-export function WalletSelectorModal() {
-  const {
-    setActivatingConnector,
-    isWalletSelectorModalOpen,
-    openWalletSelectorModal,
-    closeWalletSelectorModal,
-    openNetworkModal,
-    setIsConnectingIdentity,
-    isConnectingIdentity,
-    activatingConnector
-  } = useContext(Web3Connection);
+export function WalletSelectorModal({ loginSuccess }: Props) {
+  const { isWalletSelectorModalOpen, closeWalletSelectorModal } = useContext(Web3Connection);
   return (
     <Modal open={isWalletSelectorModalOpen} onClose={closeWalletSelectorModal}>
-      <DialogTitle onClose={closeWalletSelectorModal}>Connect Wallet</DialogTitle>
-      <WalletSelector />
+      <WalletSelector loginSuccess={loginSuccess} />
     </Modal>
   );
 }

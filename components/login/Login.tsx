@@ -1,15 +1,8 @@
-import PersonIcon from '@mui/icons-material/Person';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import { blue } from '@mui/material/colors';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
 import type { IdentityType } from '@prisma/client';
-import * as React from 'react';
 import { useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
@@ -24,8 +17,14 @@ import type { LoggedInUser } from 'models/User';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { WalletSign } from './WalletSign';
 
-export type AnyIdLogin = { identityType: IdentityType; user: LoggedInUser; displayName: string };
-export type AnyIdFunction = () => Promise<AnyIdLogin>;
+export type AnyIdLogin<I extends IdentityType = IdentityType> = {
+  identityType: I;
+  user: LoggedInUser;
+  displayName: string;
+};
+export type AnyIdFunction<I extends IdentityType = IdentityType> = () => Promise<AnyIdLogin<I>>;
+
+export type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 export interface DialogProps {
   open: boolean;
   selectedValue: string;
@@ -54,11 +53,13 @@ function LoginHandler(props: DialogProps) {
     handleLogin(googleLoginResult);
   }
 
-  async function handleWalletSign(signature: AuthSig) {
-    closeWalletSelector();
-    const user = await loginFromWeb3Account(signature);
-
-    handleLogin({ identityType: 'Wallet', user, displayName: signature.address });
+  async function handleWeb3Login(authSig: AuthSig) {
+    const user = await loginFromWeb3Account(authSig);
+    handleLogin({
+      identityType: 'Wallet',
+      displayName: authSig.address,
+      user
+    });
   }
 
   return (
@@ -68,13 +69,13 @@ function LoginHandler(props: DialogProps) {
 
         {/** Web 3 login methods */}
         <ListItem>
-          <WalletSelector />
+          <WalletSelector loginSuccess={handleLogin} />
 
           {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
         {verifiableWalletDetected && (
           <ListItem>
-            <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWalletSign} enableAutosign />
+            <WalletSign buttonStyle={{ width: '100%' }} signSuccess={handleWeb3Login} enableAutosign />
           </ListItem>
         )}
 
@@ -99,7 +100,7 @@ function LoginHandler(props: DialogProps) {
 }
 
 export function Login() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState('');
 
   const handleClickOpen = () => {
