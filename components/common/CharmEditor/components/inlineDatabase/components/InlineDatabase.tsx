@@ -3,12 +3,11 @@ import styled from '@emotion/styled';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { getClientConfig } from 'components/common/BoardEditor/focalboard/src/store/clientConfig';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import {
   getCurrentViewDisplayBy,
@@ -104,7 +103,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
 
-  const views = allViews.filter((view) => view.parentId === pageId);
+  const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
   const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
 
@@ -120,18 +119,26 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
   // TODO: Handle for other sources in future like workspace users
   const currentPagePermissions = getPagePermissions(pageId || '');
 
-  function showCard(cardId: string | null) {
-    setShownCardId(cardId);
+  const debouncedPageUpdate = useCallback(() => {
+    return debouncePromise(async (updates: Partial<Page>) => {
+      const updatedPage = await updatePage({ id: pageId, ...updates });
+
+      return updatedPage;
+    }, 500);
+  }, [updatePage]);
+
+  function stopPropagation(e: React.KeyboardEvent) {
+    e.stopPropagation();
   }
-
-  const debouncedPageUpdate = debouncePromise(async (updates: Partial<Page>) => {
-    const updatedPage = await updatePage({ id: pageId, ...updates });
-
-    return updatedPage;
-  }, 500);
 
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions.edit_content !== true : readOnlyOverride;
+
+  useEffect(() => {
+    if (views.length > 0 && !currentViewId) {
+      setCurrentViewId(views[0].id);
+    }
+  }, [currentViewId, views]);
 
   if (!board) {
     return null;
@@ -147,30 +154,27 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
     displayProperty = board.fields.cardProperties.find((o: any) => o.type === 'date');
   }
 
-  useEffect(() => {
-    if (views.length > 0 && !currentViewId) {
-      setCurrentViewId(views[0].id);
-    }
-  }, [currentViewId, views]);
+  const deleteView = useCallback(
+    (viewId: string) => {
+      setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
+    },
+    [setCurrentViewId, views]
+  );
 
   return (
     <>
-      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
+      <StylesContainer className='focalboard-body' containerWidth={containerWidth} onKeyDown={stopPropagation}>
         <CenterPanel
           // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl
-          onViewTabClick={(viewId: string) => {
-            setCurrentViewId(viewId);
-          }}
-          onDeleteView={(viewId: string) => {
-            setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
-          }}
+          onViewTabClick={setCurrentViewId}
+          onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}
           board={board}
           embeddedBoardPath={pages[pageId]?.path}
           setPage={debouncedPageUpdate}
-          showCard={showCard}
+          showCard={setShownCardId}
           activeView={currentView}
           views={views}
           // Show more tabs on shared inline database as the space gets increased
@@ -179,7 +183,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
       </StylesContainer>
       {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
         <RootPortal>
-          <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => showCard(null)} readOnly={readOnly} />
+          <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
         </RootPortal>
       )}
       <FocalBoardPortal />
