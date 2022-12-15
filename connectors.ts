@@ -395,4 +395,4 @@ export function getChainExplorerLink(
   }
 }
 
-export { RPC, supportedChains, injected, walletConnect, walletLink };
+export { RPC, supportedChains, supportedChainIds, injected, walletConnect, walletLink };
