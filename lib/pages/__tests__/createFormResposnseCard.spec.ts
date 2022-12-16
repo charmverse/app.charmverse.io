@@ -1,6 +1,6 @@
 import type { Space, User } from '@prisma/client';
 
-import { createFormResposnseCard } from 'lib/pages/createFormResposnseCard';
+import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabase } from 'lib/public-api/createDatabaseCardPage';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -27,7 +27,7 @@ describe('createFormResposnseCard', () => {
       { question: 'Test q 2', answer: 'answer 2' }
     ];
 
-    const res1 = await createFormResposnseCard({
+    const res1 = await createFormResponseCard({
       spaceId: space.id,
       databaseIdorPath: createdDb.id,
       userId: user.id,
@@ -44,7 +44,7 @@ describe('createFormResposnseCard', () => {
       { question: 'Test q 2', answer: 'answer 4' }
     ];
 
-    const res2 = await createFormResposnseCard({
+    const res2 = await createFormResponseCard({
       spaceId: space.id,
       databaseIdorPath: createdDb.id,
       userId: user.id,
@@ -60,7 +60,7 @@ describe('createFormResposnseCard', () => {
       { question: 'Test q 3', answer: 'answer 4' }
     ];
 
-    const res3 = await createFormResposnseCard({
+    const res3 = await createFormResponseCard({
       spaceId: space.id,
       databaseIdorPath: createdDb.id,
       userId: user.id,

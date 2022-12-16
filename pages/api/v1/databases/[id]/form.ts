@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { createFormResposnseCard } from 'lib/pages/createFormResposnseCard';
+import { createFormResposnseCard } from 'lib/pages/createFormResponseCard';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 

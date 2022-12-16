@@ -8,7 +8,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
 import { parseFormData } from 'lib/zapier/parseFormData';
 
-export async function createFormResposnseCard({
+export async function createFormResponseCard({
   spaceId,
   databaseIdorPath,
   userId,
@@ -66,7 +66,7 @@ export async function createFormResposnseCard({
   return card;
 }
 
-function creteNewFormProperty(description: string, index: number = 0): FormResponseProperty {
+function createNewFormProperty(description: string, index: number = 0): FormResponseProperty {
   return {
     id: v4(),
     name: `Question ${index + 1}`,
@@ -85,7 +85,7 @@ function mapAndCreateProperties(formResponses: FormResponse[], existingResponseP
     let property = existingResponseProperties.find((p) => p.description === response.question);
     if (!property) {
       const propertyIndex = existingResponseProperties.length + newProperties.length;
-      property = creteNewFormProperty(response.question, propertyIndex);
+      property = createNewFormProperty(response.question, propertyIndex);
       newProperties.push(property);
     }
 
