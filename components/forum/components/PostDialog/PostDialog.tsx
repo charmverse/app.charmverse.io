@@ -6,17 +6,20 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient';
-import DocumentPage from 'components/[pageId]/DocumentPage';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor';
+import { PageActions } from 'components/common/PageActions';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { PageActions } from '../PageActions';
+import PostProperties from '../PostProperties';
 
 interface Props {
   page?: ForumPostPage | null;
@@ -75,63 +78,65 @@ export default function PostDialog(props: Props) {
     [page]
   );
 
+  function updateTitle(_page: { title: string; updatedAt: any }) {
+    setPage(_page);
+  }
+  const readOnly = false;
+
   return (
     <RootPortal>
       {popupState.isOpen && (
         <Dialog
           hideCloseButton
-          toolsMenu={
-            page && (
-              <PageActions
-                page={page}
-                onClickDelete={
-                  user?.id === page.createdBy
-                    ? () => {
-                        onClickDelete();
-                      }
-                    : undefined
-                }
-              />
-            )
-          }
-          toolbar={
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                size='small'
-                color='secondary'
-                href={`/${router.query.domain}/${page?.path}`}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-              >
-                Open as Page
-              </Button>
-            </Box>
-          }
+          // toolsMenu={
+          //   page && (
+          //     <PageActions
+          //       page={page}
+          //       onClickDelete={
+          //         user?.id === page.createdBy
+          //           ? () => {
+          //               onClickDelete();
+          //             }
+          //           : undefined
+          //       }
+          //     />
+          //   )
+          // }
+          // toolbar={
+          //   <Box display='flex' justifyContent='space-between'>
+          //     <Button
+          //       size='small'
+          //       color='secondary'
+          //       href={`/${router.query.domain}/${page?.path}`}
+          //       variant='text'
+          //       startIcon={<OpenInFullIcon fontSize='small' />}
+          //     >
+          //       Open as Page
+          //     </Button>
+          //   </Box>
+          // }
           onClose={onClose}
         >
-          {page && (
-            <DocumentPage
-              insideModal
-              page={{
-                ...page,
-                permissions:
-                  user?.id === page.createdBy
-                    ? [
-                        {
-                          id: '',
-                          userId: user.id,
-                          pageId: page.id,
-                          permissionLevel: 'full_access',
-                          spaceId: null,
-                          roleId: null,
-                          permissions: [],
-                          public: false
-                        }
-                      ]
-                    : []
-              }}
-              setPage={setPage}
-            />
+          {page?.postId && (
+            <Container top={50}>
+              <CharmEditor
+                // content={pageDetails?.content as PageContent}
+                // onContentChange={updatePageContent}
+                readOnly={readOnly}
+                pageActionDisplay={null}
+                pageId={page.id}
+                disablePageSpecificFeatures={true}
+                pageType={page.type}
+              >
+                <PageTitleInput
+                  readOnly={readOnly}
+                  value={page.title}
+                  onChange={updateTitle}
+                  updatedAt={page.updatedAt.toString()}
+                />
+                <PostProperties postId={page.postId} readOnly={page.createdBy !== user?.id} />
+              </CharmEditor>
+            </Container>
           )}
         </Dialog>
       )}

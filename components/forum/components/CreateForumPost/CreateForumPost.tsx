@@ -8,8 +8,8 @@ import { forwardRef, useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
