@@ -95,6 +95,29 @@ describe('searchForumPosts', () => {
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
 
+  it(`should return only return published posts`, async () => {
+    const { space: _space, user: _user } = await generateUserAndSpaceWithApiToken();
+    const title = 'title';
+    const draftPost = await generateForumPosts({
+      createdBy: _user.id,
+      spaceId: _space.id,
+      status: 'draft',
+      count: 1,
+      title
+    });
+
+    const publishedPost = await generateForumPosts({
+      createdBy: _user.id,
+      spaceId: _space.id,
+      status: 'published',
+      count: 1,
+      title
+    });
+    const posts = await searchForumPosts({ spaceId: _space.id, search: title }, _user.id);
+    expect(posts.data).toHaveLength(1);
+    expect(posts.data[0].post.status).toEqual('published');
+  });
+
   it(`should return posts from all categories`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
