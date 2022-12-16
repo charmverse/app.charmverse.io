@@ -73,22 +73,26 @@ export class PageCreator {
     this.charmversePageId = v4();
   }
 
-  async create({
-    charmverseParentPageId,
-    properties
-  }: {
-    charmverseParentPageId: string;
-    properties?: Record<string, IPropertyTemplate>;
-  }) {
+  async create({ properties }: { properties?: Record<string, IPropertyTemplate> }) {
     const pageContent: PageContent = {
       type: 'doc',
       content: []
     };
 
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
+    const notionPage = this.cache.notionPagesRecord[this.notionPageId] as GetPageResponse;
+    const parentPage =
+      notionPage.parent.type !== 'workspace'
+        ? await this.fetcher.fetchAndCreatePage({
+            notionPageId:
+              notionPage.parent.type === 'database_id' ? notionPage.parent.database_id : notionPage.parent.page_id,
+            spaceId: this.spaceId,
+            userId: this.userId
+          })
+        : null;
 
+    const parentId = parentPage?.id ?? this.fetcher.workspacePageId;
     if (!pageRecord?.charmversePage) {
-      const notionPage = this.cache.notionPagesRecord[this.notionPageId] as GetPageResponse;
       const notionPageTitleProperty = Object.values(notionPage.properties).find(
         (property) => property.type === 'title'
       );
@@ -134,8 +138,8 @@ export class PageCreator {
             ...createCard({
               title: notionPageTitle,
               id: this.charmversePageId,
-              parentId: charmverseParentPageId,
-              rootId: charmverseParentPageId,
+              parentId,
+              rootId: parentId,
               fields: {
                 icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
                 contentOrder: [],
@@ -162,9 +166,14 @@ export class PageCreator {
         createdBy: this.userId,
         title: notionPageTitle,
         icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
-        parentId: charmverseParentPageId,
+        parentId,
         type: notionPage.parent.type === 'database_id' ? 'card' : 'page',
         cardId: notionPage.parent.type ? this.charmversePageId : undefined
+      });
+
+      this.cache.pagesRecord.set(this.notionPageId, {
+        ...pageRecord,
+        charmversePage: createdCharmversePage
       });
 
       for (const firstLevelBlockId of this.topLevelBlockIds) {
@@ -181,11 +190,6 @@ export class PageCreator {
         data: {
           content: pageContent
         }
-      });
-
-      this.cache.pagesRecord.set(this.notionPageId, {
-        ...pageRecord,
-        charmversePage: createdCharmversePage
       });
       return createdCharmversePage;
     } else {
@@ -496,9 +500,7 @@ export class PageCreator {
                 }
               };
             }
-
             const charmversePage = await this.fetcher.fetchAndCreatePage({
-              charmverseParentPageId: this.charmversePageId,
               spaceId: this.spaceId,
               userId: this.userId,
               notionPageId: linkedPageId
@@ -506,7 +508,7 @@ export class PageCreator {
             return {
               type: 'page',
               attrs: {
-                id: charmversePage.id
+                id: charmversePage?.id
               }
             };
           } catch (_) {
@@ -514,10 +516,9 @@ export class PageCreator {
           }
         }
 
-        case 'child_page': {
+        case 'child_database': {
           try {
             const charmversePage = await this.fetcher.fetchAndCreatePage({
-              charmverseParentPageId: this.charmversePageId,
               spaceId: this.spaceId,
               userId: this.userId,
               notionPageId: block.id
@@ -526,7 +527,26 @@ export class PageCreator {
             return {
               type: 'page',
               attrs: {
-                id: charmversePage.id
+                id: charmversePage?.id
+              }
+            };
+          } catch (_) {
+            return log.debug('Error on creating child page');
+          }
+        }
+
+        case 'child_page': {
+          try {
+            const charmversePage = await this.fetcher.fetchAndCreatePage({
+              spaceId: this.spaceId,
+              userId: this.userId,
+              notionPageId: block.id
+            });
+
+            return {
+              type: 'page',
+              attrs: {
+                id: charmversePage?.id
               }
             };
           } catch (_) {

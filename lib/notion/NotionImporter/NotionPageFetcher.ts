@@ -1,5 +1,6 @@
 import type { Client } from '@notionhq/client';
 import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { Page } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
@@ -25,6 +26,8 @@ export class NotionPageFetcher {
 
   client: Client;
 
+  workspacePageId: string;
+
   constructor({
     client,
     blocksPerRequest = 100,
@@ -43,6 +46,7 @@ export class NotionPageFetcher {
     this.blocksPerRequest = blocksPerRequest;
     this.maxChildBlockDepth = maxChildBlockDepth;
     this.totalImportedPagesLimit = totalImportedPagesLimit;
+    this.workspacePageId = v4();
   }
 
   /**
@@ -82,11 +86,10 @@ export class NotionPageFetcher {
       notionPagesRecord[notionPage.id] = notionPage;
     });
 
-    const workspacePageId = v4();
-    const workspacePage = await createPrismaPage({
+    await createPrismaPage({
       createdBy: userId,
       spaceId,
-      id: workspacePageId,
+      id: this.workspacePageId,
       title: workspaceName,
       icon: workspaceIcon
     });
@@ -97,8 +100,7 @@ export class NotionPageFetcher {
         await this.fetchAndCreatePage({
           notionPageId: notionPage.id,
           spaceId,
-          userId,
-          charmverseParentPageId: workspacePage.id
+          userId
         });
       }
     }
@@ -108,15 +110,13 @@ export class NotionPageFetcher {
     notionPageId,
     spaceId,
     userId,
-    charmverseParentPageId,
     properties
   }: {
     notionPageId: string;
     spaceId: string;
     userId: string;
-    charmverseParentPageId: string;
     properties?: Record<string, IPropertyTemplate>;
-  }) {
+  }): Promise<undefined | Page> {
     const notionPage = this.cache.notionPagesRecord[notionPageId];
     // Regular page
     if (notionPage.object === 'page') {
@@ -132,9 +132,9 @@ export class NotionPageFetcher {
         fetcher: this
       });
 
-      return pageCreator.create({ charmverseParentPageId, properties });
+      return pageCreator.create({ properties });
     } else {
-      const { pageIds, properties: databaseProperties } = await this.fetchNotionDatabaseChildPages({ notionPageId });
+      const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
 
       const databasePageCreator = new DatabasePageCreator({
         pageIds,
@@ -145,16 +145,7 @@ export class NotionPageFetcher {
         fetcher: this
       });
 
-      const databasePage = await databasePageCreator.create({ charmverseParentPageId });
-      for (const pageId of pageIds) {
-        await this.fetchAndCreatePage({
-          charmverseParentPageId: databasePage.id,
-          notionPageId: pageId,
-          spaceId,
-          userId,
-          properties: databaseProperties
-        });
-      }
+      const databasePage = await databasePageCreator.create();
       return databasePage;
     }
   }
