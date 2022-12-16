@@ -6,7 +6,6 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { TextSelection } from 'prosemirror-state';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup } from '../paletteItem';
 
@@ -18,7 +17,7 @@ function createColumnPaletteItem(colCount: number): PaletteItemTypeNoGroup {
     title: `${colCount} Columns`,
     icon: <ViewColumnIcon sx={{ fontSize: iconSize }} />,
     description: `${colCount} Column Layout`,
-    editorExecuteCommand: () => {
+    editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         if (view) {
           rafCommandExec(view!, (_state, _dispatch) => {
@@ -70,7 +69,7 @@ export function items(): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Insert a code block in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view, (_state, _dispatch) => {

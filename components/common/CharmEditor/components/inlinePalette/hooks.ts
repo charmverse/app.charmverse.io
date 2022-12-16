@@ -6,21 +6,17 @@ import { useCallback, useEffect } from 'react';
 import { suggestTooltip } from '../@bangle.dev/tooltip';
 
 import { getSuggestTooltipKey } from './inlinePalette';
-import type { PromisedCommand } from './paletteItem';
+import type { InlinePaletteItem } from './paletteItem';
 
-export interface InlinePaletteItem {
-  editorExecuteCommand: (arg: { item: InlinePaletteItem; itemIndex: number }) => PromisedCommand;
-}
-
-export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
+export function useInlinePaletteQuery(palettePluginKey: PluginKey) {
   const view = useEditorViewContext();
   // TODO show is a bad name
   const {
     triggerText: query,
     counter,
     show: isVisible
-  } = usePluginState(getSuggestTooltipKey(inlinePaletteKey)(view.state), true);
-  const { tooltipContentDOM } = usePluginState(inlinePaletteKey);
+  } = usePluginState(getSuggestTooltipKey(palettePluginKey)(view.state), true);
+  const { tooltipContentDOM } = usePluginState(palettePluginKey);
 
   return { query, counter, isVisible, tooltipContentDOM };
 }
@@ -33,7 +29,7 @@ export function useInlinePaletteQuery(inlinePaletteKey: PluginKey) {
  * @returns
  */
 export function useInlinePaletteItems<T extends InlinePaletteItem>(
-  inlinePaletteKey: PluginKey,
+  palettePluginKey: PluginKey,
   items: T[],
   counter: number,
   isItemDisabled?: (item: T) => boolean
@@ -47,12 +43,12 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
   };
   dismissPalette: () => boolean;
 } {
-  const { setExecuteItemCommand } = usePluginState(inlinePaletteKey);
+  const { setExecuteItemCommand } = usePluginState(palettePluginKey);
   const view = useEditorViewContext();
 
   const dismissPalette = useCallback(() => {
-    return suggestTooltip.removeSuggestMark(inlinePaletteKey)(view.state, view.dispatch, view);
-  }, [view, inlinePaletteKey]);
+    return suggestTooltip.removeSuggestMark(palettePluginKey)(view.state, view.dispatch, view);
+  }, [view, palettePluginKey]);
 
   const activeIndex = getActiveIndex(counter, items.length);
 
@@ -61,7 +57,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
       const item = items[itemIndex];
 
       if (!item) {
-        return suggestTooltip.removeSuggestMark(inlinePaletteKey);
+        return suggestTooltip.removeSuggestMark(palettePluginKey);
       }
 
       if (isItemDisabled?.(item)) {
@@ -72,11 +68,12 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
       return (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, _view: EditorView) => {
         return item.editorExecuteCommand({
           item,
+          palettePluginKey,
           itemIndex
         })(state, dispatch, _view);
       };
     },
-    [inlinePaletteKey, items, isItemDisabled]
+    [palettePluginKey, items, isItemDisabled]
   );
 
   useEffect(() => {

@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
@@ -74,8 +73,6 @@ export default function ForumFilterList() {
   const { categories, error } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
-  const router = useRouter();
-  const selectedCategory = router.query.categoryIds as string;
   const [forumCategoryName, setForumCategoryName] = useState('');
   const { createForumCategory } = useForumCategories();
 

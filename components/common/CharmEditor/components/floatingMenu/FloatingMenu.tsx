@@ -48,6 +48,7 @@ type MenuProps = {
   pagePermissions?: IPagePermissionFlags;
   nestedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
+  palettePluginKey?: PluginKey;
 };
 
 export default function FloatingMenuComponent(props: MenuProps) {
@@ -57,8 +58,16 @@ export default function FloatingMenuComponent(props: MenuProps) {
 }
 
 function MenuByType(props: MenuProps) {
-  const { pluginKey, inline, pagePermissions, enableComments, enableVoting, nestedPagePluginKey, disableNestedPage } =
-    props;
+  const {
+    palettePluginKey,
+    pluginKey,
+    inline,
+    pagePermissions,
+    enableComments,
+    enableVoting,
+    nestedPagePluginKey,
+    disableNestedPage
+  } = props;
   const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
   const { showMessage } = useSnackbar();
 
@@ -86,28 +95,31 @@ function MenuByType(props: MenuProps) {
   if (type === 'defaultMenu') {
     return (
       <Menu hideMenu={hideMenu} type={type}>
-        <MenuGroup>
-          <Tooltip title={<Typography component='div'>Turn into</Typography>}>
-            <Button
-              {...bindTrigger(popupState)}
-              endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
-              disableElevation
-              variant='text'
-              color='inherit'
-              sx={{ padding: 0 }}
-            >
-              {activeItem}
-            </Button>
-          </Tooltip>
-          <InlineCommandPalette
-            menuKey={pluginKey}
-            nestedPagePluginKey={nestedPagePluginKey}
-            disableNestedPage={disableNestedPage}
-            externalPopupState={popupState}
-            size='small'
-            handleActiveItem={handleActiveItem}
-          />
-        </MenuGroup>
+        {!inline && palettePluginKey && (
+          <MenuGroup>
+            <Tooltip title={<Typography component='div'>Turn into</Typography>}>
+              <Button
+                {...bindTrigger(popupState)}
+                endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
+                disableElevation
+                variant='text'
+                color='inherit'
+                sx={{ padding: 0 }}
+              >
+                {activeItem}
+              </Button>
+            </Tooltip>
+            <InlineCommandPalette
+              palettePluginKey={palettePluginKey}
+              menuKey={pluginKey}
+              nestedPagePluginKey={nestedPagePluginKey}
+              disableNestedPage={disableNestedPage}
+              externalPopupState={popupState}
+              size='small'
+              handleActiveItem={handleActiveItem}
+            />
+          </MenuGroup>
+        )}
         <MenuGroup isLastGroup={inline}>
           <BoldButton />
           <ItalicButton />
@@ -118,11 +130,13 @@ function MenuByType(props: MenuProps) {
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
           {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
         </MenuGroup>
-        <MenuGroup>
-          <TextColorMenuDropdown>
-            <TextColorButton />
-          </TextColorMenuDropdown>
-        </MenuGroup>
+        {!inline && (
+          <MenuGroup>
+            <TextColorMenuDropdown>
+              <TextColorButton />
+            </TextColorMenuDropdown>
+          </MenuGroup>
+        )}
         {!inline && (
           <MenuGroup isLastGroup>
             <ParagraphButton />

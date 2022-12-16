@@ -18,10 +18,9 @@ import ForumPosts from './components/ForumPosts';
 export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
-
   const currentSpace = useCurrentSpace();
   const { categories } = useForumCategories();
-  const categoryIds = router.query.categoryIds ?? [];
+  const categoryIds = router.query.categoryIds;
   const { showPost } = usePostDialog();
 
   // eslint-disable-next-line @typescript-eslint/no-shadow

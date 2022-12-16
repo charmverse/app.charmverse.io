@@ -11,7 +11,7 @@ import { safeRequestAnimationFrame } from '../../utils';
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
-import { paletteMarkName, palettePluginKey, trigger } from './config';
+import { paletteMarkName, trigger } from './config';
 
 const { decrementSuggestTooltipCounter, incrementSuggestTooltipCounter, queryIsSuggestTooltipActive } = suggestTooltip;
 
@@ -31,8 +31,7 @@ function specFactory(): BaseRawMarkSpec {
   };
 }
 
-function pluginsFactory() {
-  const key = palettePluginKey;
+function pluginsFactory({ key }: { key: PluginKey }) {
   const markName = paletteMarkName;
   const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
     getScrollContainer,
@@ -103,7 +102,7 @@ function pluginsFactory() {
         [keybindings.toggleInlineCommandPalette.key]: (state, dispatch): boolean => {
           const { tr, schema: _schema, selection } = state;
 
-          if (queryInlinePaletteActive(palettePluginKey)(state)) {
+          if (queryInlinePaletteActive(key)(state)) {
             return false;
           }
           const marks = selection.$from.marks();
