@@ -39,7 +39,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
 
   const { data, isValidating, mutate } = useSWR(
     () => (currentPageId ? `pages/${currentPageId}/threads` : null),
-    () => charmClient.getPageThreads(currentPageId),
+    () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
   );
   useEffect(() => {
@@ -49,7 +49,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   async function addComment(threadId: string, commentContent: PageContent) {
     const thread = threads[threadId];
     if (thread) {
-      const comment = await charmClient.addComment({
+      const comment = await charmClient.comments.addComment({
         content: commentContent,
         threadId: thread.id
       });
@@ -69,7 +69,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   async function editComment(threadId: string, editedCommentId: string, commentContent: PageContent) {
     const thread = threads[threadId];
     if (thread) {
-      await charmClient.editComment(editedCommentId, commentContent);
+      await charmClient.comments.editComment(editedCommentId, commentContent);
       setThreads((_threads) => ({
         ..._threads,
         [thread.id]: {
@@ -87,7 +87,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     if (thread) {
       const comment = thread.comments.find((_comment) => _comment.id === commentId);
       if (comment) {
-        await charmClient.deleteComment(comment.id);
+        await charmClient.comments.deleteComment(comment.id);
         const threadWithoutComment = {
           ...thread,
           comments: thread.comments.filter((_comment) => _comment.id !== comment.id)
@@ -101,7 +101,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     const thread = threads[threadId];
 
     if (thread) {
-      await charmClient.resolveThread(thread.id, {
+      await charmClient.comments.resolveThread(thread.id, {
         resolved: !thread.resolved
       });
       setThreads((_threads) => ({
@@ -118,7 +118,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     const thread = threads[threadId];
 
     if (thread) {
-      await charmClient.deleteThread(thread.id);
+      await charmClient.comments.deleteThread(thread.id);
       delete threads[thread.id];
       setThreads({ ...threads });
     }

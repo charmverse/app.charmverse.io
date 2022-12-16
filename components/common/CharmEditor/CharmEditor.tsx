@@ -10,6 +10,7 @@ import { Box, Divider } from '@mui/material';
 import type { PageType } from '@prisma/client';
 import type { CryptoCurrency, FiatCurrency } from 'connectors';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -27,6 +28,7 @@ import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
@@ -59,9 +61,12 @@ import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
+import * as nft from './components/nft/nft';
+import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
+import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/index';
 import Quote from './components/quote';
 import ResizableImage from './components/ResizableImage';
@@ -93,9 +98,11 @@ const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
 const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 const suggestionsPluginKey = new PluginKey('suggestions');
+const inlinePalettePluginKey = new PluginKey('inlinePalette');
 
 export function charmEditorPlugins({
   onContentChange,
+  onError = () => {},
   onSelectionSet,
   readOnly = false,
   disablePageSpecificFeatures = false,
@@ -112,6 +119,7 @@ export function charmEditorPlugins({
   readOnly?: boolean;
   onContentChange?: (view: EditorView, prevDoc: EditorState['doc']) => void;
   onSelectionSet?: (state: EditorState) => void;
+  onError?: (error: Error) => void;
   disablePageSpecificFeatures?: boolean;
   enableVoting?: boolean;
   enableComments?: boolean;
@@ -121,6 +129,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
+    pasteChecker.plugins({ onError }),
     new Plugin({
       view: (_view) => {
         if (readOnly) {
@@ -154,7 +163,7 @@ export function charmEditorPlugins({
     mentionPlugins({
       key: mentionPluginKey
     }),
-    inlinePalettePlugins(),
+    inlinePalettePlugins({ key: inlinePalettePluginKey }),
     bold.plugins(),
     bulletList.plugins(),
     code.plugins(),
@@ -217,6 +226,7 @@ export function charmEditorPlugins({
     // @ts-ignore missing type
     table.TableFiltersMenu(),
     disclosure.plugins(),
+    nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
     videoPlugins(),
@@ -379,6 +389,7 @@ function CharmEditor({
   onParticipantUpdate
 }: CharmEditorProps) {
   const router = useRouter();
+  const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
   const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
@@ -390,14 +401,14 @@ function CharmEditor({
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
-      charmClient
+      charmClient.comments
         .resolveMultipleThreads({
           threadIds: deletedThreadIds,
           pageId: _pageId
         })
         .then(() => {
-          charmClient
-            .getPageThreads(_pageId)
+          charmClient.comments
+            .getThreads(_pageId)
             .then((threads) => {
               mutate(`pages/${_pageId}/threads`, threads);
             })
@@ -408,6 +419,22 @@ function CharmEditor({
         .catch((err) => {
           log.warn('Failed to auto resolve threads', err);
         });
+    }
+  }, 1000);
+
+  const sendPageEvent = throttle(() => {
+    if (currentSpace && pageType) {
+      if (enableSuggestingMode) {
+        charmClient.track.trackAction('page_suggestion_created', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      } else {
+        charmClient.track.trackAction('edit_page', {
+          pageId,
+          spaceId: currentSpace.id
+        });
+      }
     }
   }, 1000);
 
@@ -446,6 +473,10 @@ function CharmEditor({
     return charmEditorPlugins({
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
+        sendPageEvent();
+      },
+      onError(err) {
+        showMessage(err.message, 'warning');
       },
       onSelectionSet,
       readOnly,
@@ -499,6 +530,7 @@ function CharmEditor({
   return (
     <StyledReactBangleEditor
       pageId={pageId}
+      spaceId={currentSpace?.id}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
@@ -596,6 +628,9 @@ function CharmEditor({
           case 'tweet': {
             return <TweetNodeView {...allProps} />;
           }
+          case 'nft': {
+            return <NFTNodeView {...allProps} />;
+          }
           case 'video': {
             return <VideoNodeView {...allProps} />;
           }
@@ -606,6 +641,7 @@ function CharmEditor({
       }}
     >
       <floatingMenu.FloatingMenu
+        palettePluginKey={inlinePalettePluginKey}
         // disable comments and polls in suggestions mode since they dont interact well
         enableComments={!disablePageSpecificFeatures && !enableSuggestingMode && !isTemplate}
         enableVoting={enableVoting && !enableSuggestingMode && !isTemplate}
@@ -618,7 +654,11 @@ function CharmEditor({
       <NestedPagesList pluginKey={nestedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && <RowActionsMenu pluginKey={actionsPluginKey} />}
-      <InlineCommandPalette nestedPagePluginKey={nestedPagePluginKey} disableNestedPage={disableNestedPage} />
+      <InlineCommandPalette
+        nestedPagePluginKey={nestedPagePluginKey}
+        disableNestedPage={disableNestedPage}
+        palettePluginKey={inlinePalettePluginKey}
+      />
       {children}
       {!disablePageSpecificFeatures && (
         <>
@@ -627,15 +667,27 @@ function CharmEditor({
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >
-            {pageActionDisplay === 'suggestions' && (
-              <SuggestionsSidebar readOnly={!pagePermissions?.edit_content} state={suggestionState} />
+            {pageActionDisplay === 'suggestions' && currentSpace && (
+              <SuggestionsSidebar
+                pageId={pageId}
+                spaceId={currentSpace.id}
+                readOnly={!pagePermissions?.edit_content}
+                state={suggestionState}
+              />
             )}
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
             {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          <SuggestionsPopup pluginKey={suggestionsPluginKey} readOnly={readOnly} />
+          {currentSpace && (
+            <SuggestionsPopup
+              pageId={pageId}
+              spaceId={currentSpace.id}
+              pluginKey={suggestionsPluginKey}
+              readOnly={readOnly}
+            />
+          )}
         </>
       )}
       {!readOnly && <DevTools />}

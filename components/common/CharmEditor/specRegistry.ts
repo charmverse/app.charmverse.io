@@ -22,6 +22,7 @@ import * as inlineVote from './components/inlineVote';
 import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
+import * as nft from './components/nft/nftSpec';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as quote from './components/quote';
@@ -83,5 +84,6 @@ export const specRegistry = new SpecRegistry([
   insertion,
   formatChange,
   video.spec(),
-  textColor.spec()
+  textColor.spec(),
+  nft.spec()
 ]);

@@ -101,7 +101,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     if (!isEmpty) {
       const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
       e.preventDefault();
-      const threadWithComment = await charmClient.startThread({
+      const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId: cardId ?? currentPageId

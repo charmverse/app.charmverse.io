@@ -1,5 +1,5 @@
-import type { PageEvent } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-
+import type { BaseEvent } from './BaseEvent';
+import type { PageEvent } from './PageEvent';
 import type { ResourceEvent } from './ResourceEvent';
 
 type BountyEvent = ResourceEvent & PageEvent;
@@ -26,4 +26,5 @@ export interface BountyEventMap {
   bounty_application_rejected: BountyRewardEvent;
   bounty_complete: BountyRewardEvent;
   bounty_paid: BountyPaidEvent;
+  export_bounties_csv: BaseEvent;
 }

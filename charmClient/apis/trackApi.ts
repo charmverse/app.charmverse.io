@@ -6,7 +6,7 @@ export class TrackApi {
   private lastEvent: { payload: string; timestamp: number } | null = null;
 
   trackAction<T extends MixpanelEventName>(event: T, payload: Omit<MixpanelEventMap[T], 'userId'>) {
-    const payloadAsString = JSON.stringify(payload);
+    const payloadAsString = event + JSON.stringify(payload);
     const now = Date.now();
 
     // Ignore identical events within 1 second of each other
@@ -31,6 +31,6 @@ export class TrackApi {
       timestamp: now
     };
 
-    return http.POST<{ success: 'ok' }>(`/api/events?event=${event}`, payload);
+    return http.POST(`/api/events`, { event, ...payload });
   }
 }

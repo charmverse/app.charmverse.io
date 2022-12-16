@@ -10,7 +10,8 @@ export function EmbedIcon({
   size?: 'small' | 'large';
 }) {
   if (Icon) {
-    return <Icon style={{ fontSize: size === 'small' ? 20 : 30 }} />;
+    const boxSize = size === 'small' ? 20 : 30;
+    return <Icon style={{ fontSize: boxSize, width: boxSize }} />;
   }
 
   return <img src={iconUrl} height={size === 'small' ? 20 : 30} width='auto' />;
