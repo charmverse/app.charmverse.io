@@ -52,6 +52,8 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const bottomPostReached = useOnScreen(ref);
   const createPostBoxRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const loadingMode = useRef<'list' | 'search'>('list');
   // Re-enable sorting later on
 
   // const querySort = query.sort;
@@ -75,62 +77,90 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { subscribe } = useWebSocketClient();
 
+  const categoryRef = useRef(categoryId);
+  const searchRef = useRef(search);
+
+  useEffect(() => {
+    if (search !== searchRef.current) {
+      searchRef.current = search;
+      loadingMode.current = 'search';
+    } else if (categoryId !== categoryRef.current) {
+      categoryRef.current = categoryId;
+      loadingMode.current = 'list';
+    }
+    loadMorePosts(true);
+  }, [search, categoryId]);
+
+  useEffect(() => {
+    // When loading mode changes, clear out the current list to switch between search and list data
+    loadMorePosts(true);
+  }, [loadingMode]);
+
   function loadMorePosts(refetch = false) {
-    setIsLoadingMore(true);
+    if (currentSpace) {
+      setIsLoadingMore(true);
 
-    charmClient.forum
-      .listForumPosts({
-        spaceId: currentSpace!.id,
-        categoryIds: categoryId,
-        count: resultsPerQuery,
-        page: refetch ? undefined : posts?.cursor
-      })
-      .then((foundPosts) => {
-        if (error) {
-          setError(null);
-        }
+      (loadingMode.current === 'list'
+        ? charmClient.forum.listForumPosts({
+            spaceId: currentSpace!.id,
+            categoryIds: categoryId,
+            count: resultsPerQuery,
+            page: refetch ? undefined : posts?.cursor
+          })
+        : charmClient.forum.searchForumPosts({
+            spaceId: currentSpace!.id,
+            search,
+            count: resultsPerQuery,
+            page: refetch ? undefined : posts?.cursor
+          })
+      )
+        .then((foundPosts) => {
+          if (error) {
+            setError(null);
+          }
 
-        // UX improvement: add a delay so the user sees the post loading skeleton
-        setTimeout(() => {
-          setPosts((_prevList) => {
-            if (!_prevList || refetch) {
-              return foundPosts;
-            }
-            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
-            _prevList.cursor = foundPosts.cursor;
+          // UX improvement: add a delay so the user sees the post loading skeleton
+          setTimeout(() => {
+            setPosts((_prevList) => {
+              if (!_prevList || refetch) {
+                return foundPosts;
+              }
+              const filteredPosts = foundPosts.data.filter((post) => !_prevList?.data.find((i) => i.id === post.id));
+              _prevList.cursor = foundPosts.cursor;
 
-            const previousDataToKeep = !_prevList
-              ? []
-              : categoryId === undefined
-              ? // No need for filtering since categoryId is undefined
-                _prevList.data
-              : _prevList.data.filter((postPage) => {
-                  if (typeof categoryId === 'string') {
-                    return postPage.post.categoryId === categoryId;
-                  } else if (categoryId instanceof Array && postPage.post.categoryId) {
-                    return categoryId.includes(postPage.post.categoryId);
-                  } else if (categoryId === null) {
-                    return !postPage.post.categoryId;
-                  }
-                  return false;
-                });
+              const previousDataToKeep = !_prevList
+                ? []
+                : categoryId === undefined
+                ? // No need for filtering since categoryId is undefined
+                  _prevList.data
+                : _prevList.data.filter((postPage) => {
+                    if (typeof categoryId === 'string') {
+                      return postPage.post.categoryId === categoryId;
+                    } else if (categoryId instanceof Array && postPage.post.categoryId) {
+                      return categoryId.includes(postPage.post.categoryId);
+                    } else if (categoryId === null) {
+                      return !postPage.post.categoryId;
+                    }
+                    return false;
+                  });
 
-            _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
-              return { ...post, user: members.find((member) => member.id === post.createdBy) };
+              _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
+                return { ...post, user: members.find((member) => member.id === post.createdBy) };
+              });
+              _prevList.hasNext = foundPosts.hasNext;
+
+              return {
+                ..._prevList
+              };
             });
-            _prevList.hasNext = foundPosts.hasNext;
-
-            return {
-              ..._prevList
-            };
-          });
+            setIsLoadingMore(false);
+          }, generatePostRefreshTimeout());
+        })
+        .catch((err) => {
+          setError(err);
           setIsLoadingMore(false);
-        }, generatePostRefreshTimeout());
-      })
-      .catch((err) => {
-        setError(err);
-        setIsLoadingMore(false);
-      });
+        });
+    }
   }
 
   const currentCategoryId =

@@ -72,7 +72,20 @@ export async function listForumPosts(
     where: {
       type: 'post',
       spaceId,
-      post: postPropsQuery
+      post: postPropsQuery,
+      OR: [
+        {
+          createdBy: userId,
+          post: {
+            status: 'draft'
+          }
+        },
+        {
+          post: {
+            status: 'published'
+          }
+        }
+      ]
     },
     include: {
       upDownVotes: {
