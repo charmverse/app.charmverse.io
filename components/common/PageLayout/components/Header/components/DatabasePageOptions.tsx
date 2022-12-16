@@ -83,7 +83,6 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   const { members } = useMembers();
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const [isLoadingCsv, setIsLoadingCsv] = useState(false);
 
   const activeBoardId = view?.fields.linkedSourceId || view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -189,26 +188,21 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
   };
 
   const importCsv: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setIsLoadingCsv(true);
-
     if (event.target.files && event.target.files[0]) {
       Papa.parse(event.target.files[0], {
         header: true,
         skipEmptyLines: true,
         worker: event.target.files[0].size > 100000, // 100kb
         complete: async (results) => {
+          closeMenu();
           if (results.errors && results.errors[0]) {
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'error');
-            setIsLoadingCsv(false);
-            closeMenu();
             return;
           }
           if (isValidCsvResult(results)) {
             await addNewCards(results);
           }
-          setIsLoadingCsv(false);
           showMessage('Your csv file was imported successfully', 'success');
-          closeMenu();
         }
       });
     }
@@ -267,7 +261,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         />
         <ListItemText primary='Export to CSV' />
       </ListItemButton>
-      <ListItemButton component='label' disabled={isLoadingCsv}>
+      <ListItemButton component='label'>
         <input hidden type='file' name='csvfile' accept='.csv' onChange={importCsv} />
         <VerticalAlignBottomOutlinedIcon
           fontSize='small'
