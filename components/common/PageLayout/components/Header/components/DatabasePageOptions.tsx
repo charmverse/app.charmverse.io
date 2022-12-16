@@ -141,9 +141,12 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     // Remove name property because it is not an option
     const allAvailableProperties = headers.filter((header) => header !== 'Name');
 
-    // Create card properties for the board
-    const newBoardProperties = allAvailableProperties.map((prop) => createNewPropertiesForBoard(csvData, prop));
+    const mappedInitialBoardProperties = mapCardBoardProperties(board.fields.cardProperties);
 
+    // Create card properties for the board
+    const newBoardProperties = allAvailableProperties.map((prop) =>
+      createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
+    );
     // Merge the fields of both boards
     const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
 

@@ -10,7 +10,7 @@ interface MappedProperties {
   id: string;
   options: Record<string, string>;
   name: string;
-  type: string;
+  type: PropertyType;
 }
 
 export const monthNames = [
@@ -60,11 +60,38 @@ export const mapCardBoardProperties = (cardProperties: IPropertyTemplate[]) =>
     {}
   );
 
-export const createNewPropertiesForBoard = (csvData: Record<string, string>[], prop: string): IPropertyTemplate => {
+export const createNewPropertiesForBoard = (
+  csvData: Record<string, string>[],
+  prop: string,
+  existingBoardProp?: MappedProperties
+): IPropertyTemplate => {
   const propValues = csvData.map((result) => result[prop]).filter((result) => !!result);
   const defaultProps = { id: uuid.v4(), name: prop, options: [] };
   // eslint-disable-next-line
   const emailReg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+
+  // Create select property for the new board. The new values and the old values will be merged later.
+  if (existingBoardProp && existingBoardProp.type === 'select') {
+    const allMultiSelectValues = csvData
+      .map((result) => result[prop])
+      .filter((option) => !!option && !existingBoardProp.options[option]);
+
+    const options: IPropertyTemplate['options'] = allMultiSelectValues
+      // Sometimes there are no options
+      .filter((value) => !!value)
+      .map((value) => {
+        // generate random color for multiSelect type
+        const randomColor = multiSelectColors[Math.floor(Math.random() * multiSelectColors.length)];
+
+        return {
+          id: uuid.v4(),
+          color: randomColor,
+          value
+        };
+      });
+
+    return { ...defaultProps, options, type: 'multiSelect' };
+  }
 
   if (propValues.some((p) => p.includes('|'))) {
     const allMultiSelectValues = csvData.map((result) => result[prop].split('|')).flat();
@@ -83,28 +110,28 @@ export const createNewPropertiesForBoard = (csvData: Record<string, string>[], p
         };
       });
 
-    return { ...defaultProps, options, type: 'multiSelect' as PropertyType };
+    return { ...defaultProps, options, type: 'multiSelect' };
   }
   if (propValues.every((p) => uuid.validate(p))) {
-    return { ...defaultProps, type: 'person' as PropertyType };
+    return { ...defaultProps, type: 'person' };
   }
   if (propValues.some((p) => monthNames.find((month) => p.includes(month)))) {
-    return { ...defaultProps, type: 'date' as PropertyType };
+    return { ...defaultProps, type: 'date' };
   }
   if (propValues.every((p) => !Number.isNaN(+p))) {
-    return { ...defaultProps, type: 'number' as PropertyType };
+    return { ...defaultProps, type: 'number' };
   }
   if (propValues.some((p) => p.startsWith('http') || p.startsWith('www.'))) {
-    return { ...defaultProps, type: 'url' as PropertyType };
+    return { ...defaultProps, type: 'url' };
   }
   if (propValues.some((p) => emailReg.test(p))) {
-    return { ...defaultProps, type: 'email' as PropertyType };
+    return { ...defaultProps, type: 'email' };
   }
   if (propValues.some((p) => p === 'true' || p === 'false')) {
-    return { ...defaultProps, type: 'checkbox' as PropertyType };
+    return { ...defaultProps, type: 'checkbox' };
   }
 
-  return { ...defaultProps, type: 'text' as PropertyType };
+  return { ...defaultProps, type: 'text' };
 };
 
 export const createCardFieldProperties = (
@@ -158,7 +185,7 @@ export const createCardFieldProperties = (
 
     if (
       mappedBoardProperties[key]?.type !== 'select' ||
-      mappedBoardProperties[key]?.type !== 'multiselect' ||
+      mappedBoardProperties[key]?.type !== 'multiSelect' ||
       mappedBoardProperties[key]?.type !== 'person'
     ) {
       return {
