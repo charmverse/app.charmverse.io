@@ -1,4 +1,3 @@
-import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import type { Page, Prisma } from '@prisma/client';
 
 export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
@@ -1134,8 +1133,10 @@ export type CreatePageInput = {
 };
 
 export interface ChildBlockListResponse {
-  request: ListBlockChildrenParameters;
+  block_id: string;
   results: BlockObjectResponse[];
   next_cursor: string | null;
 }
-export type BlockWithChildren = BlockObjectResponse & { children: string[]; pageId: string };
+
+export type BlockWithChildren = BlockObjectResponse & { children: string[] };
+export type BlocksRecord = Record<string, BlockWithChildren>;

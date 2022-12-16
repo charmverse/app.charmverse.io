@@ -46,6 +46,8 @@ export class NotionCache {
 
   linkedPages: Record<string, string> = {};
 
+  createdCharmversePageIds: Set<string> = new Set();
+
   focalboardRecord: Record<
     string,
     {

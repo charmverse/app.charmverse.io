@@ -1,5 +1,4 @@
 import type { Client } from '@notionhq/client';
-import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
 import type { PageType } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -15,9 +14,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { isTruthy } from 'lib/utilities/types';
 import type {
-  PageContent,
   BlockNode,
   CalloutNode,
   ColumnBlockNode,
@@ -25,6 +22,7 @@ import type {
   DisclosureDetailsNode,
   ListItemNode,
   MentionNode,
+  PageContent,
   TableNode,
   TableRowNode
 } from 'models';
@@ -33,19 +31,10 @@ import { convertPropertyType } from '../convertPropertyType';
 import { convertRichText } from '../convertRichText';
 import { convertToPlainText } from '../convertToPlainText';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type {
-  CreatePageInput,
-  GetDatabaseResponse,
-  BlockWithChildren,
-  ChildBlockListResponse,
-  RichTextItemResponse
-} from '../types';
+import type { BlockWithChildren, CreatePageInput, GetDatabaseResponse, RichTextItemResponse } from '../types';
 
 import type { NotionCache } from './NotionCache';
 import type { NotionPageFetcher } from './NotionPageFetcher';
-
-const BlocksWithChildrenRegex =
-  /(heading_1|heading_2|heading_3|table|toggle|bulleted_list_item|callout|numbered_list_item|to_do|quote|column_list|column)/;
 
 export class InMemoryRepresentation {
   cache: NotionCache;
@@ -202,7 +191,6 @@ export class InMemoryRepresentation {
       pagesWithoutIntegrationAccess,
       populateFailedImportRecord
     } = this.cache;
-    const { blocksPerRequest, getChildren } = this.fetcher;
     const { createCharmverseDatabasePageInMemory, createCharmversePageInMemory } = this;
 
     // The last item of the pageIds is the notion block id and the optimistic charmverse page id
@@ -218,91 +206,10 @@ export class InMemoryRepresentation {
       content: []
     };
 
-    // Array to store parameters for further requests to retrieve children blocks
-    let listBlockChildrenParameters: ListBlockChildrenParameters[] = [
-      {
-        block_id: notionPageId,
-        page_size: blocksPerRequest
-      }
-    ];
-
-    async function getListBlockChildrenResponses(): Promise<ChildBlockListResponse[]> {
-      const childBlockListResponses = await Promise.all(
-        listBlockChildrenParameters.map((listBlockChildrenParameter) => getChildren(listBlockChildrenParameter))
-      ).then((_results) => _results.filter(isTruthy));
-
-      // Reset the requests as they've all been fetched
-      listBlockChildrenParameters = [];
-
-      childBlockListResponses.forEach((childBlockListResponse) => {
-        // If next_cursor exist then this block contains more child blocks
-        if (childBlockListResponse.next_cursor) {
-          listBlockChildrenParameters.push({
-            // Using the request.block_id to get the block's parent id
-            block_id: childBlockListResponse.request.block_id,
-            page_size: blocksPerRequest,
-            start_cursor: childBlockListResponse.next_cursor
-          });
-        }
-      });
-
-      return childBlockListResponses;
-    }
-
     // notion.pages.retrieve will return an error if the integration doesn't have access to the page
     try {
       await this.fetcher.retrievePage(notionPageId);
       const notionPage = notionPagesRecord[notionPageId];
-
-      // We allow a maximum of `MAX_CHILD_BLOCK_DEPTH` level of nested contents
-      // Blocks like callout, quote, all forms of list allow other blocks to be nested inside them
-      for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
-        // While there are more children to be fetched
-        if (listBlockChildrenParameters.length !== 0) {
-          log.debug(`[notion] - ${listBlockChildrenParameters.length} Requests for child blocks at depth: ${depth}`);
-
-          const childBlockListResponses = await getListBlockChildrenResponses();
-
-          // If the block has more child to be fetch, this will be true
-          while (listBlockChildrenParameters.length !== 0) {
-            childBlockListResponses.push(...(await getListBlockChildrenResponses()));
-          }
-
-          // Reset the requests as they've all been fetched
-          listBlockChildrenParameters = [];
-
-          // Now that all child content has been fetched, we need to check if any of the child block has children or not
-          // Go through each of the block and add them to the record
-          // eslint-disable-next-line
-          childBlockListResponses.forEach((childBlockListResponse) => {
-            childBlockListResponse.results.forEach((block) => {
-              const blockWithChildren: BlockWithChildren = {
-                ...block,
-                children: [],
-                pageId: notionPageId
-              };
-              blocksRecord[block.id] = blockWithChildren;
-              if (depth !== 0) {
-                // Add the current block's id to its parent's `children` array
-                blocksRecord[childBlockListResponse.request.block_id].children.push(block.id);
-              } else {
-                // Only push the top level blocks to the array
-                blocks.push(blockWithChildren);
-              }
-
-              // If the block has children then we need to fetch them as well
-              if (block.type.match(BlocksWithChildrenRegex) && block.has_children) {
-                listBlockChildrenParameters.push({
-                  block_id: block.id,
-                  page_size: blocksPerRequest
-                });
-              }
-            });
-          });
-        } else {
-          break;
-        }
-      }
 
       for (let index = 0; index < blocks.length; index++) {
         try {
