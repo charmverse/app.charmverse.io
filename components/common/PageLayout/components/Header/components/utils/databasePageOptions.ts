@@ -28,7 +28,21 @@ export const monthNames = [
   'December'
 ];
 
-export const multiSelectColors = Object.keys(focalboardColorsMap);
+export const selectColors = Object.keys(focalboardColorsMap);
+
+export const createBoardPropertyOptions = (arr: string[]): IPropertyTemplate['options'] =>
+  arr
+    .filter((value) => !!value)
+    .map((value) => {
+      // generate random color for multiSelect type
+      const randomColor = selectColors[Math.floor(Math.random() * selectColors.length)];
+
+      return {
+        id: uuid.v4(),
+        color: randomColor,
+        value
+      };
+    });
 
 export const isValidCsvResult = (results: ParseResult<unknown>): results is ParseResult<Record<string, string>> => {
   if (
@@ -70,45 +84,21 @@ export const createNewPropertiesForBoard = (
   // eslint-disable-next-line
   const emailReg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
-  // Create select property for the new board. The new values and the old values will be merged later.
-  if (existingBoardProp && existingBoardProp.type === 'select') {
-    const allMultiSelectValues = csvData
+  // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
+  if (existingBoardProp && (existingBoardProp.type === 'select' || existingBoardProp.type === 'multiSelect')) {
+    const newSelectValues = csvData
       .map((result) => result[prop])
       .filter((option) => !!option && !existingBoardProp.options[option]);
 
-    const options: IPropertyTemplate['options'] = allMultiSelectValues
-      // Sometimes there are no options
-      .filter((value) => !!value)
-      .map((value) => {
-        // generate random color for multiSelect type
-        const randomColor = multiSelectColors[Math.floor(Math.random() * multiSelectColors.length)];
+    const options = createBoardPropertyOptions(newSelectValues);
 
-        return {
-          id: uuid.v4(),
-          color: randomColor,
-          value
-        };
-      });
-
-    return { ...defaultProps, options, type: 'multiSelect' };
+    return { ...defaultProps, options, type: existingBoardProp.type };
   }
 
   if (propValues.some((p) => p.includes('|'))) {
     const allMultiSelectValues = csvData.map((result) => result[prop].split('|')).flat();
     const uniqueMultiSelectValues = [...new Set(allMultiSelectValues)];
-    const options: IPropertyTemplate['options'] = uniqueMultiSelectValues
-      // Sometimes there are no options
-      .filter((value) => !!value)
-      .map((value) => {
-        // generate random color for multiSelect type
-        const randomColor = multiSelectColors[Math.floor(Math.random() * multiSelectColors.length)];
-
-        return {
-          id: uuid.v4(),
-          color: randomColor,
-          value
-        };
-      });
+    const options = createBoardPropertyOptions(uniqueMultiSelectValues);
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }

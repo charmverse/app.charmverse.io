@@ -200,6 +200,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           if (results.errors && results.errors[0]) {
             showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'error');
             setIsLoadingCsv(false);
+            closeMenu();
             return;
           }
           if (isValidCsvResult(results)) {
