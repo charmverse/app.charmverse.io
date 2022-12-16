@@ -405,6 +405,11 @@ class CharmClient {
     updater([fbBlock]);
   }
 
+  async updateBlock(blockInput: FBBlock) {
+    const newBlock = this.fbBlockToBlock(blockInput);
+    return http.PUT<Block[]>('/api/blocks', [newBlock]);
+  }
+
   async patchBlocks(_blocks: FBBlock[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
     const updatedBlockInput = _blocks.map((currentFBBlock, i) => {
       const { deletedFields = [], updatedFields = {}, ...updates } = blockPatches[i];
