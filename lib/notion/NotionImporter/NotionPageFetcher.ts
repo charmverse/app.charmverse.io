@@ -28,19 +28,29 @@ export class NotionPageFetcher {
 
   workspacePageId: string;
 
+  userId: string;
+
+  spaceId: string;
+
   constructor({
     client,
     blocksPerRequest = 100,
     totalImportedPagesLimit = 10000,
     maxChildBlockDepth = 10,
-    cache
+    cache,
+    spaceId,
+    userId
   }: {
+    userId: string;
+    spaceId: string;
     client: Client;
     cache: NotionCache;
     maxChildBlockDepth?: number;
     blocksPerRequest?: number;
     totalImportedPagesLimit?: number;
   }) {
+    this.userId = userId;
+    this.spaceId = spaceId;
     this.cache = cache;
     this.client = client;
     this.blocksPerRequest = blocksPerRequest;
@@ -52,17 +62,7 @@ export class NotionPageFetcher {
   /**
    * Fetch accessible notion pages
    */
-  async fetchAndCreatePages({
-    spaceId,
-    userId,
-    workspaceIcon,
-    workspaceName
-  }: {
-    spaceId: string;
-    userId: string;
-    workspaceName: string;
-    workspaceIcon: string;
-  }) {
+  async fetchAndCreatePages({ workspaceIcon, workspaceName }: { workspaceName: string; workspaceIcon: string }) {
     const { notionPagesRecord } = this.cache;
     let searchResult = await this.client.search({
       page_size: this.blocksPerRequest
@@ -87,8 +87,8 @@ export class NotionPageFetcher {
     });
 
     await createPrismaPage({
-      createdBy: userId,
-      spaceId,
+      createdBy: this.userId,
+      spaceId: this.spaceId,
       id: this.workspacePageId,
       title: workspaceName,
       icon: workspaceIcon
@@ -98,9 +98,7 @@ export class NotionPageFetcher {
       // Only create the root-level pages first
       if (notionPage.parent.type === 'workspace') {
         await this.fetchAndCreatePage({
-          notionPageId: notionPage.id,
-          spaceId,
-          userId
+          notionPageId: notionPage.id
         });
       }
     }
@@ -108,13 +106,9 @@ export class NotionPageFetcher {
 
   async fetchAndCreatePage({
     notionPageId,
-    spaceId,
-    userId,
     properties
   }: {
     notionPageId: string;
-    spaceId: string;
-    userId: string;
     properties?: Record<string, IPropertyTemplate>;
   }): Promise<Page> {
     const notionPage = this.cache.notionPagesRecord[notionPageId];
@@ -126,8 +120,8 @@ export class NotionPageFetcher {
         blocksRecord,
         topLevelBlockIds,
         notionPageId,
-        spaceId,
-        userId,
+        spaceId: this.spaceId,
+        userId: this.userId,
         cache: this.cache,
         fetcher: this
       });
@@ -139,8 +133,8 @@ export class NotionPageFetcher {
       const databasePageCreator = new DatabasePageCreator({
         pageIds,
         notionPageId,
-        spaceId,
-        userId,
+        spaceId: this.spaceId,
+        userId: this.userId,
         cache: this.cache,
         fetcher: this
       });

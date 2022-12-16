@@ -40,10 +40,6 @@ export type DatabasePageItem = {
 export class NotionCache {
   notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
 
-  spaceId: string;
-
-  userId: string;
-
   charmversePagesRecord: Record<string, CreatePageInput> = {};
 
   pagesRecord: Map<string, DatabasePageItem | RegularPageItem> = new Map();
@@ -59,11 +55,6 @@ export class NotionCache {
       blocks: [string, number][][];
     }
   > = {};
-
-  constructor({ spaceId, userId }: { userId: string; spaceId: string }) {
-    this.userId = userId;
-    this.spaceId = spaceId;
-  }
 
   populateFailedImportRecord(failedImportBlocks: [string, number][][], block: GetPageResponse | GetDatabaseResponse) {
     let title = '';

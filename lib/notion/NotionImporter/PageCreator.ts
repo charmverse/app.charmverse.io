@@ -87,9 +87,7 @@ export class PageCreator {
       notionPage.parent.type !== 'workspace'
         ? await this.fetcher.fetchAndCreatePage({
             notionPageId:
-              notionPage.parent.type === 'database_id' ? notionPage.parent.database_id : notionPage.parent.page_id,
-            spaceId: this.spaceId,
-            userId: this.userId
+              notionPage.parent.type === 'database_id' ? notionPage.parent.database_id : notionPage.parent.page_id
           })
         : null;
 
@@ -220,9 +218,7 @@ export class PageCreator {
         const mentionNode = contents[index] as MentionNode;
         if (mentionNode.attrs.type === 'page') {
           const createdPage = await this.fetcher.fetchAndCreatePage({
-            notionPageId: mentionNode.attrs.value,
-            spaceId: this.spaceId,
-            userId: this.userId
+            notionPageId: mentionNode.attrs.value
           });
           modifiedContent[index] = {
             attrs: {
@@ -250,7 +246,6 @@ export class PageCreator {
           const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
           if (childIds.length !== 0) {
-            // Toggle list heading 1
             const disclosureDetailsNode: DisclosureDetailsNode = {
               type: 'disclosureDetails',
               content: [
@@ -281,7 +276,6 @@ export class PageCreator {
           }
         }
         case 'toggle': {
-          // TODO: Linked page support
           const contents = convertRichText(block.toggle.rich_text);
           const childIds = block.children;
           const { childContent, content } = await this.populatePageContent({ childIds, contents });
@@ -308,8 +302,6 @@ export class PageCreator {
         case 'paragraph': {
           const contents = convertRichText(block[block.type].rich_text);
           const { content } = await this.populatePageContent({ contents });
-          // await createInlinePageLinks(inlineLinkedPages);
-
           return {
             type: 'paragraph',
             content
@@ -513,8 +505,6 @@ export class PageCreator {
               };
             }
             const charmversePage = await this.fetcher.fetchAndCreatePage({
-              spaceId: this.spaceId,
-              userId: this.userId,
               notionPageId: linkedPageId
             });
             return {
@@ -532,8 +522,6 @@ export class PageCreator {
         case 'child_page': {
           try {
             const charmversePage = await this.fetcher.fetchAndCreatePage({
-              spaceId: this.spaceId,
-              userId: this.userId,
               notionPageId: block.id
             });
 

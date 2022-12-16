@@ -1,9 +1,4 @@
-import { Client } from '@notionhq/client';
-
-import log from 'lib/log';
-
-import { NotionCache } from './NotionImporter/NotionCache';
-import { NotionPageFetcher } from './NotionImporter/NotionPageFetcher';
+import { NotionImporter } from './NotionImporter/NotionImporter';
 
 export async function importFromWorkspace({
   workspaceName,
@@ -18,15 +13,13 @@ export async function importFromWorkspace({
   workspaceName: string;
   workspaceIcon: string;
 }) {
-  const client = new Client({
-    auth: accessToken
+  const notionImporter = new NotionImporter({
+    accessToken,
+    spaceId,
+    userId
   });
 
-  const notionCache = new NotionCache({ spaceId, userId });
-  const notionPageFetcher = new NotionPageFetcher({ client, cache: notionCache });
-  await notionPageFetcher.fetchAndCreatePages({
-    spaceId,
-    userId,
+  await notionImporter.import({
     workspaceName,
     workspaceIcon
   });

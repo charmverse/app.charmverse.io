@@ -59,9 +59,7 @@ export class DatabasePageCreator {
       const parentPage =
         notionPage.parent.type !== 'workspace'
           ? await this.fetcher.fetchAndCreatePage({
-              notionPageId: notionPage.parent.page_id,
-              spaceId: this.spaceId,
-              userId: this.userId
+              notionPageId: notionPage.parent.page_id
             })
           : null;
 
@@ -129,8 +127,6 @@ export class DatabasePageCreator {
       for (const pageId of pageIds) {
         await this.fetcher.fetchAndCreatePage({
           notionPageId: pageId,
-          spaceId: this.spaceId,
-          userId: this.userId,
           properties: pageRecordProperties
         });
       }
