@@ -1,5 +1,8 @@
+import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -60,11 +63,13 @@ export default function ForumPage() {
       <Typography variant='h1' mb={2}>
         Forum
       </Typography>
-      {/** Re-enable once we support searching for posts
-             <TextField
+
+      <TextField
         variant='outlined'
         placeholder='Search Posts, Comments and Members'
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
         fullWidth
         sx={{ padding: '20px 0' }}
         InputProps={{
@@ -75,7 +80,6 @@ export default function ForumPage() {
           )
         }}
       />
-         */}
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ xs: 'block', lg: 'none' }}>
