@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
-import { createFormResposnseCard } from 'lib/pages/createFormResponseCard';
+import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 
@@ -40,7 +40,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
   const body: AddFormResponseInput = req.body;
 
   await validateFormRequestInput({ spaceId, databaseIdOrPath: id as string, data: body });
-  const card = await createFormResposnseCard({
+  const card = await createFormResponseCard({
     spaceId,
     databaseIdorPath: id as string,
     data: body,
