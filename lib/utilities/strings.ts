@@ -128,3 +128,8 @@ export function conditionalPlural({ word = '', count = 1 }: { word: string; coun
 export function lowerCaseEqual(firstString?: string | null, secondString?: string | null): boolean {
   return firstString?.toLowerCase() === secondString?.toLowerCase();
 }
+
+// ref: https://stackoverflow.com/questions/6300183/sanitize-string-of-regex-characters-before-regexp-build
+export function sanitizeForRegex(string: string) {
+  return string.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
+}
