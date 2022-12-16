@@ -1,6 +1,9 @@
 import type { Page, Prisma } from '@prisma/client';
 
-import type { GetDatabaseResponse, GetPageResponse, BlockObjectResponse } from '../types';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+
+import { convertToPlainText } from '../convertToPlainText';
+import type { BlocksRecord, GetDatabaseResponse, GetPageResponse } from '../types';
 
 type CreatePageInput = {
   id: string;
@@ -16,11 +19,23 @@ type CreatePageInput = {
   cardId?: string;
 };
 
-type BlockWithChildren = BlockObjectResponse & { children: string[]; pageId: string };
+export type RegularPageItem = {
+  charmversePage?: Page;
+  notionPage: {
+    topLevelBlockIds: string[];
+    blocksRecord: BlocksRecord;
+  };
+  type: 'page';
+};
 
-function convertToPlainText(chunks: { plain_text: string }[]) {
-  return chunks.reduce((prev: string, cur: { plain_text: string }) => prev + cur.plain_text, '');
-}
+export type DatabasePageItem = {
+  charmversePage?: Page;
+  notionPage?: {
+    pageIds: string[];
+    properties: Record<string, IPropertyTemplate>;
+  };
+  type: 'database';
+};
 
 export class NotionCache {
   notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
@@ -29,33 +44,9 @@ export class NotionCache {
 
   userId: string;
 
-  notionPages: (GetPageResponse | GetDatabaseResponse)[] = [];
-
   charmversePagesRecord: Record<string, CreatePageInput> = {};
 
-  charmverseCardsRecord: Record<
-    string,
-    {
-      card: Prisma.BlockCreateManyInput;
-      page: CreatePageInput;
-      notionPageId: string;
-    }
-  > = {};
-
-  blocksRecord: Record<string, BlockWithChildren> = {};
-
-  linkedPages: Record<string, string> = {};
-
-  createdCharmversePageIds: Set<string> = new Set();
-
-  focalboardRecord: Record<
-    string,
-    {
-      board: Prisma.BlockCreateManyInput;
-      view: Prisma.BlockCreateManyInput;
-      properties: Record<string, string>;
-    }
-  > = {};
+  pagesRecord: Map<string, DatabasePageItem | RegularPageItem> = new Map();
 
   pagesWithoutIntegrationAccess: Set<string> = new Set();
 

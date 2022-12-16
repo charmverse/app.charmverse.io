@@ -3,13 +3,15 @@ import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
-import { convertToPlainText } from '../convertToPlainText';
+import { convertPropertyType } from '../convertPropertyType';
 import { createPrismaPage } from '../createPrismaPage';
 import type { BlocksRecord, ChildBlockListResponse, GetDatabaseResponse, GetPageResponse } from '../types';
 
-import type { NotionCache } from './NotionCache';
+import { DatabasePageCreator } from './DatabasePageCreator';
+import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
 import { PageCreator } from './PageCreator';
 
 export class NotionPageFetcher {
@@ -57,11 +59,12 @@ export class NotionPageFetcher {
     workspaceName: string;
     workspaceIcon: string;
   }) {
-    const { notionPagesRecord, notionPages = [] } = this.cache;
+    const { notionPagesRecord } = this.cache;
     let searchResult = await this.client.search({
       page_size: this.blocksPerRequest
     });
 
+    const notionPages: (GetPageResponse | GetDatabaseResponse)[] = [];
     notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
 
     // Store all the pages/databases the integration fetched in a record
@@ -89,13 +92,15 @@ export class NotionPageFetcher {
     });
 
     for (const notionPage of notionPages) {
-      const createdPage = await this.fetchAndCreatePage({
-        notionPageId: notionPage.id,
-        spaceId,
-        userId,
-        parentId: workspacePage.id
-      });
-      this.cache.createdCharmversePageIds.add(createdPage.id);
+      // Only create the root-level pages first
+      if (notionPage.parent.type === 'workspace') {
+        await this.fetchAndCreatePage({
+          notionPageId: notionPage.id,
+          spaceId,
+          userId,
+          charmverseParentPageId: workspacePage.id
+        });
+      }
     }
   }
 
@@ -103,67 +108,180 @@ export class NotionPageFetcher {
     notionPageId,
     spaceId,
     userId,
-    parentId
+    charmverseParentPageId,
+    properties
   }: {
     notionPageId: string;
     spaceId: string;
     userId: string;
-    parentId: string;
+    charmverseParentPageId: string;
+    properties?: Record<string, IPropertyTemplate>;
   }) {
     const notionPage = this.cache.notionPagesRecord[notionPageId];
-    const [firstLevelBlocks, blocksRecord] = await this.fetchNotionPageChildBlocks(notionPageId);
-    const pageCreator = new PageCreator({
-      blocksRecord,
-      firstLevelBlocks,
-      notionPageId
-    });
+    // Regular page
+    if (notionPage.object === 'page') {
+      const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
 
-    const pageTitleRichText = Object.values(notionPage.properties).find((property) => property.type === 'title')?.title;
-    return pageCreator.create({
-      spaceId,
-      userId,
-      parentId,
-      title: pageTitleRichText ? convertToPlainText(pageTitleRichText) : 'Untitled',
-      icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : ''
-    });
+      const pageCreator = new PageCreator({
+        blocksRecord,
+        topLevelBlockIds,
+        notionPageId,
+        spaceId,
+        userId,
+        cache: this.cache,
+        fetcher: this
+      });
+
+      return pageCreator.create({ charmverseParentPageId, properties });
+    } else {
+      const { pageIds, properties: databaseProperties } = await this.fetchNotionDatabaseChildPages({ notionPageId });
+
+      const databasePageCreator = new DatabasePageCreator({
+        pageIds,
+        notionPageId,
+        spaceId,
+        userId,
+        cache: this.cache,
+        fetcher: this
+      });
+
+      const databasePage = await databasePageCreator.create({ charmverseParentPageId });
+      for (const pageId of pageIds) {
+        await this.fetchAndCreatePage({
+          charmverseParentPageId: databasePage.id,
+          notionPageId: pageId,
+          spaceId,
+          userId,
+          properties: databaseProperties
+        });
+      }
+      return databasePage;
+    }
   }
 
-  async fetchNotionPageChildBlocks(pageId: string) {
-    const blocksRecord: BlocksRecord = {};
+  private async fetchNotionPageChildBlocks(notionPageId: string): Promise<Required<RegularPageItem>['notionPage']> {
+    const pageRecord = this.cache.pagesRecord.get(notionPageId);
+    if (!pageRecord?.notionPage) {
+      const blocksRecord: BlocksRecord = {};
+      const { blockChildrenRecord, blocksRecord: nestedBlocksRecord } = await this.fetchNestedChildBlocks([
+        notionPageId
+      ]);
 
-    const { blockChildrenRecord, blocksRecord: nestedBlocksRecord } = await this.fetchNestedChildBlocks([pageId]);
-
-    const firstLevelBlocks: string[] = Object.keys(nestedBlocksRecord);
-    blockChildrenRecord[pageId].forEach((childId) => {
-      blocksRecord[childId] = nestedBlocksRecord[childId];
-    });
-
-    let previousBlocks = [...firstLevelBlocks];
-
-    for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
-      const { blockChildrenRecord: internalBlockChildrenRecord, blocksRecord: internalBlocksRecord } =
-        await this.fetchNestedChildBlocks(previousBlocks);
-
-      // Store the children id in blocks record
-      previousBlocks.forEach((parentBlockId) => {
-        blocksRecord[parentBlockId] = {
-          ...blocksRecord[parentBlockId],
-          children: internalBlockChildrenRecord[parentBlockId]
-        };
+      const topLevelBlockIds: string[] = Object.keys(nestedBlocksRecord);
+      blockChildrenRecord[notionPageId].forEach((childId) => {
+        blocksRecord[childId] = nestedBlocksRecord[childId];
       });
 
-      previousBlocks = Object.keys(internalBlocksRecord);
+      let previousBlocks = [...topLevelBlockIds];
 
-      previousBlocks.forEach((previousBlockId) => {
-        blocksRecord[previousBlockId] = internalBlocksRecord[previousBlockId];
-      });
+      for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
+        const { blockChildrenRecord: internalBlockChildrenRecord, blocksRecord: internalBlocksRecord } =
+          await this.fetchNestedChildBlocks(previousBlocks);
 
-      if (!previousBlocks.length) {
-        break;
+        // Store the children id in blocks record
+        previousBlocks.forEach((parentBlockId) => {
+          blocksRecord[parentBlockId] = {
+            ...blocksRecord[parentBlockId],
+            children: internalBlockChildrenRecord[parentBlockId]
+          };
+        });
+
+        previousBlocks = Object.keys(internalBlocksRecord);
+
+        previousBlocks.forEach((previousBlockId) => {
+          blocksRecord[previousBlockId] = internalBlocksRecord[previousBlockId];
+        });
+
+        if (!previousBlocks.length) {
+          break;
+        }
       }
+
+      this.cache.pagesRecord.set(notionPageId, {
+        ...pageRecord,
+        notionPage: {
+          topLevelBlockIds,
+          blocksRecord
+        },
+        type: 'page'
+      });
+
+      return {
+        topLevelBlockIds,
+        blocksRecord
+      };
+    }
+    return pageRecord.notionPage as Required<RegularPageItem>['notionPage'];
+  }
+
+  private async fetchNotionDatabaseChildPages({
+    notionPageId
+  }: {
+    notionPageId: string;
+  }): Promise<Required<DatabasePageItem>['notionPage']> {
+    const pageRecord = this.cache.pagesRecord.get(notionPageId);
+    const notionPage = this.cache.notionPagesRecord[notionPageId] as GetDatabaseResponse;
+    if (!pageRecord?.notionPage) {
+      const pageIds: string[] = [];
+      let databaseQueryResponse = await this.client.databases.query({ database_id: notionPageId });
+      databaseQueryResponse.results.forEach((page) => {
+        this.cache.notionPagesRecord[page.id] = page as GetPageResponse | GetDatabaseResponse;
+        pageIds.push(page.id);
+      });
+
+      while (databaseQueryResponse.has_more) {
+        databaseQueryResponse = await this.client.databases.query({
+          database_id: notionPageId,
+          start_cursor: databaseQueryResponse.next_cursor ?? undefined
+        });
+        databaseQueryResponse.results.forEach((page) => {
+          this.cache.notionPagesRecord[page.id] = page as GetPageResponse | GetDatabaseResponse;
+          pageIds.push(page.id);
+        });
+      }
+
+      const databaseProperties = Object.values(notionPage.properties);
+      const boardPropertiesRecord: Record<string, IPropertyTemplate> = {};
+
+      databaseProperties.forEach((property) => {
+        const propertyType = convertPropertyType(property.type);
+        if (propertyType) {
+          const cardProperty: IPropertyTemplate = {
+            id: v4(),
+            name: property.name,
+            options: [],
+            type: propertyType
+          };
+
+          boardPropertiesRecord[property.id] = cardProperty;
+          if (property.type === 'select' || property.type === 'multi_select') {
+            (property as any)[property.type].options.forEach((option: { id: string; name: string; color: string }) => {
+              cardProperty.options.push({
+                value: option.name,
+                color: `propColor${option.color.charAt(0).toUpperCase() + option.color.slice(1)}`,
+                id: option.id
+              });
+            });
+          }
+        }
+      });
+
+      this.cache.pagesRecord.set(notionPageId, {
+        ...pageRecord,
+        notionPage: {
+          pageIds,
+          properties: boardPropertiesRecord
+        },
+        type: 'database'
+      });
+
+      return {
+        properties: boardPropertiesRecord,
+        pageIds
+      };
     }
 
-    return [firstLevelBlocks, blocksRecord] as const;
+    return pageRecord.notionPage as Required<DatabasePageItem>['notionPage'];
   }
 
   async fetchNestedChildBlocks(parentBlockIds: string[]) {
@@ -238,7 +356,6 @@ export class NotionPageFetcher {
         page_id: notionPageId
       })) as unknown as GetPageResponse;
       this.cache.notionPagesRecord[notionPageId] = pageResponse;
-      this.cache.notionPages.push(pageResponse);
       log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
     }
   }
@@ -249,7 +366,6 @@ export class NotionPageFetcher {
         database_id: notionDatabasePageId
       })) as GetDatabaseResponse;
       this.cache.notionPagesRecord[notionDatabasePageId] = databasePage;
-      this.cache.notionPages.push(databasePage);
       log.debug(`[notion]: Retrieved database ${notionDatabasePageId} manually`);
     }
   }

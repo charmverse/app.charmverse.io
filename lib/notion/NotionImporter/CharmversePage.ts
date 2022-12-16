@@ -20,46 +20,6 @@ export class CharmversePageCreator {
     this.fetcher = fetcher;
   }
 
-  async createCharmversePage(notionPageId: string, parentId?: string | null) {
-    try {
-      await createPrismaPage({
-        ...this.cache.charmversePagesRecord[notionPageId],
-        parentId
-      });
-      this.createdCharmversePageIds.add(notionPageId);
-    } catch (_) {
-      log.debug(`Error creating charmverse page ${notionPageId}`);
-      if (!this.cache.failedImportsRecord[notionPageId]) {
-        this.cache.failedImportsRecord[this.cache.notionPagesRecord[notionPageId].id] =
-          this.cache.populateFailedImportRecord([], this.cache.notionPagesRecord[notionPageId]);
-      }
-    }
-  }
-
-  async createCharmverseDatabasePage(notionPageId: string, parentId?: string | null) {
-    try {
-      await createPrismaPage({
-        ...this.cache.charmversePagesRecord[notionPageId],
-        parentId
-      });
-
-      const charmverseDatabasePage = this.cache.charmversePagesRecord[notionPageId];
-      if (charmverseDatabasePage && charmverseDatabasePage.boardId) {
-        const { board, view } = this.cache.focalboardRecord[charmverseDatabasePage.boardId];
-        await prisma.block.createMany({
-          data: [view, board]
-        });
-      }
-      this.createdCharmversePageIds.add(notionPageId);
-    } catch (_) {
-      log.debug(`Error creating charmverse database page ${notionPageId}`);
-      if (!this.cache.failedImportsRecord[notionPageId]) {
-        this.cache.failedImportsRecord[this.cache.notionPagesRecord[notionPageId].id] =
-          this.cache.populateFailedImportRecord([], this.cache.notionPagesRecord[notionPageId]);
-      }
-    }
-  }
-
   async createCharmversePageFromNotionPage(
     workspacePageId: string,
     rootParentId: string,
