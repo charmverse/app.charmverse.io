@@ -116,7 +116,7 @@ export class NotionPageFetcher {
     spaceId: string;
     userId: string;
     properties?: Record<string, IPropertyTemplate>;
-  }): Promise<undefined | Page> {
+  }): Promise<Page> {
     const notionPage = this.cache.notionPagesRecord[notionPageId];
     // Regular page
     if (notionPage.object === 'page') {

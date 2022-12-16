@@ -15,9 +15,11 @@ import type {
   ColumnLayoutNode,
   DisclosureDetailsNode,
   ListItemNode,
+  MentionNode,
   PageContent,
   TableNode,
-  TableRowNode
+  TableRowNode,
+  TextContent
 } from 'models';
 
 import { convertRichText } from '../convertRichText';
@@ -197,6 +199,45 @@ export class PageCreator {
     }
   }
 
+  private async populatePageContent({
+    childIds = [],
+    contents = []
+  }: {
+    contents?: (TextContent | MentionNode)[];
+    childIds?: string[];
+  }) {
+    const childContent: any[] = [];
+    const modifiedContent: (MentionNode | TextContent)[] = [...contents];
+    for (let index = 0; index < childIds.length; index++) {
+      const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
+      if (blockNode) {
+        childContent.push(blockNode);
+      }
+    }
+
+    for (let index = 0; index < contents.length; index++) {
+      if (contents[index].type === 'mention') {
+        const mentionNode = contents[index] as MentionNode;
+        if (mentionNode.attrs.type === 'page') {
+          const createdPage = await this.fetcher.fetchAndCreatePage({
+            notionPageId: mentionNode.attrs.value,
+            spaceId: this.spaceId,
+            userId: this.userId
+          });
+          modifiedContent[index] = {
+            attrs: {
+              type: 'page',
+              value: createdPage.id
+            },
+            type: 'mention'
+          };
+        }
+      }
+    }
+
+    return { childContent, content: modifiedContent };
+  }
+
   private async populatePage(block: BlockWithChildren) {
     try {
       switch (block.type) {
@@ -204,8 +245,10 @@ export class PageCreator {
         case 'heading_2':
         case 'heading_3': {
           const level = Number(block.type.split('_')[1]);
-          const { contents, inlineLinkedPages } = convertRichText((block as any)[block.type].rich_text);
+          const contents = convertRichText((block as any)[block.type].rich_text);
           const childIds = block.children;
+          const { childContent, content } = await this.populatePageContent({ childIds, contents });
+
           if (childIds.length !== 0) {
             // Toggle list heading 1
             const disclosureDetailsNode: DisclosureDetailsNode = {
@@ -219,35 +262,30 @@ export class PageCreator {
                       attrs: {
                         level
                       },
-                      content: contents
+                      content
                     }
                   ]
-                }
+                },
+                ...childContent
               ]
             };
-
-            for (let index = 0; index < childIds.length; index++) {
-              const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-              if (blockNode) {
-                disclosureDetailsNode.content.push(blockNode);
-              }
-            }
             return disclosureDetailsNode;
           } else {
-            // Regular heading 1
             return {
               type: 'heading',
               attrs: {
                 level
               },
-              content: contents
+              content
             };
           }
-          // await createInlinePageLinks(inlineLinkedPages);
         }
         case 'toggle': {
           // TODO: Linked page support
-          const { contents, inlineLinkedPages } = convertRichText(block.toggle.rich_text);
+          const contents = convertRichText(block.toggle.rich_text);
+          const childIds = block.children;
+          const { childContent, content } = await this.populatePageContent({ childIds, contents });
+
           const disclosureDetailsNode: DisclosureDetailsNode = {
             type: 'disclosureDetails',
             content: [
@@ -256,31 +294,25 @@ export class PageCreator {
                 content: [
                   {
                     type: 'paragraph',
-                    content: contents
-                  }
+                    content
+                  },
+                  ...childContent
                 ]
               }
             ]
           };
 
-          // await createInlinePageLinks(inlineLinkedPages);
-          const childIds = block.children;
-          for (let index = 0; index < childIds.length; index++) {
-            const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-            if (blockNode) {
-              disclosureDetailsNode.content.push(blockNode);
-            }
-          }
           return disclosureDetailsNode;
         }
 
         case 'paragraph': {
-          const { contents, inlineLinkedPages } = convertRichText(block[block.type].rich_text);
+          const contents = convertRichText(block[block.type].rich_text);
+          const { content } = await this.populatePageContent({ contents });
           // await createInlinePageLinks(inlineLinkedPages);
 
           return {
             type: 'paragraph',
-            content: contents
+            content
           };
         }
 
@@ -297,30 +329,23 @@ export class PageCreator {
             richText = block.to_do.rich_text;
           }
 
-          const { contents, inlineLinkedPages } = convertRichText(richText);
+          const contents = convertRichText(richText);
+          const childIds = block.children;
+          const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
           const listItemNode: ListItemNode = {
             type: 'listItem',
             content: [
               {
                 type: 'paragraph',
-                content: contents
-              }
+                content
+              },
+              ...childContent
             ],
             attrs: {
               todoChecked: block.type === 'to_do' ? block.to_do.checked : null
             }
           };
-
-          // await createInlinePageLinks(inlineLinkedPages);
-
-          const childIds = block.children;
-          for (let index = 0; index < childIds.length; index++) {
-            const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-            if (blockNode) {
-              listItemNode.content.push(blockNode);
-            }
-          }
 
           return {
             type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
@@ -338,7 +363,10 @@ export class PageCreator {
           } else if (block.type === 'quote') {
             richText = block.quote.rich_text;
           }
-          const { contents, inlineLinkedPages } = convertRichText(richText);
+          const contents = convertRichText(richText);
+          const childIds = block.children;
+          const { childContent, content } = await this.populatePageContent({ childIds, contents });
+
           const calloutNode = {
             type: block.type === 'callout' ? 'blockquote' : ('quote' as any),
             attrs: {
@@ -347,18 +375,11 @@ export class PageCreator {
             content: [
               {
                 type: 'paragraph',
-                content: contents
-              }
+                content
+              },
+              ...childContent
             ]
           };
-          // await createInlinePageLinks(inlineLinkedPages);
-          const childIds = block.children;
-          for (let index = 0; index < childIds.length; index++) {
-            const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-            if (blockNode) {
-              calloutNode.content.push(blockNode);
-            }
-          }
 
           return calloutNode;
         }
@@ -437,12 +458,13 @@ export class PageCreator {
                 content
               });
               for (const cell of row.table_row.cells) {
-                const { contents, inlineLinkedPages } = convertRichText(cell);
+                const contents = convertRichText(cell);
+                const { content: tableRowContent } = await this.populatePageContent({ contents });
+
                 content.push({
                   type: index === 0 ? 'table_header' : 'table_cell',
-                  content: contents
+                  content: tableRowContent
                 });
-                // await createInlinePageLinks(inlineLinkedPages);
               }
             }
           }
@@ -450,41 +472,31 @@ export class PageCreator {
         }
 
         case 'column_list': {
+          const childIds = block.children;
+          const { childContent } = await this.populatePageContent({ childIds });
           const columnLayoutNode: ColumnLayoutNode = {
             type: 'columnLayout',
-            content: []
+            content: childContent
           };
-
-          const childIds = block.children;
-          for (let index = 0; index < childIds.length; index++) {
-            const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-            if (blockNode) {
-              columnLayoutNode.content.push(blockNode);
-            }
-          }
 
           return columnLayoutNode;
         }
 
         case 'column': {
+          const childIds = block.children;
+          const { childContent } = await this.populatePageContent({ childIds });
+
           const columnBlockNode: ColumnBlockNode = {
             type: 'columnBlock',
             // This empty paragraph is necessary, otherwise charmeditor throws an error
             content: [
               {
                 type: 'paragraph',
-                content: []
+                content: childContent
               }
             ]
           };
 
-          const childIds = block.children;
-          for (let index = 0; index < childIds.length; index++) {
-            const blockNode = (await this.populatePage(this.blocksRecord[childIds[index]])) as any;
-            if (blockNode) {
-              columnBlockNode.content.push(blockNode);
-            }
-          }
           return columnBlockNode;
         }
 
@@ -516,25 +528,7 @@ export class PageCreator {
           }
         }
 
-        case 'child_database': {
-          try {
-            const charmversePage = await this.fetcher.fetchAndCreatePage({
-              spaceId: this.spaceId,
-              userId: this.userId,
-              notionPageId: block.id
-            });
-
-            return {
-              type: 'page',
-              attrs: {
-                id: charmversePage?.id
-              }
-            };
-          } catch (_) {
-            return log.debug('Error on creating child page');
-          }
-        }
-
+        case 'child_database':
         case 'child_page': {
           try {
             const charmversePage = await this.fetcher.fetchAndCreatePage({

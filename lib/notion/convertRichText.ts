@@ -2,12 +2,8 @@ import type { TextContent, MentionNode } from 'models';
 
 import type { RichTextItemResponse } from './types';
 
-export function convertRichText(richTexts: RichTextItemResponse[]): {
-  contents: (TextContent | MentionNode)[];
-  inlineLinkedPages: MentionNode[];
-} {
+export function convertRichText(richTexts: RichTextItemResponse[]) {
   const contents: (TextContent | MentionNode)[] = [];
-  const inlineLinkedPages: MentionNode[] = [];
 
   richTexts.forEach((richText) => {
     const marks: { type: string; attrs?: Record<string, string> }[] = [];
@@ -57,7 +53,6 @@ export function convertRichText(richTexts: RichTextItemResponse[]): {
         }
       };
       contents.push(inlineLinkedPage);
-      inlineLinkedPages.push(inlineLinkedPage);
     } else if (richText.mention?.type === 'database') {
       const inlineLinkedPage: MentionNode = {
         type: 'mention',
@@ -67,12 +62,8 @@ export function convertRichText(richTexts: RichTextItemResponse[]): {
         }
       };
       contents.push(inlineLinkedPage);
-      inlineLinkedPages.push(inlineLinkedPage);
     }
   });
 
-  return {
-    contents,
-    inlineLinkedPages
-  };
+  return contents;
 }
