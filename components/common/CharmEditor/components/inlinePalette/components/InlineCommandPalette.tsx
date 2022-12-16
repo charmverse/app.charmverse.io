@@ -14,7 +14,6 @@ import { useMemo, useCallback, useEffect, useState } from 'react';
 
 import type { NestedPagePluginState } from '../../nestedPage';
 import { GroupLabel } from '../../PopoverMenu';
-import { palettePluginKey } from '../config';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
 import { PaletteItem, PALETTE_ITEM_REGULAR_TYPE } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
@@ -61,6 +60,7 @@ interface InlineCommentGroupProps {
   externalPopupState?: PopupState;
   size?: InlinePaletteSize;
   handleActiveItem?: (item: string) => void;
+  palettePluginKey: PluginKey;
 }
 
 export default function InlineCommandPalette({
@@ -69,7 +69,8 @@ export default function InlineCommandPalette({
   disableNestedPage = false,
   externalPopupState,
   size = 'big',
-  handleActiveItem
+  handleActiveItem,
+  palettePluginKey
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
