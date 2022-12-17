@@ -1,4 +1,5 @@
 import PreviewIcon from '@mui/icons-material/Preview';
+import { BsGoogle } from 'react-icons/bs';
 import { FiFigma } from 'react-icons/fi';
 import { SiLoom } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
@@ -61,6 +62,25 @@ export const embeds = {
     },
     urlTest(url: string) {
       return url.includes('www.figma.com');
+    }
+  },
+  google: {
+    icon: BsGoogle,
+    name: 'Google',
+    placeholder: 'https://docs.google.com/forms/...',
+    text: 'Insert a Google form',
+    convertURLToEmbed(url: string) {
+      if (!url.includes('embedded=true')) {
+        if (url.includes('?')) {
+          url += '&embedded=true';
+        } else {
+          url += '?embedded=true';
+        }
+      }
+      return url;
+    },
+    urlTest(url: string) {
+      return url.includes('docs.google.com');
     }
   },
   loom: {
