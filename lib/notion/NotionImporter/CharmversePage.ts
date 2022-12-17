@@ -11,7 +11,7 @@ import type { BlocksRecord, GetPageResponse } from '../types';
 
 import { NotionBlock } from './NotionBlock';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
-import type { NotionPageFetcher } from './NotionPage';
+import type { NotionPage } from './NotionPage';
 
 export class CharmversePage {
   blocksRecord: BlocksRecord;
@@ -22,7 +22,7 @@ export class CharmversePage {
 
   cache: NotionCache;
 
-  fetcher: NotionPageFetcher;
+  notionPage: NotionPage;
 
   charmversePageId: string;
 
@@ -31,16 +31,16 @@ export class CharmversePage {
     topLevelBlockIds,
     notionPageId,
     cache,
-    fetcher
+    notionPage
   }: {
     blocksRecord: BlocksRecord;
     topLevelBlockIds: string[];
     notionPageId: string;
     cache: NotionCache;
-    fetcher: NotionPageFetcher;
+    notionPage: NotionPage;
   }) {
     this.cache = cache;
-    this.fetcher = fetcher;
+    this.notionPage = notionPage;
     this.blocksRecord = blocksRecord;
     this.topLevelBlockIds = topLevelBlockIds;
     this.notionPageId = notionPageId;
@@ -55,15 +55,18 @@ export class CharmversePage {
 
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
     const notionPage = this.cache.notionPagesRecord[this.notionPageId] as GetPageResponse;
-    const parentPage =
-      notionPage.parent.type !== 'workspace'
-        ? await this.fetcher.fetchAndCreatePage({
-            notionPageId:
-              notionPage.parent.type === 'database_id' ? notionPage.parent.database_id : notionPage.parent.page_id
-          })
+    const notionParentPageId =
+      notionPage.parent.type === 'database_id'
+        ? notionPage.parent.database_id
+        : notionPage.parent.type === 'page_id'
+        ? notionPage.parent.page_id
         : null;
-
-    const parentId = parentPage?.id ?? this.fetcher.workspacePageId;
+    const charmverseParentPage = notionParentPageId
+      ? await this.notionPage.fetchAndCreatePage({
+          notionPageId: notionParentPageId
+        })
+      : null;
+    const charmverseParentPageId = charmverseParentPage?.id ?? this.notionPage.workspacePageId;
     if (!pageRecord?.charmversePage) {
       const notionPageTitleProperty = Object.values(notionPage.properties).find(
         (property) => property.type === 'title'
@@ -73,8 +76,8 @@ export class CharmversePage {
         notionPageTitleProperty?.type === 'title' ? convertToPlainText(notionPageTitleProperty.title) : '';
 
       const properties =
-        parentPage !== null
-          ? (this.cache.pagesRecord.get(parentPage.id) as DatabasePageItem)?.notionPage?.properties
+        notionParentPageId !== null
+          ? (this.cache.pagesRecord.get(notionParentPageId) as DatabasePageItem)?.notionPage?.properties
           : null;
       if (notionPage.parent.type === 'database_id' && properties) {
         const cardProperties: Record<string, any> = {};
@@ -106,7 +109,7 @@ export class CharmversePage {
         });
 
         const headerImage = notionPage.cover
-          ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.fetcher.spaceId })
+          ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.notionPage.spaceId })
           : null;
 
         await prisma.block.create({
@@ -114,8 +117,8 @@ export class CharmversePage {
             ...createCard({
               title: notionPageTitle,
               id: this.charmversePageId,
-              parentId,
-              rootId: parentId,
+              parentId: charmverseParentPageId,
+              rootId: charmverseParentPageId,
               fields: {
                 icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
                 contentOrder: [],
@@ -123,9 +126,9 @@ export class CharmversePage {
                 properties: cardProperties
               },
               deletedAt: null,
-              spaceId: this.fetcher.spaceId,
-              createdBy: this.fetcher.userId,
-              updatedBy: this.fetcher.userId
+              spaceId: this.notionPage.spaceId,
+              createdBy: this.notionPage.userId,
+              updatedBy: this.notionPage.userId
             }),
             deletedAt: null,
             createdAt: new Date(),
@@ -138,11 +141,11 @@ export class CharmversePage {
       const createdCharmversePage = await createPrismaPage({
         id: this.charmversePageId,
         content: pageContent,
-        spaceId: this.fetcher.spaceId,
-        createdBy: this.fetcher.userId,
+        spaceId: this.notionPage.spaceId,
+        createdBy: this.notionPage.userId,
         title: notionPageTitle,
         icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
-        parentId,
+        parentId: charmverseParentPageId,
         type: notionPage.parent.type === 'database_id' ? 'card' : 'page',
         cardId: notionPage.parent.type ? this.charmversePageId : undefined
       });
@@ -154,7 +157,8 @@ export class CharmversePage {
 
       for (const firstLevelBlockId of this.topLevelBlockIds) {
         const notionBlock = new NotionBlock({
-          charmversePage: this
+          charmversePage: this,
+          notionPage: this.notionPage
         });
 
         const charmverseBlock = await notionBlock.convert(this.blocksRecord[firstLevelBlockId]);

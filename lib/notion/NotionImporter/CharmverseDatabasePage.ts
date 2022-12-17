@@ -10,7 +10,7 @@ import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { GetDatabaseResponse } from '../types';
 
 import type { DatabasePageItem, NotionCache } from './NotionCache';
-import type { NotionPageFetcher } from './NotionPage';
+import type { NotionPage } from './NotionPage';
 
 export class CharmverseDatabasePage {
   pageIds: string[];
@@ -19,7 +19,7 @@ export class CharmverseDatabasePage {
 
   cache: NotionCache;
 
-  fetcher: NotionPageFetcher;
+  notionPage: NotionPage;
 
   charmversePageId: string;
 
@@ -27,15 +27,15 @@ export class CharmverseDatabasePage {
     pageIds,
     notionPageId,
     cache,
-    fetcher
+    notionPage
   }: {
     pageIds: string[];
     notionPageId: string;
     cache: NotionCache;
-    fetcher: NotionPageFetcher;
+    notionPage: NotionPage;
   }) {
     this.cache = cache;
-    this.fetcher = fetcher;
+    this.notionPage = notionPage;
     this.pageIds = pageIds;
     this.notionPageId = notionPageId;
     this.charmversePageId = v4();
@@ -48,15 +48,15 @@ export class CharmverseDatabasePage {
       const notionPageTitle = convertToPlainText(notionPage.title);
       const parentPage =
         notionPage.parent.type !== 'workspace'
-          ? await this.fetcher.fetchAndCreatePage({
+          ? await this.notionPage.fetchAndCreatePage({
               notionPageId: notionPage.parent.page_id
             })
           : null;
 
-      const parentId = parentPage?.id ?? this.fetcher.workspacePageId;
+      const parentId = parentPage?.id ?? this.notionPage.workspacePageId;
       const board = createBoard();
       const headerImageUrl = notionPage.cover
-        ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.fetcher.spaceId })
+        ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.notionPage.spaceId })
         : null;
 
       board.id = this.charmversePageId;
@@ -72,9 +72,9 @@ export class CharmverseDatabasePage {
       view.title = 'Board view';
 
       const commonBlockData = {
-        spaceId: this.fetcher.spaceId,
-        createdBy: this.fetcher.userId,
-        updatedBy: this.fetcher.userId,
+        spaceId: this.notionPage.spaceId,
+        createdBy: this.notionPage.userId,
+        updatedBy: this.notionPage.userId,
         deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -85,9 +85,9 @@ export class CharmverseDatabasePage {
         id: this.charmversePageId,
         headerImage: headerImageUrl,
         icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
-        spaceId: this.fetcher.spaceId,
+        spaceId: this.notionPage.spaceId,
         type: 'board',
-        createdBy: this.fetcher.userId,
+        createdBy: this.notionPage.userId,
         title: notionPageTitle,
         parentId,
         boardId: board.id
@@ -114,7 +114,7 @@ export class CharmverseDatabasePage {
 
       const pageIds = pageRecord.notionPage?.pageIds ?? [];
       for (const pageId of pageIds) {
-        await this.fetcher.fetchAndCreatePage({
+        await this.notionPage.fetchAndCreatePage({
           notionPageId: pageId
         });
       }

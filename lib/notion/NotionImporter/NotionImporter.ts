@@ -44,6 +44,7 @@ export class NotionImporter {
     const client = new Client({
       auth: accessToken
     });
+    const workspacePageId = v4();
     const notionCache = new NotionCache();
     const notionPage = new NotionPage({
       blocksPerRequest,
@@ -52,15 +53,16 @@ export class NotionImporter {
       client,
       cache: notionCache,
       spaceId,
-      userId
+      userId,
+      workspacePageId
     });
 
+    this.workspacePageId = workspacePageId;
     this.cache = notionCache;
     this.notionPage = notionPage;
     this.client = client;
     this.userId = userId;
     this.spaceId = spaceId;
-    this.workspacePageId = v4();
     this.blocksPerRequest = blocksPerRequest;
     this.maxChildBlockDepth = maxChildBlockDepth;
     this.totalImportedPagesLimit = totalImportedPagesLimit;

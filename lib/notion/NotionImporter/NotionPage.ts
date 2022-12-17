@@ -29,8 +29,11 @@ export class NotionPage {
 
   spaceId: string;
 
+  workspacePageId: string;
+
   constructor({
     client,
+    workspacePageId,
     blocksPerRequest = 100,
     totalImportedPagesLimit = 10000,
     maxChildBlockDepth = 10,
@@ -38,6 +41,7 @@ export class NotionPage {
     spaceId,
     userId
   }: {
+    workspacePageId: string;
     userId: string;
     spaceId: string;
     client: Client;
@@ -46,6 +50,7 @@ export class NotionPage {
     blocksPerRequest?: number;
     totalImportedPagesLimit?: number;
   }) {
+    this.workspacePageId = workspacePageId;
     this.userId = userId;
     this.spaceId = spaceId;
     this.cache = cache;
@@ -69,7 +74,7 @@ export class NotionPage {
         topLevelBlockIds,
         notionPageId,
         cache: this.cache,
-        fetcher: this
+        notionPage: this
       });
 
       return charmversePage.create();
@@ -80,11 +85,10 @@ export class NotionPage {
         pageIds,
         notionPageId,
         cache: this.cache,
-        fetcher: this
+        notionPage: this
       });
 
-      const databasePage = await charmverseDatabasePage.create();
-      return databasePage;
+      return charmverseDatabasePage.create();
     }
   }
 

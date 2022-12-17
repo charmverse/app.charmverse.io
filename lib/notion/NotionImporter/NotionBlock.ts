@@ -21,12 +21,16 @@ import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { BlockWithChildren, RichTextItemResponse } from '../types';
 
 import type { CharmversePage } from './CharmversePage';
+import type { NotionPage } from './NotionPage';
 
 export class NotionBlock {
   charmversePage: CharmversePage;
 
-  constructor({ charmversePage }: { charmversePage: CharmversePage }) {
+  notionPage: NotionPage;
+
+  constructor({ charmversePage, notionPage }: { notionPage: NotionPage; charmversePage: CharmversePage }) {
     this.charmversePage = charmversePage;
+    this.notionPage = notionPage;
   }
 
   private async populatePageContent({
@@ -50,7 +54,7 @@ export class NotionBlock {
         const mentionNode = contents[index] as MentionNode;
         if (mentionNode.attrs.type === 'page') {
           try {
-            const createdPage = await this.charmversePage.fetcher.fetchAndCreatePage({
+            const createdPage = await this.notionPage.fetchAndCreatePage({
               notionPageId: mentionNode.attrs.value
             });
             modifiedContent[index] = {
@@ -261,7 +265,7 @@ export class NotionBlock {
         case 'image': {
           const persistentUrl = await getPersistentImageUrl({
             image: block.image,
-            spaceId: this.charmversePage.fetcher.spaceId
+            spaceId: this.notionPage.spaceId
           });
           return {
             type: 'image',
@@ -342,7 +346,7 @@ export class NotionBlock {
               }
             };
           }
-          const charmversePage = await this.charmversePage.fetcher.fetchAndCreatePage({
+          const charmversePage = await this.notionPage.fetchAndCreatePage({
             notionPageId: linkedPageId
           });
           return {
@@ -355,7 +359,7 @@ export class NotionBlock {
 
         case 'child_database':
         case 'child_page': {
-          const charmversePage = await this.charmversePage.fetcher.fetchAndCreatePage({
+          const charmversePage = await this.notionPage.fetchAndCreatePage({
             notionPageId: block.id
           });
 
