@@ -1,6 +1,6 @@
 import PreviewIcon from '@mui/icons-material/Preview';
-import { BsGoogle } from 'react-icons/bs';
 import { FiFigma } from 'react-icons/fi';
+import { RiGoogleFill } from 'react-icons/ri';
 import { SiLoom } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
 
@@ -65,8 +65,8 @@ export const embeds = {
     }
   },
   google: {
-    icon: BsGoogle,
-    name: 'Google Form',
+    icon: RiGoogleFill,
+    name: 'Google Forms',
     placeholder: 'https://docs.google.com/forms/...',
     text: 'Insert a Google form',
     convertURLToEmbed(url: string) {
