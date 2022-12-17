@@ -66,7 +66,7 @@ export const embeds = {
   },
   google: {
     icon: BsGoogle,
-    name: 'Google',
+    name: 'Google Form',
     placeholder: 'https://docs.google.com/forms/...',
     text: 'Insert a Google form',
     convertURLToEmbed(url: string) {
@@ -79,8 +79,9 @@ export const embeds = {
       }
       return url;
     },
+    // example: https://docs.google.com/forms/d/e/1FAIpQLSf-Z7e_l7htY7DO6GQuzkW2KWsqUOcXjzLS2fwvWnapvfltEQ/viewform
     urlTest(url: string) {
-      return url.includes('docs.google.com');
+      return url.includes('docs.google.com/forms') && url.includes('/viewform');
     }
   },
   loom: {

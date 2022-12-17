@@ -21,11 +21,21 @@ export function plugins() {
     }),
     new Plugin({
       props: {
-        handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
-          const iframeUrl = extractIframeUrl(slice);
+        handlePaste: (view: EditorView, rawEvent: ClipboardEvent) => {
+          const event = rawEvent;
+          if (!event.clipboardData) {
+            return false;
+          }
+          const text = event.clipboardData.getData('text/plain');
+          const html = event.clipboardData.getData('text/html');
+          const isPlainText = text && !html;
+
+          if (!isPlainText) {
+            return false;
+          }
+          const iframeUrl = extractIframeUrl(text);
           if (iframeUrl) {
-            const youtubeType = extractYoutubeLinkType(iframeUrl);
-            if (youtubeType) {
+            if (extractYoutubeLinkType(iframeUrl)) {
               const attrs: Partial<VideoNodeAttrs> = { src: iframeUrl };
               insertNode(videoName, view.state, view.dispatch, view, attrs);
             } else {
