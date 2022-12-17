@@ -21,26 +21,6 @@ import type { UserDetailsProps } from './components/UserDetails';
 import UserDetails, { isPublicUser } from './components/UserDetails';
 import { useCollablandCredentials } from './hooks/useCollablandCredentials';
 
-const StyledBox = styled(Box)`
-  /* display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between; */
-  /* > {
-    &:hover {
-      flex-grow: 4;
-      transition: all 2s;
-    } */
-  }
-  /* display: grid;
-  > {
-    &:hover {
-      grid-column: span 2;
-      grid-column-start: 1;
-      grid-column-end: -1;
-    }
-  } */
-`;
-
 function transformPoap(poap: ExtendedPoap): Collectable {
   return {
     type: 'poap',
@@ -235,13 +215,14 @@ export default function PublicProfile(props: UserDetailsProps) {
       setAeToken('');
     }
   }, [collabError]);
-
   function groupBy<T>(arr: T[], fn: (item: T) => any) {
-    return arr.reduce<Record<string, T[]>>((prev, curr) => {
+    return arr.reduce<Record<string, T[]>>((acc, curr) => {
       const groupKey = fn(curr);
-      const group = prev[groupKey] || [];
+      const group = acc[groupKey] || [];
       group.push(curr);
-      return { ...prev, [groupKey]: group };
+
+      acc[groupKey] = group;
+      return acc;
     }, {});
   }
 
@@ -332,7 +313,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                 </AccordionDetails>
               </Accordion>
             ))}
-            <StyledBox
+            <Box
               display='grid'
               sx={{
                 gridTemplateColumns: {
@@ -355,7 +336,7 @@ export default function PublicProfile(props: UserDetailsProps) {
                   collectable={collectable[0]}
                 />
               ))}
-            </StyledBox>
+            </Box>
           </>
         ) : null}
         {/* <CollablandCredentials error={collabError} /> */}
