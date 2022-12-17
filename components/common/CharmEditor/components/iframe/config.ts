@@ -69,6 +69,7 @@ export const embeds = {
     name: 'Google Forms',
     placeholder: 'https://docs.google.com/forms/...',
     text: 'Insert a Google form',
+    // requires ?embedded=true to be at the end
     convertURLToEmbed(url: string) {
       if (!url.includes('embedded=true')) {
         if (url.includes('?')) {
