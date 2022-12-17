@@ -18,13 +18,25 @@ export function extractEmbedType(url: string): EmbedType {
 }
 
 // a utility for pasting: take a slice of content and extract the url from it if it includes an iframe
-export function extractIframeUrl(pastedHtml: string): string | null {
+export function extractIframeProps(pastedHtml: string): { src: string; height: number | null } | null {
   const isIframeHtml = pastedHtml.includes('<iframe');
   if (isIframeHtml) {
-    const indexOfSrc = pastedHtml.indexOf('src');
-    const indexOfFirstQuote = pastedHtml.indexOf('"', indexOfSrc);
-    const indexOfLastQuote = pastedHtml.indexOf('"', indexOfFirstQuote + 1);
-    return pastedHtml.slice(indexOfFirstQuote + 1, indexOfLastQuote);
+    const src = getParamFromString(pastedHtml, 'src');
+    const height = getParamFromString(pastedHtml, 'height');
+    if (src) {
+      const heightInt = height ? parseInt(height, 10) : null;
+      return { src, height: heightInt };
+    }
   }
   return null;
+}
+
+function getParamFromString(html: string, param: string): string | null {
+  const indexOfSrc = html.indexOf(param);
+  if (indexOfSrc === -1) {
+    return null;
+  }
+  const indexOfFirstQuote = html.indexOf('"', indexOfSrc);
+  const indexOfLastQuote = html.indexOf('"', indexOfFirstQuote + 1);
+  return html.slice(indexOfFirstQuote + 1, indexOfLastQuote);
 }
