@@ -11,9 +11,9 @@ import { convertPropertyType } from '../convertPropertyType';
 import { createPrismaPage } from '../createPrismaPage';
 import type { BlocksRecord, ChildBlockListResponse, GetDatabaseResponse, GetPageResponse } from '../types';
 
-import { DatabasePageCreator } from './DatabasePageCreator';
+import { CharmverseDatabasePage } from './CharmverseDatabasePage';
+import { CharmversePage } from './CharmversePage';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
-import { PageCreator } from './PageCreator';
 
 export class NotionPageFetcher {
   blocksPerRequest: number;
@@ -111,12 +111,18 @@ export class NotionPageFetcher {
     notionPageId: string;
     properties?: Record<string, IPropertyTemplate>;
   }): Promise<Page> {
-    const notionPage = this.cache.notionPagesRecord[notionPageId];
-    // Regular page
+    let notionPage = this.cache.notionPagesRecord[notionPageId];
+    if (!notionPage) {
+      notionPage = (await this.client.pages.retrieve({
+        page_id: notionPageId
+      })) as GetPageResponse;
+      this.cache.notionPagesRecord[notionPageId] = notionPage;
+    }
+
     if (notionPage.object === 'page') {
       const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
 
-      const pageCreator = new PageCreator({
+      const charmversePage = new CharmversePage({
         blocksRecord,
         topLevelBlockIds,
         notionPageId,
@@ -126,11 +132,11 @@ export class NotionPageFetcher {
         fetcher: this
       });
 
-      return pageCreator.create({ properties });
+      return charmversePage.create({ properties });
     } else {
       const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
 
-      const databasePageCreator = new DatabasePageCreator({
+      const databasePageCreator = new CharmverseDatabasePage({
         pageIds,
         notionPageId,
         spaceId: this.spaceId,

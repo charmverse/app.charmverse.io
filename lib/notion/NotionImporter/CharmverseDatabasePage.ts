@@ -12,7 +12,7 @@ import type { GetDatabaseResponse } from '../types';
 import type { DatabasePageItem, NotionCache } from './NotionCache';
 import type { NotionPageFetcher } from './NotionPageFetcher';
 
-export class DatabasePageCreator {
+export class CharmverseDatabasePage {
   pageIds: string[];
 
   notionPageId: string;
