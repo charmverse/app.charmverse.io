@@ -1,3 +1,5 @@
+import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+
 import {
   MIN_EMBED_WIDTH,
   MAX_EMBED_WIDTH,
@@ -18,7 +20,7 @@ import type {
 
 import { convertRichText } from '../convertRichText';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlockWithChildren, RichTextItemResponse } from '../types';
+import type { BlockWithChildren } from '../types';
 
 import type { CharmversePage } from './CharmversePage';
 import type { NotionPage } from './NotionPage';
@@ -337,7 +339,11 @@ export class NotionBlock {
 
         case 'link_to_page': {
           const linkedPageId =
-            block.link_to_page.type === 'page_id' ? block.link_to_page.page_id : block.link_to_page.database_id;
+            block.link_to_page.type === 'page_id'
+              ? block.link_to_page.page_id
+              : block.link_to_page.type === 'database_id'
+              ? block.link_to_page.database_id
+              : null;
           if (linkedPageId === this.charmversePage.notionPageId) {
             return {
               type: 'page',
@@ -346,15 +352,19 @@ export class NotionBlock {
               }
             };
           }
-          const charmversePage = await this.notionPage.fetchAndCreatePage({
-            notionPageId: linkedPageId
-          });
-          return {
-            type: 'page',
-            attrs: {
-              id: charmversePage?.id
-            }
-          };
+
+          if (linkedPageId) {
+            const charmversePage = await this.notionPage.fetchAndCreatePage({
+              notionPageId: linkedPageId
+            });
+            return {
+              type: 'page',
+              attrs: {
+                id: charmversePage?.id
+              }
+            };
+          }
+          return null;
         }
 
         case 'child_database':

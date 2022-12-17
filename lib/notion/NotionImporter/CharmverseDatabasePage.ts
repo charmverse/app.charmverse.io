@@ -1,3 +1,4 @@
+import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -7,7 +8,6 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { GetDatabaseResponse } from '../types';
 
 import type { DatabasePageItem, NotionCache } from './NotionCache';
 import type { NotionPage } from './NotionPage';
@@ -44,12 +44,13 @@ export class CharmverseDatabasePage {
   async create() {
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as DatabasePageItem;
     if (!pageRecord?.charmversePage) {
-      const notionPage = this.cache.notionPagesRecord[this.notionPageId] as GetDatabaseResponse;
+      const notionPage = this.cache.notionPagesRecord[this.notionPageId] as DatabaseObjectResponse;
       const notionPageTitle = convertToPlainText(notionPage.title);
       const parentPage =
         notionPage.parent.type !== 'workspace'
           ? await this.notionPage.fetchAndCreatePage({
-              notionPageId: notionPage.parent.page_id
+              notionPageId:
+                notionPage.parent.type === 'page_id' ? notionPage.parent.page_id : notionPage.parent.block_id
             })
           : null;
 

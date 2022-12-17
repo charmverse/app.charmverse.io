@@ -1,9 +1,10 @@
+import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import type { Page } from '@prisma/client';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import { convertToPlainText } from '../convertToPlainText';
-import type { BlocksRecord, CreatePageInput, GetDatabaseResponse, GetPageResponse } from '../types';
+import type { BlocksRecord, CreatePageInput } from '../types';
 
 export type RegularPageItem = {
   charmversePage?: Page;
@@ -24,7 +25,7 @@ export type DatabasePageItem = {
 };
 
 export class NotionCache {
-  notionPagesRecord: Record<string, GetPageResponse | GetDatabaseResponse> = {};
+  notionPagesRecord: Record<string, PageObjectResponse | DatabaseObjectResponse> = {};
 
   charmversePagesRecord: Record<string, CreatePageInput> = {};
 
@@ -42,7 +43,10 @@ export class NotionCache {
     }
   > = {};
 
-  populateFailedImportRecord(failedImportBlocks: [string, number][][], block: GetPageResponse | GetDatabaseResponse) {
+  populateFailedImportRecord(
+    failedImportBlocks: [string, number][][],
+    block: PageObjectResponse | DatabaseObjectResponse
+  ) {
     let title = '';
     // Database
     if (block.object === 'database') {

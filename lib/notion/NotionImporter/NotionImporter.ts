@@ -1,8 +1,8 @@
 import { Client } from '@notionhq/client';
+import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
 import { createPrismaPage } from '../createPrismaPage';
-import type { GetPageResponse, GetDatabaseResponse } from '../types';
 
 import { NotionCache } from './NotionCache';
 import { NotionPage } from './NotionPage';
@@ -77,8 +77,8 @@ export class NotionImporter {
       page_size: this.blocksPerRequest
     });
 
-    const notionPages: (GetPageResponse | GetDatabaseResponse)[] = [];
-    notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
+    const notionPages: (PageObjectResponse | DatabaseObjectResponse)[] = [];
+    notionPages.push(...(searchResult.results as (PageObjectResponse | DatabaseObjectResponse)[]));
 
     // Store all the pages/databases the integration fetched in a record
     // While there are more pages the integration has access to
@@ -87,7 +87,7 @@ export class NotionImporter {
         page_size: this.blocksPerRequest,
         start_cursor: searchResult.next_cursor
       });
-      notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
+      notionPages.push(...(searchResult.results as (PageObjectResponse | DatabaseObjectResponse)[]));
     }
 
     notionPages.forEach((notionPage) => {

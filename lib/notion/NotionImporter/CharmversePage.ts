@@ -1,3 +1,4 @@
+import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -7,7 +8,7 @@ import type { PageContent } from 'models';
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlocksRecord, GetPageResponse } from '../types';
+import type { BlocksRecord } from '../types';
 
 import { NotionBlock } from './NotionBlock';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
@@ -54,7 +55,7 @@ export class CharmversePage {
     };
 
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
-    const notionPage = this.cache.notionPagesRecord[this.notionPageId] as GetPageResponse;
+    const notionPage = this.cache.notionPagesRecord[this.notionPageId] as PageObjectResponse;
     const notionParentPageId =
       notionPage.parent.type === 'database_id'
         ? notionPage.parent.database_id

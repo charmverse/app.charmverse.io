@@ -1,5 +1,9 @@
 import type { Client } from '@notionhq/client';
-import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
+import type {
+  DatabaseObjectResponse,
+  ListBlockChildrenParameters,
+  PageObjectResponse
+} from '@notionhq/client/build/src/api-endpoints';
 import type { Page } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
@@ -8,7 +12,7 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import { convertPropertyType } from '../convertPropertyType';
-import type { BlocksRecord, ChildBlockListResponse, GetDatabaseResponse, GetPageResponse } from '../types';
+import type { BlocksRecord, ChildBlockListResponse } from '../types';
 
 import { CharmverseDatabasePage } from './CharmverseDatabasePage';
 import { CharmversePage } from './CharmversePage';
@@ -153,12 +157,12 @@ export class NotionPage {
     notionPageId: string;
   }): Promise<Required<DatabasePageItem>['notionPage']> {
     const pageRecord = this.cache.pagesRecord.get(notionPageId);
-    const notionPage = this.cache.notionPagesRecord[notionPageId] as GetDatabaseResponse;
+    const notionPage = this.cache.notionPagesRecord[notionPageId] as DatabaseObjectResponse;
     if (!pageRecord?.notionPage) {
       const pageIds: string[] = [];
       let databaseQueryResponse = await this.client.databases.query({ database_id: notionPageId });
       databaseQueryResponse.results.forEach((page) => {
-        this.cache.notionPagesRecord[page.id] = page as GetPageResponse | GetDatabaseResponse;
+        this.cache.notionPagesRecord[page.id] = page as PageObjectResponse | DatabaseObjectResponse;
         pageIds.push(page.id);
       });
 
@@ -168,7 +172,7 @@ export class NotionPage {
           start_cursor: databaseQueryResponse.next_cursor ?? undefined
         });
         databaseQueryResponse.results.forEach((page) => {
-          this.cache.notionPagesRecord[page.id] = page as GetPageResponse | GetDatabaseResponse;
+          this.cache.notionPagesRecord[page.id] = page as PageObjectResponse | DatabaseObjectResponse;
           pageIds.push(page.id);
         });
       }
@@ -287,7 +291,7 @@ export class NotionPage {
     if (!this.cache.notionPagesRecord[notionPageId]) {
       const pageResponse = (await this.client.pages.retrieve({
         page_id: notionPageId
-      })) as unknown as GetPageResponse;
+      })) as unknown as PageObjectResponse;
       this.cache.notionPagesRecord[notionPageId] = pageResponse;
       log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
     }
@@ -299,7 +303,7 @@ export class NotionPage {
     if (!this.cache.notionPagesRecord[notionDatabasePageId]) {
       const databasePage = (await this.client.databases.retrieve({
         database_id: notionDatabasePageId
-      })) as GetDatabaseResponse;
+      })) as DatabaseObjectResponse;
       this.cache.notionPagesRecord[notionDatabasePageId] = databasePage;
       log.debug(`[notion]: Retrieved database ${notionDatabasePageId} manually`);
     }
