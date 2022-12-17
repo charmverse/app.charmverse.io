@@ -1,7 +1,6 @@
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
 import type { PageContent } from 'models';
 
@@ -11,8 +10,8 @@ import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { BlocksRecord, GetPageResponse } from '../types';
 
 import { NotionBlock } from './NotionBlock';
-import type { NotionCache, RegularPageItem } from './NotionCache';
-import type { NotionPageFetcher } from './NotionPageFetcher';
+import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
+import type { NotionPageFetcher } from './NotionPage';
 
 export class CharmversePage {
   blocksRecord: BlocksRecord;
@@ -48,7 +47,7 @@ export class CharmversePage {
     this.charmversePageId = v4();
   }
 
-  async create({ properties }: { properties?: Record<string, IPropertyTemplate> }) {
+  async create() {
     const pageContent: PageContent = {
       type: 'doc',
       content: []
@@ -73,6 +72,10 @@ export class CharmversePage {
       const notionPageTitle =
         notionPageTitleProperty?.type === 'title' ? convertToPlainText(notionPageTitleProperty.title) : '';
 
+      const properties =
+        parentPage !== null
+          ? (this.cache.pagesRecord.get(parentPage.id) as DatabasePageItem)?.notionPage?.properties
+          : null;
       if (notionPage.parent.type === 'database_id' && properties) {
         const cardProperties: Record<string, any> = {};
 

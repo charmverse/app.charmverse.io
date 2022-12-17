@@ -10,7 +10,7 @@ import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { GetDatabaseResponse } from '../types';
 
 import type { DatabasePageItem, NotionCache } from './NotionCache';
-import type { NotionPageFetcher } from './NotionPageFetcher';
+import type { NotionPageFetcher } from './NotionPage';
 
 export class CharmverseDatabasePage {
   pageIds: string[];
@@ -112,12 +112,10 @@ export class CharmverseDatabasePage {
         charmversePage: createdCharmversePage
       });
 
-      const pageRecordProperties = pageRecord.notionPage?.properties;
       const pageIds = pageRecord.notionPage?.pageIds ?? [];
       for (const pageId of pageIds) {
         await this.fetcher.fetchAndCreatePage({
-          notionPageId: pageId,
-          properties: pageRecordProperties
+          notionPageId: pageId
         });
       }
 

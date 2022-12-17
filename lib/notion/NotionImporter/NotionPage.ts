@@ -8,14 +8,13 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import { convertPropertyType } from '../convertPropertyType';
-import { createPrismaPage } from '../createPrismaPage';
 import type { BlocksRecord, ChildBlockListResponse, GetDatabaseResponse, GetPageResponse } from '../types';
 
 import { CharmverseDatabasePage } from './CharmverseDatabasePage';
 import { CharmversePage } from './CharmversePage';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
 
-export class NotionPageFetcher {
+export class NotionPage {
   blocksPerRequest: number;
 
   totalImportedPagesLimit: number;
@@ -25,8 +24,6 @@ export class NotionPageFetcher {
   cache: NotionCache;
 
   client: Client;
-
-  workspacePageId: string;
 
   userId: string;
 
@@ -56,61 +53,9 @@ export class NotionPageFetcher {
     this.blocksPerRequest = blocksPerRequest;
     this.maxChildBlockDepth = maxChildBlockDepth;
     this.totalImportedPagesLimit = totalImportedPagesLimit;
-    this.workspacePageId = v4();
   }
 
-  /**
-   * Fetch accessible notion pages
-   */
-  async fetchAndCreatePages({ workspaceIcon, workspaceName }: { workspaceName: string; workspaceIcon: string }) {
-    const { notionPagesRecord } = this.cache;
-    let searchResult = await this.client.search({
-      page_size: this.blocksPerRequest
-    });
-
-    const notionPages: (GetPageResponse | GetDatabaseResponse)[] = [];
-    notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
-
-    // Store all the pages/databases the integration fetched in a record
-    // While there are more pages the integration has access to
-    while (searchResult.has_more && searchResult.next_cursor && notionPages.length < this.totalImportedPagesLimit) {
-      searchResult = await this.client.search({
-        page_size: this.blocksPerRequest,
-        start_cursor: searchResult.next_cursor
-      });
-      notionPages.push(...(searchResult.results as (GetPageResponse | GetDatabaseResponse)[]));
-    }
-
-    notionPages.forEach((notionPage) => {
-      // This would ideally decrease the amount of api requests made to fetch a page/database
-      notionPagesRecord[notionPage.id] = notionPage;
-    });
-
-    await createPrismaPage({
-      createdBy: this.userId,
-      spaceId: this.spaceId,
-      id: this.workspacePageId,
-      title: workspaceName,
-      icon: workspaceIcon
-    });
-
-    for (const notionPage of notionPages) {
-      // Only create the root-level pages first
-      if (notionPage.parent.type === 'workspace') {
-        await this.fetchAndCreatePage({
-          notionPageId: notionPage.id
-        });
-      }
-    }
-  }
-
-  async fetchAndCreatePage({
-    notionPageId,
-    properties
-  }: {
-    notionPageId: string;
-    properties?: Record<string, IPropertyTemplate>;
-  }): Promise<Page> {
+  async fetchAndCreatePage({ notionPageId }: { notionPageId: string }): Promise<Page> {
     let notionPage = this.cache.notionPagesRecord[notionPageId];
     if (!notionPage) {
       notionPage = await this.retrievePage(notionPageId);
@@ -127,18 +72,18 @@ export class NotionPageFetcher {
         fetcher: this
       });
 
-      return charmversePage.create({ properties });
+      return charmversePage.create();
     } else {
       const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
 
-      const databasePageCreator = new CharmverseDatabasePage({
+      const charmverseDatabasePage = new CharmverseDatabasePage({
         pageIds,
         notionPageId,
         cache: this.cache,
         fetcher: this
       });
 
-      const databasePage = await databasePageCreator.create();
+      const databasePage = await charmverseDatabasePage.create();
       return databasePage;
     }
   }
