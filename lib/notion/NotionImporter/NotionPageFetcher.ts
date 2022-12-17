@@ -113,10 +113,7 @@ export class NotionPageFetcher {
   }): Promise<Page> {
     let notionPage = this.cache.notionPagesRecord[notionPageId];
     if (!notionPage) {
-      notionPage = (await this.client.pages.retrieve({
-        page_id: notionPageId
-      })) as GetPageResponse;
-      this.cache.notionPagesRecord[notionPageId] = notionPage;
+      notionPage = await this.retrievePage(notionPageId);
     }
 
     if (notionPage.object === 'page') {
@@ -126,8 +123,6 @@ export class NotionPageFetcher {
         blocksRecord,
         topLevelBlockIds,
         notionPageId,
-        spaceId: this.spaceId,
-        userId: this.userId,
         cache: this.cache,
         fetcher: this
       });
@@ -139,8 +134,6 @@ export class NotionPageFetcher {
       const databasePageCreator = new CharmverseDatabasePage({
         pageIds,
         notionPageId,
-        spaceId: this.spaceId,
-        userId: this.userId,
         cache: this.cache,
         fetcher: this
       });
@@ -349,6 +342,8 @@ export class NotionPageFetcher {
       this.cache.notionPagesRecord[notionPageId] = pageResponse;
       log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
     }
+
+    return this.cache.notionPagesRecord[notionPageId];
   }
 
   async retrieveDatabasePage(notionDatabasePageId: string) {
@@ -359,6 +354,8 @@ export class NotionPageFetcher {
       this.cache.notionPagesRecord[notionDatabasePageId] = databasePage;
       log.debug(`[notion]: Retrieved database ${notionDatabasePageId} manually`);
     }
+
+    return this.cache.notionPagesRecord[notionDatabasePageId];
   }
 
   async fetchChildBlocks(listBlockChildrenParameters: ListBlockChildrenParameters, client: Client) {

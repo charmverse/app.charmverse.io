@@ -1,23 +1,9 @@
-import type { Page, Prisma } from '@prisma/client';
+import type { Page } from '@prisma/client';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import { convertToPlainText } from '../convertToPlainText';
-import type { BlocksRecord, GetDatabaseResponse, GetPageResponse } from '../types';
-
-type CreatePageInput = {
-  id: string;
-  content?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
-  headerImage?: string | null;
-  icon?: string | null;
-  spaceId: string;
-  title: string;
-  type?: Page['type'];
-  createdBy: string;
-  boardId?: string;
-  parentId?: string | null;
-  cardId?: string;
-};
+import type { BlocksRecord, CreatePageInput, GetDatabaseResponse, GetPageResponse } from '../types';
 
 export type RegularPageItem = {
   charmversePage?: Page;

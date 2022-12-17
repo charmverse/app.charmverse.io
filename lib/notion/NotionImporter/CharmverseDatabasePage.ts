@@ -17,10 +17,6 @@ export class CharmverseDatabasePage {
 
   notionPageId: string;
 
-  spaceId: string;
-
-  userId: string;
-
   cache: NotionCache;
 
   fetcher: NotionPageFetcher;
@@ -30,22 +26,16 @@ export class CharmverseDatabasePage {
   constructor({
     pageIds,
     notionPageId,
-    spaceId,
     cache,
-    userId,
     fetcher
   }: {
     pageIds: string[];
     notionPageId: string;
-    spaceId: string;
-    userId: string;
     cache: NotionCache;
     fetcher: NotionPageFetcher;
   }) {
     this.cache = cache;
     this.fetcher = fetcher;
-    this.spaceId = spaceId;
-    this.userId = userId;
     this.pageIds = pageIds;
     this.notionPageId = notionPageId;
     this.charmversePageId = v4();
@@ -66,7 +56,7 @@ export class CharmverseDatabasePage {
       const parentId = parentPage?.id ?? this.fetcher.workspacePageId;
       const board = createBoard();
       const headerImageUrl = notionPage.cover
-        ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.spaceId })
+        ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.fetcher.spaceId })
         : null;
 
       board.id = this.charmversePageId;
@@ -82,9 +72,9 @@ export class CharmverseDatabasePage {
       view.title = 'Board view';
 
       const commonBlockData = {
-        spaceId: this.spaceId,
-        createdBy: this.userId,
-        updatedBy: this.userId,
+        spaceId: this.fetcher.spaceId,
+        createdBy: this.fetcher.userId,
+        updatedBy: this.fetcher.userId,
         deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -95,9 +85,9 @@ export class CharmverseDatabasePage {
         id: this.charmversePageId,
         headerImage: headerImageUrl,
         icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
-        spaceId: this.spaceId,
+        spaceId: this.fetcher.spaceId,
         type: 'board',
-        createdBy: this.userId,
+        createdBy: this.fetcher.userId,
         title: notionPageTitle,
         parentId,
         boardId: board.id
