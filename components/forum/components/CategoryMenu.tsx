@@ -16,7 +16,7 @@ import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
 
-import { ForumFilterCategory } from './ForumFilterCategory';
+import { ForumFilterCategory } from './CategoryPopup';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
@@ -69,7 +69,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
   );
 }
 
-export default function ForumFilterList() {
+export function CategoryMenu() {
   const { categories, error } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
@@ -93,13 +93,13 @@ export default function ForumFilterList() {
           px: 0
         }}
       >
-        {/** TODO - Enable sorting 
+        {/** TODO - Enable sorting
         <Box display='flex' sx={{ alignItems: 'flex-start', flexDirection: 'column' }} gap={2}>
           {sortList.map((sort) => (
             <Link
               key={sort}
               href={getLinkUrl(sort)}
-              
+
               color='inherit'
             >
               {sort}

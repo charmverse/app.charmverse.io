@@ -1,10 +1,9 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { IconButton, Stack } from '@mui/material';
+import { Box, Divider, Typography, IconButton, Stack } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { Box } from '@mui/system';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -18,9 +17,8 @@ import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listFo
 import type { Member } from 'lib/members/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import CreateForumPost from '../CreateForumPost';
-import ForumPost from '../ForumPost/ForumPost';
-import ForumPostSkeleton from '../ForumPostSkeleton';
+import { PostCard } from './components/PostCard';
+import { PostSkeleton } from './components/PostSkeleton';
 
 interface ForumPostsProps {
   search: string;
@@ -46,11 +44,10 @@ const generatePostRefreshTimeout = () => {
   }
 };
 
-export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
+export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
-  const createPostBoxRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const loadingMode = useRef<'list' | 'search'>('list');
@@ -179,6 +176,14 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
     [user, categoryId]
   );
 
+  function refreshPosts() {
+    window.document.body.scrollIntoView({
+      behavior: 'smooth'
+    });
+    loadMorePosts(true);
+    setIsOpen(false);
+  }
+
   useEffect(() => {
     const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
     return () => {
@@ -200,13 +205,21 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      <CreateForumPost ref={createPostBoxRef} />
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
       {posts?.data.map((post) => (
-        <ForumPost key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
+        <PostCard key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
       ))}
-      {isLoadingMore && <ForumPostSkeleton />}
-      {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
+      {isLoadingMore && <PostSkeleton />}
+      {posts?.hasNext === false && (
+        <>
+          <Divider flexItem sx={{ mb: 4 }} />
+          <Box display='flex' alignItems='center' justifyContent='center'>
+            <Typography variant='body2' color='secondary'>
+              No more posts to show
+            </Typography>
+          </Box>
+        </>
+      )}
       <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
 
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
@@ -230,15 +243,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
               <Button
                 key='reload'
                 variant='outlined'
-                onClick={() => {
-                  if (createPostBoxRef.current) {
-                    createPostBoxRef.current.scrollIntoView({
-                      behavior: 'smooth'
-                    });
-                    loadMorePosts(true);
-                    setIsOpen(false);
-                  }
-                }}
+                onClick={refreshPosts}
                 size='small'
                 startIcon={<ReplayIcon fontSize='small' />}
                 color='inherit'

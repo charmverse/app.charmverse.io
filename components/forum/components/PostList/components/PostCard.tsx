@@ -42,7 +42,7 @@ function ForumPostContent({
   return null;
 }
 
-export default function ForumPost({
+export function PostCard({
   createdAt,
   updatedAt,
   user,

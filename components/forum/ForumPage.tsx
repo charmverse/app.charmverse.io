@@ -14,9 +14,10 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import DesktopFilterMenu from './components/ForumFilterList';
-import MobileFilterMenu from './components/ForumFilterSelect';
-import ForumPosts from './components/ForumPosts';
+import { CategoryMenu } from './components/CategoryMenu';
+import { CategorySelect } from './components/CategorySelect';
+import CreateForumPost from './components/CreateForumPost';
+import { ForumPostList } from './components/PostList/PostList';
 
 export default function ForumPage() {
   const [search, setSearch] = useState('');
@@ -26,9 +27,8 @@ export default function ForumPage() {
   const categoryIds = router.query.categoryIds;
   const { showPost } = usePostDialog();
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
-    const pathname = `/${currentSpace!.domain}/forum`;
+    const pathname = `/${currentSpace?.domain}/forum`;
 
     if (categoryId === null) {
       router.push({
@@ -83,12 +83,13 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ xs: 'block', lg: 'none' }}>
-            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
+            <CategoryMenu />
           </Box>
-          <ForumPosts search={search} categoryId={categoryIds} />
+          <CreateForumPost />
+          <ForumPostList search={search} categoryId={categoryIds} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <DesktopFilterMenu />
+          <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
         </Grid>
       </Grid>
     </CenteredPageContent>

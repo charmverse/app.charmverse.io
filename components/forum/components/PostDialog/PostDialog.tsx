@@ -10,16 +10,13 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor';
-import { PageActions } from 'components/common/PageActions';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import PostProperties from '../PostProperties';
+import { PostPage } from '../PostPage/PostPage';
 
 interface Props {
   page?: ForumPostPage | null;
@@ -60,29 +57,6 @@ export default function PostDialog(props: Props) {
     props.onClose();
   }
 
-  const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
-    if (page) {
-      await charmClient.forum.updateForumPost(page.id, updates);
-    }
-  }, 500);
-
-  const setPage = useCallback(
-    async (updates: Partial<Page>) => {
-      if (!page || !mounted.current) {
-        return;
-      }
-      debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>).catch((err: any) => {
-        log.error('Error saving page', err);
-      });
-    },
-    [page]
-  );
-
-  function updateTitle(_page: { title: string; updatedAt: any }) {
-    setPage(_page);
-  }
-  const readOnly = false;
-
   return (
     <RootPortal>
       {popupState.isOpen && (
@@ -117,27 +91,7 @@ export default function PostDialog(props: Props) {
           // }
           onClose={onClose}
         >
-          {page?.postId && (
-            <Container top={50}>
-              <CharmEditor
-                // content={pageDetails?.content as PageContent}
-                // onContentChange={updatePageContent}
-                readOnly={readOnly}
-                pageActionDisplay={null}
-                pageId={page.id}
-                disablePageSpecificFeatures={true}
-                pageType={page.type}
-              >
-                <PageTitleInput
-                  readOnly={readOnly}
-                  value={page.title}
-                  onChange={updateTitle}
-                  updatedAt={page.updatedAt.toString()}
-                />
-                <PostProperties postId={page.postId} readOnly={page.createdBy !== user?.id} />
-              </CharmEditor>
-            </Container>
-          )}
+          {page && <PostPage page={page} />}
         </Dialog>
       )}
     </RootPortal>
