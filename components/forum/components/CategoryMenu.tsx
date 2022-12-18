@@ -133,6 +133,7 @@ export function CategoryMenu() {
           startIcon={<AddIcon />}
           onClick={addCategoryPopupState.open}
           variant='outlined'
+          color='secondary'
           size='small'
           disabledTooltip="You don't have permission to add category"
         >

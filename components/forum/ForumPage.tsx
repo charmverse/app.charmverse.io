@@ -82,14 +82,14 @@ export default function ForumPage() {
       />
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
-          <Box display={{ xs: 'block', lg: 'none' }}>
-            <CategoryMenu />
+          <Box display={{ lg: 'none' }}>
+            <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
           </Box>
           <CreateForumPost />
           <ForumPostList search={search} categoryId={categoryIds} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
+          <CategoryMenu />
         </Grid>
       </Grid>
     </CenteredPageContent>
