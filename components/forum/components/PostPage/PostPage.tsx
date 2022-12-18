@@ -1,24 +1,18 @@
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
-import { PageActions } from 'components/common/PageActions';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import log from 'lib/log';
 import type { PageUpdates } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
+import type { PageContent } from 'models/Page';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PublishPostButton } from './components/PublishPostButton';
@@ -69,31 +63,48 @@ export function PostPage(props: Props) {
     //   revalidate: false
     // });
   }
+
+  function updateForumPost(content: ICharmEditorOutput) {
+    charmClient.forum.updateForumPost(page.id, {
+      content: content.doc,
+      contentText: content.rawText
+    });
+  }
+
   const readOnly = false;
 
   const isMyPost = page.createdBy === user?.id;
 
   return (
     <Container top={50}>
-      <CharmEditor
-        // content={pageDetails?.content as PageContent}
-        // onContentChange={updatePageContent}
-        readOnly={readOnly}
-        pageActionDisplay={null}
-        pageId={page.id}
-        disablePageSpecificFeatures={true}
-        pageType={page.type}
-      >
-        <PageTitleInput
+      <Box minHeight={300}>
+        <CharmEditor
           readOnly={readOnly}
-          value={page.title}
-          onChange={updateTitle}
-          updatedAt={page.updatedAt.toString()}
-        />
-        <PostCategoryInput spaceId={page.spaceId} setCategoryId={updateCategoryId} categoryId={page.post.categoryId} />
-      </CharmEditor>
+          pageActionDisplay={null}
+          pageId={page.id}
+          disablePageSpecificFeatures={true}
+          pageType={page.type}
+          isContentControlled={true}
+          content={page.content as PageContent}
+          onContentChange={updateForumPost}
+        >
+          <PageTitleInput
+            readOnly={readOnly}
+            value={page.title}
+            onChange={updateTitle}
+            updatedAt={page.updatedAt.toString()}
+          />
+          <Box my={2}>
+            <PostCategoryInput
+              spaceId={page.spaceId}
+              setCategoryId={updateCategoryId}
+              categoryId={page.post.categoryId}
+            />
+          </Box>
+        </CharmEditor>
+      </Box>
       {isMyPost && (
-        <Box display='flex' flexDirection='row' justifyContent='space-between' mb={2}>
+        <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
           <PublishPostButton postStatus={page.post.status} onClick={publishForumPost} />
         </Box>
       )}

@@ -43,17 +43,12 @@ export function PostCategoryInput({
     }
   }
   return (
-    <Stack alignItems='center' gap={2} flexDirection='row' color='text.secondary'>
-      <Typography variant='caption' fontWeight='600'>
-        Category
-      </Typography>
-      <PostCategoryAutocomplete
-        value={postCategory ?? null}
-        options={categories ?? []}
-        disabled={readOnly}
-        onChange={updateForumPost}
-      />
-    </Stack>
+    <PostCategoryAutocomplete
+      value={postCategory ?? null}
+      options={categories ?? []}
+      disabled={readOnly}
+      onChange={updateForumPost}
+    />
   );
 }
 
@@ -96,7 +91,7 @@ function PostCategoryAutocomplete({ disabled, options, onChange, value }: Autoco
       }
       getOptionLabel={(option) => option.name}
       noOptionsText='No categories available'
-      renderInput={(params) => <TextField {...params} placeholder='Select category' size='small' />}
+      renderInput={(params) => <TextField {...params} placeholder='Choose a category' size='small' />}
       onChange={(_event, _value) => onChange(_value)}
     />
   );
