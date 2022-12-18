@@ -1,46 +1,33 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import type { PaginatedResponse } from 'lib/public-api';
 
 import type { ForumPostPage } from './interfaces';
-
+import type { PaginatedPostList } from './listForumPosts';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
-
-export type PaginatedPostList<T = Record<string, unknown>> = Required<
-  PaginatedResponse<ForumPostPage> & { cursor: number }
-> &
-  T;
-
-export type CategoryIdQuery = string | string[] | null | undefined;
 /**
  * @sort ignored for now - the server sorts posts by most recent
  */
-export interface ListForumPostsRequest {
+export interface SearchForumPostsRequest {
   spaceId: string;
-  categoryIds?: CategoryIdQuery;
+  search?: string;
   page?: number;
   count?: number;
-  sort?: string;
 }
-export async function listForumPosts(
+export async function searchForumPosts(
   {
     spaceId,
+    search,
     page = 0,
     // Count is the number of posts we want per page
-    count = defaultPostsPerResult,
-    categoryIds
-  }: ListForumPostsRequest,
+    count = defaultPostsPerResult
+  }: SearchForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
-
-  if (typeof categoryIds === 'string') {
-    categoryIds = [categoryIds];
-  }
 
   // Avoid page being less than 0
   page = Math.abs(page);
@@ -53,40 +40,33 @@ export async function listForumPosts(
     }
   };
 
-  const postPropsQuery: Prisma.PostWhereInput = categoryIds
-    ? {
-        categoryId: {
-          in: categoryIds
+  const whereQuery: Prisma.PageWhereInput = {
+    type: 'post',
+    post: {
+      status: 'published'
+    },
+    spaceId,
+    OR: [
+      {
+        title: {
+          contains: search,
+          mode: 'insensitive'
+        }
+      },
+      {
+        contentText: {
+          contains: search,
+          mode: 'insensitive'
         }
       }
-    : categoryIds === null
-    ? { categoryId: null }
-    : {};
-
-  // postPropsQuery.status = 'published';
+    ]
+  };
 
   const pages = await prisma.page.findMany({
     ...orderQuery,
     take: count,
     skip: toSkip,
-    where: {
-      type: 'post',
-      spaceId,
-      post: postPropsQuery,
-      OR: [
-        {
-          createdBy: userId,
-          post: {
-            status: 'draft'
-          }
-        },
-        {
-          post: {
-            status: 'published'
-          }
-        }
-      ]
-    },
+    where: whereQuery,
     include: {
       upDownVotes: {
         select: {
@@ -106,7 +86,7 @@ export async function listForumPosts(
             ...orderQuery,
             skip: toSkip + count,
             take: 1,
-            where: { type: 'post', spaceId, post: postPropsQuery }
+            where: whereQuery
           })
         ).length === 1;
 

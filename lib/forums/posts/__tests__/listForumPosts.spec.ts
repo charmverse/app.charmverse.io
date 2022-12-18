@@ -2,7 +2,7 @@ import type { Space, User } from '@prisma/client';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import type { ForumPostPageWithoutVotes } from '../interfaces';
 import { defaultPostsPerResult, listForumPosts } from '../listForumPosts';
@@ -29,6 +29,43 @@ describe('listForumPosts', () => {
     const posts = await listForumPosts({ spaceId: space.id }, user.id);
 
     expect(posts.data).toHaveLength(defaultPostsPerResult);
+  });
+
+  it(`should return only return published posts or draft posts by the user`, async () => {
+    const { space: _space, user: _user } = await generateUserAndSpaceWithApiToken();
+    const extraUser = await generateSpaceUser({ isAdmin: false, spaceId: _space.id });
+
+    const draftPost = (
+      await generateForumPosts({
+        createdBy: _user.id,
+        spaceId: _space.id,
+        status: 'draft',
+        count: 1
+      })
+    )[0];
+
+    const ignoredDraftPost = (
+      await generateForumPosts({
+        createdBy: extraUser.id,
+        spaceId: _space.id,
+        status: 'draft',
+        count: 1
+      })
+    )[0];
+
+    const publishedPost = (
+      await generateForumPosts({
+        createdBy: _user.id,
+        spaceId: _space.id,
+        status: 'published',
+        count: 1
+      })
+    )[0];
+    const posts = await listForumPosts({ spaceId: _space.id }, _user.id);
+    expect(posts.data).toHaveLength(2);
+    expect(posts.data.some((p) => p.id === publishedPost.id)).toBe(true);
+    expect(posts.data.some((p) => p.id === draftPost.id)).toBe(true);
+    expect(posts.data.every((p) => p.id !== ignoredDraftPost.id)).toBe(true);
   });
 
   it(`should return posts from all cateogories (including uncategorised) if no category is provided`, async () => {

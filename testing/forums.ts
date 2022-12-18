@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { PostStatus, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -27,7 +27,8 @@ export async function generateForumPosts({
   content = { type: 'doc', content: [] },
   contentText = '',
   title,
-  withImageRatio = 30
+  withImageRatio = 30,
+  status = 'published'
 }: {
   spaceId: string;
   createdBy: string;
@@ -37,6 +38,7 @@ export async function generateForumPosts({
   contentText?: string;
   title?: string;
   withImageRatio?: number;
+  status?: PostStatus;
 }) {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
@@ -46,7 +48,7 @@ export async function generateForumPosts({
 
   for (let i = 0; i < count; i++) {
     const postInput: Prisma.PostCreateManyInput = {
-      status: 'published',
+      status,
       categoryId,
       id: v4()
     };

@@ -10,6 +10,7 @@ import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
 import type { PageMeta } from 'lib/pages';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
+import { sanitizeForRegex } from 'lib/utilities/strings';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -41,22 +42,24 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
+  const triggerTextRegex = sanitizeForRegex(triggerText).toLowerCase();
+
   const filterByUserCustomName = (member: Member) =>
     member.properties
       .find((prop) => prop.type === 'name')
       ?.value?.toString()
       .toLowerCase()
-      .match(triggerText.toLowerCase());
+      .match(triggerTextRegex);
 
   const filterByDiscordName = (member: Member) =>
     (member.profile?.social as Record<string, string>)?.discordUsername
       ?.toString()
       .toLowerCase()
-      .match(triggerText.toLowerCase());
+      .match(triggerTextRegex);
 
-  const filterByUsername = (member: Member) => member.username.toLowerCase().match(triggerText.toLowerCase());
+  const filterByUsername = (member: Member) => member.username.toLowerCase().match(triggerTextRegex);
 
-  const filterByPath = (member: Member) => member.path?.toLowerCase().match(triggerText.toLowerCase());
+  const filterByPath = (member: Member) => member.path?.toLowerCase().match(triggerTextRegex);
 
   const filteredMembers =
     triggerText.length !== 0
