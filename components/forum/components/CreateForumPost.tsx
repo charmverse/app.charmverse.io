@@ -15,7 +15,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
+function CreateForumPost() {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -46,7 +46,7 @@ const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
   }, [currentSpace, user, pageTitle]);
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }} ref={ref}>
+    <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea disabled={createPageLoading || !userSpacePermissions?.createPage}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
@@ -76,6 +76,6 @@ const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
       </CardActionArea>
     </Card>
   );
-});
+}
 
 export default CreateForumPost;

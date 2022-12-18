@@ -1,10 +1,11 @@
 import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
-import { useCallback, useRef } from 'react';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
@@ -15,16 +16,16 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import type { PageContent } from 'models/Page';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
-import { PublishPostButton } from './components/PublishPostButton';
 
 interface Props {
   page: ForumPostPage;
+  onPublish?: () => void;
 }
 
 export function PostPage(props: Props) {
   const { page } = props;
-  const mounted = useRef(false);
   const { user } = useUser();
+  const [title, setTitle] = useState(props.page.title);
 
   const debouncedPageUpdate = debouncePromise(async (updates: PageUpdates) => {
     if (page) {
@@ -32,27 +33,16 @@ export function PostPage(props: Props) {
     }
   }, 500);
 
-  const setPage = useCallback(
-    async (updates: Partial<Page>) => {
-      if (!page || !mounted.current) {
-        return;
-      }
-      debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>).catch((err: any) => {
-        log.error('Error saving page', err);
-      });
-    },
-    [page]
-  );
-
-  function updateTitle(_page: { title: string; updatedAt: any }) {
-    setPage(_page);
+  function updateTitle(updates: { title: string; updatedAt: any }) {
+    debouncedPageUpdate({ id: page.id, ...updates } as Partial<Page>).catch((err: any) => {
+      log.error('Error saving page', err);
+    });
+    setTitle(updates.title);
   }
 
   async function publishForumPost() {
     await charmClient.forum.publishForumPost(page.post.id);
-    // mutate((page) => (page ? { ...page, post: { ...page.post, status: 'published' } } : undefined), {
-    //   revalidate: false
-    // });
+    props.onPublish?.();
   }
 
   async function updateCategoryId(categoryId: string) {
@@ -64,16 +54,14 @@ export function PostPage(props: Props) {
     // });
   }
 
-  function updateForumPost(content: ICharmEditorOutput) {
+  function updatePostContent({ doc, rawText }: ICharmEditorOutput) {
     charmClient.forum.updateForumPost(page.id, {
-      content: content.doc,
-      contentText: content.rawText
+      content: doc,
+      contentText: rawText
     });
   }
-
-  const readOnly = false;
-
   const isMyPost = page.createdBy === user?.id;
+  const readOnly = !isMyPost;
 
   return (
     <Container top={50}>
@@ -86,7 +74,7 @@ export function PostPage(props: Props) {
           pageType={page.type}
           isContentControlled={true}
           content={page.content as PageContent}
-          onContentChange={updateForumPost}
+          onContentChange={updatePostContent}
         >
           <PageTitleInput
             readOnly={readOnly}
@@ -105,7 +93,13 @@ export function PostPage(props: Props) {
       </Box>
       {isMyPost && (
         <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-          <PublishPostButton postStatus={page.post.status} onClick={publishForumPost} />
+          <Button
+            disabledTooltip={!title ? 'Post needs a title' : 'Post has already been published'}
+            onClick={publishForumPost}
+            disabled={page.post.status === 'published' || !title}
+          >
+            {page.post.status === 'published' ? 'Published' : 'Publish Post'}
+          </Button>
         </Box>
       )}
     </Container>

@@ -81,7 +81,7 @@ export default function PostDialog(props: Props) {
           // }
           onClose={onClose}
         >
-          {page && <PostPage page={page} />}
+          {page && <PostPage page={page} onPublish={onClose} />}
         </Dialog>
       )}
     </RootPortal>
