@@ -75,51 +75,16 @@ export class NotionBlock {
   }
 
   async convert(block: BlockWithChildren) {
-    try {
-      switch (block.type) {
-        case 'heading_1':
-        case 'heading_2':
-        case 'heading_3': {
-          const level = Number(block.type.split('_')[1]);
-          const contents = convertRichText((block as any)[block.type].rich_text);
-          const childIds = block.children;
-          const { childContent, content } = await this.populatePageContent({ childIds, contents });
+    switch (block.type) {
+      case 'heading_1':
+      case 'heading_2':
+      case 'heading_3': {
+        const level = Number(block.type.split('_')[1]);
+        const contents = convertRichText((block as any)[block.type].rich_text);
+        const childIds = block.children;
+        const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
-          if (childIds.length !== 0) {
-            const disclosureDetailsNode: DisclosureDetailsNode = {
-              type: 'disclosureDetails',
-              content: [
-                {
-                  type: 'disclosureSummary',
-                  content: [
-                    {
-                      type: 'heading',
-                      attrs: {
-                        level
-                      },
-                      content
-                    }
-                  ]
-                },
-                ...childContent
-              ]
-            };
-            return disclosureDetailsNode;
-          } else {
-            return {
-              type: 'heading',
-              attrs: {
-                level
-              },
-              content
-            };
-          }
-        }
-        case 'toggle': {
-          const contents = convertRichText(block.toggle.rich_text);
-          const childIds = block.children;
-          const { childContent, content } = await this.populatePageContent({ childIds, contents });
-
+        if (childIds.length !== 0) {
           const disclosureDetailsNode: DisclosureDetailsNode = {
             type: 'disclosureDetails',
             content: [
@@ -127,7 +92,10 @@ export class NotionBlock {
                 type: 'disclosureSummary',
                 content: [
                   {
-                    type: 'paragraph',
+                    type: 'heading',
+                    attrs: {
+                      level
+                    },
                     content
                   }
                 ]
@@ -135,242 +103,257 @@ export class NotionBlock {
               ...childContent
             ]
           };
-
           return disclosureDetailsNode;
-        }
-
-        case 'paragraph': {
-          const contents = convertRichText(block[block.type].rich_text);
-          const { content } = await this.populatePageContent({ contents });
+        } else {
           return {
-            type: 'paragraph',
+            type: 'heading',
+            attrs: {
+              level
+            },
             content
           };
         }
+      }
+      case 'toggle': {
+        const contents = convertRichText(block.toggle.rich_text);
+        const childIds = block.children;
+        const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
-        case 'bulleted_list_item':
-        case 'numbered_list_item':
-        case 'to_do': {
-          let richText: RichTextItemResponse[] = [];
-
-          if (block.type === 'bulleted_list_item') {
-            richText = block.bulleted_list_item.rich_text;
-          } else if (block.type === 'numbered_list_item') {
-            richText = block.numbered_list_item.rich_text;
-          } else if (block.type === 'to_do') {
-            richText = block.to_do.rich_text;
-          }
-
-          const contents = convertRichText(richText);
-          const childIds = block.children;
-          const { childContent, content } = await this.populatePageContent({ childIds, contents });
-
-          const listItemNode: ListItemNode = {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content
-              },
-              ...childContent
-            ],
-            attrs: {
-              todoChecked: block.type === 'to_do' ? block.to_do.checked : null
-            }
-          };
-
-          return {
-            type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
-            content: [listItemNode]
-          };
-        }
-
-        case 'callout':
-        case 'quote': {
-          let richText: RichTextItemResponse[] = [];
-          let emoji: string | null = null;
-          if (block.type === 'callout') {
-            richText = block.callout.rich_text;
-            emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
-          } else if (block.type === 'quote') {
-            richText = block.quote.rich_text;
-          }
-          const contents = convertRichText(richText);
-          const childIds = block.children;
-          const { childContent, content } = await this.populatePageContent({ childIds, contents });
-
-          const calloutNode = {
-            type: block.type === 'callout' ? 'blockquote' : ('quote' as any),
-            attrs: {
-              emoji
+        const disclosureDetailsNode: DisclosureDetailsNode = {
+          type: 'disclosureDetails',
+          content: [
+            {
+              type: 'disclosureSummary',
+              content: [
+                {
+                  type: 'paragraph',
+                  content
+                }
+              ]
             },
-            content: [
-              {
-                type: 'paragraph',
-                content
-              },
-              ...childContent
-            ]
-          };
+            ...childContent
+          ]
+        };
 
-          return calloutNode;
+        return disclosureDetailsNode;
+      }
+
+      case 'paragraph': {
+        const contents = convertRichText(block[block.type].rich_text);
+        const { content } = await this.populatePageContent({ contents });
+        return {
+          type: 'paragraph',
+          content
+        };
+      }
+
+      case 'bulleted_list_item':
+      case 'numbered_list_item':
+      case 'to_do': {
+        let richText: RichTextItemResponse[] = [];
+
+        if (block.type === 'bulleted_list_item') {
+          richText = block.bulleted_list_item.rich_text;
+        } else if (block.type === 'numbered_list_item') {
+          richText = block.numbered_list_item.rich_text;
+        } else if (block.type === 'to_do') {
+          richText = block.to_do.rich_text;
         }
 
-        case 'video': {
-          return {
-            type: 'iframe',
-            attrs: {
-              src: block.video.type === 'external' ? block.video.external.url : null,
-              type: 'video',
-              width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
-              height: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2 / VIDEO_ASPECT_RATIO
-            }
-          };
-        }
+        const contents = convertRichText(richText);
+        const childIds = block.children;
+        const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
-        case 'embed':
-        case 'bookmark': {
-          return {
-            type: 'iframe',
-            attrs: {
-              src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
-              type: 'embed',
-              width: MAX_EMBED_WIDTH,
-              height: MIN_EMBED_HEIGHT
-            }
-          };
-        }
-
-        case 'divider': {
-          return {
-            type: 'horizontalRule'
-          };
-        }
-
-        case 'code': {
-          return {
-            type: 'codeBlock',
-            content: [
-              {
-                type: 'text',
-                text: block.code.rich_text[0].plain_text
-              }
-            ],
-            attrs: {
-              language: block.code.language
-            }
-          };
-        }
-
-        case 'image': {
-          const persistentUrl = await getPersistentImageUrl({
-            image: block.image,
-            spaceId: this.notionPage.spaceId
-          });
-          return {
-            type: 'image',
-            attrs: {
-              src: persistentUrl,
-              size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
-              aspectRatio: 1
-            }
-          };
-        }
-
-        case 'table': {
-          const tableNode: TableNode = {
-            type: 'table',
-            content: []
-          };
-
-          for (let index = 0; index < this.charmversePage.blocksRecord[block.id].children.length; index++) {
-            const rowId = this.charmversePage.blocksRecord[block.id].children[index];
-            const row = this.charmversePage.blocksRecord[rowId];
-            if (row.type === 'table_row') {
-              const content: TableRowNode['content'] = [];
-              tableNode.content.push({
-                type: 'table_row',
-                content
-              });
-              for (const cell of row.table_row.cells) {
-                const contents = convertRichText(cell);
-                const { content: tableRowContent } = await this.populatePageContent({ contents });
-
-                content.push({
-                  type: index === 0 ? 'table_header' : 'table_cell',
-                  content: tableRowContent
-                });
-              }
-            }
+        const listItemNode: ListItemNode = {
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content
+            },
+            ...childContent
+          ],
+          attrs: {
+            todoChecked: block.type === 'to_do' ? block.to_do.checked : null
           }
-          return tableNode;
+        };
+
+        return {
+          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+          content: [listItemNode]
+        };
+      }
+
+      case 'callout':
+      case 'quote': {
+        let richText: RichTextItemResponse[] = [];
+        let emoji: string | null = null;
+        if (block.type === 'callout') {
+          richText = block.callout.rich_text;
+          emoji = block.callout.icon?.type === 'emoji' ? block.callout.icon.emoji : null;
+        } else if (block.type === 'quote') {
+          richText = block.quote.rich_text;
         }
+        const contents = convertRichText(richText);
+        const childIds = block.children;
+        const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
-        case 'column_list': {
-          const childIds = block.children;
-          const { childContent } = await this.populatePageContent({ childIds });
-          const columnLayoutNode: ColumnLayoutNode = {
-            type: 'columnLayout',
-            content: childContent
-          };
+        const calloutNode = {
+          type: block.type === 'callout' ? 'blockquote' : ('quote' as any),
+          attrs: {
+            emoji
+          },
+          content: [
+            {
+              type: 'paragraph',
+              content
+            },
+            ...childContent
+          ]
+        };
 
-          return columnLayoutNode;
-        }
+        return calloutNode;
+      }
 
-        case 'column': {
-          const childIds = block.children;
-          const { childContent } = await this.populatePageContent({ childIds });
-
-          const columnBlockNode: ColumnBlockNode = {
-            type: 'columnBlock',
-            // This empty paragraph is necessary, otherwise charmeditor throws an error
-            content: [
-              {
-                type: 'paragraph',
-                content: childContent
-              }
-            ]
-          };
-
-          return columnBlockNode;
-        }
-
-        case 'link_to_page': {
-          const linkedPageId =
-            block.link_to_page.type === 'page_id'
-              ? block.link_to_page.page_id
-              : block.link_to_page.type === 'database_id'
-              ? block.link_to_page.database_id
-              : null;
-          if (linkedPageId === this.charmversePage.notionPageId) {
-            return {
-              type: 'page',
-              attrs: {
-                id: this.charmversePage.charmversePageId
-              }
-            };
+      case 'video': {
+        return {
+          type: 'iframe',
+          attrs: {
+            src: block.video.type === 'external' ? block.video.external.url : null,
+            type: 'video',
+            width: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2,
+            height: (MIN_EMBED_WIDTH + MAX_EMBED_WIDTH) / 2 / VIDEO_ASPECT_RATIO
           }
+        };
+      }
 
-          if (linkedPageId) {
-            const charmversePage = await this.notionPage.fetchAndCreatePage({
-              notionPageId: linkedPageId
+      case 'embed':
+      case 'bookmark': {
+        return {
+          type: 'iframe',
+          attrs: {
+            src: block.type === 'bookmark' ? block.bookmark.url : block.embed.url,
+            type: 'embed',
+            width: MAX_EMBED_WIDTH,
+            height: MIN_EMBED_HEIGHT
+          }
+        };
+      }
+
+      case 'divider': {
+        return {
+          type: 'horizontalRule'
+        };
+      }
+
+      case 'code': {
+        return {
+          type: 'codeBlock',
+          content: [
+            {
+              type: 'text',
+              text: block.code.rich_text[0].plain_text
+            }
+          ],
+          attrs: {
+            language: block.code.language
+          }
+        };
+      }
+
+      case 'image': {
+        const persistentUrl = await getPersistentImageUrl({
+          image: block.image,
+          spaceId: this.notionPage.spaceId
+        });
+        return {
+          type: 'image',
+          attrs: {
+            src: persistentUrl,
+            size: (MAX_IMAGE_WIDTH + MIN_IMAGE_WIDTH) / 2,
+            aspectRatio: 1
+          }
+        };
+      }
+
+      case 'table': {
+        const tableNode: TableNode = {
+          type: 'table',
+          content: []
+        };
+
+        for (let index = 0; index < this.charmversePage.blocksRecord[block.id].children.length; index++) {
+          const rowId = this.charmversePage.blocksRecord[block.id].children[index];
+          const row = this.charmversePage.blocksRecord[rowId];
+          if (row.type === 'table_row') {
+            const content: TableRowNode['content'] = [];
+            tableNode.content.push({
+              type: 'table_row',
+              content
             });
-            return {
-              type: 'page',
-              attrs: {
-                id: charmversePage?.id
-              }
-            };
+            for (const cell of row.table_row.cells) {
+              const contents = convertRichText(cell);
+              const { content: tableRowContent } = await this.populatePageContent({ contents });
+
+              content.push({
+                type: index === 0 ? 'table_header' : 'table_cell',
+                content: tableRowContent
+              });
+            }
           }
-          return null;
+        }
+        return tableNode;
+      }
+
+      case 'column_list': {
+        const childIds = block.children;
+        const { childContent } = await this.populatePageContent({ childIds });
+        const columnLayoutNode: ColumnLayoutNode = {
+          type: 'columnLayout',
+          content: childContent
+        };
+
+        return columnLayoutNode;
+      }
+
+      case 'column': {
+        const childIds = block.children;
+        const { childContent } = await this.populatePageContent({ childIds });
+
+        const columnBlockNode: ColumnBlockNode = {
+          type: 'columnBlock',
+          // This empty paragraph is necessary, otherwise charmeditor throws an error
+          content: [
+            {
+              type: 'paragraph',
+              content: childContent
+            }
+          ]
+        };
+
+        return columnBlockNode;
+      }
+
+      case 'link_to_page': {
+        const linkedPageId =
+          block.link_to_page.type === 'page_id'
+            ? block.link_to_page.page_id
+            : block.link_to_page.type === 'database_id'
+            ? block.link_to_page.database_id
+            : null;
+        if (linkedPageId === this.charmversePage.notionPageId) {
+          return {
+            type: 'page',
+            attrs: {
+              id: this.charmversePage.charmversePageId
+            }
+          };
         }
 
-        case 'child_database':
-        case 'child_page': {
+        if (linkedPageId) {
           const charmversePage = await this.notionPage.fetchAndCreatePage({
-            notionPageId: block.id
+            notionPageId: linkedPageId
           });
-
           return {
             type: 'page',
             attrs: {
@@ -378,12 +361,25 @@ export class NotionBlock {
             }
           };
         }
-        default: {
-          break;
-        }
+        return null;
       }
-    } catch (err) {
-      // console.log({ err1: err });
+
+      case 'child_database':
+      case 'child_page': {
+        const charmversePage = await this.notionPage.fetchAndCreatePage({
+          notionPageId: block.id
+        });
+
+        return {
+          type: 'page',
+          attrs: {
+            id: charmversePage?.id
+          }
+        };
+      }
+      default: {
+        break;
+      }
     }
   }
 }

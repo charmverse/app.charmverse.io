@@ -7,6 +7,7 @@ import type { PageContent } from 'models';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
+import { getPageTitleText } from '../getPageTitle';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { BlocksRecord } from '../types';
 
@@ -162,9 +163,28 @@ export class CharmversePage {
           notionPage: this.notionPage
         });
 
-        const charmverseBlock = await notionBlock.convert(this.blocksRecord[firstLevelBlockId]);
-        if (charmverseBlock) {
-          pageContent.content?.push(charmverseBlock);
+        const block = this.blocksRecord[firstLevelBlockId];
+
+        try {
+          const charmverseBlock = await notionBlock.convert(block);
+          if (charmverseBlock) {
+            pageContent.content?.push(charmverseBlock);
+          }
+        } catch (err) {
+          const failedImportsRecord = this.notionPage.cache.failedImportsRecord[block.id];
+          if (!failedImportsRecord) {
+            this.notionPage.cache.failedImportsRecord[block.id] = {
+              blocks: [[block.id, block.type]],
+              pageId: this.notionPageId,
+              title: getPageTitleText(notionPage),
+              type: notionPage.object
+            };
+          } else {
+            this.notionPage.cache.failedImportsRecord[block.id] = {
+              ...failedImportsRecord,
+              blocks: [...failedImportsRecord.blocks, [block.id, block.type]]
+            };
+          }
         }
       }
 
