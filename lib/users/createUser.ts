@@ -13,7 +13,7 @@ import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 export async function createUserFromWallet(
-  { address = Wallet.createRandom().address, email }: { address?: string; email?: string },
+  { address = Wallet.createRandom().address, email }: { address?: string; email?: string } = {},
   signupAnalytics: Partial<SignupAnalytics> = {},
   // An ID set by analytics tools to have pre signup user journey
   preExistingId: string = v4(),
