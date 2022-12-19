@@ -55,10 +55,10 @@ export class NotionBlock {
       if (contents[index].type === 'mention') {
         const mentionNode = contents[index] as MentionNode;
         if (mentionNode.attrs.type === 'page') {
-          try {
-            const createdPage = await this.notionPage.fetchAndCreatePage({
-              notionPageId: mentionNode.attrs.value
-            });
+          const createdPage = await this.notionPage.fetchAndCreatePage({
+            notionPageId: mentionNode.attrs.value
+          });
+          if (createdPage) {
             modifiedContent[index] = {
               attrs: {
                 type: 'page',
@@ -66,8 +66,6 @@ export class NotionBlock {
               },
               type: 'mention'
             };
-          } catch (err) {
-            // console.log(err);
           }
         }
       }
@@ -385,7 +383,7 @@ export class NotionBlock {
         }
       }
     } catch (err) {
-      //
+      // console.log({ err1: err });
     }
   }
 }

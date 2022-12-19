@@ -64,35 +64,42 @@ export class NotionPage {
     this.totalImportedPagesLimit = totalImportedPagesLimit;
   }
 
-  async fetchAndCreatePage({ notionPageId }: { notionPageId: string }): Promise<Page> {
-    let notionPage = this.cache.notionPagesRecord[notionPageId];
-    if (!notionPage) {
-      notionPage = await this.retrievePage(notionPageId);
-    }
+  async fetchAndCreatePage({ notionPageId }: { notionPageId: string }): Promise<Page | null> {
+    try {
+      let notionPage = this.cache.notionPagesRecord[notionPageId];
+      if (!notionPage) {
+        notionPage = await this.retrievePage(notionPageId);
+      }
 
-    if (notionPage.object === 'page') {
-      const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
+      if (notionPage.object === 'page') {
+        const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
 
-      const charmversePage = new CharmversePage({
-        blocksRecord,
-        topLevelBlockIds,
-        notionPageId,
-        cache: this.cache,
-        notionPage: this
-      });
+        const charmversePage = new CharmversePage({
+          blocksRecord,
+          topLevelBlockIds,
+          notionPageId,
+          cache: this.cache,
+          notionPage: this
+        });
 
-      return charmversePage.create();
-    } else {
-      const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
+        return charmversePage.create();
+      } else {
+        const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
 
-      const charmverseDatabasePage = new CharmverseDatabasePage({
-        pageIds,
-        notionPageId,
-        cache: this.cache,
-        notionPage: this
-      });
+        const charmverseDatabasePage = new CharmverseDatabasePage({
+          pageIds,
+          notionPageId,
+          cache: this.cache,
+          notionPage: this
+        });
 
-      return charmverseDatabasePage.create();
+        return charmverseDatabasePage.create();
+      }
+    } catch (err: any) {
+      if (err.code === 'object_not_found') {
+        this.cache.pagesWithoutIntegrationAccess.add(notionPageId);
+      }
+      return null;
     }
   }
 
@@ -221,7 +228,7 @@ export class NotionPage {
     return pageRecord.notionPage as Required<DatabasePageItem>['notionPage'];
   }
 
-  async fetchNestedChildBlocks(parentBlockIds: string[]) {
+  private async fetchNestedChildBlocks(parentBlockIds: string[]) {
     const { fetchChildBlocks, blocksPerRequest, client } = this;
     const blockCursorRecord: Record<string, string> = {};
     let childBlockListResponses: ChildBlockListResponse[] = [];
@@ -286,7 +293,7 @@ export class NotionPage {
     };
   }
 
-  async retrievePage(notionPageId: string) {
+  private async retrievePage(notionPageId: string) {
     // If the page doesn't exist in the cache fetch it
     if (!this.cache.notionPagesRecord[notionPageId]) {
       const pageResponse = (await this.client.pages.retrieve({
@@ -299,19 +306,7 @@ export class NotionPage {
     return this.cache.notionPagesRecord[notionPageId];
   }
 
-  async retrieveDatabasePage(notionDatabasePageId: string) {
-    if (!this.cache.notionPagesRecord[notionDatabasePageId]) {
-      const databasePage = (await this.client.databases.retrieve({
-        database_id: notionDatabasePageId
-      })) as DatabaseObjectResponse;
-      this.cache.notionPagesRecord[notionDatabasePageId] = databasePage;
-      log.debug(`[notion]: Retrieved database ${notionDatabasePageId} manually`);
-    }
-
-    return this.cache.notionPagesRecord[notionDatabasePageId];
-  }
-
-  async fetchChildBlocks(listBlockChildrenParameters: ListBlockChildrenParameters, client: Client) {
+  private async fetchChildBlocks(listBlockChildrenParameters: ListBlockChildrenParameters, client: Client) {
     return promiseRetry<ChildBlockListResponse | void>(
       (retry) => {
         return client.blocks.children

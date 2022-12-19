@@ -24,25 +24,14 @@ export async function importFromWorkspace({
     workspaceIcon
   });
 
-  // const {
-  //   notionPages,
-  //   charmversePagesRecord,
-  //   charmverseCardsRecord,
-  //   failedImportsRecord,
-  //   pagesWithoutIntegrationAccess
-  //   // createdCharmversePageIds
-  // } = notionCache;
-  // log.debug(`[notion] Fetching content for ${notionCache.notionPages.length} pages`, { spaceId });
+  const pagesRecordValues = Array.from(notionImporter.cache.pagesRecord.values());
 
-  // log.info('[notion] Completed import of Notion pages', {
-  //   'Notion pages': notionPages.length,
-  //   'CharmVerse pages': Object.keys(charmversePagesRecord).length,
-  //   'CharmVerse cards': Object.keys(charmverseCardsRecord).length,
-  //   // 'Created CharmVerse pages (incl. cards)': createdCharmversePageIds.size,
-  //   'Failed import pages': failedImportsRecord,
-  //   pagesWithoutIntegrationAccess
-  // });
+  log.info('[notion] Completed import of Notion pages', {
+    'Notion pages': pagesRecordValues.filter((value) => value.notionPage).length,
+    'Created CharmVerse pages (incl. cards)': pagesRecordValues.filter((value) => value.charmversePage).length,
+    'Failed import pages': Object.values(notionImporter.cache.failedImportsRecord).slice(0, 25),
+    'Pages without integration access': notionImporter.cache.pagesWithoutIntegrationAccess
+  });
 
-  // return Object.values().slice(0, 25);
   return [];
 }
