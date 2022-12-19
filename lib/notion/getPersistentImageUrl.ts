@@ -1,15 +1,7 @@
 import { getFilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 
-import type { NotionImage } from './types';
-
 // if image is stored in notion s3, it will expire so we need to re-upload it to our s3
-export function getPersistentImageUrl({
-  image,
-  spaceId
-}: {
-  image: NotionImage;
-  spaceId: string;
-}): Promise<string | null> {
+export function getPersistentImageUrl({ image, spaceId }: { image: any; spaceId: string }): Promise<string | null> {
   const url = image.type === 'external' ? image.external.url : image.type === 'file' ? image.file.url : null;
   const isNotionS3 = url?.includes('amazonaws.com/secure.notion-static.com');
   if (url && isNotionS3) {

@@ -1,6 +1,6 @@
-import type { TextContent, MentionNode } from 'models';
+import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 
-import type { RichTextItemResponse } from './types';
+import type { TextContent, MentionNode } from 'models';
 
 export function convertRichText(richTexts: RichTextItemResponse[]) {
   const contents: (TextContent | MentionNode)[] = [];
