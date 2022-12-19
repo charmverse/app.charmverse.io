@@ -12,7 +12,6 @@ import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEventHandler } from 'react';
-import { useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
@@ -164,15 +163,19 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     // Create the new mapped board properties to know what are the ids of each property and option
     const mappedBoardProperties = mapCardBoardProperties(mergedFields);
 
+    if (!user || !currentSpace || !board) {
+      throw new Error('An error occured while importing. Please verify you have a valid user, space and board.');
+    }
+
     // Create the new card blocks from the csv data
     const blocks = csvData
       .map((csvRow) => {
         const card = createCard({
           parentId: board.id,
           rootId: board.id,
-          createdBy: user?.id ?? '',
-          updatedBy: user?.id ?? '',
-          spaceId: currentSpace?.id ?? '',
+          createdBy: user.id,
+          updatedBy: user.id,
+          spaceId: currentSpace.id,
           title: csvRow.Name ?? '',
           fields: {
             properties: createCardFieldProperties(csvRow, mappedBoardProperties, members)

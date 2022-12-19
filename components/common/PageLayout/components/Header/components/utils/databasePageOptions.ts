@@ -6,12 +6,12 @@ import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
-interface MappedProperties {
+type MappedProperties = {
   id: string;
   options: Record<string, string>;
   name: string;
   type: PropertyType;
-}
+};
 
 export const monthNames = [
   'January',
@@ -30,8 +30,8 @@ export const monthNames = [
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
-export const createBoardPropertyOptions = (arr: string[]): IPropertyTemplate['options'] =>
-  arr
+export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
+  return arr
     .filter((value) => !!value)
     .map((value) => {
       // generate random color for multiSelect type
@@ -43,8 +43,9 @@ export const createBoardPropertyOptions = (arr: string[]): IPropertyTemplate['op
         value
       };
     });
+}
 
-export const isValidCsvResult = (results: ParseResult<unknown>): results is ParseResult<Record<string, string>> => {
+export function isValidCsvResult(results: ParseResult<unknown>): results is ParseResult<Record<string, string>> {
   if (
     Array.isArray(results?.data) &&
     results.data.length > 0 &&
@@ -55,10 +56,10 @@ export const isValidCsvResult = (results: ParseResult<unknown>): results is Pars
     return true;
   }
   return false;
-};
+}
 
-export const mapCardBoardProperties = (cardProperties: IPropertyTemplate[]) =>
-  cardProperties.reduce<{ [key: string]: MappedProperties }>(
+export function mapCardBoardProperties(cardProperties: IPropertyTemplate[]) {
+  return cardProperties.reduce<{ [key: string]: MappedProperties }>(
     (acc, b) => ({
       ...acc,
       [b.name]: {
@@ -73,16 +74,16 @@ export const mapCardBoardProperties = (cardProperties: IPropertyTemplate[]) =>
     }),
     {}
   );
+}
 
-export const createNewPropertiesForBoard = (
+export function createNewPropertiesForBoard(
   csvData: Record<string, string>[],
   prop: string,
   existingBoardProp?: MappedProperties
-): IPropertyTemplate => {
+): IPropertyTemplate {
   const propValues = csvData.map((result) => result[prop]).filter((result) => !!result);
   const defaultProps = { id: uuid.v4(), name: prop, options: [] };
-  // eslint-disable-next-line
-  const emailReg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  const emailReg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
   // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
   if (existingBoardProp && (existingBoardProp.type === 'select' || existingBoardProp.type === 'multiSelect')) {
@@ -111,24 +112,24 @@ export const createNewPropertiesForBoard = (
   if (propValues.every((p) => !Number.isNaN(+p))) {
     return { ...defaultProps, type: 'number' };
   }
-  if (propValues.some((p) => p.startsWith('http') || p.startsWith('www.'))) {
+  if (propValues.every((p) => p.startsWith('http') || p.startsWith('www.'))) {
     return { ...defaultProps, type: 'url' };
   }
-  if (propValues.some((p) => emailReg.test(p))) {
+  if (propValues.every((p) => emailReg.test(p))) {
     return { ...defaultProps, type: 'email' };
   }
-  if (propValues.some((p) => p === 'true' || p === 'false')) {
+  if (propValues.every((p) => p === 'true' || p === 'false')) {
     return { ...defaultProps, type: 'checkbox' };
   }
 
   return { ...defaultProps, type: 'text' };
-};
+}
 
-export const createCardFieldProperties = (
+export function createCardFieldProperties(
   csvRow: Record<string, string>,
   mappedBoardProperties: { [key: string]: MappedProperties },
   members: Member[]
-) => {
+) {
   return Object.entries(csvRow).reduce<Record<string, string | string[]>>((acc, [key, value]) => {
     // Exclude the name. That prop is used only for the card title
     if (key === 'Name') {
@@ -188,13 +189,13 @@ export const createCardFieldProperties = (
       ...acc
     };
   }, {});
-};
-export const customizer = (objValue: IPropertyTemplate[], srcValue: IPropertyTemplate[], propertyName: string) => {
+}
+export function customizer(objValue: IPropertyTemplate[], srcValue: IPropertyTemplate[], propertyName: string) {
   if (propertyName === 'options') {
     return _.unionBy(objValue, srcValue, 'value');
   }
-};
+}
 
-export const deepMergeArrays = (arr1: IPropertyTemplate[], arr2: IPropertyTemplate[]) => {
+export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTemplate[]) {
   return _(arr1).keyBy('name').mergeWith(_.keyBy(arr2, 'name'), customizer).values().value();
-};
+}
