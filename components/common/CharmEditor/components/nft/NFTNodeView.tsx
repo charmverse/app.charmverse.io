@@ -28,6 +28,12 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
   const ref = useRef<HTMLDivElement>(null);
   const attrs = node.attrs as Partial<NodeAttrs>;
 
+  useEffect(() => {
+    if (ref.current) {
+      setCSSOverrides(ref.current);
+    }
+  }, [ref.current]);
+
   // If there are no source for the node, return the image select component
   if (!attrs.contract) {
     if (readOnly) {
@@ -59,19 +65,13 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
     }
   }
 
-  useEffect(() => {
-    if (ref.current) {
-      setCSSOverrides(ref.current);
-    }
-  }, [ref]);
-
   return (
     <>
       <Script id='opensea-script' src={widgetJS} />
       <BlockAligner onDelete={deleteNode}>
         <StyledContainer ref={ref}>
           {/* @ts-ignore nft-card element is from OpenSea */}
-          <nft-card contractAddress={attrs.contract} tokenId={attrs.token}></nft-card>
+          <nft-card contractAddress={attrs.contract} tokenId={attrs.token} width='100%'></nft-card>
         </StyledContainer>
       </BlockAligner>
     </>
