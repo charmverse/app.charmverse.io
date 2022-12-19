@@ -37,7 +37,6 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
-import type { Block } from 'lib/focalboard/block';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import {
@@ -145,11 +144,15 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     const newBoardProperties = allAvailableProperties.map((prop) =>
       createNewPropertiesForBoard(csvData, prop, mappedInitialBoardProperties[prop])
     );
-    // Merge the fields of both boards
+
+    /**
+     * Merge the fields of both boards.
+     * The order is important here. The old board should be last so it can overwrite the important properties.
+     */
     const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
 
     // Create the new board and update the db
-    const newBoardBlock: Block = {
+    const newBoardBlock: Board = {
       ...board,
       fields: {
         ...board.fields,
@@ -170,13 +173,19 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     // Create the new card blocks from the csv data
     const blocks = csvData
       .map((csvRow) => {
+        // Show the first text column as a title if no Name column is in the csv
+        const firstTextId = newBoardBlock.fields.cardProperties.find((prop) => prop.type === 'text')?.id;
+        const fieldProperties = createCardFieldProperties(csvRow, mappedBoardProperties, members);
+        const text = firstTextId ? fieldProperties[firstTextId] : undefined;
+        const textName = text && typeof text === 'string' ? text : '';
+
         const card = createCard({
           parentId: board.id,
           rootId: board.id,
           createdBy: user.id,
           updatedBy: user.id,
           spaceId: currentSpace.id,
-          title: csvRow.Name ?? '',
+          title: csvRow.Name || textName,
           fields: {
             properties: createCardFieldProperties(csvRow, mappedBoardProperties, members)
           }

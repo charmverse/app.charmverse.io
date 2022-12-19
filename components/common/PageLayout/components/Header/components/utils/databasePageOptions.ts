@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { DateTime } from 'luxon';
+import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
 import * as uuid from 'uuid';
 
@@ -14,31 +13,15 @@ type MappedProperties = {
   type: PropertyType;
 };
 
-export const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-];
-
 export const selectColors = Object.keys(focalboardColorsMap);
 
-export function isDateValid(str: string): boolean {
-  if (DateTime.fromISO(str).isValid) {
-    return true;
+export const isDate = (dt: string) => !Number.isNaN(new Date(dt).valueOf());
+
+export function isDateValid(strDate: string) {
+  if (strDate.includes(' -> ')) {
+    return strDate.split(' -> ').every(isDate);
   }
-  if (!Number.isNaN(+str) && DateTime.fromMillis(+str).isValid) {
-    return true;
-  }
-  return false;
+  return isDate(strDate);
 }
 
 export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
@@ -174,8 +157,8 @@ export function createCardFieldProperties(
     }
 
     if (mappedBoardProperties[key]?.type === 'multiSelect') {
-      const values = value.split('|');
-      const optionIds = values.map((v) => mappedBoardProperties[key].options[v]);
+      const multiSelectValues = value.split('|');
+      const optionIds = multiSelectValues.map((v) => mappedBoardProperties[key].options[v]);
 
       if (optionIds.length > 0) {
         return {
@@ -201,12 +184,23 @@ export function createCardFieldProperties(
     };
   }, {});
 }
-export function customizer(objValue: IPropertyTemplate[], srcValue: IPropertyTemplate[], propertyName: string) {
-  if (propertyName === 'options') {
-    return _.unionBy(objValue, srcValue, 'value');
-  }
-}
 
-export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTemplate[]) {
-  return _(arr1).keyBy('name').mergeWith(_.keyBy(arr2, 'name'), customizer).values().value();
+export function deepMergeArrays(arr1: IPropertyTemplate[], arr2: IPropertyTemplate[]): IPropertyTemplate[] {
+  return [
+    ...arr1
+      .concat(arr2)
+      .reduce<Map<string, IPropertyTemplate>>((acc, obj) => {
+        const currentObj = acc.get(obj.name);
+
+        if (currentObj) {
+          return acc.set(
+            obj.name,
+            Object.assign(currentObj || {}, obj, { options: unionBy(currentObj.options, obj.options, 'value') })
+          );
+        }
+
+        return acc.set(obj.name, Object.assign(currentObj || {}, obj));
+      }, new Map())
+      .values()
+  ];
 }
