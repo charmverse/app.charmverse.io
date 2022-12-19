@@ -26,10 +26,10 @@ export type CreatePageInput = {
 };
 
 export interface ChildBlockListResponse {
-  block_id: string;
+  parent_block_id: string;
   results: BlockObjectResponse[];
   next_cursor: string | null;
 }
 
-export type BlockWithChildren = BlockObjectResponse & { children: string[] };
+export type BlockWithChildren = BlockObjectResponse & { children: string[]; has_children: boolean };
 export type BlocksRecord = Record<string, BlockWithChildren>;

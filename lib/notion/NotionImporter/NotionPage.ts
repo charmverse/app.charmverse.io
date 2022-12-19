@@ -116,27 +116,30 @@ export class NotionPage {
         blocksRecord[childId] = nestedBlocksRecord[childId];
       });
 
-      let previousBlocks = [...topLevelBlockIds];
+      let previousBlockIds = topLevelBlockIds.filter((blockId) => nestedBlocksRecord[blockId].has_children);
 
       for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
         const { blockChildrenRecord: internalBlockChildrenRecord, blocksRecord: internalBlocksRecord } =
-          await this.fetchNestedChildBlocks(previousBlocks);
+          await this.fetchNestedChildBlocks(previousBlockIds);
 
         // Store the children id in blocks record
-        previousBlocks.forEach((parentBlockId) => {
+        previousBlockIds.forEach((parentBlockId) => {
           blocksRecord[parentBlockId] = {
             ...blocksRecord[parentBlockId],
             children: internalBlockChildrenRecord[parentBlockId]
           };
         });
 
-        previousBlocks = Object.keys(internalBlocksRecord);
+        // Only keep track of the blocks that has children
+        previousBlockIds = Object.keys(internalBlocksRecord).filter(
+          (blockId) => internalBlocksRecord[blockId].has_children
+        );
 
-        previousBlocks.forEach((previousBlockId) => {
+        previousBlockIds.forEach((previousBlockId) => {
           blocksRecord[previousBlockId] = internalBlocksRecord[previousBlockId];
         });
 
-        if (!previousBlocks.length) {
+        if (!previousBlockIds.length) {
           break;
         }
       }
@@ -257,26 +260,26 @@ export class NotionPage {
 
       if (childBlockListResponses.length) {
         childBlockListResponses.forEach((childBlockListResponse) => {
-          if (!blockChildrenRecord[childBlockListResponse.block_id]) {
-            blockChildrenRecord[childBlockListResponse.block_id] = [];
+          if (!blockChildrenRecord[childBlockListResponse.parent_block_id]) {
+            blockChildrenRecord[childBlockListResponse.parent_block_id] = [];
           }
 
           childBlockListResponse.results.forEach((result) => {
-            blockChildrenRecord[childBlockListResponse.block_id].push(result.id);
+            blockChildrenRecord[childBlockListResponse.parent_block_id].push(result.id);
           });
 
           childBlockListResponse.results.forEach((result) => {
             blocksRecord[result.id] = {
               ...result,
-              children: []
+              children: [],
+              has_children: result.has_children
             };
           });
 
-          if (!blockCursorRecord[childBlockListResponse.block_id] && childBlockListResponse.next_cursor) {
-            blockCursorRecord[childBlockListResponse.block_id] = childBlockListResponse.next_cursor;
+          if (!blockCursorRecord[childBlockListResponse.parent_block_id] && childBlockListResponse.next_cursor) {
+            blockCursorRecord[childBlockListResponse.parent_block_id] = childBlockListResponse.next_cursor;
             fetchMore = fetchMore || true;
           }
-          return childBlockListResponse.results;
         });
       } else {
         break;
@@ -315,7 +318,7 @@ export class NotionPage {
             (response) =>
               ({
                 results: response.results,
-                block_id: listBlockChildrenParameters.block_id,
+                parent_block_id: listBlockChildrenParameters.block_id,
                 next_cursor: response.next_cursor
               } as ChildBlockListResponse)
           )

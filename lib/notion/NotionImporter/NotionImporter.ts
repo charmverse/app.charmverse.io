@@ -2,6 +2,8 @@ import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
+import log from 'lib/log';
+
 import { createPrismaPage } from '../createPrismaPage';
 
 import { NotionCache } from './NotionCache';
@@ -32,35 +34,38 @@ export class NotionImporter {
     maxChildBlockDepth = 10,
     spaceId,
     userId,
-    accessToken
+    accessToken,
+    client
   }: {
     userId: string;
     spaceId: string;
-    accessToken: string;
+    accessToken?: string;
     maxChildBlockDepth?: number;
     blocksPerRequest?: number;
     totalImportedPagesLimit?: number;
+    client?: Client;
   }) {
-    const client = new Client({
-      auth: accessToken
-    });
+    this.client =
+      client ??
+      new Client({
+        auth: accessToken
+      });
     const workspacePageId = v4();
     const notionCache = new NotionCache();
     const notionPage = new NotionPage({
       blocksPerRequest,
       maxChildBlockDepth,
       totalImportedPagesLimit,
-      client,
+      client: this.client,
       cache: notionCache,
       spaceId,
       userId,
       workspacePageId
     });
 
-    this.workspacePageId = workspacePageId;
     this.cache = notionCache;
     this.notionPage = notionPage;
-    this.client = client;
+    this.workspacePageId = workspacePageId;
     this.userId = userId;
     this.spaceId = spaceId;
     this.blocksPerRequest = blocksPerRequest;
