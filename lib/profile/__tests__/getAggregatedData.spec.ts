@@ -14,7 +14,7 @@ let space: Space & { spaceRoles: SpaceRole[] };
 const walletAddresses = [Wallet.createRandom().address, Wallet.createRandom().address].map((a) => a.toLowerCase());
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(walletAddresses[0], false);
+  const generated = await generateUserAndSpaceWithApiToken({ walletAddress: walletAddresses[0] }, false);
   user = generated.user;
   space = generated.space;
 
