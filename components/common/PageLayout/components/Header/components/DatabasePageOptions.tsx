@@ -149,7 +149,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     const mergedFields = deepMergeArrays(newBoardProperties, board.fields.cardProperties);
 
     // Create the new board and update the db
-    const newBlock: Block = {
+    const newBoardBlock: Block = {
       ...board,
       fields: {
         ...board.fields,
@@ -158,7 +158,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
     };
 
     // Update board with new cardProperties
-    await charmClient.updateBlock(newBlock);
+    await charmClient.updateBlock(newBoardBlock);
 
     // Create the new mapped board properties to know what are the ids of each property and option
     const mappedBoardProperties = mapCardBoardProperties(mergedFields);

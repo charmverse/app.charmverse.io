@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { DateTime } from 'luxon';
 import type { ParseResult } from 'papaparse';
 import * as uuid from 'uuid';
 
@@ -29,6 +30,16 @@ export const monthNames = [
 ];
 
 export const selectColors = Object.keys(focalboardColorsMap);
+
+export function isDateValid(str: string): boolean {
+  if (DateTime.fromISO(str).isValid) {
+    return true;
+  }
+  if (!Number.isNaN(+str) && DateTime.fromMillis(+str).isValid) {
+    return true;
+  }
+  return false;
+}
 
 export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
   return arr
@@ -106,7 +117,7 @@ export function createNewPropertiesForBoard(
   if (propValues.every((p) => uuid.validate(p))) {
     return { ...defaultProps, type: 'person' };
   }
-  if (propValues.some((p) => monthNames.find((month) => p.includes(month)))) {
+  if (propValues.every(isDateValid)) {
     return { ...defaultProps, type: 'date' };
   }
   if (propValues.every((p) => !Number.isNaN(+p))) {
@@ -152,7 +163,7 @@ export function createCardFieldProperties(
     }
 
     if (mappedBoardProperties[key]?.type === 'select') {
-      const optionId = mappedBoardProperties[key].options[value];
+      const optionId: string = mappedBoardProperties[key].options[value];
 
       if (optionId && typeof optionId === 'string') {
         return {
