@@ -125,26 +125,25 @@ export function WalletSelector({ loginSuccess }: Props) {
     <div>
       <ErrorComponent error={error} processError={processConnectionError} />
       <Grid container spacing={2}>
-        {!isMobile && (
-          <Grid item xs={12}>
-            <ConnectorButton
-              name={
-                typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                  ? 'MetaMask'
-                  : 'Install MetaMask'
-              }
-              onClick={
-                typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
-                  ? () => handleConnect(injected)
-                  : handleOnboarding
-              }
-              iconUrl='metamask.png'
-              disabled={connector === injected || !!activatingConnector}
-              isActive={connector === injected}
-              isLoading={activatingConnector === injected}
-            />
-          </Grid>
-        )}
+        <Grid item xs={12}>
+          <ConnectorButton
+            name={
+              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
+                ? 'MetaMask'
+                : 'Install MetaMask'
+            }
+            onClick={
+              typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled()
+                ? () => handleConnect(injected)
+                : handleOnboarding
+            }
+            iconUrl='metamask.png'
+            disabled={connector === injected || !!activatingConnector}
+            isActive={connector === injected}
+            isLoading={activatingConnector === injected}
+          />
+        </Grid>
+
         <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
@@ -155,18 +154,16 @@ export function WalletSelector({ loginSuccess }: Props) {
             isLoading={activatingConnector === walletConnect}
           />
         </Grid>
-        {!isMobile && (
-          <Grid item xs={12}>
-            <ConnectorButton
-              name='Coinbase Wallet'
-              onClick={() => handleConnect(walletLink)}
-              iconUrl='coinbasewallet.png'
-              disabled={connector === walletLink || !!activatingConnector}
-              isActive={connector === walletLink}
-              isLoading={activatingConnector === walletLink}
-            />
-          </Grid>
-        )}
+        <Grid item xs={12}>
+          <ConnectorButton
+            name='Coinbase Wallet'
+            onClick={() => handleConnect(walletLink)}
+            iconUrl='coinbasewallet.png'
+            disabled={connector === walletLink || !!activatingConnector}
+            isActive={connector === walletLink}
+            isLoading={activatingConnector === walletLink}
+          />
+        </Grid>
         <Grid item xs={12}>
           <ConnectorButton
             name='Unstoppable Domains'
