@@ -38,7 +38,7 @@ function LoginHandler(props: DialogProps) {
   const { showMessage } = useSnackbar();
 
   const { loginWithGoogle } = useGoogleAuth();
-  const { verifiableWalletDetected, closeWalletSelector } = useWeb3AuthSig();
+  const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
@@ -114,7 +114,7 @@ export function Login() {
 
   return (
     <div>
-      <Button onClick={handleClickOpen} size='large' primary>
+      <Button onClick={handleClickOpen} data-test='universal-connect-button' size='large' primary>
         Connect
       </Button>
       <LoginHandler selectedValue={selectedValue} open={open} onClose={handleClose} />
