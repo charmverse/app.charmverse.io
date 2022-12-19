@@ -157,36 +157,15 @@ export class CharmversePage {
         charmversePage: createdCharmversePage
       });
 
-      for (const firstLevelBlockId of this.topLevelBlockIds) {
-        const notionBlock = new NotionBlock({
-          charmversePage: this,
-          notionPage: this.notionPage
-        });
+      const notionBlock = new NotionBlock({
+        charmversePage: this,
+        notionPage: this.notionPage,
+        blocksRecord: this.blocksRecord
+      });
 
-        const block = this.blocksRecord[firstLevelBlockId];
+      const convertedBlocks = await notionBlock.convertBlocks(this.topLevelBlockIds);
 
-        try {
-          const charmverseBlock = await notionBlock.convert(block);
-          if (charmverseBlock) {
-            pageContent.content?.push(charmverseBlock);
-          }
-        } catch (err) {
-          const failedImportsRecord = this.notionPage.cache.failedImportsRecord[block.id];
-          if (!failedImportsRecord) {
-            this.notionPage.cache.failedImportsRecord[block.id] = {
-              blocks: [[block.id, block.type]],
-              pageId: this.notionPageId,
-              title: getPageTitleText(notionPage),
-              type: notionPage.object
-            };
-          } else {
-            this.notionPage.cache.failedImportsRecord[block.id] = {
-              ...failedImportsRecord,
-              blocks: [...failedImportsRecord.blocks, [block.id, block.type]]
-            };
-          }
-        }
-      }
+      pageContent.content?.push(...convertedBlocks);
 
       await prisma.page.update({
         where: {

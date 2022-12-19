@@ -1,4 +1,4 @@
-import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 
 import {
   MIN_EMBED_WIDTH,
@@ -19,8 +19,9 @@ import type {
 } from 'models';
 
 import { convertRichText } from '../convertRichText';
+import { getPageTitleText } from '../getPageTitle';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlockWithChildren } from '../types';
+import type { BlockWithChildren, BlocksRecord } from '../types';
 
 import type { CharmversePage } from './CharmversePage';
 import type { NotionPage } from './NotionPage';
@@ -30,9 +31,20 @@ export class NotionBlock {
 
   notionPage: NotionPage;
 
-  constructor({ charmversePage, notionPage }: { notionPage: NotionPage; charmversePage: CharmversePage }) {
+  blocksRecord: BlocksRecord;
+
+  constructor({
+    blocksRecord,
+    charmversePage,
+    notionPage
+  }: {
+    blocksRecord: BlocksRecord;
+    notionPage: NotionPage;
+    charmversePage: CharmversePage;
+  }) {
     this.charmversePage = charmversePage;
     this.notionPage = notionPage;
+    this.blocksRecord = blocksRecord;
   }
 
   private async populatePageContent({
@@ -42,14 +54,8 @@ export class NotionBlock {
     contents?: (TextContent | MentionNode)[];
     childIds?: string[];
   }) {
-    const childContent: any[] = [];
+    const childContent: any[] = childIds.length !== 0 ? await this.convertBlocks(childIds) : [];
     const modifiedContent: (MentionNode | TextContent)[] = [...contents];
-    for (let index = 0; index < childIds.length; index++) {
-      const blockNode = (await this.convert(this.charmversePage.blocksRecord[childIds[index]])) as any;
-      if (blockNode) {
-        childContent.push(blockNode);
-      }
-    }
 
     for (let index = 0; index < contents.length; index++) {
       if (contents[index].type === 'mention') {
@@ -72,6 +78,69 @@ export class NotionBlock {
     }
 
     return { childContent, content: modifiedContent };
+  }
+
+  async convertBlocks(blockIds: string[]) {
+    const convertedBlocks: any[] = [];
+    let block;
+    for (let i = 0; i < blockIds.length; i++) {
+      try {
+        block = this.blocksRecord[blockIds[i]];
+        if (block.type === 'bulleted_list_item' || block.type === 'numbered_list_item' || block.type === 'to_do') {
+          const listItemBlock = block;
+          const convertedBlock = await this.convert(block);
+          const listItem = {
+            type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+            content: convertedBlock ? [convertedBlock] : []
+          } as any;
+
+          // eslint-disable-next-line
+          while (true) {
+            i += 1;
+            if (i < blockIds.length) {
+              block = this.blocksRecord[blockIds[i]];
+              const charmverseBlock = await this.convert(block);
+              if (block.type !== listItemBlock.type) {
+                i -= 1;
+                break;
+              } else if (charmverseBlock) {
+                listItem.content.push(charmverseBlock);
+              }
+            } else {
+              break;
+            }
+          }
+          convertedBlocks?.push(listItem);
+        } else {
+          const charmverseBlock = await this.convert(block);
+          if (charmverseBlock) {
+            convertedBlocks?.push(charmverseBlock);
+          }
+        }
+      } catch (err) {
+        if (block) {
+          const notionPage = this.notionPage.cache.notionPagesRecord[
+            this.charmversePage.notionPageId
+          ] as PageObjectResponse;
+          const failedImportsRecord = this.notionPage.cache.failedImportsRecord[block.id];
+          if (!failedImportsRecord) {
+            this.notionPage.cache.failedImportsRecord[block.id] = {
+              blocks: [[block.id, block.type]],
+              pageId: this.charmversePage.notionPageId,
+              title: getPageTitleText(notionPage),
+              type: notionPage.object
+            };
+          } else {
+            this.notionPage.cache.failedImportsRecord[block.id] = {
+              ...failedImportsRecord,
+              blocks: [...failedImportsRecord.blocks, [block.id, block.type]]
+            };
+          }
+        }
+      }
+    }
+
+    return convertedBlocks;
   }
 
   async convert(block: BlockWithChildren) {
@@ -178,10 +247,7 @@ export class NotionBlock {
           }
         };
 
-        return {
-          type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
-          content: [listItemNode]
-        };
+        return listItemNode;
       }
 
       case 'callout':
