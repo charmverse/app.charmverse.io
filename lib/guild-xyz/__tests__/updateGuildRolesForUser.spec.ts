@@ -15,7 +15,7 @@ let space2guildRole1: Role;
 let space2guildRole2: Role;
 
 beforeAll(async () => {
-  user = await createUserFromWallet(v4());
+  user = await createUserFromWallet();
   space1 = await prisma.space.create({
     data: {
       domain: v4(),

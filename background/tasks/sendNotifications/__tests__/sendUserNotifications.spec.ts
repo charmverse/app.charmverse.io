@@ -7,7 +7,9 @@ import { sendUserNotifications } from '../sendNotifications';
 
 describe('sendNotification()', () => {
   it('Should send a notification email only once', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpaceWithApiToken({
+      email: `${Math.random()}@charmversetest.io`
+    });
 
     await generateProposal({
       proposalStatus: 'discussion',

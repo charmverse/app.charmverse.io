@@ -18,9 +18,9 @@ beforeAll(async () => {
   const { user: user1, space: generatedSpace } = await generateUserAndSpaceWithApiToken();
 
   author1 = user1;
-  author2 = await createUserFromWallet(v4());
-  reviewer1 = await createUserFromWallet(v4());
-  reviewer2 = await createUserFromWallet(v4());
+  author2 = await createUserFromWallet();
+  reviewer1 = await createUserFromWallet();
+  reviewer2 = await createUserFromWallet();
 
   await prisma?.spaceRole.createMany({
     data: [author2, reviewer1, reviewer2].map((user) => ({ spaceId: generatedSpace.id, userId: user.id }))

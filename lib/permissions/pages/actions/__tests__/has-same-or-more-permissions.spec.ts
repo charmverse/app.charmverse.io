@@ -45,7 +45,7 @@ async function setupPagesWithPermissions(permissionSets: Partial<PagePermission>
 }
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
   space = generated.space;
 

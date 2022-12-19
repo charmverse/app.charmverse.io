@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -8,12 +9,11 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 export async function createUserFromWallet(
-  address: string,
+  { address = Wallet.createRandom().address, email }: { address?: string; email?: string },
   signupAnalytics: Partial<SignupAnalytics> = {},
   // An ID set by analytics tools to have pre signup user journey
   preExistingId: string = v4(),
@@ -42,6 +42,7 @@ export async function createUserFromWallet(
 
     const newUser = await tx.user.create({
       data: {
+        email,
         id: preExistingId,
         identityType: 'Wallet',
         username,

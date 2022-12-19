@@ -72,11 +72,11 @@ export async function generateSpaceUser({
  * @returns
  */
 export async function generateUserAndSpaceWithApiToken(
-  walletAddress: string = v4(),
+  { email, walletAddress }: { email?: string; walletAddress?: string } = {},
   isAdmin = true,
   spaceName = 'Example space'
 ) {
-  const user = await createUserFromWallet(walletAddress);
+  const user = await createUserFromWallet({ email, address: walletAddress });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
