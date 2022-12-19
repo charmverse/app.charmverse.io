@@ -61,6 +61,7 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('airtable'),
     iframeEmbedType('dune'),
     iframeEmbedType('figma'),
+    iframeEmbedType('google'),
     iframeEmbedType('loom'),
     iframeEmbedType('typeform'),
     {
