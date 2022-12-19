@@ -1,4 +1,3 @@
-import type { Prisma } from '@prisma/client';
 import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
