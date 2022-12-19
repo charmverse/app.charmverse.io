@@ -72,14 +72,14 @@ describe('PUT /api/profile - Update user profile', () => {
 
     const update: Partial<LoggedInUser> = {
       identityType: 'Google',
-      username: googleAccount.email
+      username: googleAccount.name
     };
 
     const updatedProfile = (
       await request(baseUrl).put('/api/profile').set('Cookie', userCookie).send(update).expect(200)
     ).body as LoggedInUser;
 
-    expect(updatedProfile.username).toBe(googleAccount.email);
+    expect(updatedProfile.username).toBe(googleAccount.name);
     expect(updatedProfile.identityType).toBe('Google');
     expect(updatedProfile.avatar).toBe(googleAccount.avatarUrl);
   });
