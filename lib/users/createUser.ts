@@ -46,7 +46,7 @@ export async function createUserFromWallet(
         identityType: 'Wallet',
         username,
         path: isUserPathAvailable ? userPath : null,
-        email: `${randomName()}@charmversetest.io`,
+        // email: `${randomName()}@charmversetest.io`,
         wallets: {
           create: {
             address: lowercaseAddress
