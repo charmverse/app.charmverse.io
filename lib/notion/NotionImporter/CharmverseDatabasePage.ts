@@ -113,6 +113,7 @@ export class CharmverseDatabasePage {
         charmversePage: createdCharmversePage
       });
 
+      // Create all card pages
       const pageIds = pageRecord.notionPage?.pageIds ?? [];
       for (const pageId of pageIds) {
         await this.notionPage.fetchAndCreatePage({

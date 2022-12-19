@@ -7,7 +7,6 @@ import type { PageContent } from 'models';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
-import { getPageTitleText } from '../getPageTitle';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
 import type { BlocksRecord } from '../types';
 

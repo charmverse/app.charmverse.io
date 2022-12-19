@@ -86,6 +86,7 @@ export class NotionBlock {
     for (let i = 0; i < blockIds.length; i++) {
       try {
         block = this.blocksRecord[blockIds[i]];
+        // list items are continuous thus check for the rest blocks and put them inside same node
         if (block.type === 'bulleted_list_item' || block.type === 'numbered_list_item' || block.type === 'to_do') {
           const listItemBlock = block;
           const convertedBlock = await this.convert(block);
@@ -101,6 +102,7 @@ export class NotionBlock {
               block = this.blocksRecord[blockIds[i]];
               const charmverseBlock = await this.convert(block);
               if (block.type !== listItemBlock.type) {
+                // Negate to process the current block again
                 i -= 1;
                 break;
               } else if (charmverseBlock) {

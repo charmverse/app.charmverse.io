@@ -105,6 +105,7 @@ export class NotionPage {
 
   private async fetchNotionPageChildBlocks(notionPageId: string): Promise<Required<RegularPageItem>['notionPage']> {
     const pageRecord = this.cache.pagesRecord.get(notionPageId);
+    // If notion page hasn't been processed
     if (!pageRecord?.notionPage) {
       const blocksRecord: BlocksRecord = {};
       const { blockChildrenRecord, blocksRecord: nestedBlocksRecord } = await this.fetchNestedChildBlocks([
@@ -116,13 +117,15 @@ export class NotionPage {
         blocksRecord[childId] = nestedBlocksRecord[childId];
       });
 
+      // Only fetch new blocks of parents that has children
       let previousBlockIds = topLevelBlockIds.filter((blockId) => nestedBlocksRecord[blockId].has_children);
 
+      // Go at most maxChildBlockDepth depth
       for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
         const { blockChildrenRecord: internalBlockChildrenRecord, blocksRecord: internalBlocksRecord } =
           await this.fetchNestedChildBlocks(previousBlockIds);
 
-        // Store the children id in blocks record
+        // Store the children ids
         previousBlockIds.forEach((parentBlockId) => {
           blocksRecord[parentBlockId] = {
             ...blocksRecord[parentBlockId],
@@ -233,6 +236,7 @@ export class NotionPage {
 
   private async fetchNestedChildBlocks(parentBlockIds: string[]) {
     const { fetchChildBlocks, blocksPerRequest, client } = this;
+    // Record to keep track of blockid and its latest cursor
     const blockCursorRecord: Record<string, string> = {};
     let childBlockListResponses: ChildBlockListResponse[] = [];
     // A record to keep track of parent and children ids
@@ -276,6 +280,7 @@ export class NotionPage {
             };
           });
 
+          // Only if there is a next_cursor continue further
           if (!blockCursorRecord[childBlockListResponse.parent_block_id] && childBlockListResponse.next_cursor) {
             blockCursorRecord[childBlockListResponse.parent_block_id] = childBlockListResponse.next_cursor;
             fetchMore = fetchMore || true;
