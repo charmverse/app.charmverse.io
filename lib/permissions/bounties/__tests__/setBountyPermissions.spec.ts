@@ -14,7 +14,7 @@ let user: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
   space = generated.space;
   user = generated.user;
 });
