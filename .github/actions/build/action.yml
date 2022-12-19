@@ -25,9 +25,25 @@ inputs:
   NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI:
     description: "..."
     required: false
-  NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG:
+  NEXT_PUBLIC_GOOGLE_API_KEY:
     description: "..."
     required: false
+  NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_GOOGLE_PROJECT_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID:
+    description: "..."
+    required: false
+  NEXT_PUBLIC_GOOGLE_APP_ID:
+    description: "..."
+    required: false
+  
 
 runs:
   using: 'composite'
@@ -63,4 +79,9 @@ runs:
         NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ inputs.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
         NEXT_PUBLIC_WEBSOCKETS_HOST: ${{ inputs.NEXT_PUBLIC_WEBSOCKETS_HOST }}
         NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-        NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG: ${{ inputs.NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG }}
+        NEXT_PUBLIC_GOOGLE_API_KEY: ${{ inputs.NEXT_PUBLIC_GOOGLE_API_KEY }}
+        NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ inputs.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
+        NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
+        NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ inputs.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
+        NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
+        NEXT_PUBLIC_GOOGLE_APP_ID: ${{ inputs.NEXT_PUBLIC_GOOGLE_APP_ID }}
