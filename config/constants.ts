@@ -16,4 +16,13 @@ export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
 // Google config
 export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
 export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-export const googleOAuthWebClientConfig = JSON.parse(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_CONFIG ?? '{}');
+// Google client
+// To retrieve these values, go to Firebase, then project settings, and retrieve the JSON for the web client. You can then assign the values for each key in the client secrets area.
+export const googleWebClientConfig = {
+  apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_GOOGLE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_GOOGLE_APP_ID
+};

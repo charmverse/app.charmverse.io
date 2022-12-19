@@ -4,13 +4,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthWebClientConfig } from 'config/constants';
+import { googleWebClientConfig } from 'config/constants';
 import { ExternalServiceError, SystemError } from 'lib/utilities/errors';
 
 import type { AnyIdLogin } from '../Login';
 
 export function useGoogleAuth() {
-  const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleOAuthWebClientConfig));
+  const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
 
