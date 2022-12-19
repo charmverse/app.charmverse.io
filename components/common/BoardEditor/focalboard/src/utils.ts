@@ -271,7 +271,7 @@ class Utils {
 
   static displayDate(date: Date, intl: IntlShape): string {
     return intl.formatDate(date, {
-      year: Utils.yearOption(date),
+      year: 'numeric',
       month: 'long',
       day: '2-digit'
     });
