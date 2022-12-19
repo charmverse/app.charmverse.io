@@ -8,14 +8,14 @@ import { forwardRef, useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
+function CreateForumPost() {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -46,7 +46,7 @@ const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
   }, [currentSpace, user, pageTitle]);
 
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }} ref={ref}>
+    <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea disabled={createPageLoading || !userSpacePermissions?.createPage}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
@@ -76,6 +76,6 @@ const CreateForumPost = forwardRef<HTMLDivElement>((_, ref) => {
       </CardActionArea>
     </Card>
   );
-});
+}
 
 export default CreateForumPost;

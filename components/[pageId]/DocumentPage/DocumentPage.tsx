@@ -30,7 +30,6 @@ import PageBanner from './components/PageBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import PostProperties from './components/PostProperties';
 import { ProposalProperties } from './components/ProposalProperties';
 
 const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
@@ -186,7 +185,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
-                pageType={page.type}
                 headerImage={page.headerImage}
                 // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
                 // key={page.title}
@@ -248,7 +246,6 @@ function DocumentPage({ page, setPage, insideModal, readOnly = false, parentProp
                       refreshBountyPermissions={refreshBountyPermissions}
                     />
                   )}
-                  {page.postId && <PostProperties postId={page.postId} readOnly={page.createdBy !== user?.id} />}
                   {(page.type === 'bounty' || page.type === 'card') && (
                     <CommentsList
                       comments={comments}
