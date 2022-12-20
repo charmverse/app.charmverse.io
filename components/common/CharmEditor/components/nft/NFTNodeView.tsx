@@ -38,6 +38,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
   useLayoutEffect(() => {
     const elm = ref.current;
     if (elm) {
+      // add a timeout so that the DOM has a chance to render. Otherwise clientWidth is 0
       setTimeout(() => {
         setWidth(elm.clientWidth);
       }, 0);
