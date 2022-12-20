@@ -22,7 +22,6 @@ const StyledContainer = styled.div`
   nft-card-front > div {
     background: transparent !important;
   }
-  width: 100%;
 `;
 
 export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
