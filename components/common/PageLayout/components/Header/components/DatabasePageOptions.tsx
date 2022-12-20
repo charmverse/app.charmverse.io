@@ -205,6 +205,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         header: true,
         skipEmptyLines: true,
         worker: event.target.files[0].size > 100000, // 100kb
+        delimiter: '\n', // fallback for a csv with 1 column
         complete: async (results) => {
           closeMenu();
           if (results.errors && results.errors[0]) {

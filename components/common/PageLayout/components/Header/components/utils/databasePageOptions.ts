@@ -15,7 +15,10 @@ type MappedProperties = {
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
-export const isDate = (dt: string) => !Number.isNaN(new Date(dt).valueOf());
+export const isDate = (dt: string) => {
+  const date = new Date(dt);
+  return !Number.isNaN(date.valueOf()) && date.getFullYear() > 1970;
+};
 
 export function isDateValid(strDate: string) {
   if (strDate.includes(' -> ')) {
@@ -166,6 +169,38 @@ export function createCardFieldProperties(
           [propId]: optionIds
         };
       }
+    }
+
+    if (mappedBoardProperties[key]?.type === 'date') {
+      const valuesArr = value.split(' -> ');
+
+      if (valuesArr.length === 1) {
+        const from = new Date(valuesArr[0]).getTime();
+        const jsonValue: string = JSON.stringify({
+          from
+        });
+        return {
+          ...acc,
+          [propId]: jsonValue
+        };
+      }
+
+      if (valuesArr.length === 2) {
+        const from = new Date(valuesArr[0]).getTime();
+        const to = new Date(valuesArr[1]).getTime();
+        const jsonValue: string = JSON.stringify({
+          from,
+          to
+        });
+        return {
+          ...acc,
+          [propId]: jsonValue
+        };
+      }
+
+      return {
+        ...acc
+      };
     }
 
     if (
