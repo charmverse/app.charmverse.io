@@ -214,8 +214,13 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           }
           if (isValidCsvResult(results)) {
             await addNewCards(results);
+
+            const spaceId = currentSpace?.id;
+            if (spaceId) {
+              charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
+            }
+            showMessage('Your csv file was imported successfully', 'success');
           }
-          showMessage('Your csv file was imported successfully', 'success');
         }
       });
     }
