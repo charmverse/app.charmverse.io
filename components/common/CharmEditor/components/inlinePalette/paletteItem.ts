@@ -1,8 +1,7 @@
+import type { PluginKey } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@prisma/client';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-
-import type { InlinePaletteItem } from './hooks';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
 export const PALETTE_ITEM_HINT_TYPE = 'HINT_TYPE';
@@ -14,7 +13,16 @@ export type PromisedCommand = (
   view?: EditorView
 ) => boolean | Promise<boolean>;
 
-type EditorExecuteCommand = (arg: { item: InlinePaletteItem; itemIndex: number }) => PromisedCommand;
+export interface InlinePaletteItem {
+  // eslint-disable-next-line no-use-before-define
+  editorExecuteCommand: EditorExecuteCommand;
+}
+
+export type EditorExecuteCommand = (arg: {
+  item: InlinePaletteItem;
+  itemIndex: number;
+  palettePluginKey: PluginKey;
+}) => PromisedCommand;
 
 /**
  * @requiredSpacePermission Optional parameter. If this is provided, the palette item should not be available to a user without this space permission.

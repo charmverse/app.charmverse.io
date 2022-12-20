@@ -1,19 +1,23 @@
+import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import DesktopFilterMenu from './components/ForumFilterList';
-import MobileFilterMenu from './components/ForumFilterSelect';
-import ForumPosts from './components/ForumPosts';
+import { CategoryMenu } from './components/CategoryMenu';
+import { CategorySelect } from './components/CategorySelect';
+import CreateForumPost from './components/CreateForumPost';
+import { ForumPostList } from './components/PostList/PostList';
 
 export default function ForumPage() {
   const [search, setSearch] = useState('');
@@ -23,9 +27,8 @@ export default function ForumPage() {
   const categoryIds = router.query.categoryIds;
   const { showPost } = usePostDialog();
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
-    const pathname = `/${currentSpace!.domain}/forum`;
+    const pathname = `/${currentSpace?.domain}/forum`;
 
     if (categoryId === null) {
       router.push({
@@ -60,11 +63,13 @@ export default function ForumPage() {
       <Typography variant='h1' mb={2}>
         Forum
       </Typography>
-      {/** Re-enable once we support searching for posts
-             <TextField
+
+      <TextField
         variant='outlined'
         placeholder='Search Posts, Comments and Members'
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
         fullWidth
         sx={{ padding: '20px 0' }}
         InputProps={{
@@ -75,16 +80,16 @@ export default function ForumPage() {
           )
         }}
       />
-         */}
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
-          <Box display={{ xs: 'block', lg: 'none' }}>
-            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
+          <Box display={{ lg: 'none' }}>
+            <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
           </Box>
-          <ForumPosts search={search} categoryId={categoryIds} />
+          <CreateForumPost />
+          <ForumPostList search={search} categoryId={categoryIds} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <DesktopFilterMenu />
+          <CategoryMenu />
         </Grid>
       </Grid>
     </CenteredPageContent>

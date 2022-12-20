@@ -16,7 +16,7 @@ export type FilterProps = {
   sort?: any;
 };
 
-export default function ForumFilterSelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+export function CategorySelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
   const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
@@ -37,7 +37,7 @@ export default function ForumFilterSelect({ categoryIdSelected, selectedCategory
 
   return (
     <Box justifyContent='flex-start' flexWrap='wrap'>
-      {/* 
+      {/*
       Re-enable when we allow sorting in the app
       <ViewOptions label='Sort' sx={{ mr: '10px', pb: '20px' }}>
         <Select disabled={disabled} value={sortValue} onChange={(e: SelectChangeEvent) => handleClick(e.target.value)}>

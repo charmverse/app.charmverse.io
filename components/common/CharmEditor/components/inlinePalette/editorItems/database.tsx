@@ -5,7 +5,6 @@ import type { PageType } from '@prisma/client';
 import { addPage } from 'lib/pages';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
@@ -35,7 +34,7 @@ export function items({
         title: 'Database - Inline',
         icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
         description: 'Add a new inline database to this page',
-        editorExecuteCommand: () => {
+        editorExecuteCommand: ({ palettePluginKey }) => {
           return (state, dispatch, view) => {
             // Execute the animation
             if (view) {
@@ -76,7 +75,7 @@ export function items({
           />
         ),
         description: 'Insert a new board',
-        editorExecuteCommand: () => {
+        editorExecuteCommand: ({ palettePluginKey }) => {
           return (async (state, dispatch, view) => {
             await addNestedPage('board');
             return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
@@ -91,7 +90,7 @@ export function items({
     title: 'Linked view of database',
     icon: <DatabaseIcon sx={{ fontSize: iconSize }} />,
     description: 'Embed a view from an existing board',
-    editorExecuteCommand: () => {
+    editorExecuteCommand: ({ palettePluginKey }) => {
       return (state, dispatch, view) => {
         // Execute the animation
         if (view) {

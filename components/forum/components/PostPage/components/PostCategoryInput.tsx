@@ -1,17 +1,56 @@
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/TextField';
+import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/material';
 import type { PostCategory } from '@prisma/client';
 import type { HTMLAttributes } from 'react';
+import useSWR from 'swr';
 
-import type { BrandColor } from 'theme/colors';
+import charmClient from 'charmClient';
 
 type PostCategoryOptionProps = {
   category: PostCategory;
   props: HTMLAttributes<HTMLLIElement>;
   onDelete?: (id: string) => void;
 };
+
+// <Stack
+// gap={1}
+// sx={{
+//   '& .MuiInputBase-input': {
+//     background: 'none'
+//   },
+//   my: 2
+// }}
+// >
+export function PostCategoryInput({
+  categoryId,
+  readOnly,
+  spaceId,
+  setCategoryId
+}: {
+  categoryId: string | null;
+  readOnly?: boolean;
+  spaceId?: string;
+  setCategoryId: (categoryId: string) => void;
+}) {
+  const { data: categories } = useSWR(spaceId ? `spaces/${spaceId}/post-categories` : null, () =>
+    charmClient.forum.listPostCategories(spaceId!)
+  );
+
+  const postCategory = categories?.find((category) => category.id === categoryId);
+
+  async function updateForumPost(_postCategory: PostCategory | null) {
+    if (_postCategory) {
+      setCategoryId(_postCategory.id);
+    }
+  }
+  return (
+    <PostCategoryAutocomplete
+      value={postCategory ?? null}
+      options={categories ?? []}
+      disabled={readOnly}
+      onChange={updateForumPost}
+    />
+  );
+}
 
 function PostCategoryOption({ props, category }: PostCategoryOptionProps) {
   return (
@@ -27,14 +66,14 @@ function PostCategoryOption({ props, category }: PostCategoryOptionProps) {
   );
 }
 
-type Props = {
+type AutocompleteProps = {
   disabled?: boolean;
   options: PostCategory[];
   onChange: (value: PostCategory | null) => void;
   value: PostCategory | null;
 };
 
-export default function PostCategoryInput({ disabled, options, onChange, value }: Props) {
+function PostCategoryAutocomplete({ disabled, options, onChange, value }: AutocompleteProps) {
   return (
     <Autocomplete
       value={value}
@@ -52,7 +91,7 @@ export default function PostCategoryInput({ disabled, options, onChange, value }
       }
       getOptionLabel={(option) => option.name}
       noOptionsText='No categories available'
-      renderInput={(params) => <TextField {...params} placeholder='Select category' size='small' />}
+      renderInput={(params) => <TextField {...params} placeholder='Choose a category' size='small' />}
       onChange={(_event, _value) => onChange(_value)}
     />
   );

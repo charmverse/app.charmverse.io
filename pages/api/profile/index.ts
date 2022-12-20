@@ -36,7 +36,7 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId);
+    user = await createUserFromWallet({ address, id: req.session.anonymousUserId }, signupAnalytics);
     user.isNew = true;
 
     logSignupViaWallet();

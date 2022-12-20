@@ -16,7 +16,7 @@ let space: Space;
 let role: Role;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4(), true);
+  const generated = await generateUserAndSpaceWithApiToken(undefined, true);
   user = generated.user;
   space = generated.space;
   role = await generateRole({

@@ -1,10 +1,9 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { IconButton, Stack } from '@mui/material';
+import { Box, Divider, Typography, IconButton, Stack } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { Box } from '@mui/system';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -18,9 +17,8 @@ import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listFo
 import type { Member } from 'lib/members/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import CreateForumPost from '../CreateForumPost';
-import ForumPost from '../ForumPost/ForumPost';
-import ForumPostSkeleton from '../ForumPostSkeleton';
+import { PostCard } from './components/PostCard';
+import { PostSkeleton } from './components/PostSkeleton';
 
 interface ForumPostsProps {
   search: string;
@@ -46,12 +44,13 @@ const generatePostRefreshTimeout = () => {
   }
 };
 
-export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
+export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
-  const createPostBoxRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const loadingMode = useRef<'list' | 'search'>('list');
   // Re-enable sorting later on
 
   // const querySort = query.sort;
@@ -75,62 +74,90 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { subscribe } = useWebSocketClient();
 
+  const categoryRef = useRef(categoryId);
+  const searchRef = useRef(search);
+
+  useEffect(() => {
+    if (search !== searchRef.current) {
+      searchRef.current = search;
+      loadingMode.current = 'search';
+    } else if (categoryId !== categoryRef.current) {
+      categoryRef.current = categoryId;
+      loadingMode.current = 'list';
+    }
+    loadMorePosts(true);
+  }, [search, categoryId]);
+
+  useEffect(() => {
+    // When loading mode changes, clear out the current list to switch between search and list data
+    loadMorePosts(true);
+  }, [loadingMode]);
+
   function loadMorePosts(refetch = false) {
-    setIsLoadingMore(true);
+    if (currentSpace) {
+      setIsLoadingMore(true);
 
-    charmClient.forum
-      .listForumPosts({
-        spaceId: currentSpace!.id,
-        categoryIds: categoryId,
-        count: resultsPerQuery,
-        page: refetch ? undefined : posts?.cursor
-      })
-      .then((foundPosts) => {
-        if (error) {
-          setError(null);
-        }
+      (loadingMode.current === 'list'
+        ? charmClient.forum.listForumPosts({
+            spaceId: currentSpace!.id,
+            categoryIds: categoryId,
+            count: resultsPerQuery,
+            page: refetch ? undefined : posts?.cursor
+          })
+        : charmClient.forum.searchForumPosts({
+            spaceId: currentSpace!.id,
+            search,
+            count: resultsPerQuery,
+            page: refetch ? undefined : posts?.cursor
+          })
+      )
+        .then((foundPosts) => {
+          if (error) {
+            setError(null);
+          }
 
-        // UX improvement: add a delay so the user sees the post loading skeleton
-        setTimeout(() => {
-          setPosts((_prevList) => {
-            if (!_prevList || refetch) {
-              return foundPosts;
-            }
-            const filteredPosts = foundPosts.data.filter((post) => !posts?.data.find((i) => i.id === post.id));
-            _prevList.cursor = foundPosts.cursor;
+          // UX improvement: add a delay so the user sees the post loading skeleton
+          setTimeout(() => {
+            setPosts((_prevList) => {
+              if (!_prevList || refetch) {
+                return foundPosts;
+              }
+              const filteredPosts = foundPosts.data.filter((post) => !_prevList?.data.find((i) => i.id === post.id));
+              _prevList.cursor = foundPosts.cursor;
 
-            const previousDataToKeep = !_prevList
-              ? []
-              : categoryId === undefined
-              ? // No need for filtering since categoryId is undefined
-                _prevList.data
-              : _prevList.data.filter((postPage) => {
-                  if (typeof categoryId === 'string') {
-                    return postPage.post.categoryId === categoryId;
-                  } else if (categoryId instanceof Array && postPage.post.categoryId) {
-                    return categoryId.includes(postPage.post.categoryId);
-                  } else if (categoryId === null) {
-                    return !postPage.post.categoryId;
-                  }
-                  return false;
-                });
+              const previousDataToKeep = !_prevList
+                ? []
+                : categoryId === undefined
+                ? // No need for filtering since categoryId is undefined
+                  _prevList.data
+                : _prevList.data.filter((postPage) => {
+                    if (typeof categoryId === 'string') {
+                      return postPage.post.categoryId === categoryId;
+                    } else if (categoryId instanceof Array && postPage.post.categoryId) {
+                      return categoryId.includes(postPage.post.categoryId);
+                    } else if (categoryId === null) {
+                      return !postPage.post.categoryId;
+                    }
+                    return false;
+                  });
 
-            _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
-              return { ...post, user: members.find((member) => member.id === post.createdBy) };
+              _prevList.data = [...previousDataToKeep, ...filteredPosts].map((post) => {
+                return { ...post, user: members.find((member) => member.id === post.createdBy) };
+              });
+              _prevList.hasNext = foundPosts.hasNext;
+
+              return {
+                ..._prevList
+              };
             });
-            _prevList.hasNext = foundPosts.hasNext;
-
-            return {
-              ..._prevList
-            };
-          });
+            setIsLoadingMore(false);
+          }, generatePostRefreshTimeout());
+        })
+        .catch((err) => {
+          setError(err);
           setIsLoadingMore(false);
-        }, generatePostRefreshTimeout());
-      })
-      .catch((err) => {
-        setError(err);
-        setIsLoadingMore(false);
-      });
+        });
+    }
   }
 
   const currentCategoryId =
@@ -148,6 +175,14 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
     },
     [user, categoryId]
   );
+
+  function refreshPosts() {
+    window.document.body.scrollIntoView({
+      behavior: 'smooth'
+    });
+    loadMorePosts(true);
+    setIsOpen(false);
+  }
 
   useEffect(() => {
     const unsubscribeFromPostPublishEvent = subscribe('post_published', handlePostPublishEvent);
@@ -170,13 +205,21 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
 
   return (
     <>
-      <CreateForumPost ref={createPostBoxRef} />
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
       {posts?.data.map((post) => (
-        <ForumPost key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
+        <PostCard key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
       ))}
-      {isLoadingMore && <ForumPostSkeleton />}
-      {posts?.hasNext === false && <Alert severity='info'>No more posts to show</Alert>}
+      {isLoadingMore && <PostSkeleton />}
+      {posts?.hasNext === false && (
+        <>
+          <Divider flexItem sx={{ mb: 4 }} />
+          <Box display='flex' alignItems='center' justifyContent='center'>
+            <Typography variant='body2' color='secondary'>
+              No more posts to show
+            </Typography>
+          </Box>
+        </>
+      )}
       <Box ref={ref} display={isLoadingMore ? 'none' : 'block'} />
 
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
@@ -200,15 +243,7 @@ export default function ForumPosts({ search, categoryId }: ForumPostsProps) {
               <Button
                 key='reload'
                 variant='outlined'
-                onClick={() => {
-                  if (createPostBoxRef.current) {
-                    createPostBoxRef.current.scrollIntoView({
-                      behavior: 'smooth'
-                    });
-                    loadMorePosts(true);
-                    setIsOpen(false);
-                  }
-                }}
+                onClick={refreshPosts}
                 size='small'
                 startIcon={<ReplayIcon fontSize='small' />}
                 color='inherit'

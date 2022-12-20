@@ -6,14 +6,14 @@ export function extractAttrsFromUrl(url: string): NodeAttrs | null {
     return null;
   }
 
-  const match = url.match(/opensea\.io\/assets\/ethereum\/([^/]+)\/([^/]+)/);
+  const match = url.match(/opensea\.io\/([^/]+\/)?assets\/ethereum\/([^/]+)\/([^/]+)/);
   if (!match) {
     return null;
   }
   return {
     chain: 1,
-    contract: match[1],
-    token: match[2]
+    contract: match[2],
+    token: match[3]
   };
 }
 

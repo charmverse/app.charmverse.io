@@ -11,11 +11,16 @@ import type {
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
 export class ForumApi {
   listForumPosts({ spaceId, count, page, sort, categoryIds }: ListForumPostsRequest): Promise<PaginatedPostList> {
     return http.GET('/api/forums/posts', { spaceId, sort, categoryIds, count, page });
+  }
+
+  searchForumPosts(searchQuery: SearchForumPostsRequest): Promise<PaginatedPostList> {
+    return http.POST('/api/forums/posts/search', searchQuery);
   }
 
   updateForumPost(postId: string, payload: UpdateForumPostInput) {

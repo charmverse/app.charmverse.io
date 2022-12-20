@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 import Avatar from 'components/common/Avatar';
 
-export default function ForumPostSkeleton() {
+export function PostSkeleton() {
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea>

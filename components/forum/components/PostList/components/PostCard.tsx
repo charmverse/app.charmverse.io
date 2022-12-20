@@ -9,8 +9,8 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
 import UserDisplay from 'components/common/UserDisplay';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -42,7 +42,7 @@ function ForumPostContent({
   return null;
 }
 
-export default function ForumPost({
+export function PostCard({
   createdAt,
   updatedAt,
   user,
@@ -120,7 +120,7 @@ export default function ForumPost({
                 fontSize='medium'
                 sx={{ '> p': { display: { xs: 'none', sm: 'block' } } }}
               />
-              {/** Re-enable this once we have a number of comments 
+              {/** Re-enable this once we have a number of comments
                  <Box display='flex' alignItems='center' padding='0 15px'>
                   <MessageOutlined fontSize='small' sx={{ pr: '5px' }} />
                   {commentsNumber}
