@@ -15,14 +15,28 @@ type MappedProperties = {
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
+export const isNumber = (n: string) => !Number.isNaN(+n);
+
 export const isDate = (dt: string) => {
-  const date = new Date(dt);
+  const date = new Date(isNumber(dt) ? +dt : dt);
+
   return !Number.isNaN(date.valueOf()) && date.getFullYear() > 1970;
 };
 
 export function isDateValid(strDate: string) {
   if (strDate.includes(' -> ')) {
-    return strDate.split(' -> ').every(isDate);
+    const dates = strDate.split(' -> ');
+
+    // Both dates should be valid
+    if (dates.every(isDate)) {
+      // If there are 2 dates, make sure the second one is after the first one
+      const firstDateString = dates[0];
+      const secondDateString = dates[1];
+      const firstDate = new Date(isNumber(firstDateString) ? +firstDateString : firstDateString);
+      const secondDate = new Date(isNumber(secondDateString) ? +secondDateString : secondDateString);
+
+      return firstDate <= secondDate;
+    }
   }
   return isDate(strDate);
 }
