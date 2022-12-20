@@ -7,6 +7,7 @@ import {
 } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { isTruthy } from 'lib/utilities/types';
 import type {
   TextContent,
   MentionNode,
@@ -113,6 +114,8 @@ export class NotionBlock {
             }
           }
           convertedBlocks?.push(listItem);
+        } else if (block.type === 'synced_block') {
+          convertedBlocks?.push(...(await this.convertBlocks(block.children)).filter(isTruthy));
         } else {
           const charmverseBlock = await this.convert(block);
           if (charmverseBlock) {

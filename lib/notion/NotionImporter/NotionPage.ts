@@ -133,14 +133,14 @@ export class NotionPage {
           };
         });
 
+        Object.values(internalBlocksRecord).forEach((childBlock) => {
+          blocksRecord[childBlock.id] = childBlock;
+        });
+
         // Only keep track of the blocks that has children
         previousBlockIds = Object.keys(internalBlocksRecord).filter(
           (blockId) => internalBlocksRecord[blockId].has_children
         );
-
-        previousBlockIds.forEach((previousBlockId) => {
-          blocksRecord[previousBlockId] = internalBlocksRecord[previousBlockId];
-        });
 
         if (!previousBlockIds.length) {
           break;
