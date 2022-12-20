@@ -57,7 +57,17 @@ function CreateForumPost({
         return paginatedPostList
           ? {
               ...paginatedPostList,
-              data: [page, ...paginatedPostList.data]
+              data: [
+                {
+                  ...page,
+                  post: {
+                    ...page.post,
+                    downvotes: 0,
+                    upvotes: 0
+                  }
+                },
+                ...paginatedPostList.data
+              ]
             }
           : null;
       });

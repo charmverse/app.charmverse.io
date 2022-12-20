@@ -6,8 +6,8 @@ import { Box } from '@mui/system';
 import type { MouseEvent } from 'react';
 
 export function PostVote({
-  downvotes,
-  upvotes,
+  downvotes = 0,
+  upvotes = 0,
   upvoted,
   votePost
 }: {
