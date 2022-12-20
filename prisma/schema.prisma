@@ -415,7 +415,7 @@ model User {
   isBot                Boolean?               @default(false)
   path                 String?                @unique
   identityType         IdentityType?
-  email                String?                @unique
+  email                String?                
   applications         Application[]
   blocks               Block[]
   bounties             Bounty[]
