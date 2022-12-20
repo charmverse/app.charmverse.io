@@ -6,7 +6,7 @@ import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
-type MappedProperties = {
+export type MappedProperties = {
   id: string;
   options: Record<string, string>;
   name: string;
