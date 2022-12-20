@@ -48,7 +48,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
-  const [isOpen, setIsOpen] = useState(false);
+  const [morePostsAvailable, setMorePostsAvailable] = useState(false);
 
   const loadingMode = useRef<'list' | 'search'>('list');
   // Re-enable sorting later on
@@ -163,12 +163,12 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
 
   const handlePostPublishEvent = useCallback(
     (postWithPage: WebSocketPayload<'post_published'>) => {
-      if (
-        user &&
-        postWithPage?.createdBy !== user.id &&
-        (currentCategoryId ? postWithPage.categoryId === currentCategoryId : true)
-      ) {
-        setIsOpen(true);
+      if (!currentCategoryId || postWithPage.categoryId === currentCategoryId) {
+        if (postWithPage.createdBy === user?.id) {
+          refreshPosts();
+        } else {
+          setMorePostsAvailable(true);
+        }
       }
     },
     [user, categoryId]
@@ -179,7 +179,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
       behavior: 'smooth'
     });
     loadMorePosts(true);
-    setIsOpen(false);
+    setMorePostsAvailable(false);
   }
 
   useEffect(() => {
@@ -222,13 +222,13 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
 
       <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
         <Snackbar
-          open={isOpen}
+          open={morePostsAvailable}
           autoHideDuration={10000}
           anchorOrigin={{
             horizontal: 'center',
             vertical: 'top'
           }}
-          onClose={() => setIsOpen(false)}
+          onClose={() => setMorePostsAvailable(false)}
           sx={{
             '& .MuiAlert-action': {
               alignItems: 'center',
@@ -248,7 +248,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
               >
                 Fetch
               </Button>,
-              <IconButton key='clear' onClick={() => setIsOpen(false)} color='inherit'>
+              <IconButton key='clear' onClick={() => setMorePostsAvailable(false)} color='inherit'>
                 <ClearIcon fontSize='small' />
               </IconButton>
             ]}
