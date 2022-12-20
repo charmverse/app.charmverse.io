@@ -1,6 +1,7 @@
 import type { ProfileItem } from '@prisma/client';
 
 import * as http from 'adapters/http';
+import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 import type { UnstoppableDomainsLoginRequest } from 'pages/api/unstoppable-domains/login';
@@ -20,5 +21,9 @@ export class ProfileApi {
 
   loginWithUnstoppableDomains(login: UnstoppableDomainsLoginRequest) {
     return http.POST<LoggedInUser>('/api/unstoppable-domains/login', login);
+  }
+
+  loginWithGoogle(login: LoginWithGoogleRequest) {
+    return http.POST<LoggedInUser>('/api/google/login', login);
   }
 }
