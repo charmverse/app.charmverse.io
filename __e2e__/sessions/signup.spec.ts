@@ -6,7 +6,7 @@ import { baseUrl } from 'config/constants';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
-import { generateUser, generateUserAndSpace } from '../utils/mocks';
+import { createUser, generateUser, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 import { mockWeb3 } from '../utils/web3';
 
@@ -33,9 +33,12 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   loginPage,
   signupPage
 }) => {
+  let address: string = '';
+
   await mockWeb3({
     page: sandboxPage,
     init: ({ Web3Mock, context }) => {
+      address = context.address;
       Web3Mock.mock({
         blockchain: 'ethereum',
         accounts: {
@@ -44,6 +47,8 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
       });
     }
   });
+
+  await createUser({ browserPage: sandboxPage, address });
 
   const uniqueDomain = Math.random().toString().replace('.', '');
 
@@ -58,27 +63,27 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   await signupPage.waitForWorkspaceLoaded({ domain: uniqueDomain });
 });
 
-test('signup - ignores the logic to redirect user after connect if the user has 0 spaces', async ({
-  sandboxPage,
-  signupPage
-}) => {
-  // mimic signup: create a user and a session
-  const user = await generateUser();
-  await sandboxPage.goto('/');
-  await login({ page: sandboxPage, userId: user.id });
-  await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent('/profile')}`);
+// test('signup - ignores the logic to redirect user after connect if the user has 0 spaces', async ({
+//   sandboxPage,
+//   signupPage
+// }) => {
+//   // mimic signup: create a user and a session
+//   const user = await generateUser();
+//   await sandboxPage.goto('/');
+//   await login({ page: sandboxPage, userId: user.id });
+//   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent('/profile')}`);
 
-  await signupPage.waitForURL();
-});
+//   await signupPage.waitForURL();
+// });
 
-test('signup - follows the logic to redirect to a token gate', async ({ sandboxPage }) => {
-  const user = await generateUser();
+// test('signup - follows the logic to redirect to a token gate', async ({ sandboxPage }) => {
+//   const user = await generateUser();
 
-  // go to a workspace
-  const { space } = await generateUserAndSpace();
+//   // go to a workspace
+//   const { space } = await generateUserAndSpace();
 
-  await login({ page: sandboxPage, userId: user.id });
-  await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/${space.domain}`)}`);
+//   await login({ page: sandboxPage, userId: user.id });
+//   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/${space.domain}`)}`);
 
-  await sandboxPage.waitForURL('**/join**');
-});
+//   await sandboxPage.waitForURL('**/join**');
+// });

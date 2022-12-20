@@ -306,8 +306,10 @@ const supportedChains: Blockchain[] = [
 
 const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
 
+// Metamask Web3 Connector
 const injected = new InjectedConnector({ supportedChainIds });
 
+// WalletConnect Web3 Connector
 const walletConnect = new WalletConnectConnector({
   supportedChainIds,
   rpc: Object.keys(RPC).reduce(
@@ -321,6 +323,7 @@ const walletConnect = new WalletConnectConnector({
   qrcode: true
 });
 
+// Coinbase Web3 Connector
 const walletLink = new WalletLinkConnector({
   url: 'https://app.charmverse.io',
   appName: 'CharmVerse.io',
