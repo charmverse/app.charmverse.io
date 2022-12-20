@@ -24,21 +24,7 @@ export const isDate = (dt: string) => {
 };
 
 export function isDateValid(strDate: string) {
-  if (strDate.includes(' -> ')) {
-    const dates = strDate.split(' -> ');
-
-    // Both dates should be valid
-    if (dates.every(isDate)) {
-      // If there are 2 dates, make sure the second one is after the first one
-      const firstDateString = dates[0];
-      const secondDateString = dates[1];
-      const firstDate = new Date(isNumber(firstDateString) ? +firstDateString : firstDateString);
-      const secondDate = new Date(isNumber(secondDateString) ? +secondDateString : secondDateString);
-
-      return firstDate <= secondDate;
-    }
-  }
-  return isDate(strDate);
+  return strDate.split(' -> ').every(isDate);
 }
 
 export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
@@ -189,7 +175,8 @@ export function createCardFieldProperties(
       const valuesArr = value.split(' -> ');
 
       if (valuesArr.length === 1) {
-        const from = new Date(valuesArr[0]).getTime();
+        const fromDateString = valuesArr[0];
+        const from = new Date(isNumber(fromDateString) ? +fromDateString : fromDateString).getTime();
         const jsonValue: string = JSON.stringify({
           from
         });
@@ -200,16 +187,21 @@ export function createCardFieldProperties(
       }
 
       if (valuesArr.length === 2) {
-        const from = new Date(valuesArr[0]).getTime();
-        const to = new Date(valuesArr[1]).getTime();
+        const fromDateString = valuesArr[0];
+        const toDateString = valuesArr[1];
+        const from = new Date(isNumber(fromDateString) ? +fromDateString : fromDateString).getTime();
+        const to = new Date(isNumber(toDateString) ? +toDateString : toDateString).getTime();
         const jsonValue: string = JSON.stringify({
           from,
           to
         });
-        return {
-          ...acc,
-          [propId]: jsonValue
-        };
+
+        if (from < to) {
+          return {
+            ...acc,
+            [propId]: jsonValue
+          };
+        }
       }
 
       return {

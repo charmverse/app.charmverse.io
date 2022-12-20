@@ -187,7 +187,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           spaceId: currentSpace.id,
           title: csvRow.Name || textName,
           fields: {
-            properties: createCardFieldProperties(csvRow, mappedBoardProperties, members)
+            properties: fieldProperties
           }
         });
 
