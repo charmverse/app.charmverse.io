@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Script from 'next/script';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -30,20 +30,16 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    if (ref.current) {
-      setCSSOverrides(ref.current);
-    }
-  }, [ref.current]);
-
-  useLayoutEffect(() => {
     const elm = ref.current;
     if (elm) {
+      setCSSOverrides(elm);
       // add a timeout so that the DOM has a chance to render. Otherwise clientWidth is 0
       setTimeout(() => {
         setWidth(elm.clientWidth);
       }, 0);
     }
   }, [ref.current]);
+
   // If there are no source for the node, return the image select component
   if (!attrs.contract) {
     if (readOnly) {
