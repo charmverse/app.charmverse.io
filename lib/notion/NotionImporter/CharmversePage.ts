@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { createCard } from 'lib/focalboard/card';
+import log from 'lib/log';
 import type { PageContent } from 'models';
 
 import { convertToPlainText } from '../convertToPlainText';
@@ -156,6 +157,12 @@ export class CharmversePage {
         type: notionPage.parent.type === 'database_id' ? 'card' : 'page',
         cardId: notionPage.parent.type === 'database_id' ? this.charmversePageId : undefined
       });
+
+      this.cache.totalCreatedPages += 1;
+
+      if (this.cache.totalCreatedPages % 10 === 0) {
+        log.debug('[notion]: Created 10 pages');
+      }
 
       this.cache.pagesRecord.set(this.notionPageId, {
         ...pageRecord,

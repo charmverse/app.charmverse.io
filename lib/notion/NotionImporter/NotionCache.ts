@@ -44,4 +44,6 @@ export class NotionCache {
 
   // key: blockId, value: pageId
   blockPageIdRecord: Map<string, string> = new Map();
+
+  totalCreatedPages: number = 0;
 }

@@ -72,10 +72,17 @@ export class NotionPage {
         notionPage = await this.retrievePage(notionPageId);
       }
       if (notionPage.object === 'page') {
-        const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
-        Object.keys(blocksRecord).forEach((blockId) => {
-          cache.blockPageIdRecord.set(blockId, notionPageId);
-        });
+        const pageRecord = this.cache.pagesRecord.get(notionPageId) as RegularPageItem;
+        const { blocksRecord, topLevelBlockIds } =
+          pageRecord?.notionPage ?? (await this.fetchNotionPageChildBlocks(notionPageId));
+        if (!pageRecord?.notionPage) {
+          Object.keys(blocksRecord).forEach((blockId) => {
+            cache.blockPageIdRecord.set(blockId, notionPageId);
+          });
+        }
+        if (pageRecord?.charmversePage) {
+          return pageRecord.charmversePage;
+        }
         const charmversePage = new CharmversePage({
           blocksRecord,
           topLevelBlockIds,
@@ -85,7 +92,13 @@ export class NotionPage {
         });
         return charmversePage.create();
       } else {
-        const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
+        const pageRecord = this.cache.pagesRecord.get(notionPageId) as DatabasePageItem;
+
+        const { pageIds } = pageRecord?.notionPage ?? (await this.fetchNotionDatabaseChildPages({ notionPageId }));
+
+        if (pageRecord?.charmversePage) {
+          return pageRecord.charmversePage;
+        }
 
         const charmverseDatabasePage = new CharmverseDatabasePage({
           pageIds,
@@ -119,7 +132,12 @@ export class NotionPage {
       });
 
       // Only fetch new blocks of parents that has children
-      let previousBlockIds = topLevelBlockIds.filter((blockId) => nestedBlocksRecord[blockId].has_children);
+      let previousBlockIds = topLevelBlockIds.filter(
+        (blockId) =>
+          nestedBlocksRecord[blockId].type !== 'child_database' &&
+          nestedBlocksRecord[blockId].type !== 'child_page' &&
+          nestedBlocksRecord[blockId].has_children
+      );
 
       // Go at most maxChildBlockDepth depth
       for (let depth = 0; depth < this.maxChildBlockDepth; depth++) {
