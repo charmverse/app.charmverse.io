@@ -19,10 +19,10 @@ async function reopenProposal (path: string, newDate: Date) {
     }
   });
 
-  const vote = page.votes[0];
-  assert(vote, 'Vote not found');
   const proposal = page.proposal;
   assert(proposal, 'Proposal not found');
+  const vote = page.votes.find(vote => vote.context === 'proposal');
+  assert(vote, 'Proposal vote not found');
 
   console.log('Proposal + Vote found', { voteDeadline: vote.deadline, voteStatus: vote.status, proposalStatus: proposal.status });
 
@@ -49,5 +49,5 @@ async function reopenProposal (path: string, newDate: Date) {
   console.log('Proposal updated', proposalRes.id, proposalRes.status);
 }
 
-reopenProposal('story-dao/page-04742242151671694', new Date(2022, 11, 21, 21 ));
+reopenProposal('story-dao/page-04742242151671694', new Date(2022, 11, 21, 23 ));
 reopenProposal('story-dao/page-08009722798423935', new Date(2022, 11, 21, 23 ));
