@@ -99,7 +99,7 @@ describe('listForumPosts', () => {
     const postsInCategory1 = await generateForumPosts({
       spaceId: extraSpace.id,
       createdBy: extraUser.id,
-      count: 10,
+      count: 20,
       categoryId: category1.id
     });
 
@@ -115,12 +115,6 @@ describe('listForumPosts', () => {
       createdBy: extraUser.id,
       count: 10,
       categoryId: category3.id
-    });
-
-    const uncategorisedPosts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: 10
     });
     // With 40 posts, we should have 3 pages
     let resultsPerQuery = 10;

@@ -46,10 +46,21 @@ export async function generatePostWithComment({ userId, spaceId }: { spaceId: st
   };
 }
 
-export async function generateForumPost({ userId, spaceId }: { userId: string; spaceId: string }) {
-  const category = await generatePostCategory({ spaceId });
+export async function generateForumPost({
+  categoryId,
+  userId,
+  spaceId
+}: {
+  categoryId?: string;
+  userId: string;
+  spaceId: string;
+}) {
+  if (!categoryId) {
+    const category = await generatePostCategory({ spaceId });
+    categoryId = category.id;
+  }
   return createForumPost({
-    categoryId: category.id,
+    categoryId,
     content: {
       type: ''
     },

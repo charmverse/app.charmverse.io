@@ -54,8 +54,8 @@ export async function updateForumPost({
     throw new UndesirableOperationError('Cannot update a locked post');
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.page.update({
+  const updated = await prisma.$transaction(async (tx) => {
+    const _updated = await tx.page.update({
       where: { id: postId },
       data: {
         content: content as Prisma.InputJsonObject,
@@ -69,5 +69,8 @@ export async function updateForumPost({
     if (categoryId) {
       await tx.post.update({ where: { id: postId }, data: { category: { connect: { id: categoryId } } } });
     }
+    return _updated;
   });
+
+  return updated;
 }

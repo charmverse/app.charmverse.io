@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
-import { createForumPost } from '../createForumPost';
 import { deleteForumPost } from '../deleteForumPost';
 
 describe('deleteForumPost', () => {
@@ -9,13 +9,9 @@ describe('deleteForumPost', () => {
   it('should delete a post and the corresponding page', async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
 
-    const postPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: null
+    const postPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
     await deleteForumPost(postPage.post.id);
