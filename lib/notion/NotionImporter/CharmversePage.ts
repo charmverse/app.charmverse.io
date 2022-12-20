@@ -53,7 +53,6 @@ export class CharmversePage {
       type: 'doc',
       content: []
     };
-
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
     const notionPage = this.cache.notionPagesRecord[this.notionPageId] as PageObjectResponse;
     const notionParentPageId =
@@ -155,7 +154,7 @@ export class CharmversePage {
         icon: notionPage.icon?.type === 'emoji' ? notionPage.icon.emoji : '',
         parentId: charmverseParentPageId,
         type: notionPage.parent.type === 'database_id' ? 'card' : 'page',
-        cardId: notionPage.parent.type ? this.charmversePageId : undefined
+        cardId: notionPage.parent.type === 'database_id' ? this.charmversePageId : undefined
       });
 
       this.cache.pagesRecord.set(this.notionPageId, {

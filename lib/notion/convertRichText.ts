@@ -12,6 +12,18 @@ export function convertRichText(richTexts: RichTextItemResponse[]) {
         marks.push({ type: 'strike' });
       }
 
+      if (richText.annotations.color) {
+        if (richText.annotations.color.endsWith('background')) {
+          marks.push({ type: 'text-color', attrs: { color: '', bgColor: richText.annotations.color } });
+        } else {
+          marks.push({ type: 'text-color', attrs: { color: richText.annotations.color, bgColor: '' } });
+        }
+      }
+
+      if (richText.annotations.strikethrough) {
+        marks.push({ type: 'strike' });
+      }
+
       if (richText.annotations.bold) {
         marks.push({ type: 'bold' });
       }

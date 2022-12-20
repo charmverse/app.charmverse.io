@@ -71,7 +71,6 @@ export class NotionPage {
       if (!notionPage) {
         notionPage = await this.retrievePage(notionPageId);
       }
-
       if (notionPage.object === 'page') {
         const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
         Object.keys(blocksRecord).forEach((blockId) => {
