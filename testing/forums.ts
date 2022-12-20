@@ -4,6 +4,8 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import type { ForumPostPageWithoutVotes } from 'lib/forums/posts/interfaces';
 
+import { generatePostCategory } from './utils/forums';
+
 const imageUrl1 =
   'https://media.wtsp.com/assets/WTSP/images/657c2b38-486d-467b-8f35-ba1014ff5c61/657c2b38-486d-467b-8f35-ba1014ff5c61.png';
 const imageUrl2 =
@@ -41,12 +43,17 @@ export async function generateForumPosts({
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
   if (!categoryId) {
-    const category = await prisma.postCategory.findFirstOrThrow({
+    const category = await prisma.postCategory.findFirst({
       where: {
         spaceId
       }
     });
-    categoryId = category.id;
+    if (!category) {
+      const newCategory = await generatePostCategory({ spaceId });
+      categoryId = newCategory.id;
+    } else {
+      categoryId = category.id;
+    }
   }
 
   // Start creating the posts 3 days ago

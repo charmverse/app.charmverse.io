@@ -21,7 +21,7 @@ beforeAll(async () => {
 });
 
 describe('updateForumPost', () => {
-  it('should only update page.content, page.contentText, page.title, page.headerImage, page.galleryImage and post.categoryId', async () => {
+  it('should only update page.content, page.contentText, page.title, and post.categoryId', async () => {
     const [category1, category2] = await Promise.all([
       createPostCategory({ name: 'First', spaceId: space.id }),
       createPostCategory({ name: 'Second', spaceId: space.id })
@@ -49,9 +49,7 @@ describe('updateForumPost', () => {
     const pageUpdate: Partial<Page> = {
       content: { type: 'doc', content: [] } as any,
       contentText: 'New content text',
-      title: 'New post title',
-      headerImage: 'image-url-1',
-      galleryImage: 'image-url-2'
+      title: 'New post title'
     };
 
     const postUpdate: Partial<Post> = {

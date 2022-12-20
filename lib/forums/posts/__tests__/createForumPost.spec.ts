@@ -38,9 +38,7 @@ describe('createForumPost', () => {
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
           pinned: false
-        }),
-        galleryImage: 'image-url-1',
-        headerImage: 'image-url-2'
+        })
       })
     );
   });
