@@ -237,7 +237,7 @@ model Space {
   memberProperties            MemberProperty[]
   memberPropertyValues        MemberPropertyValue[]
   userTokenGates              UserTokenGate[]
-  PostCategory                PostCategory[]
+  postCategories              PostCategory[]
 
   @@index([createdBy])
 }
