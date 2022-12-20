@@ -217,7 +217,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
 
             const spaceId = currentSpace?.id;
             if (spaceId) {
-              charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
+              charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
             }
             showMessage('Your csv file was imported successfully', 'success');
           }

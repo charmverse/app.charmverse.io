@@ -1,6 +1,6 @@
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
-import * as uuid from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Member } from 'lib/members/interfaces';
@@ -35,7 +35,7 @@ export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['op
       const randomColor = selectColors[Math.floor(Math.random() * selectColors.length)];
 
       return {
-        id: uuid.v4(),
+        id: uuidv4(),
         color: randomColor,
         value
       };
@@ -79,7 +79,7 @@ export function createNewPropertiesForBoard(
   existingBoardProp?: MappedProperties
 ): IPropertyTemplate {
   const propValues = csvData.map((result) => result[prop]).filter((result) => !!result);
-  const defaultProps = { id: uuid.v4(), name: prop, options: [] };
+  const defaultProps = { id: uuidv4(), name: prop, options: [] };
   const emailReg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
   // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
@@ -100,7 +100,7 @@ export function createNewPropertiesForBoard(
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }
-  if (propValues.every((p) => uuid.validate(p))) {
+  if (propValues.every((p) => uuidValidate(p))) {
     return { ...defaultProps, type: 'person' };
   }
   if (propValues.every(isDateValid)) {
@@ -139,7 +139,7 @@ export function createCardFieldProperties(
     // Verify that we have the person in the members array
     if (
       mappedBoardProperties[key]?.type === 'person' &&
-      uuid.validate(value) &&
+      uuidValidate(value) &&
       !!members.find((member) => member.id === value)
     ) {
       return {
