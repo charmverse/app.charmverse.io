@@ -61,6 +61,8 @@ export class CharmversePage {
         ? notionPage.parent.database_id
         : notionPage.parent.type === 'page_id'
         ? notionPage.parent.page_id
+        : notionPage.parent.type === 'block_id'
+        ? this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? null
         : null;
     const charmverseParentPage = notionParentPageId
       ? await this.notionPage.fetchAndCreatePage({
@@ -138,10 +140,15 @@ export class CharmversePage {
         });
       }
 
+      const headerImageUrl = notionPage.cover
+        ? await getPersistentImageUrl({ image: notionPage.cover, spaceId: this.notionPage.spaceId })
+        : null;
+
       // Optimistically create the page
       const createdCharmversePage = await createPrismaPage({
         id: this.charmversePageId,
         content: pageContent,
+        headerImage: headerImageUrl,
         spaceId: this.notionPage.spaceId,
         createdBy: this.notionPage.userId,
         title: notionPageTitle,

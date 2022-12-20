@@ -41,4 +41,7 @@ export class NotionCache {
       blocks: [string, string][];
     }
   > = {};
+
+  // key: blockId, value: pageId
+  blockPageIdRecord: Map<string, string> = new Map();
 }

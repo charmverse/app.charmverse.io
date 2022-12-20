@@ -50,7 +50,9 @@ export class CharmverseDatabasePage {
         notionPage.parent.type !== 'workspace'
           ? await this.notionPage.fetchAndCreatePage({
               notionPageId:
-                notionPage.parent.type === 'page_id' ? notionPage.parent.page_id : notionPage.parent.block_id
+                notionPage.parent.type === 'page_id'
+                  ? notionPage.parent.page_id
+                  : this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? notionPage.parent.block_id
             })
           : null;
 

@@ -66,14 +66,17 @@ export class NotionPage {
 
   async fetchAndCreatePage({ notionPageId }: { notionPageId: string }): Promise<Page | null> {
     try {
-      let notionPage = this.cache.notionPagesRecord[notionPageId];
+      const { cache } = this;
+      let notionPage = cache.notionPagesRecord[notionPageId];
       if (!notionPage) {
         notionPage = await this.retrievePage(notionPageId);
       }
 
       if (notionPage.object === 'page') {
         const { blocksRecord, topLevelBlockIds } = await this.fetchNotionPageChildBlocks(notionPageId);
-
+        Object.keys(blocksRecord).forEach((blockId) => {
+          cache.blockPageIdRecord.set(blockId, notionPageId);
+        });
         const charmversePage = new CharmversePage({
           blocksRecord,
           topLevelBlockIds,
@@ -81,7 +84,6 @@ export class NotionPage {
           cache: this.cache,
           notionPage: this
         });
-
         return charmversePage.create();
       } else {
         const { pageIds } = await this.fetchNotionDatabaseChildPages({ notionPageId });
