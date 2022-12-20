@@ -5,6 +5,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
@@ -20,14 +21,25 @@ import { CategorySelect } from './components/CategorySelect';
 import CreateForumPost from './components/CreateForumPost';
 import { ForumPostList } from './components/PostList/PostList';
 
-export default function ForumPage() {
+export default function ForumPage({
+  posts,
+  setPosts
+}: {
+  setPosts: Dispatch<
+    SetStateAction<PaginatedPostList<{
+      user?: Member | undefined;
+    }> | null>
+  >;
+  posts: PaginatedPostList<{
+    user?: Member | undefined;
+  }> | null;
+}) {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
   const { categories } = useForumCategories();
   const categoryIds = router.query.categoryIds;
   const { showPost } = usePostDialog();
-  const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
 
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
     const pathname = `/${currentSpace?.domain}/forum`;
