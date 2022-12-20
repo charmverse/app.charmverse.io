@@ -4,7 +4,8 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/router';
-import { forwardRef, useCallback, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
@@ -13,9 +14,19 @@ import { usePostDialog } from 'components/forum/components/PostDialog/hooks/useP
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useUser } from 'hooks/useUser';
+import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-function CreateForumPost() {
+function CreateForumPost({
+  setPosts
+}: {
+  setPosts: Dispatch<
+    SetStateAction<PaginatedPostList<{
+      user?: Member | undefined;
+    }> | null>
+  >;
+}) {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
@@ -42,6 +53,14 @@ function CreateForumPost() {
       });
       setPageTitle('');
       setCreatePageLoading(false);
+      setPosts((paginatedPostList) => {
+        return paginatedPostList
+          ? {
+              ...paginatedPostList,
+              data: [page, ...paginatedPostList.data]
+            }
+          : null;
+      });
     }
   }, [currentSpace, user, pageTitle]);
 

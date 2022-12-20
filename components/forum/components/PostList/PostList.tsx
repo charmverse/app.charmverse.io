@@ -1,9 +1,10 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Box, Divider, Typography, IconButton, Stack } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import type { Dispatch, SetStateAction } from 'react';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -23,13 +24,15 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: CategoryIdQuery;
+  setPosts: Dispatch<
+    SetStateAction<PaginatedPostList<{
+      user?: Member | undefined;
+    }> | null>
+  >;
+  posts: PaginatedPostList<{
+    user?: Member | undefined;
+  }> | null;
 }
-
-const resultsPerQuery = 10;
-
-const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
-  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
-});
 
 // Add a manual delay so the user sees the post loading skeleton
 const generatePostRefreshTimeout = () => {
@@ -44,13 +47,17 @@ const generatePostRefreshTimeout = () => {
   }
 };
 
-export function ForumPostList({ search, categoryId }: ForumPostsProps) {
+const resultsPerQuery = 10;
+
+const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
+
+export function ForumPostList({ posts, setPosts, search, categoryId }: ForumPostsProps) {
   const ref = useRef();
-  const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const [isOpen, setIsOpen] = useState(false);
 
-  const loadingMode = useRef<'list' | 'search'>('list');
   // Re-enable sorting later on
 
   // const querySort = query.sort;
@@ -65,17 +72,19 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   //   }
   //   return 'Most popular';
   // }, [querySort]);
-
-  const { members } = useMembers();
-  const { user } = useUser();
-  const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
+  const loadingMode = useRef<'list' | 'search'>('list');
   const [error, setError] = useState<Error | null>(null);
-
+  const currentSpace = useCurrentSpace();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { subscribe } = useWebSocketClient();
 
   const categoryRef = useRef(categoryId);
   const searchRef = useRef(search);
+  const { members } = useMembers();
+  const { user } = useUser();
+  const { subscribe } = useWebSocketClient();
+
+  const currentCategoryId =
+    typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;
 
   useEffect(() => {
     if (search !== searchRef.current) {
@@ -99,13 +108,13 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
 
       (loadingMode.current === 'list'
         ? charmClient.forum.listForumPosts({
-            spaceId: currentSpace!.id,
+            spaceId: currentSpace.id,
             categoryIds: categoryId,
             count: resultsPerQuery,
             page: refetch ? undefined : posts?.cursor
           })
         : charmClient.forum.searchForumPosts({
-            spaceId: currentSpace!.id,
+            spaceId: currentSpace.id,
             search,
             count: resultsPerQuery,
             page: refetch ? undefined : posts?.cursor
@@ -159,9 +168,6 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
         });
     }
   }
-
-  const currentCategoryId =
-    typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;
 
   const handlePostPublishEvent = useCallback(
     (postWithPage: WebSocketPayload<'post_published'>) => {

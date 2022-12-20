@@ -11,7 +11,8 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
-import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
+import type { CategoryIdQuery, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -26,6 +27,7 @@ export default function ForumPage() {
   const { categories } = useForumCategories();
   const categoryIds = router.query.categoryIds;
   const { showPost } = usePostDialog();
+  const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
 
   function handleCategoryUpdate(categoryId: CategoryIdQuery) {
     const pathname = `/${currentSpace?.domain}/forum`;
@@ -85,8 +87,8 @@ export default function ForumPage() {
           <Box display={{ lg: 'none' }}>
             <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
           </Box>
-          <CreateForumPost />
-          <ForumPostList search={search} categoryId={categoryIds} />
+          <CreateForumPost setPosts={setPosts} />
+          <ForumPostList posts={posts} setPosts={setPosts} search={search} categoryId={categoryIds} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu />
