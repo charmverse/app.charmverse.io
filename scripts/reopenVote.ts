@@ -20,9 +20,9 @@ async function reopenProposal (path: string, newDate: Date) {
       votes: true
     }
   });
-  console.log(page.votes, newDate);
   const vote = page.votes[0];
   assert(vote, 'Vote not found');
+  console.log('Vote found', vote.id, vote.deadline, vote.status);
 
   await prisma.vote.update({
     where: {
