@@ -94,30 +94,6 @@ describe('searchForumPosts', () => {
     const posts = await searchForumPosts({ spaceId: space.id, search: rootPostTitle.substring(0, 5) }, user.id);
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
-
-  it(`should return only return published posts`, async () => {
-    const { space: _space, user: _user } = await generateUserAndSpaceWithApiToken();
-    const title = 'title';
-    const draftPost = await generateForumPosts({
-      createdBy: _user.id,
-      spaceId: _space.id,
-      status: 'draft',
-      count: 1,
-      title
-    });
-
-    const publishedPost = await generateForumPosts({
-      createdBy: _user.id,
-      spaceId: _space.id,
-      status: 'published',
-      count: 1,
-      title
-    });
-    const posts = await searchForumPosts({ spaceId: _space.id, search: title }, _user.id);
-    expect(posts.data).toHaveLength(1);
-    expect(posts.data[0].post.status).toEqual('published');
-  });
-
   it(`should return posts from all categories`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
@@ -130,22 +106,6 @@ describe('searchForumPosts', () => {
 
     const uncategorisedPostsToGenerate = 2;
     const categorisedPostsToGenerate = 2;
-
-    const posts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: uncategorisedPostsToGenerate,
-      title: exampleTitle
-    });
-
-    const categoryPosts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: categorisedPostsToGenerate,
-      categoryId: category.id,
-      title: exampleTitle
-    });
-
     const ignoredPosts = await generateForumPosts({
       spaceId: extraSpace.id,
       createdBy: extraUser.id,
@@ -168,7 +128,7 @@ describe('searchForumPosts', () => {
   it(`should support paginated queries and return 0 as the next page once there are no more results`, async () => {
     const title = `Pagination test`;
 
-    const matchingPosts = await generateForumPosts({
+    await generateForumPosts({
       count: 40,
       spaceId: space.id,
       createdBy: user.id,

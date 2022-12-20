@@ -100,7 +100,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
       (loadingMode.current === 'list'
         ? charmClient.forum.listForumPosts({
             spaceId: currentSpace!.id,
-            categoryIds: categoryId,
+            categoryId,
             count: resultsPerQuery,
             page: refetch ? undefined : posts?.cursor
           })
@@ -133,8 +133,6 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
                 : _prevList.data.filter((postPage) => {
                     if (typeof categoryId === 'string') {
                       return postPage.post.categoryId === categoryId;
-                    } else if (categoryId instanceof Array && postPage.post.categoryId) {
-                      return categoryId.includes(postPage.post.categoryId);
                     } else if (categoryId === null) {
                       return !postPage.post.categoryId;
                     }

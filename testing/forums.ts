@@ -1,4 +1,4 @@
-import type { PostStatus, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -20,35 +20,40 @@ function getRandomImage() {
 }
 
 export async function generateForumPosts({
+  categoryId,
   count,
   spaceId,
   createdBy,
-  categoryId,
   content = { type: 'doc', content: [] },
   contentText = '',
   title,
-  withImageRatio = 30,
-  status = 'published'
+  withImageRatio = 30
 }: {
   spaceId: string;
+  categoryId?: string;
   createdBy: string;
   count: number;
-  categoryId?: string;
   content?: any;
   contentText?: string;
   title?: string;
   withImageRatio?: number;
-  status?: PostStatus;
 }) {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
+  if (!categoryId) {
+    const category = await prisma.postCategory.findFirstOrThrow({
+      where: {
+        spaceId
+      }
+    });
+    categoryId = category.id;
+  }
 
   // Start creating the posts 3 days ago
   let createdAt = Date.now() - 1000 * 60 * 60 * 24 * 30;
 
   for (let i = 0; i < count; i++) {
     const postInput: Prisma.PostCreateManyInput = {
-      status,
       categoryId,
       id: v4()
     };

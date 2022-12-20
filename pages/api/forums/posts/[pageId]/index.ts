@@ -26,7 +26,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
   const updatedPost = await updateForumPost({ userId, postId: pageId, ...req.body });
 
-  res.status(200).json(updatedPost);
+  res.status(200).end();
 }
 
 async function deleteForumPostController(req: NextApiRequest, res: NextApiResponse) {

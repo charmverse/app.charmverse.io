@@ -82,8 +82,7 @@ describe('POST /api/forums/posts/search - Search for posts', () => {
           contentText: expect.any(String),
           post: expect.objectContaining<Partial<Post>>({
             locked: false,
-            pinned: false,
-            status: expect.any(String)
+            pinned: false
           })
         })
       );

@@ -10,41 +10,49 @@ import { useEffect, useState } from 'react';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useForumCategories } from 'hooks/useForumCategories';
 import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategorySelect } from './components/CategorySelect';
 import CreateForumPost from './components/CreateForumPost';
+import PostDialog from './components/PostDialog';
 import { ForumPostList } from './components/PostList/PostList';
 
 export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const { categories } = useForumCategories();
-  const categoryIds = router.query.categoryIds;
+  const categoryId = router.query.categoryId as CategoryIdQuery;
+  const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
 
-  function handleCategoryUpdate(categoryId: CategoryIdQuery) {
+  function handleCategoryUpdate(_categoryId: CategoryIdQuery) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
-    if (categoryId === null) {
+    if (_categoryId === null) {
       router.push({
         pathname,
-        query: { categoryIds: null }
+        query: { _categoryId: null }
       });
-    } else if (typeof categoryId === 'string' && categories?.some((c) => c.id === categoryId)) {
+    } else if (typeof _categoryId === 'string') {
       router.push({
         pathname,
-        query: { categoryIds: categoryId }
+        query: { _categoryId }
       });
     } else {
       router.push({
         pathname
       });
     }
+  }
+
+  function showNewPostPopup() {
+    setShowNewPostForm(true);
+  }
+
+  function hideNewPostPopup() {
+    setShowNewPostForm(false);
   }
 
   useEffect(() => {
@@ -83,10 +91,11 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ lg: 'none' }}>
-            <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
+            <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryId} />
           </Box>
-          <CreateForumPost />
-          <ForumPostList search={search} categoryId={categoryIds} />
+          <CreateForumPost onClick={showNewPostPopup} />
+          {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
+          <ForumPostList search={search} categoryId={categoryId} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu />

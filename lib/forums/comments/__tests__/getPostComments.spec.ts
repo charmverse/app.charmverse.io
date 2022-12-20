@@ -1,7 +1,7 @@
 import type { Space, User } from '@prisma/client';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostComment } from 'testing/utils/forums';
+import { generatePostWithComment } from 'testing/utils/forums';
 
 import { getPostComments } from '../getPostComments';
 
@@ -16,7 +16,7 @@ beforeAll(async () => {
 
 describe('getPostComments', () => {
   it('should get all the comments of a post with votes information', async () => {
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });

@@ -25,7 +25,7 @@ const StyledBox = styled(Box)`
 function ForumFilterListLink({ category, label }: { label: string; category?: PostCategory }) {
   const { deleteForumCategory, updateForumCategory } = useForumCategories();
   const router = useRouter();
-  const selectedCategory = router.query.categoryIds as string;
+  const selectedCategory = router.query.categoryId as string;
   const admin = isAdmin();
 
   return (
@@ -39,7 +39,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
       }}
     >
       <Link
-        href={`/${router.query.domain}/forum${category ? `?categoryIds=${category.id}` : ''}`}
+        href={`/${router.query.domain}/forum${category ? `?categoryId=${category.id}` : ''}`}
         sx={{
           cursor: 'pointer',
           wordBreak: 'break-all',

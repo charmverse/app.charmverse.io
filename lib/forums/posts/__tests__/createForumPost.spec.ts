@@ -36,8 +36,7 @@ describe('createForumPost', () => {
         contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
-          pinned: false,
-          status: 'draft'
+          pinned: false
         }),
         galleryImage: 'image-url-1',
         headerImage: 'image-url-2'
@@ -69,7 +68,6 @@ describe('createForumPost', () => {
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
           pinned: false,
-          status: 'draft',
           categoryId: category.id
         })
       })

@@ -25,8 +25,7 @@ describe('getForumPost', () => {
       contentText: '',
       createdBy: user.id,
       spaceId: space.id,
-      title: 'Test',
-      categoryId: null
+      title: 'Test'
     });
 
     const retrievedPost = await getForumPost({ postId: createdPage.id });
@@ -39,8 +38,7 @@ describe('getForumPost', () => {
         contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
-          pinned: false,
-          status: 'draft'
+          pinned: false
         })
       })
     );
