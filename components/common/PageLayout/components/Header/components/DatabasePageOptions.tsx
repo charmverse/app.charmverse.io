@@ -209,7 +209,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         complete: async (results) => {
           closeMenu();
           if (results.errors && results.errors[0]) {
-            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'error');
+            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
             return;
           }
           if (isValidCsvResult(results)) {
