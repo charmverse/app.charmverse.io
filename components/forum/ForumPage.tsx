@@ -66,7 +66,7 @@ export default function ForumPage() {
 
       <TextField
         variant='outlined'
-        placeholder='Search Posts, Comments and Members'
+        placeholder='Search posts'
         onChange={(e) => {
           setSearch(e.target.value);
         }}
