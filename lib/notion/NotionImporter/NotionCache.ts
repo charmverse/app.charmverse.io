@@ -1,5 +1,6 @@
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import type { Page } from '@prisma/client';
+import { RateLimit } from 'async-sema';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
@@ -46,4 +47,6 @@ export class NotionCache {
   blockPageIdRecord: Map<string, string> = new Map();
 
   totalCreatedPages: number = 0;
+
+  rateLimiter: () => Promise<void> = RateLimit(3);
 }

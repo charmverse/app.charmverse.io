@@ -192,6 +192,7 @@ export class NotionPage {
     const notionPage = this.cache.notionPagesRecord[notionPageId] as DatabaseObjectResponse;
     if (!pageRecord?.notionPage) {
       const pageIds: string[] = [];
+      await this.cache.rateLimiter();
       let databaseQueryResponse = await this.client.databases.query({ database_id: notionPageId });
       databaseQueryResponse.results.forEach((page) => {
         this.cache.notionPagesRecord[page.id] = page as PageObjectResponse | DatabaseObjectResponse;
@@ -199,6 +200,7 @@ export class NotionPage {
       });
 
       while (databaseQueryResponse.has_more) {
+        await this.cache.rateLimiter();
         databaseQueryResponse = await this.client.databases.query({
           database_id: notionPageId,
           start_cursor: databaseQueryResponse.next_cursor ?? undefined
@@ -254,7 +256,7 @@ export class NotionPage {
   }
 
   private async fetchNestedChildBlocks(parentBlockIds: string[]) {
-    const { fetchChildBlocks, blocksPerRequest, client } = this;
+    const { fetchChildBlocks, blocksPerRequest, client, cache } = this;
     // Record to keep track of blockid and its latest cursor
     const blockCursorRecord: Record<string, string> = {};
     let childBlockListResponses: ChildBlockListResponse[] = [];
@@ -273,7 +275,8 @@ export class NotionPage {
                 page_size: blocksPerRequest,
                 start_cursor: blockCursorRecord[parentBlockId]
               },
-              client
+              client,
+              cache
             )
           )
         )
@@ -323,6 +326,7 @@ export class NotionPage {
   private async retrievePage(notionPageId: string) {
     // If the page doesn't exist in the cache fetch it
     if (!this.cache.notionPagesRecord[notionPageId]) {
+      await this.cache.rateLimiter();
       const pageResponse = (await this.client.pages.retrieve({
         page_id: notionPageId
       })) as unknown as PageObjectResponse;
@@ -333,9 +337,15 @@ export class NotionPage {
     return this.cache.notionPagesRecord[notionPageId];
   }
 
-  private async fetchChildBlocks(listBlockChildrenParameters: ListBlockChildrenParameters, client: Client) {
+  // For some reason this this.client doesn't work so passing it as parameter
+  private async fetchChildBlocks(
+    listBlockChildrenParameters: ListBlockChildrenParameters,
+    client: Client,
+    cache: NotionCache
+  ) {
     return promiseRetry<ChildBlockListResponse | void>(
-      (retry) => {
+      async (retry) => {
+        await cache.rateLimiter();
         return client.blocks.children
           .list(listBlockChildrenParameters)
           .then(
