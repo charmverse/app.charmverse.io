@@ -49,4 +49,12 @@ export class NotionCache {
   totalCreatedPages: number = 0;
 
   rateLimiter: () => Promise<void> = RateLimit(3);
+
+  incrementCreatedPagesCounter() {
+    this.totalCreatedPages += 1;
+
+    if (this.totalCreatedPages % 10 === 0) {
+      log.debug(`[notion]: Created ${this.totalCreatedPages}/${Object.keys(this.notionPagesRecord).length} pages`);
+    }
+  }
 }

@@ -158,11 +158,7 @@ export class CharmversePage {
         cardId: notionPage.parent.type === 'database_id' ? this.charmversePageId : undefined
       });
 
-      this.cache.totalCreatedPages += 1;
-
-      if (this.cache.totalCreatedPages % 10 === 0) {
-        log.debug('[notion]: Created 10 pages');
-      }
+      this.cache.incrementCreatedPagesCounter();
 
       this.cache.pagesRecord.set(this.notionPageId, {
         ...pageRecord,

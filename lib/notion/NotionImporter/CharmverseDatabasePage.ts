@@ -96,6 +96,8 @@ export class CharmverseDatabasePage {
         boardId: board.id
       });
 
+      this.cache.incrementCreatedPagesCounter();
+
       await prisma.block.createMany({
         data: [
           {
