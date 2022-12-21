@@ -12,7 +12,7 @@ export function spec(): RawSpecs {
       inline: true,
       group: 'inline',
       parseDOM: [{ tag: 'span.charm-tab' }],
-      toDOM: (): DOMOutputSpec => ['span', { className: 'charm-tab', style: 'white-space:pre' }, '\t'],
+      toDOM: (): DOMOutputSpec => ['span', { class: 'charm-tab', style: 'white-space:pre' }, '\t'],
       attrs: {}
     },
     markdown: {

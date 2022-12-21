@@ -269,7 +269,7 @@ export async function generateUserAndSpace({
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
-  const user = await createUserFromWallet(address);
+  const user = await createUserFromWallet({ address });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 

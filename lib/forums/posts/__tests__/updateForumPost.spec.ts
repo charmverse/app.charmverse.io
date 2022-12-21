@@ -6,8 +6,9 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
-import { createForumPost } from '../createForumPost';
+import { getForumPost } from '../getForumPost';
 import { updateForumPost } from '../updateForumPost';
 
 let space: Space;
@@ -20,18 +21,15 @@ beforeAll(async () => {
 });
 
 describe('updateForumPost', () => {
-  it('should only update page.content, page.contentText, page.title, page.headerImage, page.galleryImage and post.categoryId', async () => {
+  it('should only update page.content, page.contentText, page.title, and post.categoryId', async () => {
     const [category1, category2] = await Promise.all([
       createPostCategory({ name: 'First', spaceId: space.id }),
       createPostCategory({ name: 'Second', spaceId: space.id })
     ]);
 
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
+    const createdPage = await generateForumPost({
+      userId: user.id,
       spaceId: space.id,
-      title: 'Test',
       categoryId: category1.id
     });
 
@@ -51,9 +49,7 @@ describe('updateForumPost', () => {
     const pageUpdate: Partial<Page> = {
       content: { type: 'doc', content: [] } as any,
       contentText: 'New content text',
-      title: 'New post title',
-      headerImage: 'image-url-1',
-      galleryImage: 'image-url-2'
+      title: 'New post title'
     };
 
     const postUpdate: Partial<Post> = {
@@ -67,11 +63,12 @@ describe('updateForumPost', () => {
       ...postUpdate
     };
 
-    const updatedForumPost = await updateForumPost({
+    await updateForumPost({
       ...(groupedUpdate as any),
       postId: createdPage.id,
       userId: user.id
     });
+    const updatedForumPost = await getForumPost({ pageId: createdPage.id });
 
     // ---------------------- Make sure data was preserved ----------------------
     typedKeys(droppedPageUpdate).forEach((key) => {
@@ -106,12 +103,9 @@ describe('updateForumPost', () => {
       createPostCategory({ name: 'Fourth', spaceId: secondSpace.id })
     ]);
 
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
+    const createdPage = await generateForumPost({
+      userId: user.id,
       spaceId: space.id,
-      title: 'Test',
       categoryId: category1.id
     });
 
@@ -125,12 +119,9 @@ describe('updateForumPost', () => {
   });
 
   it('should fail to update if the post is locked', async () => {
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test'
+    const createdPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
     await prisma.post.update({

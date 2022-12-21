@@ -3,7 +3,7 @@ import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { useWeb3React } from '@web3-react/core';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { PropsWithChildren } from 'react';
+import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { createContext, useEffect, useState } from 'react';
 
 import NetworkModal from 'components/common/PageLayout/components/Account/components/NetworkModal/NetworkModal';
@@ -20,7 +20,10 @@ const Web3Connection = createContext({
   isNetworkModalOpen: false,
   openNetworkModal: () => {},
   closeNetworkModal: () => {},
-  isConnectingIdentity: false
+  isConnectingIdentity: false,
+  setIsConnectingIdentity: (() => null) as Dispatch<SetStateAction<boolean>>,
+  setActivatingConnector: (() => null) as Dispatch<SetStateAction<AbstractConnector | undefined>>,
+  activatingConnector: undefined as AbstractConnector | undefined
 });
 
 function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
@@ -69,20 +72,14 @@ function Web3ConnectionManager({ children }: PropsWithChildren<any>) {
         isNetworkModalOpen,
         openNetworkModal,
         closeNetworkModal,
-        isConnectingIdentity
+        isConnectingIdentity,
+        setIsConnectingIdentity,
+        setActivatingConnector,
+        activatingConnector
       }}
     >
       {children}
-      <WalletSelectorModal
-        {...{
-          setActivatingConnector,
-          isModalOpen: isWalletSelectorModalOpen,
-          openModal: openWalletSelectorModal,
-          closeModal: closeWalletSelectorModal,
-          openNetworkModal,
-          setIsConnectingIdentity
-        }}
-      />
+      <WalletSelectorModal loginSuccess={() => null} />
       <NetworkModal {...{ isOpen: isNetworkModalOpen, onClose: closeNetworkModal }} />
     </Web3Connection.Provider>
   );

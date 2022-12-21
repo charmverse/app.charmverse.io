@@ -7,7 +7,7 @@ import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testin
 
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
   it('should get votes of a page for the admin user and return it, responding with 200', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
     const userCookie = await loginUser(user.id);
     const page = await createPage({
       createdBy: user.id,
@@ -24,7 +24,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
   });
 
   it('should get votes of a page for a member who has read access, responding with 200', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page = await createPage({
       createdBy: user.id,
@@ -49,7 +49,7 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
   });
 
   it("should fail to get votes of a page for a member who doesn't have read access, responding with 404", async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page = await createPage({
       createdBy: user.id,
@@ -69,8 +69,8 @@ describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', ()
   });
 
   it('should fail to get votes of a page for a user not part of the space, responding with 404', async () => {
-    const { user: userInSpace, space } = await generateUserAndSpaceWithApiToken(v4(), true);
-    const { user: userNotInSpace } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user: userInSpace, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user: userNotInSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const page = await createPage({
       createdBy: userInSpace.id,

@@ -18,7 +18,7 @@ interface Props {
   children: (state: State) => JSX.Element;
 }
 
-export default function DiscordProvider({ children }: Props) {
+export function DiscordProvider({ children }: Props) {
   const { user, setUser } = useUser();
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
@@ -46,7 +46,7 @@ export default function DiscordProvider({ children }: Props) {
   function disconnect() {
     setIsDisconnectingDiscord(true);
 
-    return charmClient
+    return charmClient.discord
       .disconnectDiscord()
       .then(() => {
         setUser({ ...user, discordUser: null });
@@ -73,7 +73,7 @@ export default function DiscordProvider({ children }: Props) {
       deleteCookie(AUTH_CODE_COOKIE);
       setIsConnectDiscordLoading(true);
 
-      charmClient
+      charmClient.discord
         .connectDiscord({
           code: authCode
         })

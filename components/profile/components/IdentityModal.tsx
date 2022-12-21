@@ -51,6 +51,9 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
     case 'UnstoppableDomain':
       return <img src='/images/walletLogos/unstoppable-domains.png' height={40} width={40} />;
 
+    case 'Google':
+      return <img src='/images/walletLogos/Google_G.png' height={40} width={40} />;
+
     case 'RandomName':
     default:
       return (

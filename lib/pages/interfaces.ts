@@ -1,6 +1,6 @@
 import type { Block, Page, PagePermission, Space } from '@prisma/client';
 
-import type { Board } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
@@ -111,3 +111,8 @@ export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, 
 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
+
+export type FormResponseProperty = IPropertyTemplate & {
+  description: string;
+  isQuestion?: true;
+};

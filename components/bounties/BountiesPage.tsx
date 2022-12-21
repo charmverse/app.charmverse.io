@@ -52,6 +52,12 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
     ];
   }, [bountiesSorted]);
 
+  function recordExportEvent() {
+    if (space) {
+      charmClient.track.trackAction('export_bounties_csv', { spaceId: space.id });
+    }
+  }
+
   return (
     <div className='focalboard-body full-page'>
       <div className='BoardComponent'>
@@ -65,7 +71,12 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
               {!publicMode && (
                 <Box width='fit-content' display='flex' gap={1}>
                   {!!csvData.length && (
-                    <CSVLink data={csvData} filename='Gnosis Safe Airdrop.csv' style={{ textDecoration: 'none' }}>
+                    <CSVLink
+                      data={csvData}
+                      onClick={recordExportEvent}
+                      filename='Gnosis Safe Airdrop.csv'
+                      style={{ textDecoration: 'none' }}
+                    >
                       <Button color='secondary' variant='outlined'>
                         Export to CSV
                       </Button>

@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
-import { generateDefaultPostCategoriesInput } from 'lib/forums/categories/generateDefaultPostCategories';
+import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -39,7 +39,7 @@ export async function createWorkspace({ spaceData, userId }: CreateSpaceProps) {
     ...seedPagesTransactionInput.pagesToCreate.map((input) => createPage({ data: input })),
     prisma.proposalCategory.createMany({ data: defaultCategories }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
-    prisma.postCategory.createMany({ data: generateDefaultPostCategoriesInput(space.id) })
+    prisma.postCategory.createMany({ data: generateDefaultPostCategories(space.id) })
   ]);
 
   const updatedSpace = await updateSpacePermissionConfigurationMode({

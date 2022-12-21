@@ -30,7 +30,6 @@ describe('listForumPosts', () => {
 
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
-
   it(`should return posts from all cateogories (including uncategorised) if no category is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
@@ -56,7 +55,6 @@ describe('listForumPosts', () => {
 
     expect(foundPosts.data).toHaveLength(posts.length + categoryPosts.length);
 
-    expect(foundPosts.data.some((p) => p.post.categoryId === null)).toBe(true);
     expect(foundPosts.data.some((p) => p.post.categoryId === category.id)).toBe(true);
   });
 
@@ -100,7 +98,7 @@ describe('listForumPosts', () => {
     const postsInCategory1 = await generateForumPosts({
       spaceId: extraSpace.id,
       createdBy: extraUser.id,
-      count: 10,
+      count: 20,
       categoryId: category1.id
     });
 
@@ -117,22 +115,17 @@ describe('listForumPosts', () => {
       count: 10,
       categoryId: category3.id
     });
-
-    const uncategorisedPosts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: 10
-    });
     // With 40 posts, we should have 3 pages
     let resultsPerQuery = 10;
+    // Test querying for posts in category 3 -------------------------------
 
-    // Test querying for posts in category 1 + 2 -------------------------------
+    resultsPerQuery = 5;
 
     let firstResult = await listForumPosts(
       {
         spaceId: extraSpace.id,
         count: resultsPerQuery,
-        categoryIds: [category1.id, category2.id]
+        categoryId: category3.id
       },
       user.id
     );
@@ -146,37 +139,7 @@ describe('listForumPosts', () => {
         spaceId: extraSpace.id,
         count: resultsPerQuery,
         page: firstResult.cursor,
-        categoryIds: [category1.id, category2.id]
-      },
-      user.id
-    );
-    expect(secondResult.data).toHaveLength(resultsPerQuery);
-    expect(secondResult.cursor).toBe(0);
-    expect(secondResult.hasNext).toBe(false);
-
-    // Test querying for posts in category 3 -------------------------------
-
-    resultsPerQuery = 5;
-
-    firstResult = await listForumPosts(
-      {
-        spaceId: extraSpace.id,
-        count: resultsPerQuery,
-        categoryIds: [category3.id]
-      },
-      user.id
-    );
-
-    expect(firstResult.data).toHaveLength(resultsPerQuery);
-    expect(firstResult.cursor).toBe(1);
-    expect(firstResult.hasNext).toBe(true);
-
-    secondResult = await listForumPosts(
-      {
-        spaceId: extraSpace.id,
-        count: resultsPerQuery,
-        page: firstResult.cursor,
-        categoryIds: [category3.id]
+        categoryId: category3.id
       },
       user.id
     );
@@ -188,8 +151,7 @@ describe('listForumPosts', () => {
     firstResult = await listForumPosts(
       {
         spaceId: extraSpace.id,
-        count: resultsPerQuery,
-        categoryIds: null
+        count: resultsPerQuery
       },
       user.id
     );
@@ -202,14 +164,13 @@ describe('listForumPosts', () => {
       {
         spaceId: extraSpace.id,
         count: resultsPerQuery,
-        page: firstResult.cursor,
-        categoryIds: null
+        page: firstResult.cursor
       },
       user.id
     );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
-    expect(secondResult.cursor).toBe(0);
-    expect(secondResult.hasNext).toBe(false);
+    expect(secondResult.cursor).toBe(2);
+    expect(secondResult.hasNext).toBe(true);
 
     // What should be left for third query after executing the query twice
   });

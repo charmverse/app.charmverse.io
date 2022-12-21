@@ -109,13 +109,18 @@ export class ModCollabDoc {
     this.mod.editor.docInfo.version = doc.v;
     this.mod.editor.docInfo.updated = new Date();
     const stateDoc = this.mod.editor.schema.nodeFromJSON(doc.content);
-    const plugins = this.mod.editor.statePlugins.map((plugin) => {
-      if (plugin[1]) {
-        return plugin[0](plugin[1](doc));
-      } else {
-        return plugin[0]();
-      }
-    });
+
+    const currentPlugins = this.mod.editor.view.state.plugins;
+    const plugins = this.mod.editor.statePlugins
+      .map((plugin) => {
+        if (plugin[1]) {
+          return plugin[0](plugin[1](doc));
+        } else {
+          return plugin[0]();
+        }
+      })
+      // filter out plugins in case we already loaded the doc once
+      .filter((plugin) => !currentPlugins.some((p) => (p as any).key === plugin.key));
 
     const stateConfig = {
       schema: this.mod.editor.schema,
@@ -124,15 +129,18 @@ export class ModCollabDoc {
     };
 
     // Set document in prosemirror
-    this.mod.editor.view.setProps({ state: EditorState.create(stateConfig) });
+    this.mod.editor.view.updateState(EditorState.create(stateConfig));
     this.mod.editor.view.setProps({ nodeViews: {} }); // Needed to initialize nodeViews in plugins
     // Set initial confirmed doc
     this.mod.editor.docInfo.confirmedDoc = this.mod.editor.view.state.doc;
-
     // deactivateWait();
     if (locationHash.length) {
       // this.mod.editor.scrollIdIntoView(locationHash.slice(1));
     }
+
+    // scroll to top in case we had to reset the content due to large payload
+    this.mod.editor.view.dispatch(this.mod.editor.view.state.tr.scrollIntoView());
+
     this.mod.editor.waitingForDocument = false;
   }
 

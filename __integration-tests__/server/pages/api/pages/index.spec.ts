@@ -10,7 +10,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/pages - create page', () => {
   it('should create a page if the non-admin user has the permission and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations({
       forSpaceId: space.id,
@@ -37,7 +37,7 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should allow admins to create a page even if no permission exists, and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const userCookie = await loginUser(user.id);
 
@@ -58,7 +58,7 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should fail to create a page if the non-admin user does not have the permission and return it, responding with 401', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const userCookie = await loginUser(user.id);
 
@@ -71,7 +71,7 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should prevent creation of proposal templates', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const userCookie = await loginUser(user.id);
 
@@ -93,7 +93,7 @@ describe('POST /api/pages - create page', () => {
 
 describe('POST /api/pages - create proposal page', () => {
   it('should create a proposal page if the non-admin user has the permission and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     await addSpaceOperations({
       forSpaceId: space.id,
@@ -121,7 +121,7 @@ describe('POST /api/pages - create proposal page', () => {
   });
 
   it('should allow admins to create a page even if no permission exists, and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), true);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
     const userCookie = await loginUser(user.id);
 
@@ -143,7 +143,7 @@ describe('POST /api/pages - create proposal page', () => {
   });
 
   it('should fail to create a page if the non-admin user does not have the permission and return it, responding with 401', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(v4(), false);
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const userCookie = await loginUser(user.id);
 

@@ -17,7 +17,8 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
-import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
+import { updateUserProfile } from 'lib/users/updateUserProfile';
+import { DataNotFoundError, InsecureOperationError, MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -36,7 +37,7 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId);
+    user = await createUserFromWallet({ address, id: req.session.anonymousUserId }, signupAnalytics);
     user.isNew = true;
 
     logSignupViaWallet();
@@ -92,37 +93,13 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 }
 
 async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
-  const { username, identityType } = req.body as User;
   const { id: userId } = req.session.user;
 
-  if (identityType === 'UnstoppableDomain' && username) {
-    const domain = await prisma.unstoppableDomain.findFirst({
-      where: {
-        userId,
-        domain: username
-      }
-    });
+  const updatedUser = await updateUserProfile(userId, req.body);
 
-    if (!domain) {
-      throw new InsecureOperationError(
-        `Cannot switch to Unstoppable Domain ${username} for user ${userId} as it is not registered`
-      );
-    }
-  }
+  updateTrackUserProfile(updatedUser);
 
-  const user = await prisma.user.update({
-    where: {
-      id: req.session.user.id
-    },
-    include: sessionUserRelations,
-    data: {
-      ...req.body
-    }
-  });
-
-  updateTrackUserProfile(user);
-
-  return res.status(200).json(user);
+  return res.status(200).json(updatedUser);
 }
 
 export default withSessionRoute(handler);

@@ -65,7 +65,7 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
     });
 
     const user: LoggedInUser = !userWallet
-      ? await createUserFromWallet(address, signupAnalytics)
+      ? await createUserFromWallet({ address }, signupAnalytics)
       : await getUserProfile('id', userWallet.userId);
 
     await prisma.unstoppableDomain.create({

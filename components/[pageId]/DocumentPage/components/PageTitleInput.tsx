@@ -43,7 +43,7 @@ const StyledReadOnlyTitle = styled(Typography)`
 
 interface PageTitleProps {
   value: string;
-  updatedAt: string; // need this to determine if the title has been updated
+  updatedAt?: string; // need this to determine if the title has been updated
   onChange: (page: { title: string; updatedAt: string }) => void;
   readOnly?: boolean;
 }
@@ -55,7 +55,7 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
   const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
 
   useEffect(() => {
-    if (updatedAt < updatedAtExternal) {
+    if (updatedAtExternal && updatedAt && updatedAt < updatedAtExternal) {
       setTitle(value);
     }
   }, [value, updatedAtExternal]);

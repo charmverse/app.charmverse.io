@@ -11,27 +11,32 @@ import type {
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
+import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
 export class ForumApi {
-  listForumPosts({ spaceId, count, page, sort, categoryIds }: ListForumPostsRequest): Promise<PaginatedPostList> {
-    return http.GET('/api/forums/posts', { spaceId, sort, categoryIds, count, page });
+  createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
+    return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
+  }
+
+  listForumPosts({ spaceId, count, page, sort, categoryId }: ListForumPostsRequest): Promise<PaginatedPostList> {
+    return http.GET('/api/forums/posts', { spaceId, sort, categoryId, count, page });
+  }
+
+  searchForumPosts(searchQuery: SearchForumPostsRequest): Promise<PaginatedPostList> {
+    return http.POST('/api/forums/posts/search', searchQuery);
   }
 
   updateForumPost(postId: string, payload: UpdateForumPostInput) {
-    return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}`, payload);
+    return http.PUT(`/api/forums/posts/${postId}`, payload);
   }
 
-  deleteForumPost(postId: string) {
-    return http.DELETE(`/api/forums/posts/${postId}`);
+  deleteForumPost(pageId: string) {
+    return http.DELETE(`/api/forums/posts/${pageId}`);
   }
 
-  publishForumPost(postId: string) {
-    return http.PUT<ForumPostPage>(`/api/forums/posts/${postId}/publish`);
-  }
-
-  getForumPost(postId: string) {
-    return http.GET<ForumPostPage>(`/api/forums/posts/${postId}`);
+  getForumPost(pageId: string) {
+    return http.GET<ForumPostPage>(`/api/forums/posts/${pageId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
@@ -72,10 +77,6 @@ export class ForumApi {
 
   votePost({ postId, upvoted }: { upvoted?: boolean; postId: string }) {
     return http.PUT(`/api/forums/posts/${postId}/vote`, { upvoted });
-  }
-
-  createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
-    return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
   }
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {

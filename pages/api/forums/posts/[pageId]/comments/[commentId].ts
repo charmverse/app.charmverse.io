@@ -21,7 +21,7 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 
@@ -41,7 +41,7 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 

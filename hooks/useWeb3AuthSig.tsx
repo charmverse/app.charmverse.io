@@ -37,6 +37,7 @@ type IContext = {
   connectWalletModalIsOpen: boolean;
   isSigning: boolean;
   isConnectingIdentity: boolean;
+  closeWalletSelector: () => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -44,24 +45,30 @@ export const Web3Context = createContext<Readonly<IContext>>({
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
-  getStoredSignature: (address?: string) => null,
+  getStoredSignature: () => null,
   disconnectWallet: () => null,
   library: null,
   chainId: null,
-  setLoggedInUser: (user: LoggedInUser | null) => null,
+  setLoggedInUser: () => null,
   connector: null,
   verifiableWalletDetected: false,
   connectWallet: () => null,
   connectWalletModalIsOpen: false,
   isSigning: false,
-  isConnectingIdentity: false
+  isConnectingIdentity: false,
+  closeWalletSelector: () => null
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { account, library, chainId, connector } = useWeb3React();
-  const { triedEager, openWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } =
-    useContext(Web3Connection);
+  const {
+    triedEager,
+    openWalletSelectorModal,
+    closeWalletSelectorModal,
+    isWalletSelectorModalOpen,
+    isConnectingIdentity
+  } = useContext(Web3Connection);
 
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account && !isConnectingIdentity;
@@ -207,7 +214,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       connectWallet,
       connectWalletModalIsOpen: isWalletSelectorModalOpen,
       isSigning,
-      isConnectingIdentity
+      isConnectingIdentity,
+      closeWalletSelector: closeWalletSelectorModal
     }),
     [
       account,

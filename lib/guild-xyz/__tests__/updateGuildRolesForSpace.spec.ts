@@ -17,9 +17,9 @@ let guild2Role1: Role;
 let guild2Role2: Role;
 
 beforeAll(async () => {
-  const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken(v4());
+  const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken();
   user1 = user;
-  user2 = await createUserFromWallet(v4());
+  user2 = await createUserFromWallet();
   space = createdSpace;
   user1SpaceRole = (await prisma.spaceRole.findFirst({
     where: {
