@@ -722,6 +722,7 @@ model Role {
   id                        String                     @id @default(uuid()) @db.Uuid
   createdAt                 DateTime                   @default(now())
   createdBy                 String                     @db.Uuid
+  externalId                String?
   name                      String
   spaceId                   String                     @db.Uuid
   source                    RoleSource?

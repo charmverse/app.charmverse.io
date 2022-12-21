@@ -378,12 +378,13 @@ export async function generateBountyWithSingleApplication({
  * @roleName uses UUID to ensure role names do not conflict
  */
 export async function generateRole({
-  id,
+  externalId,
   spaceId,
   createdBy,
   roleName = `role-${v4()}`,
   source
 }: {
+  externalId?: string;
   spaceId: string;
   roleName?: string;
   createdBy: string;
@@ -392,7 +393,7 @@ export async function generateRole({
 }): Promise<Role> {
   const role = await prisma.role.create({
     data: {
-      id,
+      externalId,
       name: roleName,
       createdBy,
       space: {
