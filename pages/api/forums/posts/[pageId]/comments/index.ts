@@ -7,7 +7,6 @@ import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/com
 import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

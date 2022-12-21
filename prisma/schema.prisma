@@ -446,6 +446,7 @@ model User {
   memberPropertyValues MemberPropertyValue[]
   userTokenGates       UserTokenGate[]
   unstoppableDomains   UnstoppableDomain[]
+  PageComment          PageComment[]
 }
 
 model UserWallet {
@@ -1051,6 +1052,7 @@ model PageComment {
 
   pageId String                  @db.Uuid
   page   Page                    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user   User                    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   votes  PageCommentUpDownVote[]
 
   @@index([pageId])

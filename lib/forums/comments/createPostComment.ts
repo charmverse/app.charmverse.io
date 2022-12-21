@@ -19,6 +19,15 @@ export async function createPostComment({
       createdBy: userId,
       pageId: postId,
       parentId
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          avatar: true,
+          username: true
+        }
+      }
     }
   });
 }

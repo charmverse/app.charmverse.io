@@ -14,7 +14,14 @@ export async function getPostComments({
       pageId: postId
     },
     include: {
-      votes: true
+      votes: true,
+      user: {
+        select: {
+          id: true,
+          avatar: true,
+          username: true
+        }
+      }
     },
     orderBy: {
       createdAt: 'desc'

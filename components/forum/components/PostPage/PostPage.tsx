@@ -17,6 +17,7 @@ import type { PageContent } from 'models/Page';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
+import { PostCommentList } from './components/PostCommentList';
 
 interface Props {
   page: ForumPostPage;
@@ -105,6 +106,7 @@ export function PostPage(props: Props) {
       )}
 
       {page.postId && <PostComment postId={page.postId} />}
+      {page.postId && <PostCommentList postId={page.postId} />}
     </Container>
   );
 }
