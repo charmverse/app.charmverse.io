@@ -62,6 +62,7 @@ export async function generateForumPosts({
   for (let i = 0; i < count; i++) {
     const postInput: Prisma.PostCreateManyInput = {
       categoryId,
+      spaceId,
       id: v4()
     };
 

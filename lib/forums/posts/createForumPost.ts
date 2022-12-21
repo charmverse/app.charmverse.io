@@ -57,6 +57,7 @@ export async function createForumPost({
       post: {
         create: {
           id: postId,
+          spaceId,
           category: {
             connect: {
               id: categoryId
