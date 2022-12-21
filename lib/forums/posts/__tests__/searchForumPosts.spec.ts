@@ -118,7 +118,7 @@ describe('searchForumPosts', () => {
     expect(posts.data[0].post.status).toEqual('published');
   });
 
-  it(`should return posts from all categories`, async () => {
+  it(`should return posts from all categories if no category id is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
     const exampleTitle = `Example title`;
@@ -205,5 +205,56 @@ describe('searchForumPosts', () => {
     expect(thirdResult.data).toHaveLength(expectedRemainingData);
     expect(thirdResult.cursor).toBe(0);
     expect(thirdResult.hasNext).toBe(false);
+  });
+
+  it('should return only posts from a specific category if provided, or uncategorised posts if category ID is null', async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const exampleTitle = `Example title`;
+
+    const category = await createPostCategory({
+      spaceId: extraSpace.id,
+      name: 'Test Category'
+    });
+
+    const uncategorisedPostsToGenerate = 4;
+    const categorisedPostsToGenerate = 2;
+
+    const uncategorisedPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: uncategorisedPostsToGenerate,
+      title: exampleTitle
+    });
+
+    const categoryPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: categorisedPostsToGenerate,
+      categoryId: category.id,
+      title: exampleTitle
+    });
+
+    // First assertion - categorised
+    const foundCategoryPosts = await searchForumPosts(
+      { spaceId: extraSpace.id, count: 10, categoryId: category.id, search: exampleTitle.substring(0, 5) },
+      user.id
+    );
+
+    expect(foundCategoryPosts.data).toHaveLength(categorisedPostsToGenerate);
+
+    // Make sure ignored posts didn't enter the result
+    expect(foundCategoryPosts.data.every((item) => categoryPosts.some((_post) => _post.id === item.id)));
+
+    // Second assertion - uncategorised
+    const foundUncategorisedPosts = await searchForumPosts(
+      { spaceId: extraSpace.id, count: 10, categoryId: null, search: exampleTitle.substring(0, 5) },
+      user.id
+    );
+
+    expect(foundUncategorisedPosts.data).toHaveLength(uncategorisedPostsToGenerate);
+
+    // Make sure ignored posts didn't enter the result
+    expect(foundUncategorisedPosts.data.every((item) => uncategorisedPosts.some((_post) => _post.id === item.id)));
   });
 });

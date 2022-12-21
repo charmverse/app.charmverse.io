@@ -16,7 +16,7 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import TelegramIcon from 'public/images/telegram_logo.svg';
 
-import DiscordProvider from './DiscordProvider';
+import { DiscordProvider } from './DiscordProvider';
 import TelegramLoginIframe, { loginWithTelegram } from './TelegramLoginIframe';
 
 const StyledButton = styled(Button)`

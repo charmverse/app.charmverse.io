@@ -50,22 +50,6 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   const bottomPostReached = useOnScreen(ref);
   const [isOpen, setIsOpen] = useState(false);
 
-  const loadingMode = useRef<'list' | 'search'>('list');
-  // Re-enable sorting later on
-
-  // const querySort = query.sort;
-  // const sortValue = useMemo(() => {
-  //   const defaultValue = 'Most popular';
-  //   if (querySort) {
-  //     if (Array.isArray(querySort)) {
-  //       return querySort[0] || defaultValue;
-  //     } else {
-  //       return querySort;
-  //     }
-  //   }
-  //   return 'Most popular';
-  // }, [querySort]);
-
   const { members } = useMembers();
   const { user } = useUser();
   const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
@@ -74,30 +58,16 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { subscribe } = useWebSocketClient();
 
-  const categoryRef = useRef(categoryId);
-  const searchRef = useRef(search);
-
-  useEffect(() => {
-    if (search !== searchRef.current) {
-      searchRef.current = search;
-      loadingMode.current = 'search';
-    } else if (categoryId !== categoryRef.current) {
-      categoryRef.current = categoryId;
-      loadingMode.current = 'list';
-    }
-    loadMorePosts(true);
-  }, [search, categoryId]);
-
   useEffect(() => {
     // When loading mode changes, clear out the current list to switch between search and list data
     loadMorePosts(true);
-  }, [loadingMode]);
+  }, [search, categoryId]);
 
   function loadMorePosts(refetch = false) {
     if (currentSpace) {
       setIsLoadingMore(true);
 
-      (loadingMode.current === 'list'
+      (!search
         ? charmClient.forum.listForumPosts({
             spaceId: currentSpace!.id,
             categoryIds: categoryId,
@@ -108,7 +78,8 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
             spaceId: currentSpace!.id,
             search,
             count: resultsPerQuery,
-            page: refetch ? undefined : posts?.cursor
+            page: refetch ? undefined : posts?.cursor,
+            categoryId
           })
       )
         .then((foundPosts) => {
@@ -201,7 +172,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
     ) {
       loadMorePosts();
     }
-  }, [bottomPostReached, members, currentSpace, posts, isLoadingMore, categoryId]);
+  }, [bottomPostReached, members, currentSpace, isLoadingMore]);
 
   return (
     <>

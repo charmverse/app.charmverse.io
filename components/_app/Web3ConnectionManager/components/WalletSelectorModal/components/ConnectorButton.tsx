@@ -24,7 +24,7 @@ type Props = {
   isLoading: boolean;
 };
 
-function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
+export function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading }: Props) {
   return (
     <Button
       color='secondary'
@@ -43,10 +43,8 @@ function ConnectorButton({ name, onClick, iconUrl, disabled, isActive, isLoading
     >
       <ButtonContent>
         {`${name} ${isActive ? ' - connected' : ''}`}
-        <ImageIcon src={`/images/walletLogos/${iconUrl}`} />
+        <ImageIcon style={{ marginLeft: 3 }} src={`/images/walletLogos/${iconUrl}`} />
       </ButtonContent>
     </Button>
   );
 }
-
-export default ConnectorButton;

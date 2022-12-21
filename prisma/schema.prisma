@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -29,6 +29,7 @@ enum IdentityType {
   Telegram
   RandomName
   UnstoppableDomain
+  Google
 }
 
 enum VoteStatus {
@@ -447,6 +448,7 @@ model User {
   userTokenGates       UserTokenGate[]
   unstoppableDomains   UnstoppableDomain[]
   PageComment          PageComment[]
+  googleAccounts       GoogleAccount[]
 }
 
 model UserWallet {
@@ -1078,4 +1080,13 @@ model UnstoppableDomain {
   domain String @unique
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleAccount {
+  id        String @id @default(uuid()) @db.Uuid
+  email     String @unique
+  name      String
+  avatarUrl String
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
