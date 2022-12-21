@@ -90,7 +90,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
       }
     });
 
-    expect(updatedPage?.deletedAt).toBeNull();
+    expect(updatedPage?.deletedAt).toBeDefined();
   });
 
   it('should delete a post if the user did not create the post, but is a space admin, responding with 200', async () => {
