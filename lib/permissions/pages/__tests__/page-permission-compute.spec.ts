@@ -10,7 +10,7 @@ import type { PageOperationType } from '../page-permission-interfaces';
 let user: User;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
 });
 

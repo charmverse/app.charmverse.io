@@ -1,20 +1,25 @@
 import getPageLayout from 'components/common/PageLayout/getLayout';
+import { PostDialogProvider } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import PostDialogGlobal from 'components/forum/components/PostDialog/PostDialogGlobal';
 import ForumPageComponent from 'components/forum/ForumPage';
-import { isProdEnv } from 'config/constants';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { setTitle } from 'hooks/usePageTitle';
 
 export default function ForumPage() {
   setTitle('Forum');
-
-  const space = useCurrentSpace();
+  const isCharmVerseSpace = useIsCharmverseSpace();
 
   // Show this page only to charmverse users
-  if (!space?.name.includes('charmverse') && isProdEnv) {
+  if (!isCharmVerseSpace) {
     return null;
   }
 
-  return <ForumPageComponent />;
+  return (
+    <PostDialogProvider>
+      <ForumPageComponent />
+      <PostDialogGlobal />
+    </PostDialogProvider>
+  );
 }
 
 ForumPage.getLayout = getPageLayout;

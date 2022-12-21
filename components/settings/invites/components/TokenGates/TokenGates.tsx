@@ -66,7 +66,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
   const theme = useTheme();
   const litClient = useLitProtocol();
   const { chainId } = useWeb3AuthSig();
-  const { walletAuthSignature } = useWeb3AuthSig();
+  const { walletAuthSignature, sign } = useWeb3AuthSig();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () => charmClient.getTokenGates({ spaceId }));
@@ -104,10 +104,12 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
     const chain = getLitChainFromChainId(chainId);
 
+    const authSig: AuthSig = walletAuthSignature ?? (await sign());
+
     await litClient!.saveSigningCondition({
       ...conditions,
       chain,
-      authSig: walletAuthSignature as AuthSig,
+      authSig,
       resourceId
     });
     await charmClient.saveTokenGate({

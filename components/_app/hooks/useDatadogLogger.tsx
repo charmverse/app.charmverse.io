@@ -7,7 +7,7 @@ import { isProdEnv } from 'config/constants';
 import { useUser } from '../../../hooks/useUser';
 
 const DD_SITE = 'datadoghq.com';
-const DD_SERVICE = 'charmverseapp';
+const DD_SERVICE = 'webapp-browser';
 
 export default function useDatadogLogger() {
   const { user } = useUser();

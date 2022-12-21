@@ -122,7 +122,13 @@ async function deleteInvite(req: NextApiRequest, res: NextApiResponse) {
       id: req.query.id as string
     }
   });
-  return res.status(200).json({ ok: true });
+
+  trackUserAction('delete_invite_link', {
+    userId: req.session.user.id,
+    spaceId: existingInvite.spaceId
+  });
+
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

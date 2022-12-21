@@ -203,7 +203,8 @@ export type PageQuery = Partial<Pick<Page, 'title' | 'properties'>>;
 export interface PaginatedResponse<T> {
   data: T[];
   hasNext: boolean;
-  cursor?: string;
+  // Can be a cursor or a page number depending on pagination method
+  cursor?: string | number;
 }
 
 export type PaginatedQuery<T> = {

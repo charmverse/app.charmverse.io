@@ -13,7 +13,7 @@ let bounty: Bounty;
 let application: Application;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4(), true);
+  const generated = await generateUserAndSpaceWithApiToken(undefined, true);
   user = generated.user;
   space = generated.space;
   bounty = await generateBounty({

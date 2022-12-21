@@ -98,6 +98,12 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       resourceId: vote.id,
       platform: 'charmverse'
     });
+  } else {
+    trackUserAction('poll_created', {
+      userId,
+      pageId,
+      spaceId: vote.spaceId
+    });
   }
 
   const [pageMeta, space] = await Promise.all([

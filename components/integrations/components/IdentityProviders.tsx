@@ -62,7 +62,7 @@ export default function IdentityProviders() {
       case walletLink:
         return 'Coinbase Wallet';
       default:
-        return '';
+        return 'Wallet';
     }
   }
 
@@ -101,7 +101,7 @@ export default function IdentityProviders() {
       <ProviderRow>
         <ImageIcon src='/images/walletLogos/metamask.png' />
         <Typography color='secondary' variant='button'>
-          {account ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
+          {user && user.wallets.length > 0 ? `Connected with ${connectorName(connector)}` : 'Connect your wallet'}
         </Typography>
         <WalletConnect onSuccess={() => null} />
       </ProviderRow>

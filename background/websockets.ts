@@ -2,7 +2,7 @@ import { createServer } from 'http';
 
 import { Server } from 'socket.io';
 
-import { baseUrl, appEnv } from 'config/constants';
+import { appEnv, isDevEnv } from 'config/constants';
 import log from 'lib/log';
 import { relay } from 'lib/websockets/relay';
 
@@ -17,12 +17,13 @@ const io = new Server(server, {
     allowedHeaders: ['authorization'],
     credentials: true,
     origin: (requestOrigin, callback) => {
-      if (baseUrl) {
-        callback(null, baseUrl);
-      }
       // support any subdomain for staging
-      else if (requestOrigin?.endsWith('.charmverse.co')) {
+      if (requestOrigin?.endsWith('.charmverse.co') || requestOrigin?.endsWith('.charmverse.io')) {
         callback(null, requestOrigin);
+      } else if (isDevEnv) {
+        callback(null, requestOrigin);
+      } else {
+        callback(new Error('Not allowed by CORS'));
       }
     }
   }

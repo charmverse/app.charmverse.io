@@ -24,7 +24,6 @@ import { TrackApi } from 'charmClient/apis/trackApi';
 import type { Block as FBBlock, BlockPatch } from 'components/common/BoardEditor/focalboard/src/blocks/block';
 import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { FailedImportsError } from 'lib/notion/types';
@@ -42,7 +41,6 @@ import type {
 } from 'lib/permissions/pages/page-permission-interfaces';
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import type {
   TokenGateEvaluationAttempt,
   TokenGateEvaluationResult,
@@ -52,7 +50,7 @@ import type {
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthReponse } from 'lib/websockets/interfaces';
-import type { LoggedInUser, PageContent } from 'models';
+import type { LoggedInUser } from 'models';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { InviteLinkPopulated } from 'pages/api/invites/index';
@@ -60,11 +58,11 @@ import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
-import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
+import { CommentsApi } from './apis/commentsApi';
 import { ForumApi } from './apis/forumApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
@@ -85,6 +83,8 @@ class CharmClient {
   bounties = new BountiesApi();
 
   collabland = new CollablandApi();
+
+  comments = new CommentsApi();
 
   votes = new VotesApi();
 
@@ -394,6 +394,11 @@ class CharmClient {
     updater([fbBlock]);
   }
 
+  async updateBlock(blockInput: FBBlock) {
+    const newBlock = this.fbBlockToBlock(blockInput);
+    return http.PUT<Block[]>('/api/blocks', [newBlock]);
+  }
+
   async patchBlocks(_blocks: FBBlock[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
     const updatedBlockInput = _blocks.map((currentFBBlock, i) => {
       const { deletedFields = [], updatedFields = {}, ...updates } = blockPatches[i];
@@ -572,38 +577,6 @@ class CharmClient {
 
   computeUserSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionFlags> {
     return http.GET<SpacePermissionFlags>(`/api/permissions/space/${spaceId}/compute`);
-  }
-
-  startThread(request: Omit<ThreadCreate, 'userId'>): Promise<ThreadWithCommentsAndAuthors> {
-    return http.POST('/api/threads', request);
-  }
-
-  deleteThread(threadId: string) {
-    return http.DELETE(`/api/threads/${threadId}`);
-  }
-
-  resolveThread(threadId: string, request: ResolveThreadRequest) {
-    return http.PUT(`/api/threads/${threadId}/resolve`, request);
-  }
-
-  resolveMultipleThreads(payload: MultipleThreadsInput) {
-    return http.POST('/api/threads/resolve', payload);
-  }
-
-  addComment(request: Omit<CommentCreate, 'userId'>): Promise<CommentWithUser> {
-    return http.POST('/api/comments', request);
-  }
-
-  editComment(commentId: string, content: PageContent): Promise<CommentWithUser> {
-    return http.PUT(`/api/comments/${commentId}`, { content });
-  }
-
-  deleteComment(commentId: string) {
-    return http.DELETE(`/api/comments/${commentId}`);
-  }
-
-  getPageThreads(pageId: string): Promise<ThreadWithCommentsAndAuthors[]> {
-    return http.GET(`/api/pages/${pageId}/threads`);
   }
 
   updateSnapshotConnection(

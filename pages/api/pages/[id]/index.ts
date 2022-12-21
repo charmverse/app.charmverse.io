@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import {
   ActionNotPermittedError,
@@ -50,7 +50,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<IPageWithP
     userId
   });
 
-  if (permissions.read !== true) {
+  if (page.type !== 'post' && permissions.read !== true) {
     throw new ActionNotPermittedError('You do not have permission to view this page');
   }
 
@@ -132,17 +132,14 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   const { content, contentText, ...updatedPageMeta } = updateContent;
 
-  // Update page track profile and meta data state, unless it was content update
-  if (!('content' in updateContent)) {
-    updateTrackPageProfile(pageWithPermission.id);
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
-      },
-      page.spaceId
-    );
-  }
+  updateTrackPageProfile(pageWithPermission.id);
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+    },
+    page.spaceId
+  );
 
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
@@ -182,7 +179,6 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
-  trackPageAction('delete_page', { userId, pageId });
   updateTrackPageProfile(pageId);
 
   if (pageToDelete) {
@@ -193,6 +189,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
       },
       pageToDelete.spaceId
     );
+    trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });

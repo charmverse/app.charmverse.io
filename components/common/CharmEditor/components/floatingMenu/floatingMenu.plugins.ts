@@ -1,12 +1,16 @@
 import { link } from '@bangle.dev/base-components';
 import type { PluginKey } from '@bangle.dev/core';
 import type { Node, Plugin, ResolvedPos } from '@bangle.dev/pm';
-import { floatingMenu } from '@bangle.dev/react-menu';
-import { hasComponentInSchema } from '@bangle.dev/react-menu/helper';
 import type { NodeSelection } from 'prosemirror-state';
+
+import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { queryIsSelectionAroundInlineVote } from '../inlineVote';
 import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
+
+import { floatingMenu } from './floating-menu';
+
+const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase';
 
 export function plugins({
   key,
@@ -17,23 +21,18 @@ export function plugins({
   readOnly?: boolean;
   enableComments?: boolean;
 }) {
-  const menuPlugins = floatingMenu.plugins({
+  const menuPlugins = floatingMenu({
     key,
     calculateType: (state) => {
-      if (
-        state.selection.empty ||
-        (state.selection as NodeSelection)?.node?.type?.name.match(
-          /(image)|(cryptoPrice)|(iframe)|(page)|(pdf)|(mention)|(tabIndent)|(codeBlock)/
-        )
-      ) {
+      const nodeName = (state.selection as NodeSelection)?.node?.type?.name;
+      if (blacklistedComponents.includes(nodeName)) {
         return null;
       }
 
-      if (readOnly && enableComments) {
-        return 'commentOnlyMenu';
-      }
-
       if (readOnly) {
+        if (enableComments && !state.selection.empty) {
+          return 'commentOnlyMenu';
+        }
         return null;
       }
 
@@ -69,6 +68,9 @@ export function plugins({
           return null;
         }
       }
+      if (state.selection.empty) {
+        return null;
+      }
 
       return 'defaultMenu';
     }
@@ -76,10 +78,10 @@ export function plugins({
 
   // We need to override the selection tooltip plugin to not show up when the rowAction plugin is handling drag and drop.
   // They both work through pm's active selection, but since this plugin responds to mousedown events, we can safely remove the listener to view updates
-  const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any, any>[];
+  const selectionTooltipPluginFn = menuPlugins[0] as () => Plugin<any>[];
   menuPlugins[0] = () => {
     const selectionTooltipPlugins = selectionTooltipPluginFn();
-    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any, any>;
+    const selectionTooltipController = selectionTooltipPlugins[1] as Plugin<any>;
     if (!selectionTooltipController.spec.view) {
       throw new Error('View not found for the selection toolip plugin');
     }

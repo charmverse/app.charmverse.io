@@ -3,10 +3,10 @@ import type { PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
+import type { PostCategoryUpdate } from 'lib//forums/categories/updatePostCategory';
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
+import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
-import { createPostCategory } from 'lib/posts/createPostCategory';
-import type { PostCategoryUpdate } from 'lib/posts/updatePostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -49,7 +49,6 @@ describe('PUT /api/spaces/[id]/post-categories/[postCategoryId] - Update a post 
 
     expect(updatedPostCategory.name).toBe(updateInput.name);
     expect(updatedPostCategory.spaceId).toBe(firstSpace.id);
-    expect(updatedPostCategory.color).toBe(postCategory.color);
   });
 
   it('should fail to update the post category if the user is not a space admin, responding with 401', async () => {

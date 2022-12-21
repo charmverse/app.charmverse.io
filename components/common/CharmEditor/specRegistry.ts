@@ -22,6 +22,7 @@ import * as inlineVote from './components/inlineVote';
 import * as listItem from './components/listItem/listItem';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
+import * as nft from './components/nft/nftSpec';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as quote from './components/quote';
@@ -29,6 +30,7 @@ import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
 import * as table from './components/table';
+import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
 
@@ -81,5 +83,7 @@ export const specRegistry = new SpecRegistry([
   deletion,
   insertion,
   formatChange,
-  video.spec()
+  video.spec(),
+  textColor.spec(),
+  nft.spec()
 ]);

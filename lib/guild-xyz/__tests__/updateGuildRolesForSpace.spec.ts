@@ -1,4 +1,4 @@
-import type { Role, Space, SpaceRole, User } from '@prisma/client';
+import type { Role, Space, SpaceRole } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
@@ -17,9 +17,9 @@ let guild2Role1: Role;
 let guild2Role2: Role;
 
 beforeAll(async () => {
-  const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken(v4());
+  const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken();
   user1 = user;
-  user2 = await createUserFromWallet(v4());
+  user2 = await createUserFromWallet();
   space = createdSpace;
   user1SpaceRole = (await prisma.spaceRole.findFirst({
     where: {
@@ -124,7 +124,7 @@ it('Should correctly update guild roles for space', async () => {
         if (address === user1.wallets[0].address) {
           return [
             {
-              roleids: ['G1R1']
+              roleIds: ['G1R1']
             },
             {
               roleids: ['G2R1']

@@ -10,7 +10,7 @@ import { removeSpaceOperations } from '../removeSpaceOperations';
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
   space = generated.space;
 });
 

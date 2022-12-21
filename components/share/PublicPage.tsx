@@ -32,12 +32,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
-import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { PublicPageResponse } from 'lib/pages';
 import { findParentOfType } from 'lib/pages/findParentOfType';
-
-import { lowerCaseEqual } from '../../lib/utilities/strings';
 
 import PublicBountiesPage from './PublicBountiesPage';
 
@@ -47,10 +43,6 @@ const LayoutContainer = styled.div`
 `;
 
 export default function PublicPage() {
-  const { account, verifiableWalletDetected } = useWeb3AuthSig();
-  const { setUser } = useUser();
-  const { walletAuthSignature } = useWeb3AuthSig();
-
   const theme = useTheme();
   const colorMode = useColorMode();
   const router = useRouter();

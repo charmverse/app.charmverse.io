@@ -49,7 +49,7 @@ describe('getProposalTasks', () => {
 
   it('Should not get draft and private draft proposals where the user is one of the authors', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet(v4());
+    const user2 = await createUserFromWallet();
 
     await generateProposal({
       proposalStatus: 'draft',
@@ -83,7 +83,7 @@ describe('getProposalTasks', () => {
 
   it('Should get all reviewed proposals where the user is one of the authors', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet(v4());
+    const user2 = await createUserFromWallet();
 
     const reviewedProposal1 = await generateProposal({
       proposalStatus: 'reviewed',
@@ -115,7 +115,7 @@ describe('getProposalTasks', () => {
 
   it('Should get all proposals to review where the user is one of the reviewer through both roleId and userId', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet(v4());
+    const user2 = await createUserFromWallet();
 
     const { role } = await generateRoleWithSpaceRole({
       spaceId: space.id,
@@ -165,7 +165,7 @@ describe('getProposalTasks', () => {
 
   it('Should get all proposals in discussion and active vote stage where the user is a member of the proposal space', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet(v4());
+    const user2 = await createUserFromWallet();
 
     const { user: inaccessibleSpaceUser, space: inaccessibleSpace } = await generateUserAndSpaceWithApiToken();
 

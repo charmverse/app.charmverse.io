@@ -2,50 +2,41 @@ import type { Slice } from 'prosemirror-model';
 
 import { isUrl } from 'lib/utilities/strings';
 
-import type { EmbedType } from './config';
+import { embeds } from './config';
+import type { Embed, EmbedType } from './config';
 
 export function extractEmbedType(url: string): EmbedType {
   let type: EmbedType = 'embed';
 
-  const isAirtable = url.includes('airtable.com');
-  const isFigma = url.includes('www.figma.com');
-  if (isFigma) {
-    type = 'figma';
+  for (const embedType in embeds) {
+    if ((embeds[embedType as EmbedType] as Embed).urlTest?.(url)) {
+      type = embedType as EmbedType;
+      break;
+    }
   }
-  if (isAirtable) {
-    type = 'airtable';
-  }
-
   return type;
 }
 
 // a utility for pasting: take a slice of content and extract the url from it if it includes an iframe
-export function extractIframeUrl(slice: Slice): string | null {
-  // @ts-ignore
-  const contentRow = slice.content.content?.[0]?.content.content || [];
-  const isIframeHtml = contentRow.some((node: { text: string }) => node.text?.includes('<iframe'));
-  // the link ParseRule converts iframe html into separate text nodes. but we check for iframe html just in case
-  const urls = contentRow
-    .filter((node: { text: string }) => isUrl(node.text))
-    .map((node: { text: string }) => node.text);
-  if (isIframeHtml && urls.length) {
-    const url = urls[0];
-    const indexOfSrc = url.indexOf('src');
-    const indexOfFirstQuote = url.indexOf('"', indexOfSrc);
-    const indexOfLastQuote = url.indexOf('"', indexOfFirstQuote + 1);
-    return url.slice(indexOfFirstQuote + 1, indexOfLastQuote);
+export function extractIframeProps(pastedHtml: string): { src: string; height: number | null } | null {
+  const isIframeHtml = pastedHtml.includes('<iframe');
+  if (isIframeHtml) {
+    const src = getParamFromString(pastedHtml, 'src');
+    const height = getParamFromString(pastedHtml, 'height');
+    if (src) {
+      const heightInt = height ? parseInt(height, 10) : null;
+      return { src, height: heightInt };
+    }
   }
   return null;
 }
 
-export function convertFigmaToEmbedUrl(url: string) {
-  return `https://www.figma.com/embed?embed_host=charmverse&url=${url}`;
-}
-
-export function convertAirtableToEmbedUrl(url: string) {
-  if (url.includes('embed')) {
-    return url; // already embeddable
+function getParamFromString(html: string, param: string): string | null {
+  const indexOfSrc = html.indexOf(param);
+  if (indexOfSrc === -1) {
+    return null;
   }
-  const shareId = url.split('/').pop();
-  return `https://airtable.com/embed/${shareId}`;
+  const indexOfFirstQuote = html.indexOf('"', indexOfSrc);
+  const indexOfLastQuote = html.indexOf('"', indexOfFirstQuote + 1);
+  return html.slice(indexOfFirstQuote + 1, indexOfLastQuote);
 }

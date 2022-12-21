@@ -9,7 +9,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import { sessionUserRelations } from 'lib/session/config';
-import { IDENTITY_TYPES } from 'models';
 
 export default async function loginByDiscord({
   code,
@@ -63,12 +62,19 @@ export default async function loginByDiscord({
       data: {
         id: userId,
         username: discordAccount.username,
-        identityType: IDENTITY_TYPES[1],
+        identityType: 'Discord',
         avatar,
         discordUser: {
           create: {
             account: rest as any,
             discordId: id
+          }
+        },
+        profile: {
+          create: {
+            social: {
+              discordUsername: discordAccount.username
+            }
           }
         }
       },

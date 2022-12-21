@@ -35,7 +35,10 @@ const WebSocketClientContext = createContext<Readonly<IContext>>({
   // Development only
   messageLog: [],
   clearLog: () => null,
-  subscribe: () => () => null
+  subscribe: () =>
+    function () {
+      return null;
+    }
 });
 
 let socket: SocketConnection;

@@ -42,9 +42,9 @@ export default function PopoverMenu({ children, container, maxHeight = '40vh', i
 }
 
 export const GroupLabel = styled((props: any) => <MenuItem disabled {...props} />)`
-  font-size: 12px;
+  font-size: 0.75em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
   color: ${({ theme }) => theme.palette.secondary.main};
   opacity: 1 !important;
 `;

@@ -1,10 +1,30 @@
-import { prisma } from 'db';
 
-prisma.pageDiff.deleteMany({
-  where: {
-    pageId: '4bd13deb-57eb-4c1f-8939-1a0ce886f2a9'
+import { getAccessiblePages, includePagePermissionsMeta } from 'lib/pages/server';
+import { prisma } from 'db'
+async function search () {
+  const user = await prisma.user.findFirst({
+    where: {
+      spaceRoles: {
+        some: {
+          spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
+          isAdmin: true
+        }
+      }
+    }
+  });
+  if (!user) {
+    throw new Error('No user found');
   }
-}).then(space => {
-  // eslint-disable-next-line no-console
-  console.log('Found space', space);
-});
+
+  getAccessiblePages({
+    meta: false,
+    search: 'forum',
+    spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a',
+    userId: user.id,
+  }).then(record => {
+    // eslint-disable-next-line no-console
+    console.log( record.length, record.slice(0, 10).map(r => r.title));
+  });
+}
+
+search();

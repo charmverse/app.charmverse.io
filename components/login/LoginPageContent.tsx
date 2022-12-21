@@ -5,22 +5,16 @@ import Typography from '@mui/material/Typography';
 
 import Button from 'components/common/Button';
 import Image from 'components/common/Image';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import splashImage from 'public/images/artwork/world.png';
 
-import { WalletSign } from './WalletSign';
+import { Login } from './Login';
 
 export const Container = styled(Box)`
   max-width: 100%;
   width: 1170px;
   margin: 0 auto;
 `;
-
-interface Props {
-  walletSigned: (authSig: AuthSig) => void;
-}
-
-export function LoginPageContent({ walletSigned }: Props) {
+export function LoginPageContent() {
   const returnUrl = new URLSearchParams(decodeURIComponent(window.location.search)).get('returnUrl');
 
   return (
@@ -51,12 +45,18 @@ export function LoginPageContent({ walletSigned }: Props) {
                 mb: 3
               }}
             >
-              First Web 3 Native <br />
-              All-in-one Workspace
+              Powering the Future <br />
+              of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6 }}>Tasks, docs, bounties, and more</Typography>
+            <Typography sx={{ fontSize: 20, mb: 6 }}>
+              The solution for token communities to build relationships,
+              <br />
+              work together and vote
+            </Typography>
             <Box display={{ sm: 'flex' }} gap={2} alignItems='center'>
-              <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} />
+              <Login />
+              {/* 
+              <WalletSign buttonStyle={{ width: { xs: '100%', sm: 'auto' } }} signSuccess={walletSigned} /> */}
               <Typography color='secondary' variant='body2' sx={{ lineHeight: '40px' }}>
                 or
               </Typography>

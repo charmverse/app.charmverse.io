@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -16,6 +17,8 @@ import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
+import { updateUserProfile } from 'lib/users/updateUserProfile';
+import { DataNotFoundError, InsecureOperationError, MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -34,7 +37,7 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet(address, signupAnalytics, req.session.anonymousUserId);
+    user = await createUserFromWallet({ address, id: req.session.anonymousUserId }, signupAnalytics);
     user.isNew = true;
 
     logSignupViaWallet();
@@ -90,19 +93,13 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 }
 
 async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
-  const user = await prisma.user.update({
-    where: {
-      id: req.session.user.id
-    },
-    include: sessionUserRelations,
-    data: {
-      ...req.body
-    }
-  });
+  const { id: userId } = req.session.user;
 
-  updateTrackUserProfile(user);
+  const updatedUser = await updateUserProfile(userId, req.body);
 
-  return res.status(200).json(user);
+  updateTrackUserProfile(updatedUser);
+
+  return res.status(200).json(updatedUser);
 }
 
 export default withSessionRoute(handler);

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Divider, Grid, Typography } from '@mui/material';
+import type { IdentityType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
 import Button from 'components/common/Button';
-import type { IdentityType } from 'models';
 
 const IntegrationName = styled(Typography)`
   background-color: ${({ theme }) => theme.palette.background.dark};

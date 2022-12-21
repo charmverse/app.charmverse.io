@@ -4,13 +4,13 @@ import type { NextHandler } from 'next-connect';
 import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
 
-type RequiredKey = string | { key: string; truthy: boolean };
+type RequiredKey<T> = keyof T | { key: keyof T; truthy: boolean };
 
 /**
  * Generates a request handler that checks for target keys
  * @nullableKeys Keys which are considered to pass required check if they have a null value. Defaults to empty list
  */
-export function requireKeys<T>(keys: (RequiredKey | keyof T)[], location: 'body' | 'query') {
+export function requireKeys<T = any>(keys: RequiredKey<T>[], location: 'body' | 'query') {
   return (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
     const toVerify = location === 'query' ? req.query : req.body;
 

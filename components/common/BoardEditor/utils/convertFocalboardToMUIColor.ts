@@ -1,8 +1,8 @@
 import type { BrandColor, SupportedColor } from 'theme/colors';
-import { focalboardColorsMap, brandColorNames } from 'theme/colors';
+import { focalboardColorsMap, colors } from 'theme/colors';
 
 export function convertFocalboardToMUIColor(color: string): SupportedColor {
-  if (brandColorNames.find((name) => name === color)) {
+  if (colors[color as BrandColor]) {
     return color as BrandColor;
   }
 

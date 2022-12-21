@@ -3,8 +3,7 @@ import type { PostCategory, Prisma, Space, User } from '@prisma/client';
 import request from 'supertest';
 
 import { prisma } from 'db';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -30,18 +29,15 @@ beforeAll(async () => {
   const createInput: Prisma.PostCategoryCreateManyInput[] = [
     {
       name: 'Category 1',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     },
     {
       name: 'Category 2',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     },
     {
       name: 'Category 3',
-      spaceId: secondSpace.id,
-      color: '#000000'
+      spaceId: secondSpace.id
     }
   ];
 
@@ -51,7 +47,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/spaces/[id]/post-categories - Create a post category', () => {
-  it('should create the post category if the user is a space admin, and return the post category, responding with 200', async () => {
+  it('should create the post category if the user is a space admin, and return the post category, responding with 201', async () => {
     const adminUserCookie = await loginUser(firstSpaceAdminUser.id);
 
     const createInput: Partial<CreatePostCategoryInput> = {
@@ -68,7 +64,6 @@ describe('POST /api/spaces/[id]/post-categories - Create a post category', () =>
 
     expect(postCategory.name).toBe(createInput.name);
     expect(postCategory.spaceId).toBe(firstSpace.id);
-    expect(postCategory.color).toBeDefined();
   });
 
   it('should fail to create the post category if the user is not a space admin, responding with 401', async () => {

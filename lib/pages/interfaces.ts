@@ -1,6 +1,6 @@
 import type { Block, Page, PagePermission, Space } from '@prisma/client';
 
-import type { Board } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
@@ -96,7 +96,7 @@ export type TargetPageTreeWithFlatChildren<T extends PageNode = PageNode> = {
 };
 
 // Page without content and contentText props - used for list of pages (on the client)
-export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText' | 'version' | 'postId'>;
+export type PageMeta = Omit<PageWithPermissionsMeta, 'content' | 'contentText' | 'version'>;
 
 export type PageDetails = {
   id: string;
@@ -111,3 +111,8 @@ export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, 
 
 export type PageUpdates = Partial<Page> & { id: string };
 export type PageDetailsUpdates = Partial<PageDetails> & { id: string };
+
+export type FormResponseProperty = IPropertyTemplate & {
+  description: string;
+  isQuestion?: true;
+};

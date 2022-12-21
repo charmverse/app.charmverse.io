@@ -151,4 +151,17 @@ describe('getAccessiblePages', () => {
     const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id, search: 'mom' });
     expect(pages.map((p) => p.id)).toEqual([pageToFind.id]);
   });
+
+  it('should not return pages of type post', async () => {
+    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const [pageToFind, postToIgnore] = await Promise.all([
+      createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Page', type: 'page' }),
+      createPage({ createdBy: adminUser.id, spaceId: space.id, title: 'Post', type: 'post' })
+    ]);
+
+    const pages = await getAccessiblePages({ userId: adminUser.id, spaceId: space.id });
+
+    expect(pages.length).toBe(1);
+    expect(pages[0].id).toBe(pageToFind.id);
+  });
 });

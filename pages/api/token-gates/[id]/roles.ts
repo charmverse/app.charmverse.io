@@ -2,6 +2,8 @@ import type { TokenGateToRole } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -20,6 +22,20 @@ async function updateTokenGateRolesHandler(req: NextApiRequest, res: NextApiResp
   const tokenGateId = req.query.id as string;
   const tokenGateToRoles = await updateTokenGateRoles(roleIds, tokenGateId);
 
+  // tracking
+  const tokenGate = await prisma.tokenGate.findUnique({
+    where: {
+      id: tokenGateId
+    }
+  });
+
+  if (tokenGate) {
+    trackUserAction('update_token_gate_roles', {
+      spaceId: tokenGate.spaceId,
+      userId: req.session.user.id,
+      roles: tokenGateToRoles.length
+    });
+  }
   return res.status(200).json(tokenGateToRoles);
 }
 

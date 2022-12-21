@@ -24,7 +24,6 @@ import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfac
 import * as orderedList from '../../orderedList';
 import paragraph from '../../paragraph';
 import { isList } from '../commands';
-import { palettePluginKey } from '../config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
@@ -57,7 +56,7 @@ const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBu
 const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
 
 const setHeadingBlockType =
-  (level: number) => (state: EditorState, dispatch: ((tr: Transaction<any>) => void) | undefined) => {
+  (level: number) => (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {
     const type = state.schema.nodes.heading;
     return setBlockType(type, { level })(state, dispatch);
   };
@@ -65,7 +64,7 @@ const setHeadingBlockType =
 export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
   const { addNestedPage, disableNestedPage, nestedPagePluginKey, pageType, userSpacePermissions } = props;
 
-  const insertPageItem =
+  const insertPageItem: PaletteItemTypeNoGroup[] =
     pageType !== 'card_template' && !disableNestedPage
       ? [
           {
@@ -81,7 +80,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
               />
             ),
             description: 'Insert a new page',
-            editorExecuteCommand: () => {
+            editorExecuteCommand: ({ palettePluginKey }) => {
               return (async (state, dispatch, view) => {
                 await addNestedPage();
                 return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
@@ -104,7 +103,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Create a plain text block',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
             if (queryIsTodoListActive()(_state)) {
@@ -136,7 +135,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       ),
       keywords: ['todo', 'lists', 'checkbox', 'checked'],
       description: 'Create a todo list',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
@@ -169,7 +168,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
           const result = isList()(state);
           return result;
         },
-        editorExecuteCommand: () => {
+        editorExecuteCommand: ({ palettePluginKey }) => {
           return (state, dispatch, view) => {
             rafCommandExec(view!, setHeadingBlockType(level));
             return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
@@ -189,7 +188,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Table',
       keywords: ['table'],
       description: 'Insert a simple table below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
             return insertNode(
@@ -234,7 +233,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       ),
       keywords: ['unordered', 'lists'],
       description: 'Create a simple bulleted list',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
@@ -256,7 +255,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Ordered List',
       keywords: ['numbered', 'lists'],
       description: 'Create an ordered list',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch, _view) => {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
@@ -272,7 +271,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       title: 'Toggle List/Heading',
       keywords: ['summary', 'disclosure', 'toggle', 'collapse'],
       description: 'Insert a summary and content',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
             const { $from, $to } = _state.selection;
@@ -319,7 +318,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Insert a quote in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
             const node = _state.schema.nodes.quote.create(
@@ -349,7 +348,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       keywords: ['divider', 'hr'],
       icon: <HorizontalRuleIcon sx={{ fontSize: iconSize }} />,
       description: 'Display horizontal rule',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           // Execute the animation
           rafCommandExec(view!, (_state, _dispatch) => {
@@ -376,14 +375,14 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Link to a new page',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (async (state, dispatch, view) => {
           if (nestedPagePluginKey) {
             const nestedPagePluginState = nestedPagePluginKey.getState(state);
             if (nestedPagePluginState) {
               replaceSuggestionMarkWith(
                 palettePluginKey,
-                state.schema.text(' ', state.schema.marks[nestedPageSuggestMarkName].create({})),
+                state.schema.text(' ', [state.schema.marks[nestedPageSuggestMarkName].create({})]),
                 true
               )(state, dispatch, view);
             }
@@ -404,7 +403,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Insert a callout block in the line below',
-      editorExecuteCommand: () => {
+      editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
             const node = _state.schema.nodes.blockquote.create(

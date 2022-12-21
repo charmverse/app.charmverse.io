@@ -1,9 +1,11 @@
 import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import { NodeView } from '@bangle.dev/core';
-import type { DOMOutputSpec, EditorState, EditorView, Transaction } from '@bangle.dev/pm';
 import { chainCommands, createParagraphNear, keymap, newlineInCode, splitBlock } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
+import type { DOMOutputSpec } from 'prosemirror-model';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import log from 'lib/log';
 
@@ -104,8 +106,8 @@ export function plugins(): RawPlugins {
 }
 function exitColumn(
   state: EditorState,
-  dispatch: ((tr: Transaction<any>) => void) | undefined,
-  view: EditorView<any> | undefined
+  dispatch: ((tr: Transaction) => void) | undefined,
+  view: EditorView | undefined
 ) {
   return insertEmpty(state.schema.nodes.paragraph, 'below', true)(state, dispatch, view);
 }

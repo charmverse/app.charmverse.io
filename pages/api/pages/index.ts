@@ -9,8 +9,10 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions } from 'lib/pages/server';
-import { getPage, PageNotFoundError, resolvePageTree } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
+import { PageNotFoundError } from 'lib/pages/server/errors';
+import { getPage } from 'lib/pages/server/getPage';
+import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
@@ -47,8 +49,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   } else if (data.type !== 'proposal' && !permissions.createPage) {
     throw new UnauthorisedActionError('You do not have permissions to create a page.');
   }
-
-  data.hasContent = !checkIsContentEmpty(data.content as PageContent);
 
   // Remove parent ID and pass it to the creation input
   // This became necessary after adding a formal parentPage relation related to page.parentId
@@ -120,6 +120,32 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       },
       page.spaceId
     );
+
+    if (newPageToNotify.type === 'post') {
+      const post = await prisma.post.create({
+        data: {
+          page: {
+            connect: {
+              id: newPageToNotify.id
+            }
+          },
+          status: 'draft'
+        }
+      });
+
+      if (post) {
+        relay.broadcast(
+          {
+            type: 'post_published',
+            payload: {
+              categoryId: post.categoryId,
+              createdBy: userId
+            }
+          },
+          page.spaceId
+        );
+      }
+    }
 
     res.status(201).json(pageWithPermissions);
   } catch (error) {

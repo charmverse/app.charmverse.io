@@ -55,6 +55,7 @@ export class FidusEditor {
   // @ts-ignore gets defined in initEditor
   mod: EditorModules = {};
 
+  // @ts-ignore gets defined in initEditor
   schema: EditorState['schema'];
 
   statePlugins: [any, any][] = [];
@@ -112,6 +113,7 @@ export class FidusEditor {
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
+      editor: this,
       anythingToSend: () => Boolean(sendableSteps(view.state)),
       authToken,
       initialMessage: () => {
@@ -281,7 +283,7 @@ export class FidusEditor {
         const trackedTr = amendTransaction(tr, view.state, this, this.enableSuggestionMode);
         const { state: newState } = view.state.applyTransaction(trackedTr);
         view.updateState(newState);
-        if (tr.steps) {
+        if (tr.steps.length) {
           this.docInfo.updated = new Date();
         }
         this.mod.collab.doc.sendToCollaborators();

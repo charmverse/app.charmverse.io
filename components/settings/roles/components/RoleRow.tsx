@@ -121,7 +121,13 @@ export default function RoleRow({
               </Typography>
             </Box>
             {isEditable && (
-              <IconButton size='small' {...bindTrigger(menuState)}>
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  menuState.open();
+                }}
+              >
                 <MoreHorizIcon />
               </IconButton>
             )}

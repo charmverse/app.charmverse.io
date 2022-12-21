@@ -1,5 +1,5 @@
 import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { hideSelectionTooltip } from '@bangle.dev/tooltip/selection-tooltip';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { Box, Button, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
@@ -22,6 +22,8 @@ import PageThread from '../PageThread';
 
 import type { InlineCommentPluginState } from './inlineComment.plugins';
 import { updateInlineComment } from './inlineComment.utils';
+
+const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 
 export const ThreadContainer = styled(Paper)`
   max-height: 400px;
@@ -99,7 +101,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     if (!isEmpty) {
       const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
       e.preventDefault();
-      const threadWithComment = await charmClient.startThread({
+      const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId: cardId ?? currentPageId

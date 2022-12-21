@@ -36,6 +36,8 @@ type IContext = {
   connectWallet: () => void;
   connectWalletModalIsOpen: boolean;
   isSigning: boolean;
+  isConnectingIdentity: boolean;
+  closeWalletSelector: () => void;
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -43,27 +45,33 @@ export const Web3Context = createContext<Readonly<IContext>>({
   walletAuthSignature: null,
   sign: () => Promise.resolve({} as AuthSig),
   triedEager: false,
-  getStoredSignature: (address?: string) => null,
+  getStoredSignature: () => null,
   disconnectWallet: () => null,
   library: null,
   chainId: null,
-  setLoggedInUser: (user: LoggedInUser | null) => null,
+  setLoggedInUser: () => null,
   connector: null,
   verifiableWalletDetected: false,
   connectWallet: () => null,
   connectWalletModalIsOpen: false,
-  isSigning: false
+  isSigning: false,
+  isConnectingIdentity: false,
+  closeWalletSelector: () => null
 });
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { account, library, chainId, connector } = useWeb3React();
+  const {
+    triedEager,
+    openWalletSelectorModal,
+    closeWalletSelectorModal,
+    isWalletSelectorModalOpen,
+    isConnectingIdentity
+  } = useContext(Web3Connection);
 
   const [isSigning, setIsSigning] = useState(false);
-
-  const verifiableWalletDetected = !!account;
-
-  const { triedEager, openWalletSelectorModal, isWalletSelectorModalOpen } = useContext(Web3Connection);
+  const verifiableWalletDetected = !!account && !isConnectingIdentity;
 
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
@@ -112,7 +120,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   // Only expose account if current user and account match up
   useEffect(() => {
-    if (account && user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
+    if (isConnectingIdentity) {
+      // Don't update new values
+    } else if (account && user?.wallets.some((w) => lowerCaseEqual(w.address, account))) {
       setStoredAccount(account.toLowerCase());
 
       const storedWalletSignature = getStoredSignature();
@@ -121,7 +131,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setSignature(null);
       setStoredAccount(null);
     }
-  }, [account, user]);
+  }, [account, user, isConnectingIdentity]);
 
   async function sign(): Promise<AuthSig> {
     if (!account) {
@@ -203,7 +213,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       verifiableWalletDetected,
       connectWallet,
       connectWalletModalIsOpen: isWalletSelectorModalOpen,
-      isSigning
+      isSigning,
+      isConnectingIdentity,
+      closeWalletSelector: closeWalletSelectorModal
     }),
     [
       account,
@@ -214,7 +226,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isWalletSelectorModalOpen,
       isSigning,
       chainId,
-      library
+      library,
+      isConnectingIdentity
     ]
   );
 

@@ -3,7 +3,7 @@ import { expect, test as base } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
 import { NexusPage } from '../po/nexus.po';
-import { generateUserAndSpace } from '../utils/mocks';
+import { createUserAndSpace, generateUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
 type Fixtures = {
@@ -23,7 +23,7 @@ const test = base.extend<Fixtures>({
 });
 
 test('login - allows user to logout even with a connected wallet', async ({ loginPage, nexusPage }) => {
-  const { address, privateKey } = await generateUserAndSpace();
+  const { address, privateKey } = await createUserAndSpace({ browserPage: loginPage.page });
 
   await mockWeb3({
     page: loginPage.page,

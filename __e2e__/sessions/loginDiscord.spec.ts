@@ -61,7 +61,7 @@ test('login - allows user to login and see their workspace even when a wallet is
 
   await loginPage.goto();
 
-  await expect(loginPage.verifyWalletButton).toBeVisible();
+  await expect(loginPage.universalConnectButton).toBeVisible();
 
   const discordApiUrl = discordServer.host;
   const discordWebsiteUrl = await loginPage.getDiscordUrl();

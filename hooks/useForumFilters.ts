@@ -1,25 +1,16 @@
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
-
-import { useCurrentSpace } from './useCurrentSpace';
+import { useForumCategories } from './useForumCategories';
 
 const sortList = ['Most Popular', 'Newest post', 'Latest Activity'];
 
 export function useForumFilters() {
   const { push, query } = useRouter();
-  const currentSpace = useCurrentSpace();
-
-  const {
-    data: categories,
-    error,
-    isValidating
-  } = useSWR(currentSpace ? '/forum/categories' : null, () => charmClient.forum.listPostCategories(currentSpace!.id));
+  const { categories } = useForumCategories();
 
   const getLinkUrl = (value: string) => {
     const isValidSort = value && sortList.some((sortOption) => sortOption === value);
-    const isValidCategory = value && categories?.some((category) => category.name === value);
+    const isValidCategory = value && categories.some((category) => category.name === value);
 
     if (isValidSort) {
       return `/${query.domain}/forum/?sort=${value}`;
@@ -31,9 +22,9 @@ export function useForumFilters() {
     return `${query.domain}/forum/`;
   };
 
-  const handleClick = (value: string) => {
+  const applyFilters = (value: string) => {
     const isValidSort = value && sortList.some((btn) => btn === value);
-    const isValidCategory = value && categories?.some((category) => category.name === value);
+    const isValidCategory = value && categories.some((category) => category.name === value);
 
     push(
       {
@@ -50,5 +41,9 @@ export function useForumFilters() {
     );
   };
 
-  return { categories, sortList, error, getLinkUrl, handleClick, disabled: isValidating };
+  return {
+    sortList,
+    getLinkUrl,
+    applyFilters
+  };
 }

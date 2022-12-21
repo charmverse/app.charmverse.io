@@ -28,6 +28,8 @@ enum IdentityType {
   Discord
   Telegram
   RandomName
+  UnstoppableDomain
+  Google
 }
 
 enum VoteStatus {
@@ -299,7 +301,7 @@ model Page {
   bountyId           String?                 @unique @db.Uuid
   bounty             Bounty?                 @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   proposal           Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  post               Post?                   @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  post               Post?                   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threads            Thread[]
   votes              Vote[]
   workspaceEvents    WorkspaceEvent[]
@@ -413,7 +415,7 @@ model User {
   isBot                Boolean?               @default(false)
   path                 String?                @unique
   identityType         IdentityType?
-  email                String?
+  email                String?                
   applications         Application[]
   blocks               Block[]
   bounties             Bounty[]
@@ -444,6 +446,8 @@ model User {
   wallets              UserWallet[]
   memberPropertyValues MemberPropertyValue[]
   userTokenGates       UserTokenGate[]
+  unstoppableDomains   UnstoppableDomain[]
+  googleAccounts       GoogleAccount[]
 }
 
 model UserWallet {
@@ -1002,7 +1006,6 @@ model MemberPropertyPermission {
 // Begin Forum models
 model PostCategory {
   id      String @id @default(uuid()) @db.Uuid
-  color   String
   name    String
   spaceId String @db.Uuid
   space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -1020,6 +1023,8 @@ enum PostStatus {
 model Post {
   id         String        @id @default(uuid()) @db.Uuid
   categoryId String?       @db.Uuid
+  pinned     Boolean?      @default(false)
+  locked     Boolean?      @default(false)
   category   PostCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   status     PostStatus
   page       Page?
@@ -1066,4 +1071,20 @@ model PageCommentUpDownVote {
   @@unique([createdBy, commentId])
   @@index([commentId])
   @@index([pageId])
+}
+
+model UnstoppableDomain {
+  id        String   @id @default(uuid()) @db.Uuid
+  domain    String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleAccount {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String   
+  avatarUrl String 
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

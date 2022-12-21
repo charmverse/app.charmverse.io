@@ -58,31 +58,34 @@ async function updateMixpanelUserProfiles() {
       }
     },
     include: {
-    favorites: {
-      where: {
-        page: {
-          deletedAt: null
-        }
-      },
-      select: {
-        pageId: true
-      }
-    },
-    spaceRoles: {
-      include: {
-        spaceRoleToRole: {
-          include: {
-            role: true
+      unstoppableDomains: true,
+      favorites: {
+        where: {
+          page: {
+            deletedAt: null
           }
         },
-        space: true
-      }
-    },
-    discordUser: true,
-    telegramUser: true,
-    notificationState: true,
-    wallets: true
-  } });
+        select: {
+          pageId: true
+        }
+      },
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: {
+            include: {
+              role: true
+            }
+          },
+          space: true
+        }
+      },
+      discordUser: true,
+      telegramUser: true,
+      notificationState: true,
+      wallets: true,
+      googleAccounts: true
+    }
+  });
 
   const profiles = users.map(user => ({
     $token: MIXPANEL_API_KEY,

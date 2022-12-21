@@ -1,15 +1,17 @@
 import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
 import { PluginKey } from '@bangle.dev/core';
 import { keymap } from '@bangle.dev/pm';
-import type { Command, EditorState, Schema, EditorView } from '@bangle.dev/pm';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
+import type { Node, Schema } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 
-import { paletteMarkName, palettePluginKey, trigger } from './config';
+import { paletteMarkName, trigger } from './config';
 
 const { decrementSuggestTooltipCounter, incrementSuggestTooltipCounter, queryIsSuggestTooltipActive } = suggestTooltip;
 
@@ -29,8 +31,7 @@ function specFactory(): BaseRawMarkSpec {
   };
 }
 
-function pluginsFactory() {
-  const key = palettePluginKey;
+function pluginsFactory({ key }: { key: PluginKey }) {
   const markName = paletteMarkName;
   const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
     getScrollContainer,
@@ -101,7 +102,7 @@ function pluginsFactory() {
         [keybindings.toggleInlineCommandPalette.key]: (state, dispatch): boolean => {
           const { tr, schema: _schema, selection } = state;
 
-          if (queryInlinePaletteActive(palettePluginKey)(state)) {
+          if (queryInlinePaletteActive(key)(state)) {
             return false;
           }
           const marks = selection.$from.marks();
@@ -131,10 +132,10 @@ export function getSuggestTooltipKey(key: PluginKey) {
   };
 }
 
-export function replaceSuggestionMarkWith(key: PluginKey, replaceWith: string, setSelection?: boolean): Command {
+export function replaceSuggestionMarkWith(key: PluginKey, maybeNode?: string | Node, setSelection?: boolean): Command {
   return (state, dispatch, view) => {
     const suggestTooltipKey = getSuggestTooltipKey(key)(state);
-    return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, replaceWith, setSelection)(state, dispatch, view);
+    return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, maybeNode, setSelection)(state, dispatch, view);
   };
 }
 

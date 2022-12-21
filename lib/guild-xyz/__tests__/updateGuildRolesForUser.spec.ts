@@ -15,7 +15,7 @@ let space2guildRole1: Role;
 let space2guildRole2: Role;
 
 beforeAll(async () => {
-  user = await createUserFromWallet(v4());
+  user = await createUserFromWallet();
   space1 = await prisma.space.create({
     data: {
       domain: v4(),
@@ -140,7 +140,7 @@ it('Should correctly update guild roles for space', async () => {
             roleids: ['S1GR1']
           },
           {
-            roleids: ['S2GR1', 'S2GR2']
+            roleIds: ['S2GR1', 'S2GR2']
           }
         ];
       }

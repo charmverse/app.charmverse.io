@@ -2,10 +2,10 @@ import type { PostCategory } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
+import { createPostCategory } from 'lib/forums/categories/createPostCategory';
+import { getPostCategories } from 'lib/forums/categories/getPostCategories';
 import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { CreatePostCategoryInput } from 'lib/posts/createPostCategory';
-import { createPostCategory } from 'lib/posts/createPostCategory';
-import { getPostCategories } from 'lib/posts/getPostCategories';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -33,6 +33,7 @@ async function getPostCategoriesController(req: NextApiRequest, res: NextApiResp
 
   return res.status(200).json(postCategories);
 }
+
 async function createPostCategoryController(req: NextApiRequest, res: NextApiResponse<PostCategory>) {
   const { id: spaceId } = req.query;
 

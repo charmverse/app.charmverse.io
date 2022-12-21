@@ -16,14 +16,14 @@ export function spec(): BaseRawNodeSpec {
       group: 'block',
       defining: true,
       draggable: false,
-      parseDOM: [{ tag: 'blockquote' }],
+      parseDOM: [{ tag: 'blockquote.charm-quote' }],
       toDOM: (): DOMOutputSpec => {
-        return ['blockquote', 0];
+        return ['blockquote', { class: 'charm-quote' }, 0];
       }
     },
     markdown: {
       toMarkdown: (state: MarkdownSerializerState, node: Node) => {
-        state.wrapBlock('> ', undefined, node, () => state.renderContent(node));
+        state.wrapBlock('> ', null, node, () => state.renderContent(node));
       },
       parseMarkdown: {
         blockquote: {
