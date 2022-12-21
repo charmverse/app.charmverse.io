@@ -2,7 +2,7 @@ import type { Thread } from '@prisma/client';
 import { Comment } from '@prisma/client';
 
 import type { CommentWithUser } from 'lib/comments/interfaces';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export enum ThreadStatus {
   open,

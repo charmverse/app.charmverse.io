@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import TreeView from '@mui/lab/TreeView';
+import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import type { ComponentProps, ReactNode, SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -18,7 +19,6 @@ import type { IPageWithPermissions, NewPageInput, PageMeta, PageUpdates } from '
 import { addPageAndRedirect } from 'lib/pages';
 import { mapPageTree, sortNodes } from 'lib/pages/mapPageTree';
 import { isTruthy } from 'lib/utilities/types';
-import type { Page } from 'models';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';

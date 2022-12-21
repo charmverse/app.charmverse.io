@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 import type { ListBlockChildrenParameters } from '@notionhq/client/build/src/api-endpoints';
-import type { PageType, Prisma } from '@prisma/client';
+import type { Page, PageType, Prisma } from '@prisma/client';
 import promiseRetry from 'promise-retry';
 import { v4 as uuid } from 'uuid';
 
@@ -20,8 +20,6 @@ import log from 'lib/log';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { isTruthy } from 'lib/utilities/types';
 import type {
   BlockNode,
   CalloutNode,
@@ -30,12 +28,13 @@ import type {
   DisclosureDetailsNode,
   ListItemNode,
   MentionNode,
-  Page,
   PageContent,
   TableNode,
   TableRowNode,
   TextContent
-} from 'models';
+} from 'lib/prosemirror/interfaces';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { isTruthy } from 'lib/utilities/types';
 
 import type {
   BlockObjectResponse,

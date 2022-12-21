@@ -2,8 +2,8 @@ import type { Page, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
+import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
-import type { MentionNode, PageContent, TextContent } from 'models';
 
 import type { DiscussionTask } from './interfaces';
 

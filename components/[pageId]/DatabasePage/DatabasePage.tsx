@@ -1,3 +1,4 @@
+import type { Page } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -23,7 +24,6 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import type { Page } from 'models';
 
 /**
  *

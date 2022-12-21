@@ -1,5 +1,5 @@
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/strings';
-import type { PageContent } from 'models';
 
 /**
  * Extract all mention ids from page content (json)

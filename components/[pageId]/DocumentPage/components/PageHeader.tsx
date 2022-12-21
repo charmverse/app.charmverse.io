@@ -4,6 +4,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import ImageIcon from '@mui/icons-material/Image';
 import { ListItemButton } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { Page } from '@prisma/client';
 import { memo } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
@@ -13,7 +14,6 @@ import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
 import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
-import type { Page } from 'models';
 
 import { randomBannerImage } from './PageBanner';
 import { PageTitleInput } from './PageTitleInput';

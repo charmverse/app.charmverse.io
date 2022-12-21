@@ -7,7 +7,7 @@ import { usePages } from 'hooks/usePages';
 import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function usePageDetails(pageIdOrPath: string, spaceId?: string) {
   const {

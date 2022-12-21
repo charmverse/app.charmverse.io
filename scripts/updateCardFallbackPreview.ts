@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
-import { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 async function updatePageGalleryUrl () {
   const pages = await prisma.page.findMany({

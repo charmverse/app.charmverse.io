@@ -3,7 +3,7 @@ import type { Page, Prisma, PrismaPromise } from '@prisma/client';
 import { prisma } from 'db';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
   const createArgs: Prisma.PageCreateArgs = {

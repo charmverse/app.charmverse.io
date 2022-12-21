@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Block } from './block';
 import { createBlock } from './block';

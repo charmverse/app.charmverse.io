@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -10,7 +9,7 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
-import type { PageContent } from 'models/Page';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 

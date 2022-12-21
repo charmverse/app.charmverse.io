@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface AWSAssetUrl {
   oldPageId: string;
