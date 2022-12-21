@@ -95,6 +95,7 @@ enum WalletType {
 
 enum RoleSource {
   guild_xyz
+  collabland
 }
 
 enum PagePermissionLevel {

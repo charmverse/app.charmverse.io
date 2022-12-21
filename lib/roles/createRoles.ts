@@ -1,17 +1,19 @@
 import type { Role, RoleSource } from '@prisma/client';
 
 import { prisma } from 'db';
+import type { ExternalRole } from 'lib/roles/interfaces';
+import { isUUID } from 'lib/utilities/strings';
 
 type RolesRecord = Record<string, Role | null>;
 
 // Create charmverse roles or find them from prisma to generate a final record
 export async function findOrCreateRoles(
-  externalRoles: { id: string | number; name: string }[],
+  externalRoles: ExternalRole[],
   spaceId: string,
   userId: string,
-  options?: { source?: RoleSource | null; createRoles?: boolean }
+  options?: { source?: RoleSource | null; createRoles?: boolean; preserveIds?: boolean }
 ): Promise<RolesRecord> {
-  const { createRoles = true, source = null } = options ?? {};
+  const { createRoles = true, source = null, preserveIds } = options ?? {};
   const rolesRecord: RolesRecord = {};
   // Create all of the discord roles fist
   for (const externalRole of externalRoles) {
@@ -21,6 +23,10 @@ export async function findOrCreateRoles(
       const existingRole = await prisma.role.findFirst({
         where: {
           OR: [
+            {
+              id: String(externalRole.id),
+              spaceId
+            },
             {
               name: externalRole.name,
               spaceId
@@ -37,7 +43,9 @@ export async function findOrCreateRoles(
 
       // Only create the role if it doesn't already exist
       if (createRoles) {
+        const id = preserveIds && isUUID(String(externalRole.id)) ? String(externalRole.id) : undefined;
         const upsertData = {
+          id,
           name: externalRole.name,
           space: {
             connect: {
@@ -48,7 +56,6 @@ export async function findOrCreateRoles(
           source,
           sourceId: source !== null ? String(externalRole.id) : null
         };
-
         if (existingRole) {
           charmVerseRole = await prisma.role.update({
             where: {
