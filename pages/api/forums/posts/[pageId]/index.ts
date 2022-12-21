@@ -47,7 +47,7 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
   const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ userId, postId: pageId });
+  const page = await getForumPost({ userId, pageId });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);

@@ -25,7 +25,7 @@ describe('getForumPost', () => {
       spaceId: space.id
     });
 
-    const retrievedPost = await getForumPost({ postId: createdPage.id });
+    const retrievedPost = await getForumPost({ pageId: createdPage.id });
 
     expect(retrievedPost).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
@@ -63,6 +63,6 @@ describe('getForumPost', () => {
       }
     });
 
-    await expect(getForumPost({ postId: page.id })).rejects.toBeInstanceOf(PageNotFoundError);
+    await expect(getForumPost({ pageId: page.id })).rejects.toBeInstanceOf(PageNotFoundError);
   });
 });

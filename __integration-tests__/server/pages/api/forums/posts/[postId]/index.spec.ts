@@ -4,12 +4,10 @@ import request from 'supertest';
 
 import { prisma } from 'db';
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
-import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import { createForumPost } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -19,8 +17,7 @@ let adminUserCookie: string;
 let extraSpaceUser: User;
 let extraSpaceUserCookie: string;
 let postCategory: PostCategory;
-// A post created by user, which extraSpaceUser and adminUser will try to edit
-let createInput: CreateForumPostInput;
+let createInput: { spaceId: string; userId: string; categoryId: string };
 const updateInput: UpdateForumPostInput = {
   title: 'New title'
 };
@@ -40,11 +37,8 @@ beforeAll(async () => {
   });
 
   createInput = {
-    content: { type: 'doc' },
-    contentText: 'Empty',
     spaceId: space.id,
-    title: 'Test Post',
-    createdBy: user.id,
+    userId: user.id,
     categoryId: postCategory.id
   };
 
@@ -55,17 +49,13 @@ beforeAll(async () => {
 
 describe('PUT /api/forums/posts/[postId] - Update a post', () => {
   it('should update a post if the user created it, responding with 200', async () => {
-    const post = (
-      await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
-    ).body as ForumPostPage;
+    const post = await generateForumPost(createInput);
 
     await request(baseUrl).put(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send(updateInput).expect(200);
   });
 
   it('should update a post if the user did not create the post, but is a space admin, responding with 200', async () => {
-    const post = (
-      await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
-    ).body as ForumPostPage;
+    const post = await generateForumPost(createInput);
 
     await request(baseUrl)
       .put(`/api/forums/posts/${post.id}`)
@@ -75,14 +65,7 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
   });
 
   it('should fail to update the post if the user did not create it, responding with 401', async () => {
-    const forumPost = await createForumPost({
-      content: { type: 'doc' },
-      contentText: 'Empty',
-      spaceId: space.id,
-      title: 'Test Post',
-      createdBy: user.id,
-      categoryId: postCategory.id
-    });
+    const forumPost = await generateForumPost(createInput);
 
     const update: UpdateForumPostInput = {
       title: 'Updated title'
@@ -97,34 +80,30 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
 });
 describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
   it('should delete a post if the user created it, responding with 200', async () => {
-    const post = (
-      await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
-    ).body as ForumPostPage;
+    const page = await generateForumPost(createInput);
 
-    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send().expect(200);
+    await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', userCookie).send().expect(200);
 
-    const deletedPost = await prisma.post.findUnique({
+    const updatedPage = await prisma.page.findUnique({
       where: {
-        id: post.id
+        id: page.id
       }
     });
 
-    expect(deletedPost).toBeNull();
+    expect(updatedPage?.deletedAt).toBeNull();
   });
 
   it('should delete a post if the user did not create the post, but is a space admin, responding with 200', async () => {
-    const post = (
-      await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
-    ).body as ForumPostPage;
+    const page = await generateForumPost(createInput);
 
-    await request(baseUrl).delete(`/api/forums/posts/${post.id}`).set('Cookie', adminUserCookie).send().expect(200);
+    await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', adminUserCookie).send().expect(200);
   });
 
   it('should fail to update the post if the user did not create it, responding with 401', async () => {
-    const forumPost = await createForumPost(createInput);
+    const page = await generateForumPost(createInput);
 
     await request(baseUrl)
-      .delete(`/api/forums/posts/${forumPost.id}`)
+      .delete(`/api/forums/posts/${page.id}`)
       .set('Cookie', extraSpaceUserCookie)
       .send()
       .expect(401);

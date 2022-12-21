@@ -68,7 +68,7 @@ describe('updateForumPost', () => {
       postId: createdPage.id,
       userId: user.id
     });
-    const updatedForumPost = await getForumPost({ postId: createdPage.id });
+    const updatedForumPost = await getForumPost({ pageId: createdPage.id });
 
     // ---------------------- Make sure data was preserved ----------------------
     typedKeys(droppedPageUpdate).forEach((key) => {

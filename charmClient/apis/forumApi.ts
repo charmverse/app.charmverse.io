@@ -35,8 +35,8 @@ export class ForumApi {
     return http.DELETE(`/api/forums/posts/${pageId}`);
   }
 
-  getForumPost(postId: string) {
-    return http.GET<ForumPostPage>(`/api/forums/posts/${postId}`);
+  getForumPost(pageId: string) {
+    return http.GET<ForumPostPage>(`/api/forums/posts/${pageId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
