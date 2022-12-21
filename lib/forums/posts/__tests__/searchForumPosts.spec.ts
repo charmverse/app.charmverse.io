@@ -190,7 +190,7 @@ describe('searchForumPosts', () => {
     expect(thirdResult.hasNext).toBe(false);
   });
 
-  it('should return only posts from a specific category if provided, or uncategorised posts if category ID is null', async () => {
+  it('should return only posts from a specific category if provided', async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
     const exampleTitle = `Example title`;
@@ -200,15 +200,7 @@ describe('searchForumPosts', () => {
       name: 'Test Category'
     });
 
-    const uncategorisedPostsToGenerate = 4;
     const categorisedPostsToGenerate = 2;
-
-    const uncategorisedPosts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: uncategorisedPostsToGenerate,
-      title: exampleTitle
-    });
 
     const categoryPosts = await generateForumPosts({
       spaceId: extraSpace.id,
@@ -228,16 +220,5 @@ describe('searchForumPosts', () => {
 
     // Make sure ignored posts didn't enter the result
     expect(foundCategoryPosts.data.every((item) => categoryPosts.some((_post) => _post.id === item.id)));
-
-    // Second assertion - uncategorised
-    const foundUncategorisedPosts = await searchForumPosts(
-      { spaceId: extraSpace.id, count: 10, search: exampleTitle.substring(0, 5) },
-      user.id
-    );
-
-    expect(foundUncategorisedPosts.data).toHaveLength(uncategorisedPostsToGenerate);
-
-    // Make sure ignored posts didn't enter the result
-    expect(foundUncategorisedPosts.data.every((item) => uncategorisedPosts.some((_post) => _post.id === item.id)));
   });
 });
