@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 async function updatePageGalleryUrl () {
@@ -15,7 +15,7 @@ async function updatePageGalleryUrl () {
   });
 
   const pagesWithContent = pages.filter(p => !checkIsContentEmpty(p.content as PageContent))
-  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, galleryImage: getPreviewImageFromContent(p.content as PageContent) }) )
+  const cardsWithFallbackImage = pagesWithContent.map(p => ({ id: p.id, galleryImage: extractPreviewImage(p.content as PageContent) }) )
     .filter(p => !!p.galleryImage)
 
   console.log('🔥 Count of cards with gallery url:', cardsWithFallbackImage.length);

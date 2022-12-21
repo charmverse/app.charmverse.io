@@ -2,16 +2,16 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumPostPage } from './interfaces';
+import type { PageWithRelations } from './getPostMeta';
+import { getPostMeta } from './getPostMeta';
+import type { ForumPostMeta } from './interfaces';
 
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList<T = Record<string, unknown>> = Required<
-  PaginatedResponse<ForumPostPage> & { cursor: number }
-> &
-  T;
+export type PaginatedPostList = PaginatedResponse<ForumPostMeta> & { cursor: number };
 
 /**
  * @sort ignored for now - the server sorts posts by most recent
@@ -86,21 +86,17 @@ export async function listForumPosts(
           })
         ).length === 1;
 
+  const data = pages
+    .map((_page) => {
+      if (_page.post) {
+        return getPostMeta({ page: _page as PageWithRelations, userId });
+      }
+      return null;
+    })
+    .filter(isTruthy);
+
   const response: PaginatedPostList = {
-    data: pages.map((_page) => {
-      const { upDownVotes, post, ...rest } = _page;
-      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage = {
-        ...rest,
-        post: {
-          ...post!,
-          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-          upvoted: userVote ? userVote.upvoted : undefined
-        }
-      };
-      return forumPostPage;
-    }),
+    data,
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

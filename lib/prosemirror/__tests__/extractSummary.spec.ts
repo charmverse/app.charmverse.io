@@ -1,4 +1,4 @@
-import { extractSummaryHtml } from '../extractSummary';
+import { extractSummaryNode } from '../extractSummary';
 import type { PageContent } from '../interfaces';
 
 describe('extractSummaryHtml()', () => {
@@ -28,7 +28,27 @@ describe('extractSummaryHtml()', () => {
         { type: 'paragraph', content: [{ text: 'Some paragraph text', type: 'text' }] }
       ]
     };
-    const result = extractSummaryHtml(doc);
+    const result = extractSummaryNode(doc);
+    expect(result).toEqual('');
+  });
+
+  it('Should extract the first image', () => {
+    const doc: PageContent = {
+      type: 'doc',
+      content: [
+        {
+          type: 'image',
+          attrs: {
+            alt: null,
+            src: 'https://google.com/image.png',
+            size: 700,
+            track: [],
+            caption: null
+          }
+        }
+      ]
+    };
+    const result = extractSummaryNode(doc);
     expect(result).toEqual('');
   });
 });

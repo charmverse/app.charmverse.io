@@ -9,6 +9,7 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
@@ -36,7 +37,7 @@ export function PostPage(props: Props) {
   }
 
   async function publishForumPost() {
-    if (!form.content || !form.contentText || !categoryId) {
+    if (checkIsContentEmpty(form.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
     if (props.page) {
@@ -74,7 +75,7 @@ export function PostPage(props: Props) {
   let disabledTooltip = '';
   if (!form.title) {
     disabledTooltip = 'Title is required';
-  } else if (!form.contentText) {
+  } else if (checkIsContentEmpty(form.content)) {
     disabledTooltip = 'Content is required';
   } else if (!categoryId) {
     disabledTooltip = 'Category is required';

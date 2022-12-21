@@ -1,9 +1,16 @@
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 
-import type { ForumPostPage } from './interfaces';
+import { getPostVoteSummary } from './getPostMeta';
+import type { ForumPostPageWithVotes } from './interfaces';
 
-export async function getForumPost({ pageId, userId }: { userId?: string; pageId: string }): Promise<ForumPostPage> {
+export async function getForumPost({
+  pageId,
+  userId
+}: {
+  userId: string;
+  pageId: string;
+}): Promise<ForumPostPageWithVotes> {
   const forumPage = await prisma.page.findFirst({
     where: { id: pageId, type: 'post' },
     include: {
@@ -21,17 +28,13 @@ export async function getForumPost({ pageId, userId }: { userId?: string; pageId
     throw new PageNotFoundError(pageId);
   }
 
-  const { upDownVotes, post } = forumPage;
+  const { post, upDownVotes, ...page } = forumPage;
 
-  const userVote = forumPage.upDownVotes.find((vote) => vote.createdBy === userId);
+  const votes = getPostVoteSummary(upDownVotes, userId);
 
   return {
-    ...forumPage,
-    post: {
-      ...post,
-      downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-      upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-      upvoted: userVote ? userVote.upvoted : undefined
-    }
+    ...page,
+    post,
+    votes
   };
 }

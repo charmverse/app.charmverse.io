@@ -4,7 +4,7 @@ import type { Block, Page, Prisma, Space } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface AWSAssetUrl {
@@ -55,7 +55,7 @@ async function convertFolderContent({
   oldNewHashmap[newPageId] = pageContent.id;
 
   pageContent.id = newPageId;
-  pageContent.galleryImage = getPreviewImageFromContent(pageContent.content as PageContent);
+  pageContent.galleryImage = extractPreviewImage(pageContent.content as PageContent);
 
   if (pageContent.type === 'board') {
     pageContent.boardId = pageContent.id;

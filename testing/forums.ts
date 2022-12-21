@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { ForumPostPageWithoutVotes } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 
 import { generatePostCategory } from './utils/forums';
 
@@ -107,5 +107,5 @@ export async function generateForumPosts({
     include: {
       post: true
     }
-  }) as Promise<ForumPostPageWithoutVotes[]>;
+  }) as Promise<ForumPostPage[]>;
 }

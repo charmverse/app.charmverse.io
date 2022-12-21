@@ -5,8 +5,8 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { usePages } from 'hooks/usePages';
 import type { PageDetails, PageDetailsUpdates } from 'lib/pages';
-import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function usePageDetails(pageIdOrPath: string, spaceId?: string) {
@@ -45,7 +45,7 @@ export function usePageDetails(pageIdOrPath: string, spaceId?: string) {
       };
 
       const hasContent = !checkIsContentEmpty(updatedPage.content as PageContent);
-      const galleryImage = getPreviewImageFromContent(updatedPage.content as PageContent);
+      const galleryImage = extractPreviewImage(updatedPage.content as PageContent);
 
       // Update pages context data only when hasContent value changed
       mutatePagesList(
