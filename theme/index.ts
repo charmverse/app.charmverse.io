@@ -15,6 +15,8 @@ import {
   darkBlueColor,
   primaryTextColor,
   primaryTextColorDarkMode,
+  secondaryTextColor,
+  secondaryTextColorDarkMode,
   settingsHeaderBackgroundColor,
   settingsHeaderBackgroundColorDarkMode
 } from './colors';
@@ -165,7 +167,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: blueColor // '#010101',
       },
       secondary: {
-        main: mode === 'dark' ? '#999' : '#888'
+        main: mode === 'dark' ? secondaryTextColorDarkMode : secondaryTextColor
       },
       white: {
         main: '#eee'
@@ -237,7 +239,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
     components: {
       MuiAvatar: {
         styleOverrides: {
-          root: ({ ownerState, theme }) => ({
+          root: ({ ownerState }) => ({
             ...(ownerState.variant === 'rounded' && {
               borderRadius: 10
             })

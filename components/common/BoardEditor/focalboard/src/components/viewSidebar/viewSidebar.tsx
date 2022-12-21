@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
+import { RiFolder2Line } from 'react-icons/ri';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
@@ -24,6 +25,7 @@ import type { BoardView } from '../../blocks/boardView';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
+import { ViewSourceOptions } from './viewSourceOptions';
 
 interface Props {
   board: Board;
@@ -46,7 +48,7 @@ const StyledSidebar = styled.div`
   }
 `;
 
-type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by';
+type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
 
 const initialState: SidebarView = 'view-options';
 
@@ -104,6 +106,14 @@ function ViewOptionsSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
+              {withGroupBy && (
+                <MenuRow
+                  onClick={() => setSidebarView('source')}
+                  icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
+                  title='Source'
+                  value={props.view.fields.source ?? 'None'}
+                />
+              )}
             </>
           )}
           {sidebarView === 'layout' && (
@@ -126,6 +136,12 @@ function ViewOptionsSidebar(props: Props) {
                 view={props.view}
                 groupByProperty={props.groupByProperty}
               />
+            </>
+          )}
+          {sidebarView === 'source' && (
+            <>
+              <SidebarHeader goBack={goBack} title='Data source' closeSidebar={props.closeSidebar} />
+              <ViewSourceOptions view={props.view} />
             </>
           )}
         </StyledSidebar>

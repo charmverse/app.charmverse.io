@@ -38,12 +38,6 @@ const SidebarContent = styled.div`
 
 export default function SourceSelection(props: Props) {
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
-
-  const { pages } = usePages();
-  const boardPages = Object.values(pages)
-    .filter((p) => p?.type === 'board')
-    .filter(isTruthy);
-
   function openSidebar() {
     setSidebarState(!sidebarState ? 'select-source' : null);
   }
@@ -83,21 +77,33 @@ export default function SourceSelection(props: Props) {
               <CloseIcon fontSize='small' />
             </IconButton>
           </Box>
-          <SidebarContent>
-            <PagesList pages={boardPages} onSelectPage={(page) => props.onSelectSource({ boardId: page.id })} />
-          </SidebarContent>
-          {props.showCreateDatabase && (
-            <MenuItem onClick={props.onCreateDatabase}>
-              <ListItemIcon>
-                <AddIcon color='secondary' />
-              </ListItemIcon>
-              <Typography variant='body2' color='secondary'>
-                New database
-              </Typography>
-            </MenuItem>
-          )}
+          <SourceOptions {...props} />
         </StyledSidebar>
       </Collapse>
     </Box>
+  );
+}
+
+export function SourceOptions(props: Omit<Props, 'readOnly'>) {
+  const { pages } = usePages();
+  const boardPages = Object.values(pages)
+    .filter((p) => p?.type === 'board')
+    .filter(isTruthy);
+  return (
+    <>
+      <SidebarContent>
+        <PagesList pages={boardPages} onSelectPage={(page) => props.onSelectSource({ boardId: page.id })} />
+      </SidebarContent>
+      {props.showCreateDatabase && (
+        <MenuItem onClick={props.onCreateDatabase}>
+          <ListItemIcon>
+            <AddIcon color='secondary' />
+          </ListItemIcon>
+          <Typography variant='body2' color='secondary'>
+            New database
+          </Typography>
+        </MenuItem>
+      )}
+    </>
   );
 }

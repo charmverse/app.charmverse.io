@@ -23,6 +23,7 @@ const globalCSS = css`
     --input-border-hover: #37352f;
     --primary-color: ${colors.blueColor};
     --primary-text: ${colors.primaryTextColor};
+    --secondary-text: ${colors.secondaryTextColor};
 
     /* copied from https://mui.com/material-ui/customization/z-index/#main-content */
     --z-index-mobileStepper: 1000;
@@ -72,6 +73,7 @@ const globalCSS = css`
     --input-border-hover: #ededed;
 
     --primary-text: ${colors.primaryTextColorDarkMode};
+    --secondary-text: ${colors.secondaryTextColorDarkMode};
 
     --background-default: ${colors.backgroundColorDarkMode};
     --background-paper: ${colors.backgroundLightColorDarkMode};
