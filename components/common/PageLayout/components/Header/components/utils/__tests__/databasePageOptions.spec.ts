@@ -6,8 +6,8 @@ import {
   createBoardPropertyOptions,
   createCardFieldProperties,
   createNewPropertiesForBoard,
-  isDate,
-  isDateValid,
+  validDate,
+  validateAllBlockDates,
   isNumber,
   mapCardBoardProperties,
   selectColors
@@ -31,22 +31,22 @@ describe('Database options util', () => {
     expect(isNumber('random text')).toBeFalsy();
   });
 
-  test('isDate should validate a date', () => {
-    expect(isDate('2012-12-01')).toBeTruthy();
-    expect(isDate('December 10, 2021')).toBeTruthy();
-    expect(isDate('1354320000000')).toBeTruthy();
-    expect(isDate('543543')).toBeFalsy();
-    expect(isDate('random text')).toBeFalsy();
+  test('validDate should validate a date and return it', () => {
+    expect(validDate('2012-12-01')).toBeTruthy();
+    expect(validDate('December 10, 2021')).toBeTruthy();
+    expect(validDate('1354320000000')).toBeTruthy();
+    expect(validDate('543543')).toBeFalsy();
+    expect(validDate('random text')).toBeFalsy();
   });
 
-  test('isDateValid should validate if a string has one or 2 valid dates', () => {
-    expect(isDateValid('2012-12-01 -> 2012-12-03')).toBeTruthy();
-    expect(isDateValid('December 01 2012 -> December 03 2012')).toBeTruthy();
-    expect(isDateValid('1354320000000 -> 1354485600000')).toBeTruthy();
-    expect(isDateValid('2012-12-01')).toBeTruthy();
-    expect(isDateValid('December 10, 2021')).toBeTruthy();
-    expect(isDateValid('543543')).toBeFalsy();
-    expect(isDateValid('random text')).toBeFalsy();
+  test('validateAllBlockDates should validate if a string has one or 2 valid dates', () => {
+    expect(validateAllBlockDates('2012-12-01 -> 2012-12-03')).toBeTruthy();
+    expect(validateAllBlockDates('December 01 2012 -> December 03 2012')).toBeTruthy();
+    expect(validateAllBlockDates('1354320000000 -> 1354485600000')).toBeTruthy();
+    expect(validateAllBlockDates('2012-12-01')).toBeTruthy();
+    expect(validateAllBlockDates('December 10, 2021')).toBeTruthy();
+    expect(validateAllBlockDates('543543')).toBeFalsy();
+    expect(validateAllBlockDates('random text')).toBeFalsy();
   });
 
   test('createBoardPropertiesOptions should receive a list of string from the csv and create a list of options property for a type Board block', () => {

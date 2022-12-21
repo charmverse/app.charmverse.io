@@ -17,14 +17,17 @@ export const selectColors = Object.keys(focalboardColorsMap);
 
 export const isNumber = (n: string) => !Number.isNaN(+n);
 
-export const isDate = (dt: string) => {
+export const validDate = (dt: string) => {
   const date = new Date(isNumber(dt) ? +dt : dt);
 
-  return !Number.isNaN(date.valueOf()) && date.getFullYear() > 1970;
+  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 1970) {
+    return date;
+  }
+  return null;
 };
 
-export function isDateValid(strDate: string) {
-  return strDate.split(' -> ').every(isDate);
+export function validateAllBlockDates(strDate: string) {
+  return strDate.split(' -> ').every((dt) => !!validDate(dt));
 }
 
 export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
@@ -103,10 +106,10 @@ export function createNewPropertiesForBoard(
   if (propValues.every((p) => uuidValidate(p))) {
     return { ...defaultProps, type: 'person' };
   }
-  if (propValues.every(isDateValid)) {
+  if (propValues.every(validateAllBlockDates)) {
     return { ...defaultProps, type: 'date' };
   }
-  if (propValues.every((p) => !Number.isNaN(+p))) {
+  if (propValues.every(isNumber)) {
     return { ...defaultProps, type: 'number' };
   }
   if (propValues.every((p) => p.startsWith('http') || p.startsWith('www.'))) {
@@ -175,32 +178,37 @@ export function createCardFieldProperties(
       const valuesArr = value.split(' -> ');
 
       if (valuesArr.length === 1) {
-        const fromDateString = valuesArr[0];
-        const from = new Date(isNumber(fromDateString) ? +fromDateString : fromDateString).getTime();
-        const jsonValue: string = JSON.stringify({
-          from
-        });
-        return {
-          ...acc,
-          [propId]: jsonValue
-        };
+        const from = validDate(valuesArr[0])?.getTime();
+
+        if (from) {
+          const jsonValue: string = JSON.stringify({
+            from
+          });
+          return {
+            ...acc,
+            [propId]: jsonValue
+          };
+        }
       }
 
       if (valuesArr.length === 2) {
         const fromDateString = valuesArr[0];
         const toDateString = valuesArr[1];
-        const from = new Date(isNumber(fromDateString) ? +fromDateString : fromDateString).getTime();
-        const to = new Date(isNumber(toDateString) ? +toDateString : toDateString).getTime();
-        const jsonValue: string = JSON.stringify({
-          from,
-          to
-        });
+        const from = validDate(fromDateString)?.getTime();
+        const to = validDate(toDateString)?.getTime();
 
-        if (from < to) {
-          return {
-            ...acc,
-            [propId]: jsonValue
-          };
+        if (from && to) {
+          const jsonValue: string = JSON.stringify({
+            from,
+            to
+          });
+
+          if (from < to) {
+            return {
+              ...acc,
+              [propId]: jsonValue
+            };
+          }
         }
       }
 
