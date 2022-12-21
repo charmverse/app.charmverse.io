@@ -12,7 +12,7 @@ handler.get(checkDiscordGateEndpoint);
 
 async function checkDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<CheckDiscordGateResult>) {
   const spaceDomain = req.query.spaceDomain as string;
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
 
   const result = await checkDiscordGate({ spaceDomain, userId });
 

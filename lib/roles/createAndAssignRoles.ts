@@ -14,7 +14,6 @@ export async function createAndAssignRoles({
   if (!roles.length) {
     return;
   }
-
   const spaceMembership = await prisma.spaceRole.findFirst({
     where: {
       spaceId,

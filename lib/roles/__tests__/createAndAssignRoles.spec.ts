@@ -14,10 +14,10 @@ describe('createAndAssignRoles', () => {
       { id: idRole2, name: 'Role 2' }
     ];
 
-    expect(await prisma.role.findMany({ where: { id: { in: [idRole1, idRole2] } } })).toHaveLength(0);
+    expect(await prisma.role.findMany({ where: { externalId: { in: [idRole1, idRole2] } } })).toHaveLength(0);
 
     await createAndAssignRoles({ userId: user.id, spaceId: space.id, roles });
-    expect(await prisma.role.findMany({ where: { id: { in: [idRole1, idRole2] } } })).toHaveLength(2);
+    expect(await prisma.role.findMany({ where: { externalId: { in: [idRole1, idRole2] } } })).toHaveLength(2);
 
     const membership = await prisma.spaceRole.findFirst({
       where: { userId: user.id, spaceId: space.id },
@@ -39,13 +39,13 @@ describe('createAndAssignRoles', () => {
     await generateRole({
       spaceId: space.id,
       createdBy: user.id,
-      id: idRole1
+      externalId: idRole1
     });
 
-    expect(await prisma.role.findMany({ where: { id: { in: [idRole1, idRole2] } } })).toHaveLength(1);
+    expect(await prisma.role.findMany({ where: { externalId: { in: [idRole1, idRole2] } } })).toHaveLength(1);
 
     await createAndAssignRoles({ userId: user.id, spaceId: space.id, roles });
-    expect(await prisma.role.findMany({ where: { id: { in: [idRole1, idRole2] } } })).toHaveLength(2);
+    expect(await prisma.role.findMany({ where: { externalId: { in: [idRole1, idRole2] } } })).toHaveLength(2);
 
     const membership = await prisma.spaceRole.findFirst({
       where: { userId: user.id, spaceId: space.id },
