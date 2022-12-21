@@ -1,7 +1,7 @@
 import type { Space, User } from '@prisma/client';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostComment } from 'testing/utils/forums';
+import { generatePostWithComment } from 'testing/utils/forums';
 
 import { updatePostComment } from '../updatePostComment';
 
@@ -16,7 +16,7 @@ beforeAll(async () => {
 
 describe('updatePostComment', () => {
   it('should update a post comment if the user is the creator', async () => {
-    const { comment } = await generatePostComment({
+    const { comment } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });

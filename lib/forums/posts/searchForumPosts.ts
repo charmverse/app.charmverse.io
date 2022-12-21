@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 
 import type { ForumPostPage } from './interfaces';
-import type { CategoryIdQuery, PaginatedPostList } from './listForumPosts';
+import type { PaginatedPostList } from './listForumPosts';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 /**
@@ -14,7 +14,7 @@ export interface SearchForumPostsRequest {
   search?: string;
   page?: number;
   count?: number;
-  categoryId?: CategoryIdQuery;
+  categoryId?: string;
 }
 export async function searchForumPosts(
   {
@@ -45,10 +45,10 @@ export async function searchForumPosts(
   const whereQuery: Prisma.PageWhereInput = {
     type: 'post',
     post: {
-      status: 'published',
-      categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId
+      categoryId
     },
     spaceId,
+    deletedAt: null,
     OR: [
       {
         title: {
@@ -81,17 +81,18 @@ export async function searchForumPosts(
     }
   });
 
-  const hasNext =
-    pages.length === 0
-      ? false
-      : (
-          await prisma.page.findMany({
-            ...orderQuery,
-            skip: toSkip + count,
-            take: 1,
-            where: whereQuery
-          })
-        ).length === 1;
+  let hasNext = false;
+  if (pages.length > 0) {
+    const nextPages = await prisma.page.findMany({
+      ...orderQuery,
+      skip: toSkip + count,
+      take: 1,
+      where: whereQuery
+    });
+    if (nextPages.length > 0) {
+      hasNext = true;
+    }
+  }
 
   const response: PaginatedPostList = {
     data: pages.map((_page) => {

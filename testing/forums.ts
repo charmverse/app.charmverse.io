@@ -1,8 +1,10 @@
-import type { PostStatus, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import type { ForumPostPageWithoutVotes } from 'lib/forums/posts/interfaces';
+
+import { generatePostCategory } from './utils/forums';
 
 const imageUrl1 =
   'https://media.wtsp.com/assets/WTSP/images/657c2b38-486d-467b-8f35-ba1014ff5c61/657c2b38-486d-467b-8f35-ba1014ff5c61.png';
@@ -20,36 +22,47 @@ function getRandomImage() {
 }
 
 export async function generateForumPosts({
+  categoryId,
   count,
   spaceId,
   createdBy,
-  categoryId,
   content = { type: 'doc', content: [] },
   contentText = '',
   title,
-  withImageRatio = 30,
-  status = 'published'
+  withImageRatio = 30
 }: {
   spaceId: string;
+  categoryId?: string;
   createdBy: string;
   count: number;
-  categoryId?: string;
   content?: any;
   contentText?: string;
   title?: string;
   withImageRatio?: number;
-  status?: PostStatus;
 }) {
   const postCreateInputs: Prisma.PostCreateManyInput[] = [];
   const pageCreateInputs: Prisma.PageCreateManyInput[] = [];
+  if (!categoryId) {
+    const category = await prisma.postCategory.findFirst({
+      where: {
+        spaceId
+      }
+    });
+    if (!category) {
+      const newCategory = await generatePostCategory({ spaceId });
+      categoryId = newCategory.id;
+    } else {
+      categoryId = category.id;
+    }
+  }
 
   // Start creating the posts 3 days ago
   let createdAt = Date.now() - 1000 * 60 * 60 * 24 * 30;
 
   for (let i = 0; i < count; i++) {
     const postInput: Prisma.PostCreateManyInput = {
-      status,
       categoryId,
+      spaceId,
       id: v4()
     };
 
