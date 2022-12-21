@@ -32,9 +32,9 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
     userId
   });
 
-  if (page.post.status === 'draft') {
-    throw new UndesirableOperationError("Can't create comment on drafted posts");
-  }
+  // if (page.post.status === 'draft') {
+  //   throw new UndesirableOperationError("Can't create comment on drafted posts");
+  // }
 
   const postComment = await createPostComment({ postId: pageId, userId, ...body });
 

@@ -16,6 +16,7 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import type { PageContent } from 'models/Page';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
+import { PostComment } from './components/PostComment';
 
 interface Props {
   page: ForumPostPage;
@@ -102,6 +103,8 @@ export function PostPage(props: Props) {
           </Button>
         </Box>
       )}
+
+      {page.postId && <PostComment postId={page.postId} />}
     </Container>
   );
 }

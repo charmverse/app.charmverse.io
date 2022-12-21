@@ -7,7 +7,7 @@ export type PostCommentWithVote = PageComment & { upvotes: number; downvotes: nu
 export type CreatePostCommentInput = {
   content: PageContent;
   contentText: string;
-  parentId: string;
+  parentId: string | null;
 };
 
 export type UpdatePostCommentInput = {
