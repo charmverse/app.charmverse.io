@@ -24,7 +24,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
-  const updatedPost = await updateForumPost({ userId, postId: pageId, ...req.body });
+  await updateForumPost({ userId, postId: pageId, ...req.body });
 
   res.status(200).end();
 }

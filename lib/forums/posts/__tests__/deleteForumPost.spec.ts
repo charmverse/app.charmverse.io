@@ -14,7 +14,7 @@ describe('deleteForumPost', () => {
       spaceId: space.id
     });
 
-    await deleteForumPost(postPage.post.id);
+    await deleteForumPost(postPage.id);
 
     const [post, page] = await Promise.all([
       prisma.post.findUnique({ where: { id: postPage.post.id } }),

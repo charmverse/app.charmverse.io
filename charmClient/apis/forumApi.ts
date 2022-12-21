@@ -31,8 +31,8 @@ export class ForumApi {
     return http.PUT(`/api/forums/posts/${postId}`, payload);
   }
 
-  deleteForumPost(postId: string) {
-    return http.DELETE(`/api/forums/posts/${postId}`);
+  deleteForumPost(pageId: string) {
+    return http.DELETE(`/api/forums/posts/${pageId}`);
   }
 
   getForumPost(postId: string) {

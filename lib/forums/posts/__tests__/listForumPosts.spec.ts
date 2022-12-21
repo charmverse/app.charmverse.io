@@ -170,7 +170,7 @@ describe('listForumPosts', () => {
     );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
     expect(secondResult.cursor).toBe(2);
-    expect(secondResult.hasNext).toBe(false);
+    expect(secondResult.hasNext).toBe(true);
 
     // What should be left for third query after executing the query twice
   });

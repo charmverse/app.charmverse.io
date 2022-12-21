@@ -104,8 +104,16 @@ describe('searchForumPosts', () => {
       name: 'Test Category'
     });
 
-    const uncategorisedPostsToGenerate = 2;
     const categorisedPostsToGenerate = 2;
+
+    const categoryPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: categorisedPostsToGenerate,
+      categoryId: category.id,
+      title: exampleTitle
+    });
+
     const ignoredPosts = await generateForumPosts({
       spaceId: extraSpace.id,
       createdBy: extraUser.id,
@@ -119,7 +127,7 @@ describe('searchForumPosts', () => {
       user.id
     );
 
-    expect(foundPosts.data).toHaveLength(uncategorisedPostsToGenerate + categorisedPostsToGenerate);
+    expect(foundPosts.data).toHaveLength(categorisedPostsToGenerate);
 
     // Make sure ignored posts didn't enter the result
     expect(foundPosts.data.every((item) => ignoredPosts.every((_post) => _post.id !== item.id)));
