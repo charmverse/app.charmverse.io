@@ -4,6 +4,7 @@ import nc from 'next-connect';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { getPostComments } from 'lib/forums/comments/getPostComments';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
+import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -24,6 +25,11 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const { pageId } = req.query as any as { pageId: string };
   const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
+
+  await checkPostAccess({
+    pageId,
+    userId
+  });
 
   const postComment = await createPostComment({ postId: pageId, userId, ...body });
 

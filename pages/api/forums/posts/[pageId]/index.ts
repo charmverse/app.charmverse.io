@@ -20,7 +20,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 
@@ -34,7 +34,7 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 

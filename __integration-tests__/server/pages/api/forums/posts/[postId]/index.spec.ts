@@ -59,14 +59,7 @@ describe('PUT /api/forums/posts/[postId] - Update a post', () => {
       await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
     ).body as ForumPostPage;
 
-    const updatedPost = (
-      await request(baseUrl).put(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send(updateInput).expect(200)
-    ).body as ForumPostPage;
-
-    expect(updatedPost).toMatchObject({
-      ...post,
-      title: updateInput.title
-    });
+    await request(baseUrl).put(`/api/forums/posts/${post.id}`).set('Cookie', userCookie).send(updateInput).expect(200);
   });
 
   it('should update a post if the user did not create the post, but is a space admin, responding with 200', async () => {
