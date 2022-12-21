@@ -187,7 +187,7 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
           spaceId: currentSpace.id,
           title: csvRow.Name || textName,
           fields: {
-            properties: createCardFieldProperties(csvRow, mappedBoardProperties, members)
+            properties: fieldProperties
           }
         });
 
@@ -205,16 +205,22 @@ export default function DatabaseOptions({ pagePermissions, closeMenu, pageId }: 
         header: true,
         skipEmptyLines: true,
         worker: event.target.files[0].size > 100000, // 100kb
+        delimiter: '\n', // fallback for a csv with 1 column
         complete: async (results) => {
           closeMenu();
           if (results.errors && results.errors[0]) {
-            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'error');
+            showMessage(results.errors[0].message ?? 'There was an error importing your csv file.', 'warning');
             return;
           }
           if (isValidCsvResult(results)) {
             await addNewCards(results);
+
+            const spaceId = currentSpace?.id;
+            if (spaceId) {
+              charmClient.track.trackAction('import_page_csv', { pageId, spaceId });
+            }
+            showMessage('Your csv file was imported successfully', 'success');
           }
-          showMessage('Your csv file was imported successfully', 'success');
         }
       });
     }

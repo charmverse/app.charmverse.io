@@ -14,6 +14,7 @@ export interface SearchForumPostsRequest {
   search?: string;
   page?: number;
   count?: number;
+  categoryId?: string;
 }
 export async function searchForumPosts(
   {
@@ -21,7 +22,8 @@ export async function searchForumPosts(
     search,
     page = 0,
     // Count is the number of posts we want per page
-    count = defaultPostsPerResult
+    count = defaultPostsPerResult,
+    categoryId
   }: SearchForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
@@ -42,6 +44,9 @@ export async function searchForumPosts(
 
   const whereQuery: Prisma.PageWhereInput = {
     type: 'post',
+    post: {
+      categoryId
+    },
     spaceId,
     deletedAt: null,
     OR: [
@@ -76,17 +81,18 @@ export async function searchForumPosts(
     }
   });
 
-  const hasNext =
-    pages.length === 0
-      ? false
-      : (
-          await prisma.page.findMany({
-            ...orderQuery,
-            skip: toSkip + count,
-            take: 1,
-            where: whereQuery
-          })
-        ).length === 1;
+  let hasNext = false;
+  if (pages.length > 0) {
+    const nextPages = await prisma.page.findMany({
+      ...orderQuery,
+      skip: toSkip + count,
+      take: 1,
+      where: whereQuery
+    });
+    if (nextPages.length > 0) {
+      hasNext = true;
+    }
+  }
 
   const response: PaginatedPostList = {
     data: pages.map((_page) => {

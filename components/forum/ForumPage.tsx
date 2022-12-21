@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -23,11 +22,11 @@ export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const categoryId = router.query.categoryId as CategoryIdQuery;
+  const categoryId = router.query.categoryId as string | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
 
-  function handleCategoryUpdate(_categoryId: CategoryIdQuery) {
+  function handleCategoryUpdate(_categoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
 
     if (_categoryId === null) {
@@ -74,7 +73,7 @@ export default function ForumPage() {
 
       <TextField
         variant='outlined'
-        placeholder='Search Posts, Comments and Members'
+        placeholder='Search posts'
         onChange={(e) => {
           setSearch(e.target.value);
         }}
