@@ -55,7 +55,6 @@ describe('listForumPosts', () => {
 
     expect(foundPosts.data).toHaveLength(posts.length + categoryPosts.length);
 
-    expect(foundPosts.data.some((p) => p.post.categoryId === null)).toBe(true);
     expect(foundPosts.data.some((p) => p.post.categoryId === category.id)).toBe(true);
   });
 
@@ -170,7 +169,7 @@ describe('listForumPosts', () => {
       user.id
     );
     expect(secondResult.data).toHaveLength(resultsPerQuery);
-    expect(secondResult.cursor).toBe(0);
+    expect(secondResult.cursor).toBe(2);
     expect(secondResult.hasNext).toBe(false);
 
     // What should be left for third query after executing the query twice
