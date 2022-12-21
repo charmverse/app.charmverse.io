@@ -12,7 +12,9 @@ import { PostPage } from '../PostPage/PostPage';
 
 interface Props {
   page?: ForumPostPage | null;
+  spaceId: string;
   onClose: () => void;
+  open?: boolean;
 }
 
 export default function PostDialog(props: Props) {
@@ -34,6 +36,13 @@ export default function PostDialog(props: Props) {
       popupState.open();
     }
   }, [!!page]);
+
+  // open modal when page is set
+  useEffect(() => {
+    if (props.open) {
+      popupState.open();
+    }
+  }, [props.open]);
 
   async function onClickDelete() {
     if (page) {
@@ -81,7 +90,7 @@ export default function PostDialog(props: Props) {
           // }
           onClose={onClose}
         >
-          {page && <PostPage page={page} onPublish={onClose} />}
+          <PostPage page={page ?? null} spaceId={props.spaceId} onSave={onClose} />
         </Dialog>
       )}
     </RootPortal>

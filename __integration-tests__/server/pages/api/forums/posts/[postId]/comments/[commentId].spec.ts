@@ -8,7 +8,7 @@ import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostComment } from 'testing/utils/forums';
+import { generatePostWithComment } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;
@@ -70,7 +70,7 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
   });
 
   it(`should throw error if user doesn't have access to workspace, responding with 401`, async () => {
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
     });
@@ -84,7 +84,7 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
   it(`should throw error if user isn't the comment author, responding with 401`, async () => {
     const spaceUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: spaceUser.id
     });
@@ -97,7 +97,7 @@ describe('PUT /api/forums/posts/[postId]/comments/[commentId] - Update a comment
   });
 
   it('should update post comment, responding with 200', async () => {
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
     });
@@ -115,7 +115,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
   });
 
   it(`should throw error if user doesn't have access to workspace, responding with 401`, async () => {
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
     });
@@ -127,7 +127,7 @@ describe('DELETE /api/forums/posts/[postId]/comments/[commentId] - Delete a comm
   });
 
   it('should delete post comment, responding with 200', async () => {
-    const { comment, post } = await generatePostComment({
+    const { comment, post } = await generatePostWithComment({
       spaceId: space.id,
       userId: user.id
     });

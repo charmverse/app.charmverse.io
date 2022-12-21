@@ -3,6 +3,7 @@ import { verifyJwt } from 'lit-js-sdk';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
@@ -26,6 +27,9 @@ export async function applyTokenGates({
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
+
+  // Try to apply disocrd gate first
+  await applyDiscordGate({ spaceId, userId });
 
   const space = await prisma.space.findUnique({
     where: {

@@ -7,6 +7,7 @@ import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -25,8 +26,19 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
 }
 
 async function createForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
-  const newPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
-  return res.status(201).json(newPost);
+  const createdPage = await createForumPost({ ...req.body, createdBy: req.session.user.id });
+
+  relay.broadcast(
+    {
+      type: 'post_published',
+      payload: {
+        createdBy: createdPage.createdBy,
+        categoryId: createdPage.post.categoryId
+      }
+    },
+    createdPage.spaceId
+  );
+  return res.status(201).json(createdPage);
 }
 
 export default withSessionRoute(handler);

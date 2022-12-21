@@ -17,11 +17,9 @@ import { setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
 import { computeSpacePermissions } from 'lib/permissions/spaces';
 import { createProposal } from 'lib/proposal/createProposal';
 import { syncProposalPermissions } from 'lib/proposal/syncProposalPermissions';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
-import type { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -120,32 +118,6 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       },
       page.spaceId
     );
-
-    if (newPageToNotify.type === 'post') {
-      const post = await prisma.post.create({
-        data: {
-          page: {
-            connect: {
-              id: newPageToNotify.id
-            }
-          },
-          status: 'draft'
-        }
-      });
-
-      if (post) {
-        relay.broadcast(
-          {
-            type: 'post_published',
-            payload: {
-              categoryId: post.categoryId,
-              createdBy: userId
-            }
-          },
-          page.spaceId
-        );
-      }
-    }
 
     res.status(201).json(pageWithPermissions);
   } catch (error) {

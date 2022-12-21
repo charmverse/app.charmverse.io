@@ -32,6 +32,7 @@ export interface PageEventMap {
   page_suggestion_accepted: PageEvent;
   export_page_markdown: PageEvent;
   export_page_csv: PageEvent;
+  import_page_csv: PageEvent;
 }
 
 export type PageEventName = keyof PageEventMap;
