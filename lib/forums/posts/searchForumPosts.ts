@@ -43,6 +43,7 @@ export async function searchForumPosts(
   const whereQuery: Prisma.PageWhereInput = {
     type: 'post',
     spaceId,
+    deletedAt: null,
     OR: [
       {
         title: {

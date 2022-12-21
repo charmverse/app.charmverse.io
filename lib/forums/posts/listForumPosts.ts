@@ -55,8 +55,6 @@ export async function listForumPosts(
       }
     : {};
 
-  // postPropsQuery.status = 'published';
-
   const pages = await prisma.page.findMany({
     ...orderQuery,
     take: count,
@@ -64,7 +62,8 @@ export async function listForumPosts(
     where: {
       type: 'post',
       spaceId,
-      post: postPropsQuery
+      post: postPropsQuery,
+      deletedAt: null
     },
     include: {
       upDownVotes: {
