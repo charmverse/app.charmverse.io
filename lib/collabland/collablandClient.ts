@@ -105,7 +105,8 @@ export async function canJoinSpaceViaDiscord({
   try {
     const res = await fetch<CollablandUserResult>(
       // TODO: use discordUserId - currently we do not have better way of testing than using hardcoded userId
-      `${DOMAIN}/discord/${discordServerId}/member/${'646733536744833054'}`,
+      // TODO: use discordServerId - same as above
+      `${DOMAIN}/discord/${'834476259199156245'}/member/${'646733536744833054'}`,
       {
         headers: {
           Accept: 'application/json',
