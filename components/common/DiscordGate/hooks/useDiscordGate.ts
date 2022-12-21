@@ -19,8 +19,9 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
   const [joiningSpace, setJoiningSpace] = useState(false);
   const { spaces, setSpaces } = useSpaces();
 
-  const { data } = useSWR(`discord/gate/${spaceDomain}/${discordUserId || ''}`, () =>
-    charmClient.discord.checkDiscordGate(spaceDomain)
+  const { data } = useSWR(
+    spaceDomain && discordUserId ? `discord/gate/${spaceDomain}/${discordUserId || ''}` : null,
+    () => charmClient.discord.checkDiscordGate(spaceDomain)
   );
 
   async function verifyDiscordGate() {
@@ -52,7 +53,7 @@ export function useDiscordGate({ spaceDomain, onSuccess }: Props) {
   }
 
   return {
-    isLoading: !data,
+    isLoading: !!discordUserId && !data,
     discordGate: data,
     isConnectedToDiscord: !!discordUserId,
     verifyDiscordGate,

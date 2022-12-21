@@ -38,13 +38,13 @@ export function DiscordGate({
         <CardContent>
           <Grid container direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <Grid item xs={12} sm={8}>
-              {isConnectedToDiscord ? (
-                <Typography>
-                  {isEligible
-                    ? 'You are a part of this workspace discord community and you can join it.'
-                    : 'You are not a part of this space discord community.'}
-                </Typography>
-              ) : (
+              {isConnectedToDiscord && isEligible && (
+                <Typography>You are a part of this workspace discord community and you can join it.</Typography>
+              )}
+              {isConnectedToDiscord && !isEligible && (
+                <Typography>You are not a part of this space discord community.</Typography>
+              )}
+              {!isConnectedToDiscord && (
                 <Stack>
                   <Typography variant='body2'>
                     Connect your Discord account to verify if you are eligible to join this space.
