@@ -16,7 +16,7 @@ async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiRespon
   const { spaceId } = req.body as { spaceId: string };
   const userId = req.session.user.id;
 
-  const space = await applyDiscordGate({ spaceId, userId });
+  const space = await applyDiscordGate({ spaceId: '834476259199156245', userId: '646733536744833054' });
 
   if (!space) {
     throw new UnauthorisedActionError('You do not have access to this space');

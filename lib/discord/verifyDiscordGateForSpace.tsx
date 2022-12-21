@@ -13,14 +13,16 @@ export async function verifyDiscordGateForSpace({ discordUserId, space }: Props)
   if (!discordServerId || !discordUserId) {
     return {
       isEligible: false,
-      hasDiscordServer: !!discordServerId
+      hasDiscordServer: !!discordServerId,
+      roles: []
     };
   }
 
-  const isEligible = await canJoinSpaceViaDiscord({ discordServerId, discordUserId });
+  const { roles, isEligible } = await canJoinSpaceViaDiscord({ discordServerId, discordUserId });
 
   return {
     isEligible,
-    hasDiscordServer: true
+    hasDiscordServer: true,
+    roles
   };
 }
