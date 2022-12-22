@@ -1,6 +1,6 @@
 import type { LoggedInUser } from 'models';
 
-export function countConnectedIdentities(user: LoggedInUser): number {
+export function countConnectableIdentities(user: LoggedInUser): number {
   let count = 0;
 
   count += user.wallets.length;

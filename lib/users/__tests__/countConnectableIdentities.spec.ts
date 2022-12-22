@@ -1,9 +1,9 @@
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 
-import { countConnectedIdentities } from '../countConnectedIdentities';
+import { countConnectableIdentities } from '../countConnectableIdentities';
 
-describe('countConnectedIdentities', () => {
+describe('countConnectableIdentities', () => {
   it('should return the number of connected identities', async () => {
     // 0 ID
     const userWithNoIdentities = await prisma.user.create({
@@ -12,7 +12,7 @@ describe('countConnectedIdentities', () => {
       },
       include: sessionUserRelations
     });
-    let count = countConnectedIdentities(userWithNoIdentities);
+    let count = countConnectableIdentities(userWithNoIdentities);
     expect(count).toBe(0);
 
     // 1 ID
@@ -27,7 +27,7 @@ describe('countConnectedIdentities', () => {
       },
       include: sessionUserRelations
     });
-    count = countConnectedIdentities(userWithOneIdentity);
+    count = countConnectableIdentities(userWithOneIdentity);
     expect(count).toBe(1);
 
     // 2 ID
@@ -50,7 +50,7 @@ describe('countConnectedIdentities', () => {
       include: sessionUserRelations
     });
 
-    count = countConnectedIdentities(userWithTwoIdentities);
+    count = countConnectableIdentities(userWithTwoIdentities);
     expect(count).toBe(2);
 
     // 4 ID
@@ -84,7 +84,7 @@ describe('countConnectedIdentities', () => {
       },
       include: sessionUserRelations
     });
-    count = countConnectedIdentities(userWithFourIdentities);
+    count = countConnectableIdentities(userWithFourIdentities);
     expect(count).toBe(4);
 
     // 5 ID
@@ -124,7 +124,27 @@ describe('countConnectedIdentities', () => {
       },
       include: sessionUserRelations
     });
-    count = countConnectedIdentities(userWithFiveIdentities);
+    count = countConnectableIdentities(userWithFiveIdentities);
     expect(count).toBe(5);
+  });
+
+  it('should ignore Telegram as we cannot login with this identity', async () => {
+    const userWithTelegramIdentity = await prisma.user.create({
+      data: {
+        username: 'userWithOneIdentity',
+        identityType: 'Telegram',
+        telegramUser: {
+          create: {
+            account: {
+              username: 'Empty'
+            },
+            telegramId: Math.round(Math.random() * 1000000000)
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    expect(countConnectableIdentities(userWithTelegramIdentity)).toBe(0);
   });
 });

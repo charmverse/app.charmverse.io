@@ -7,6 +7,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
+import { countConnectableIdentities } from './countConnectableIdentities';
 import { getUserProfile } from './getUser';
 
 export type IdentityUpdate = {
