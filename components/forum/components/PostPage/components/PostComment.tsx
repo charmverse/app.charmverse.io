@@ -2,6 +2,7 @@ import { useTheme } from '@emotion/react';
 import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -9,6 +10,7 @@ import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PostCommentWithVote } from 'lib/forums/comments/interface';
 
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
@@ -18,7 +20,13 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
   rawText: ''
 };
 
-export function PostComment({ postId }: { postId: string }) {
+export function PostComment({
+  postId,
+  setPostComments
+}: {
+  postId: string;
+  setPostComments: KeyedMutator<PostCommentWithVote[]>;
+}) {
   const { user } = useUser();
   const theme = useTheme();
   const [postContent, setPostContent] = useState<ICharmEditorOutput>({
@@ -31,11 +39,12 @@ export function PostComment({ postId }: { postId: string }) {
   }
 
   async function createPostComment() {
-    await charmClient.forum.createPostComment(postId, {
+    const postComment = await charmClient.forum.createPostComment(postId, {
       content: postContent.doc,
       contentText: postContent.rawText,
       parentId: postId
     });
+    setPostComments((postComments) => (postComments ? [postComment, ...postComments] : [postComment]));
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
   }

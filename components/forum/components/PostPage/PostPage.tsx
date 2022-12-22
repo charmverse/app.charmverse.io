@@ -1,5 +1,6 @@
-import { Box } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
@@ -32,6 +33,9 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   const { user } = useUser();
   const [form, setForm] = useState<FormInputs>(page ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(page?.post.categoryId ?? null);
+  const { data: postComments = [], mutate: setPostComments } = useSWR(page ? `${page.id}/comments` : null, () =>
+    page ? charmClient.forum.listPostComments(page.id) : []
+  );
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -109,8 +113,13 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         </Box>
       )}
 
-      {page?.postId && <PostComment postId={page.postId} />}
-      {page?.postId && <PostCommentList postId={page.postId} />}
+      {page?.postId && <PostComment setPostComments={setPostComments} postId={page.postId} />}
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
+      {page?.postId && <PostCommentList postComments={postComments} />}
     </Container>
   );
 }
