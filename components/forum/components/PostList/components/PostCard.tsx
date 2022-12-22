@@ -97,6 +97,7 @@ export function PostCard({
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
+        component='div'
         onClick={() => {
           showPost({
             postId,
