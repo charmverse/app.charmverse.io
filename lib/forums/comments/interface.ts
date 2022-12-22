@@ -13,6 +13,10 @@ export type PostCommentWithVote = PageComment & {
   upvoted: null | boolean;
 };
 
+export type PostCommentWithVoteAndChildren = PostCommentWithVote & {
+  children: PostCommentWithVoteAndChildren[];
+};
+
 export type CreatePostCommentInput = {
   content: PageContent;
   contentText: string;

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import type { PostCommentVote, PostCommentWithVote } from 'lib/forums/comments/interface';
+import type { PostCommentVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { relativeTime } from 'lib/utilities/dates';
 import type { PageContent } from 'models';
 
@@ -12,7 +12,7 @@ import { ForumVote } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
-export function PostComment({ comment }: { comment: PostCommentWithVote }) {
+export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildren }) {
   const [postComment, setPostComment] = useState(comment);
   const [showCommentReply, setShowCommentReply] = useState(false);
 
@@ -98,6 +98,9 @@ export function PostComment({ comment }: { comment: PostCommentWithVote }) {
             />
           )}
         </Box>
+        {postComment.children.map((childComment) => (
+          <PostComment comment={childComment} key={childComment.id} />
+        ))}
       </Box>
     </Stack>
   );

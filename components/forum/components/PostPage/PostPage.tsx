@@ -1,5 +1,5 @@
 import { Box, Divider, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -9,6 +9,7 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { PageContent } from 'models/Page';
 
@@ -86,6 +87,22 @@ export function PostPage({ page, spaceId, onSave }: Props) {
     disabledTooltip = 'Category is required';
   }
 
+  const topLevelComments = useMemo(() => {
+    const postCommentsRecord: Record<string, PostCommentWithVoteAndChildren> = {};
+    postComments.forEach((postComment) => {
+      postCommentsRecord[postComment.id] = {
+        ...postComment,
+        children: []
+      };
+    });
+    postComments.forEach((postComment) => {
+      if (postComment.parentId !== page?.id) {
+        postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
+      }
+    });
+    return Object.values(postCommentsRecord).filter((comment) => comment.parentId === page?.id);
+  }, [postComments, page]);
+
   return (
     <Container top={50}>
       <Box minHeight={300}>
@@ -120,7 +137,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         }}
       />
       <Stack gap={2}>
-        {postComments.map((comment) => (
+        {topLevelComments.map((comment) => (
           <PostComment comment={comment} key={comment.id} />
         ))}
       </Stack>
