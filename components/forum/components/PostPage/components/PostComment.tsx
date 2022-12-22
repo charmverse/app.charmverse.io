@@ -24,6 +24,7 @@ export function PostComment({ postId }: { postId: string }) {
   const [postContent, setPostContent] = useState<ICharmEditorOutput>({
     ...defaultCharmEditorOutput
   });
+  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
 
   function updatePostContent(updatedContent: ICharmEditorOutput) {
     setPostContent(updatedContent);
@@ -35,6 +36,8 @@ export function PostComment({ postId }: { postId: string }) {
       contentText: postContent.rawText,
       parentId: postId
     });
+    setPostContent({ ...defaultCharmEditorOutput });
+    setEditorKey((key) => key + 1);
   }
 
   if (!user) {
@@ -49,6 +52,7 @@ export function PostComment({ postId }: { postId: string }) {
           style={{
             backgroundColor: theme.palette.background.light
           }}
+          key={editorKey}
           content={postContent.doc}
           onContentChange={updatePostContent}
           placeholderText='Add comment to post...'
