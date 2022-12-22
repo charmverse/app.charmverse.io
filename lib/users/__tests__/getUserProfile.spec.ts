@@ -21,7 +21,7 @@ beforeAll(async () => {
       },
       googleAccounts: {
         create: {
-          email: 'test5@example.com',
+          email: `test-${v4()}test5@example.com`,
           name: 'test user',
           avatarUrl: 'https://example.com/avatar.png'
         }

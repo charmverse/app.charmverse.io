@@ -67,7 +67,8 @@ describe('updateUserProfile', () => {
 
     const update: Partial<User> = {
       identityType: 'Google',
-      username: googleAccount.name
+      username: googleAccount.name,
+      avatar: googleAccount.avatarUrl
     };
 
     const updatedUser = await updateUserProfile(user.id, update);
