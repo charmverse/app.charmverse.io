@@ -33,7 +33,7 @@ describe('updateForumPost', () => {
       categoryId: category1.id
     });
 
-    const droppedPageUpdate: Partial<Page> = {
+    const droppedPageUpdate = {
       createdAt: new Date(),
       deletedAt: new Date(),
       postId: v4(),
@@ -41,12 +41,12 @@ describe('updateForumPost', () => {
       path: `new-path-${v4()}`
     };
 
-    const droppedPostUpdate: Partial<Post> = {
+    const droppedPostUpdate = {
       locked: true,
       pinned: true
     };
 
-    const pageUpdate: Partial<Page> = {
+    const pageUpdate = {
       content: { type: 'doc', content: [] } as any,
       contentText: 'New content text',
       title: 'New post title'
@@ -68,30 +68,22 @@ describe('updateForumPost', () => {
       postId: createdPage.id,
       userId: user.id
     });
-    const updatedForumPost = await getForumPost({ pageId: createdPage.id, userId: '' });
 
-    // ---------------------- Make sure data was preserved ----------------------
-    typedKeys(droppedPageUpdate).forEach((key) => {
-      // Change not passed through
-      expect(updatedForumPost[key]).not.toEqual(droppedPageUpdate[key]);
-      // Old data still present
-      expect(updatedForumPost[key]).toEqual(createdPage[key]);
+    const updatedPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: createdPage.id
+      },
+      include: {
+        post: true
+      }
     });
 
-    typedKeys(droppedPostUpdate).forEach((key) => {
-      // Change not passed through
-      expect(updatedForumPost.post[key]).not.toEqual(droppedPostUpdate[key]);
-      // Old data still present
-      expect(updatedForumPost.post[key]).toEqual(createdPage.post[key]);
-    });
-
-    // ---------------------- Make sure new data is present ----------------------
     typedKeys(pageUpdate).forEach((key) => {
-      expect(updatedForumPost[key]).toEqual(pageUpdate[key]);
+      expect(updatedPage[key]).toEqual(pageUpdate[key]);
     });
 
     typedKeys(postUpdate).forEach((key) => {
-      expect(updatedForumPost.post[key]).toEqual(postUpdate[key]);
+      expect(updatedPage.post?.[key]).toEqual(postUpdate[key]);
     });
   });
 

@@ -23,7 +23,7 @@ type Props = {
 type FormInputs = {
   title: string;
   content: any | null;
-  contentText: string;
+  contentText?: string;
   id?: string;
 };
 
@@ -51,7 +51,7 @@ export function PostPage(props: Props) {
       await charmClient.forum.createForumPost({
         categoryId,
         content: form.content,
-        contentText: form.contentText,
+        contentText: form.contentText ?? '',
         spaceId: props.spaceId,
         title: form.title
       });

@@ -52,9 +52,7 @@ describe('POST /api/forums/posts - Create a post', () => {
     expect(post).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
         id: expect.any(String),
-        postId: expect.any(String),
         content: expect.any(Object),
-        contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
           pinned: false

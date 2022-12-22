@@ -1,8 +1,10 @@
+import type { Page } from '@prisma/client';
+
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 
 import { getPostVoteSummary } from './getPostMeta';
-import type { ForumPostPageWithVotes } from './interfaces';
+import type { ForumPostPageWithVotes, PageValues } from './interfaces';
 
 export async function getForumPost({
   pageId,
@@ -28,13 +30,22 @@ export async function getForumPost({
     throw new PageNotFoundError(pageId);
   }
 
-  const { post, upDownVotes, ...page } = forumPage;
-
-  const votes = getPostVoteSummary(upDownVotes, userId);
-
   return {
-    ...page,
-    post,
-    votes
+    ...selectPageValues(forumPage),
+    post: forumPage.post,
+    votes: getPostVoteSummary(forumPage.upDownVotes, userId)
+  };
+}
+
+// since we can't do the select in the query, we have to do it here
+export function selectPageValues(page: Page): PageValues {
+  return {
+    id: page.id,
+    title: page.title,
+    content: page.content,
+    createdAt: page.createdAt.toString(),
+    createdBy: page.createdBy,
+    spaceId: page.spaceId,
+    updatedAt: page.updatedAt.toString()
   };
 }
