@@ -23,3 +23,5 @@ export type UpdatePostCommentInput = {
   content: PageContent;
   contentText: string;
 };
+
+export type PostCommentVote = { upvotes: number; downvotes: number; upvoted?: boolean };

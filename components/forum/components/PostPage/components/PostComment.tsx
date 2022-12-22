@@ -1,81 +1,81 @@
-import { useTheme } from '@emotion/react';
-import { Stack } from '@mui/material';
-import { Box } from '@mui/system';
-import { useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import { Box, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
-import Button from 'components/common/Button';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
-import { useUser } from 'hooks/useUser';
-import type { PostCommentWithVote } from 'lib/forums/comments/interface';
+import type { PostCommentVote, PostCommentWithVote } from 'lib/forums/comments/interface';
+import { relativeTime } from 'lib/utilities/dates';
+import type { PageContent } from 'models';
 
-const defaultCharmEditorOutput: ICharmEditorOutput = {
-  doc: {
-    type: 'doc',
-    content: [{ type: 'paragraph', content: [] }]
-  },
-  rawText: ''
-};
+import { ForumVote } from '../../ForumVote';
 
-export function PostComment({
-  postId,
-  setPostComments
-}: {
-  postId: string;
-  setPostComments: KeyedMutator<PostCommentWithVote[]>;
-}) {
-  const { user } = useUser();
-  const theme = useTheme();
-  const [postContent, setPostContent] = useState<ICharmEditorOutput>({
-    ...defaultCharmEditorOutput
-  });
-  const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
+export function PostComment({ comment }: { comment: PostCommentWithVote }) {
+  const [postComment, setPostComment] = useState(comment);
 
-  function updatePostContent(updatedContent: ICharmEditorOutput) {
-    setPostContent(updatedContent);
-  }
+  useEffect(() => {
+    setPostComment(comment);
+  }, [comment]);
 
-  async function createPostComment() {
-    const postComment = await charmClient.forum.createPostComment(postId, {
-      content: postContent.doc,
-      contentText: postContent.rawText,
-      parentId: postId
+  async function voteComment(newUpvotedStatus?: boolean) {
+    await charmClient.forum.voteComment({
+      postId: postComment.pageId,
+      commentId: postComment.id,
+      upvoted: newUpvotedStatus
     });
-    setPostComments((postComments) => (postComments ? [postComment, ...postComments] : [postComment]));
-    setPostContent({ ...defaultCharmEditorOutput });
-    setEditorKey((key) => key + 1);
-  }
 
-  if (!user) {
-    return null;
+    const postCommentVote: PostCommentVote = {
+      downvotes: postComment.downvotes,
+      upvotes: postComment.upvotes,
+      upvoted: newUpvotedStatus
+    };
+
+    if (newUpvotedStatus === true) {
+      postCommentVote.upvotes += 1;
+      if (postComment.upvoted === false) {
+        postCommentVote.downvotes -= 1;
+      }
+    } else if (newUpvotedStatus === false) {
+      postCommentVote.downvotes += 1;
+      if (postComment.upvoted === true) {
+        postCommentVote.upvotes -= 1;
+      }
+    } else if (postComment.upvoted === true) {
+      postCommentVote.upvotes -= 1;
+    } else {
+      postCommentVote.downvotes -= 1;
+    }
+
+    setPostComment({
+      ...postComment,
+      ...postCommentVote
+    });
   }
 
   return (
-    <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row'>
-        <Avatar avatar={user.avatar} variant='circular' />
+    <Stack my={1}>
+      <Stack flexDirection='row' gap={1} alignItems='center'>
+        <Avatar size='small' avatar={postComment.user.avatar} />
+        <Typography>{postComment.user.username}</Typography>
+        <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
+      </Stack>
+      <Box ml={3}>
         <InlineCharmEditor
           style={{
-            backgroundColor: theme.palette.background.light
+            paddingTop: 0,
+            paddingBottom: 0
           }}
-          key={editorKey}
-          content={postContent.doc}
-          onContentChange={updatePostContent}
-          placeholderText='Add comment to post...'
+          focusOnInit={false}
+          readOnly
+          content={postComment.content as PageContent}
+        />
+        <ForumVote
+          downvotes={postComment.downvotes}
+          upvotes={postComment.upvotes}
+          vote={voteComment}
+          upvoted={postComment.upvoted}
         />
       </Box>
-      <Button
-        sx={{
-          alignSelf: 'flex-end'
-        }}
-        disabled={!postContent.rawText}
-        onClick={createPostComment}
-      >
-        Comment
-      </Button>
     </Stack>
   );
 }

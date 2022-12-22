@@ -79,6 +79,10 @@ export class ForumApi {
     return http.PUT(`/api/forums/posts/${postId}/vote`, { upvoted });
   }
 
+  voteComment({ postId, upvoted, commentId }: { commentId: string; upvoted?: boolean; postId: string }) {
+    return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}/vote`, { upvoted });
+  }
+
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {
     return http.DELETE(`/api/forums/posts/${postId}/comments/${commentId}`);
   }

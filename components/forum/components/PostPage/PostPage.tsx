@@ -1,4 +1,4 @@
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { useState } from 'react';
 import useSWR from 'swr';
 
@@ -14,7 +14,7 @@ import type { PageContent } from 'models/Page';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
-import { PostCommentList } from './components/PostCommentList';
+import { PostCommentForm } from './components/PostCommentForm';
 
 type Props = {
   spaceId: string;
@@ -113,13 +113,17 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         </Box>
       )}
 
-      {page?.postId && <PostComment setPostComments={setPostComments} postId={page.postId} />}
+      {page?.postId && <PostCommentForm setPostComments={setPostComments} postId={page.postId} />}
       <Divider
         sx={{
           my: 2
         }}
       />
-      {page?.postId && <PostCommentList postComments={postComments} />}
+      <Stack gap={2}>
+        {postComments.map((comment) => (
+          <PostComment comment={comment} key={comment.id} />
+        ))}
+      </Stack>
     </Container>
   );
 }

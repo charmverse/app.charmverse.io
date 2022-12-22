@@ -5,16 +5,16 @@ import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { MouseEvent } from 'react';
 
-export function PostVote({
+export function ForumVote({
   downvotes,
   upvotes,
   upvoted,
-  votePost
+  vote: _vote
 }: {
-  upvoted?: boolean;
+  upvoted?: boolean | null;
   upvotes: number;
   downvotes: number;
-  votePost: (upvoted?: boolean) => void;
+  vote: (upvoted?: boolean) => void;
 }) {
   const theme = useTheme();
 
@@ -22,9 +22,9 @@ export function PostVote({
     e.preventDefault();
     e.stopPropagation();
     if (upvoted === newUpvotedStatus) {
-      votePost(undefined);
+      _vote(undefined);
     } else {
-      votePost(newUpvotedStatus);
+      _vote(newUpvotedStatus);
     }
   }
 

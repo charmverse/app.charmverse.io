@@ -17,7 +17,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { PostVote } from './PostVote';
+import { ForumVote } from '../../ForumVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
@@ -131,7 +131,7 @@ export function PostCard({
                 {relativeTime}
               </Box>
             </Stack>
-            <PostVote votePost={votePost} {...pagePost} />
+            <ForumVote vote={votePost} {...pagePost} />
           </Box>
         </CardContent>
       </CardActionArea>
