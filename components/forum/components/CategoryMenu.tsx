@@ -23,9 +23,8 @@ const StyledBox = styled(Box)`
 `;
 
 function ForumFilterListLink({ category, label }: { label: string; category?: PostCategory }) {
-  const { deleteForumCategory, updateForumCategory } = useForumCategories();
+  const { deleteForumCategory, updateForumCategory, currentCategory } = useForumCategories();
   const router = useRouter();
-  const selectedCategory = router.query.categoryId as string;
   const admin = isAdmin();
 
   return (
@@ -51,7 +50,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
           sx={{
             color: 'text.primary'
           }}
-          fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
+          fontWeight={(category ? currentCategory?.id === category.id : !currentCategory?.id) ? 'bold' : 'initial'}
         >
           {label}
         </Typography>
@@ -70,11 +69,10 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
 }
 
 export function CategoryMenu() {
-  const { categories, error } = useForumCategories();
+  const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
   const [forumCategoryName, setForumCategoryName] = useState('');
-  const { createForumCategory } = useForumCategories();
 
   function createCategory() {
     createForumCategory(forumCategoryName);
