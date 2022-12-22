@@ -74,6 +74,7 @@ export function PostCard({ post, user }: ForumPostProps) {
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
+        component='div'
         onClick={() => {
           showPost({
             postId,
