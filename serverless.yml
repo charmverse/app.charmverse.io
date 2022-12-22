@@ -39,8 +39,10 @@ constructs:
         Properties:
           # Using predictable queue names, allows us to be consistent across every deployments
           # We can use branch names as stages, so each deployed env can have their own queue
-          QueueName: charmverse-fifo-queue-${sls:stage}
+          QueueName: charmverse-serverless-queue-${sls:stage}.fifo
 
 provider:
   name: aws
   runtime: nodejs14.x
+  deploymentMethod: direct
+
