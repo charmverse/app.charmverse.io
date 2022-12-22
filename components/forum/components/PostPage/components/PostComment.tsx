@@ -1,10 +1,18 @@
 import { useTheme } from '@emotion/react';
-import { Box, Stack, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import Button from 'components/common/Button';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useUser } from 'hooks/useUser';
 import type { PostCommentVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { relativeTime } from 'lib/utilities/dates';
 import type { PageContent } from 'models';
@@ -13,13 +21,58 @@ import { ForumVote } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
+const StyledStack = styled(Stack)`
+  &:hover .comment-actions {
+    transition: opacity 150ms ease-in-out;
+    opacity: 1;
+  }
+
+  & .comment-actions {
+    transition: opacity 150ms ease-in-out;
+    opacity: 0;
+  }
+`;
+
 export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildren }) {
   const [postComment, setPostComment] = useState(comment);
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
+  const { user } = useUser();
+  const [isEditingComment, setIsEditingComment] = useState(false);
+  const [commentContent, setCommentContent] = useState<ICharmEditorOutput>({
+    doc: comment.content as PageContent,
+    rawText: ''
+  });
+  const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
+
+  async function onClickEditComment() {
+    setIsEditingComment(true);
+    menuState.close();
+  }
+
+  async function updateCommentContent(content: ICharmEditorOutput) {
+    if (isEditingComment) {
+      setCommentContent({
+        doc: content.doc,
+        rawText: content.rawText
+      });
+    }
+  }
+
   useEffect(() => {
     setPostComment(comment);
   }, [comment]);
+
+  async function saveCommentContent() {
+    await charmClient.forum.updatePostComment({
+      commentId: comment.id,
+      content: commentContent.doc,
+      contentText: commentContent.rawText,
+      postId: comment.pageId
+    });
+  }
+
+  async function onClickDeleteComment() {}
 
   async function voteComment(newUpvotedStatus?: boolean) {
     await charmClient.forum.voteComment({
@@ -58,20 +111,33 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
 
   return (
     <Stack my={1}>
-      <Stack flexDirection='row' gap={1} alignItems='center'>
-        <Avatar size='small' avatar={postComment.user.avatar} />
-        <Typography>{postComment.user.username}</Typography>
-        <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
-      </Stack>
+      <StyledStack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <Avatar size='small' avatar={postComment.user.avatar} />
+          <Typography>{postComment.user.username}</Typography>
+          <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
+        </Stack>
+        {comment.createdBy === user?.id && (
+          <IconButton
+            className='comment-actions'
+            size='small'
+            onClick={(event) => {
+              menuState.open(event.currentTarget);
+            }}
+          >
+            <MoreHorizIcon fontSize='small' />
+          </IconButton>
+        )}
+      </StyledStack>
       <Box ml={3} position='relative'>
         <Box
           sx={{
-            height: '100%',
+            height: 'calc(100% - 24px)',
             width: 2.5,
             position: 'absolute',
             backgroundColor: theme.palette.background.light,
             left: -13.5,
-            top: 8
+            top: 10
           }}
         />
         <InlineCharmEditor
@@ -80,9 +146,11 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
             paddingBottom: 0
           }}
           focusOnInit={false}
-          readOnly
-          content={postComment.content as PageContent}
+          readOnly={!isEditingComment}
+          onContentChange={updateCommentContent}
+          content={commentContent.doc}
         />
+        {isEditingComment && <Button onClick={saveCommentContent}>Save</Button>}
         <Stack flexDirection='row' gap={1}>
           <ForumVote
             downvotes={postComment.downvotes}
@@ -113,6 +181,25 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
           <PostComment comment={childComment} key={childComment.id} />
         ))}
       </Box>
+      <Menu
+        {...bindMenu(menuState)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MenuItem onClick={onClickEditComment}>
+          <ListItemIcon>
+            <EditIcon />
+          </ListItemIcon>
+          <ListItemText>Edit comment</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={onClickDeleteComment}>
+          <ListItemIcon>
+            <DeleteOutlinedIcon />
+          </ListItemIcon>
+          <ListItemText>Delete comment</ListItemText>
+        </MenuItem>
+      </Menu>
     </Stack>
   );
 }
