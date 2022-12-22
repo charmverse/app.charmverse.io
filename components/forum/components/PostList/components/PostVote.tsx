@@ -35,6 +35,7 @@ export function PostVote({
         onClick={(e) => {
           vote(e, true);
         }}
+        component='span'
       >
         <NorthIcon
           sx={{
@@ -53,6 +54,7 @@ export function PostVote({
         onClick={(e) => {
           vote(e, false);
         }}
+        component='span'
       >
         <SouthIcon
           sx={{

@@ -15,7 +15,7 @@ export type FilterProps = {
   sort?: any;
 };
 
-export function CategorySelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+export function CategorySelect({ categoryIdSelected, selectedCategory = 'all-category' }: FilterProps) {
   const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
@@ -49,7 +49,7 @@ export function CategorySelect({ categoryIdSelected, selectedCategory = 'none' }
       </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
+          value={!selectedCategory || selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
           onChange={(e) => {
             categoryIdSelected(e.target.value);
           }}
