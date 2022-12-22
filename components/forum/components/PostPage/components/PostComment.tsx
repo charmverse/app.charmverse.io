@@ -41,39 +41,35 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
   const [isEditingComment, setIsEditingComment] = useState(false);
   const [commentContent, setCommentContent] = useState<ICharmEditorOutput>({
     doc: comment.content as PageContent,
-    rawText: ''
+    rawText: comment.contentText
   });
-  const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
-
-  async function onClickEditComment() {
-    setIsEditingComment(true);
-    menuState.close();
-  }
-
-  async function updateCommentContent(content: ICharmEditorOutput) {
-    if (isEditingComment) {
-      setCommentContent({
-        doc: content.doc,
-        rawText: content.rawText
-      });
-    }
-  }
-
-  useEffect(() => {
-    setPostComment(comment);
-  }, [comment]);
+  const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
 
   async function saveCommentContent() {
     await charmClient.forum.updatePostComment({
       commentId: comment.id,
-      content: commentContent.doc,
-      contentText: commentContent.rawText,
+      content: commentEditContent.doc,
+      contentText: commentEditContent.rawText,
       postId: comment.pageId
     });
+    setCommentContent(commentEditContent);
     setIsEditingComment(false);
   }
 
-  async function onClickDeleteComment() {}
+  async function updateCommentContent(content: ICharmEditorOutput) {
+    setCommentEditContent(content);
+  }
+
+  function cancelEditingComment() {
+    setIsEditingComment(false);
+    setCommentEditContent(commentContent);
+  }
+
+  const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
+
+  useEffect(() => {
+    setPostComment(comment);
+  }, [comment]);
 
   async function voteComment(newUpvotedStatus?: boolean) {
     await charmClient.forum.voteComment({
@@ -110,12 +106,9 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
     });
   }
 
-  function cancelEditingComment() {
-    setIsEditingComment(false);
-    setCommentContent({
-      doc: comment.content as PageContent,
-      rawText: ''
-    });
+  function onClickEditComment() {
+    setIsEditingComment(true);
+    menuState.close();
   }
 
   return (
@@ -149,26 +142,37 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
             top: 10
           }}
         />
-        <InlineCharmEditor
-          style={{
-            paddingTop: 0,
-            paddingBottom: 0
-          }}
-          focusOnInit={false}
-          readOnly={!isEditingComment}
-          key={isEditingComment.toString()}
-          onContentChange={updateCommentContent}
-          content={commentContent.doc}
-        />
-        {isEditingComment && (
-          <Stack flexDirection='row' my={1} ml={1} gap={1}>
-            <Button size='small' onClick={saveCommentContent}>
-              Save
-            </Button>
-            <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
-              Cancel
-            </Button>
-          </Stack>
+        {isEditingComment ? (
+          <>
+            <InlineCharmEditor
+              style={{
+                paddingTop: 0,
+                paddingBottom: 0,
+                backgroundColor: theme.palette.background.light
+              }}
+              focusOnInit
+              onContentChange={updateCommentContent}
+              content={commentEditContent.doc}
+            />
+            <Stack flexDirection='row' my={1} ml={1} gap={1}>
+              <Button size='small' onClick={saveCommentContent}>
+                Save
+              </Button>
+              <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
+                Cancel
+              </Button>
+            </Stack>
+          </>
+        ) : (
+          <InlineCharmEditor
+            style={{
+              paddingTop: 0,
+              paddingBottom: 0
+            }}
+            readOnly
+            key={isEditingComment.toString()}
+            content={commentContent.doc}
+          />
         )}
         <Stack flexDirection='row' gap={1}>
           <ForumVote
@@ -212,7 +216,7 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
           </ListItemIcon>
           <ListItemText>Edit comment</ListItemText>
         </MenuItem>
-        <MenuItem onClick={onClickDeleteComment}>
+        <MenuItem>
           <ListItemIcon>
             <DeleteOutlinedIcon />
           </ListItemIcon>

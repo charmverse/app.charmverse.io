@@ -2,7 +2,6 @@ import { useTheme } from '@emotion/react';
 import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
-import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
