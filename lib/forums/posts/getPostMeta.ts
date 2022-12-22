@@ -1,6 +1,6 @@
 import type { Page, PageUpDownVote } from '@prisma/client';
 
-import { extractSummaryNode } from 'lib/prosemirror/extractSummary';
+import { extractSummary } from 'lib/prosemirror/extractSummary';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ForumPostMeta, ForumVotes } from './interfaces';
@@ -31,7 +31,7 @@ export function getPostMeta({ page, userId }: { page: PageWithRelations; userId:
     categoryId: post.categoryId,
     id: page.id,
     title: page.title,
-    summary: extractSummaryNode(page.content as PageContent),
+    summary: extractSummary(page.content as PageContent),
     updatedAt: page.updatedAt.toString(),
     votes: getPostVoteSummary(upDownVotes, userId)
   };

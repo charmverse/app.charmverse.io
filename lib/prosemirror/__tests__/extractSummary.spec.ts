@@ -1,7 +1,7 @@
-import { extractSummaryNode } from '../extractSummary';
+import { extractSummary } from '../extractSummary';
 import type { PageContent } from '../interfaces';
 
-describe('extractSummaryHtml()', () => {
+describe('extractSummary()', () => {
   it('Should extract first few text blocks', () => {
     const doc: PageContent = {
       type: 'doc',
@@ -28,7 +28,7 @@ describe('extractSummaryHtml()', () => {
         { type: 'paragraph', content: [{ text: 'Some paragraph text', type: 'text' }] }
       ]
     };
-    const result = extractSummaryNode(doc);
+    const result = extractSummary(doc);
     expect(result).toEqual('');
   });
 
@@ -48,7 +48,7 @@ describe('extractSummaryHtml()', () => {
         }
       ]
     };
-    const result = extractSummaryNode(doc);
+    const result = extractSummary(doc);
     expect(result).toEqual('');
   });
 });
