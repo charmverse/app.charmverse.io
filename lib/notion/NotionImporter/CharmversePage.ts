@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
