@@ -83,7 +83,7 @@ export async function addPage({
 
   await mutate(
     getPagesListCacheKey(spaceId),
-    (pages: Record<string, Page>) => {
+    (pages: Record<string, Page> | undefined) => {
       return { ...pages, [newPage.id]: newPage };
     },
     {
