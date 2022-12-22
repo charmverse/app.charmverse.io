@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -15,7 +16,7 @@ import { CommentReplyForm } from './CommentReplyForm';
 export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildren }) {
   const [postComment, setPostComment] = useState(comment);
   const [showCommentReply, setShowCommentReply] = useState(false);
-
+  const theme = useTheme();
   useEffect(() => {
     setPostComment(comment);
   }, [comment]);
@@ -62,7 +63,17 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
         <Typography>{postComment.user.username}</Typography>
         <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
       </Stack>
-      <Box ml={3}>
+      <Box ml={3} position='relative'>
+        <Box
+          sx={{
+            height: '100%',
+            width: 2.5,
+            position: 'absolute',
+            backgroundColor: theme.palette.background.light,
+            left: -13.5,
+            top: 8
+          }}
+        />
         <InlineCharmEditor
           style={{
             paddingTop: 0,

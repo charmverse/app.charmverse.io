@@ -136,7 +136,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
           my: 2
         }}
       />
-      <Stack gap={2}>
+      <Stack gap={1}>
         {topLevelComments.map((comment) => (
           <PostComment comment={comment} key={comment.id} />
         ))}
