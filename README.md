@@ -171,6 +171,27 @@ SELECT started_at,migration_name FROM "_prisma_migrations" ORDER BY "started_at"
 
 ```
 
+### Get access to AWS resources:
+
+Get on Twingate to use the ZeroTrust network to get access to AWS. 
+
+- Download the Twingate client here: https://www.twingate.com/download
+- Install client
+- When prompted with "Connect to a Network", type in "charmverse.twingate.com"
+- Client will then forward you to Google auth page. If asked to grant twingate access to your google account please do so. 
+- Your Client is now properly configured to connect to resources behind AWS. 
+
+To test your connection:
+
+Use your favorite database client and connect to stg postgres at URL hostname 
+
+`stg-app-charmverse-io.ckvazun0eddr.us-east-1.rds.amazonaws.com`
+
+or cmdline
+
+`psql -h stg-app-charmverse-io.ckvazun0eddr.us-east-1.rds.amazonaws.com -U charmverse`
+
+
 ### Web Sockets
 Real-time features including the content editor for pages relies on a web socket service. It depends on socket.io.
 
@@ -349,4 +370,5 @@ Should/when Secrets Manager template variable placeholder becomes supported in E
 
 Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit 
 `.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
+
 
