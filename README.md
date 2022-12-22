@@ -191,6 +191,7 @@ or cmdline
 
 `psql -h stg-app-charmverse-io.ckvazun0eddr.us-east-1.rds.amazonaws.com -U charmverse`
 
+For a longer version of this Twingate docs: https://app.charmverse.io/charmverse/page-7001517083591569
 
 ### Web Sockets
 Real-time features including the content editor for pages relies on a web socket service. It depends on socket.io.
