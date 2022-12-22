@@ -281,7 +281,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     font-size: 85%;
     height: fit-content;
     tab-size: 4;
-    caret-color: ${({ theme }) => (theme.palette.mode === 'dark' ? 'white' : 'black')};
+    caret-color: var(--primary-text);
   }
   pre code {
     color: inherit;
