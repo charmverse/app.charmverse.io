@@ -8,10 +8,10 @@ const summaryBlockTypes = ['image', 'tweet', 'video'];
 const textParagrahLimit = 3;
 
 // extract the first interesting node of a post
-export function extractSummary(doc: PageContent): PageContent | null {
+export function extractSummary(doc: PageContent): PageContent {
   const node = getNodeFromJson(doc);
   const nodes = extractBlockSummary(node) || extractTextSummary(node);
-  return createJSON(nodes);
+  return createDocument(nodes);
 }
 
 function extractBlockSummary(doc: Node): Node | null {
@@ -47,7 +47,7 @@ function extractTextSummary(doc: Node): Node[] {
   return textNodes;
 }
 
-function createJSON(node: Node[] | Node): PageContent | null {
+function createDocument(node: Node[] | Node): PageContent {
   const nodes = Array.isArray(node) ? node : [node];
   return nodes[0].type.schema.node('doc', null, nodes).toJSON();
 }
