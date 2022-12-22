@@ -7,9 +7,15 @@ package:
   individually: true
 
 plugins:
+  # This plugins allows to use TS
+  - serverless-esbuild
+  # This plugins gives superpowers to serverless and allows us to deploy SQS queues easily
   - serverless-lift
-  - serverless-plugin-typescript
-  - serverless-plugin-optimize
+
+custom:
+  esbuild:
+    watch:
+      pattern: ['serverless/**/*.ts'] # match only typescript files in serverless directory
 
 # This uses the lift plugin to generate our SQS setup in AWS
 # Based on https://github.com/getlift/lift/blob/master/docs/queue.md
@@ -22,6 +28,12 @@ constructs:
     worker:
       # Function responsible for handle messages in the queue
       handler: serverless/handler.webhookWorker
+    extensions:
+      queue:
+        Properties:
+          # Using predictable queue names, allows us to be consistent across every deployments
+          # We can use branch names as stages, so each deployed env can have their own queue
+          QueueName: charmverse-fifo-queue-${sls:stage}
 
 provider:
   name: aws

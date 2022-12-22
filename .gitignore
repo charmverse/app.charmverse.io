@@ -5,6 +5,7 @@ jspm_packages
 
 # Serverless directories
 .serverless
+.build
 
 # next.js
 /.next/
