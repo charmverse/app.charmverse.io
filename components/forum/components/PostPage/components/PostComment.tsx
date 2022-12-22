@@ -10,8 +10,11 @@ import type { PageContent } from 'models';
 
 import { ForumVote } from '../../ForumVote';
 
+import { CommentReplyForm } from './CommentReplyForm';
+
 export function PostComment({ comment }: { comment: PostCommentWithVote }) {
   const [postComment, setPostComment] = useState(comment);
+  const [showCommentReply, setShowCommentReply] = useState(false);
 
   useEffect(() => {
     setPostComment(comment);
@@ -69,12 +72,32 @@ export function PostComment({ comment }: { comment: PostCommentWithVote }) {
           readOnly
           content={postComment.content as PageContent}
         />
-        <ForumVote
-          downvotes={postComment.downvotes}
-          upvotes={postComment.upvotes}
-          vote={voteComment}
-          upvoted={postComment.upvoted}
-        />
+        <Stack flexDirection='row' gap={1}>
+          <ForumVote
+            downvotes={postComment.downvotes}
+            upvotes={postComment.upvotes}
+            vote={voteComment}
+            upvoted={postComment.upvoted}
+          />
+          <Typography
+            sx={{
+              cursor: 'pointer'
+            }}
+            onClick={() => setShowCommentReply(true)}
+          >
+            Reply
+          </Typography>
+        </Stack>
+        <Box mt={2}>
+          {showCommentReply && (
+            <CommentReplyForm
+              commentId={comment.id}
+              onCreateComment={() => {}}
+              onCancelComment={() => setShowCommentReply(false)}
+              postId={comment.pageId}
+            />
+          )}
+        </Box>
       </Box>
     </Stack>
   );

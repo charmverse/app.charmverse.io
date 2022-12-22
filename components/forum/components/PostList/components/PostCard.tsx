@@ -123,13 +123,6 @@ export function PostCard({
                 fontSize='medium'
                 sx={{ '> p': { display: { xs: 'none', sm: 'block' } } }}
               />
-              {/** Re-enable this once we have a number of comments
-                 <Box display='flex' alignItems='center' padding='0 15px'>
-                  <MessageOutlined fontSize='small' sx={{ pr: '5px' }} />
-                  {commentsNumber}
-                </Box>
-              */}
-
               <Stack flexDirection='row' gap={0.5} alignItems='center'>
                 <AccessTimeIcon fontSize='small' />
                 <Typography variant='body2'>{relativeTime}</Typography>
