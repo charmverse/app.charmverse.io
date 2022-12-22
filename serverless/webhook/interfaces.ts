@@ -1,3 +1,5 @@
+import type { Space } from '@prisma/client';
+
 export type UserEntity = {
   avatar: string;
   id: string;
@@ -105,6 +107,7 @@ export type WebhookEvent<T = WebhookEventNames> =
 export type WebhookPayload<T = WebhookEventNames> = {
   createdAt: string;
   event: WebhookEvent<T>;
+  spaceId: Space['id'];
   // resource: {
   //   id: string;
   //   type: T;

@@ -4,6 +4,12 @@ frameworkVersion: '3'
 
 # Create an optimized package for our functions
 package:
+  patterns:
+    # Ensure we only includes usefull prisma libs
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
   individually: true
 
 plugins:
