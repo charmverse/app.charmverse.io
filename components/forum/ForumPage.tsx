@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
@@ -67,11 +67,13 @@ export default function ForumPage() {
     }
   }, [router.query.pageId]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
+  const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
 
-  const debounceSearch = debounce(handleChange, 400);
+  useEffect(() => {
+    return () => {
+      debounceSearch.cancel();
+    };
+  }, [debounceSearch]);
 
   return (
     <CenteredPageContent>
