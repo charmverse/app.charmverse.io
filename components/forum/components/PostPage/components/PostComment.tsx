@@ -70,6 +70,7 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
       contentText: commentContent.rawText,
       postId: comment.pageId
     });
+    setIsEditingComment(false);
   }
 
   async function onClickDeleteComment() {}
@@ -106,6 +107,14 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
     setPostComment({
       ...postComment,
       ...postCommentVote
+    });
+  }
+
+  function cancelEditingComment() {
+    setIsEditingComment(false);
+    setCommentContent({
+      doc: comment.content as PageContent,
+      rawText: ''
     });
   }
 
@@ -147,10 +156,20 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
           }}
           focusOnInit={false}
           readOnly={!isEditingComment}
+          key={isEditingComment.toString()}
           onContentChange={updateCommentContent}
           content={commentContent.doc}
         />
-        {isEditingComment && <Button onClick={saveCommentContent}>Save</Button>}
+        {isEditingComment && (
+          <Stack flexDirection='row' my={1} ml={1} gap={1}>
+            <Button size='small' onClick={saveCommentContent}>
+              Save
+            </Button>
+            <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
+              Cancel
+            </Button>
+          </Stack>
+        )}
         <Stack flexDirection='row' gap={1}>
           <ForumVote
             downvotes={postComment.downvotes}

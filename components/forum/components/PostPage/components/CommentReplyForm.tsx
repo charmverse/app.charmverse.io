@@ -73,7 +73,7 @@ export function CommentReplyForm({
         />
       </Box>
       <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
-        <Button variant='outlined' color='error' onClick={onCancelComment}>
+        <Button variant='outlined' color='secondary' onClick={onCancelComment}>
           Cancel
         </Button>
         <Button disabled={!postContent.rawText} onClick={createCommentReply}>
