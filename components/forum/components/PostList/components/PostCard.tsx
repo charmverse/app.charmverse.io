@@ -1,4 +1,5 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -21,6 +22,7 @@ import { ForumVote } from '../../ForumVote';
 
 export type ForumPostProps = ForumPostPage & {
   user?: Member;
+  totalComments: number;
 };
 
 const maxCharactersInPost = 140;
@@ -50,7 +52,8 @@ export function PostCard({
   contentText,
   galleryImage,
   post,
-  headerImage
+  headerImage,
+  totalComments
 }: ForumPostProps) {
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
@@ -113,7 +116,7 @@ export function PostCard({
           </Typography>
           <ForumPostContent galleryImage={galleryImage || headerImage} contentText={contentText} title={title} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Stack flexDirection='row' gap={2} alignItems='center'>
               <UserDisplay
                 user={user}
                 avatarSize='small'
@@ -126,10 +129,16 @@ export function PostCard({
                   {commentsNumber}
                 </Box>
               */}
-              <Box display='flex' alignItems='center'>
-                <AccessTimeIcon fontSize='small' sx={{ pr: '5px' }} />
-                {relativeTime}
-              </Box>
+
+              <Stack flexDirection='row' gap={0.5} alignItems='center'>
+                <AccessTimeIcon fontSize='small' />
+                <Typography variant='body2'>{relativeTime}</Typography>
+              </Stack>
+
+              <Stack flexDirection='row' gap={0.5} alignItems='center'>
+                <ModeCommentOutlinedIcon fontSize='small' />
+                <Typography variant='body2'>{totalComments}</Typography>
+              </Stack>
             </Stack>
             <ForumVote vote={votePost} {...pagePost} />
           </Box>

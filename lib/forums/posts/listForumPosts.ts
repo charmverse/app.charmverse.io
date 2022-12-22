@@ -9,7 +9,7 @@ import type { ForumPostPage } from './interfaces';
 export const defaultPostsPerResult = 5;
 
 export type PaginatedPostList<T = Record<string, unknown>> = Required<
-  PaginatedResponse<ForumPostPage> & { cursor: number }
+  PaginatedResponse<ForumPostPage & { totalComments: number }> & { cursor: number }
 > &
   T;
 
@@ -86,18 +86,27 @@ export async function listForumPosts(
           })
         ).length === 1;
 
+  const comments = await prisma.pageComment.groupBy({
+    _count: {
+      _all: true
+    },
+    by: ['pageId']
+  });
+
   const response: PaginatedPostList = {
     data: pages.map((_page) => {
+      const comment = comments.find((_comment) => _comment.pageId === _page.id);
       const { upDownVotes, post, ...rest } = _page;
       const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage = {
+      const forumPostPage: ForumPostPage & { totalComments: number } = {
         ...rest,
         post: {
           ...post!,
           downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
           upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
           upvoted: userVote ? userVote.upvoted : undefined
-        }
+        },
+        totalComments: comment?._count._all ?? 0
       };
       return forumPostPage;
     }),
