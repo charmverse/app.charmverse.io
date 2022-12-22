@@ -1,9 +1,34 @@
-import type { MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
+import { createAndAssignRolesDiscord } from 'lib/discord/createAndAssignRolesDiscord';
+import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
+import type { MemberRoleWebhookData, MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<boolean>> = {
-  // TODO - add processing logic for each message type
-  remove_role: async (message: WebhookMessage) => true,
-  add_role: async (message: WebhookMessage) => true,
+  remove_role: async (message: WebhookMessage) => {
+    try {
+      const {
+        guild_id: discordServerId,
+        member: { discordId: discordUserId },
+        role
+      } = message?.data as MemberRoleWebhookData;
+      await createAndAssignRolesDiscord({ discordUserId, discordServerId, roles: role });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
+  add_role: async (message: WebhookMessage) => {
+    try {
+      const {
+        guild_id: discordServerId,
+        member: { discordId: discordUserId },
+        role
+      } = message?.data as MemberRoleWebhookData;
+      await unassignRolesDiscord({ discordUserId, discordServerId, roles: role });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
   add_member: async (message: WebhookMessage) => true,
   remove_member: async (message: WebhookMessage) => true
 };
