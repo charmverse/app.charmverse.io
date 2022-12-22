@@ -16,4 +16,14 @@ describe('extractSummary()', () => {
     const result = extractSummary(node);
     expect(result).toEqual(doc(img()).toJSON());
   });
+  it('Returns null when content is null', () => {
+    const result = extractSummary(null);
+    expect(result).toBeNull();
+  });
+
+  it('Returns null when document is empty', () => {
+    const node = doc().toJSON();
+    const result = extractSummary(node);
+    expect(result).toBeNull();
+  });
 });
