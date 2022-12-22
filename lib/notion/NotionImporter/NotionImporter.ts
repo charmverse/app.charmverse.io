@@ -18,10 +18,6 @@ export class NotionImporter {
 
   spaceId: string;
 
-  notionPage: NotionPage;
-
-  workspacePageId: string;
-
   blocksPerRequest: number;
 
   totalImportedPagesLimit: number;
@@ -50,22 +46,9 @@ export class NotionImporter {
       new Client({
         auth: accessToken
       });
-    const workspacePageId = v4();
     const notionCache = new NotionCache();
-    const notionPage = new NotionPage({
-      blocksPerRequest,
-      maxChildBlockDepth,
-      totalImportedPagesLimit,
-      client: this.client,
-      cache: notionCache,
-      spaceId,
-      userId,
-      workspacePageId
-    });
 
     this.cache = notionCache;
-    this.notionPage = notionPage;
-    this.workspacePageId = workspacePageId;
     this.userId = userId;
     this.spaceId = spaceId;
     this.blocksPerRequest = blocksPerRequest;
@@ -101,19 +84,35 @@ export class NotionImporter {
 
     log.debug(`[notion] Fetching content for ${notionPages.length} pages`, { spaceId: this.spaceId });
 
+    const workspacePageId = v4();
+
     await createPrismaPage({
       createdBy: this.userId,
       spaceId: this.spaceId,
-      id: this.workspacePageId,
+      id: workspacePageId,
       title: workspaceName,
       icon: workspaceIcon
     });
 
-    for (const notionPage of notionPages) {
+    const notionPage = new NotionPage({
+      blocksPerRequest: this.blocksPerRequest,
+      maxChildBlockDepth: this.maxChildBlockDepth,
+      totalImportedPagesLimit: this.totalImportedPagesLimit,
+      client: this.client,
+      cache: this.cache,
+      spaceId: this.spaceId,
+      userId: this.userId,
+      workspacePageId
+    });
+
+    for (const {
+      id: notionPageId,
+      parent: { type: parentType }
+    } of notionPages) {
       // Only create the root-level pages first
-      if (notionPage.parent.type === 'workspace') {
-        await this.notionPage.fetchAndCreatePage({
-          notionPageId: notionPage.id
+      if (parentType === 'workspace') {
+        await notionPage.fetchAndCreatePage({
+          notionPageId
         });
       }
     }
