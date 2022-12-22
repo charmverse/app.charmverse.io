@@ -18,7 +18,7 @@ export type LoginWithGoogleRequest = {
 };
 
 // https://developers.google.com/people/quickstart/nodejs
-async function verifyToken(idToken: string): Promise<TokenPayload> {
+export async function verifyToken(idToken: string): Promise<TokenPayload> {
   const ticket = await googleOAuthClient.verifyIdToken({
     idToken,
     audience: googleOAuthClientId

@@ -1,13 +1,11 @@
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
-export type DisconnectGoogleAccount = {
+export type DisconnectGoogleAccountRequest = {
   userId: string;
   googleAccountEmail: string;
 };
@@ -15,7 +13,7 @@ export type DisconnectGoogleAccount = {
 export async function disconnectGoogleAccount({
   googleAccountEmail,
   userId
-}: DisconnectGoogleAccount): Promise<LoggedInUser> {
+}: DisconnectGoogleAccountRequest): Promise<LoggedInUser> {
   if (!googleAccountEmail || !userId) {
     throw new InvalidInputError(`Email and userId required to disconnect Google account`);
   }
