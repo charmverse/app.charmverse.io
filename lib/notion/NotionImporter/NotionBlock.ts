@@ -75,6 +75,29 @@ export class NotionBlock {
             };
           }
         }
+      } else if (contents[index].type === 'text') {
+        const textContent = contents[index] as TextContent;
+        if (textContent.marks) {
+          for (let textContentIndex = 0; textContentIndex < textContent.marks.length; textContentIndex++) {
+            const mark = textContent.marks[textContentIndex];
+            if (mark.attrs && mark.type === 'link') {
+              const notionPageLink = mark.attrs.href.slice(1);
+              const notionPageId = [
+                notionPageLink.substring(0, 8),
+                notionPageLink.substring(8, 12),
+                notionPageLink.substring(12, 16),
+                notionPageLink.substring(16, 20),
+                notionPageLink.substring(20)
+              ].join('-');
+              const charmversePage = await this.notionPage.fetchAndCreatePage({
+                notionPageId
+              });
+              if (charmversePage) {
+                mark.attrs.href = charmversePage.path;
+              }
+            }
+          }
+        }
       }
     }
 
