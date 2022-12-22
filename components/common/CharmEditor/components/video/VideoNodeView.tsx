@@ -27,9 +27,9 @@ export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop
 
   // poll endpoint until video is ready
   const { data: asset, error } = useSwr(
-    () => (attrs.muxAssetId && !playbackIdWithToken ? `/api/mux/asset/${attrs.muxAssetId}` : null),
+    () => (attrs.muxAssetId && !playbackIdWithToken && pageId ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
-      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId });
+      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId! });
     },
     {
       refreshInterval: 5000
@@ -51,7 +51,7 @@ export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly) {
+    if (readOnly || !pageId) {
       // hide the row completely
       return <div />;
     } else {

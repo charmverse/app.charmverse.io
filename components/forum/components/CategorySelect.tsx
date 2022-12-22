@@ -6,11 +6,10 @@ import Typography from '@mui/material/Typography';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumCategories } from 'hooks/useForumCategories';
-import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
 export type FilterProps = {
-  selectedCategory?: CategoryIdQuery;
-  categoryIdSelected: (categoryId: CategoryIdQuery) => void;
+  selectedCategory?: string;
+  categoryIdSelected: (categoryId?: string) => void;
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;

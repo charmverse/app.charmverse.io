@@ -345,7 +345,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
-  pageId: string;
+  pageId?: string;
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
@@ -423,7 +423,7 @@ function CharmEditor({
   }, 1000);
 
   const sendPageEvent = throttle(() => {
-    if (currentSpace && pageType) {
+    if (currentSpace && pageType && pageId) {
       if (enableSuggestingMode) {
         charmClient.track.trackAction('page_suggestion_created', {
           pageId,
@@ -667,7 +667,7 @@ function CharmEditor({
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >
-            {pageActionDisplay === 'suggestions' && currentSpace && (
+            {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
               <SuggestionsSidebar
                 pageId={pageId}
                 spaceId={currentSpace.id}
@@ -680,7 +680,7 @@ function CharmEditor({
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          {currentSpace && (
+          {currentSpace && pageId && (
             <SuggestionsPopup
               pageId={pageId}
               spaceId={currentSpace.id}

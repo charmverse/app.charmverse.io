@@ -26,14 +26,10 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
 
-  const page = await checkPostAccess({
-    postId: pageId,
+  await checkPostAccess({
+    pageId,
     userId
   });
-
-  // if (page.post.status === 'draft') {
-  //   throw new UndesirableOperationError("Can't create comment on drafted posts");
-  // }
 
   const postComment = await createPostComment({ postId: pageId, userId, ...body });
 
