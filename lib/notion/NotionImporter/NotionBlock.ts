@@ -6,8 +6,6 @@ import {
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { isTruthy } from 'lib/utilities/types';
 import type {
   TextContent,
   MentionNode,
@@ -17,7 +15,9 @@ import type {
   TableRowNode,
   ColumnLayoutNode,
   ColumnBlockNode
-} from 'models';
+} from 'lib/prosemirror/interfaces';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { isTruthy } from 'lib/utilities/types';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';

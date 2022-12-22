@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -10,7 +9,8 @@ import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
-import type { PageContent } from 'models/Page';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 
@@ -23,7 +23,7 @@ type Props = {
 type FormInputs = {
   title: string;
   content: any | null;
-  contentText: string;
+  contentText?: string;
   id?: string;
 };
 
@@ -37,7 +37,7 @@ export function PostPage(props: Props) {
   }
 
   async function publishForumPost() {
-    if (!form.content || !form.contentText || !categoryId) {
+    if (checkIsContentEmpty(form.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
     if (props.page) {
@@ -51,7 +51,7 @@ export function PostPage(props: Props) {
       await charmClient.forum.createForumPost({
         categoryId,
         content: form.content,
-        contentText: form.contentText,
+        contentText: form.contentText ?? '',
         spaceId: props.spaceId,
         title: form.title
       });
@@ -75,7 +75,7 @@ export function PostPage(props: Props) {
   let disabledTooltip = '';
   if (!form.title) {
     disabledTooltip = 'Title is required';
-  } else if (!form.contentText) {
+  } else if (checkIsContentEmpty(form.content)) {
     disabledTooltip = 'Content is required';
   } else if (!categoryId) {
     disabledTooltip = 'Category is required';

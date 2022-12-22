@@ -10,7 +10,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';

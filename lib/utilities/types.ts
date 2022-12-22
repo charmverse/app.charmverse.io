@@ -6,3 +6,8 @@ export const isTruthy = <T>(t: T | false | undefined | null | void): t is T => B
 export type RequiredNotNull<T> = {
   [P in keyof T]: NonNullable<T[P]>;
 };
+
+// a generic type to replace all date properties with strings
+export type JSONValues<T> = {
+  [P in keyof T]: P extends string ? (T[P] extends Date ? string : T[P]) : never;
+};
