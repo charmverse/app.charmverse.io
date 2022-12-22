@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceandUserFromDiscord';
+import { getSpaceAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import type { ExternalRole } from 'lib/roles';
 import { unassignRole } from 'lib/roles';
 
