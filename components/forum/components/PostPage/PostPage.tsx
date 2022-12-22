@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import type { Page } from '@prisma/client';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -29,10 +28,10 @@ type FormInputs = {
   id?: string;
 };
 
-export function PostPage(props: Props) {
+export function PostPage({ page, spaceId, onSave }: Props) {
   const { user } = useUser();
-  const [form, setForm] = useState<FormInputs>(props.page ?? { title: '', content: null, contentText: '' });
-  const [categoryId, setCategoryId] = useState(props.page?.post.categoryId ?? null);
+  const [form, setForm] = useState<FormInputs>(page ?? { title: '', content: null, contentText: '' });
+  const [categoryId, setCategoryId] = useState(page?.post.categoryId ?? null);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -42,8 +41,8 @@ export function PostPage(props: Props) {
     if (!form.content || !form.contentText || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
-    if (props.page) {
-      await charmClient.forum.updateForumPost(props.page.id, {
+    if (page) {
+      await charmClient.forum.updateForumPost(page.id, {
         categoryId,
         content: form.content,
         contentText: form.contentText,
@@ -54,11 +53,11 @@ export function PostPage(props: Props) {
         categoryId,
         content: form.content,
         contentText: form.contentText,
-        spaceId: props.spaceId,
+        spaceId,
         title: form.title
       });
     }
-    props.onSave?.();
+    onSave?.();
   }
 
   function updateCategoryId(_categoryId: string) {
@@ -72,7 +71,7 @@ export function PostPage(props: Props) {
       contentText: rawText
     }));
   }
-  const isMyPost = !props.page || props.page.createdBy === user?.id;
+  const isMyPost = !page || page.createdBy === user?.id;
   const readOnly = !isMyPost;
   let disabledTooltip = '';
   if (!form.title) {
@@ -89,7 +88,7 @@ export function PostPage(props: Props) {
         <CharmEditor
           readOnly={readOnly}
           pageActionDisplay={null}
-          pageId={props.page?.id}
+          pageId={page?.id}
           disablePageSpecificFeatures={true}
           pageType='post'
           isContentControlled={true}
@@ -98,20 +97,20 @@ export function PostPage(props: Props) {
         >
           <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
           <Box my={2}>
-            <PostCategoryInput spaceId={props.spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
+            <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
           </Box>
         </CharmEditor>
       </Box>
       {isMyPost && (
         <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
           <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
-            {props.page ? 'Update' : 'Post'}
+            {page ? 'Update' : 'Post'}
           </Button>
         </Box>
       )}
 
-      {page.postId && <PostComment postId={page.postId} />}
-      {page.postId && <PostCommentList postId={page.postId} />}
+      {page?.postId && <PostComment postId={page.postId} />}
+      {page?.postId && <PostCommentList postId={page.postId} />}
     </Container>
   );
 }

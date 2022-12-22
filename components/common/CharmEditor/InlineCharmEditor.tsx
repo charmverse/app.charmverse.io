@@ -16,6 +16,7 @@ import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import { placeholderPlugin } from './components/placeholder';
 import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
@@ -56,11 +57,11 @@ export function charmEditorPlugins({
   userId?: string | null;
   placeholderText?: string;
 } = {}) {
-  return () => [
+  const basePlugins = [
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
+          if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
             onContentChange(view);
           }
         }
@@ -91,6 +92,10 @@ export function charmEditorPlugins({
     }),
     tabIndent.plugins()
   ];
+  if (!readOnly) {
+    basePlugins.push(placeholderPlugin(placeholderText));
+  }
+  return () => basePlugins;
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
@@ -193,6 +198,7 @@ export default function CharmEditor({
         width: '100%',
         height: '100%'
       }}
+      readOnly={readOnly}
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,

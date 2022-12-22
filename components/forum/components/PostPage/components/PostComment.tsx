@@ -58,6 +58,7 @@ export function PostComment({ postId }: { postId: string }) {
         sx={{
           alignSelf: 'flex-end'
         }}
+        disabled={!postContent.rawText}
         onClick={createPostComment}
       >
         Comment
