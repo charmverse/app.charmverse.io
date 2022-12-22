@@ -1,7 +1,8 @@
 import type { Space } from '@prisma/client';
 
 import log from 'lib/log';
-import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
+
+import { mixpanel } from './mixpanel';
 
 export async function updateTrackGroupProfile(space: Space) {
   try {

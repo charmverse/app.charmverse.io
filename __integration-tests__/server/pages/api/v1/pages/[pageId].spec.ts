@@ -48,7 +48,7 @@ let space: Space;
 let apiToken: SpaceApiToken;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
 
   user = generated.user;
   space = generated.space;
@@ -96,7 +96,7 @@ describe('GET /api/v1/pages/{pageId}', () => {
   });
 
   it('should fail when the API key belongs to a different space than the page', async () => {
-    const secondSpace = await generateUserAndSpaceWithApiToken(v4());
+    const secondSpace = await generateUserAndSpaceWithApiToken();
 
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -151,7 +151,7 @@ describe('PATCH /api/v1/pages/{pageId}', () => {
   });
 
   it('should respond with 404 when the API key belongs to a different space than the page', async () => {
-    const secondSpace = await generateUserAndSpaceWithApiToken(v4());
+    const secondSpace = await generateUserAndSpaceWithApiToken();
 
     const card = await createDatabaseCardPage({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

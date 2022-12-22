@@ -1,27 +1,23 @@
-import type { Prisma } from '@prisma/client';
+import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import getENSName from 'lib/blockchain/getENSName';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvents';
+import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 export async function createUserFromWallet(
-  address: string,
-  signupAnalytics: Partial<SignupAnalytics> = {},
-  // An ID set by analytics tools to have pre signup user journey
-  preExistingId: string = v4(),
-  tx: Prisma.TransactionClient = prisma
+  { id = v4(), address = Wallet.createRandom().address, email }: { address?: string; email?: string; id?: string } = {},
+  signupAnalytics: Partial<SignupAnalytics> = {}
 ): Promise<LoggedInUser> {
   const lowercaseAddress = address.toLowerCase();
 
-  const user = await tx.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       wallets: {
         some: {
@@ -38,15 +34,15 @@ export async function createUserFromWallet(
     const ens: string | null = await getENSName(address);
     const username = ens || shortenHex(address);
     const userPath = username.replace('…', '-');
-    const isUserPathAvailable = await isProfilePathAvailable(userPath, undefined, tx);
+    const isUserPathAvailable = await isProfilePathAvailable(userPath, undefined, prisma);
 
-    const newUser = await tx.user.create({
+    const newUser = await prisma.user.create({
       data: {
-        id: preExistingId,
+        email,
+        id,
         identityType: 'Wallet',
         username,
         path: isUserPathAvailable ? userPath : null,
-        email: `${randomName()}@charmversetest.io`,
         wallets: {
           create: {
             address: lowercaseAddress
@@ -56,7 +52,7 @@ export async function createUserFromWallet(
       include: sessionUserRelations
     });
 
-    updateTrackUserProfile(newUser, tx);
+    updateTrackUserProfile(newUser, prisma);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
 
     return newUser;

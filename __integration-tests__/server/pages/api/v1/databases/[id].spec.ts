@@ -12,7 +12,7 @@ let space: Space;
 let apiToken: SpaceApiToken;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
 
   user = generated.user;
   space = generated.space;
@@ -64,7 +64,7 @@ describe('GET /databases/{id}', () => {
       title: 'Title'
     });
 
-    const secondSpace = await generateUserAndSpaceWithApiToken(v4());
+    const secondSpace = await generateUserAndSpaceWithApiToken();
 
     const response = await request(baseUrl)
       .get(`/api/v1/databases/${database.boardId}`)

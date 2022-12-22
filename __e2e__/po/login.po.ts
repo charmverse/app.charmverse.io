@@ -12,6 +12,10 @@ export class LoginPage {
 
   readonly selectNewWorkspaceButton: Locator;
 
+  readonly universalConnectButton: Locator;
+
+  readonly connectWalletButton: Locator;
+
   readonly verifyWalletButton: Locator;
 
   readonly workspaceFormDomainInput: Locator;
@@ -20,7 +24,9 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.universalConnectButton = page.locator('data-test=universal-connect-button');
     this.connectDiscordButton = page.locator('data-test=connect-discord');
+    this.connectWalletButton = page.locator('data-test=connect-wallet-button');
     this.verifyWalletButton = page.locator('data-test=verify-wallet-button');
     this.selectNewWorkspaceButton = page.locator('data-test=goto-create-workspace');
     this.workspaceFormDomainInput = page.locator('data-test=workspace-domain-input');

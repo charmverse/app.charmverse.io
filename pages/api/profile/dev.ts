@@ -22,7 +22,7 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
   try {
     user = await getUserProfile('addresses', address);
   } catch {
-    user = await createUserFromWallet(address);
+    user = await createUserFromWallet({ address });
     user.isNew = true;
   }
 

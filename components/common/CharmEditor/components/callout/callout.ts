@@ -1,22 +1,47 @@
 import { NodeView, type BaseRawNodeSpec, type RawPlugins } from '@bangle.dev/core';
-
-import { spec as quoteSpec } from '../quote';
+import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
+import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 const name = 'blockquote';
 
 const defaultIcon = '😃';
 
 export function spec(): BaseRawNodeSpec {
-  const _spec = quoteSpec();
-  _spec.name = 'blockquote';
-  _spec.schema.attrs = {
-    emoji: { default: defaultIcon },
-    track: { default: [] }
+  return {
+    type: 'node',
+    name,
+    schema: {
+      attrs: {
+        emoji: { default: defaultIcon },
+        track: { default: [] }
+      },
+      content: 'block*',
+      group: 'block',
+      defining: true,
+      draggable: false,
+      parseDOM: [
+        {
+          tag: 'blockquote.charm-callout',
+          getAttrs: (dom: any) => ({
+            emoji: dom.getAttribute('data-emoji')
+          })
+        }
+      ],
+      toDOM(node): DOMOutputSpec {
+        return ['blockquote', { class: 'charm-callout', 'data-emoji': node.attrs.emoji }, 0];
+      }
+    },
+    markdown: {
+      toMarkdown: (state: MarkdownSerializerState, node: Node) => {
+        state.wrapBlock('> ', null, node, () => state.renderContent(node));
+      },
+      parseMarkdown: {
+        blockquote: {
+          block: name
+        }
+      }
+    }
   };
-  if (_spec.markdown?.parseMarkdown) {
-    _spec.markdown.parseMarkdown.blockquote.block = name;
-  }
-  return _spec;
 }
 
 export function plugins(): RawPlugins {

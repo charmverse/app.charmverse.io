@@ -4,30 +4,25 @@ import { useContext, useEffect, useState } from 'react';
 
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import getLayout from 'components/common/BaseLayout/BaseLayout';
+import Loader from 'components/common/LoadingComponent';
 import { LoginPageContent } from 'components/login';
 import Footer from 'components/login/Footer';
 import { getKey } from 'hooks/useLocalStorage';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
 import log from 'lib/log';
 import { isSpaceDomain } from 'lib/spaces/utils';
 import { deleteCookie, getCookie } from 'lib/utilities/browser';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export default function LoginPage() {
-  const { account, walletAuthSignature, verifiableWalletDetected, getStoredSignature } = useWeb3AuthSig();
   const { triedEager } = useContext(Web3Connection);
   const router = useRouter();
   const [, setTitleState] = usePageTitle();
-  const { user, isLoaded, loginFromWeb3Account } = useUser();
+  const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const discordCookie = getCookie(AUTH_CODE_COOKIE);
-
-  const [loggingIn, setLoggingIn] = useState(false);
-
   const [showLogin, setShowLogin] = useState(false); // capture isLoaded state to prevent render on route change
   const isLogInWithDiscord = Boolean(discordCookie);
   const isDataLoaded = triedEager && isSpacesLoaded && isLoaded;
@@ -72,29 +67,15 @@ export default function LoginPage() {
     }
   }, [isDataLoaded, isLoggedIn, user]);
 
-  const signature = getStoredSignature();
-
-  useEffect(() => {
-    if (verifiableWalletDetected && signature && !user) {
-      setLoggingIn(true);
-      loginFromWeb3Account(signature).finally(() => setLoggingIn(false));
-    }
-  }, [verifiableWalletDetected]);
-
-  if (!showLogin || loggingIn) {
-    return null;
+  if (!showLogin) {
+    return <Loader isLoading />;
   }
 
   return isLogInWithDiscord
     ? null
     : getLayout(
         <>
-          <LoginPageContent
-            walletSigned={(authSig) => {
-              // console.log('Received authSig', authSig);
-              loginFromWeb3Account(authSig);
-            }}
-          />
+          <LoginPageContent />
           <Footer />
         </>
       );

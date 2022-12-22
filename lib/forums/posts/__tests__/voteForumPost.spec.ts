@@ -2,6 +2,7 @@ import type { Space, User } from '@prisma/client';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
 import { getPostVote } from '../getPostVote';
@@ -48,25 +49,19 @@ describe('voteForumPost', () => {
   });
 
   it('should update page vote if upvoted is false and return correct vote information', async () => {
-    const [category1] = await Promise.all([createPostCategory({ name: 'Second', spaceId: space.id })]);
-
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: category1.id
+    const createdPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
     await voteForumPost({
-      pageId: createdPage.id!,
+      pageId: createdPage.id,
       userId: user.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: createdPage.id!,
+      pageId: createdPage.id,
       userId: user.id,
       upvoted: false
     });
@@ -84,25 +79,19 @@ describe('voteForumPost', () => {
   });
 
   it('should delete page vote if upvoted is undefined and return correct vote information', async () => {
-    const [category1] = await Promise.all([createPostCategory({ name: 'Third', spaceId: space.id })]);
-
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: category1.id
+    const createdPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
     await voteForumPost({
-      pageId: createdPage.id!,
+      pageId: createdPage.id,
       userId: user.id,
       upvoted: true
     });
 
     await voteForumPost({
-      pageId: createdPage.id!,
+      pageId: createdPage.id,
       userId: user.id,
       upvoted: undefined
     });

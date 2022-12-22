@@ -69,6 +69,13 @@ export default async function loginByDiscord({
             account: rest as any,
             discordId: id
           }
+        },
+        profile: {
+          create: {
+            social: {
+              discordUsername: discordAccount.username
+            }
+          }
         }
       },
       include: sessionUserRelations

@@ -53,7 +53,7 @@ const exampleBoardSchema: PageProperty[] = [
 ];
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
   user = generated.user;
   space = generated.space;
   apiToken = generated.apiToken;
@@ -354,7 +354,7 @@ describe('POST /databases/{id}/search', () => {
   });
 
   it('should respond a 404 error when an API token for a different space is provided', async () => {
-    const differentSpace = await generateUserAndSpaceWithApiToken(v4());
+    const differentSpace = await generateUserAndSpaceWithApiToken();
 
     const response = await request(baseUrl)
       .post(`/api/v1/databases/${database.boardId}/search`)
