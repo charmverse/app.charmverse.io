@@ -1,8 +1,11 @@
 import { SQSClient, ReceiveMessageCommand, GetQueueUrlCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 
+import log from 'lib/log';
+import type { WebhookMessage } from 'lib/webhooks/interfaces';
+
 type ProcessMssagesInput = {
   maxNumOfMessages?: number;
-  processorFn: (messageBody: Record<string, any> | string) => Promise<void>;
+  processorFn: (messageBody: WebhookMessage) => Promise<boolean>;
 };
 
 const SQS_KEY = process.env.SQS_KEY as string;
@@ -58,9 +61,11 @@ export async function processMessages({ processorFn, maxNumOfMessages = 5 }: Pro
 
     try {
       // process message
-      await processorFn(msgBody);
+      const isProcessed = await processorFn(msgBody as WebhookMessage);
       // delete if processed correctly
-      await deleteMessage(message.ReceiptHandle || '');
+      if (isProcessed) {
+        // await deleteMessage(message.ReceiptHandle || '');
+      }
     } catch (e) {
       log.error('Failed to process webhook message', e);
     }
