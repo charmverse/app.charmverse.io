@@ -1,4 +1,5 @@
-import { Box, Divider, Stack } from '@mui/material';
+import CommentIcon from '@mui/icons-material/Comment';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -149,6 +150,15 @@ export function PostPage({ page, spaceId, onSave }: Props) {
           <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
         ))}
       </Stack>
+      {topLevelComments.length === 0 && (
+        <Stack gap={1} alignItems='center' my={1}>
+          <CommentIcon color='secondary' fontSize='large' />
+          <Typography color='secondary' variant='h6'>
+            No Comments Yet
+          </Typography>
+          <Typography color='secondary'>Be the first to share what you think!</Typography>
+        </Stack>
+      )}
     </Container>
   );
 }
