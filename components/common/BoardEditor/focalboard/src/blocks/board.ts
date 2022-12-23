@@ -1,4 +1,4 @@
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { IDType, Utils } from '../utils';
 

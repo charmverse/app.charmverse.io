@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Page, PageProperty, PageQuery, PaginatedQuery, PaginatedResponse } from 'lib/public-api';
 import {
   DatabasePageNotFoundError,
@@ -13,7 +14,6 @@ import {
   validatePageQuery,
   validatePaginationQuery
 } from 'lib/public-api';
-import { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

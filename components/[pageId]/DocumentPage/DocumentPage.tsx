@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useState } from 'react';
@@ -23,7 +24,6 @@ import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import type { PageMeta } from 'lib/pages';
-import type { Page } from 'models';
 
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';

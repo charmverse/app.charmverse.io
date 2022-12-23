@@ -6,17 +6,16 @@ import Typography from '@mui/material/Typography';
 
 import { ViewOptions } from 'components/common/ViewOptions';
 import { useForumCategories } from 'hooks/useForumCategories';
-import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 
 export type FilterProps = {
-  selectedCategory?: CategoryIdQuery;
-  categoryIdSelected: (categoryId: CategoryIdQuery) => void;
+  selectedCategory?: string;
+  onSelect: (categoryId?: string) => void;
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;
 };
 
-export function CategorySelect({ categoryIdSelected, selectedCategory = 'none' }: FilterProps) {
+export function CategorySelect({ onSelect, selectedCategory }: FilterProps) {
   const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
@@ -50,9 +49,9 @@ export function CategorySelect({ categoryIdSelected, selectedCategory = 'none' }
       </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
+          value={selectedCategory ?? 'all-category'}
           onChange={(e) => {
-            categoryIdSelected(e.target.value);
+            onSelect(e.target.value);
           }}
         >
           <MenuItem value='all-category'>

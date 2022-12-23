@@ -20,13 +20,13 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 
-  const updatedPost = await updateForumPost({ userId, postId: pageId, ...req.body });
+  await updateForumPost({ userId, postId: pageId, ...req.body });
 
-  res.status(200).json(updatedPost);
+  res.status(200).end();
 }
 
 async function deleteForumPostController(req: NextApiRequest, res: NextApiResponse) {
@@ -34,7 +34,7 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const userId = req.session.user.id;
 
   await checkPostAccess({
-    postId: pageId,
+    pageId,
     userId
   });
 
@@ -47,7 +47,7 @@ async function getForumPostController(req: NextApiRequest, res: NextApiResponse<
   const { pageId } = req.query as any as { pageId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ userId, postId: pageId });
+  const page = await getForumPost({ userId, pageId });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);

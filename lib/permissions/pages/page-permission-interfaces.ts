@@ -15,8 +15,6 @@ export type PageOperationType = keyof typeof PageOperationEnum;
 
 export type PagePermissionLevelType = keyof typeof PagePermissionLevel;
 
-export type PagePermissionLevelWithoutCustom = Exclude<PagePermissionLevelType, 'custom'>;
-
 export type IPagePermissionFlags = UserPermissionFlags<PageOperationType>;
 
 /**

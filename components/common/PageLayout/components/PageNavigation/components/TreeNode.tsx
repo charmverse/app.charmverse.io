@@ -1,6 +1,7 @@
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { Page } from '@prisma/client';
 import { useCallback, useRef, memo, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -9,7 +10,6 @@ import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/sto
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { mergeRefs } from 'lib/utilities/react';
-import type { Page } from 'models';
 import { greyColor2 } from 'theme/colors';
 
 import BoardViewTreeItem from './BoardViewTreeItem';

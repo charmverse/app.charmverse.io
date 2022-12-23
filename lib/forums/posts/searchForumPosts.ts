@@ -1,9 +1,11 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumPostPage } from './interfaces';
-import type { CategoryIdQuery, PaginatedPostList } from './listForumPosts';
+import type { PageWithRelations } from './getPostMeta';
+import { getPostMeta } from './getPostMeta';
+import type { PaginatedPostList } from './listForumPosts';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 /**
@@ -14,7 +16,7 @@ export interface SearchForumPostsRequest {
   search?: string;
   page?: number;
   count?: number;
-  categoryId?: CategoryIdQuery;
+  categoryId?: string;
 }
 export async function searchForumPosts(
   {
@@ -45,10 +47,10 @@ export async function searchForumPosts(
   const whereQuery: Prisma.PageWhereInput = {
     type: 'post',
     post: {
-      status: 'published',
-      categoryId: categoryId instanceof Array ? { in: categoryId } : categoryId
+      categoryId
     },
     spaceId,
+    deletedAt: null,
     OR: [
       {
         title: {
@@ -81,33 +83,30 @@ export async function searchForumPosts(
     }
   });
 
-  const hasNext =
-    pages.length === 0
-      ? false
-      : (
-          await prisma.page.findMany({
-            ...orderQuery,
-            skip: toSkip + count,
-            take: 1,
-            where: whereQuery
-          })
-        ).length === 1;
+  let hasNext = false;
+  if (pages.length > 0) {
+    const nextPages = await prisma.page.findMany({
+      ...orderQuery,
+      skip: toSkip + count,
+      take: 1,
+      where: whereQuery
+    });
+    if (nextPages.length > 0) {
+      hasNext = true;
+    }
+  }
+
+  const data = pages
+    .map((_page) => {
+      if (_page.post) {
+        return getPostMeta({ page: _page as PageWithRelations, userId });
+      }
+      return null;
+    })
+    .filter(isTruthy);
 
   const response: PaginatedPostList = {
-    data: pages.map((_page) => {
-      const { upDownVotes, post, ...rest } = _page;
-      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage = {
-        ...rest,
-        post: {
-          ...post!,
-          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-          upvoted: userVote ? userVote.upvoted : undefined
-        }
-      };
-      return forumPostPage;
-    }),
+    data,
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

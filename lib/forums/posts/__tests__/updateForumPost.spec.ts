@@ -6,8 +6,9 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
-import { createForumPost } from '../createForumPost';
+import { getForumPost } from '../getForumPost';
 import { updateForumPost } from '../updateForumPost';
 
 let space: Space;
@@ -20,22 +21,19 @@ beforeAll(async () => {
 });
 
 describe('updateForumPost', () => {
-  it('should only update page.content, page.contentText, page.title, page.headerImage, page.galleryImage and post.categoryId', async () => {
+  it('should only update page.content, page.contentText, page.title, and post.categoryId', async () => {
     const [category1, category2] = await Promise.all([
       createPostCategory({ name: 'First', spaceId: space.id }),
       createPostCategory({ name: 'Second', spaceId: space.id })
     ]);
 
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
+    const createdPage = await generateForumPost({
+      userId: user.id,
       spaceId: space.id,
-      title: 'Test',
       categoryId: category1.id
     });
 
-    const droppedPageUpdate: Partial<Page> = {
+    const droppedPageUpdate = {
       createdAt: new Date(),
       deletedAt: new Date(),
       postId: v4(),
@@ -43,17 +41,15 @@ describe('updateForumPost', () => {
       path: `new-path-${v4()}`
     };
 
-    const droppedPostUpdate: Partial<Post> = {
+    const droppedPostUpdate = {
       locked: true,
       pinned: true
     };
 
-    const pageUpdate: Partial<Page> = {
+    const pageUpdate = {
       content: { type: 'doc', content: [] } as any,
       contentText: 'New content text',
-      title: 'New post title',
-      headerImage: 'image-url-1',
-      galleryImage: 'image-url-2'
+      title: 'New post title'
     };
 
     const postUpdate: Partial<Post> = {
@@ -67,34 +63,27 @@ describe('updateForumPost', () => {
       ...postUpdate
     };
 
-    const updatedForumPost = await updateForumPost({
+    await updateForumPost({
       ...(groupedUpdate as any),
       postId: createdPage.id,
       userId: user.id
     });
 
-    // ---------------------- Make sure data was preserved ----------------------
-    typedKeys(droppedPageUpdate).forEach((key) => {
-      // Change not passed through
-      expect(updatedForumPost[key]).not.toEqual(droppedPageUpdate[key]);
-      // Old data still present
-      expect(updatedForumPost[key]).toEqual(createdPage[key]);
+    const updatedPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: createdPage.id
+      },
+      include: {
+        post: true
+      }
     });
 
-    typedKeys(droppedPostUpdate).forEach((key) => {
-      // Change not passed through
-      expect(updatedForumPost.post[key]).not.toEqual(droppedPostUpdate[key]);
-      // Old data still present
-      expect(updatedForumPost.post[key]).toEqual(createdPage.post[key]);
-    });
-
-    // ---------------------- Make sure new data is present ----------------------
     typedKeys(pageUpdate).forEach((key) => {
-      expect(updatedForumPost[key]).toEqual(pageUpdate[key]);
+      expect(updatedPage[key]).toEqual(pageUpdate[key]);
     });
 
     typedKeys(postUpdate).forEach((key) => {
-      expect(updatedForumPost.post[key]).toEqual(postUpdate[key]);
+      expect(updatedPage.post?.[key]).toEqual(postUpdate[key]);
     });
   });
 
@@ -106,12 +95,9 @@ describe('updateForumPost', () => {
       createPostCategory({ name: 'Fourth', spaceId: secondSpace.id })
     ]);
 
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
+    const createdPage = await generateForumPost({
+      userId: user.id,
       spaceId: space.id,
-      title: 'Test',
       categoryId: category1.id
     });
 
@@ -125,12 +111,9 @@ describe('updateForumPost', () => {
   });
 
   it('should fail to update if the post is locked', async () => {
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test'
+    const createdPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
     await prisma.post.update({

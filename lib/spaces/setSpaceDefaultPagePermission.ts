@@ -2,6 +2,7 @@ import type { PagePermissionLevel, Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { SpaceNotFoundError } from 'lib/public-api';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function setSpaceDefaultPagePermission({
   spaceId,
@@ -10,6 +11,10 @@ export async function setSpaceDefaultPagePermission({
   spaceId: string;
   defaultPagePermissionGroup: PagePermissionLevel;
 }): Promise<Space> {
+  if (defaultPagePermissionGroup === 'custom' || defaultPagePermissionGroup === 'proposal_editor') {
+    throw new InvalidInputError(`Invalid default page permission group: ${defaultPagePermissionGroup}`);
+  }
+
   const space = await prisma.space.findUnique({
     where: {
       id: spaceId
