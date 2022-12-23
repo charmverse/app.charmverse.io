@@ -18,5 +18,4 @@ export type ForumPostMeta = {
   summary: PageContent | null;
   updatedAt: string;
   votes: ForumVotes;
-  totalComments: number;
 };

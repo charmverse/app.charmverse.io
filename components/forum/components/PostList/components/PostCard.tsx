@@ -26,7 +26,7 @@ const maxCharactersInPost = 140;
 
 export type ForumPostProps = {
   user?: Member;
-  post: ForumPostMeta;
+  post: ForumPostMeta & { totalComments: number };
 };
 
 export function PostCard({ post, user }: ForumPostProps) {

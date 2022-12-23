@@ -11,7 +11,7 @@ import type { ForumPostMeta } from './interfaces';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList = PaginatedResponse<ForumPostMeta> & { cursor: number };
+export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
 /**
  * @sort ignored for now - the server sorts posts by most recent
