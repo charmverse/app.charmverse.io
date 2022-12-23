@@ -56,7 +56,7 @@ export function PostComment({
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
 
   async function saveCommentContent() {
-    await charmClient.forum.updatePostComment({
+    const updatedComment = await charmClient.forum.updatePostComment({
       commentId: comment.id,
       content: commentEditContent.doc,
       contentText: commentEditContent.rawText,
@@ -64,6 +64,9 @@ export function PostComment({
     });
     setCommentContent(commentEditContent);
     setIsEditingComment(false);
+    setPostComments((comments) =>
+      comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, ...updatedComment } : _comment))
+    );
   }
 
   async function updateCommentContent(content: ICharmEditorOutput) {

@@ -104,7 +104,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
     });
     const _topLevelComments: PostCommentWithVoteAndChildren[] = [];
     Object.values(postCommentsRecord).forEach((comment) => {
-      comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? -1 : 1));
+      comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? 1 : -1));
       if (comment.parentId === page?.id) {
         _topLevelComments.push(comment);
       }
