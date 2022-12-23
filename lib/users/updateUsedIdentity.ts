@@ -7,7 +7,6 @@ import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
-import { countConnectableIdentities } from './countConnectableIdentities';
 import { getUserProfile } from './getUser';
 
 export type IdentityUpdate = {
@@ -15,6 +14,9 @@ export type IdentityUpdate = {
   identityType: IdentityType;
 };
 
+/**
+ * Switch to specific identity, or auto-fallback to an existing identity if current was just deleted
+ */
 export async function updateUsedIdentity(userId: string, identityUpdate?: IdentityUpdate): Promise<LoggedInUser> {
   const user = await getUserProfile('id', userId);
 
