@@ -162,11 +162,13 @@ export function PostComment({
         />
         <Box ml={3}>
           {isEditingComment ? (
-            <>
+            <Stack>
               <InlineCharmEditor
                 style={{
                   paddingTop: 0,
                   paddingBottom: 0,
+                  marginLeft: 8,
+                  minHeight: 100,
                   backgroundColor: theme.palette.background.light
                 }}
                 focusOnInit
@@ -181,7 +183,7 @@ export function PostComment({
                   Cancel
                 </Button>
               </Stack>
-            </>
+            </Stack>
           ) : (
             <InlineCharmEditor
               style={{

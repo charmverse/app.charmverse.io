@@ -59,11 +59,12 @@ export function CommentReplyForm({
 
   return (
     <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='center'>
+      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <Avatar size='small' avatar={user.avatar} variant='circular' />
         <InlineCharmEditor
           style={{
-            backgroundColor: theme.palette.background.light
+            backgroundColor: theme.palette.background.light,
+            minHeight: 100
           }}
           key={editorKey}
           content={postContent.doc}

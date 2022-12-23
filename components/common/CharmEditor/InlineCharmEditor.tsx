@@ -105,6 +105,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
   .ProseMirror.bangle-editor {
     padding-left: 0px !important;
     width: 100% !important;
+    height: 100%;
   }
   code {
     border-radius: 2px !important;

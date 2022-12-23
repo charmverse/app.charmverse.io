@@ -59,7 +59,8 @@ export function PostCommentForm({
         <Avatar avatar={user.avatar} variant='circular' />
         <InlineCharmEditor
           style={{
-            backgroundColor: theme.palette.background.light
+            backgroundColor: theme.palette.background.light,
+            minHeight: 100
           }}
           key={editorKey}
           content={postContent.doc}
