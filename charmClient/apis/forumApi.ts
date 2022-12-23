@@ -9,7 +9,7 @@ import type {
   UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostPage, ForumPostPageWithVotes } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
@@ -36,7 +36,7 @@ export class ForumApi {
   }
 
   getForumPost(pageId: string) {
-    return http.GET<ForumPostPage>(`/api/forums/posts/${pageId}`);
+    return http.GET<ForumPostPageWithVotes>(`/api/forums/posts/${pageId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
@@ -75,7 +75,7 @@ export class ForumApi {
     return http.DELETE(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 
-  votePost({ postId, upvoted }: { upvoted?: boolean; postId: string }) {
+  voteOnPost({ postId, upvoted }: { upvoted?: boolean; postId: string }) {
     return http.PUT(`/api/forums/posts/${postId}/vote`, { upvoted });
   }
 

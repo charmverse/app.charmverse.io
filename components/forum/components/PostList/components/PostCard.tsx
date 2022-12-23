@@ -12,7 +12,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
-import type { ForumPostPage, ForumPostPageVote } from 'lib/forums/posts/interfaces';
+import type { ForumPostMeta, ForumPostPage, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -20,58 +20,35 @@ import { fancyTrim } from 'lib/utilities/strings';
 
 import { ForumVote } from '../../ForumVote';
 
-export type ForumPostProps = ForumPostPage & {
-  user?: Member;
-  totalComments: number;
-};
+import { PostSummary } from './PostSummary';
 
 const maxCharactersInPost = 140;
 
-function ForumPostContent({
-  galleryImage,
-  title,
-  contentText
-}: Pick<ForumPostProps, 'galleryImage' | 'title' | 'contentText'>) {
-  // Only show published posts
-  if (galleryImage) {
-    return (
-      <img src={galleryImage} alt={title || 'Post'} width='100%' style={{ maxHeight: '250px', objectFit: 'cover' }} />
-    );
-  } else if (title) {
-    return <Typography variant='body2'>{fancyTrim(contentText, maxCharactersInPost)}</Typography>;
-  }
+export type ForumPostProps = ForumPostPage & {
+  user?: Member;
+  totalComments: number;
+  post: ForumPostMeta;
+};
 
-  return null;
-}
-
-export function PostCard({
-  createdAt,
-  updatedAt,
-  user,
-  title,
-  contentText,
-  galleryImage,
-  post,
-  headerImage,
-  totalComments
-}: ForumPostProps) {
+export function PostCard({ post, user, totalComments }: ForumPostProps) {
+  const { createdAt, votes, updatedAt } = post;
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const [pagePost, setPagePost] = useState(post);
   const { id: postId } = pagePost;
-  const currentUpvotedStatus = pagePost.upvoted;
+  const currentUpvotedStatus = votes.upvoted;
   const router = useRouter();
   const { showPost } = usePostDialog();
 
-  async function votePost(newUpvotedStatus?: boolean) {
-    await charmClient.forum.votePost({
+  async function voteOnPost(newUpvotedStatus?: boolean) {
+    await charmClient.forum.voteOnPost({
       postId,
       upvoted: newUpvotedStatus
     });
 
-    const forumPostPageVote: ForumPostPageVote = {
-      downvotes: pagePost.downvotes,
-      upvotes: pagePost.upvotes,
+    const forumPostPageVote: ForumVotes = {
+      downvotes: votes.downvotes,
+      upvotes: votes.upvotes,
       upvoted: newUpvotedStatus
     };
 
@@ -100,6 +77,7 @@ export function PostCard({
   return (
     <Card variant='outlined' sx={{ mb: '15px' }}>
       <CardActionArea
+        component='div'
         onClick={() => {
           showPost({
             postId,
@@ -112,9 +90,9 @@ export function PostCard({
       >
         <CardContent>
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
-            {title}
+            {fancyTrim(post.title, maxCharactersInPost)}
           </Typography>
-          <ForumPostContent galleryImage={galleryImage || headerImage} contentText={contentText} title={title} />
+          <PostSummary content={post.summary} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <UserDisplay
@@ -133,7 +111,7 @@ export function PostCard({
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote vote={votePost} {...pagePost} />
+            <ForumVote onVote={voteOnPost} {...pagePost} />
           </Box>
         </CardContent>
       </CardActionArea>

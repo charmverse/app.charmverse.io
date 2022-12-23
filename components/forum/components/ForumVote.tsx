@@ -5,26 +5,19 @@ import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { MouseEvent } from 'react';
 
-export function ForumVote({
-  downvotes,
-  upvotes,
-  upvoted,
-  vote: _vote
-}: {
-  upvoted?: boolean | null;
-  upvotes: number;
-  downvotes: number;
-  vote: (upvoted?: boolean) => void;
-}) {
-  const theme = useTheme();
+import type { ForumVotes } from 'lib/forums/posts/interfaces';
 
-  function vote(e: MouseEvent, newUpvotedStatus: boolean) {
+export function ForumVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted?: boolean) => void }) {
+  const theme = useTheme();
+  const { downvotes, upvotes, upvoted } = votes;
+
+  function clickVote(e: MouseEvent, newUpvotedStatus: boolean) {
     e.preventDefault();
     e.stopPropagation();
     if (upvoted === newUpvotedStatus) {
-      _vote(undefined);
+      onVote(undefined);
     } else {
-      _vote(newUpvotedStatus);
+      onVote(newUpvotedStatus);
     }
   }
 
@@ -33,7 +26,7 @@ export function ForumVote({
       <IconButton
         size='small'
         onClick={(e) => {
-          vote(e, true);
+          clickVote(e, true);
         }}
       >
         <NorthIcon
@@ -51,7 +44,7 @@ export function ForumVote({
       <IconButton
         size='small'
         onClick={(e) => {
-          vote(e, false);
+          clickVote(e, false);
         }}
       >
         <SouthIcon

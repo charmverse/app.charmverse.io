@@ -52,7 +52,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
 
   const { members } = useMembers();
   const { user } = useUser();
-  const [posts, setPosts] = useState<PaginatedPostList<{ user?: Member }> | null>(null);
+  const [posts, setPosts] = useState<PaginatedPostList | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -103,9 +103,9 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
                   _prevList.data
                 : _prevList.data.filter((postPage) => {
                     if (typeof categoryId === 'string') {
-                      return postPage.post.categoryId === categoryId;
+                      return postPage.categoryId === categoryId;
                     } else if (categoryId === null) {
-                      return !postPage.post.categoryId;
+                      return !postPage.categoryId;
                     }
                     return false;
                   });
@@ -176,7 +176,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
     <>
       {error && <Alert severity='error'>There was an unexpected error while loading the posts</Alert>}
       {posts?.data.map((post) => (
-        <PostCard key={post.id} user={members.find((member) => member.id === post.createdBy)} {...post} />
+        <PostCard key={post.id} user={members.find((member) => member.id === post.createdBy)} post={post} />
       ))}
       {isLoadingMore && <PostSkeleton />}
       {posts?.hasNext === false && (

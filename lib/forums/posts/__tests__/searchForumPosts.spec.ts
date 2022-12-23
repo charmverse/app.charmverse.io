@@ -4,12 +4,12 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPageWithoutVotes } from '../interfaces';
+import type { ForumPostPage } from '../interfaces';
 import { defaultPostsPerResult, searchForumPosts } from '../searchForumPosts';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPageWithoutVotes[];
+let spacePosts: ForumPostPage[];
 
 const rootPostTitle = `Top level`;
 

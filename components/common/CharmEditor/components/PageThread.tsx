@@ -32,9 +32,9 @@ import { useUser } from 'hooks/useUser';
 import type { CommentWithUser } from 'lib/comments/interfaces';
 import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { PageContent } from 'models';
 
 import InlineCharmEditor from '../InlineCharmEditor';
 

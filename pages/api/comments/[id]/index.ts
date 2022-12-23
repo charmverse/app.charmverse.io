@@ -4,9 +4,9 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { deleteComment, updateComment } from 'lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import type { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

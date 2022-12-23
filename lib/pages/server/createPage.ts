@@ -1,16 +1,16 @@
 import type { Page, Prisma, PrismaPromise } from '@prisma/client';
 
 import { prisma } from 'db';
-import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'models';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function createPage<T>({ data, include }: Prisma.PageCreateArgs): PrismaPromise<Page & T> {
   const createArgs: Prisma.PageCreateArgs = {
     data: {
       ...data,
       hasContent: data.content ? !checkIsContentEmpty(data.content as PageContent) : false,
-      galleryImage: getPreviewImageFromContent(data.content as PageContent)
+      galleryImage: extractPreviewImage(data.content as PageContent)
     }
   };
 

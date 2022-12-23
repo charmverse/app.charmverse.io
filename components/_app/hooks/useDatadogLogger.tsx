@@ -37,7 +37,7 @@ export default function useDatadogLogger() {
         site: DD_SITE,
         service: DD_SERVICE,
         sampleRate: 100,
-        sessionReplaySampleRate: 100,
+        sessionReplaySampleRate: 20,
         trackInteractions: true,
         trackResources: true,
         trackLongTasks: true,

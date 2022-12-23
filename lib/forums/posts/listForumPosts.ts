@@ -2,16 +2,16 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumPostPage } from './interfaces';
+import type { PageWithRelations } from './getPostMeta';
+import { getPostMeta } from './getPostMeta';
+import type { ForumPostMeta } from './interfaces';
 
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList<T = Record<string, unknown>> = Required<
-  PaginatedResponse<ForumPostPage & { totalComments: number }> & { cursor: number }
-> &
-  T;
+export type PaginatedPostList = PaginatedResponse<ForumPostMeta> & { cursor: number };
 
 /**
  * @sort ignored for now - the server sorts posts by most recent
@@ -90,26 +90,30 @@ export async function listForumPosts(
     _count: {
       _all: true
     },
-    by: ['pageId']
+    by: ['pageId'],
+    where: {
+      pageId: {
+        in: pages.map((_page) => _page.id)
+      }
+    }
   });
 
+  const data = pages
+    .map((_page) => {
+      if (_page.post) {
+        const comment = comments.find((_comment) => _comment.pageId === _page.id);
+        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
+        return {
+          ...postMeta,
+          totalComments: comment?._count._all ?? 0
+        };
+      }
+      return null;
+    })
+    .filter(isTruthy);
+
   const response: PaginatedPostList = {
-    data: pages.map((_page) => {
-      const comment = comments.find((_comment) => _comment.pageId === _page.id);
-      const { upDownVotes, post, ...rest } = _page;
-      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage & { totalComments: number } = {
-        ...rest,
-        post: {
-          ...post!,
-          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-          upvoted: userVote ? userVote.upvoted : undefined
-        },
-        totalComments: comment?._count._all ?? 0
-      };
-      return forumPostPage;
-    }),
+    data,
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

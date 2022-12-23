@@ -11,7 +11,8 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
-import type { PageContent } from 'models/Page';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
@@ -26,7 +27,7 @@ type Props = {
 type FormInputs = {
   title: string;
   content: any | null;
-  contentText: string;
+  contentText?: string;
   id?: string;
 };
 
@@ -43,7 +44,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }
 
   async function publishForumPost() {
-    if (!form.content || !form.contentText || !categoryId) {
+    if (checkIsContentEmpty(form.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
     if (page) {
@@ -57,7 +58,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
       await charmClient.forum.createForumPost({
         categoryId,
         content: form.content,
-        contentText: form.contentText,
+        contentText: form.contentText ?? '',
         spaceId,
         title: form.title
       });
@@ -81,7 +82,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   let disabledTooltip = '';
   if (!form.title) {
     disabledTooltip = 'Title is required';
-  } else if (!form.contentText) {
+  } else if (checkIsContentEmpty(form.content)) {
     disabledTooltip = 'Content is required';
   } else if (!categoryId) {
     disabledTooltip = 'Category is required';
@@ -130,7 +131,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         </Box>
       )}
 
-      {page?.postId && <PostCommentForm setPostComments={setPostComments} postId={page.postId} />}
+      {page?.post && <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />}
       <Divider
         sx={{
           my: 2

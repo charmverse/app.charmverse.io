@@ -1,6 +1,6 @@
 import { prisma } from 'db';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 async function updatePageHasContent () {
   const pages = await prisma.page.findMany({

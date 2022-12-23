@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { getPagePath } from 'lib/pages/utils';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
+import { selectPageValues } from './getForumPost';
 import type { ForumPostPage } from './interfaces';
 
 export type CreateForumPostInput = Pick<Page, 'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title'> &
@@ -67,5 +68,8 @@ export async function createForumPost({
     }
   });
 
-  return createdPost as ForumPostPage;
+  return {
+    ...selectPageValues(createdPost),
+    post: createdPost.post!
+  };
 }

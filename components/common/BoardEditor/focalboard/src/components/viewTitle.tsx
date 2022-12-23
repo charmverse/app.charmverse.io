@@ -4,6 +4,7 @@ import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined
 import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
@@ -11,7 +12,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import type { Page, PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';
 import type { Board } from '../blocks/board';
