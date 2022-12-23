@@ -170,23 +170,25 @@ export function PostPage({ page, spaceId, onSave }: Props) {
           <CircularProgress />
         </Box>
       ) : (
-        <>
-          <Stack gap={1}>
-            <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-            {topLevelComments.map((comment) => (
-              <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-            ))}
-          </Stack>
-          {topLevelComments.length === 0 && (
-            <Stack gap={1} alignItems='center' my={1}>
-              <CommentIcon color='secondary' fontSize='large' />
-              <Typography color='secondary' variant='h6'>
-                No Comments Yet
-              </Typography>
-              <Typography color='secondary'>Be the first to share what you think!</Typography>
+        page?.post && (
+          <>
+            <Stack gap={1}>
+              <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+              {topLevelComments.map((comment) => (
+                <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+              ))}
             </Stack>
-          )}
-        </>
+            {topLevelComments.length === 0 && (
+              <Stack gap={1} alignItems='center' my={1}>
+                <CommentIcon color='secondary' fontSize='large' />
+                <Typography color='secondary' variant='h6'>
+                  No Comments Yet
+                </Typography>
+                <Typography color='secondary'>Be the first to share what you think!</Typography>
+              </Stack>
+            )}
+          </>
+        )
       )}
     </Container>
   );
