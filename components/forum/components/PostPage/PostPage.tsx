@@ -101,7 +101,14 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
       }
     });
-    return Object.values(postCommentsRecord).filter((comment) => comment.parentId === page?.id);
+    const _topLevelComments: PostCommentWithVoteAndChildren[] = [];
+    Object.values(postCommentsRecord).forEach((comment) => {
+      comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? -1 : 1));
+      if (comment.parentId === page?.id) {
+        _topLevelComments.push(comment);
+      }
+    });
+    return _topLevelComments;
   }, [postComments, page]);
 
   return (
