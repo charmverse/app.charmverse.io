@@ -3,11 +3,6 @@ import type { PageComment } from '@prisma/client';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type PostCommentWithVote = PageComment & {
-  user: {
-    id: string;
-    avatar: string | null;
-    username: string;
-  };
   upvotes: number;
   downvotes: number;
   upvoted: null | boolean;

@@ -13,6 +13,7 @@ import Avatar from 'components/common/Avatar';
 import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type {
   PostCommentVote,
@@ -48,6 +49,8 @@ export function PostComment({
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
+  const { members } = useMembers();
+  const commentUser = members.find((member) => member.id === comment.createdBy);
   const [isEditingComment, setIsEditingComment] = useState(false);
   const [commentContent, setCommentContent] = useState<ICharmEditorOutput>({
     doc: comment.content as PageContent,
@@ -143,8 +146,8 @@ export function PostComment({
       <StyledStack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
-            <Avatar size='small' sx={{ mr: 1 }} avatar={comment.user.avatar} />
-            <Typography mr={1}>{comment.user.username}</Typography>
+            <Avatar size='small' sx={{ mr: 1 }} avatar={commentUser?.avatar} />
+            <Typography mr={1}>{commentUser?.username}</Typography>
             <Typography variant='subtitle1' mr={0.5}>
               {getRelativeTimeInThePast(new Date(comment.createdAt))}
             </Typography>
