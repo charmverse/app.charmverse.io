@@ -6,6 +6,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -13,7 +14,11 @@ import Button from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
-import type { PostCommentVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
+import type {
+  PostCommentVote,
+  PostCommentWithVote,
+  PostCommentWithVoteAndChildren
+} from 'lib/forums/comments/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { relativeTime } from 'lib/utilities/dates';
 
@@ -33,7 +38,13 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildren }) {
+export function PostComment({
+  comment,
+  setPostComments
+}: {
+  comment: PostCommentWithVoteAndChildren;
+  setPostComments: KeyedMutator<PostCommentWithVote[]>;
+}) {
   const [postComment, setPostComment] = useState(comment);
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
@@ -63,6 +74,10 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
   function cancelEditingComment() {
     setIsEditingComment(false);
     setCommentEditContent(commentContent);
+  }
+
+  function onCreateComment(_comment: PostCommentWithVote) {
+    setPostComments((comments) => (comments ? [_comment, ...comments] : []));
   }
 
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
@@ -193,7 +208,7 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
             {showCommentReply && (
               <CommentReplyForm
                 commentId={comment.id}
-                onCreateComment={() => {}}
+                onCreateComment={onCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
                 postId={comment.pageId}
               />
@@ -203,7 +218,7 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
       </StyledStack>
       <Box ml={3} position='relative'>
         {postComment.children.map((childComment) => (
-          <PostComment comment={childComment} key={childComment.id} />
+          <PostComment setPostComments={setPostComments} comment={childComment} key={childComment.id} />
         ))}
       </Box>
       <Menu
