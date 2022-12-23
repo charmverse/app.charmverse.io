@@ -12,7 +12,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
-import type { ForumPostMeta, ForumPostPage, ForumVotes } from 'lib/forums/posts/interfaces';
+import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -30,12 +30,11 @@ export type ForumPostProps = {
 };
 
 export function PostCard({ post, user }: ForumPostProps) {
-  const { createdAt, votes, updatedAt, totalComments } = post;
+  const { createdAt, updatedAt, totalComments } = post;
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const [pagePost, setPagePost] = useState(post);
   const { id: postId } = pagePost;
-  const currentUpvotedStatus = votes.upvoted;
   const router = useRouter();
   const { showPost } = usePostDialog();
 
@@ -46,22 +45,22 @@ export function PostCard({ post, user }: ForumPostProps) {
     });
 
     const forumPostPageVote: ForumVotes = {
-      downvotes: votes.downvotes,
-      upvotes: votes.upvotes,
+      downvotes: pagePost.votes.downvotes,
+      upvotes: pagePost.votes.upvotes,
       upvoted: newUpvotedStatus
     };
 
     if (newUpvotedStatus === true) {
       forumPostPageVote.upvotes += 1;
-      if (currentUpvotedStatus === false) {
+      if (pagePost.votes.upvoted === false) {
         forumPostPageVote.downvotes -= 1;
       }
     } else if (newUpvotedStatus === false) {
       forumPostPageVote.downvotes += 1;
-      if (currentUpvotedStatus === true) {
+      if (pagePost.votes.upvoted === true) {
         forumPostPageVote.upvotes -= 1;
       }
-    } else if (currentUpvotedStatus === true) {
+    } else if (pagePost.votes.upvoted === true) {
       forumPostPageVote.upvotes -= 1;
     } else {
       forumPostPageVote.downvotes -= 1;
@@ -69,7 +68,7 @@ export function PostCard({ post, user }: ForumPostProps) {
 
     setPagePost({
       ...pagePost,
-      ...forumPostPageVote
+      votes: forumPostPageVote
     });
   }
 
@@ -110,7 +109,7 @@ export function PostCard({ post, user }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote onVote={voteOnPost} {...pagePost} />
+            <ForumVote onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>
