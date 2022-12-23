@@ -18,7 +18,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { ForumVote } from '../../ForumVote';
+import { ForumContentUpDownVotes } from '../../ForumVote';
 
 import { PostSummary } from './PostSummary';
 
@@ -50,17 +50,19 @@ export function PostCard({ post, user }: ForumPostProps) {
       upvoted: newUpvotedStatus
     };
 
+    const upvotedByCurrentUser = pagePost.votes.upvoted;
+
     if (newUpvotedStatus === true) {
       forumPostPageVote.upvotes += 1;
-      if (pagePost.votes.upvoted === false) {
+      if (upvotedByCurrentUser === false) {
         forumPostPageVote.downvotes -= 1;
       }
     } else if (newUpvotedStatus === false) {
       forumPostPageVote.downvotes += 1;
-      if (pagePost.votes.upvoted === true) {
+      if (upvotedByCurrentUser === true) {
         forumPostPageVote.upvotes -= 1;
       }
-    } else if (pagePost.votes.upvoted === true) {
+    } else if (upvotedByCurrentUser === true) {
       forumPostPageVote.upvotes -= 1;
     } else {
       forumPostPageVote.downvotes -= 1;
@@ -109,7 +111,7 @@ export function PostCard({ post, user }: ForumPostProps) {
                 <Typography variant='body2'>{totalComments}</Typography>
               </Stack>
             </Stack>
-            <ForumVote onVote={voteOnPost} votes={pagePost.votes} />
+            <ForumContentUpDownVotes onVote={voteOnPost} votes={pagePost.votes} />
           </Box>
         </CardContent>
       </CardActionArea>

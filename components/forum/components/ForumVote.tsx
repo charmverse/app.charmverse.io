@@ -7,7 +7,7 @@ import type { MouseEvent } from 'react';
 
 import type { ForumVotes } from 'lib/forums/posts/interfaces';
 
-export function ForumVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted?: boolean) => void }) {
+export function ForumContentUpDownVotes({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted?: boolean) => void }) {
   const theme = useTheme();
   const { downvotes, upvotes, upvoted } = votes;
 

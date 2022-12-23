@@ -23,7 +23,7 @@ import type {
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
-import { ForumVote } from '../../ForumVote';
+import { ForumContentUpDownVotes } from '../../ForumVote';
 
 import { CommentReplyForm } from './CommentReplyForm';
 
@@ -88,7 +88,7 @@ export function PostComment({
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
 
   async function voteComment(newUpvotedStatus?: boolean) {
-    await charmClient.forum.voteComment({
+    await charmClient.forum.upOrDownVoteComment({
       postId: comment.pageId,
       commentId: comment.id,
       upvoted: newUpvotedStatus
@@ -214,7 +214,7 @@ export function PostComment({
           )}
           {!comment.deletedAt && (
             <Stack flexDirection='row' gap={1}>
-              <ForumVote votes={comment} onVote={voteComment} />
+              <ForumContentUpDownVotes votes={comment} onVote={voteComment} />
               <Typography
                 sx={{
                   cursor: 'pointer'

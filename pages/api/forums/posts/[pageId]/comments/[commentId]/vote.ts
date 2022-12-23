@@ -7,9 +7,9 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(voteForumPostHandler);
+handler.use(requireUser).put(commentUpDownVoteHandler);
 
-async function voteForumPostHandler(req: NextApiRequest, res: NextApiResponse) {
+async function commentUpDownVoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
