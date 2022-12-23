@@ -18,6 +18,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { PostCategoryInput } from './components/PostCategoryInput';
 import { PostComment } from './components/PostComment';
 import { PostCommentForm } from './components/PostCommentForm';
+import { PostCommentSort } from './components/PostCommentSort';
 
 type Props = {
   spaceId: string;
@@ -39,6 +40,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   const { data: postComments = [], mutate: setPostComments } = useSWR(page ? `${page.id}/comments` : null, () =>
     page ? charmClient.forum.listPostComments(page.id) : []
   );
+  const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -109,8 +111,13 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         _topLevelComments.push(comment);
       }
     });
+    if (commentSort === 'latest') {
+      return _topLevelComments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
+    } else if (commentSort === 'top') {
+      return _topLevelComments.sort((c1, c2) => (c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1));
+    }
     return _topLevelComments;
-  }, [postComments, page]);
+  }, [postComments, page, commentSort]);
 
   return (
     <Container top={50}>
@@ -146,6 +153,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         }}
       />
       <Stack gap={1}>
+        <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
         {topLevelComments.map((comment) => (
           <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
         ))}

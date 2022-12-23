@@ -197,7 +197,7 @@ export function PostComment({
               </Stack>
             </Stack>
           ) : comment.deletedAt ? (
-            <Typography fontStyle='italic'>This comment has been deleted</Typography>
+            <Typography color='secondary'>Comment deleted by user</Typography>
           ) : (
             <InlineCharmEditor
               style={{
@@ -209,18 +209,22 @@ export function PostComment({
               content={commentContent.doc}
             />
           )}
-          <Stack flexDirection='row' gap={1}>
-            {!comment.deletedAt && <ForumVote votes={comment} onVote={voteComment} />}
-            <Typography
-              sx={{
-                cursor: 'pointer'
-              }}
-              onClick={() => setShowCommentReply(true)}
-              color='secondary'
-            >
-              Reply
-            </Typography>
-          </Stack>
+          {!comment.deletedAt && (
+            <Stack flexDirection='row' gap={1}>
+              <ForumVote votes={comment} onVote={voteComment} />
+              <Typography
+                sx={{
+                  cursor: 'pointer'
+                }}
+                onClick={() => setShowCommentReply(true)}
+                color='secondary'
+                fontWeight='semibold'
+                variant='subtitle1'
+              >
+                Reply
+              </Typography>
+            </Stack>
+          )}
           <Box mt={2}>
             {showCommentReply && (
               <CommentReplyForm
