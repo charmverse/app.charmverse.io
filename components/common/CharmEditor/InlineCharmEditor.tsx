@@ -10,7 +10,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
@@ -109,7 +109,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
     font-size: 85%;
     height: fit-content;
     tab-size: 4;
-    caret-color: black;
+    caret-color: var(--primary-text);
   }
   pre code {
     color: inherit;

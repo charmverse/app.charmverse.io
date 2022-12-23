@@ -4,11 +4,11 @@ import { validate } from 'uuid';
 
 import { prisma } from 'db';
 import { getLogger } from 'lib/log/prefix';
-import { getPreviewImageFromContent } from 'lib/pages/getPreviewImageFromContent';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 
 import type { AuthenticatedSocketData } from '../authentication';
@@ -531,7 +531,7 @@ export class DocumentEventHandler {
     const contentText = room.node.textContent;
     // check if content is empty only if it got changed
     const hasContent = contentText.length > 0;
-    const galleryImage = room.doc.type === 'card' ? getPreviewImageFromContent(room.doc.content) : null;
+    const galleryImage = room.doc.type === 'card' ? extractPreviewImage(room.doc.content) : null;
 
     const res = await prisma.page.update({
       where: { id: room.doc.id },

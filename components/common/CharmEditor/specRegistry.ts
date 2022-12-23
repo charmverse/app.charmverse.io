@@ -1,7 +1,7 @@
 import { bold, code, hardBreak, italic, link, strike, underline } from '@bangle.dev/base-components';
 import { SpecRegistry } from '@bangle.dev/core';
 
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import * as bulletList from './components/bulletList';

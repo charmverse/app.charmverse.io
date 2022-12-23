@@ -91,7 +91,7 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ lg: 'none' }}>
-            <CategorySelect categoryIdSelected={handleCategoryUpdate} selectedCategory={currentCategory?.id} />
+            <CategorySelect onSelect={handleCategoryUpdate} selectedCategory={currentCategory?.id} />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
           {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}

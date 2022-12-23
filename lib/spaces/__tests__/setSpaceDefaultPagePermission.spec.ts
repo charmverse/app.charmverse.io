@@ -2,6 +2,7 @@ import type { Space } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { SpaceNotFoundError } from 'lib/public-api';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -33,5 +34,25 @@ describe('setSpaceDefaultPagePermission', () => {
       spaceId: space.id
     });
     expect(spaceWithPermission.defaultPagePermissionGroup).toBe('view');
+  });
+
+  // We don't yet use the custom option
+  it('Should fail to set the default page permission level to custom', async () => {
+    await expect(
+      setSpaceDefaultPagePermission({
+        defaultPagePermissionGroup: 'custom',
+        spaceId: space.id
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  // Proposal editor preset is only used for proposals
+  it('Should fail to set the default page permission level to proposal_editor', async () => {
+    await expect(
+      setSpaceDefaultPagePermission({
+        defaultPagePermissionGroup: 'proposal_editor',
+        spaceId: space.id
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

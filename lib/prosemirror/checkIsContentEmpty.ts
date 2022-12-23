@@ -1,4 +1,4 @@
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function checkIsContentEmpty(content: PageContent | null | undefined) {
   return (

@@ -12,8 +12,14 @@ import { useUser } from 'hooks/useUser';
 function CreateForumPost({ onClick }: { onClick: () => void }) {
   const { user } = useUser();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+
+  function clickHandler() {
+    if (userSpacePermissions?.createPage) {
+      onClick();
+    }
+  }
   return (
-    <Card variant='outlined' sx={{ mb: '15px' }} onClick={onClick}>
+    <Card variant='outlined' sx={{ mb: '15px' }} onClick={clickHandler}>
       <CardActionArea disabled={!userSpacePermissions?.createPage}>
         <CardContent>
           <Box display='flex' flexDirection='row' justifyContent='space-between' mb='16px'>
