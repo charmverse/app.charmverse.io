@@ -24,14 +24,13 @@ import { PostSummary } from './PostSummary';
 
 const maxCharactersInPost = 140;
 
-export type ForumPostProps = ForumPostPage & {
+export type ForumPostProps = {
   user?: Member;
-  totalComments: number;
   post: ForumPostMeta;
 };
 
-export function PostCard({ post, user, totalComments }: ForumPostProps) {
-  const { createdAt, votes, updatedAt } = post;
+export function PostCard({ post, user }: ForumPostProps) {
+  const { createdAt, votes, updatedAt, totalComments } = post;
   const date = new Date(updatedAt || createdAt);
   const relativeTime = getRelativeTimeInThePast(date);
   const [pagePost, setPagePost] = useState(post);

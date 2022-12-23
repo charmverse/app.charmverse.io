@@ -14,8 +14,8 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCha
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { relativeTime } from 'lib/utilities/dates';
-import type { PageContent } from 'models';
 
 import { ForumVote } from '../../ForumVote';
 
@@ -175,12 +175,7 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
           />
         )}
         <Stack flexDirection='row' gap={1}>
-          <ForumVote
-            downvotes={postComment.downvotes}
-            upvotes={postComment.upvotes}
-            vote={voteComment}
-            upvoted={postComment.upvoted}
-          />
+          <ForumVote votes={postComment} onVote={voteComment} />
           <Typography
             sx={{
               cursor: 'pointer'
