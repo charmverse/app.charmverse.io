@@ -1,7 +1,7 @@
 import * as http from 'adapters/http';
 import type { CommentCreate, CommentWithUser } from 'lib/comments/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { MultipleThreadsInput, ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { PageContent } from 'models';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 
 export class CommentsApi {

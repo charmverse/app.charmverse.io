@@ -9,9 +9,9 @@ import log from 'lib/log';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
-import type { PageContent } from 'models';
 
 import type { ExportedPage, WorkspaceExport, WorkspaceImport } from './interfaces';
 

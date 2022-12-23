@@ -32,9 +32,7 @@ describe('createForumPost', () => {
     expect(createdPage).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
         id: expect.any(String),
-        postId: expect.any(String),
         content: expect.any(Object),
-        contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
           pinned: false
@@ -61,9 +59,7 @@ describe('createForumPost', () => {
     expect(createdPage).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
         id: expect.any(String),
-        postId: expect.any(String),
         content: expect.any(Object),
-        contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
           pinned: false,

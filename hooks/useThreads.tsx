@@ -4,8 +4,8 @@ import type { KeyedMutator } from 'swr';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
-import type { PageContent } from 'models';
 
 import { usePages } from './usePages';
 

@@ -79,15 +79,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
     [search, postsData, searchData]
   );
 
-  const postsToShow = (search && searchData ? searchData : postsData ?? [])
-    .map((post) => post.data)
-    .flat()
-    .map((post) => {
-      return {
-        ...post,
-        user: members.find((item) => item.id === post.createdBy)
-      };
-    });
+  const postsToShow = (search && searchData ? searchData : postsData ?? []).map((post) => post.data).flat();
 
   const currentCategoryId =
     typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;
@@ -144,7 +136,7 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
         <Alert severity='error'>There was an unexpected error while loading the posts</Alert>
       )}
       {postsToShow.map((post) => (
-        <PostCard key={post.id} {...post} />
+        <PostCard key={post.id} user={members.find((item) => item.id === post.createdBy)} post={post} />
       ))}
       {(isLoadingPosts || isLoadingSearch) && !hasNext && <PostSkeleton />}
       {!hasNext && (

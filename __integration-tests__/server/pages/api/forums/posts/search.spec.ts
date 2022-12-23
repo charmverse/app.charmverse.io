@@ -4,7 +4,7 @@ import request from 'supertest';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { ForumPostMeta } from 'lib/forums/posts/interfaces';
 import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import { generateForumPosts } from 'testing/forums';
@@ -75,15 +75,9 @@ describe('POST /api/forums/posts/search - Search for posts', () => {
       expect(posts.some((_post) => _post.id === post.id));
 
       expect(post).toMatchObject(
-        expect.objectContaining<Partial<ForumPostPage>>({
+        expect.objectContaining<Partial<ForumPostMeta>>({
           id: expect.any(String),
-          postId: expect.any(String),
-          content: expect.any(Object),
-          contentText: expect.any(String),
-          post: expect.objectContaining<Partial<Post>>({
-            locked: false,
-            pinned: false
-          })
+          summary: expect.any(Object)
         })
       );
     });

@@ -62,14 +62,14 @@ export function spec(): RawSpecs {
           tag: 'tweet-embed',
           getAttrs: (dom: any) => {
             return {
-              screenName: dom.getAttribute('screen-name'),
-              tweetId: dom.getAttribute('tweet-id')
+              screenName: dom.getAttribute('data-screen-name'),
+              tweetId: dom.getAttribute('data-tweet-id')
             };
           }
         }
       ],
       toDOM: (node: Node) => {
-        return ['tweet-embed', { 'tweet-id': node.attrs.tweetId, 'screen-name': node.attrs.screenName }];
+        return ['tweet-embed', { 'data-tweet-id': node.attrs.tweetId, 'data-screen-name': node.attrs.screenName }];
       }
     }
   };

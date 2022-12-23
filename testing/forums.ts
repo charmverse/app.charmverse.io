@@ -2,7 +2,8 @@ import type { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import type { ForumPostPageWithoutVotes } from 'lib/forums/posts/interfaces';
+import { selectPageValues } from 'lib/forums/posts/getForumPost';
+import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 
 import { generatePostCategory } from './utils/forums';
 
@@ -93,10 +94,12 @@ export async function generateForumPosts({
     createdAt += 1000 * 60 * 30;
   }
 
-  await prisma.post.createMany({ data: postCreateInputs });
-  await prisma.page.createMany({ data: pageCreateInputs });
+  await prisma.$transaction([
+    prisma.post.createMany({ data: postCreateInputs }),
+    prisma.page.createMany({ data: pageCreateInputs })
+  ]);
 
-  return prisma.page.findMany({
+  const pages = await prisma.page.findMany({
     where: {
       spaceId,
       type: 'post',
@@ -107,5 +110,12 @@ export async function generateForumPosts({
     include: {
       post: true
     }
-  }) as Promise<ForumPostPageWithoutVotes[]>;
+  });
+
+  const postPages: ForumPostPage[] = pages.map((page) => ({
+    ...selectPageValues(page),
+    post: page.post!
+  }));
+
+  return postPages;
 }

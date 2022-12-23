@@ -38,7 +38,7 @@ export function PageActions({
 }) {
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const pageCreator = members.find((member) => member.id === page.createdBy);
+  const charmversePage = members.find((member) => member.id === page.createdBy);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -120,14 +120,14 @@ export function PageActions({
         </MenuItem>
         {children}
         <Divider />
-        {pageCreator && (
+        {charmversePage && (
           <Stack
             sx={{
               px: 2
             }}
           >
             <Typography variant='caption' color='secondary'>
-              Last edited by {pageCreator.username}
+              Last edited by {charmversePage.username}
             </Typography>
             <Typography variant='caption' color='secondary'>
               Last edited at {humanFriendlyDate(page.updatedAt)}

@@ -9,13 +9,13 @@ import { useForumCategories } from 'hooks/useForumCategories';
 
 export type FilterProps = {
   selectedCategory?: string;
-  categoryIdSelected: (categoryId?: string) => void;
+  onSelect: (categoryId?: string) => void;
   // Unused prop for now
   // eslint-disable-next-line react/no-unused-prop-types
   sort?: any;
 };
 
-export function CategorySelect({ categoryIdSelected, selectedCategory = 'all-category' }: FilterProps) {
+export function CategorySelect({ onSelect, selectedCategory }: FilterProps) {
   const { categories, error } = useForumCategories();
   // Unused for now
   // const sortValue = useMemo(() => {
@@ -49,9 +49,9 @@ export function CategorySelect({ categoryIdSelected, selectedCategory = 'all-cat
       </ViewOptions> */}
       <ViewOptions label='Categories' sx={{ pb: '20px' }}>
         <Select
-          value={!selectedCategory || selectedCategory?.length === 0 ? 'all-category' : selectedCategory}
+          value={selectedCategory ?? 'all-category'}
           onChange={(e) => {
-            categoryIdSelected(e.target.value);
+            onSelect(e.target.value);
           }}
         >
           <MenuItem value='all-category'>

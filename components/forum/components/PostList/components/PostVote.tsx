@@ -5,26 +5,19 @@ import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { MouseEvent } from 'react';
 
-export function PostVote({
-  downvotes,
-  upvotes,
-  upvoted,
-  votePost
-}: {
-  upvoted?: boolean;
-  upvotes: number;
-  downvotes: number;
-  votePost: (upvoted?: boolean) => void;
-}) {
-  const theme = useTheme();
+import type { ForumVotes } from 'lib/forums/posts/interfaces';
 
-  function vote(e: MouseEvent, newUpvotedStatus: boolean) {
+export function PostVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted?: boolean) => void }) {
+  const theme = useTheme();
+  const { downvotes, upvotes, upvoted } = votes;
+
+  function clickVote(e: MouseEvent, newUpvotedStatus: boolean) {
     e.preventDefault();
     e.stopPropagation();
     if (upvoted === newUpvotedStatus) {
-      votePost(undefined);
+      onVote(undefined);
     } else {
-      votePost(newUpvotedStatus);
+      onVote(newUpvotedStatus);
     }
   }
 
@@ -33,7 +26,7 @@ export function PostVote({
       <IconButton
         size='small'
         onClick={(e) => {
-          vote(e, true);
+          clickVote(e, true);
         }}
         component='span'
       >
@@ -52,7 +45,7 @@ export function PostVote({
       <IconButton
         size='small'
         onClick={(e) => {
-          vote(e, false);
+          clickVote(e, false);
         }}
         component='span'
       >
