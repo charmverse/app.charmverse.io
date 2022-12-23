@@ -9,7 +9,7 @@ import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { checkPostAccess } from 'lib/forums/posts/checkPostAccess';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -29,6 +29,10 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   if (comment?.createdBy !== userId) {
     throw new UnauthorisedActionError();
+  }
+
+  if (comment.deletedAt) {
+    throw new UndesirableOperationError("Can't edit deleted comments");
   }
 
   const postComment = await updatePostComment({ commentId, ...body });

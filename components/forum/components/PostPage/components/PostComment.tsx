@@ -130,6 +130,14 @@ export function PostComment({
     menuState.close();
   }
 
+  async function onClickDeleteComment() {
+    await charmClient.forum.deletePostComment({ commentId: comment.id, postId: comment.pageId });
+    setPostComments((comments) =>
+      comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, deletedAt: new Date() } : _comment))
+    );
+    menuState.close();
+  }
+
   return (
     <Stack my={1} position='relative'>
       <StyledStack>
@@ -142,7 +150,7 @@ export function PostComment({
             </Typography>
             {comment.createdAt !== comment.updatedAt && <Typography variant='subtitle2'>(Edited)</Typography>}
           </Stack>
-          {comment.createdBy === user?.id && (
+          {comment.createdBy === user?.id && !comment.deletedAt && (
             <IconButton
               className='comment-actions'
               size='small'
@@ -188,6 +196,8 @@ export function PostComment({
                 </Button>
               </Stack>
             </Stack>
+          ) : comment.deletedAt ? (
+            <Typography fontStyle='italic'>This comment has been deleted</Typography>
           ) : (
             <InlineCharmEditor
               style={{
@@ -200,12 +210,13 @@ export function PostComment({
             />
           )}
           <Stack flexDirection='row' gap={1}>
-            <ForumVote votes={comment} onVote={voteComment} />
+            {!comment.deletedAt && <ForumVote votes={comment} onVote={voteComment} />}
             <Typography
               sx={{
                 cursor: 'pointer'
               }}
               onClick={() => setShowCommentReply(true)}
+              color='secondary'
             >
               Reply
             </Typography>
@@ -239,7 +250,7 @@ export function PostComment({
           </ListItemIcon>
           <ListItemText>Edit comment</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={onClickDeleteComment}>
           <ListItemIcon>
             <DeleteOutlinedIcon />
           </ListItemIcon>
