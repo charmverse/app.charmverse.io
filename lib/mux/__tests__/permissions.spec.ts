@@ -1,6 +1,3 @@
-import type { User } from '@prisma/client';
-
-import { prisma } from 'db';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
@@ -32,13 +29,13 @@ describe('Video Permissions', () => {
   });
 
   it('Checks that a user can create a page video', async () => {
-    const isAllowed = await canView({ userId: users.member, pageId });
+    const isAllowed = await canCreate({ userId: users.member, pageId });
 
     expect(isAllowed).toBe(false);
   });
 
   it('Checks that a user cannot create a page video', async () => {
-    const isAllowed = await canView({ userId: users.nonMember, pageId });
+    const isAllowed = await canCreate({ userId: users.nonMember, pageId });
 
     expect(isAllowed).toBe(false);
   });
