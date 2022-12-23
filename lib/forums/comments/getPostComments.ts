@@ -28,12 +28,12 @@ export async function getPostComments({
     }
   });
 
-  return comments.map((comment) => {
+  return comments.map(({ votes, ...comment }) => {
     let upvoted: boolean | null = null;
     let downvotes = 0;
     let upvotes = 0;
 
-    comment.votes.forEach((vote) => {
+    votes.forEach((vote) => {
       if (vote.upvoted) {
         upvotes += 1;
       } else {
