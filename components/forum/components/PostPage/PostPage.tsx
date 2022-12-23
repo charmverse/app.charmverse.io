@@ -1,5 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Divider, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -37,10 +37,16 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   const { user } = useUser();
   const [form, setForm] = useState<FormInputs>(page ?? { title: '', content: null, contentText: '' });
   const [categoryId, setCategoryId] = useState(page?.post.categoryId ?? null);
-  const { data: postComments = [], mutate: setPostComments } = useSWR(page ? `${page.id}/comments` : null, () =>
-    page ? charmClient.forum.listPostComments(page.id) : []
+  const {
+    data: postComments,
+    mutate: setPostComments,
+    isValidating
+  } = useSWR(page ? `${page.id}/comments` : null, () =>
+    page ? charmClient.forum.listPostComments(page.id) : undefined
   );
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
+
+  const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -92,29 +98,32 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }
 
   const topLevelComments = useMemo(() => {
-    const postCommentsRecord: Record<string, PostCommentWithVoteAndChildren> = {};
-    postComments.forEach((postComment) => {
-      postCommentsRecord[postComment.id] = {
-        ...postComment,
-        children: []
-      };
-    });
-    postComments.forEach((postComment) => {
-      if (postComment.parentId !== page?.id) {
-        postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
-      }
-    });
     const _topLevelComments: PostCommentWithVoteAndChildren[] = [];
-    Object.values(postCommentsRecord).forEach((comment) => {
-      comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? 1 : -1));
-      if (comment.parentId === page?.id) {
-        _topLevelComments.push(comment);
+
+    if (postComments) {
+      const postCommentsRecord: Record<string, PostCommentWithVoteAndChildren> = {};
+      postComments.forEach((postComment) => {
+        postCommentsRecord[postComment.id] = {
+          ...postComment,
+          children: []
+        };
+      });
+      postComments.forEach((postComment) => {
+        if (postComment.parentId !== page?.id) {
+          postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
+        }
+      });
+      Object.values(postCommentsRecord).forEach((comment) => {
+        comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? 1 : -1));
+        if (comment.parentId === page?.id) {
+          _topLevelComments.push(comment);
+        }
+      });
+      if (commentSort === 'latest') {
+        return _topLevelComments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
+      } else if (commentSort === 'top') {
+        return _topLevelComments.sort((c1, c2) => (c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1));
       }
-    });
-    if (commentSort === 'latest') {
-      return _topLevelComments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
-    } else if (commentSort === 'top') {
-      return _topLevelComments.sort((c1, c2) => (c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1));
     }
     return _topLevelComments;
   }, [postComments, page, commentSort]);
@@ -146,26 +155,38 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         </Box>
       )}
 
-      {page?.post && <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />}
+      {page?.post && (
+        <Box my={2}>
+          <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />
+        </Box>
+      )}
       <Divider
         sx={{
           my: 2
         }}
       />
-      <Stack gap={1}>
-        <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-        {topLevelComments.map((comment) => (
-          <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-        ))}
-      </Stack>
-      {topLevelComments.length === 0 && (
-        <Stack gap={1} alignItems='center' my={1}>
-          <CommentIcon color='secondary' fontSize='large' />
-          <Typography color='secondary' variant='h6'>
-            No Comments Yet
-          </Typography>
-          <Typography color='secondary'>Be the first to share what you think!</Typography>
-        </Stack>
+      {isLoading ? (
+        <Box width='100%' display='flex' height={100} justifyContent='center'>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Stack gap={1}>
+            <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+            {topLevelComments.map((comment) => (
+              <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+            ))}
+          </Stack>
+          {topLevelComments.length === 0 && (
+            <Stack gap={1} alignItems='center' my={1}>
+              <CommentIcon color='secondary' fontSize='large' />
+              <Typography color='secondary' variant='h6'>
+                No Comments Yet
+              </Typography>
+              <Typography color='secondary'>Be the first to share what you think!</Typography>
+            </Stack>
+          )}
+        </>
       )}
     </Container>
   );

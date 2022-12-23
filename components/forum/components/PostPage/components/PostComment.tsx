@@ -44,7 +44,7 @@ export function PostComment({
   setPostComments
 }: {
   comment: PostCommentWithVoteAndChildren;
-  setPostComments: KeyedMutator<PostCommentWithVote[]>;
+  setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
 }) {
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();

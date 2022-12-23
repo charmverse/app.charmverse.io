@@ -25,7 +25,7 @@ export function PostCommentForm({
   setPostComments
 }: {
   postId: string;
-  setPostComments: KeyedMutator<PostCommentWithVote[]>;
+  setPostComments: KeyedMutator<PostCommentWithVote[] | undefined>;
 }) {
   const { user } = useUser();
   const theme = useTheme();
