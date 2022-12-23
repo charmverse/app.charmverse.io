@@ -112,89 +112,93 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
   }
 
   return (
-    <Stack my={1}>
-      <StyledStack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Stack flexDirection='row' gap={1} alignItems='center'>
-          <Avatar size='small' avatar={postComment.user.avatar} />
-          <Typography>{postComment.user.username}</Typography>
-          <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
+    <Stack my={1} position='relative'>
+      <StyledStack>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Avatar size='small' avatar={postComment.user.avatar} />
+            <Typography>{postComment.user.username}</Typography>
+            <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
+          </Stack>
+          {comment.createdBy === user?.id && (
+            <IconButton
+              className='comment-actions'
+              size='small'
+              onClick={(event) => {
+                menuState.open(event.currentTarget);
+              }}
+            >
+              <MoreHorizIcon fontSize='small' />
+            </IconButton>
+          )}
         </Stack>
-        {comment.createdBy === user?.id && (
-          <IconButton
-            className='comment-actions'
-            size='small'
-            onClick={(event) => {
-              menuState.open(event.currentTarget);
-            }}
-          >
-            <MoreHorizIcon fontSize='small' />
-          </IconButton>
-        )}
-      </StyledStack>
-      <Box ml={3} position='relative'>
         <Box
           sx={{
-            height: 'calc(100% - 24px)',
+            height: 'calc(100% - 50px)',
             width: 2.5,
             position: 'absolute',
             backgroundColor: theme.palette.background.light,
-            left: -13.5,
-            top: 10
+            top: 30,
+            left: 10
           }}
         />
-        {isEditingComment ? (
-          <>
+        <Box ml={3}>
+          {isEditingComment ? (
+            <>
+              <InlineCharmEditor
+                style={{
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  backgroundColor: theme.palette.background.light
+                }}
+                focusOnInit
+                onContentChange={updateCommentContent}
+                content={commentEditContent.doc}
+              />
+              <Stack flexDirection='row' my={1} ml={1} gap={1}>
+                <Button size='small' onClick={saveCommentContent}>
+                  Save
+                </Button>
+                <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
+                  Cancel
+                </Button>
+              </Stack>
+            </>
+          ) : (
             <InlineCharmEditor
               style={{
                 paddingTop: 0,
-                paddingBottom: 0,
-                backgroundColor: theme.palette.background.light
+                paddingBottom: 0
               }}
-              focusOnInit
-              onContentChange={updateCommentContent}
-              content={commentEditContent.doc}
-            />
-            <Stack flexDirection='row' my={1} ml={1} gap={1}>
-              <Button size='small' onClick={saveCommentContent}>
-                Save
-              </Button>
-              <Button size='small' variant='outlined' color='secondary' onClick={cancelEditingComment}>
-                Cancel
-              </Button>
-            </Stack>
-          </>
-        ) : (
-          <InlineCharmEditor
-            style={{
-              paddingTop: 0,
-              paddingBottom: 0
-            }}
-            readOnly
-            key={isEditingComment.toString()}
-            content={commentContent.doc}
-          />
-        )}
-        <Stack flexDirection='row' gap={1}>
-          <ForumVote votes={postComment} onVote={voteComment} />
-          <Typography
-            sx={{
-              cursor: 'pointer'
-            }}
-            onClick={() => setShowCommentReply(true)}
-          >
-            Reply
-          </Typography>
-        </Stack>
-        <Box mt={2}>
-          {showCommentReply && (
-            <CommentReplyForm
-              commentId={comment.id}
-              onCreateComment={() => {}}
-              onCancelComment={() => setShowCommentReply(false)}
-              postId={comment.pageId}
+              readOnly
+              key={isEditingComment.toString()}
+              content={commentContent.doc}
             />
           )}
+          <Stack flexDirection='row' gap={1}>
+            <ForumVote votes={postComment} onVote={voteComment} />
+            <Typography
+              sx={{
+                cursor: 'pointer'
+              }}
+              onClick={() => setShowCommentReply(true)}
+            >
+              Reply
+            </Typography>
+          </Stack>
+          <Box mt={2}>
+            {showCommentReply && (
+              <CommentReplyForm
+                commentId={comment.id}
+                onCreateComment={() => {}}
+                onCancelComment={() => setShowCommentReply(false)}
+                postId={comment.pageId}
+              />
+            )}
+          </Box>
         </Box>
+      </StyledStack>
+      <Box ml={3} position='relative'>
         {postComment.children.map((childComment) => (
           <PostComment comment={childComment} key={childComment.id} />
         ))}
