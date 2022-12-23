@@ -13,8 +13,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { PaginatedPostList } from 'lib/forums/posts/listForumPosts';
-import type { Member } from 'lib/members/interfaces';
+import type { PaginatedPostList, SortPosts } from 'lib/forums/posts/listForumPosts';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -23,6 +22,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
+  sort?: string;
 }
 
 const resultsPerQuery = 10;
@@ -44,7 +44,14 @@ const generatePostRefreshTimeout = () => {
   }
 };
 
-export function ForumPostList({ search, categoryId }: ForumPostsProps) {
+function getSortPost(item: string | undefined): SortPosts {
+  if (item === 'newest' || item === 'most_voted' || item === 'most_commented') {
+    return item;
+  }
+  return 'newest';
+}
+
+export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const ref = useRef();
   const currentSpace = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
@@ -72,7 +79,8 @@ export function ForumPostList({ search, categoryId }: ForumPostsProps) {
             spaceId: currentSpace!.id,
             categoryId,
             count: resultsPerQuery,
-            page: refetch ? undefined : posts?.cursor
+            page: refetch ? undefined : posts?.cursor,
+            sort: getSortPost(sort)
           })
         : charmClient.forum.searchForumPosts({
             spaceId: currentSpace!.id,
