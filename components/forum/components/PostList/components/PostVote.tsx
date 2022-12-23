@@ -28,7 +28,6 @@ export function PostVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvote
         onClick={(e) => {
           clickVote(e, true);
         }}
-        component='span'
       >
         <NorthIcon
           sx={{
@@ -47,7 +46,6 @@ export function PostVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvote
         onClick={(e) => {
           clickVote(e, false);
         }}
-        component='span'
       >
         <SouthIcon
           sx={{
