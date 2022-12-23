@@ -1,5 +1,7 @@
-import { Box } from '@mui/material';
-import { useState } from 'react';
+import CommentIcon from '@mui/icons-material/Comment';
+import { Box, Divider, Stack, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
@@ -8,11 +10,15 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { PostCategoryInput } from './components/PostCategoryInput';
+import { PostComment } from './components/PostComment';
+import { PostCommentForm } from './components/PostCommentForm';
+import { PostCommentSort } from './components/PostCommentSort';
 
 type Props = {
   spaceId: string;
@@ -27,10 +33,14 @@ type FormInputs = {
   id?: string;
 };
 
-export function PostPage(props: Props) {
+export function PostPage({ page, spaceId, onSave }: Props) {
   const { user } = useUser();
-  const [form, setForm] = useState<FormInputs>(props.page ?? { title: '', content: null, contentText: '' });
-  const [categoryId, setCategoryId] = useState(props.page?.post.categoryId ?? null);
+  const [form, setForm] = useState<FormInputs>(page ?? { title: '', content: null, contentText: '' });
+  const [categoryId, setCategoryId] = useState(page?.post.categoryId ?? null);
+  const { data: postComments = [], mutate: setPostComments } = useSWR(page ? `${page.id}/comments` : null, () =>
+    page ? charmClient.forum.listPostComments(page.id) : []
+  );
+  const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
@@ -40,8 +50,8 @@ export function PostPage(props: Props) {
     if (checkIsContentEmpty(form.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
-    if (props.page) {
-      await charmClient.forum.updateForumPost(props.page.id, {
+    if (page) {
+      await charmClient.forum.updateForumPost(page.id, {
         categoryId,
         content: form.content,
         contentText: form.contentText,
@@ -52,11 +62,11 @@ export function PostPage(props: Props) {
         categoryId,
         content: form.content,
         contentText: form.contentText ?? '',
-        spaceId: props.spaceId,
+        spaceId,
         title: form.title
       });
     }
-    props.onSave?.();
+    onSave?.();
   }
 
   function updateCategoryId(_categoryId: string) {
@@ -70,7 +80,7 @@ export function PostPage(props: Props) {
       contentText: rawText
     }));
   }
-  const isMyPost = !props.page || props.page.createdBy === user?.id;
+  const isMyPost = !page || page.createdBy === user?.id;
   const readOnly = !isMyPost;
   let disabledTooltip = '';
   if (!form.title) {
@@ -81,13 +91,41 @@ export function PostPage(props: Props) {
     disabledTooltip = 'Category is required';
   }
 
+  const topLevelComments = useMemo(() => {
+    const postCommentsRecord: Record<string, PostCommentWithVoteAndChildren> = {};
+    postComments.forEach((postComment) => {
+      postCommentsRecord[postComment.id] = {
+        ...postComment,
+        children: []
+      };
+    });
+    postComments.forEach((postComment) => {
+      if (postComment.parentId !== page?.id) {
+        postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
+      }
+    });
+    const _topLevelComments: PostCommentWithVoteAndChildren[] = [];
+    Object.values(postCommentsRecord).forEach((comment) => {
+      comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? 1 : -1));
+      if (comment.parentId === page?.id) {
+        _topLevelComments.push(comment);
+      }
+    });
+    if (commentSort === 'latest') {
+      return _topLevelComments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
+    } else if (commentSort === 'top') {
+      return _topLevelComments.sort((c1, c2) => (c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1));
+    }
+    return _topLevelComments;
+  }, [postComments, page, commentSort]);
+
   return (
     <Container top={50}>
       <Box minHeight={300}>
         <CharmEditor
           readOnly={readOnly}
           pageActionDisplay={null}
-          pageId={props.page?.id}
+          pageId={page?.id}
           disablePageSpecificFeatures={true}
           pageType='post'
           isContentControlled={true}
@@ -96,16 +134,38 @@ export function PostPage(props: Props) {
         >
           <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
           <Box my={2}>
-            <PostCategoryInput spaceId={props.spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
+            <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
           </Box>
         </CharmEditor>
       </Box>
       {isMyPost && (
         <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
           <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
-            {props.page ? 'Update' : 'Post'}
+            {page ? 'Update' : 'Post'}
           </Button>
         </Box>
+      )}
+
+      {page?.post && <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />}
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
+      <Stack gap={1}>
+        <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+        {topLevelComments.map((comment) => (
+          <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+        ))}
+      </Stack>
+      {topLevelComments.length === 0 && (
+        <Stack gap={1} alignItems='center' my={1}>
+          <CommentIcon color='secondary' fontSize='large' />
+          <Typography color='secondary' variant='h6'>
+            No Comments Yet
+          </Typography>
+          <Typography color='secondary'>Be the first to share what you think!</Typography>
+        </Stack>
       )}
     </Container>
   );

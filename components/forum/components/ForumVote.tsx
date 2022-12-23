@@ -7,7 +7,13 @@ import type { MouseEvent } from 'react';
 
 import type { ForumVotes } from 'lib/forums/posts/interfaces';
 
-export function PostVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvoted?: boolean) => void }) {
+export function ForumContentUpDownVotes({
+  votes,
+  onVote
+}: {
+  votes: ForumVotes;
+  onVote: (upvoted: boolean | null) => void;
+}) {
   const theme = useTheme();
   const { downvotes, upvotes, upvoted } = votes;
 
@@ -15,7 +21,7 @@ export function PostVote({ votes, onVote }: { votes: ForumVotes; onVote: (upvote
     e.preventDefault();
     e.stopPropagation();
     if (upvoted === newUpvotedStatus) {
-      onVote(undefined);
+      onVote(null);
     } else {
       onVote(newUpvotedStatus);
     }

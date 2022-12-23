@@ -78,7 +78,7 @@ describe('voteForumPost', () => {
     });
   });
 
-  it('should delete page vote if upvoted is undefined and return correct vote information', async () => {
+  it('should delete page vote if upvoted is null and return correct vote information', async () => {
     const createdPage = await generateForumPost({
       userId: user.id,
       spaceId: space.id
@@ -93,7 +93,7 @@ describe('voteForumPost', () => {
     await voteForumPost({
       pageId: createdPage.id,
       userId: user.id,
-      upvoted: undefined
+      upvoted: null
     });
 
     const postPageVote = await getPostVote({
@@ -104,7 +104,7 @@ describe('voteForumPost', () => {
     expect(postPageVote).toStrictEqual({
       downvotes: 0,
       upvotes: 0,
-      upvoted: undefined
+      upvoted: null
     });
   });
 });

@@ -118,7 +118,6 @@ function AddCommentCharmEditor({
   const isEmpty = checkIsContentEmpty(commentContent);
   const { addComment, threads } = useThreads();
   const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
-
   const touched = useRef(false);
 
   usePreventReload(touched.current);

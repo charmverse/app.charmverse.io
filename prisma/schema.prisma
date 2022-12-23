@@ -448,6 +448,7 @@ model User {
   memberPropertyValues MemberPropertyValue[]
   userTokenGates       UserTokenGate[]
   unstoppableDomains   UnstoppableDomain[]
+  PageComment          PageComment[]
   googleAccounts       GoogleAccount[]
 }
 
@@ -1039,16 +1040,18 @@ model PageUpDownVote {
 }
 
 model PageComment {
-  id          String   @id @default(uuid()) @db.Uuid
-  createdAt   DateTime @default(now())
-  createdBy   String   @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  createdBy   String    @db.Uuid
   content     Json
   contentText String
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   parentId    String
 
   pageId String                  @db.Uuid
   page   Page                    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user   User                    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   votes  PageCommentUpDownVote[]
 
   @@index([pageId])
