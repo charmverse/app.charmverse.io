@@ -1,11 +1,12 @@
 import { prisma } from 'db';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import { verifyToken } from 'lib/google/loginWithGoogle';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
+
+import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type ConnectGoogleAccountRequest = LoginWithGoogleRequest & { userId: string };
 
@@ -15,7 +16,7 @@ export async function connectGoogleAccount({
   displayName,
   userId
 }: ConnectGoogleAccountRequest): Promise<LoggedInUser> {
-  const verified = await verifyToken(accessToken);
+  const verified = await verifyGoogleToken(accessToken);
 
   const email = verified.email;
 
