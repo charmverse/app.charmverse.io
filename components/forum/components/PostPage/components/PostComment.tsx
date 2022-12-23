@@ -115,10 +115,13 @@ export function PostComment({ comment }: { comment: PostCommentWithVoteAndChildr
     <Stack my={1} position='relative'>
       <StyledStack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-          <Stack flexDirection='row' gap={1} alignItems='center'>
-            <Avatar size='small' avatar={postComment.user.avatar} />
-            <Typography>{postComment.user.username}</Typography>
-            <Typography variant='subtitle1'>{relativeTime(postComment.createdAt)}</Typography>
+          <Stack flexDirection='row' alignItems='center'>
+            <Avatar size='small' sx={{ mr: 1 }} avatar={postComment.user.avatar} />
+            <Typography mr={1}>{postComment.user.username}</Typography>
+            <Typography variant='subtitle1' mr={0.5}>
+              {relativeTime(postComment.createdAt)}
+            </Typography>
+            {postComment.createdAt !== postComment.updatedAt && <Typography variant='subtitle2'>(Edited)</Typography>}
           </Stack>
           {comment.createdBy === user?.id && (
             <IconButton
