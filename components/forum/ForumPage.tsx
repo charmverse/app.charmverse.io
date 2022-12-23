@@ -23,6 +23,7 @@ export default function ForumPage() {
   const router = useRouter();
   const currentSpace = useCurrentSpace();
   const categoryId = router.query.categoryId as string | undefined;
+  const sort = router.query.sort as string | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
 
@@ -94,7 +95,7 @@ export default function ForumPage() {
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
           {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
-          <ForumPostList search={search} categoryId={categoryId} />
+          <ForumPostList search={search} categoryId={categoryId} sort={sort} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu />
