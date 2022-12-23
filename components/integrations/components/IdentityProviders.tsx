@@ -8,12 +8,14 @@ import { useContext, useState } from 'react';
 import charmClient from 'charmClient';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Button from 'components/common/Button';
+import { useGoogleAuth } from 'components/login/hooks/useGoogleAuth';
 import { WalletConnect } from 'components/login/WalletConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 import DiscordIcon from 'public/images/discord_logo.svg';
+import GoogleIcon from 'public/images/Google_G.png';
 import TelegramIcon from 'public/images/telegram_logo.svg';
 
 import { DiscordProvider } from './DiscordProvider';
@@ -48,10 +50,12 @@ export default function IdentityProviders() {
   const { account, connector, connectWallet } = useWeb3AuthSig();
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
+  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle } = useGoogleAuth();
   const [isLoggingOut] = useState(false);
   const [telegramError, setTelegramError] = useState('');
 
   const connectedWithTelegram = Boolean(user?.telegramUser);
+  const connectedWithGoogle = !!user?.googleAccounts.length;
 
   function connectorName(c: any) {
     switch (c) {
@@ -157,6 +161,25 @@ export default function IdentityProviders() {
           onClick={() => (connectedWithTelegram ? disconnectFromTelegram() : connectToTelegram())}
         >
           {connectedWithTelegram ? 'Disconnect' : 'Connect'}
+        </StyledButton>
+        <TelegramLoginIframe />
+
+        {telegramError && <Alert severity='error'>{telegramError}</Alert>}
+      </ProviderRow>
+      <ProviderRow>
+        <img src='images/Google_G.png' height={48} width='auto' />
+        <Typography color='secondary' variant='button'>
+          {connectedWithGoogle ? 'Connected with Google' : 'Connect with Google'}
+        </Typography>
+        <StyledButton
+          variant='outlined'
+          sx={{ overflow: 'hidden' }}
+          color={connectedWithGoogle ? 'error' : 'primary'}
+          disabled={isLoggingOut || isConnectingGoogle}
+          loading={isConnectingGoogle}
+          onClick={connectedWithGoogle ? disconnectGoogleAccount : connectGoogleAccount}
+        >
+          {connectedWithGoogle ? 'Disconnect' : 'Connect'}
         </StyledButton>
         <TelegramLoginIframe />
 

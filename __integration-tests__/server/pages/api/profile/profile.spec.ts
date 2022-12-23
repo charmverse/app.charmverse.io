@@ -81,7 +81,6 @@ describe('PUT /api/profile - Update user profile', () => {
 
     expect(updatedProfile.username).toBe(googleAccount.name);
     expect(updatedProfile.identityType).toBe('Google');
-    expect(updatedProfile.avatar).toBe(googleAccount.avatarUrl);
   });
 
   it('should refuse to update a users profile to a Google Account not registered to their account, responding with 401', async () => {
