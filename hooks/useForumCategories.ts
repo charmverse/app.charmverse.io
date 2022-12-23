@@ -1,5 +1,4 @@
 import type { PostCategory } from '@prisma/client';
-import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -8,8 +7,6 @@ import { useCurrentSpace } from './useCurrentSpace';
 
 export function useForumCategories() {
   const currentSpace = useCurrentSpace();
-  const router = useRouter();
-  const selectedCategoryId = router.query.categoryId as string | undefined;
 
   const {
     data: categories = [],
@@ -31,8 +28,6 @@ export function useForumCategories() {
       })
     )
   );
-
-  const currentCategory = categories.find((cat) => cat.id === selectedCategoryId);
 
   async function createForumCategory(categoryName: string) {
     if (currentSpace) {
@@ -85,7 +80,6 @@ export function useForumCategories() {
     deleteForumCategory,
     updateForumCategory,
     categories,
-    currentCategory,
     error,
     disabled: isValidating
   };

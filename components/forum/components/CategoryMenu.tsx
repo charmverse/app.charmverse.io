@@ -23,8 +23,9 @@ const StyledBox = styled(Box)`
 `;
 
 function ForumFilterListLink({ category, label }: { label: string; category?: PostCategory }) {
-  const { deleteForumCategory, updateForumCategory, currentCategory } = useForumCategories();
+  const { deleteForumCategory, updateForumCategory } = useForumCategories();
   const router = useRouter();
+  const selectedCategory = router.query.categoryId as string;
   const admin = isAdmin();
 
   return (
@@ -50,7 +51,7 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
           sx={{
             color: 'text.primary'
           }}
-          fontWeight={(category ? currentCategory?.id === category.id : !currentCategory?.id) ? 'bold' : 'initial'}
+          fontWeight={(category ? selectedCategory === category.id : !selectedCategory) ? 'bold' : 'initial'}
         >
           {label}
         </Typography>

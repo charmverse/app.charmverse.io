@@ -25,7 +25,9 @@ export default function ForumPage() {
   const currentSpace = useCurrentSpace();
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
-  const { currentCategory } = useForumCategories();
+  const { categories } = useForumCategories();
+  const categoryId = router.query.categoryId as string | undefined;
+  const currentCategory = categories.find((category) => category.id === categoryId);
 
   function handleCategoryUpdate(_categoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
