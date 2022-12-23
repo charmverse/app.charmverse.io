@@ -15,7 +15,7 @@ export async function createPostComment({
   return prisma.pageComment.create({
     data: {
       content,
-      contentText,
+      contentText: contentText.trim(),
       createdBy: userId,
       pageId: postId,
       parentId
