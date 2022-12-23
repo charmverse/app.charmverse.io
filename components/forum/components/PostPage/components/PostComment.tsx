@@ -134,11 +134,11 @@ export function PostComment({
   }
 
   async function onClickDeleteComment() {
+    menuState.close();
     await charmClient.forum.deletePostComment({ commentId: comment.id, postId: comment.pageId });
     setPostComments((comments) =>
       comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, deletedAt: new Date() } : _comment))
     );
-    menuState.close();
   }
 
   return (
@@ -151,7 +151,9 @@ export function PostComment({
             <Typography variant='subtitle1' mr={0.5}>
               {getRelativeTimeInThePast(new Date(comment.createdAt))}
             </Typography>
-            {comment.createdAt !== comment.updatedAt && <Typography variant='subtitle2'>(Edited)</Typography>}
+            {comment.createdAt !== comment.updatedAt && !comment.deletedAt && (
+              <Typography variant='subtitle2'>(Edited)</Typography>
+            )}
           </Stack>
           {comment.createdBy === user?.id && !comment.deletedAt && (
             <IconButton
@@ -200,7 +202,9 @@ export function PostComment({
               </Stack>
             </Stack>
           ) : comment.deletedAt ? (
-            <Typography color='secondary'>Comment deleted by user</Typography>
+            <Typography color='secondary' my={1}>
+              Comment deleted by user
+            </Typography>
           ) : (
             <InlineCharmEditor
               style={{
