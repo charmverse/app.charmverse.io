@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -20,7 +20,7 @@ import type {
   PostCommentWithVoteAndChildren
 } from 'lib/forums/comments/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { relativeTime } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 import { ForumVote } from '../../ForumVote';
 
@@ -45,7 +45,6 @@ export function PostComment({
   comment: PostCommentWithVoteAndChildren;
   setPostComments: KeyedMutator<PostCommentWithVote[]>;
 }) {
-  const [postComment, setPostComment] = useState(comment);
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { user } = useUser();
@@ -82,43 +81,45 @@ export function PostComment({
 
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
 
-  useEffect(() => {
-    setPostComment(comment);
-  }, [comment]);
-
   async function voteComment(newUpvotedStatus?: boolean) {
     await charmClient.forum.voteComment({
-      postId: postComment.pageId,
-      commentId: postComment.id,
+      postId: comment.pageId,
+      commentId: comment.id,
       upvoted: newUpvotedStatus
     });
 
     const postCommentVote: PostCommentVote = {
-      downvotes: postComment.downvotes,
-      upvotes: postComment.upvotes,
+      downvotes: comment.downvotes,
+      upvotes: comment.upvotes,
       upvoted: newUpvotedStatus
     };
 
     if (newUpvotedStatus === true) {
       postCommentVote.upvotes += 1;
-      if (postComment.upvoted === false) {
+      if (comment.upvoted === false) {
         postCommentVote.downvotes -= 1;
       }
     } else if (newUpvotedStatus === false) {
       postCommentVote.downvotes += 1;
-      if (postComment.upvoted === true) {
+      if (comment.upvoted === true) {
         postCommentVote.upvotes -= 1;
       }
-    } else if (postComment.upvoted === true) {
+    } else if (comment.upvoted === true) {
       postCommentVote.upvotes -= 1;
     } else {
       postCommentVote.downvotes -= 1;
     }
 
-    setPostComment({
-      ...postComment,
-      ...postCommentVote
-    });
+    setPostComments((comments) =>
+      comments?.map((_comment) =>
+        _comment.id === comment.id
+          ? {
+              ...comment,
+              ...postCommentVote
+            }
+          : _comment
+      )
+    );
   }
 
   function onClickEditComment() {
@@ -131,12 +132,12 @@ export function PostComment({
       <StyledStack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
-            <Avatar size='small' sx={{ mr: 1 }} avatar={postComment.user.avatar} />
-            <Typography mr={1}>{postComment.user.username}</Typography>
+            <Avatar size='small' sx={{ mr: 1 }} avatar={comment.user.avatar} />
+            <Typography mr={1}>{comment.user.username}</Typography>
             <Typography variant='subtitle1' mr={0.5}>
-              {relativeTime(postComment.createdAt)}
+              {getRelativeTimeInThePast(new Date(comment.createdAt))}
             </Typography>
-            {postComment.createdAt !== postComment.updatedAt && <Typography variant='subtitle2'>(Edited)</Typography>}
+            {comment.createdAt !== comment.updatedAt && <Typography variant='subtitle2'>(Edited)</Typography>}
           </Stack>
           {comment.createdBy === user?.id && (
             <IconButton
@@ -196,7 +197,7 @@ export function PostComment({
             />
           )}
           <Stack flexDirection='row' gap={1}>
-            <ForumVote votes={postComment} onVote={voteComment} />
+            <ForumVote votes={comment} onVote={voteComment} />
             <Typography
               sx={{
                 cursor: 'pointer'
@@ -219,7 +220,7 @@ export function PostComment({
         </Box>
       </StyledStack>
       <Box ml={3} position='relative'>
-        {postComment.children.map((childComment) => (
+        {comment.children.map((childComment) => (
           <PostComment setPostComments={setPostComments} comment={childComment} key={childComment.id} />
         ))}
       </Box>
