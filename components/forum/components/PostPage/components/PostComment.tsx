@@ -87,7 +87,7 @@ export function PostComment({
 
   const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
 
-  async function voteComment(newUpvotedStatus?: boolean) {
+  async function voteComment(newUpvotedStatus: boolean | null) {
     await charmClient.forum.upOrDownVoteComment({
       postId: comment.pageId,
       commentId: comment.id,

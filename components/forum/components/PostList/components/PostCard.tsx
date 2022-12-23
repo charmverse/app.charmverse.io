@@ -38,7 +38,7 @@ export function PostCard({ post, user }: ForumPostProps) {
   const router = useRouter();
   const { showPost } = usePostDialog();
 
-  async function voteOnPost(newUpvotedStatus?: boolean) {
+  async function voteOnPost(newUpvotedStatus: boolean | null) {
     await charmClient.forum.voteOnPost({
       postId,
       upvoted: newUpvotedStatus

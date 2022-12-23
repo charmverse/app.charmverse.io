@@ -23,4 +23,4 @@ export type UpdatePostCommentInput = {
   contentText: string;
 };
 
-export type PostCommentVote = { upvotes: number; downvotes: number; upvoted?: boolean };
+export type PostCommentVote = { upvotes: number; downvotes: number; upvoted: boolean | null };

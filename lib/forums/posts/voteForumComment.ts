@@ -12,7 +12,7 @@ export async function voteForumComment({
   commentId: string;
   pageId: string;
   userId: string;
-  upvoted?: boolean;
+  upvoted: boolean | null;
 }) {
   const comment = await getComment(commentId);
 
@@ -20,7 +20,7 @@ export async function voteForumComment({
     throw new DataNotFoundError(commentId);
   }
 
-  if (upvoted === undefined) {
+  if (upvoted === null) {
     await prisma.pageCommentUpDownVote.delete({
       where: {
         createdBy_commentId: {
