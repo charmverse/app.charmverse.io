@@ -31,7 +31,7 @@ describe('Video Permissions', () => {
   it('Checks that a user can create a page video', async () => {
     const isAllowed = await canCreate({ userId: users.member, pageId });
 
-    expect(isAllowed).toBe(false);
+    expect(isAllowed).toBe(true);
   });
 
   it('Checks that a user cannot create a page video', async () => {
