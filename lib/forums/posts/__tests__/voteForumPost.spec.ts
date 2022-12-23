@@ -78,7 +78,7 @@ describe('voteForumPost', () => {
     });
   });
 
-  it('should delete page vote if upvoted is undefined and return correct vote information', async () => {
+  it('should delete page vote if upvoted is null and return correct vote information', async () => {
     const createdPage = await generateForumPost({
       userId: user.id,
       spaceId: space.id
