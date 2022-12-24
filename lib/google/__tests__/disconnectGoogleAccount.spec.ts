@@ -61,7 +61,7 @@ describe('disconnectGoogleAccount', () => {
     expect(userAfterDisconnect.deletedAt).toBeInstanceOf(Date);
   });
 
-  it('should update the old user username and identity type to another connected identity', async () => {
+  it('should update the users username and identity type to another connected identity, after deleting Google account', async () => {
     const user = await prisma.user.create({
       data: {
         username: 'Test user',
