@@ -55,7 +55,7 @@ export function WalletSign({
         .then(signSuccess)
         .catch((error) => {
           log.error('Error requesting wallet signature in login page', error);
-          showMessage('Wallet signature failed', 'warning');
+          showMessage('Wallet signature cancelled', 'info');
         });
     }
   }
