@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/system';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -8,15 +8,13 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import log from 'lib/log';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
-import { Web3Connection } from '../_app/Web3ConnectionManager';
-
 interface Props {
   signSuccess: (authSig: AuthSig) => void;
   buttonStyle?: SxProps<Theme>;
   ButtonComponent?: typeof PrimaryButton;
   buttonSize?: 'small' | 'medium' | 'large';
   buttonOutlined?: boolean;
-  // If connecting a wallet, this component auto-triggers signing. Defaults to true
+  // Verify Wallet will trigger signature as soon as a wallet is detected
   enableAutosign?: boolean;
   loading?: boolean;
 }
@@ -27,7 +25,7 @@ export function WalletSign({
   buttonSize,
   ButtonComponent = PrimaryButton,
   buttonOutlined,
-  enableAutosign = true,
+  enableAutosign,
   loading
 }: Props) {
   const {
@@ -40,32 +38,14 @@ export function WalletSign({
     connectWalletModalIsOpen,
     isConnectingIdentity
   } = useWeb3AuthSig();
-  const { isWalletSelectorModalOpen } = useContext(Web3Connection);
   const { showMessage } = useSnackbar();
 
-  // We want to avoid auto-firing the sign workflow if the user is already with a connected wallet
-  const userClickedConnect = useRef<boolean>(false);
-
   const showLoadingState = loading || isSigning;
-
   useEffect(() => {
-    if (isWalletSelectorModalOpen && !userClickedConnect.current) {
-      userClickedConnect.current = true;
-    }
-  }, [isWalletSelectorModalOpen]);
-
-  useEffect(() => {
-    if (
-      userClickedConnect.current &&
-      !isSigning &&
-      enableAutosign &&
-      verifiableWalletDetected &&
-      !isConnectingIdentity
-    ) {
-      userClickedConnect.current = false;
+    if (!isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
       generateWalletAuth();
     }
-  }, [verifiableWalletDetected, isConnectingIdentity]);
+  }, [verifiableWalletDetected]);
 
   async function generateWalletAuth() {
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
@@ -88,7 +68,6 @@ export function WalletSign({
         size={buttonSize ?? 'large'}
         loading={connectWalletModalIsOpen || isConnectingIdentity}
         onClick={() => {
-          userClickedConnect.current = true;
           connectWallet();
         }}
         variant={buttonOutlined ? 'outlined' : undefined}
