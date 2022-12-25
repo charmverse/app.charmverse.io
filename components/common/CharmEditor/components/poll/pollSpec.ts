@@ -1,5 +1,5 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import type { Node } from '@bangle.dev/pm';
+import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 
 import { name } from './config';
 
@@ -26,18 +26,9 @@ export function spec(): RawSpecs {
       group: 'block',
       inline: false,
       draggable: false,
-      parseDOM: [
-        {
-          tag: 'poll',
-          getAttrs: (dom: any) => {
-            return {
-              pollId: dom.getAttribute('pollId')
-            };
-          }
-        }
-      ],
-      toDOM: (node: Node) => {
-        return ['poll', { pollId: node.attrs.pollId }];
+      parseDOM: [{ tag: 'div.charm-poll' }],
+      toDOM: (): DOMOutputSpec => {
+        return ['div.charm-poll'];
       }
     }
   };
