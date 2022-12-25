@@ -5,9 +5,6 @@ import type { NodeSelection } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
-import { queryIsSelectionAroundInlineVote } from '../inlineVote';
-import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
-
 import { floatingMenu } from './floating-menu';
 
 const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll';
@@ -34,13 +31,6 @@ export function plugins({
           return 'commentOnlyMenu';
         }
         return null;
-      }
-
-      // If we are inside an inline vote
-      if (hasComponentInSchema(state, inlineVoteMarkName)) {
-        if (queryIsSelectionAroundInlineVote()(state)) {
-          return 'inlineVoteSubMenu';
-        }
       }
 
       // If we are inside a link

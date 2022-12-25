@@ -16,7 +16,6 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
-import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
 import type { SubMenu } from './floating-menu';
@@ -128,7 +127,6 @@ function MenuByType(props: MenuProps) {
           <CodeButton />
           <FloatingLinkButton menuKey={pluginKey} />
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
-          {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
         </MenuGroup>
         {!inline && (
           <MenuGroup>
@@ -164,12 +162,5 @@ function MenuByType(props: MenuProps) {
     );
   }
 
-  if (type === 'inlineVoteSubMenu' && !inline) {
-    return (
-      <Menu hideMenu={hideMenu}>
-        <InlineVoteSubMenu pluginKey={pluginKey} />
-      </Menu>
-    );
-  }
   return null;
 }

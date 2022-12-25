@@ -31,11 +31,6 @@ export const SIDEBAR_VIEWS = {
     icon: <RateReviewOutlined fontSize='small' />,
     tooltip: 'View suggestions',
     title: 'Suggestions'
-  },
-  polls: {
-    icon: <FormatListBulleted fontSize='small' />,
-    tooltip: 'View polls',
-    title: 'Polls'
   }
 } as const;
 
@@ -81,7 +76,6 @@ function SidebarDrawerComponent({
             <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
               <PageActionIcon view='comments' />
               <PageActionIcon view='suggestions' />
-              <PageActionIcon view='polls' />
             </Box>
           </Box>
           {children}
