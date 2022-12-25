@@ -102,13 +102,13 @@ export default function VoteDetail({
   return (
     <VotesWrapper detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='h6' fontWeight='bold'>
+        <Typography variant='h6' fontWeight='bold' className='polls'>
           {!isProposal ? title : 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu deleteVote={deleteVote} cancelVote={cancelVote} vote={vote} removeFromPage={removeFromPage} />
       </Box>
       <Box display='flex' justifyContent='space-between'>
-        <Typography color='secondary' variant='subtitle1'>
+        <Typography style={{ margin: 0 }} color='secondary' variant='subtitle1' my={0} className='polls'>
           {hasPassedDeadline ? relativeDate : `${relativeDate?.replace(/^in/g, '')} left`}
         </Typography>
         <VoteStatusChip size='small' status={hasPassedDeadline && isProposal ? 'Complete' : vote.status} />
@@ -151,7 +151,7 @@ export default function VoteDetail({
               label={
                 <Box display='flex' justifyContent='space-between' flexGrow={1}>
                   <span>{voteOption.name}</span>
-                  <Typography variant='subtitle1' color='secondary'>
+                  <Typography variant='subtitle1' color='secondary' className='polls'>
                     {((totalVotes === 0 ? 0 : (aggregatedResult?.[voteOption.name] ?? 0) / totalVotes) * 100).toFixed(
                       2
                     )}

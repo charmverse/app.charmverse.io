@@ -10,7 +10,7 @@ import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constan
 
 import { floatingMenu } from './floating-menu';
 
-const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase';
+const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll';
 
 export function plugins({
   key,

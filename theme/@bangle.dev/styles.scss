@@ -270,7 +270,7 @@ img.ProseMirror-separator {
   margin-top: 1rem;
 }
 
-.bangle-editor h6 {
+.bangle-editor h6:not(.polls) {
   font-weight: 500;
   font-size: 0.75rem;
   margin-top: 1rem;
