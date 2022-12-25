@@ -28,7 +28,6 @@ import {
   FloatingLinkButton,
   HeadingButton,
   InlineCommentButton,
-  InlineVoteButton,
   ItalicButton,
   ParagraphButton,
   StrikeButton,
@@ -63,7 +62,6 @@ function MenuByType(props: MenuProps) {
     inline,
     pagePermissions,
     enableComments,
-    enableVoting,
     nestedPagePluginKey,
     disableNestedPage
   } = props;
@@ -72,7 +70,6 @@ function MenuByType(props: MenuProps) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
-  const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting;
   const [activeItem, setActiveItem] = useState('Text');
   const handleActiveItem = (item: string) => setActiveItem(item);
   const view = useEditorViewContext();
@@ -86,7 +83,6 @@ function MenuByType(props: MenuProps) {
     return (
       <Menu hideMenu={hideMenu}>
         <InlineCommentButton enableComments menuKey={pluginKey} />
-        {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
       </Menu>
     );
   }
