@@ -24,6 +24,7 @@ import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import * as poll from 'components/common/CharmEditor/components/poll';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -211,6 +212,10 @@ export function charmEditorPlugins({
     }),
     NodeView.createPlugin({
       name: 'inlineDatabase',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
+    NodeView.createPlugin({
+      name: 'poll',
       containerDOM: ['div', { draggable: 'false' }]
     }),
     tabIndent.plugins(),
@@ -621,6 +626,9 @@ function CharmEditor({
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
+          }
+          case 'poll': {
+            return <poll.Component {...allProps} />;
           }
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
