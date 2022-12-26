@@ -78,10 +78,6 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 
   const profile = await getUserProfile('id', req.session.user.id);
 
-  if (!profile) {
-    return handleNoProfile(req, res);
-  }
-
   // Clean up the anonymous id if the user has a profile
   if (req.session.anonymousUserId) {
     req.session.anonymousUserId = undefined;
