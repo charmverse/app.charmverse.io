@@ -17,18 +17,9 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const lowerCaseAddress = address.toLowerCase();
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    select: {
-      wallets: true
-    }
-  });
+  const user = await getUserProfile('id', userId);
 
-  if (!user) {
-    throw new MissingDataError('User not found');
-  } else if (!user.wallets.some((w) => w.address === lowerCaseAddress)) {
+  if (!user.wallets.some((w) => w.address === lowerCaseAddress)) {
     throw new MissingDataError('No user wallet found with this address');
   }
 
@@ -40,7 +31,16 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
         address: lowerCaseAddress
       },
       data: {
-        ensname: ensName
+        ensname: ensName,
+        // Also update the username if it currently matches the wallet address for this ENS name
+        user:
+          user.username === lowerCaseAddress
+            ? {
+                update: {
+                  username: ensName
+                }
+              }
+            : undefined
       }
     });
   }
