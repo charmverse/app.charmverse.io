@@ -6,6 +6,7 @@ import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import type { IdentityType } from '@prisma/client';
+import { utils } from 'ethers';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -19,8 +20,6 @@ import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import useENSName from 'hooks/useENSName';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import randomName from 'lib/utilities/randomName';
@@ -191,7 +190,9 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <Grid item>
             <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
-              <Typography variant='h1'>{user?.username}</Typography>
+              <Typography variant='h1'>
+                {utils.isAddress(user?.username) ? shortenHex(user.username) : user.username}
+              </Typography>
             </EditIconContainer>
           </Grid>
           {!readOnly && (
