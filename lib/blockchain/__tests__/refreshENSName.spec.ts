@@ -47,6 +47,27 @@ describe('refreshENSName', () => {
     expect(checkEnsName(address, userAfterRefresh.wallets[0].ensname as string)).toBe(true);
   });
 
+  it('should update the main current user displayname if identity type is "Wallet" it does not match the ENS Name', async () => {
+    const address = Wallet.createRandom().address.toLowerCase();
+    const user = await prisma.user.create({
+      data: {
+        username: address,
+        wallets: {
+          create: {
+            address
+          }
+        }
+      }
+    });
+
+    const userAfterRefresh = await refreshENSName({
+      userId: user.id,
+      address
+    });
+
+    expect(checkEnsName(address, userAfterRefresh.wallets[0].ensname as string)).toBe(true);
+  });
+
   it('should perform a no-op if no ENS name is found', async () => {
     const address = `ignore-${Wallet.createRandom().address.toLowerCase()}`;
     const user = await prisma.user.create({
@@ -78,15 +99,18 @@ describe('refreshENSName', () => {
   it('should throw an error if the user does not exist', async () => {
     await expect(refreshENSName({ userId: v4(), address: v4() })).rejects.toBeInstanceOf(MissingDataError);
   });
-  it('should throw an error if this user does not have a matching wallet address', async () => {
+  it('should throw an error if this user does not have a matching wallet address or ENSname', async () => {
     const address = `${Wallet.createRandom().address}`;
     const user = await prisma.user.create({
       data: {
         username: 'Example User',
-        identityType: 'RandomName'
+        identityType: 'Wallet'
       }
     });
 
     await expect(refreshENSName({ userId: user.id, address })).rejects.toBeInstanceOf(MissingDataError);
+    await expect(refreshENSName({ userId: user.id, address: `test-${v4()}.ft` })).rejects.toBeInstanceOf(
+      MissingDataError
+    );
   });
 });

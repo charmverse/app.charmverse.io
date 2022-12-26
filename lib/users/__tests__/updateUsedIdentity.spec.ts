@@ -138,6 +138,32 @@ describe('updateUsedIdentity', () => {
     expect(userAfterUpdate.identityType).toBe(`Wallet`);
   });
 
+  it('should update a user identity to their connected ENS name', async () => {
+    const ensname = `example-${v4()}.nft`;
+
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        wallets: {
+          create: {
+            address: v4(),
+            ensname
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Wallet',
+      displayName: ensname
+    });
+
+    expect(userAfterUpdate.username).toBe(ensname);
+    expect(userAfterUpdate.identityType).toBe(`Wallet`);
+  });
+
   it('should update a user identity to their connected Unstoppable Domain', async () => {
     const user = await prisma.user.create({
       data: {

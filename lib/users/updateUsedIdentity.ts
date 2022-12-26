@@ -41,12 +41,8 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
     ) {
       throw new InsecureOperationError(`User ${userId} does not have an Unstoppable Domain with name ${displayName}`);
     } else if (identityType === 'Wallet') {
-      if (!user.wallets.some((wallet) => wallet.address === displayName)) {
-        const ensNames = await Promise.all(user.wallets.map((wallet) => getENSName(wallet.address)));
-        const matchingENSNameFound = ensNames.some((ensName) => ensName === displayName);
-        if (!matchingENSNameFound) {
-          throw new InsecureOperationError(`User ${userId} does not have a wallet with address ${displayName}`);
-        }
+      if (!user.wallets.some((wallet) => wallet.address === displayName || wallet.ensname === displayName)) {
+        throw new InsecureOperationError(`User ${userId} does not have wallet with address or ensname ${displayName}`);
       }
     } else if (identityType === 'Telegram' && (user.telegramUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Telegram account with name ${displayName}`);
