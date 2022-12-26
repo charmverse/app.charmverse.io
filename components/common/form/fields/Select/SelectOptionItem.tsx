@@ -23,7 +23,8 @@ export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdi
           label={option.name}
           color={option.color}
           size='small'
-          sx={{ maxWidth: 'calc(100% - 24px)', px: 0.5, zIndex: 0, position: 'relative' }}
+          // 100% - 24px to not collide with ellipsis
+          sx={{ maxWidth: readOnly ? '100%' : 'calc(100% - 24px)', px: 0.5, zIndex: 0, position: 'relative' }}
         />
 
         {!readOnly && (
