@@ -2,7 +2,7 @@ import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import getENSName from 'lib/blockchain/getENSName';
+import { getENSName } from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';

@@ -74,13 +74,11 @@ function EditIconContainer({
 }
 
 function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
-  const { account } = useWeb3AuthSig();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
     return isPublic ? user.profile : charmClient.getUserDetails();
   });
 
-  const ENSName = useENSName(account);
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
@@ -110,15 +108,14 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     }
 
     const types: IntegrationModel[] = [];
-    if (user?.wallets.length !== 0) {
+    user.wallets.forEach((wallet) => {
       types.push({
         type: 'Wallet',
-        username: ENSName || user.wallets[0].address,
+        username: wallet.ensname ?? wallet.address,
         isInUse: user.identityType === 'Wallet',
         icon: getIdentityIcon('Wallet')
       });
-    }
-
+    });
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
@@ -242,8 +239,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
             save={(id: string, identityType: IdentityType) => {
-              const username: string = identityType === 'Wallet' ? ENSName || shortenHex(id) : id;
-              handleUserUpdate({ username, identityType });
+              handleUserUpdate({ id, identityType });
             }}
             identityTypes={identityTypes}
             identityType={(user?.identityType || 'Wallet') as IdentityType}

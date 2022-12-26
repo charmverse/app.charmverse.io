@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import getENSName from 'lib/blockchain/getENSName';
+import { getENSName } from 'lib/blockchain/getENSName';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

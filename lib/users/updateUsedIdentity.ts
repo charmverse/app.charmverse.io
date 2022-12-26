@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
 
 import { prisma } from 'db';
-import getENSName from 'lib/blockchain/getENSName';
+import { getENSName } from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
