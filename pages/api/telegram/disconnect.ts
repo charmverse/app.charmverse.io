@@ -1,13 +1,12 @@
-import type { IdentityType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getENSName } from 'lib/blockchain/getENSName';
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import { InvalidStateError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { shortenHex } from 'lib/utilities/strings';
+import { getUserProfile } from 'lib/users/getUser';
+import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
+import type { LoggedInUser } from 'models';
 
 const handler = nc({
   onError,
@@ -16,68 +15,25 @@ const handler = nc({
 
 handler.use(requireUser).post(disconnectTelegram);
 
-async function disconnectTelegram(req: NextApiRequest, res: NextApiResponse) {
-  await prisma.telegramUser.delete({
-    where: {
-      userId: req.session.user.id
-    }
-  });
+async function disconnectTelegram(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
+  const userId = req.session.user.id;
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: req.session.user.id
-    },
-    include: {
-      discordUser: true,
-      wallets: true
-    }
-  });
+  const user = await getUserProfile('id', userId);
 
-  if (!user) {
-    return res.status(400).json({
-      error: 'User does not exist'
+  if (user.telegramUser) {
+    await prisma.telegramUser.delete({
+      where: {
+        userId: req.session.user.id
+      }
     });
   }
-
-  // If identity type is not Telegram
+  // If identity type is not Telegram we don't need to fallback to another identity
   if (user.identityType !== 'Telegram') {
-    return res.status(200).json({ success: 'ok' });
+    const { telegramUser, ...withoutTelegramUser } = user;
+    return res.status(200).json(withoutTelegramUser);
   }
 
-  let newUserName: string;
-  let newIdentityProvider: IdentityType;
-
-  let ens: string | null = null;
-  if (user.wallets[0]?.address) {
-    ens = await getENSName(user.wallets[0].address);
-  }
-
-  if (ens) {
-    newUserName = ens;
-    newIdentityProvider = 'Wallet';
-  }
-  if (user.discordUser && user.discordUser.account && (user.discordUser.account as Partial<DiscordAccount>).username) {
-    const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
-    // Already checked that there is a username
-    newUserName = discordAccount.username || '';
-    newIdentityProvider = 'Discord';
-  } else if (user.wallets.length) {
-    newUserName = shortenHex(user.wallets[0].address);
-    newIdentityProvider = 'Wallet';
-  } else {
-    throw new InvalidStateError();
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: req.session.user.id
-    },
-    data: {
-      username: newUserName,
-      identityType: newIdentityProvider
-    }
-  });
-
+  const updatedUser = await updateUsedIdentity(user.id);
   return res.status(200).json(updatedUser);
 }
 
