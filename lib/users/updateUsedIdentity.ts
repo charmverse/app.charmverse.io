@@ -33,7 +33,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
 
     if (identityType === 'Google' && !user.googleAccounts.some((acc) => acc.name === displayName)) {
       throw new InsecureOperationError(`User ${userId} does not have a Google account with name ${displayName}`);
-    } else if (identityType === 'Discord' && (!user.discordUser?.account as any)?.username !== displayName) {
+    } else if (identityType === 'Discord' && (user.discordUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Discord account with name ${displayName}`);
     } else if (
       identityType === 'UnstoppableDomain' &&

@@ -23,6 +23,7 @@ import useENSName from 'hooks/useENSName';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import randomName from 'lib/utilities/randomName';
 import { shortenHex } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -112,7 +113,9 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       types.push({
         type: 'Wallet',
         username: wallet.ensname ?? wallet.address,
-        isInUse: user.identityType === 'Wallet',
+        secondaryUserName: wallet.address,
+        isInUse:
+          user.identityType === 'Wallet' && (user.username === wallet.ensname || user.username === wallet.address),
         icon: getIdentityIcon('Wallet')
       });
     });
@@ -121,6 +124,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       types.push({
         type: 'Discord',
         username: discordAccount.username || '',
+        secondaryUserName: `${discordAccount.username} #${discordAccount.discriminator}`,
         isInUse: user.identityType === 'Discord',
         icon: getIdentityIcon('Discord')
       });
@@ -139,7 +143,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     if (user) {
       types.push({
         type: 'RandomName',
-        username: user.identityType === 'RandomName' && user.username ? user.username : '',
+        username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
         isInUse: user.identityType === 'RandomName',
         icon: getIdentityIcon('RandomName')
       });
@@ -149,6 +153,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       types.push({
         type: 'Google',
         username: acc.name,
+        secondaryUserName: acc.email,
         icon: getIdentityIcon('Google'),
         isInUse: user.identityType === 'Google' && user.username === acc.name
       });
@@ -238,12 +243,11 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <IdentityModal
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
-            save={(id: string, identityType: IdentityType) => {
-              handleUserUpdate({ id, identityType });
+            save={(username: string, identityType: IdentityType) => {
+              handleUserUpdate({ username, identityType });
             }}
             identityTypes={identityTypes}
             identityType={(user?.identityType || 'Wallet') as IdentityType}
-            username={user?.username || ''}
           />
           <DescriptionModal
             isOpen={descriptionModalState.isOpen}

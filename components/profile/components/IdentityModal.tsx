@@ -24,6 +24,7 @@ import Integration from './Integration';
 
 export type IntegrationModel = {
   username: string;
+  secondaryUserName?: string;
   type: IdentityType;
   isInUse: boolean;
   icon: ReactNode;
@@ -69,19 +70,21 @@ export const getIdentityIcon = (identityType: IdentityType | null) => {
 };
 
 type IdentityModalProps = {
-  save: (id: string, identityType: IdentityType) => void;
+  save: (username: string, identityType: IdentityType) => void;
   close: () => void;
   isOpen: boolean;
   identityTypes: IntegrationModel[];
   identityType: IdentityType;
-  username: string;
 };
 
 function IdentityModal(props: IdentityModalProps) {
-  const { close, isOpen, save, identityTypes, identityType, username } = props;
-  const [generatedName, setGeneratedName] = useState(identityType === 'RandomName' ? username : randomName());
+  const { close, isOpen, save, identityTypes, identityType } = props;
 
-  const { setUser } = useUser();
+  const { setUser, user } = useUser();
+
+  const [generatedName, setGeneratedName] = useState(
+    user?.identityType === 'RandomName' && identityType === 'RandomName' ? user.username : randomName()
+  );
 
   const [refreshingEns, setRefreshingEns] = useState(false);
 
@@ -98,25 +101,30 @@ function IdentityModal(props: IdentityModalProps) {
   }
 
   return (
-    <Modal open={isOpen} onClose={close} size='large'>
+    <Modal
+      open={isOpen}
+      onClose={() => {
+        close();
+        if (user?.identityType === 'RandomName') {
+          setGeneratedName(user.username);
+        }
+      }}
+      size='large'
+    >
       <DialogTitle onClose={close}>Select a public identity</DialogTitle>
       <Typography>Select which integration you want to show as your username</Typography>
       <Box mb={2}>
         {identityTypes.map((item: IntegrationModel) => {
-          let usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
+          const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
           const isValidAddress = item.type === 'Wallet' && isAddress(item.username);
-
-          if (isValidAddress) {
-            usernameToDisplay = shortenHex(item.username);
-          }
-
           return (
             <Integration
               isInUse={item.type === 'RandomName' && generatedName !== item.username ? false : item.isInUse}
               icon={item.icon}
               identityType={item.type}
               name={item.type === 'RandomName' ? 'Anonymous' : item.type}
-              username={usernameToDisplay}
+              username={isValidAddress ? shortenHex(item.username) : usernameToDisplay}
+              secondaryUserName={item.secondaryUserName}
               useIntegration={() => save(usernameToDisplay, item.type)}
               action={
                 item.type === 'RandomName' ? (
@@ -126,7 +134,13 @@ function IdentityModal(props: IdentityModalProps) {
                     </IconButton>
                   </Tooltip>
                 ) : isValidAddress ? (
-                  <Tooltip arrow placement='top' title={refreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}>
+                  <Tooltip
+                    //                    disableHoverListener
+                    onMouseEnter={(e) => e.stopPropagation()}
+                    arrow
+                    placement='top'
+                    title={refreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}
+                  >
                     {refreshingEns ? (
                       <IconButton>
                         <LoadingComponent size={20} isLoading />
