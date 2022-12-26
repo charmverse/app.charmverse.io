@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import type { IViewType } from 'lib/focalboard/boardView';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
@@ -40,8 +42,15 @@ function LayoutOptions(props: LayoutOptionsProps) {
     defaultMessage: 'Gallery'
   });
 
+  function updateViewTitle(newViewType: IViewType) {
+    if (activeView.title.toLowerCase() === `${activeView.fields.viewType} view`) {
+      return `${newViewType.charAt(0).toUpperCase() + newViewType.slice(1)} view`;
+    }
+    return activeView.title;
+  }
+
   const handleAddViewBoard = useCallback(async () => {
-    const newView = createBoardView(activeView);
+    const newView = createBoardView({ ...activeView, title: updateViewTitle('board') });
     newView.fields.viewType = 'board';
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];
     try {
@@ -54,7 +63,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
 
   const handleAddViewTable = useCallback(async () => {
     const { board } = props;
-    const newView = createBoardView(activeView);
+    const newView = createBoardView({ ...activeView, title: updateViewTitle('table') });
     newView.fields.viewType = 'table';
     newView.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
     newView.fields.columnWidths = {};
@@ -69,7 +78,10 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewGallery = useCallback(async () => {
-    const newView = createBoardView(activeView);
+    const newView = createBoardView({
+      ...activeView,
+      title: updateViewTitle('gallery')
+    });
     newView.fields.viewType = 'gallery';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = newView?.fields.cardOrder ?? [];
@@ -82,7 +94,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewCalendar = useCallback(async () => {
-    const newView = createBoardView(activeView);
+    const newView = createBoardView({ ...activeView, title: updateViewTitle('calendar') });
     newView.fields.viewType = 'calendar';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = activeView?.fields.cardOrder ?? [];
