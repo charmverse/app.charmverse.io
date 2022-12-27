@@ -1,5 +1,7 @@
 import fetch from 'adapters/http/fetch.server';
+import type { CollablandUserResult } from 'lib/collabland/interfaces';
 import log from 'lib/log';
+import type { ExternalRole } from 'lib/roles';
 
 const DOMAIN = 'https://api-qa.collab.land';
 const API_KEY = process.env.COLLAB_API_KEY as string;
@@ -100,8 +102,47 @@ export async function canJoinSpaceViaDiscord({
   discordServerId: string;
   discordUserId: string;
 }) {
-  // TODO: collabland api call to check if user can join space
-  // eslint-disable-next-line no-console
-  console.log('🔥 verify discord:', discordServerId, discordUserId);
-  return true;
+  try {
+    const res = await fetch<CollablandUserResult>(
+      // TODO: use discordUserId - currently we do not have better way of testing than using hardcoded userId
+      // TODO: use discordServerId - same as above
+      `${DOMAIN}/discord/${'834476259199156245'}/member/${'646733536744833054'}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY
+        }
+      }
+    );
+
+    const serverRoles = await getGuildRoles(discordServerId);
+    const userRoles: ExternalRole[] = [];
+    res.roles?.forEach((roleId) => {
+      const externalRole = serverRoles.find((role) => role.id === roleId);
+      if (externalRole) {
+        userRoles.push({ id: externalRole.id, name: externalRole.name });
+      }
+    });
+
+    return {
+      isEligible: !res.is_pending && !res.pending,
+      roles: userRoles || []
+    };
+  } catch (e) {
+    return {
+      isEligible: false,
+      roles: []
+    };
+  }
+}
+
+export async function getGuildRoles(discordServerId: string) {
+  return fetch<ExternalRole[]>(`${DOMAIN}/discord/${discordServerId}/roles`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'X-API-KEY': API_KEY
+    }
+  });
 }

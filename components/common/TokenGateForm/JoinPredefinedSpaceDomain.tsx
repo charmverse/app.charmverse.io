@@ -57,7 +57,9 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
       </Card>
 
       {isLoadingDiscordGate ? (
-        <LoadingComponent isLoading />
+        <Box mt={3}>
+          <LoadingComponent isLoading />
+        </Box>
       ) : (
         <>
           <DiscordGate

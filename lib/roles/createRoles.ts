@@ -1,15 +1,16 @@
 import type { Role, RoleSource } from '@prisma/client';
 
 import { prisma } from 'db';
+import type { ExternalRole } from 'lib/roles/interfaces';
 
 type RolesRecord = Record<string, Role | null>;
 
 // Create charmverse roles or find them from prisma to generate a final record
 export async function findOrCreateRoles(
-  externalRoles: { id: string | number; name: string }[],
+  externalRoles: ExternalRole[],
   spaceId: string,
   userId: string,
-  options?: { source?: RoleSource | null; createRoles?: boolean }
+  options?: { source?: RoleSource | null; createRoles?: boolean; preserveIds?: boolean }
 ): Promise<RolesRecord> {
   const { createRoles = true, source = null } = options ?? {};
   const rolesRecord: RolesRecord = {};
@@ -21,6 +22,10 @@ export async function findOrCreateRoles(
       const existingRole = await prisma.role.findFirst({
         where: {
           OR: [
+            {
+              externalId: String(externalRole.id),
+              spaceId
+            },
             {
               name: externalRole.name,
               spaceId
@@ -46,9 +51,9 @@ export async function findOrCreateRoles(
           },
           createdBy: userId,
           source,
-          sourceId: source !== null ? String(externalRole.id) : null
+          sourceId: source !== null ? String(externalRole.id) : null,
+          externalId: String(externalRole.id)
         };
-
         if (existingRole) {
           charmVerseRole = await prisma.role.update({
             where: {

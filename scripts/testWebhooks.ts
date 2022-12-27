@@ -1,12 +1,11 @@
 /* eslint-disable no-console */
+import { processMessages } from 'lib/aws/webhookSqs';
 import fetch from 'node-fetch';
 
 // use this file and run against production to generate api keys
 
 
-export async function test()  {
-
-
+export async function testAddMessage()  {
   const res = await fetch('https://webhooks.charmverse.co/collabland-events', {
     method: 'POST',
     headers: {
@@ -24,4 +23,10 @@ export async function test()  {
   console.log('🔥', res);
 }
 
-test();
+export async function testFetchMessages() {
+  const processorFn = async () => true;
+
+  await processMessages({ processorFn, maxNumOfMessages: 5 });
+}
+
+testFetchMessages();
