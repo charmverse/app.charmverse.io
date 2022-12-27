@@ -103,8 +103,6 @@ export default function TokenGateForm({
         setTokenGateResult(verifyResult);
         if (verifyResult.canJoinSpace) {
           showMessage('Verification succeeded.', 'success');
-        } else {
-          showMessage('Verification failed.', 'warning');
         }
       })
       .finally(() => setIsVerifyingGates(false));
