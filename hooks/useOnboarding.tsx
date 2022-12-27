@@ -1,44 +1,53 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
+import useSWR from 'swr';
 
-import { useLocalStorage } from './useLocalStorage';
+import charmClient from 'charmClient';
+
+import { useCurrentSpace } from './useCurrentSpace';
 import { useUser } from './useUser';
 
 type IContext = {
-  onboarding: Record<string, boolean>;
-  showOnboarding: (spaceId: string) => void;
-  hideOnboarding: (spaceId: string) => void;
+  onboarding: boolean | null | undefined;
+  completeOnboarding(): Promise<void>;
 };
 
 export const OnboardingContext = createContext<Readonly<IContext>>({
-  onboarding: {},
-  showOnboarding: () => {},
-  hideOnboarding: () => {}
+  onboarding: null,
+  completeOnboarding: () => ({} as any)
 });
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
-  const [onboarding, setOnboarding] = useLocalStorage(user ? `onboarding-${user.id}` : null, {});
+  const currentSpace = useCurrentSpace();
+  const { data: onboarding, mutate: updateOnboarding } = useSWR(
+    user && currentSpace ? `onboarding-${user.id}-${currentSpace.id}` : null,
+    () =>
+      charmClient.workspaceOnboarding.getWorkspaceOnboarding({
+        spaceId: currentSpace!.id
+      })
+  );
 
-  function showOnboarding(spaceId: string) {
-    setOnboarding((_onboarding) => ({
-      ..._onboarding,
-      [spaceId]: true
-    }));
-  }
-
-  function hideOnboarding(spaceId: string) {
-    setOnboarding((_onboarding) => ({
-      ..._onboarding,
-      [spaceId]: false
-    }));
+  async function completeOnboarding() {
+    if (currentSpace) {
+      charmClient.workspaceOnboarding.completeOnboarding({
+        spaceId: currentSpace.id
+      });
+      updateOnboarding(
+        (_onboarding) => {
+          if (_onboarding) {
+            return true;
+          }
+        },
+        { revalidate: false }
+      );
+    }
   }
 
   const value: IContext = useMemo(
     () => ({
       onboarding,
-      showOnboarding,
-      hideOnboarding
+      completeOnboarding
     }),
     [onboarding]
   );

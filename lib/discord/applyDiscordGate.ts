@@ -31,12 +31,27 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
   });
 
   if (!spaceMembership) {
-    await prisma.spaceRole.create({
+    const createdSpaceRole = await prisma.spaceRole.create({
       data: {
         isAdmin: false,
         space: {
           connect: {
             id: space.id
+          }
+        },
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      }
+    });
+
+    await prisma.workspaceOnboarding.create({
+      data: {
+        spaceRole: {
+          connect: {
+            id: createdSpaceRole.id
           }
         },
         user: {

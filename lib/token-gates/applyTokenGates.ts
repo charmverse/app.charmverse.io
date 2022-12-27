@@ -171,7 +171,7 @@ export async function applyTokenGates({
     return returnValue;
   } else {
     const spaceRoleId = v4();
-    await prisma.spaceRole.create({
+    const createdSpaceRole = await prisma.spaceRole.create({
       data: {
         id: spaceRoleId,
         spaceRoleToRole: {
@@ -187,6 +187,21 @@ export async function applyTokenGates({
         space: {
           connect: {
             id: spaceId
+          }
+        },
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      }
+    });
+
+    await prisma.workspaceOnboarding.create({
+      data: {
+        spaceRole: {
+          connect: {
+            id: createdSpaceRole.id
           }
         },
         user: {

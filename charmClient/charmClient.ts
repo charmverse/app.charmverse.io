@@ -69,6 +69,7 @@ import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
 import { VotesApi } from './apis/votesApi';
+import { WorkspaceOnboardingApi } from './apis/workspaceOnboardingApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -103,6 +104,8 @@ class CharmClient {
   forum = new ForumApi();
 
   mux = new MuxApi();
+
+  workspaceOnboarding = new WorkspaceOnboardingApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

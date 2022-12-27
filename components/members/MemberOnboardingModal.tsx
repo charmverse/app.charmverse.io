@@ -7,20 +7,18 @@ import { MemberOnboardingForm } from './components/MemberOnboardingForm';
 export function MemberOnboardingModal({ userId }: { userId?: string }) {
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { hideOnboarding } = useOnboarding();
-  const { onboarding } = useOnboarding();
+  const { onboarding, completeOnboarding } = useOnboarding();
 
-  function onClose() {
-    if (space) {
-      hideOnboarding(space.id);
-    }
-  }
-
-  if (!space || !onboarding[space.id] || !user) {
+  if (!space || onboarding !== false || !user) {
     return null;
   }
 
   return (
-    <MemberOnboardingForm userId={userId ?? user.id} spaceName={space.name} spaceId={space.id} onClose={onClose} />
+    <MemberOnboardingForm
+      userId={userId ?? user.id}
+      spaceName={space.name}
+      spaceId={space.id}
+      onClose={completeOnboarding}
+    />
   );
 }
