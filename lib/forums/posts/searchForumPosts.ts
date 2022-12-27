@@ -1,8 +1,10 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumPostPage } from './interfaces';
+import type { PageWithRelations } from './getPostMeta';
+import { getPostMeta } from './getPostMeta';
 import type { PaginatedPostList } from './listForumPosts';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
@@ -14,6 +16,7 @@ export interface SearchForumPostsRequest {
   search?: string;
   page?: number;
   count?: number;
+  categoryId?: string;
 }
 export async function searchForumPosts(
   {
@@ -21,7 +24,8 @@ export async function searchForumPosts(
     search,
     page = 0,
     // Count is the number of posts we want per page
-    count = defaultPostsPerResult
+    count = defaultPostsPerResult,
+    categoryId
   }: SearchForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
@@ -43,9 +47,10 @@ export async function searchForumPosts(
   const whereQuery: Prisma.PageWhereInput = {
     type: 'post',
     post: {
-      status: 'published'
+      categoryId
     },
     spaceId,
+    deletedAt: null,
     OR: [
       {
         title: {
@@ -78,33 +83,47 @@ export async function searchForumPosts(
     }
   });
 
-  const hasNext =
-    pages.length === 0
-      ? false
-      : (
-          await prisma.page.findMany({
-            ...orderQuery,
-            skip: toSkip + count,
-            take: 1,
-            where: whereQuery
-          })
-        ).length === 1;
+  let hasNext = false;
+  if (pages.length > 0) {
+    const nextPages = await prisma.page.findMany({
+      ...orderQuery,
+      skip: toSkip + count,
+      take: 1,
+      where: whereQuery
+    });
+    if (nextPages.length > 0) {
+      hasNext = true;
+    }
+  }
+
+  const comments = await prisma.pageComment.groupBy({
+    _count: {
+      _all: true
+    },
+    by: ['pageId'],
+    where: {
+      pageId: {
+        in: pages.map((_page) => _page.id)
+      }
+    }
+  });
+
+  const data = pages
+    .map((_page) => {
+      if (_page.post) {
+        const comment = comments.find((_comment) => _comment.pageId === _page.id);
+        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
+        return {
+          ...postMeta,
+          totalComments: comment?._count._all ?? 0
+        };
+      }
+      return null;
+    })
+    .filter(isTruthy);
 
   const response: PaginatedPostList = {
-    data: pages.map((_page) => {
-      const { upDownVotes, post, ...rest } = _page;
-      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage = {
-        ...rest,
-        post: {
-          ...post!,
-          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-          upvoted: userVote ? userVote.upvoted : undefined
-        }
-      };
-      return forumPostPage;
-    }),
+    data,
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

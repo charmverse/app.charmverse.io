@@ -72,6 +72,7 @@
     "consistent-return": "off",
     "import/prefer-default-export": "off",
     "import/extensions": "off",
+    "import/no-default-export": "warn",
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": [
       "error",

@@ -11,6 +11,7 @@ import {
   TextField,
   Box
 } from '@mui/material';
+import type { Page } from '@prisma/client';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -25,7 +26,6 @@ import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { fancyTrim } from 'lib/utilities/strings';
-import type { Page } from 'models';
 
 import PageIcon from './PageIcon';
 

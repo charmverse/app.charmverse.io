@@ -4,12 +4,12 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPageWithoutVotes } from '../interfaces';
+import type { ForumPostPage } from '../interfaces';
 import { defaultPostsPerResult, searchForumPosts } from '../searchForumPosts';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPageWithoutVotes[];
+let spacePosts: ForumPostPage[];
 
 const rootPostTitle = `Top level`;
 
@@ -95,30 +95,21 @@ describe('searchForumPosts', () => {
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
 
-  it(`should return only return published posts`, async () => {
+  it(`should return posts from all categories`, async () => {
     const { space: _space, user: _user } = await generateUserAndSpaceWithApiToken();
     const title = 'title';
-    const draftPost = await generateForumPosts({
-      createdBy: _user.id,
-      spaceId: _space.id,
-      status: 'draft',
-      count: 1,
-      title
-    });
 
     const publishedPost = await generateForumPosts({
       createdBy: _user.id,
       spaceId: _space.id,
-      status: 'published',
       count: 1,
       title
     });
     const posts = await searchForumPosts({ spaceId: _space.id, search: title }, _user.id);
     expect(posts.data).toHaveLength(1);
-    expect(posts.data[0].post.status).toEqual('published');
   });
 
-  it(`should return posts from all categories`, async () => {
+  it(`should return posts from all categories if no category id is provided`, async () => {
     const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
 
     const exampleTitle = `Example title`;
@@ -128,15 +119,7 @@ describe('searchForumPosts', () => {
       name: 'Test Category'
     });
 
-    const uncategorisedPostsToGenerate = 2;
     const categorisedPostsToGenerate = 2;
-
-    const posts = await generateForumPosts({
-      spaceId: extraSpace.id,
-      createdBy: extraUser.id,
-      count: uncategorisedPostsToGenerate,
-      title: exampleTitle
-    });
 
     const categoryPosts = await generateForumPosts({
       spaceId: extraSpace.id,
@@ -159,7 +142,7 @@ describe('searchForumPosts', () => {
       user.id
     );
 
-    expect(foundPosts.data).toHaveLength(uncategorisedPostsToGenerate + categorisedPostsToGenerate);
+    expect(foundPosts.data).toHaveLength(categorisedPostsToGenerate);
 
     // Make sure ignored posts didn't enter the result
     expect(foundPosts.data.every((item) => ignoredPosts.every((_post) => _post.id !== item.id)));
@@ -168,7 +151,7 @@ describe('searchForumPosts', () => {
   it(`should support paginated queries and return 0 as the next page once there are no more results`, async () => {
     const title = `Pagination test`;
 
-    const matchingPosts = await generateForumPosts({
+    await generateForumPosts({
       count: 40,
       spaceId: space.id,
       createdBy: user.id,
@@ -205,5 +188,37 @@ describe('searchForumPosts', () => {
     expect(thirdResult.data).toHaveLength(expectedRemainingData);
     expect(thirdResult.cursor).toBe(0);
     expect(thirdResult.hasNext).toBe(false);
+  });
+
+  it('should return only posts from a specific category if provided', async () => {
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+
+    const exampleTitle = `Example title`;
+
+    const category = await createPostCategory({
+      spaceId: extraSpace.id,
+      name: 'Test Category'
+    });
+
+    const categorisedPostsToGenerate = 2;
+
+    const categoryPosts = await generateForumPosts({
+      spaceId: extraSpace.id,
+      createdBy: extraUser.id,
+      count: categorisedPostsToGenerate,
+      categoryId: category.id,
+      title: exampleTitle
+    });
+
+    // First assertion - categorised
+    const foundCategoryPosts = await searchForumPosts(
+      { spaceId: extraSpace.id, count: 10, categoryId: category.id, search: exampleTitle.substring(0, 5) },
+      user.id
+    );
+
+    expect(foundCategoryPosts.data).toHaveLength(categorisedPostsToGenerate);
+
+    // Make sure ignored posts didn't enter the result
+    expect(foundCategoryPosts.data.every((item) => categoryPosts.some((_post) => _post.id === item.id)));
   });
 });

@@ -52,21 +52,10 @@ describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
       .set('Cookie', nonSpaceUserCookie)
       .expect(401);
   });
-
-  it('should throw error when creating comment in a drafted post, responding with 400', async () => {
-    const post = await generateForumPost({
-      userId: user.id,
-      spaceId: space.id
-    });
-
-    await request(baseUrl).post(`/api/forums/posts/${post.id}/comments`).send({}).set('Cookie', userCookie).expect(400);
-  });
-
   it('should create comment, responding with 200', async () => {
     const post = await generateForumPost({
       userId: user.id,
-      spaceId: space.id,
-      status: 'published'
+      spaceId: space.id
     });
 
     await request(baseUrl)

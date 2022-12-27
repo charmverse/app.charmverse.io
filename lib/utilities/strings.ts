@@ -115,12 +115,17 @@ export function humaniseList({
 }
 
 /**
+ * If plural is provided, this word will be returned in case count is not equal to 1. Otherwise, the word will be returned with an 's' appended
+ */
+type ConditionalPlural = { word: string; count: number; plural?: string };
+
+/**
  * Append an 's' to a value's descriptor if it is not equal to 1
  * Default values will return an empty string
  */
-export function conditionalPlural({ word = '', count = 1 }: { word: string; count: number }): string {
+export function conditionalPlural({ word = '', count = 1, plural }: ConditionalPlural): string {
   if (count !== 1) {
-    return `${word}s`;
+    return plural ?? `${word}s`;
   }
   return word;
 }

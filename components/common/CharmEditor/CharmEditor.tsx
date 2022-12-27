@@ -32,9 +32,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import type { IPagePermissionFlags } from 'lib/permissions/pages/page-permission-interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import type { PageContent } from 'models';
 
 import * as bulletList from './components/bulletList';
 import Callout, * as callout from './components/callout';
@@ -281,7 +281,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
     font-size: 85%;
     height: fit-content;
     tab-size: 4;
-    caret-color: black;
+    caret-color: var(--primary-text);
   }
   pre code {
     color: inherit;
@@ -345,7 +345,7 @@ interface CharmEditorProps {
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
-  pageId: string;
+  pageId?: string;
   containerWidth?: number;
   pageType?: PageType;
   pagePermissions?: IPagePermissionFlags;
@@ -423,7 +423,7 @@ function CharmEditor({
   }, 1000);
 
   const sendPageEvent = throttle(() => {
-    if (currentSpace && pageType) {
+    if (currentSpace && pageType && pageId) {
       if (enableSuggestingMode) {
         charmClient.track.trackAction('page_suggestion_created', {
           pageId,
@@ -667,7 +667,7 @@ function CharmEditor({
             title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
             open={!!pageActionDisplay}
           >
-            {pageActionDisplay === 'suggestions' && currentSpace && (
+            {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
               <SuggestionsSidebar
                 pageId={pageId}
                 spaceId={currentSpace.id}
@@ -680,7 +680,7 @@ function CharmEditor({
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
           {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
-          {currentSpace && (
+          {currentSpace && pageId && (
             <SuggestionsPopup
               pageId={pageId}
               spaceId={currentSpace.id}

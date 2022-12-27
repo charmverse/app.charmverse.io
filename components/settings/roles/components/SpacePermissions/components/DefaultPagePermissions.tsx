@@ -4,6 +4,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import type { PagePermissionLevel } from '@prisma/client';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -14,12 +15,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import type { PagePermissionLevelWithoutCustom } from 'lib/permissions/pages/page-permission-interfaces';
 import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { typedKeys } from 'lib/utilities/objects';
 
-const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustom, string> = {
+type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
+const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProposalEditor, string> = {
   full_access: 'Workspace members can edit pages, share them with the public and manage permissions.',
-  proposal_editor: 'Proposal editors can edit proposals and share them with the public.',
   editor: 'Workspace members can edit but not share pages.',
   view_comment: 'Workspace members can view and comment on pages.',
   view: 'Workspace members can only view pages.'
@@ -36,9 +37,10 @@ export default function DefaultSpacePagePermissions() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'workspace-default-page-permission' });
 
   // Permission states
-  const [selectedPagePermission, setSelectedPagePermission] = useState<PagePermissionLevelWithoutCustom>(
-    (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustom) ?? 'full_access'
-  );
+  const [selectedPagePermission, setSelectedPagePermission] =
+    useState<PagePermissionLevelWithoutCustomAndProposalEditor>(
+      (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustomAndProposalEditor) ?? 'full_access'
+    );
   const [defaultPublicPages, setDefaultPublicPages] = useState<boolean>(space?.defaultPublicPages ?? false);
 
   const settingsChanged =
@@ -108,7 +110,7 @@ export default function DefaultSpacePagePermissions() {
               sx: { width: 300 }
             }}
           >
-            {(Object.keys(pagePermissionDescriptions) as PagePermissionLevelWithoutCustom[]).map((permissionLevel) => {
+            {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
               const permissionLevelLabel = permissionLevels[permissionLevel];
               const isSelected = selectedPagePermission === permissionLevel;
               const description = pagePermissionDescriptions[permissionLevel];

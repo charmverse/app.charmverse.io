@@ -5,10 +5,11 @@ import { prisma } from 'db';
 import { getPagePath } from 'lib/pages/utils';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
+import { selectPageValues } from './getForumPost';
 import type { ForumPostPage } from './interfaces';
 
 export type CreateForumPostInput = Pick<Page, 'createdBy' | 'spaceId' | 'content' | 'contentText' | 'title'> &
-  Partial<Pick<Post, 'categoryId' | 'status'> & Pick<Page, 'galleryImage' | 'headerImage'>>;
+  Pick<Post, 'categoryId'>;
 
 export async function createForumPost({
   content,
@@ -16,10 +17,7 @@ export async function createForumPost({
   createdBy,
   spaceId,
   title,
-  categoryId,
-  galleryImage,
-  headerImage,
-  status = 'draft'
+  categoryId
 }: CreateForumPostInput): Promise<ForumPostPage> {
   if (categoryId) {
     const category = await prisma.postCategory.findUnique({
@@ -45,8 +43,6 @@ export async function createForumPost({
       content: (content ?? undefined) as Prisma.InputJsonObject,
       contentText,
       updatedBy: createdBy,
-      galleryImage,
-      headerImage,
       author: {
         connect: {
           id: createdBy
@@ -62,14 +58,8 @@ export async function createForumPost({
       post: {
         create: {
           id: postId,
-          status,
-          category: !categoryId
-            ? undefined
-            : {
-                connect: {
-                  id: categoryId
-                }
-              }
+          spaceId,
+          categoryId
         }
       }
     },
@@ -78,5 +68,8 @@ export async function createForumPost({
     }
   });
 
-  return createdPost as ForumPostPage;
+  return {
+    ...selectPageValues(createdPost),
+    post: createdPost.post!
+  };
 }

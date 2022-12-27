@@ -14,8 +14,8 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
-import type { PageContent } from 'models';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../PageThread';

@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostComment } from 'testing/utils/forums';
+import { generatePostWithComment } from 'testing/utils/forums';
 
 import { deletePostComment } from '../deletePostComment';
 
@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 describe('deletePostComment', () => {
   it('should delete a post comment if the user is the creator', async () => {
-    const { comment } = await generatePostComment({
+    const { comment } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });
@@ -32,7 +32,7 @@ describe('deletePostComment', () => {
   });
 
   it('should throw error when deleting a post comment if the user is not the creator', async () => {
-    const { comment } = await generatePostComment({
+    const { comment } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });

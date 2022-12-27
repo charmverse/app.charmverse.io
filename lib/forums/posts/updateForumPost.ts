@@ -3,9 +3,6 @@ import type { Page, Post, Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
-import { getForumPost } from './getForumPost';
-import type { ForumPostPage } from './interfaces';
-
 export type UpdateForumPostInput = Partial<
   Pick<Page, 'content' | 'contentText' | 'title' | 'galleryImage' | 'headerImage'> & {
     categoryId?: Post['categoryId'] | null;
@@ -18,10 +15,8 @@ export async function updateForumPost({
   content,
   contentText,
   categoryId,
-  title,
-  galleryImage,
-  headerImage
-}: UpdateForumPostInput & { postId: string; userId: string }): Promise<ForumPostPage> {
+  title
+}: UpdateForumPostInput & { postId: string; userId: string }) {
   if (categoryId) {
     const [page, category] = await Promise.all([
       prisma.page.findUnique({
@@ -59,24 +54,23 @@ export async function updateForumPost({
     throw new UndesirableOperationError('Cannot update a locked post');
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.page.update({
+  const updated = await prisma.$transaction(async (tx) => {
+    const _updated = await tx.page.update({
       where: { id: postId },
       data: {
         content: content as Prisma.InputJsonObject,
         contentText,
         title,
-        galleryImage,
-        headerImage
+        updatedAt: new Date(),
+        updatedBy: userId
       }
     });
 
     if (categoryId) {
       await tx.post.update({ where: { id: postId }, data: { category: { connect: { id: categoryId } } } });
-    } else if (categoryId === null) {
-      await tx.post.update({ where: { id: postId }, data: { category: { disconnect: true } } });
     }
+    return _updated;
   });
 
-  return getForumPost({ userId, postId });
+  return updated;
 }

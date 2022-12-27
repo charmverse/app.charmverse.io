@@ -1,12 +1,12 @@
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
-import * as uuid from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
-type MappedProperties = {
+export type MappedProperties = {
   id: string;
   options: Record<string, string>;
   name: string;
@@ -15,13 +15,19 @@ type MappedProperties = {
 
 export const selectColors = Object.keys(focalboardColorsMap);
 
-export const isDate = (dt: string) => !Number.isNaN(new Date(dt).valueOf());
+export const isNumber = (n: string) => !Number.isNaN(+n);
 
-export function isDateValid(strDate: string) {
-  if (strDate.includes(' -> ')) {
-    return strDate.split(' -> ').every(isDate);
+export const validDate = (dt: string) => {
+  const date = new Date(isNumber(dt) ? +dt : dt);
+
+  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 1970) {
+    return date;
   }
-  return isDate(strDate);
+  return null;
+};
+
+export function validateAllBlockDates(strDate: string) {
+  return strDate.split(' -> ').every((dt) => !!validDate(dt));
 }
 
 export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['options'] {
@@ -32,7 +38,7 @@ export function createBoardPropertyOptions(arr: string[]): IPropertyTemplate['op
       const randomColor = selectColors[Math.floor(Math.random() * selectColors.length)];
 
       return {
-        id: uuid.v4(),
+        id: uuidv4(),
         color: randomColor,
         value
       };
@@ -76,16 +82,19 @@ export function createNewPropertiesForBoard(
   existingBoardProp?: MappedProperties
 ): IPropertyTemplate {
   const propValues = csvData.map((result) => result[prop]).filter((result) => !!result);
-  const defaultProps = { id: uuid.v4(), name: prop, options: [] };
+  const defaultProps = { id: uuidv4(), name: prop, options: [] };
   const emailReg = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
   // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
   if (existingBoardProp && (existingBoardProp.type === 'select' || existingBoardProp.type === 'multiSelect')) {
     const newSelectValues = csvData
-      .map((result) => result[prop])
+      .map((result) => result[prop].split('|'))
+      .flat()
       .filter((option) => !!option && !existingBoardProp.options[option]);
 
-    const options = createBoardPropertyOptions(newSelectValues);
+    const uniqueValues = [...new Set(newSelectValues)];
+
+    const options = createBoardPropertyOptions(uniqueValues);
 
     return { ...defaultProps, options, type: existingBoardProp.type };
   }
@@ -97,13 +106,13 @@ export function createNewPropertiesForBoard(
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }
-  if (propValues.every((p) => uuid.validate(p))) {
+  if (propValues.every((p) => uuidValidate(p))) {
     return { ...defaultProps, type: 'person' };
   }
-  if (propValues.every(isDateValid)) {
+  if (propValues.every(validateAllBlockDates)) {
     return { ...defaultProps, type: 'date' };
   }
-  if (propValues.every((p) => !Number.isNaN(+p))) {
+  if (propValues.every(isNumber)) {
     return { ...defaultProps, type: 'number' };
   }
   if (propValues.every((p) => p.startsWith('http') || p.startsWith('www.'))) {
@@ -136,7 +145,7 @@ export function createCardFieldProperties(
     // Verify that we have the person in the members array
     if (
       mappedBoardProperties[key]?.type === 'person' &&
-      uuid.validate(value) &&
+      uuidValidate(value) &&
       !!members.find((member) => member.id === value)
     ) {
       return {
@@ -166,6 +175,49 @@ export function createCardFieldProperties(
           [propId]: optionIds
         };
       }
+    }
+
+    if (mappedBoardProperties[key]?.type === 'date') {
+      const valuesArr = value.split(' -> ');
+
+      if (valuesArr.length === 1) {
+        const from = validDate(valuesArr[0])?.getTime();
+
+        if (from) {
+          const jsonValue: string = JSON.stringify({
+            from
+          });
+          return {
+            ...acc,
+            [propId]: jsonValue
+          };
+        }
+      }
+
+      if (valuesArr.length === 2) {
+        const fromDateString = valuesArr[0];
+        const toDateString = valuesArr[1];
+        const from = validDate(fromDateString)?.getTime();
+        const to = validDate(toDateString)?.getTime();
+
+        if (from && to) {
+          const jsonValue: string = JSON.stringify({
+            from,
+            to
+          });
+
+          if (from < to) {
+            return {
+              ...acc,
+              [propId]: jsonValue
+            };
+          }
+        }
+      }
+
+      return {
+        ...acc
+      };
     }
 
     if (

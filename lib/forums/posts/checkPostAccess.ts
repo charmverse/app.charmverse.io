@@ -1,15 +1,15 @@
-import { hasAccessToSpace } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/public-api';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
 import { getForumPost } from './getForumPost';
 
-export async function checkPostAccess({ postId, userId }: { postId: string; userId: string }) {
-  const page = await getForumPost({ postId, userId });
+export async function checkPostAccess({ pageId, userId }: { pageId: string; userId: string }) {
+  const page = await getForumPost({ pageId, userId });
 
   if (!page || !page.post) {
-    throw new PageNotFoundError(postId);
+    throw new PageNotFoundError(pageId);
   }
 
   // Only allow post author or space admin to update post

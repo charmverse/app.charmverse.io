@@ -1,7 +1,7 @@
 /* eslint-disable default-param-last */
 import charmClient from 'charmClient';
 import type { PageMeta } from 'lib/pages';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 

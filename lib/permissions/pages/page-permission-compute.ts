@@ -92,8 +92,7 @@ export async function computeUserPagePermissions({
   userId
 }: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
   const [foundSpaceRole, permissions] = await Promise.all([
-    // Check if user is a space admin for this page so they gain full rights
-    // eslint-disable-next-line max-len
+    // Check if user is a space admin for this page so they gain full rightss
     (
       prisma.page.findFirst(pageWithSpaceRoleQuery({ pageId, userId })) as any as Promise<IPageWithNestedSpaceRole>
     ).then((page) => {

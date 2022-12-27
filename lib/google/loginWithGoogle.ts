@@ -1,49 +1,23 @@
-import type { TokenPayload } from 'google-auth-library';
-import { OAuth2Client } from 'google-auth-library';
-
-import { googleOAuthClientId, googleOAuthClientSecret } from 'config/constants';
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { coerceToMilliseconds } from 'lib/utilities/dates';
-import { InsecureOperationError, InvalidInputError, SystemError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
-const googleOAuthClient = new OAuth2Client(googleOAuthClientId, googleOAuthClientSecret);
+import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type LoginWithGoogleRequest = {
   accessToken: string;
   displayName: string;
   avatarUrl: string;
 };
-
-// https://developers.google.com/people/quickstart/nodejs
-async function verifyToken(idToken: string): Promise<TokenPayload> {
-  const ticket = await googleOAuthClient.verifyIdToken({
-    idToken,
-    audience: googleOAuthClientId
-  });
-  const payload = ticket.getPayload();
-  if (!payload) {
-    throw new InvalidInputError('Invalid Google authentication token');
-  }
-
-  const now = Date.now();
-  const { exp } = payload;
-
-  const hasExpired = coerceToMilliseconds(exp) < now;
-  if (hasExpired) {
-    throw new UnauthorisedActionError('Authentication token has expired. Please try again.');
-  }
-  return payload;
-}
 export async function loginWithGoogle({
   accessToken,
   displayName,
   avatarUrl
 }: LoginWithGoogleRequest): Promise<LoggedInUser> {
   try {
-    const verified = await verifyToken(accessToken);
+    const verified = await verifyGoogleToken(accessToken);
 
     const email = verified.email;
 

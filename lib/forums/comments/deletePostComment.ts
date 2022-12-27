@@ -2,14 +2,20 @@ import { prisma } from 'db';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 export async function deletePostComment({ commentId, userId }: { commentId: string; userId: string }) {
-  const deletedComment = await prisma.pageComment.deleteMany({
+  const updatedComment = await prisma.pageComment.updateMany({
     where: {
       id: commentId,
-      createdBy: userId
+      createdBy: userId,
+      deletedAt: null
+    },
+    data: {
+      deletedAt: new Date(),
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [] }] },
+      contentText: ''
     }
   });
 
-  if (deletedComment.count !== 1) {
+  if (updatedComment.count !== 1) {
     throw new UnauthorisedActionError();
   }
 }
