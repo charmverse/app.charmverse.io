@@ -1,5 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, CircularProgress, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -146,7 +146,12 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }, [postComments, page, commentSort]);
 
   return (
-    <Container top={50}>
+    <Container
+      top={50}
+      style={{
+        marginLeft: 75
+      }}
+    >
       <Box minHeight={300}>
         <CharmEditor
           readOnly={readOnly}

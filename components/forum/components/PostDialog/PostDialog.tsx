@@ -1,11 +1,8 @@
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef } from 'react';
 
-import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
-import { useUser } from 'hooks/useUser';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 
 import { PostPage } from '../PostPage/PostPage';
@@ -44,13 +41,6 @@ export default function PostDialog(props: Props) {
     }
   }, [props.open]);
 
-  async function onClickDelete() {
-    if (page) {
-      await charmClient.forum.deleteForumPost(page.id);
-      onClose();
-    }
-  }
-
   function onClose() {
     popupState.close();
     props.onClose();
@@ -59,37 +49,7 @@ export default function PostDialog(props: Props) {
   return (
     <RootPortal>
       {popupState.isOpen && (
-        <Dialog
-          hideCloseButton
-          // toolsMenu={
-          //   page && (
-          //     <PageActions
-          //       page={page}
-          //       onClickDelete={
-          //         user?.id === page.createdBy
-          //           ? () => {
-          //               onClickDelete();
-          //             }
-          //           : undefined
-          //       }
-          //     />
-          //   )
-          // }
-          // toolbar={
-          //   <Box display='flex' justifyContent='space-between'>
-          //     <Button
-          //       size='small'
-          //       color='secondary'
-          //       href={`/${router.query.domain}/${page?.path}`}
-          //       variant='text'
-          //       startIcon={<OpenInFullIcon fontSize='small' />}
-          //     >
-          //       Open as Page
-          //     </Button>
-          //   </Box>
-          // }
-          onClose={onClose}
-        >
+        <Dialog fullWidth hideCloseButton onClose={onClose}>
           <PostPage page={page ?? null} spaceId={props.spaceId} onSave={onClose} />
         </Dialog>
       )}

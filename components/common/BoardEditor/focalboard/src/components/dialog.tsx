@@ -13,11 +13,11 @@ type Props = {
   hideCloseButton?: boolean;
   className?: string;
   onClose: () => void;
+  fullWidth?: boolean;
 };
 
 const Dialog = React.memo((props: Props) => {
-  const { toolsMenu } = props;
-  const { toolbar } = props;
+  const { toolbar, toolsMenu, fullWidth = false } = props;
   const intl = useIntl();
 
   const closeDialogText = intl.formatMessage({
@@ -38,7 +38,19 @@ const Dialog = React.memo((props: Props) => {
             }
           }}
         >
-          <div role='dialog' className='dialog'>
+          <div
+            role='dialog'
+            className='dialog'
+            style={
+              fullWidth
+                ? {
+                    maxWidth: '85%',
+                    maxHeight: '100%',
+                    height: '100%'
+                  }
+                : {}
+            }
+          >
             <div className='toolbar'>
               {!props.hideCloseButton && (
                 <IconButton
