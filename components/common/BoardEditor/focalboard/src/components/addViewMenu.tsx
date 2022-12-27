@@ -92,15 +92,7 @@ function AddViewMenu(props: AddViewProps) {
     const { board, activeView, intl } = props;
 
     Utils.log('addview-table');
-    const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewTableTitle', defaultMessage: 'Table view' });
-    view.fields.viewType = 'table';
-    view.parentId = board.id;
-    view.rootId = board.rootId;
-    view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
-    view.fields.columnWidths = {};
-    view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
-    view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+    const view = createTableView(board, activeView, intl);
 
     const oldViewId = activeView?.id;
 
@@ -232,4 +224,16 @@ function AddViewMenu(props: AddViewProps) {
   );
 }
 
+export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
+  const view = createBoardView();
+  view.title = intl?.formatMessage({ id: 'View.NewTableTitle', defaultMessage: 'Table view' }) ?? 'Table view';
+  view.fields.viewType = 'table';
+  view.parentId = board.id;
+  view.rootId = board.rootId;
+  view.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
+  view.fields.columnWidths = {};
+  view.fields.columnWidths[Constants.titleColumnId] = Constants.defaultTitleColumnWidth;
+  view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+  return view;
+}
 export default injectIntl(AddViewMenu);

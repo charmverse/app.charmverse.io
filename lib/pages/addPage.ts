@@ -8,6 +8,7 @@ import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks
 import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
+import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import type { Board } from 'lib/focalboard/board';
@@ -65,16 +66,12 @@ export async function addPage({
   };
 
   if (isBoardPage) {
-    const { board, view, cards } = createDefaultBoardData({ boardId: pageId });
+    const { board, view } = createDefaultBoardData({ boardId: pageId });
 
     if (shouldCreateDefaultBoardData) {
       result.board = board;
       result.view = view;
-      result.cards = cards;
       await mutator.insertBlocks([board, view], 'add board');
-
-      // Wait for board creation to succeed before adding cards
-      await mutator.insertBlocks([...cards], 'add cards');
     } else {
       result.board = board;
       await mutator.insertBlocks([board]);
@@ -100,20 +97,42 @@ interface DefaultBoardProps {
 }
 
 function createDefaultBoardData({ boardId }: DefaultBoardProps) {
-  const board = createBoard({ addDefaultProperty: true });
+  const board = createBoard();
   board.id = boardId;
   board.rootId = board.id;
 
-  const { cards, view } = createDefaultViewsAndCards({ board });
+  const view = createTableView(board);
 
   return {
     board,
     view,
-    cards
+    cards: []
   };
 }
 
 export function createDefaultViewsAndCards({ board }: { board: Board }) {
+  const view = createBoardView();
+  view.fields.viewType = 'board';
+  view.parentId = board.id;
+  view.rootId = board.rootId;
+  view.title = 'Board view';
+
+  const cards: Card[] = [];
+
+  for (let index = 0; index < 3; index++) {
+    const card = createCard();
+    card.parentId = board.id;
+    card.rootId = board.rootId;
+    card.title = `Card ${index + 1}`;
+    card.fields.contentOrder = [];
+    view.fields.cardOrder.push(card.id);
+    cards.push(card);
+  }
+
+  return { view, cards };
+}
+
+export function createDefaulBoardViewAndCards({ board }: { board: Board }) {
   const view = createBoardView();
   view.fields.viewType = 'board';
   view.parentId = board.id;
