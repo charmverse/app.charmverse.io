@@ -103,18 +103,13 @@ export async function canJoinSpaceViaDiscord({
   discordUserId: string;
 }) {
   try {
-    const res = await fetch<CollablandUserResult>(
-      // TODO: use discordUserId - currently we do not have better way of testing than using hardcoded userId
-      // TODO: use discordServerId - same as above
-      `${DOMAIN}/discord/${'834476259199156245'}/member/${'646733536744833054'}`,
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'X-API-KEY': API_KEY
-        }
+    const res = await fetch<CollablandUserResult>(`${DOMAIN}/discord/${discordServerId}/member/${discordUserId}`, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-API-KEY': API_KEY
       }
-    );
+    });
 
     const serverRoles = await getGuildRoles(discordServerId);
     const userRoles: ExternalRole[] = [];
