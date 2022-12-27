@@ -1,8 +1,8 @@
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import { hasAccessToSpace } from '../../middleware';
 import type { PermissionComputeRequest } from '../interfaces';
 
 import { AvailableBountyPermissions } from './availableBountyPermissions';
