@@ -2,6 +2,7 @@ import type { DiscordUser } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isProdEnv, isStagingEnv } from 'config/constants';
 import { prisma } from 'db';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
@@ -42,9 +43,7 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   let discordAccount: DiscordAccount;
 
   try {
-    const domain = req.headers.host?.startsWith('localhost')
-      ? `http://${req.headers.host}`
-      : `https://${req.headers.host}`;
+    const domain = isProdEnv || isStagingEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
     discordAccount = await getDiscordAccount({ code, redirectUrl: `${domain}/api/discord/callback` });
   } catch (error) {
     log.warn('Error while connecting to Discord', error);

@@ -117,8 +117,8 @@ function Component({ menuState }: { menuState: PluginState }) {
         dispatch(initialLoad({ spaceId: currentSpace.id }));
         await mutate(
           `pages/${currentSpace.id}`,
-          (_pages: Page[]) => {
-            return [..._pages, duplicatedPage];
+          (_pages: Page[] | undefined) => {
+            return [...(_pages ?? []), duplicatedPage];
           },
           {
             revalidate: true

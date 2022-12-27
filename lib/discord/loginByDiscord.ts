@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { isProdEnv } from 'config/constants';
+import { isProdEnv, isStagingEnv } from 'config/constants';
 import { prisma } from 'db';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
@@ -21,7 +21,7 @@ export default async function loginByDiscord({
   discordApiUrl?: string;
   userId?: string;
 }) {
-  const domain = isProdEnv ? `https://${hostName}` : `http://${hostName}`;
+  const domain = isProdEnv || isStagingEnv ? `https://${hostName}` : `http://${hostName}`;
   const discordAccount = await getDiscordAccount({
     code,
     discordApiUrl,

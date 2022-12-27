@@ -3,11 +3,11 @@ import { PagePermissionLevel } from '@prisma/client';
 
 import type { OptionalTransaction, TransactionClient } from 'db';
 import { prisma } from 'db';
-import { hasAccessToSpace } from 'lib/middleware';
 import { flattenTree } from 'lib/pages/mapPageTree';
 import type { PageNodeWithPermissions, TargetPageTreeWithFlatChildren } from 'lib/pages/server';
 import { resolvePageTree } from 'lib/pages/server/resolvePageTree';
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
