@@ -1,3 +1,4 @@
+import { utils } from 'ethers';
 import { validate } from 'uuid';
 
 export function fancyTrim(_text: string = '', maxLength: number = 40) {
@@ -137,4 +138,14 @@ export function lowerCaseEqual(firstString?: string | null, secondString?: strin
 // ref: https://stackoverflow.com/questions/6300183/sanitize-string-of-regex-characters-before-regexp-build
 export function sanitizeForRegex(string: string) {
   return string.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
+}
+
+/**
+ * Shortens valid wallet addresses, leaves other strings unchanged
+ */
+export function shortWalletAddress(string: string): string {
+  if (utils.isAddress(string)) {
+    return shortenHex(string);
+  }
+  return string;
 }

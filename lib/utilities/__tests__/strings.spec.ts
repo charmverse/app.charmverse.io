@@ -1,4 +1,6 @@
-import { conditionalPlural, sanitizeForRegex } from '../strings';
+import { randomETHWalletAddress } from 'testing/generate-stubs';
+
+import { conditionalPlural, sanitizeForRegex, shortenHex, shortWalletAddress } from '../strings';
 
 describe('strings', () => {
   it('should sanitize parenthesis in a regex', () => {
@@ -18,5 +20,22 @@ describe('conditionalPlural', () => {
 
   it('should return plural if provided and the number is not 1', () => {
     expect(conditionalPlural({ word: 'Identity', count: 2, plural: 'Identities' })).toBe('Identities');
+  });
+});
+
+describe('shortWalletAddress', () => {
+  it('should shorten valid wallet addresses', () => {
+    const address = randomETHWalletAddress();
+    const shortAddress = shortWalletAddress(address);
+    expect(shortAddress).toBe(shortenHex(address));
+    expect(shortAddress.length).toBe(11);
+  });
+
+  it('should leave other strings unchanged', () => {
+    const ignoredString = 'test';
+    const invalidWallet = '0x123abc';
+
+    expect(shortWalletAddress(ignoredString)).toBe(ignoredString);
+    expect(shortWalletAddress(invalidWallet)).toBe(invalidWallet);
   });
 });
