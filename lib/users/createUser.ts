@@ -8,7 +8,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -24,7 +24,7 @@ export async function createUserFromWallet(
     return user;
   } catch (error) {
     const ens: string | null = await getENSName(address);
-    const userPath = shortenHex(address).replace('…', '-');
+    const userPath = shortWalletAddress(address).replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
     const newUser = await prisma.user.create({

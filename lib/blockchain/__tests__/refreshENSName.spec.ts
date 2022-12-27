@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { shortWalletAddress } from 'lib/utilities/strings';
 import { randomETHWalletAddress } from 'testing/generate-stubs';
 
 import { refreshENSName } from '../refreshENSName';
@@ -65,6 +66,26 @@ describe('refreshENSName', () => {
     const userAfterRefresh = await refreshENSName({
       userId: user.id,
       address
+    });
+
+    expect(checkEnsName(address, userAfterRefresh.username)).toBe(true);
+  });
+  it('should support the shortened address as a lookup for the users ENS Name', async () => {
+    const address = randomETHWalletAddress();
+    const user = await prisma.user.create({
+      data: {
+        username: address,
+        wallets: {
+          create: {
+            address
+          }
+        }
+      }
+    });
+
+    const userAfterRefresh = await refreshENSName({
+      userId: user.id,
+      address: shortWalletAddress(address)
     });
 
     expect(checkEnsName(address, userAfterRefresh.username)).toBe(true);

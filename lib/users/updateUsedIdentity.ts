@@ -5,6 +5,7 @@ import { prisma } from 'db';
 import { getENSName } from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -41,7 +42,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
     ) {
       throw new InsecureOperationError(`User ${userId} does not have an Unstoppable Domain with name ${displayName}`);
     } else if (identityType === 'Wallet') {
-      if (!user.wallets.some((wallet) => wallet.address === displayName || wallet.ensname === displayName)) {
+      if (!user.wallets.some((wallet) => matchWalletAddress(displayName, wallet))) {
         throw new InsecureOperationError(`User ${userId} does not have wallet with address or ensname ${displayName}`);
       }
     } else if (identityType === 'Telegram' && (user.telegramUser?.account as any)?.username !== displayName) {
@@ -53,7 +54,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
         id: userId
       },
       data: {
-        username: displayName,
+        username: shortWalletAddress(displayName),
         identityType
       },
       include: sessionUserRelations

@@ -1,6 +1,7 @@
 import { prisma } from 'db';
 import { getUserProfile } from 'lib/users/getUser';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getENSName } from './getENSName';
@@ -19,28 +20,31 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const user = await getUserProfile('id', userId);
 
-  if (!user.wallets.some((w) => w.address === lowerCaseAddress)) {
+  const wallet = user.wallets.find((w) => matchWalletAddress(lowerCaseAddress, w));
+
+  if (!wallet) {
     throw new MissingDataError('No user wallet found with this address');
   }
 
-  const ensName = await getENSName(address);
+  const walletAddress = wallet.address;
+
+  const ensName = await getENSName(walletAddress);
 
   if (ensName) {
     await prisma.userWallet.update({
       where: {
-        address: lowerCaseAddress
+        address: walletAddress
       },
       data: {
         ensname: ensName,
         // Also update the username if it currently matches the wallet address for this ENS name
-        user:
-          user.username === lowerCaseAddress
-            ? {
-                update: {
-                  username: ensName
-                }
+        user: matchWalletAddress(user.username, walletAddress)
+          ? {
+              update: {
+                username: ensName
               }
-            : undefined
+            }
+          : undefined
       }
     });
   }

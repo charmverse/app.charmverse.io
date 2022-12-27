@@ -3,6 +3,8 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { shortWalletAddress } from 'lib/utilities/strings';
+import { randomETHWalletAddress } from 'testing/generate-stubs';
 
 import { updateUsedIdentity } from '../updateUsedIdentity';
 
@@ -115,14 +117,16 @@ describe('updateUsedIdentity', () => {
     expect(userWithGoogleAfterUpdate.identityType).toBe(`Google`);
   });
 
-  it('should update a user identity to their connected Wallet address', async () => {
+  it('should update a user identity to the short version of the specified Wallet address', async () => {
+    const address = randomETHWalletAddress();
+
     const user = await prisma.user.create({
       data: {
         username: 'random-name',
         identityType: 'RandomName',
         wallets: {
           create: {
-            address: `0x${v4()}`
+            address
           }
         }
       },
@@ -134,8 +138,23 @@ describe('updateUsedIdentity', () => {
       displayName: user.wallets[0].address
     });
 
-    expect(userAfterUpdate.username).toBe(user.wallets[0].address);
+    expect(userAfterUpdate.username).toBe(shortWalletAddress(user.wallets[0].address));
     expect(userAfterUpdate.identityType).toBe(`Wallet`);
+
+    // Reset identity
+    await updateUsedIdentity(user.id, {
+      identityType: 'RandomName',
+      displayName: 'random name'
+    });
+
+    // Make sure we support update using shortform version of address
+    const userAfterSecondUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Wallet',
+      displayName: shortWalletAddress(user.wallets[0].address)
+    });
+
+    expect(userAfterSecondUpdate.username).toBe(shortWalletAddress(user.wallets[0].address));
+    expect(userAfterSecondUpdate.identityType).toBe(`Wallet`);
   });
 
   it('should update a user identity to their connected ENS name', async () => {

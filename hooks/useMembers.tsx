@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -6,7 +5,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { Member } from 'lib/members/interfaces';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -28,12 +27,9 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     () => {
       return charmClient.members.getMembers(space!.id).then((_members) =>
         _members.map((m) => {
-          const { username } = m;
-
-          if (m.identityType === 'Wallet' && utils.isAddress(username)) {
-            m.username = shortenHex(username);
+          if (m.identityType === 'Wallet') {
+            m.username = shortWalletAddress(m.username);
           }
-
           return m;
         })
       );

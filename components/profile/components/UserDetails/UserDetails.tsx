@@ -6,7 +6,6 @@ import { Box, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import type { IdentityType } from '@prisma/client';
-import { utils } from 'ethers';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -23,7 +22,7 @@ import Avatar from 'components/settings/workspace/LargeAvatar';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import randomName from 'lib/utilities/randomName';
-import { shortenHex } from 'lib/utilities/strings';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
@@ -109,12 +108,13 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
 
     const types: IntegrationModel[] = [];
     user.wallets.forEach((wallet) => {
+      const address = wallet.address;
+
       types.push({
         type: 'Wallet',
         username: wallet.ensname ?? wallet.address,
-        secondaryUserName: wallet.address,
-        isInUse:
-          user.identityType === 'Wallet' && (user.username === wallet.ensname || user.username === wallet.address),
+        secondaryUserName: address,
+        isInUse: user.identityType === 'Wallet' && matchWalletAddress(user.username, wallet),
         icon: getIdentityIcon('Wallet')
       });
     });
@@ -190,9 +190,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <Grid item>
             <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
-              <Typography variant='h1'>
-                {utils.isAddress(user?.username) ? shortenHex(user.username) : user.username}
-              </Typography>
+              <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
             </EditIconContainer>
           </Grid>
           {!readOnly && (

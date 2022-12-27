@@ -5,7 +5,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import { Box, SvgIcon, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import type { IdentityType } from '@prisma/client';
-import { isAddress } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
 import randomName from 'lib/utilities/randomName';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/strings';
 import DiscordIcon from 'public/images/discord_logo.svg';
 import MetamaskIcon from 'public/images/metamask.svg';
 
@@ -116,14 +116,13 @@ function IdentityModal(props: IdentityModalProps) {
       <Box mb={2}>
         {identityTypes.map((item: IntegrationModel) => {
           const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
-          const isValidAddress = item.type === 'Wallet' && isAddress(item.username);
           return (
             <Integration
               isInUse={item.type === 'RandomName' && generatedName !== item.username ? false : item.isInUse}
               icon={item.icon}
               identityType={item.type}
               name={item.type === 'RandomName' ? 'Anonymous' : item.type}
-              username={isValidAddress ? shortenHex(item.username) : usernameToDisplay}
+              username={shortWalletAddress(usernameToDisplay)}
               secondaryUserName={item.secondaryUserName}
               useIntegration={() => save(usernameToDisplay, item.type)}
               action={
@@ -133,7 +132,7 @@ function IdentityModal(props: IdentityModalProps) {
                       <RefreshIcon fontSize='small' />
                     </IconButton>
                   </Tooltip>
-                ) : isValidAddress ? (
+                ) : utils.isAddress(usernameToDisplay) ? (
                   <Tooltip
                     //                    disableHoverListener
                     onMouseEnter={(e) => e.stopPropagation()}
