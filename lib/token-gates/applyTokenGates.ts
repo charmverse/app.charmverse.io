@@ -197,7 +197,7 @@ export async function applyTokenGates({
       }
     });
 
-    await prisma.workspaceOnboarding.create({
+    await prisma.workspaceOnboard.create({
       data: {
         spaceRole: {
           connect: {

@@ -50,7 +50,7 @@ async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    await prisma.workspaceOnboarding.create({
+    await prisma.workspaceOnboard.create({
       data: {
         spaceRole: {
           connect: {

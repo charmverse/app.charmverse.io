@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 
 export async function hasOnBoardedWorkspace({ spaceId, userId }: { userId: string; spaceId: string }) {
-  const workspaceOnBoarded = await prisma.workspaceOnboarding.findFirst({
+  const workspaceOnBoarded = await prisma.workspaceOnboard.findFirst({
     where: {
       userId,
       spaceRole: {

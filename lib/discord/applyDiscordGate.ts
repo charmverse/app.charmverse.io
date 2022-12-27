@@ -47,7 +47,7 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
       }
     });
 
-    await prisma.workspaceOnboarding.create({
+    await prisma.workspaceOnboard.create({
       data: {
         spaceRole: {
           connect: {

@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 
 export async function completeOnboarding({ spaceId, userId }: { userId: string; spaceId: string }) {
-  const workspaceOnboarding = await prisma.workspaceOnboarding.findFirst({
+  const workspaceOnboarding = await prisma.workspaceOnboard.findFirst({
     where: {
       spaceRole: {
         spaceId
@@ -11,7 +11,7 @@ export async function completeOnboarding({ spaceId, userId }: { userId: string; 
   });
 
   if (workspaceOnboarding) {
-    await prisma.workspaceOnboarding.update({
+    await prisma.workspaceOnboard.update({
       data: {
         onboarded: true
       },
@@ -30,7 +30,7 @@ export async function completeOnboarding({ spaceId, userId }: { userId: string; 
       }
     });
     if (spaceRole) {
-      await prisma.workspaceOnboarding.create({
+      await prisma.workspaceOnboard.create({
         data: {
           spaceRoleId: spaceRole.id,
           userId,
