@@ -1,5 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, CircularProgress, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -123,6 +123,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }
   const isMyPost = !page || page.createdBy === user?.id;
   const readOnly = !isMyPost;
+
   let disabledTooltip = '';
   if (!form.title) {
     disabledTooltip = 'Title is required';
@@ -148,21 +149,23 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   return (
     <Container top={50}>
       <Box minHeight={300}>
-        <CharmEditor
-          readOnly={readOnly}
-          pageActionDisplay={null}
-          pageId={page?.id}
-          disablePageSpecificFeatures={true}
-          pageType='post'
-          isContentControlled={true}
-          content={form.content as PageContent}
-          onContentChange={updatePostContent}
-        >
-          <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
-          <Box my={2}>
-            <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
-          </Box>
-        </CharmEditor>
+        {page && user && (
+          <CharmEditor
+            readOnly={readOnly}
+            pageActionDisplay={null}
+            pageId={page?.id}
+            disablePageSpecificFeatures
+            pageType='post'
+            isContentControlled
+            content={form.content as PageContent}
+            onContentChange={updatePostContent}
+          >
+            <PageTitleInput readOnly={readOnly} value={form.title} onChange={updateTitle} />
+            <Box my={2}>
+              <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
+            </Box>
+          </CharmEditor>
+        )}
       </Box>
       {isMyPost && (
         <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
