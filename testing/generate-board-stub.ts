@@ -290,7 +290,7 @@ export function boardWithCardsArgs({
 
   const cardPages = rootBoardNode.children;
 
-  for (let i = 3; i <= cardCount; i++) {
+  for (let i = 2; i < cardCount; i++) {
     if (i % 2 === 0) {
       cardPages.push({ ...cardPages[0], id: cardIds[i] });
     } else {
