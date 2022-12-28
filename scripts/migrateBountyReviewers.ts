@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 import { prisma } from 'db';
 import { setBountyPermissions } from 'lib/permissions/bounties/setBountyPermissions';
-import { hasAccessToSpace } from '../lib/middleware';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { addBountyPermissionGroup } from '../lib/permissions/bounties';
+
 
 export const placeholder = 2;
 
