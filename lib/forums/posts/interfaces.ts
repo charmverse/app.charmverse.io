@@ -3,7 +3,7 @@ import type { Page, Post } from '@prisma/client';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { JSONValues } from 'lib/utilities/types';
 
-type PostPage = Pick<Page, 'id' | 'title' | 'content' | 'createdAt' | 'createdBy' | 'spaceId' | 'updatedAt'>;
+type PostPage = Pick<Page, 'id' | 'title' | 'content' | 'createdAt' | 'createdBy' | 'spaceId' | 'updatedAt' | 'path'>;
 export type PageValues = JSONValues<PostPage>;
 export type ForumVotes = { upvotes: number; downvotes: number; upvoted: boolean | null };
 export type ForumPostPage = PageValues & { post: Post };

@@ -11,7 +11,9 @@
 
 
 // begin hide the token search
-.lsm-condition-container h3:nth-child(2) {
+
+// :has() is not supported by Firefox, but everyone else
+.lsm-condition-container .lsm-condition-prompt-text:has(+ .lsm-token-select) {
   display: none;
 }
 

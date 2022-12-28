@@ -88,10 +88,13 @@ export function createNewPropertiesForBoard(
   // If we already have a select or multiselect with the same property name, filter the duplicates out. The new values and the old values will be merged later.
   if (existingBoardProp && (existingBoardProp.type === 'select' || existingBoardProp.type === 'multiSelect')) {
     const newSelectValues = csvData
-      .map((result) => result[prop])
+      .map((result) => result[prop].split('|'))
+      .flat()
       .filter((option) => !!option && !existingBoardProp.options[option]);
 
-    const options = createBoardPropertyOptions(newSelectValues);
+    const uniqueValues = [...new Set(newSelectValues)];
+
+    const options = createBoardPropertyOptions(uniqueValues);
 
     return { ...defaultProps, options, type: existingBoardProp.type };
   }

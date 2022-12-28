@@ -6,9 +6,10 @@ import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { getPostComments } from 'lib/forums/comments/getPostComments';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -18,8 +18,14 @@ export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdi
 
   return (
     <MenuItem {...menuItemProps} sx={{ display: 'flex' }}>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1}>
-        <Chip label={option.name} color={option.color} size='small' sx={{ px: 0.5, zIndex: 0, position: 'relative' }} />
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1} maxWidth='100%'>
+        <Chip
+          label={option.name}
+          color={option.color}
+          size='small'
+          // 100% - 24px to not collide with ellipsis
+          sx={{ maxWidth: readOnly ? '100%' : 'calc(100% - 24px)', px: 0.5, zIndex: 0, position: 'relative' }}
+        />
 
         {!readOnly && (
           <Box position='absolute' right='5px'>
