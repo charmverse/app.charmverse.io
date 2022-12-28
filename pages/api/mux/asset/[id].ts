@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
+import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
 import type { Asset } from 'lib/mux/getAsset';
 import { getPrivateAsset } from 'lib/mux/getAsset';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { canView } from 'lib/mux/permissions';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export type AssetRequest = {
@@ -20,12 +20,12 @@ handler.get(getAssetEndpoint);
 
 async function getAssetEndpoint(req: NextApiRequest, res: NextApiResponse<AssetResponse>) {
   const query = req.query as AssetRequest;
-  const pagePermissions = await computeUserPagePermissions({
+  const isAllowed = await canView({
     userId: req.session.user?.id,
     pageId: query.pageId
   });
 
-  if (!pagePermissions.read) {
+  if (!isAllowed) {
     throw new ActionNotPermittedError();
   }
 

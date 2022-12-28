@@ -1,3 +1,5 @@
+import { upperFirst } from 'lodash';
+
 import type { Block } from './block';
 import { createBlock } from './block';
 import type { FilterGroup } from './filterGroup';
@@ -53,6 +55,10 @@ function createBoardView(block?: Partial<Block>): BoardView {
       defaultTemplateId: block?.fields?.defaultTemplateId || ''
     }
   };
+}
+
+export function formatViewTitle(view: BoardView) {
+  return `${upperFirst(view.fields.viewType)} view`;
 }
 
 export { createBoardView };

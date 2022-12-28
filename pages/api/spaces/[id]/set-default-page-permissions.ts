@@ -2,10 +2,11 @@ import type { PagePermissionLevel, Space } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import { withSessionRoute } from 'lib/session/withSession';
 import { setSpaceDefaultPagePermission } from 'lib/spaces/setSpaceDefaultPagePermission';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

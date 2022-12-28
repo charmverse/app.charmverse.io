@@ -78,7 +78,15 @@ function TableHeader(props: Props): JSX.Element {
               })}
             </div>
           </div>
-          <Typography component='span' variant='subtitle1'>
+          <Typography
+            component='span'
+            variant='subtitle1'
+            sx={{
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }}
+          >
             {props.name}
           </Typography>
           <IconButton size='small' sx={{ ml: 1 }} onClick={reverseSort}>

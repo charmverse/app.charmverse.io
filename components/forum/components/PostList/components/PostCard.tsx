@@ -92,7 +92,7 @@ export function PostCard({ post, user }: ForumPostProps) {
           <Typography variant='h6' variantMapping={{ h6: 'h3' }} gutterBottom>
             {fancyTrim(post.title, maxCharactersInPost)}
           </Typography>
-          <PostSummary content={post.summary} />
+          <PostSummary content={post.summary} pageId={postId} />
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <UserDisplay

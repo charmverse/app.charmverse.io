@@ -4,13 +4,12 @@ import { useSWRConfig } from 'swr';
 
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isSmallScreen } from 'lib/utilities/browser';
-import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
 import { useVotes } from './useVotes';
 
-export type PageAction = 'polls' | 'comments' | 'suggestions';
+export type PageAction = 'comments' | 'suggestions';
 
 export interface IPageActionDisplayContext {
   currentPageActionDisplay: PageAction | null;
@@ -43,25 +42,11 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       return setCurrentPageActionDisplay(null);
     }
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
-      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
-      );
-      // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
-      if (
-        !highlightedCommentId &&
-        cachedInlineVotesData &&
-        cachedInlineVotesData.find(
-          (inlineVote) =>
-            inlineVote.status === 'InProgress' &&
-            // We don't want to open the sidebar for a proposal-type vote
-            inlineVote.context !== 'proposal'
-        )
-      ) {
-        return setCurrentPageActionDisplay('polls');
-      }
+      )?.data as ThreadWithCommentsAndAuthors[] | undefined;
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
-      else if (
+      if (
         highlightedCommentId ||
         (cachedInlineCommentData && cachedInlineCommentData.find((thread) => thread && !thread.resolved))
       ) {

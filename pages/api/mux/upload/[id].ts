@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
 import type { Upload } from 'lib/mux/getUpload';
 import { getUpload } from 'lib/mux/getUpload';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { canCreate } from 'lib/mux/permissions';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export type UploadRequest = {
@@ -20,12 +20,12 @@ handler.use(requireUser).get(getUploadEndpoint);
 
 async function getUploadEndpoint(req: NextApiRequest, res: NextApiResponse<UploadResponse>) {
   const query = req.query as UploadRequest;
-  const pagePermissions = await computeUserPagePermissions({
+  const isAllowed = await canCreate({
     userId: req.session.user.id,
     pageId: query.pageId
   });
 
-  if (!pagePermissions.edit_content) {
+  if (!isAllowed) {
     throw new ActionNotPermittedError();
   }
 
