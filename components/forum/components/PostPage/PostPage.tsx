@@ -161,8 +161,11 @@ export function PostPage({ page, spaceId, onSave }: Props) {
     <ScrollableWindow>
       <Container
         top={50}
-        style={{
-          marginLeft: 75
+        sx={{
+          marginLeft: {
+            md: '75px',
+            xs: 0
+          }
         }}
       >
         <Box minHeight={300}>

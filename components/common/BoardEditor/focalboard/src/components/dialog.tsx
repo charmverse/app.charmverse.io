@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import Modal from '@mui/material/Modal';
+import clsx from 'clsx';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useIntl } from 'react-intl';
@@ -38,19 +39,7 @@ const Dialog = React.memo((props: Props) => {
             }
           }}
         >
-          <div
-            role='dialog'
-            className='dialog'
-            style={
-              fullWidth
-                ? {
-                    maxWidth: '85%',
-                    maxHeight: '100%',
-                    height: '100%'
-                  }
-                : {}
-            }
-          >
+          <div role='dialog' className={clsx('dialog', { fullWidth })}>
             <div className='toolbar'>
               {!props.hideCloseButton && (
                 <IconButton
