@@ -44,7 +44,7 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
-      );
+      ) as ThreadWithCommentsAndAuthors[] | undefined;
       // For some reason we cant get the threads map using useThreads, its empty even after isValidating is true (data has loaded)
       if (
         highlightedCommentId ||
