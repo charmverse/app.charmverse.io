@@ -5,8 +5,9 @@ import nc from 'next-connect';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { getPostCategories } from 'lib/forums/categories/getPostCategories';
-import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
