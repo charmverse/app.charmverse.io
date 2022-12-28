@@ -19,8 +19,8 @@ import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { RiFolder2Line } from 'react-icons/ri';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
@@ -106,7 +106,7 @@ function ViewOptionsSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {/* {withGroupBy && (
+              {/* {props.view.fields.sourceType && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
                   icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}

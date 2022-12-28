@@ -2,11 +2,12 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { FilterClause } from '../../blocks/filterClause';
-import { areEqual as areFilterClausesEqual } from '../../blocks/filterClause';
-import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { FilterClause } from 'lib/focalboard/filterClause';
+import { areEqual as areFilterClausesEqual } from 'lib/focalboard/filterClause';
+import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { Utils } from '../../utils';

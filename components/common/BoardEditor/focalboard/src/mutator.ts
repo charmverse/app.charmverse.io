@@ -1,19 +1,19 @@
 /* eslint-disable default-param-last */
 import charmClient from 'charmClient';
+import type { Block, BlockPatch } from 'lib/focalboard/block';
+import { createPatchesFromBlocks } from 'lib/focalboard/block';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { createBoard } from 'lib/focalboard/board';
+import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageMeta } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import type { Block, BlockPatch } from './blocks/block';
-import { createPatchesFromBlocks } from './blocks/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
-import { createBoard } from './blocks/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView';
-import { createBoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
-import { createCard } from './blocks/card';
-import type { FilterGroup } from './blocks/filterGroup';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';

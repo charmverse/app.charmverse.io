@@ -1,7 +1,8 @@
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { FilterClause } from '../../blocks/filterClause';
-import { createFilterGroup } from '../../blocks/filterGroup';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { FilterClause } from 'lib/focalboard/filterClause';
+import { createFilterGroup } from 'lib/focalboard/filterGroup';
+
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';

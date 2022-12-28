@@ -4,12 +4,12 @@ import { marked } from 'marked';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import type { Block } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
+import { createCard } from 'lib/focalboard/card';
 import log from 'lib/log';
 
-import type { Block } from './blocks/block';
-import { createBoard } from './blocks/board';
-import { createBoardView } from './blocks/boardView';
-import { createCard } from './blocks/card';
 import { createCommentBlock } from './blocks/commentBlock';
 import type { IAppWindow } from './types';
 

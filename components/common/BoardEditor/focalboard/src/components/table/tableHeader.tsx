@@ -3,9 +3,10 @@ import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import { IconButton, Typography } from '@mui/material';
 import React from 'react';
 
-import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

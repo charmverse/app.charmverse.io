@@ -8,9 +8,9 @@ import Button from 'components/common/Button';
 import { DownIcon } from 'components/common/Icons/DownIcon';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { usePages } from 'hooks/usePages';
+import type { Card } from 'lib/focalboard/card';
 import type { PageMeta } from 'lib/pages';
 
-import type { Card } from '../../blocks/card';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
 

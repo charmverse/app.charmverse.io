@@ -8,8 +8,9 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
+import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

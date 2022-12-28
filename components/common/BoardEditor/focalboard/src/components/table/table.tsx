@@ -3,11 +3,11 @@ import { useDragLayer, useDrop } from 'react-dnd';
 import { FormattedMessage } from 'react-intl';
 
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
+import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
-import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';

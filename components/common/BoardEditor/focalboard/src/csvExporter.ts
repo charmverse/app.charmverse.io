@@ -1,8 +1,9 @@
 import type { IntlShape } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from './blocks/board';
-import type { BoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { OctoUtils } from './octoUtils';
 import type { IAppWindow } from './types';
 import { Utils } from './utils';

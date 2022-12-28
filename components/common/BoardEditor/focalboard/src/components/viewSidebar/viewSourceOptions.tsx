@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { RiGoogleFill } from 'react-icons/ri';
 import { TbDatabase } from 'react-icons/tb';
 
-import type { BoardView } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
+import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
@@ -13,19 +14,16 @@ import { SourceOptions } from '../SourceSelection';
 interface LayoutOptionsProps {
   view: BoardView;
 }
-
-type SourceType = 'existing_database' | 'google_form';
-
 type FormStep = 'select_source' | 'configure_source';
 
 export function ViewSourceOptions(props: LayoutOptionsProps) {
   const activeView = props.view;
 
   const dispatch = useAppDispatch();
-  const [sourceType, setSourceType] = useState<SourceType | undefined>(activeView.fields.sourceType);
+  const [sourceType, setSourceType] = useState<ViewSourceType | undefined>(activeView.fields.sourceType);
   const [formStep, setStep] = useState<FormStep>('select_source');
 
-  function selectSourceType(_source: SourceType) {
+  function selectSourceType(_source: ViewSourceType) {
     return () => {
       setSourceType(_source);
       setStep('configure_source');
@@ -48,7 +46,7 @@ export function ViewSourceOptions(props: LayoutOptionsProps) {
     <Box onClick={(e) => e.stopPropagation()}>
       {formStep === 'select_source' && (
         <Grid container spacing={1} px={1}>
-          <LayoutOption active={sourceType === 'existing_database'} onClick={selectSourceType('existing_database')}>
+          <LayoutOption active={sourceType === 'board_page'} onClick={selectSourceType('board_page')}>
             <TbDatabase style={{ fontSize: 24 }} />
             CharmVerse database
           </LayoutOption>
@@ -58,7 +56,7 @@ export function ViewSourceOptions(props: LayoutOptionsProps) {
           </LayoutOption>
         </Grid>
       )}
-      {formStep === 'configure_source' && sourceType === 'existing_database' && (
+      {formStep === 'configure_source' && sourceType === 'board_page' && (
         <SourceOptions onSelectSource={selectExistingDatabase} />
       )}
       {formStep === 'configure_source' && sourceType === 'google_form' && <>connect google form!</>}

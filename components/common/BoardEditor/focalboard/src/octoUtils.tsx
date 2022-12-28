@@ -1,18 +1,19 @@
 import { DateUtils } from 'react-day-picker';
 import type { IntlShape } from 'react-intl';
 
-import type { Block } from './blocks/block';
-import { createBlock } from './blocks/block';
-import type { IPropertyTemplate } from './blocks/board';
-import { createBoard } from './blocks/board';
-import type { BoardView } from './blocks/boardView';
-import { createBoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
-import { createCard } from './blocks/card';
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { createBoard } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
+import type { FilterCondition } from 'lib/focalboard/filterClause';
+
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createCommentBlock } from './blocks/commentBlock';
 import { createDividerBlock } from './blocks/dividerBlock';
-import type { FilterCondition } from './blocks/filterClause';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';

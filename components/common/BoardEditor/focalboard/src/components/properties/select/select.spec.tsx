@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import type { IPropertyTemplate } from '../../../blocks/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+
 import { wrapIntl } from '../../../testUtils';
 
 import Select from './select';

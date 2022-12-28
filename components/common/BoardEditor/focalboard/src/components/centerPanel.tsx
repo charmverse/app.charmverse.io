@@ -32,13 +32,13 @@ import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import type { Block } from 'lib/focalboard/block';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import type { Block } from '../blocks/block';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board';
-import type { BoardView } from '../blocks/boardView';
-import type { Card } from '../blocks/card';
-import { createCard } from '../blocks/card';
 import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -106,8 +106,8 @@ function CenterPanel(props: Props) {
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   const activeBoardId = props.activeView && (props.activeView?.fields.linkedSourceId || props.board.id);
-  const activeBoard = useAppSelector(getBoard(activeBoardId));
-  const activePage = pages[activeBoardId];
+  const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
+  const activePage = pages[activeBoardId ?? ''];
 
   const _cards = useAppSelector(
     getViewCardsSortedFilteredAndGrouped({

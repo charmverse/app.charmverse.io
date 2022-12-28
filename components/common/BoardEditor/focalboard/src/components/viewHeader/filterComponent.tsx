@@ -1,11 +1,12 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { FilterClause, FilterCondition } from '../../blocks/filterClause';
-import { createFilterClause } from '../../blocks/filterClause';
-import { createFilterGroup, isAFilterGroupInstance } from '../../blocks/filterGroup';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
+import { createFilterClause } from 'lib/focalboard/filterClause';
+import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';

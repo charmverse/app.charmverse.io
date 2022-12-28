@@ -14,11 +14,11 @@ import { injectIntl } from 'react-intl';
 import type { IntlShape } from 'react-intl';
 
 import Button from 'components/common/Button';
+import type { Block } from 'lib/focalboard/block';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
 
-import type { Block } from '../blocks/block';
-import type { Board, IPropertyTemplate } from '../blocks/board';
-import type { BoardView } from '../blocks/boardView';
-import { createBoardView } from '../blocks/boardView';
 import { Constants } from '../constants';
 import mutator from '../mutator';
 import { Utils } from '../utils';
