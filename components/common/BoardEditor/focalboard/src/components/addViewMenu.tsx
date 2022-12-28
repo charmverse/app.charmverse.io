@@ -62,7 +62,7 @@ function AddViewMenu(props: AddViewProps) {
     Utils.log('addview-board');
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
     const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewBoardTitle', defaultMessage: 'Board view' });
+    view.title = '';
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.rootId;
@@ -119,7 +119,7 @@ function AddViewMenu(props: AddViewProps) {
 
     Utils.log('addview-gallery');
     const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewGalleryTitle', defaultMessage: 'Gallery view' });
+    view.title = '';
     view.fields.viewType = 'gallery';
     view.parentId = board.id;
     view.rootId = board.rootId;
@@ -150,7 +150,7 @@ function AddViewMenu(props: AddViewProps) {
 
     Utils.log('addview-calendar');
     const view = createBoardView();
-    view.title = intl.formatMessage({ id: 'View.NewCalendarTitle', defaultMessage: 'Calendar View' });
+    view.title = '';
     view.fields.viewType = 'calendar';
     view.parentId = board.id;
     view.rootId = board.rootId;
@@ -226,7 +226,7 @@ function AddViewMenu(props: AddViewProps) {
 
 export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
   const view = createBoardView();
-  view.title = intl?.formatMessage({ id: 'View.NewTableTitle', defaultMessage: 'Table view' }) ?? 'Table view';
+  view.title = '';
   view.fields.viewType = 'table';
   view.parentId = board.id;
   view.rootId = board.rootId;

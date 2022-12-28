@@ -7,9 +7,9 @@ import { MemberOnboardingForm } from './components/MemberOnboardingForm';
 export function MemberOnboardingModal({ userId }: { userId?: string }) {
   const space = useCurrentSpace();
   const { user } = useUser();
-  const { onboarding, completeOnboarding } = useOnboarding();
+  const { onboarded, completeOnboarding } = useOnboarding();
 
-  if (!space || onboarding !== false || !user) {
+  if (!space || onboarded !== false || !user) {
     return null;
   }
 

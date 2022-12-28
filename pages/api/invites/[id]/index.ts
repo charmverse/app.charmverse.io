@@ -50,22 +50,6 @@ async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
         joinedViaLink: true
       }
     });
-
-    await prisma.workspaceOnboard.create({
-      data: {
-        spaceRole: {
-          connect: {
-            id: createdSpaceRole.id
-          }
-        },
-        user: {
-          connect: {
-            id: userId
-          }
-        }
-      }
-    });
-
     logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
 
     updateTrackUserProfileById(userId);

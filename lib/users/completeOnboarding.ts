@@ -1,42 +1,13 @@
 import { prisma } from 'db';
 
 export async function completeOnboarding({ spaceId, userId }: { userId: string; spaceId: string }) {
-  const workspaceOnboarding = await prisma.workspaceOnboard.findFirst({
+  await prisma.spaceRole.updateMany({
     where: {
-      spaceRole: {
-        spaceId
-      },
+      spaceId,
       userId
+    },
+    data: {
+      onboarded: true
     }
   });
-
-  if (workspaceOnboarding) {
-    await prisma.workspaceOnboard.update({
-      data: {
-        onboarded: true
-      },
-      where: {
-        userId_spaceRoleId: {
-          spaceRoleId: workspaceOnboarding.spaceRoleId,
-          userId
-        }
-      }
-    });
-  } else {
-    const spaceRole = await prisma.spaceRole.findFirst({
-      where: {
-        spaceId,
-        userId
-      }
-    });
-    if (spaceRole) {
-      await prisma.workspaceOnboard.create({
-        data: {
-          spaceRoleId: spaceRole.id,
-          userId,
-          onboarded: true
-        }
-      });
-    }
-  }
 }

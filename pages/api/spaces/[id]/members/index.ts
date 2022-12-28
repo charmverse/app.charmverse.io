@@ -128,6 +128,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
         id,
         ...userData,
         addresses: [],
+        onboarded: spaceRole.onboarded,
         isAdmin: spaceRole.isAdmin,
         joinDate: spaceRole.createdAt.toISOString(),
         hasNftAvatar: hasNftAvatar(spaceRole.user),

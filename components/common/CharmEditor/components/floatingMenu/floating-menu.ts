@@ -9,7 +9,6 @@ import type { EditorState } from 'prosemirror-state';
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
-import { markName as inlineVoteMarkName } from '../inlineVote/inlineVote.constants';
 
 const { queryIsSelectionTooltipActive, querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } =
   selectionTooltip;
@@ -19,7 +18,7 @@ export const defaultKeys = {
   toggleLink: 'Meta-k'
 };
 
-export type SubMenu = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu' | 'inlineVoteSubMenu';
+export type SubMenu = 'defaultMenu' | 'linkSubMenu' | 'inlineCommentSubMenu';
 
 interface FloatingMenuPluginArgs extends Partial<SelectionTooltipProps> {
   keybindings?: { [index: string]: string };
@@ -48,12 +47,7 @@ export function floatingMenu({
   ];
 }
 export function toggleSubMenu(floatingMenuPluginKey: PluginKey, subMenu: SubMenu): Command {
-  const nodeName =
-    subMenu === 'inlineCommentSubMenu'
-      ? inlineCommentMarkName
-      : subMenu === 'inlineVoteSubMenu'
-      ? inlineVoteMarkName
-      : 'link';
+  const nodeName = subMenu === 'inlineCommentSubMenu' ? inlineCommentMarkName : 'link';
   return (state, _dispatch, view) => {
     const type = querySelectionTooltipType(floatingMenuPluginKey)(state);
 

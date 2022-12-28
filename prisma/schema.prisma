@@ -450,12 +450,12 @@ model User {
   unstoppableDomains   UnstoppableDomain[]
   PageComment          PageComment[]
   googleAccounts       GoogleAccount[]
-  workspaceOnboard     WorkspaceOnboard[]
 }
 
 model UserWallet {
   address String @unique
   userId  String @db.Uuid
+  ensname String? @unique
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -553,18 +553,18 @@ model UserTokenGate {
 }
 
 model SpaceRole {
-  spaceId          String             @db.Uuid
-  userId           String             @db.Uuid
-  id               String             @id @default(uuid()) @db.Uuid
-  isAdmin          Boolean            @default(false)
-  createdAt        DateTime           @default(now())
-  space            Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceRoleToRole  SpaceRoleToRole[]
-  tokenGate        TokenGate?         @relation(fields: [tokenGateId], references: [id])
-  tokenGateId      String?            @db.Uuid
-  joinedViaLink    Boolean?
-  workspaceOnboard WorkspaceOnboard[]
+  spaceId         String            @db.Uuid
+  userId          String            @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  isAdmin         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceRoleToRole SpaceRoleToRole[]
+  tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
+  joinedViaLink   Boolean?
+  onboarded       Boolean           @default(false)
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])
@@ -1088,14 +1088,4 @@ model GoogleAccount {
   avatarUrl String
   userId    String @db.Uuid
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model WorkspaceOnboard {
-  userId      String    @db.Uuid
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spaceRoleId String    @db.Uuid
-  spaceRole   SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
-  onboarded   Boolean   @default(false)
-
-  @@unique([userId, spaceRoleId])
 }

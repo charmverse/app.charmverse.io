@@ -1,55 +1,42 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useMembers } from './useMembers';
 import { useUser } from './useUser';
 
 type IContext = {
-  onboarding: boolean | null | undefined;
+  onboarded: boolean | null | undefined;
   completeOnboarding(): Promise<void>;
 };
 
 export const OnboardingContext = createContext<Readonly<IContext>>({
-  onboarding: null,
+  onboarded: null,
   completeOnboarding: () => ({} as any)
 });
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const currentSpace = useCurrentSpace();
-  const { data: onboarding, mutate: updateOnboarding } = useSWR(
-    user && currentSpace ? `onboarding-${user.id}-${currentSpace.id}` : null,
-    () =>
-      charmClient.workspaceOnboarding.getWorkspaceOnboarding({
-        spaceId: currentSpace!.id
-      })
-  );
+  const { members, mutateMembers, isLoading } = useMembers();
 
   async function completeOnboarding() {
-    if (currentSpace) {
-      charmClient.workspaceOnboarding.completeOnboarding({
+    if (currentSpace && user) {
+      await charmClient.completeOnboarding({
         spaceId: currentSpace.id
       });
-      updateOnboarding(
-        (_onboarding) => {
-          if (_onboarding) {
-            return true;
-          }
-        },
-        { revalidate: false }
-      );
+      mutateMembers(members.map((member) => (member.id === user.id ? { ...member, onboarded: true } : member)));
     }
   }
 
   const value: IContext = useMemo(
     () => ({
-      onboarding,
+      onboarded: isLoading || !user ? null : members.find((member) => member.id === user.id)?.onboarded ?? false,
       completeOnboarding
     }),
-    [onboarding]
+    [members]
   );
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;

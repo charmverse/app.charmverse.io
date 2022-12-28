@@ -11,7 +11,6 @@ import React, { useCallback } from 'react';
 
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
-import { createInlineVote } from '../inlineVote';
 import paragraph from '../paragraph';
 import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 
@@ -132,29 +131,6 @@ export function InlineCommentButton({
       menuKey={menuKey}
       hints={hints}
       subMenu='inlineCommentSubMenu'
-    >
-      {children}
-    </InlineActionButton>
-  );
-}
-
-export function InlineVoteButton({
-  hints = ['Poll'],
-  children = (
-    <ComponentIcon>
-      <HowToVoteIcon sx={{ fontSize: 14 }} />
-    </ComponentIcon>
-  ),
-  menuKey,
-  enableVotes
-}: ButtonProps & { menuKey: PluginKey; enableVotes: boolean }) {
-  return (
-    <InlineActionButton
-      commandFn={createInlineVote}
-      enable={enableVotes}
-      menuKey={menuKey}
-      hints={hints}
-      subMenu='inlineVoteSubMenu'
     >
       {children}
     </InlineActionButton>
