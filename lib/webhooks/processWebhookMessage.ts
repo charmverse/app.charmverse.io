@@ -4,7 +4,7 @@ import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import type { MemberRoleWebhookData, MemberWebhookData, MessageType, WebhookMessage } from 'lib/webhooks/interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<boolean>> = {
-  remove_role: async (message: WebhookMessage) => {
+  add_role: async (message: WebhookMessage) => {
     try {
       const {
         guild_id: discordServerId,
@@ -17,7 +17,7 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       return false;
     }
   },
-  add_role: async (message: WebhookMessage) => {
+  remove_role: async (message: WebhookMessage) => {
     try {
       const {
         guild_id: discordServerId,

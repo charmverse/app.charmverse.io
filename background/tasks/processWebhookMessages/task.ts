@@ -8,6 +8,6 @@ export async function task() {
   try {
     await processMessages({ processorFn: processWebhookMessage, maxNumOfMessages: 5 });
   } catch (error: any) {
-    log.error(`Error deleting archived pages: ${error.stack || error.message || error}`, { error });
+    log.error(`Error processing webhook messages: ${error.stack || error.message || error}`, { error });
   }
 }
