@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { DiscordGate } from 'components/common/DiscordGate/DiscordGate';
+import { useDiscordGate } from 'components/common/DiscordGate/hooks/useDiscordGate';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
 
 import LoadingComponent from '../LoadingComponent';
@@ -20,10 +22,17 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
     charmClient.getSpaceByDomain(stripUrlParts(spaceDomain))
   );
   const router = useRouter();
-
   async function onJoinSpace(joinedSpace: Space) {
     router.push(`/${joinedSpace.domain}`);
   }
+
+  const {
+    discordGate,
+    isConnectedToDiscord,
+    isLoading: isLoadingDiscordGate,
+    verifyDiscordGate,
+    joiningSpace
+  } = useDiscordGate({ spaceDomain, onSuccess: onJoinSpace });
 
   if (!spaceInfo) {
     return isValidating ? (
@@ -46,7 +55,26 @@ export function JoinPredefinedSpaceDomain({ spaceDomain }: { spaceDomain: string
           <Typography variant='h5'>{spaceInfo.name}</Typography>
         </Box>
       </Card>
-      <TokenGateForm autoVerify onSuccess={onJoinSpace} spaceDomain={spaceDomain} />
+
+      {isLoadingDiscordGate ? (
+        <LoadingComponent isLoading />
+      ) : (
+        <>
+          <DiscordGate
+            isLoadingGate={isLoadingDiscordGate}
+            joiningSpace={joiningSpace}
+            verifyDiscordGate={verifyDiscordGate}
+            discordGate={discordGate}
+            isConnectedToDiscord={isConnectedToDiscord}
+          />
+          <TokenGateForm
+            autoVerify
+            onSuccess={onJoinSpace}
+            spaceDomain={spaceDomain}
+            displayAccordion={discordGate?.hasDiscordServer}
+          />
+        </>
+      )}
     </>
   );
 }

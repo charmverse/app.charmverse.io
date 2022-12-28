@@ -14,8 +14,8 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
-import type { PageContent } from 'models';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../PageThread';
@@ -101,7 +101,7 @@ export function InlineCommentSubMenu({ pluginKey }: { pluginKey: PluginKey }) {
     if (!isEmpty) {
       const cardId = typeof window !== 'undefined' ? new URLSearchParams(window.location.href).get('cardId') : null;
       e.preventDefault();
-      const threadWithComment = await charmClient.startThread({
+      const threadWithComment = await charmClient.comments.startThread({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId: cardId ?? currentPageId

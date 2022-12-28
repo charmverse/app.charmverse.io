@@ -29,7 +29,6 @@ import { useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { useColorMode } from 'context/darkMode';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -109,6 +108,11 @@ export default function Header({ open, openSidebar }: HeaderProps) {
       linkElement.click();
 
       URL.revokeObjectURL(downloadLink);
+
+      charmClient.track.trackAction('export_page_markdown', {
+        pageId: page.id,
+        spaceId: page.spaceId
+      });
     }
   }
 
@@ -140,7 +144,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const canCreateProposal = !!userSpacePermissions?.createVote;
-  const pageCreator = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
+  const charmversePage = basePage ? members.find((member) => member.id === basePage.createdBy) : null;
 
   function onCopyLink() {
     Utils.copyTextToClipboard(window.location.href);
@@ -304,7 +308,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           label={<Typography variant='body2'>Full Width</Typography>}
         />
       </ListItemButton>
-      {pageCreator && basePage && (
+      {charmversePage && basePage && (
         <>
           <Divider />
           <Stack
@@ -313,7 +317,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
               my: 1
             }}
           >
-            <Typography variant='subtitle2'>Last edited by {pageCreator.username}</Typography>
+            <Typography variant='subtitle2'>Last edited by {charmversePage.username}</Typography>
             <Typography variant='subtitle2'>Last edited at {humanFriendlyDate(basePage.updatedAt)}</Typography>
           </Stack>
         </>
@@ -329,9 +333,9 @@ export default function Header({ open, openSidebar }: HeaderProps) {
 
   if (isBasePageDocument) {
     pageOptionsList = documentOptions;
-  } else if (isBasePageDatabase) {
+  } else if (isBasePageDatabase && basePage) {
     pageOptionsList = (
-      <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage?.id} closeMenu={closeMenu} />
+      <DatabasePageOptions pagePermissions={pagePermissions ?? undefined} pageId={basePage.id} closeMenu={closeMenu} />
     );
   }
 

@@ -11,9 +11,8 @@ import {
   backgroundLightColor,
   backgroundLightColorDarkMode,
   blueColor,
+  colors,
   darkBlueColor,
-  darkModeColors,
-  lightModeColors,
   primaryTextColor,
   primaryTextColorDarkMode,
   settingsHeaderBackgroundColor,
@@ -56,6 +55,7 @@ declare module '@mui/material/styles/createPalette' {
   interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
+    discord: PaletteOptions['primary'];
     textPrimary: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
@@ -64,6 +64,7 @@ declare module '@mui/material/styles/createPalette' {
   interface Palette extends CustomColors {
     blue: Palette['primary'];
     facebook: Palette['primary'];
+    discord: Palette['primary'];
     textPrimary: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
@@ -162,6 +163,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         dark: darken('#3b5998', 0.1),
         main: '#3b5998'
       },
+      discord: {
+        contrastText,
+        dark: darken('#5765f2', 0.1),
+        main: '#5765f2'
+      },
       primary: {
         main: blueColor // '#010101',
       },
@@ -172,40 +178,40 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: '#eee'
       },
       blue: {
-        main: mode === 'dark' ? darkModeColors.blue : lightModeColors.blue,
+        main: colors.blue[mode || 'light'],
         contrastText // Contrast text needs to be defined in the palette, otherwise consumers like Chip will throw an error, as contrast text is undefined
       },
       red: {
-        main: mode === 'dark' ? darkModeColors.red : lightModeColors.red,
+        main: colors.red[mode || 'light'],
         contrastText
       },
       gray: {
-        main: mode === 'dark' ? darkModeColors.gray : lightModeColors.gray,
+        main: colors.gray[mode || 'light'],
         contrastText
       },
       turquoise: {
-        main: mode === 'dark' ? darkModeColors.turquoise : lightModeColors.turquoise,
+        main: colors.turquoise[mode || 'light'],
         contrastText
       },
       orange: {
-        main: mode === 'dark' ? darkModeColors.orange : lightModeColors.orange,
+        main: colors.orange[mode || 'light'],
         contrastText
       },
       yellow: {
-        main: mode === 'dark' ? darkModeColors.yellow : lightModeColors.yellow,
+        main: colors.yellow[mode || 'light'],
         contrastText
       },
       teal: {
-        main: mode === 'dark' ? darkModeColors.teal : lightModeColors.teal,
-        dark: darken(mode === 'dark' ? darkModeColors.teal : lightModeColors.teal, 0.05),
+        main: colors.teal[mode || 'light'],
+        dark: darken(colors.teal[mode || 'light'], 0.05),
         contrastText
       },
       purple: {
-        main: mode === 'dark' ? darkModeColors.purple : lightModeColors.purple,
+        main: colors.purple[mode || 'light'],
         contrastText
       },
       pink: {
-        main: mode === 'dark' ? darkModeColors.pink : lightModeColors.pink,
+        main: colors.pink[mode || 'light'],
         contrastText
       },
       // custom components

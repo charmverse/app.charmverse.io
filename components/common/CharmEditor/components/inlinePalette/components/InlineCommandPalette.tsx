@@ -1,5 +1,6 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { useEditorViewContext } from '@bangle.dev/react';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
@@ -13,7 +14,6 @@ import { useMemo, useCallback, useEffect, useState } from 'react';
 
 import type { NestedPagePluginState } from '../../nestedPage';
 import { GroupLabel } from '../../PopoverMenu';
-import { palettePluginKey } from '../config';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
 import { PaletteItem, PALETTE_ITEM_REGULAR_TYPE } from '../paletteItem';
 import { useEditorItems } from '../useEditorItems';
@@ -23,10 +23,10 @@ import InlinePaletteRow from './InlinePaletteRow';
 export type InlinePaletteSize = 'small' | 'big';
 
 const StyledPaper = styled(Paper)`
-  max-height: '40vh';
-  width: '250px';
-  overflow-y: 'auto';
-  padding: '0 5px';
+  max-height: 400px;
+  width: 250px;
+  overflow-y: auto;
+  padding: 0 5px;
 `;
 
 function getItemsAndHints(
@@ -54,19 +54,23 @@ const InlinePaletteGroup = styled.div`
 `;
 
 interface InlineCommentGroupProps {
+  menuKey?: PluginKey;
   nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
   disableNestedPage?: boolean;
   externalPopupState?: PopupState;
   size?: InlinePaletteSize;
   handleActiveItem?: (item: string) => void;
+  palettePluginKey: PluginKey;
 }
 
 export default function InlineCommandPalette({
+  menuKey,
   nestedPagePluginKey,
   disableNestedPage = false,
   externalPopupState,
   size = 'big',
-  handleActiveItem
+  handleActiveItem,
+  palettePluginKey
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
@@ -105,6 +109,12 @@ export default function InlineCommandPalette({
 
   const { dismissPalette, getItemProps } = useInlinePaletteItems(palettePluginKey, items, counter, isItemDisabled);
 
+  function closeSubMenu() {
+    if (menuKey) {
+      selectionTooltip.hideSelectionTooltip(menuKey)(view.state, view.dispatch, view);
+    }
+  }
+
   const paletteGroupItemsRecord: Record<string, ReactNode[]> = useMemo(() => {
     return items.reduce<Record<string, ReactNode[]>>((acc, item, intex) => {
       if ((disableNestedPage && item.uid !== 'insert-page') || !disableNestedPage) {
@@ -128,6 +138,7 @@ export default function InlineCommandPalette({
               onClick={(e) => {
                 itemProps.onClick(e);
                 closePalette();
+                closeSubMenu();
               }}
             />
           </MenuItem>
@@ -159,12 +170,15 @@ export default function InlineCommandPalette({
   function handleListKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
-      dismissPalette();
-      closePalette();
+      close();
     } else if (event.key === 'Escape') {
-      dismissPalette();
-      closePalette();
+      close();
     }
+  }
+
+  function close() {
+    dismissPalette();
+    closePalette();
   }
 
   const filteredPaletteGroupItemsRecord =
@@ -174,10 +188,22 @@ export default function InlineCommandPalette({
     <Popper
       open={isInlineCommandVisible || isVisible}
       anchorEl={contentDOM || tooltipContentDOM}
+      sx={{ zIndex: 'var(--z-index-tooltip)' }}
       placement='bottom-start'
-      sx={{ zIndex: 1301 }}
+      modifiers={[
+        {
+          // ref: https://popper.js.org/docs/v2/modifiers/prevent-overflow/
+          name: 'preventOverflow',
+          enabled: true,
+          options: {
+            altAxis: true,
+            tether: true,
+            padding: 8
+          }
+        }
+      ]}
     >
-      <ClickAwayListener onClickAway={() => closePalette()}>
+      <ClickAwayListener onClickAway={() => close()}>
         <Grow
           in={true}
           style={{
@@ -189,7 +215,7 @@ export default function InlineCommandPalette({
               autoFocusItem={isInlineCommandVisible || isVisible}
               onKeyDown={(e) => {
                 handleListKeyDown(e);
-                closePalette();
+                close();
               }}
               sx={{ py: 0 }}
             >
@@ -239,18 +265,4 @@ function strMatch(a: string | string[], b: string): boolean {
 
   a = a.toLocaleLowerCase();
   return a.includes(b) || b.includes(a);
-}
-
-// returning -1 means keep order [a, b]
-// returning 1 means reverse order ie [b, a]
-function fieldExistenceSort(a: Record<string, any>, b: Record<string, any>, field: string, reverse = false) {
-  if (a[field] && !b[field]) {
-    return reverse ? 1 : -1;
-  }
-
-  if (b[field] && !a[field]) {
-    return reverse ? -1 : 1;
-  }
-
-  return 0;
 }

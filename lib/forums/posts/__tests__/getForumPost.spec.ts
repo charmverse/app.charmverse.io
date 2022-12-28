@@ -4,8 +4,8 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
-import { createForumPost } from '../createForumPost';
 import { getForumPost } from '../getForumPost';
 import type { ForumPostPage } from '../interfaces';
 
@@ -20,27 +20,20 @@ beforeAll(async () => {
 
 describe('getForumPost', () => {
   it('should return the page and attached post', async () => {
-    const createdPage = await createForumPost({
-      content: {},
-      contentText: '',
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: null
+    const createdPage = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
     });
 
-    const retrievedPost = await getForumPost({ postId: createdPage.id });
+    const retrievedPost = await getForumPost({ pageId: createdPage.id, userId: '' });
 
     expect(retrievedPost).toMatchObject(
       expect.objectContaining<Partial<ForumPostPage>>({
         id: expect.any(String),
-        postId: expect.any(String),
         content: expect.any(Object),
-        contentText: expect.any(String),
         post: expect.objectContaining<Partial<Post>>({
           locked: false,
-          pinned: false,
-          status: 'draft'
+          pinned: false
         })
       })
     );
@@ -68,6 +61,6 @@ describe('getForumPost', () => {
       }
     });
 
-    await expect(getForumPost({ postId: page.id })).rejects.toBeInstanceOf(PageNotFoundError);
+    await expect(getForumPost({ pageId: page.id, userId: '' })).rejects.toBeInstanceOf(PageNotFoundError);
   });
 });

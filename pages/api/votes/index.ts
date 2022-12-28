@@ -4,10 +4,11 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPageMeta } from 'lib/pages/server/getPageMeta';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService, getVote as getVoteService } from 'lib/votes';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -97,6 +98,12 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       spaceId: vote.spaceId,
       resourceId: vote.id,
       platform: 'charmverse'
+    });
+  } else {
+    trackUserAction('poll_created', {
+      userId,
+      pageId,
+      spaceId: vote.spaceId
     });
   }
 

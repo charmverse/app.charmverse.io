@@ -12,7 +12,7 @@ describe('getProposalTasksFromWorkspaceEvents', () => {
   it('Return all the proposal tasks from current workspace events', async () => {
     const { user: user1, space } = await generateUserAndSpaceWithApiToken();
 
-    const user2 = await createUserFromWallet(v4());
+    const user2 = await createUserFromWallet();
 
     await prisma.spaceRole.create({
       data: {

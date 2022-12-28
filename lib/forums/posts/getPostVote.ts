@@ -20,7 +20,7 @@ export async function getPostVote({ pageId, userId }: { pageId: string; userId: 
     return {
       downvotes: pageWithVotes.upDownVotes.filter((vote) => !vote.upvoted).length,
       upvotes: pageWithVotes.upDownVotes.filter((vote) => vote.upvoted).length,
-      upvoted: userVoted !== undefined ? userVoted.upvoted : undefined
+      upvoted: userVoted !== undefined ? userVoted.upvoted : null
     };
   }
 

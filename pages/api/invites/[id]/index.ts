@@ -6,8 +6,9 @@ import log from 'lib/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -122,7 +123,13 @@ async function deleteInvite(req: NextApiRequest, res: NextApiResponse) {
       id: req.query.id as string
     }
   });
-  return res.status(200).json({ ok: true });
+
+  trackUserAction('delete_invite_link', {
+    userId: req.session.user.id,
+    spaceId: existingInvite.spaceId
+  });
+
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

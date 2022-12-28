@@ -21,10 +21,10 @@ let role2: Role;
 let tokenGateToRole: TokenGateToRole;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
 
   user1 = generated.user;
-  user2 = await createUserFromWallet(v4());
+  user2 = await createUserFromWallet();
   space = generated.space;
   await prisma.spaceRole.create({
     data: {

@@ -4,11 +4,12 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { hasAccessToSpace, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { validateProposalStatusTransition } from 'lib/proposal/validateProposalStatusTransition';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -1,48 +1,59 @@
+import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
-import { usePostDialog } from 'components/common/PostDialog/hooks/usePostDialog';
+import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useForumCategories } from 'hooks/useForumCategories';
-import type { CategoryIdQuery } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import DesktopFilterMenu from './components/ForumFilterList';
-import MobileFilterMenu from './components/ForumFilterSelect';
-import ForumPosts from './components/ForumPosts';
+import { CategoryMenu } from './components/CategoryMenu';
+import { CategorySelect } from './components/CategorySelect';
+import CreateForumPost from './components/CreateForumPost';
+import PostDialog from './components/PostDialog';
+import { ForumPostList } from './components/PostList/PostList';
 
 export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
-
   const currentSpace = useCurrentSpace();
-  const { categories } = useForumCategories();
-  const categoryIds = router.query.categoryIds ?? [];
+  const categoryId = router.query.categoryId as string | undefined;
+  const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  function handleCategoryUpdate(categoryId: CategoryIdQuery) {
-    const pathname = `/${currentSpace!.domain}/forum`;
+  function handleCategoryUpdate(_categoryId?: string) {
+    const pathname = `/${currentSpace?.domain}/forum`;
 
-    if (categoryId === null) {
+    if (_categoryId === null) {
       router.push({
         pathname,
-        query: { categoryIds: null }
+        query: { _categoryId: null }
       });
-    } else if (typeof categoryId === 'string' && categories?.some((c) => c.id === categoryId)) {
+    } else if (typeof _categoryId === 'string') {
       router.push({
         pathname,
-        query: { categoryIds: categoryId }
+        query: { _categoryId }
       });
     } else {
       router.push({
         pathname
       });
     }
+  }
+
+  function showNewPostPopup() {
+    setShowNewPostForm(true);
+  }
+
+  function hideNewPostPopup() {
+    setShowNewPostForm(false);
   }
 
   useEffect(() => {
@@ -56,16 +67,24 @@ export default function ForumPage() {
     }
   }, [router.query.pageId]);
 
+  const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
+
+  useEffect(() => {
+    return () => {
+      debounceSearch.cancel();
+    };
+  }, [debounceSearch]);
+
   return (
     <CenteredPageContent>
       <Typography variant='h1' mb={2}>
         Forum
       </Typography>
-      {/** Re-enable once we support searching for posts
-             <TextField
+
+      <TextField
         variant='outlined'
-        placeholder='Search Posts, Comments and Members'
-        onChange={(e) => setSearch(e.target.value)}
+        placeholder='Search posts'
+        onChange={debounceSearch}
         fullWidth
         sx={{ padding: '20px 0' }}
         InputProps={{
@@ -76,16 +95,17 @@ export default function ForumPage() {
           )
         }}
       />
-         */}
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
-          <Box display={{ xs: 'block', lg: 'none' }}>
-            <MobileFilterMenu categoryIdSelected={handleCategoryUpdate} selectedCategory={categoryIds} />
+          <Box display={{ lg: 'none' }}>
+            <CategorySelect onSelect={handleCategoryUpdate} selectedCategory={categoryId} />
           </Box>
-          <ForumPosts search={search} categoryId={categoryIds} />
+          <CreateForumPost onClick={showNewPostPopup} />
+          {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
+          <ForumPostList search={search} categoryId={categoryId} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
-          <DesktopFilterMenu />
+          <CategoryMenu />
         </Grid>
       </Grid>
     </CenteredPageContent>

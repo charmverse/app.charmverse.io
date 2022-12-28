@@ -10,9 +10,9 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
-import type { PageContent } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

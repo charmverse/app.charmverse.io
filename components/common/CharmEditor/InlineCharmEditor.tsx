@@ -10,12 +10,13 @@ import type { CSSProperties, ReactNode } from 'react';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'models';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest, * as emoji from './components/emojiSuggest';
 import * as floatingMenu from './components/floatingMenu';
 import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import { placeholderPlugin } from './components/placeholder';
 import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
@@ -56,11 +57,11 @@ export function charmEditorPlugins({
   userId?: string | null;
   placeholderText?: string;
 } = {}) {
-  return () => [
+  const basePlugins = [
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
-          if (onContentChange && !view.state.doc.eq(prevState.doc)) {
+          if (!readOnly && onContentChange && !view.state.doc.eq(prevState.doc)) {
             onContentChange(view);
           }
         }
@@ -91,6 +92,10 @@ export function charmEditorPlugins({
     }),
     tabIndent.plugins()
   ];
+  if (!readOnly) {
+    basePlugins.push(placeholderPlugin(placeholderText));
+  }
+  return () => basePlugins;
 }
 
 const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean }>`
@@ -100,6 +105,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
   .ProseMirror.bangle-editor {
     padding-left: 0px !important;
     width: 100% !important;
+    height: 100%;
   }
   code {
     border-radius: 2px !important;
@@ -109,7 +115,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ noPadding?: boolean 
     font-size: 85%;
     height: fit-content;
     tab-size: 4;
-    caret-color: black;
+    caret-color: var(--primary-text);
   }
   pre code {
     color: inherit;
@@ -193,6 +199,7 @@ export default function CharmEditor({
         width: '100%',
         height: '100%'
       }}
+      readOnly={readOnly}
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,

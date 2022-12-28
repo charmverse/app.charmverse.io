@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -81,6 +82,11 @@ async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
   creationData.name = data.name;
 
   const role = await prisma.role.create({ data: creationData });
+  trackUserAction('add_role', {
+    userId: req.session.user.id,
+    spaceId: data.spaceId,
+    name: data.name
+  });
 
   return res.status(200).json(role);
 }

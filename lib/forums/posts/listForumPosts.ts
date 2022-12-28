@@ -2,24 +2,23 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { ForumPostPage } from './interfaces';
+import type { PageWithRelations } from './getPostMeta';
+import { getPostMeta } from './getPostMeta';
+import type { ForumPostMeta } from './interfaces';
 
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList<T = Record<string, unknown>> = Required<
-  PaginatedResponse<ForumPostPage> & { cursor: number }
-> &
-  T;
+export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
-export type CategoryIdQuery = string | string[] | null | undefined;
 /**
  * @sort ignored for now - the server sorts posts by most recent
  */
 export interface ListForumPostsRequest {
   spaceId: string;
-  categoryIds?: CategoryIdQuery;
+  categoryId?: string;
   page?: number;
   count?: number;
   sort?: string;
@@ -30,18 +29,13 @@ export async function listForumPosts(
     page = 0,
     // Count is the number of posts we want per page
     count = defaultPostsPerResult,
-    categoryIds
+    categoryId
   }: ListForumPostsRequest,
   userId: string
 ): Promise<PaginatedPostList> {
   // Fix string input values
   page = typeof page === 'string' ? parseInt(page) : page;
   count = typeof count === 'string' ? parseInt(count) : count;
-
-  if (typeof categoryIds === 'string') {
-    categoryIds = [categoryIds];
-  }
-
   // Avoid page being less than 0
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
@@ -53,17 +47,11 @@ export async function listForumPosts(
     }
   };
 
-  const postPropsQuery: Prisma.PostWhereInput = categoryIds
+  const postPropsQuery: Prisma.PostWhereInput = categoryId
     ? {
-        categoryId: {
-          in: categoryIds
-        }
+        categoryId
       }
-    : categoryIds === null
-    ? { categoryId: null }
     : {};
-
-  // postPropsQuery.status = 'published';
 
   const pages = await prisma.page.findMany({
     ...orderQuery,
@@ -72,7 +60,8 @@ export async function listForumPosts(
     where: {
       type: 'post',
       spaceId,
-      post: postPropsQuery
+      post: postPropsQuery,
+      deletedAt: null
     },
     include: {
       upDownVotes: {
@@ -97,21 +86,34 @@ export async function listForumPosts(
           })
         ).length === 1;
 
+  const comments = await prisma.pageComment.groupBy({
+    _count: {
+      _all: true
+    },
+    by: ['pageId'],
+    where: {
+      pageId: {
+        in: pages.map((_page) => _page.id)
+      }
+    }
+  });
+
+  const data = pages
+    .map((_page) => {
+      if (_page.post) {
+        const comment = comments.find((_comment) => _comment.pageId === _page.id);
+        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
+        return {
+          ...postMeta,
+          totalComments: comment?._count._all ?? 0
+        };
+      }
+      return null;
+    })
+    .filter(isTruthy);
+
   const response: PaginatedPostList = {
-    data: pages.map((_page) => {
-      const { upDownVotes, post, ...rest } = _page;
-      const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
-      const forumPostPage: ForumPostPage = {
-        ...rest,
-        post: {
-          ...post!,
-          downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
-          upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-          upvoted: userVote ? userVote.upvoted : undefined
-        }
-      };
-      return forumPostPage;
-    }),
+    data,
     hasNext,
     cursor: hasNext ? page + 1 : 0
   };

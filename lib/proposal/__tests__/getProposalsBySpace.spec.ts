@@ -19,11 +19,11 @@ let inaccessibleSpaceUser: User;
 
 beforeAll(async () => {
   // Not a space admin
-  const generated1 = await generateUserAndSpaceWithApiToken(v4(), false);
+  const generated1 = await generateUserAndSpaceWithApiToken(undefined, false);
   accessibleSpaceUser1 = generated1.user;
   accessibleSpace = generated1.space;
-  accessibleSpaceUser2 = await createUserFromWallet(v4());
-  accessibleSpaceAdminUser = await createUserFromWallet(v4());
+  accessibleSpaceUser2 = await createUserFromWallet();
+  accessibleSpaceAdminUser = await createUserFromWallet();
 
   const generated2 = await generateUserAndSpaceWithApiToken();
   inaccessibleSpace = generated2.space;

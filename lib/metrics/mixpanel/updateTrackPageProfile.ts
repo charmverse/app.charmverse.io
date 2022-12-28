@@ -1,7 +1,8 @@
 import log from 'lib/log';
-import { mixpanel } from 'lib/metrics/mixpanel/mixpanel';
 import type { PageWithPermissionsMeta } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
+
+import { mixpanel } from './mixpanel';
 
 export async function updateTrackPageProfile(pageId: string) {
   try {

@@ -3,10 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { hasAccessToSpace, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole, unassignRole } from 'lib/roles';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -50,6 +52,11 @@ async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<
     userId
   });
 
+  trackUserAction('unassign_member_role', {
+    spaceId: roleSpaceId.spaceId,
+    userId: requestingUserId
+  });
+
   return res.status(200).json(roleAfterUpdate);
 }
 
@@ -84,6 +91,11 @@ async function assignRoleController(req: NextApiRequest, res: NextApiResponse<Ro
   const roleAfterUpdate = await assignRole({
     roleId,
     userId
+  });
+
+  trackUserAction('assign_member_role', {
+    spaceId: roleSpaceId.spaceId,
+    userId: requestingUserId
   });
 
   return res.status(201).json(roleAfterUpdate);

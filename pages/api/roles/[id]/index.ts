@@ -3,9 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { ApiError, hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -55,7 +57,12 @@ async function deleteRole(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  return res.status(200).json({ success: true });
+  trackUserAction('delete_role', {
+    userId: req.session.user.id,
+    spaceId: role.spaceId
+  });
+
+  return res.status(200).end();
 }
 
 async function updateRole(req: NextApiRequest, res: NextApiResponse) {

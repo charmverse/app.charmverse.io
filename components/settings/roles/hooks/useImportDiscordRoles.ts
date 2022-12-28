@@ -26,7 +26,7 @@ export function useImportDiscordRoles() {
   const { data, isValidating, error } = useSWRImmutable(
     isAdmin && shouldImportDiscordRoles && space ? 'discord-roles-import' : null,
     async () => {
-      return charmClient.importRolesFromDiscordServer({
+      return charmClient.discord.importRolesFromDiscordServer({
         guildId,
         spaceId: (space as Space).id
       });

@@ -18,7 +18,7 @@ let cookie: string;
 // jest.setTimeout(1000000);
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(v4());
+  const generated = await generateUserAndSpaceWithApiToken();
 
   user = generated.user;
   space = generated.space;

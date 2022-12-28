@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
+import { MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 export async function getUserProfile(
@@ -33,9 +34,7 @@ export async function getUserProfile(
   });
 
   if (!profile) {
-    throw {
-      error: 'User not found'
-    };
+    throw new MissingDataError(`User with ${key} ${value} not found`);
   }
   return profile;
 }

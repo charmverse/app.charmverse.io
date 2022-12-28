@@ -16,9 +16,9 @@ export function spec(): BaseRawNodeSpec {
       group: 'block',
       defining: true,
       draggable: false,
-      parseDOM: [{ tag: 'blockquote' }],
+      parseDOM: [{ tag: 'blockquote.charm-quote' }],
       toDOM: (): DOMOutputSpec => {
-        return ['blockquote', 0];
+        return ['blockquote', { class: 'charm-quote' }, 0];
       }
     },
     markdown: {

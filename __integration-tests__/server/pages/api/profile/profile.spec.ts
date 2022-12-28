@@ -1,5 +1,6 @@
 import type { Space } from '@prisma/client';
 import request from 'supertest';
+import { v4 } from 'uuid';
 
 import { prisma } from 'db';
 import type { LoggedInUser } from 'models';
@@ -49,6 +50,45 @@ describe('PUT /api/profile - Update user profile', () => {
     const update: Partial<LoggedInUser> = {
       identityType: 'UnstoppableDomain',
       username: 'userdomain.nft'
+    };
+
+    const cookie = await loginUser(extraUser.id);
+
+    await request(baseUrl).put('/api/profile').set('Cookie', cookie).send(update).expect(401);
+  });
+  it('should allow the user to set a Google Account as their username, responding with 200', async () => {
+    const googleAccount = await prisma.googleAccount.create({
+      data: {
+        email: `acc-${v4()}@google.com`,
+        name: `test name`,
+        avatarUrl: `https://example.com/photourl.png`,
+        user: {
+          connect: {
+            id: user.id
+          }
+        }
+      }
+    });
+
+    const update: Partial<LoggedInUser> = {
+      identityType: 'Google',
+      username: googleAccount.name
+    };
+
+    const updatedProfile = (
+      await request(baseUrl).put('/api/profile').set('Cookie', userCookie).send(update).expect(200)
+    ).body as LoggedInUser;
+
+    expect(updatedProfile.username).toBe(googleAccount.name);
+    expect(updatedProfile.identityType).toBe('Google');
+  });
+
+  it('should refuse to update a users profile to a Google Account not registered to their account, responding with 401', async () => {
+    const extraUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+
+    const update: Partial<LoggedInUser> = {
+      identityType: 'Google',
+      username: 'wrongemail@google.com'
     };
 
     const cookie = await loginUser(extraUser.id);

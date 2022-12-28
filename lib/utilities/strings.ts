@@ -63,7 +63,7 @@ export const shortenHex = (hex: string = '', length = 4): string => {
  * Leaves other characters unchanged
  * @param input
  */
-export function upperCaseFirstCharacter(input: string): string {
+export function capitalize(input: string): string {
   if (!input) {
     return '';
   }
@@ -89,19 +89,19 @@ export function humaniseList({
   capitaliseFirstCharacter: boolean;
 }): string {
   if (content.length === 1) {
-    return capitaliseFirstCharacter ? upperCaseFirstCharacter(content[0]) : content[0];
+    return capitaliseFirstCharacter ? capitalize(content[0]) : content[0];
   } else if (content.length === 0) {
     return '';
   } else if (content.length === 2) {
     return capitaliseFirstCharacter
-      ? `${upperCaseFirstCharacter(content[0])} ${conjunction} ${upperCaseFirstCharacter(content[1])}`
+      ? `${capitalize(content[0])} ${conjunction} ${capitalize(content[1])}`
       : `${content[0]} ${conjunction} ${content[1]}`;
   }
 
   const last = content.pop();
   const formatted = content.map((item) => {
     if (capitaliseFirstCharacter) {
-      return upperCaseFirstCharacter(item);
+      return capitalize(item);
     }
     return item.trim();
   });
@@ -115,16 +115,26 @@ export function humaniseList({
 }
 
 /**
+ * If plural is provided, this word will be returned in case count is not equal to 1. Otherwise, the word will be returned with an 's' appended
+ */
+type ConditionalPlural = { word: string; count: number; plural?: string };
+
+/**
  * Append an 's' to a value's descriptor if it is not equal to 1
  * Default values will return an empty string
  */
-export function conditionalPlural({ word = '', count = 1 }: { word: string; count: number }): string {
+export function conditionalPlural({ word = '', count = 1, plural }: ConditionalPlural): string {
   if (count !== 1) {
-    return `${word}s`;
+    return plural ?? `${word}s`;
   }
   return word;
 }
 
 export function lowerCaseEqual(firstString?: string | null, secondString?: string | null): boolean {
   return firstString?.toLowerCase() === secondString?.toLowerCase();
+}
+
+// ref: https://stackoverflow.com/questions/6300183/sanitize-string-of-regex-characters-before-regexp-build
+export function sanitizeForRegex(string: string) {
+  return string.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
 }

@@ -43,10 +43,11 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       return setCurrentPageActionDisplay(null);
     }
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
-      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
+      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`)?.data;
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
-      );
+      )?.data;
+
       // Vote takes precedence over comments, so if a page has in progress votes and unresolved comments, show the votes
       if (
         !highlightedCommentId &&

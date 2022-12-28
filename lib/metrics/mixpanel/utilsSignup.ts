@@ -2,7 +2,7 @@ import { typedKeys } from 'lib/utilities/objects';
 
 import type { SignupCookieType } from '../userAcquisition/interfaces';
 
-import type { SignupAnalytics, SignupSource } from './interfaces/UserEvents';
+import type { SignupAnalytics, SignupSource } from './interfaces/UserEvent';
 
 const referrerMapping: Record<Exclude<SignupSource, '' | 'direct' | 'other'>, string> = {
   'marketing-site': 'www.charmverse.io',

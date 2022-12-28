@@ -3,17 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { trackPageAction } from 'lib/metrics/mixpanel/trackPageAction';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import {
-  ActionNotPermittedError,
-  hasAccessToSpace,
-  NotFoundError,
-  onError,
-  onNoMatch,
-  requireKeys,
-  requireUser
-} from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { resolvePageTree } from 'lib/pages/server';
@@ -21,6 +13,7 @@ import { getPage } from 'lib/pages/server/getPage';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
@@ -132,17 +125,14 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   const { content, contentText, ...updatedPageMeta } = updateContent;
 
-  // Update page track profile and meta data state, unless it was content update
-  if (!('content' in updateContent)) {
-    updateTrackPageProfile(pageWithPermission.id);
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
-      },
-      page.spaceId
-    );
-  }
+  updateTrackPageProfile(pageWithPermission.id);
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [{ ...updatedPageMeta, spaceId: page.spaceId, id: pageId }]
+    },
+    page.spaceId
+  );
 
   if (hasNewParentPage) {
     const updatedPage = await setupPermissionsAfterPageRepositioned(pageId);
@@ -182,7 +172,6 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
 
   const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
 
-  trackPageAction('delete_page', { userId, pageId });
   updateTrackPageProfile(pageId);
 
   if (pageToDelete) {
@@ -193,6 +182,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
       },
       pageToDelete.spaceId
     );
+    trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
   }
 
   return res.status(200).json({ pageIds: modifiedChildPageIds, rootBlock });
