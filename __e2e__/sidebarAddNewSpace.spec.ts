@@ -3,47 +3,30 @@ import { chromium, expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
-import { createUserAndSpace } from './utils/mocks';
-import { mockWeb3 } from './utils/web3';
-
-let browser: Browser;
-
-test.beforeAll(async () => {
-  // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
-});
+import { generateUserAndSpace } from './utils/mocks';
+import { login } from './utils/session';
 
 test.describe.serial('Add a new workspace from sidebar and load it', async () => {
-  test('Fill the form and create a new space', async () => {
+  test('Fill the form and create a new space', async ({ page }) => {
     // Arrange ------------------
-    const userContext = await browser.newContext();
-    const page = await userContext.newPage();
+    // const userContext = await browser.newContext();
+    // const page = await userContext.newPage();
 
-    const { space, address, privateKey } = await createUserAndSpace({ browserPage: page });
+    const { space, user } = await generateUserAndSpace();
 
-    await mockWeb3({
-      page,
-      context: { address, privateKey },
-      init: ({ Web3Mock, context }) => {
-        Web3Mock.mock({
-          blockchain: 'ethereum',
-          accounts: {
-            return: [context.address]
-          }
-        });
-      }
-    });
+    await login({ page, userId: user.id });
 
     const domain = space.domain;
     const targetPage = `${baseUrl}/${domain}`;
 
     await page.goto(targetPage);
+    await page.waitForNavigation({ waitUntil: 'networkidle' });
 
     // Act ----------------------
     // Part A - Prepare the page as a logged in user
     // 1. Make sure there is a button to add a new workspace
     const addNewSpaceBtn = page.locator('data-test=sidebar-add-new-space');
-    await expect(addNewSpaceBtn).toBeVisible();
+    await addNewSpaceBtn.waitFor();
 
     // 2. Open create space dialod
     await addNewSpaceBtn.click();
