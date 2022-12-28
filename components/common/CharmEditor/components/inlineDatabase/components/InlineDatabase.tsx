@@ -170,7 +170,6 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
         onKeyDown={stopPropagation}
       >
         <CenterPanel
-          // @ts-ignore types are wrong for some reason (disableUpdatingUrl should be a prop)
           disableUpdatingUrl
           onViewTabClick={setCurrentViewId}
           onDeleteView={deleteView}

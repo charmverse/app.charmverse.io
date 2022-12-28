@@ -120,7 +120,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     [router.query]
   );
 
-  if (board && activeView) {
+  if (board) {
     return (
       <>
         <FlashMessages milliseconds={2000} />
@@ -130,7 +130,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             board={board}
             setPage={setPage}
             showCard={showCard}
-            activeView={activeView}
+            activeView={activeView || undefined}
             views={boardViews}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
