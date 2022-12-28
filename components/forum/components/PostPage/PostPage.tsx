@@ -1,6 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -10,6 +10,7 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
@@ -79,13 +80,22 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   } = useSWR(page ? `${page.id}/comments` : null, () =>
     page ? charmClient.forum.listPostComments(page.id) : undefined
   );
+  const [, setTitleState] = usePageTitle();
+
   const [commentSort, setCommentSort] = useState<PostCommentSort>('latest');
 
   const isLoading = !postComments && isValidating;
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
     setForm((_form) => ({ ..._form, title: updates.title }));
+    setTitleState(updates.title);
   }
+
+  useEffect(() => {
+    if (page) {
+      setTitleState(page.title);
+    }
+  }, [page]);
 
   async function publishForumPost() {
     if (checkIsContentEmpty(form.content) || !categoryId) {

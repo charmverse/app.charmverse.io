@@ -8,9 +8,9 @@ import { PostPage } from 'components/forum/components/PostPage/PostPage';
 
 export default function BlocksEditorPage() {
   const router = useRouter();
-  const pagePath = router.query.postId as string;
+  const pagePath = router.query.pagePath as string;
 
-  const { data, isValidating } = useSWR(`post-page-${pagePath}`, () => charmClient.forum.getForumPost(pagePath));
+  const { data, isValidating } = useSWR(`post-${pagePath}`, () => charmClient.forum.getForumPost(pagePath));
 
   if (!data && !isValidating) {
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;

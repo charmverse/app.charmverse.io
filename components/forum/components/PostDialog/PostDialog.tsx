@@ -84,7 +84,7 @@ export default function PostDialog(props: Props) {
                 <Button
                   size='small'
                   color='secondary'
-                  href={`/${router.query.domain}/forum/post/${page.id}`}
+                  href={`/${router.query.domain}/forum/post/${page.path}`}
                   variant='text'
                   startIcon={<OpenInFullIcon fontSize='small' />}
                 >
