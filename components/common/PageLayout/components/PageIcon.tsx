@@ -5,7 +5,7 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import type { Page } from '@prisma/client';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
@@ -16,7 +16,7 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
   font-size: 22px;
 `;
 
-export const StyledPageIcon = styled(EmojiIcon)`
+const StyledPageIcon = styled(EmojiIcon)`
   height: 24px;
   width: 24px;
   margin-right: 4px;
@@ -32,27 +32,30 @@ export const StyledPageIcon = styled(EmojiIcon)`
   }
 `;
 
-export default function PageIcon({
-  icon,
-  isEditorEmpty,
-  pageType
-}: {
+type PageIconProps = ComponentProps<typeof StyledPageIcon> & {
   icon?: ReactNode;
-  pageType: Page['type'];
-  isEditorEmpty: boolean;
-}) {
+  pageType?: Page['type'];
+  isEditorEmpty?: boolean;
+};
+
+export function PageIcon({ icon, isEditorEmpty, pageType, ...props }: PageIconProps) {
   if (icon) {
-    return <StyledPageIcon icon={icon} />;
+    return <StyledPageIcon icon={icon} {...props} />;
   }
-  if (pageType === 'board' || pageType === 'inline_board') {
-    return <StyledPageIcon icon={<StyledDatabaseIcon />} />;
+  if (
+    pageType === 'board' ||
+    pageType === 'inline_board' ||
+    pageType === 'linked_board' ||
+    pageType === 'inline_linked_board'
+  ) {
+    return <StyledPageIcon icon={<StyledDatabaseIcon />} {...props} />;
   } else if (pageType === 'proposal') {
-    return <StyledPageIcon icon={<ProposalIcon />} />;
+    return <StyledPageIcon icon={<ProposalIcon />} {...props} />;
   } else if (pageType === 'bounty') {
-    return <StyledPageIcon icon={<BountyIcon />} />;
+    return <StyledPageIcon icon={<BountyIcon />} {...props} />;
   } else if (isEditorEmpty) {
-    return <StyledPageIcon icon={<EmptyPageIcon />} />;
+    return <StyledPageIcon icon={<EmptyPageIcon />} {...props} />;
   } else {
-    return <StyledPageIcon icon={<FilledPageIcon />} />;
+    return <StyledPageIcon icon={<FilledPageIcon />} {...props} />;
   }
 }

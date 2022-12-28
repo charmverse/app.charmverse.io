@@ -10,10 +10,10 @@ import type {
   EventContentArg,
   DayCellContentArg
 } from '@fullcalendar/react';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
 
 import type { Board, IPropertyTemplate } from '../../blocks/board';

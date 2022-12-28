@@ -6,7 +6,7 @@ import { mutate } from 'swr';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { PageActions } from 'components/common/PageActions';
-import PageIcon from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isTouchScreen } from 'lib/utilities/browser';

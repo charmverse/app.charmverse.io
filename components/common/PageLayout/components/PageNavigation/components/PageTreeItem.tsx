@@ -1,9 +1,6 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { TreeItemContentProps } from '@mui/lab/TreeItem';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
@@ -36,7 +33,7 @@ import { greyColor2 } from 'theme/colors';
 
 import AddNewCard from '../../AddNewCard';
 import NewPageMenu from '../../NewPageMenu';
-import { StyledDatabaseIcon, StyledPageIcon } from '../../PageIcon';
+import { PageIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
 
 interface PageTreeItemProps {
@@ -48,7 +45,7 @@ interface PageTreeItemProps {
   isEmptyContent?: boolean;
   labelIcon?: string;
   label: string;
-  pageType?: PageType;
+  pageType: PageType;
   pageId: string;
   hasSelectedChildView: boolean;
   children: React.ReactNode;
@@ -176,7 +173,8 @@ interface PageLinkProps {
   href: string;
   label?: string;
   labelIcon?: React.ReactNode;
-  pageType?: Page['type']; // optional since we use this for views as well
+  isEmptyContent?: boolean;
+  pageType: Page['type'];
   pageId?: string;
   showPicker?: boolean;
   onClick?: () => void;
@@ -186,6 +184,7 @@ export function PageLink({
   showPicker = !isTouchScreen(),
   children,
   href,
+  isEmptyContent,
   label,
   labelIcon,
   pageType,
@@ -217,15 +216,15 @@ export function PageLink({
   return (
     <Link passHref href={href}>
       <PageAnchor onClick={stopPropagation}>
-        {labelIcon && (
-          <span onClick={preventDefault}>
-            <StyledPageIcon
-              icon={labelIcon}
-              {...triggerState}
-              onClick={showPicker ? triggerState.onClick : undefined}
-            />
-          </span>
-        )}
+        <span onClick={preventDefault}>
+          <PageIcon
+            icon={labelIcon}
+            pageType={pageType}
+            isEditorEmpty={isEmptyContent}
+            {...triggerState}
+            onClick={showPicker ? triggerState.onClick : undefined}
+          />
+        </span>
         <PageTitle hasContent={isempty} onClick={onClick}>
           {isempty ? 'Untitled' : label}
         </PageTitle>
@@ -283,7 +282,6 @@ const PageMenuItem = styled(ListItemButton)`
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
-  const theme = useTheme();
   const {
     addSubPage,
     children,
@@ -311,30 +309,6 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     setAnchorEl(null);
   }
 
-  const icon = useMemo(() => {
-    if (labelIcon) {
-      return labelIcon;
-    } else if (pageType === 'board') {
-      return <StyledDatabaseIcon />;
-    } else if (isEmptyContent) {
-      return (
-        <InsertDriveFileOutlinedIcon
-          sx={{
-            opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-          }}
-        />
-      );
-    } else {
-      return (
-        <DescriptionOutlinedIcon
-          sx={{
-            opacity: theme.palette.mode !== 'light' ? 0.5 : 1
-          }}
-        />
-      );
-    }
-  }, [labelIcon, pageType, isEmptyContent]);
-
   const ContentProps = useMemo(
     () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
     [isAdjacent, hasSelectedChildView]
@@ -347,7 +321,15 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
   const labelComponent = useMemo(
     () => (
-      <PageLink href={href} label={label} labelIcon={icon} pageId={pageId} pageType={pageType} onClick={onClick}>
+      <PageLink
+        isEmptyContent={isEmptyContent}
+        href={href}
+        label={label}
+        labelIcon={labelIcon}
+        pageId={pageId}
+        pageType={pageType}
+        onClick={onClick}
+      >
         <div className='page-actions'>
           <MemoizedIconButton size='small' onClick={showMenu}>
             <MoreHorizIcon color='secondary' fontSize='small' />
@@ -362,7 +344,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         </div>
       </PageLink>
     ),
-    [href, label, pageId, icon, addSubPage, pageType, userSpacePermissions?.createPage]
+    [href, label, pageId, labelIcon, addSubPage, pageType, userSpacePermissions?.createPage]
   );
 
   return (

@@ -20,7 +20,16 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
 
   return (
     <StyledTreeItem
-      label={<PageLink href={href} label={label} labelIcon={labelIcon} showPicker={false} onClick={onClick} />}
+      label={
+        <PageLink
+          href={href}
+          label={label}
+          labelIcon={labelIcon}
+          pageType='board' // this is normally used for icons
+          showPicker={false}
+          onClick={onClick}
+        />
+      }
       nodeId={nodeId}
       ref={ref}
       TransitionProps={{ timeout: 50 }}
