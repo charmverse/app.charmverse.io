@@ -41,7 +41,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
   });
 
   const handleAddViewBoard = useCallback(async () => {
-    const newView = createBoardView({ ...activeView, title: '' });
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'board';
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];
     try {
@@ -54,7 +54,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
 
   const handleAddViewTable = useCallback(async () => {
     const { board } = props;
-    const newView = createBoardView({ ...activeView, title: '' });
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'table';
     newView.fields.visiblePropertyIds = board.fields.cardProperties.map((o: IPropertyTemplate) => o.id);
     newView.fields.columnWidths = {};
@@ -69,10 +69,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewGallery = useCallback(async () => {
-    const newView = createBoardView({
-      ...activeView,
-      title: ''
-    });
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'gallery';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = newView?.fields.cardOrder ?? [];
@@ -85,7 +82,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewCalendar = useCallback(async () => {
-    const newView = createBoardView({ ...activeView, title: '' });
+    const newView = createBoardView(activeView);
     newView.fields.viewType = 'calendar';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = activeView?.fields.cardOrder ?? [];
