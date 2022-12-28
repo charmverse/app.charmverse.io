@@ -7,6 +7,7 @@ import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
 import { floatingMenu } from './floating-menu';
 
+// Components that should not trigger floating menu
 const blacklistedComponents = 'image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll';
 
 export function plugins({

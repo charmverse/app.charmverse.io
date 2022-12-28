@@ -49,7 +49,7 @@ function EmptyPollContainer({
   );
 }
 
-export default function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {
+export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
   const { votes, cancelVote, castVote, deleteVote } = useVotes();
   const [showModal, setShowModal] = useState(false);
@@ -61,14 +61,30 @@ export default function PollNodeView({ node, readOnly, updateAttrs, selected, de
     setShowModal(false);
   }
 
+  const emptyPollContainer = (
+    <EmptyPollContainer
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setShowModal(true);
+      }}
+      readOnly={readOnly}
+      isSelected={selected}
+      onDelete={deleteNode}
+    />
+  );
+
   if (showModal) {
     return (
-      <CreateVoteModal
-        onClose={() => {
-          setShowModal(false);
-        }}
-        onCreateVote={onCreateVote}
-      />
+      <>
+        <CreateVoteModal
+          onClose={() => {
+            setShowModal(false);
+          }}
+          onCreateVote={onCreateVote}
+        />
+        {emptyPollContainer}
+      </>
     );
   }
 
@@ -76,18 +92,7 @@ export default function PollNodeView({ node, readOnly, updateAttrs, selected, de
     if (readOnly) {
       return <div />;
     }
-    return (
-      <EmptyPollContainer
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          setShowModal(true);
-        }}
-        readOnly={readOnly}
-        isSelected={selected}
-        onDelete={deleteNode}
-      />
-    );
+    return emptyPollContainer;
   }
 
   return (

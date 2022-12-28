@@ -1,7 +1,7 @@
 import type { RawSpecs } from '@bangle.dev/core';
-import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
+import type { DOMOutputSpec } from '@bangle.dev/pm';
 
-import { name } from './config';
+export const name = 'poll';
 
 export type NodeAttrs = {
   pollId: string | null;

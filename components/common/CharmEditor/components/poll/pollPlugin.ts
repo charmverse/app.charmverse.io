@@ -1,6 +1,6 @@
 import { NodeView } from '@bangle.dev/core';
 
-import { name } from './config';
+import { name } from './pollSpec';
 
 export function plugins() {
   return [
