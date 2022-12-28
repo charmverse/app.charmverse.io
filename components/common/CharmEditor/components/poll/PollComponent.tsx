@@ -36,7 +36,8 @@ function EmptyPollContainer({
         sx={{
           backgroundColor: isSelected ? 'var(--charmeditor-active)' : theme.palette.background.light,
           p: 2,
-          display: 'flex'
+          display: 'flex',
+          my: 2
         }}
         {...props}
       >
