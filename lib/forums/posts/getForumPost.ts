@@ -2,6 +2,7 @@ import type { Page } from '@prisma/client';
 
 import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/pages/server';
+import { isUUID } from 'lib/utilities/strings';
 
 import { getPostVoteSummary } from './getPostMeta';
 import type { ForumPostPageWithVotes, PageValues } from './interfaces';
@@ -14,7 +15,7 @@ export async function getForumPost({
   pageId: string;
 }): Promise<ForumPostPageWithVotes> {
   const forumPage = await prisma.page.findFirst({
-    where: { id: pageId, type: 'post' },
+    where: isUUID(pageId) ? { id: pageId, type: 'post' } : { path: pageId, type: 'post' },
     include: {
       post: true,
       upDownVotes: {
@@ -46,6 +47,7 @@ export function selectPageValues(page: Page): PageValues {
     createdAt: page.createdAt.toString(),
     createdBy: page.createdBy,
     spaceId: page.spaceId,
-    updatedAt: page.updatedAt.toString()
+    updatedAt: page.updatedAt.toString(),
+    path: page.path
   };
 }

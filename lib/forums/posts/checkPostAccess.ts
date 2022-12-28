@@ -1,6 +1,6 @@
-import { hasAccessToSpace } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/public-api';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
 import { getForumPost } from './getForumPost';
