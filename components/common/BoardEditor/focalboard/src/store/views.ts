@@ -72,9 +72,9 @@ export const getSortedViews = createSelector(getViews, (views) => {
     .map((v) => createBoardView(v));
 });
 
-export function getView(viewId: string): (state: RootState) => BoardView | null {
+export function getView(viewId: string | undefined): (state: RootState) => BoardView | null {
   return (state: RootState): BoardView | null => {
-    return state.views.views[viewId] || null;
+    return viewId ? state.views.views[viewId] ?? null : null;
   };
 }
 

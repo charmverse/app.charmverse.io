@@ -41,7 +41,8 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const activeView = useAppSelector(getView(router.query.viewId as string));
+  const [currentViewId, setCurrentViewId] = useState<string>(router.query.viewId as string);
+  const activeView = useAppSelector(getView(currentViewId));
   const boardViews = useAppSelector(getCurrentBoardViews);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
@@ -71,6 +72,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
+      // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
     }
@@ -126,18 +128,24 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const showView = useCallback(
     (viewId) => {
-      const { cardId, ...rest } = router.query;
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            ...rest,
-            viewId: viewId || ''
-          }
-        },
-        undefined,
-        { shallow: true }
-      );
+      if (viewId === '') {
+        // when creating an ew view for linked boards, user must select a source before the view exists
+        // but we dont want to change the URL until the view is created
+        setCurrentViewId('');
+      } else {
+        const { cardId, ...rest } = router.query;
+        router.push(
+          {
+            pathname: router.pathname,
+            query: {
+              ...rest,
+              viewId: viewId || ''
+            }
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
     },
     [router.query]
   );

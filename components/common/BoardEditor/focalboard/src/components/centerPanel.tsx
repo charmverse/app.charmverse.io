@@ -373,10 +373,11 @@ function CenterPanel(props: Props) {
     showView(view.id);
   }
 
-  // Create a new database and a new view for it when page type === 'inline_linked_board' or 'linked_board
   async function createDatabase() {
-    const pageType = boardPageType === 'inline_linked_board' ? 'inline_board' : 'board';
-    const { view } = await createNewDataSource({ board, updatePage, type: pageType });
+    if (!boardPageType) {
+      throw new Error('No board page type exists');
+    }
+    const { view } = await createNewDataSource({ board, updatePage, currentPageType: boardPageType });
     showView(view.id);
   }
 
