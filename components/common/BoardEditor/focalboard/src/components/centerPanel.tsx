@@ -32,7 +32,6 @@ import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { createBoardView } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import type { Block } from '../blocks/block';

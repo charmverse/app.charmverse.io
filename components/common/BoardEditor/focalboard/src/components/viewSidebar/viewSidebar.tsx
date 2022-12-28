@@ -106,14 +106,14 @@ function ViewOptionsSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {withGroupBy && (
+              {/* {withGroupBy && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
                   icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
                   title='Source'
                   value={props.view.fields.source ?? 'None'}
                 />
-              )}
+              )} */}
             </>
           )}
           {sidebarView === 'layout' && (
