@@ -5,8 +5,10 @@ import type { Page } from '@prisma/client';
 import { baseUrl } from 'config/constants';
 import { prisma } from 'db';
 import type { IPageWithPermissions } from 'lib/pages/interfaces';
+import { generateBoard } from 'testing/setupDatabase';
 
-import { createUserAndSpace } from './utils/mocks';
+import { generateUserAndSpace } from './utils/mocks';
+import { login } from './utils/session';
 import { mockWeb3 } from './utils/web3';
 
 let browser: Browser;
@@ -19,44 +21,34 @@ test.beforeAll(async () => {
 test.describe.serial('Make a page public and visit it', async () => {
   // Will be set by the first test
   let shareUrl = '';
-  let boardPage: IPageWithPermissions;
+  let boardPage: Page;
   let cardPage: Page;
-  let pages: IPageWithPermissions[] = [];
 
   test('make a page public', async () => {
     // Arrange ------------------
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
     const page = await userContext.newPage();
 
-    const { space, pages: spacePages, address, privateKey } = await createUserAndSpace({ browserPage: page });
-
-    await mockWeb3({
-      page,
-      context: { address, privateKey },
-      init: ({ Web3Mock, context }) => {
-        Web3Mock.mock({
-          blockchain: 'ethereum',
-          accounts: {
-            return: [context.address]
-          }
-        });
-      }
+    const { space, user } = await generateUserAndSpace();
+    boardPage = await generateBoard({
+      spaceId: space.id,
+      createdBy: user.id
     });
 
-    pages = spacePages;
+    await login({ userId: user.id, page });
 
     const domain = space.domain;
-
-    boardPage = pages.find((p) => p.type === 'board' && p.title.match(/tasks/i) !== null) as IPageWithPermissions;
 
     cardPage = (await prisma.page.findFirst({
       where: {
         type: 'card',
-        parentId: boardPage?.id
+        parentId: boardPage.id
       }
     })) as Page;
 
-    const targetPage = `${baseUrl}/${domain}/${boardPage?.path}`;
+    expect(cardPage).toBeDefined();
+
+    const targetPage = `${baseUrl}/${domain}/${boardPage.path}`;
 
     await page.goto(targetPage);
 
@@ -64,7 +56,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
-    await expect(page.locator(`data-test=kanban-card-${cardPage.id}`)).toBeVisible();
+    await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
     const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
@@ -74,7 +66,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     const publicShareToggle = page.locator('data-test=toggle-public-page');
 
     await publicShareToggle.click();
-    shareUrl = `${baseUrl}/share/${domain}/${boardPage?.path}`;
+    shareUrl = `${baseUrl}/share/${domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
 
@@ -142,7 +134,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     expect(await boardTitle.inputValue()).toBe(boardPage?.title);
 
     // 3. Wait for the card, click on it
-    const cardToOpen = page.locator(`data-test=kanban-card-${cardPage.id}`);
+    const cardToOpen = page.locator(`data-test=gallery-card-${cardPage.id}`);
     await expect(cardToOpen).toBeVisible();
 
     await cardToOpen.click();
@@ -156,9 +148,7 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     const openedCardId = queryParams.get('cardId');
 
-    const openedCardPage = pages.find((p) => p.id === openedCardId);
-
-    expect(openedCardPage).toBeDefined();
+    expect(openedCardId).toBeDefined();
 
     const cardPopup = page.locator('div.Dialog');
 
@@ -168,6 +158,6 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await expect(documentTitle).toBeVisible();
 
-    expect(await documentTitle.innerText()).toBe(openedCardPage?.title);
+    expect(await documentTitle.innerText()).toBe(cardPage.title);
   });
 });

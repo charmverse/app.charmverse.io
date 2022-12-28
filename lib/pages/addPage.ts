@@ -102,7 +102,7 @@ export function createDefaulBoardViewAndCards({ board }: { board: Board }) {
   view.fields.viewType = 'board';
   view.parentId = board.id;
   view.rootId = board.rootId;
-  view.title = 'Board view';
+  view.title = '';
 
   const cards: Card[] = [];
 

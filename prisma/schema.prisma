@@ -457,6 +457,7 @@ model User {
 model UserWallet {
   address String @unique
   userId  String @db.Uuid
+  ensname String? @unique
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -565,6 +566,7 @@ model SpaceRole {
   tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateId     String?           @db.Uuid
   joinedViaLink   Boolean?
+  onboarded       Boolean           @default(false)
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])

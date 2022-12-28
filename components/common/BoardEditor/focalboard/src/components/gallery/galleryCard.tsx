@@ -80,6 +80,7 @@ const GalleryCard = React.memo((props: Props) => {
       onClick={(e: React.MouseEvent) => props.onClick(e, card)}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       ref={cardRef}
+      data-test={`gallery-card-${card.id}`}
     >
       {!props.readOnly && (
         <PageActions

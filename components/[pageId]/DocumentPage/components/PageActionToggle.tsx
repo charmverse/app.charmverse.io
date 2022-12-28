@@ -10,7 +10,7 @@ export default function PageActionToggle() {
   return (
     <IconButton
       onClick={() => {
-        setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'polls' : null);
+        setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'comments' : null);
       }}
       size='small'
       sx={{

@@ -19,11 +19,10 @@ import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import { useUpdateProfileAvatar } from 'components/profile/components/UserDetails/hooks/useUpdateProfileAvatar';
 import { useUserDetails } from 'components/profile/components/UserDetails/hooks/useUserDetails';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import useENSName from 'hooks/useENSName';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortenHex } from 'lib/utilities/strings';
+import randomName from 'lib/utilities/randomName';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
@@ -74,13 +73,11 @@ function EditIconContainer({
 }
 
 function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) {
-  const { account } = useWeb3AuthSig();
   const isPublic = isPublicUser(user);
   const { data: userDetails, mutate } = useSWRImmutable(`/userDetails/${user.id}/${isPublic}`, () => {
     return isPublic ? user.profile : charmClient.getUserDetails();
   });
 
-  const ENSName = useENSName(account);
   const [isPersonalLinkCopied, setIsPersonalLinkCopied] = useState(false);
 
   const descriptionModalState = usePopupState({ variant: 'popover', popupId: 'description-modal' });
@@ -110,20 +107,23 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     }
 
     const types: IntegrationModel[] = [];
-    if (user?.wallets.length !== 0) {
+    user.wallets.forEach((wallet) => {
+      const address = wallet.address;
+
       types.push({
         type: 'Wallet',
-        username: ENSName || user.wallets[0].address,
-        isInUse: user.identityType === 'Wallet',
+        username: wallet.ensname ?? wallet.address,
+        secondaryUserName: address,
+        isInUse: user.identityType === 'Wallet' && matchWalletAddress(user.username, wallet),
         icon: getIdentityIcon('Wallet')
       });
-    }
-
+    });
     if (user?.discordUser && user.discordUser.account) {
       const discordAccount = user.discordUser.account as Partial<DiscordAccount>;
       types.push({
         type: 'Discord',
         username: discordAccount.username || '',
+        secondaryUserName: `${discordAccount.username} #${discordAccount.discriminator}`,
         isInUse: user.identityType === 'Discord',
         icon: getIdentityIcon('Discord')
       });
@@ -142,7 +142,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
     if (user) {
       types.push({
         type: 'RandomName',
-        username: user.identityType === 'RandomName' && user.username ? user.username : '',
+        username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
         isInUse: user.identityType === 'RandomName',
         icon: getIdentityIcon('RandomName')
       });
@@ -152,6 +152,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
       types.push({
         type: 'Google',
         username: acc.name,
+        secondaryUserName: acc.email,
         icon: getIdentityIcon('Google'),
         isInUse: user.identityType === 'Google' && user.username === acc.name
       });
@@ -189,7 +190,7 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <Grid item>
             <EditIconContainer data-testid='edit-identity' readOnly={readOnly} onClick={identityModalState.open}>
               {user && !isPublicUser(user) && getIdentityIcon(user.identityType as IdentityType)}
-              <Typography variant='h1'>{user?.username}</Typography>
+              <Typography variant='h1'>{shortWalletAddress(user.username)}</Typography>
             </EditIconContainer>
           </Grid>
           {!readOnly && (
@@ -241,13 +242,11 @@ function UserDetails({ readOnly, user, updateUser, sx = {} }: UserDetailsProps) 
           <IdentityModal
             isOpen={identityModalState.isOpen}
             close={identityModalState.close}
-            save={(id: string, identityType: IdentityType) => {
-              const username: string = identityType === 'Wallet' ? ENSName || shortenHex(id) : id;
+            save={(username: string, identityType: IdentityType) => {
               handleUserUpdate({ username, identityType });
             }}
             identityTypes={identityTypes}
             identityType={(user?.identityType || 'Wallet') as IdentityType}
-            username={user?.username || ''}
           />
           <DescriptionModal
             isOpen={descriptionModalState.isOpen}
