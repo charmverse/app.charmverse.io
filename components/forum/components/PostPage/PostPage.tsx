@@ -159,15 +159,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
 
   return (
     <ScrollableWindow>
-      <Container
-        top={50}
-        sx={{
-          marginLeft: {
-            md: '75px',
-            xs: 0
-          }
-        }}
-      >
+      <Container top={50}>
         <Box minHeight={300}>
           <CharmEditor
             readOnly={readOnly}
