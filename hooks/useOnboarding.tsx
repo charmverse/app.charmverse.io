@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo } from 'react';
 import charmClient from 'charmClient';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useMembers } from './useMembers';
 import { useUser } from './useUser';
 
 type IContext = {
@@ -17,24 +18,25 @@ export const OnboardingContext = createContext<Readonly<IContext>>({
 });
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const currentSpace = useCurrentSpace();
+  const { members, mutateMembers, isLoading } = useMembers();
 
   async function completeOnboarding() {
-    if (currentSpace) {
-      charmClient.completeOnboarding({
+    if (currentSpace && user) {
+      await charmClient.completeOnboarding({
         spaceId: currentSpace.id
       });
-      setUser({ ...user, onboarded: true });
+      mutateMembers(members.map((member) => (member.id === user.id ? { ...member, onboarded: true } : member)));
     }
   }
 
   const value: IContext = useMemo(
     () => ({
-      onboarded: user?.onboarded,
+      onboarded: isLoading || !user ? null : members.find((member) => member.id === user.id)?.onboarded ?? false,
       completeOnboarding
     }),
-    [user?.onboarded]
+    [members]
   );
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
