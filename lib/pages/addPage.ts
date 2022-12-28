@@ -20,7 +20,6 @@ import { getPagePath } from './utils';
 export type NewPageInput = Partial<Page> & {
   spaceId: string;
   createdBy: string;
-  shouldCreateDefaultBoardData?: boolean;
 };
 
 interface AddPageResponse {
@@ -30,12 +29,7 @@ interface AddPageResponse {
   page: IPageWithPermissions;
 }
 
-export async function addPage({
-  createdBy,
-  spaceId,
-  shouldCreateDefaultBoardData = true,
-  ...page
-}: NewPageInput): Promise<AddPageResponse> {
+export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Promise<AddPageResponse> {
   const pageId = page?.id || v4();
 
   const isBoardPage = page.type?.match(/board/);
@@ -67,15 +61,8 @@ export async function addPage({
 
   if (isBoardPage) {
     const { board, view } = createDefaultBoardData({ boardId: pageId });
-
-    if (shouldCreateDefaultBoardData) {
-      result.board = board;
-      result.view = view;
-      await mutator.insertBlocks([board, view], 'add board');
-    } else {
-      result.board = board;
-      await mutator.insertBlocks([board]);
-    }
+    result.board = board;
+    await mutator.insertBlocks([board]);
   }
 
   await mutate(
@@ -108,28 +95,6 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
     view,
     cards: []
   };
-}
-
-export function createDefaultViewsAndCards({ board }: { board: Board }) {
-  const view = createBoardView();
-  view.fields.viewType = 'board';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.title = 'Board view';
-
-  const cards: Card[] = [];
-
-  for (let index = 0; index < 3; index++) {
-    const card = createCard();
-    card.parentId = board.id;
-    card.rootId = board.rootId;
-    card.title = `Card ${index + 1}`;
-    card.fields.contentOrder = [];
-    view.fields.cardOrder.push(card.id);
-    cards.push(card);
-  }
-
-  return { view, cards };
 }
 
 export function createDefaulBoardViewAndCards({ board }: { board: Board }) {

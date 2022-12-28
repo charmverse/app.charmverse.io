@@ -158,7 +158,9 @@ enum PageType {
   proposal_template
   inline_board
   inline_linked_board
+  linked_board
   post
+  synced_page
 }
 
 enum VoteContext {

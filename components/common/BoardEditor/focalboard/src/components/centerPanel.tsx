@@ -32,7 +32,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { createBoardView } from 'lib/focalboard/boardView';
-import { convertToInlineBoard } from 'lib/pages/convertToInlineBoard';
+import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
 import { BlockIcons } from '../blockIcons';
 import type { Block } from '../blocks/block';
@@ -90,7 +90,7 @@ function CenterPanel(props: Props) {
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
-    // assume this is a page type 'inline_linked_board' if no view exists
+    // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     showSettings: !props.activeView ? 'create-linked-view' : null
   });
 
@@ -394,8 +394,10 @@ function CenterPanel(props: Props) {
     showView(view.id);
   }
 
+  // Create a new database and a new view for it when page type === 'inline_linked_board' or 'linked_board
   async function createDatabase() {
-    const { view } = await convertToInlineBoard({ board, updatePage });
+    const pageType = boardPageType === 'inline_linked_board' ? 'inline_board' : 'board';
+    const { view } = await createNewDataSource({ board, updatePage, type: pageType });
     showView(view.id);
   }
 
@@ -462,7 +464,11 @@ function CenterPanel(props: Props) {
               activeView={activeView}
               views={views}
               showView={showView}
-              onClick={boardPageType === 'inline_linked_board' ? openSelectSource : undefined}
+              onClick={
+                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
+                  ? openSelectSource
+                  : undefined
+              }
             />
           }
           viewsBoardId={board.id}

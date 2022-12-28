@@ -66,7 +66,8 @@ function NewPageMenu({ addPage, tooltip, ...props }: Props) {
           </ListItemIcon>
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
-        <MenuItem onClick={() => createPage({ type: 'board' })}>
+        {/* create a linked board page by default, which can be changed to 'board' by the user */}
+        <MenuItem onClick={() => createPage({ type: 'linked_board' })}>
           <ListItemIcon>
             <StyledDatabaseIcon fontSize='small' />
           </ListItemIcon>

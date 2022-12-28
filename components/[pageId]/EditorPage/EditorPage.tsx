@@ -141,7 +141,8 @@ export default function EditorPage({ pageId }: { pageId: string }) {
     if (
       currentPage?.type === 'board' ||
       currentPage?.type === 'inline_board' ||
-      currentPage?.type === 'inline_linked_board'
+      currentPage?.type === 'inline_linked_board' ||
+      currentPage?.type === 'linked_board'
     ) {
       return <DatabasePage page={memoizedCurrentPage} setPage={setPage} pagePermissions={currentPagePermissions} />;
     } else {

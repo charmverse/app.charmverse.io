@@ -75,7 +75,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board') {
+    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board' && page.type !== 'linked_board') {
       dispatch(initialReadOnlyLoad(page.boardId));
     }
   }, [page.boardId]);
