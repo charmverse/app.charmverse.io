@@ -31,6 +31,8 @@ export function boardWithCardsArgs({
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
+  const cardIds = [v4(), v4(), v4()];
+
   // Skip to the bottom of this file to find the implementation that converts this stub to Prisma arguments
 
   const rootBoardNode = {
@@ -60,7 +62,7 @@ export function boardWithCardsArgs({
     bountyId: null,
     children: [
       {
-        id: 'beacdd46-ba0b-41d3-9398-0cc0d543c173',
+        id: cardIds[0],
         deletedAt: null,
         createdAt: '2022-08-25T17:19:05.413Z',
         createdBy,
@@ -98,7 +100,7 @@ export function boardWithCardsArgs({
         children: [],
         blocks: {
           card: {
-            id: 'beacdd46-ba0b-41d3-9398-0cc0d543c173',
+            id: cardIds[0],
             deletedAt: null,
             createdAt: '2022-08-25T17:19:05.413Z',
             createdBy,
@@ -121,7 +123,7 @@ export function boardWithCardsArgs({
         }
       },
       {
-        id: '04e120c6-c5f7-4660-beec-b514db58c306',
+        id: cardIds[1],
         deletedAt: null,
         createdAt: '2022-08-25T17:19:05.413Z',
         createdBy,
@@ -167,7 +169,7 @@ export function boardWithCardsArgs({
         children: [],
         blocks: {
           card: {
-            id: '04e120c6-c5f7-4660-beec-b514db58c306',
+            id: cardIds[1],
             deletedAt: null,
             createdAt: '2022-08-25T17:19:05.413Z',
             createdBy,
@@ -265,11 +267,7 @@ export function boardWithCardsArgs({
               operation: 'and'
             },
             viewType: 'gallery',
-            cardOrder: [
-              '04e120c6-c5f7-4660-beec-b514db58c306',
-              '1622d471-23c7-43d7-9397-c5dd5a779d4b',
-              'beacdd46-ba0b-41d3-9398-0cc0d543c173'
-            ],
+            cardOrder: [cardIds[1], cardIds[0]],
             sortOptions: [],
             columnWidths: {},
             hiddenOptionIds: [],
@@ -333,7 +331,7 @@ export function boardWithCardsArgs({
 
     const pageCreateInput: Prisma.PageCreateInput = {
       ...pageWithoutExtraProps,
-      id: page.type === 'board' ? boardId : v4(),
+      id: page.id,
       ...pageContent,
       type: page.type as PageType,
       author: {
