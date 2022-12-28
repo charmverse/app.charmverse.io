@@ -455,6 +455,7 @@ model User {
 model UserWallet {
   address String @unique
   userId  String @db.Uuid
+  ensname String? @unique
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
