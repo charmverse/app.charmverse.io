@@ -31,7 +31,7 @@ export function boardWithCardsArgs({
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
-  const cardIds = [v4(), v4(), v4()];
+  const cardIds = Array.from({ length: cardCount }).map(() => v4());
 
   // Skip to the bottom of this file to find the implementation that converts this stub to Prisma arguments
 
@@ -292,9 +292,9 @@ export function boardWithCardsArgs({
 
   for (let i = 3; i <= cardCount; i++) {
     if (i % 2 === 0) {
-      cardPages.push(cardPages[0]);
+      cardPages.push({ ...cardPages[0], id: cardIds[i] });
     } else {
-      cardPages.push(cardPages[1]);
+      cardPages.push({ ...cardPages[1], id: cardIds[i] });
     }
   }
 
