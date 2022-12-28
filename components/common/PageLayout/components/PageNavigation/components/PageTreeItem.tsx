@@ -229,23 +229,17 @@ export function PageLink({
           {isempty ? 'Untitled' : label}
         </PageTitle>
         {children}
-        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} pageType={pageType} />}
+        {showPicker && pageId && <EmojiMenu popupState={popupState} pageId={pageId} />}
       </PageAnchor>
     </Link>
   );
 }
 
-function EmojiMenu({ popupState, pageId, pageType }: { popupState: any; pageId: string; pageType?: Page['type'] }) {
+function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) {
   const { updatePage } = usePages();
   const onSelectEmoji = useCallback(
     async (emoji: string) => {
-      if (pageId) {
-        updatePage({ id: pageId, icon: emoji });
-
-        if (pageType === 'board') {
-          mutator.changeIcon(pageId, emoji, emoji);
-        }
-      }
+      updatePage({ id: pageId, icon: emoji });
       popupState.close();
     },
     [pageId, updatePage]

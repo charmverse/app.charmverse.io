@@ -34,7 +34,6 @@ import { usePages } from 'hooks/usePages';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
 
-import { BlockIcons } from '../blockIcons';
 import type { Block } from '../blocks/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '../blocks/board';
 import type { BoardView } from '../blocks/boardView';
@@ -44,7 +43,6 @@ import { CardFilter } from '../cardFilter';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
-import { UserSettings } from '../userSettings';
 import { Utils } from '../utils';
 
 import AddViewMenu from './addViewMenu';
@@ -69,6 +67,7 @@ type Props = WrappedComponentProps &
     hideBanner?: boolean;
     readOnly: boolean;
     addCard: (card: Card) => void;
+    pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
     showCard: (cardId: string | null) => void;
@@ -85,7 +84,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, showView, views } = props;
+  const { activeView, board, pageIcon, showView, views } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -217,9 +216,6 @@ function CenterPanel(props: Props) {
       }
     }
     card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
-    if (!card.fields.icon && UserSettings.prefillRandomIcons) {
-      card.fields.icon = BlockIcons.shared.randomIcon();
-    }
 
     card.fields.contentOrder = [];
     card.fields.isTemplate = isTemplate;
@@ -431,7 +427,13 @@ function CenterPanel(props: Props) {
       )}
       <div className='top-head'>
         {board && (boardPageType === 'board' || !isEmbedded) && (
-          <ViewTitle key={board.id + board.title} board={board} readOnly={props.readOnly} setPage={props.setPage} />
+          <ViewTitle
+            key={board.id + board.title}
+            board={board}
+            pageIcon={pageIcon}
+            readOnly={props.readOnly}
+            setPage={props.setPage}
+          />
         )}
         <ViewHeader
           onDeleteView={props.onDeleteView}

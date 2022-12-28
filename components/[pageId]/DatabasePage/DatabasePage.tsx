@@ -159,6 +159,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             readOnly={Boolean(readOnlyBoard)}
             board={board}
             setPage={setPage}
+            pageIcon={page.icon}
             showCard={showCard}
             showView={showView}
             activeView={activeView || undefined}
