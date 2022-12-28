@@ -1,8 +1,10 @@
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
+import { upperFirst } from 'lodash';
 
 import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import Button from 'components/common/Button';
+import { formatViewTitle } from 'lib/focalboard/boardView';
 
 interface Props {
   title: string;
@@ -27,7 +29,7 @@ export default function ViewSelection(props: Props) {
         <Divider light />
         {props.views.map((view) => (
           <MenuItem onClick={() => props.onSelect(view.id)} key={view.id}>
-            {view.title}
+            {view.title || formatViewTitle(view)}
           </MenuItem>
         ))}
       </Card>
