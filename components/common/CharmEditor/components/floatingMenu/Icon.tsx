@@ -10,7 +10,9 @@ export type MenuButtonProps = {
   onMouseDown?: React.MouseEventHandler;
 };
 
-const StyledMenuButton = styled(ListItemButton)<{ active: boolean }>`
+const StyledMenuButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'active' })<{
+  active: boolean;
+}>`
   position: relative;
   cursor: pointer;
   display: flex;

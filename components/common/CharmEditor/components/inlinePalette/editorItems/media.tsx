@@ -45,7 +45,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       uid: 'video',
       title: 'Video',
       icon: <VideoLibraryIcon sx={{ fontSize: iconSize }} />,
-      description: 'Insert a video block in the line below',
+      description: 'Insert a video block',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           if (view) {
@@ -58,7 +58,6 @@ export function items(): PaletteItemTypeNoGroup[] {
                 _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
-
               return insertNode(_state, _dispatch, node);
             });
 
