@@ -8,9 +8,10 @@ import { getComment } from 'lib/forums/comments/getComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

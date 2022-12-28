@@ -1,6 +1,7 @@
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export function PostSummary({ content }: { content: PageContent | null }) {
-  return <CharmEditor content={content ?? undefined} readOnly={true} />;
+// pageId is used for permissions to content
+export function PostSummary({ content, pageId }: { content: PageContent | null; pageId: string }) {
+  return <CharmEditor content={content ?? undefined} pageId={pageId} readOnly={true} />;
 }

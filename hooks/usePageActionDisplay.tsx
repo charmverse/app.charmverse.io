@@ -4,7 +4,6 @@ import { useSWRConfig } from 'swr';
 
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { isSmallScreen } from 'lib/utilities/browser';
-import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import { usePages } from './usePages';
 import { useThreads } from './useThreads';
@@ -43,7 +42,6 @@ export function PageActionDisplayProvider({ children }: { children: ReactNode })
       return setCurrentPageActionDisplay(null);
     }
     if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes && !smallScreen) {
-      const cachedInlineVotesData: ExtendedVote[] = cache.get(`pages/${currentPageId}/votes`);
       const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
         `pages/${currentPageId}/threads`
       );
