@@ -10,6 +10,7 @@ import Button from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { ScrollableWindow } from 'components/common/PageLayout';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
@@ -157,9 +158,9 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }, [postComments, page, commentSort]);
 
   return (
-    <Container top={50}>
-      <Box minHeight={300}>
-        {page && user && (
+    <ScrollableWindow>
+      <Container top={50}>
+        <Box minHeight={300}>
           <CharmEditor
             readOnly={readOnly}
             pageActionDisplay={null}
@@ -167,6 +168,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
             disablePageSpecificFeatures
             pageType='post'
             isContentControlled
+            key={user?.id}
             content={form.content as PageContent}
             onContentChange={updatePostContent}
           >
@@ -175,51 +177,51 @@ export function PostPage({ page, spaceId, onSave }: Props) {
               <PostCategoryInput spaceId={spaceId} setCategoryId={updateCategoryId} categoryId={categoryId} />
             </Box>
           </CharmEditor>
+        </Box>
+        {isMyPost && (
+          <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
+            <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
+              {page ? 'Update' : 'Post'}
+            </Button>
+          </Box>
         )}
-      </Box>
-      {isMyPost && (
-        <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
-          <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
-            {page ? 'Update' : 'Post'}
-          </Button>
-        </Box>
-      )}
 
-      {page?.post && (
-        <Box my={2}>
-          <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />
-        </Box>
-      )}
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
-      {isLoading ? (
-        <Box height={100}>
-          <LoadingComponent size={24} isLoading label='Fetching comments' />
-        </Box>
-      ) : (
-        page?.post && (
-          <>
-            <Stack gap={1}>
-              <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-              {topLevelComments.map((comment) => (
-                <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
-              ))}
-            </Stack>
-            {topLevelComments.length === 0 && (
-              <Stack gap={1} alignItems='center' my={1}>
-                <CommentIcon color='secondary' fontSize='large' />
-                <Typography color='secondary' variant='h6'>
-                  No Comments Yet
-                </Typography>
-                <Typography color='secondary'>Be the first to share what you think!</Typography>
+        {page?.post && (
+          <Box my={2}>
+            <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />
+          </Box>
+        )}
+        <Divider
+          sx={{
+            my: 2
+          }}
+        />
+        {isLoading ? (
+          <Box height={100}>
+            <LoadingComponent size={24} isLoading label='Fetching comments' />
+          </Box>
+        ) : (
+          page?.post && (
+            <>
+              <Stack gap={1}>
+                <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                {topLevelComments.map((comment) => (
+                  <PostComment setPostComments={setPostComments} comment={comment} key={comment.id} />
+                ))}
               </Stack>
-            )}
-          </>
-        )
-      )}
-    </Container>
+              {topLevelComments.length === 0 && (
+                <Stack gap={1} alignItems='center' my={1}>
+                  <CommentIcon color='secondary' fontSize='large' />
+                  <Typography color='secondary' variant='h6'>
+                    No Comments Yet
+                  </Typography>
+                  <Typography color='secondary'>Be the first to share what you think!</Typography>
+                </Stack>
+              )}
+            </>
+          )
+        )}
+      </Container>
+    </ScrollableWindow>
   );
 }
