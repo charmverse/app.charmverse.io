@@ -69,7 +69,6 @@ import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
 import { VotesApi } from './apis/votesApi';
-import { WorkspaceOnboardingApi } from './apis/workspaceOnboardingApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
 
@@ -104,8 +103,6 @@ class CharmClient {
   forum = new ForumApi();
 
   mux = new MuxApi();
-
-  workspaceOnboarding = new WorkspaceOnboardingApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');
@@ -609,6 +606,10 @@ class CharmClient {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
       defaultPublicPages
     });
+  }
+
+  completeOnboarding({ spaceId }: { spaceId: string }) {
+    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
   }
 
   updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {

@@ -197,21 +197,6 @@ export async function applyTokenGates({
       }
     });
 
-    await prisma.workspaceOnboard.create({
-      data: {
-        spaceRole: {
-          connect: {
-            id: createdSpaceRole.id
-          }
-        },
-        user: {
-          connect: {
-            id: userId
-          }
-        }
-      }
-    });
-
     updateTrackUserProfileById(userId);
 
     return returnValue;
