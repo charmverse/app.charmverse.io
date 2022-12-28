@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -72,7 +72,7 @@ type Props = WrappedComponentProps &
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
     showCard: (cardId: string | null) => void;
-    onViewTabClick?: (viewId: string) => void;
+    showView: (viewId: string) => void;
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
     onDeleteView?: (viewId: string) => void;
@@ -85,7 +85,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, views } = props;
+  const { activeView, board, showView, views } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -360,27 +360,6 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  const showView = useCallback(
-    (viewId) => {
-      if (!props.disableUpdatingUrl) {
-        const { cardId, ...rest } = router.query;
-        router.push(
-          {
-            pathname: router.pathname,
-            query: {
-              ...rest,
-              viewId: viewId || ''
-            }
-          },
-          undefined,
-          { shallow: true }
-        );
-      }
-      props.onViewTabClick?.(viewId);
-    },
-    [router.query, typeof window !== 'undefined' && window.history]
-  );
-
   async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
     const view = createBoardView();
     view.fields.viewType = 'board';
@@ -402,11 +381,11 @@ function CenterPanel(props: Props) {
   }
 
   function openSelectSource() {
+    showView('');
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
       setState({ ...state, showSettings: 'create-linked-view' });
     });
-    props.onViewTabClick?.('');
   }
 
   function toggleViewOptions(enable?: boolean) {
@@ -457,7 +436,7 @@ function CenterPanel(props: Props) {
           onDeleteView={props.onDeleteView}
           maxTabsShown={props.maxTabsShown}
           disableUpdatingUrl={props.disableUpdatingUrl}
-          onViewTabClick={props.onViewTabClick}
+          showView={props.showView}
           addViewButton={
             <AddViewMenu
               board={board}
@@ -481,7 +460,6 @@ function CenterPanel(props: Props) {
           dateDisplayProperty={dateDisplayProperty}
           addCard={() => addCard('', true)}
           showCard={showCard}
-          showView={showView}
           // addCardFromTemplate={addCardFromTemplate}
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}

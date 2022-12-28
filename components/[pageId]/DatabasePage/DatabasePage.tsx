@@ -21,6 +21,7 @@ import {
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import type { PageMeta } from 'lib/pages';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -44,6 +45,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const boardViews = useAppSelector(getCurrentBoardViews);
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
+
+  const { setFocalboardViewsRecord } = useFocalboardViews();
 
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
 
@@ -69,6 +72,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
       dispatch(setCurrentView(urlViewId || ''));
+      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
     }
   }, [page.boardId, router.query.viewId, boardViews]);
 
@@ -120,6 +124,24 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     [router.query]
   );
 
+  const showView = useCallback(
+    (viewId) => {
+      const { cardId, ...rest } = router.query;
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            ...rest,
+            viewId: viewId || ''
+          }
+        },
+        undefined,
+        { shallow: true }
+      );
+    },
+    [router.query]
+  );
+
   if (board) {
     return (
       <>
@@ -130,6 +152,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             board={board}
             setPage={setPage}
             showCard={showCard}
+            showView={showView}
             activeView={activeView || undefined}
             views={boardViews}
           />

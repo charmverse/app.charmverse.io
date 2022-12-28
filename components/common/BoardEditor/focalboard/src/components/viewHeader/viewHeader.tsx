@@ -41,7 +41,6 @@ type Props = {
   readOnly: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   addViewButton?: ReactNode;
-  onViewTabClick?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
   onDeleteView?: (viewId: string) => void;
@@ -99,12 +98,10 @@ function ViewHeader(props: Props) {
     <div className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
       <ViewTabs
         onDeleteView={props.onDeleteView}
-        onViewTabClick={props.onViewTabClick}
         addViewButton={props.addViewButton}
         views={views}
         readOnly={props.readOnly}
         showView={showView}
-        viewsBoardId={viewsBoardId}
         activeView={activeView}
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}

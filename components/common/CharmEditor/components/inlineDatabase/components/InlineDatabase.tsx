@@ -171,7 +171,7 @@ export default function DatabaseView({ containerWidth, readOnly: readOnlyOverrid
       >
         <CenterPanel
           disableUpdatingUrl
-          onViewTabClick={setCurrentViewId}
+          showView={setCurrentViewId}
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}

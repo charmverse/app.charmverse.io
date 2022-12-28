@@ -23,7 +23,6 @@ import { injectIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
 
 import type { BoardView } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
@@ -42,13 +41,11 @@ const StyledButton = styled(Button)`
 
 interface ViewTabsProps {
   intl: IntlShape;
-  viewsBoardId: string;
   activeView?: BoardView | null;
   readOnly?: boolean;
   views: BoardView[];
   showView: (viewId: string) => void;
   addViewButton?: ReactNode;
-  onViewTabClick?: (viewId: string) => void;
   onDeleteView?: (viewId: string) => void;
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
@@ -60,10 +57,8 @@ function ViewTabs(props: ViewTabsProps) {
     onDeleteView,
     openViewOptions,
     maxTabsShown,
-    onViewTabClick,
     disableUpdatingUrl,
     addViewButton,
-    viewsBoardId,
     activeView,
     intl,
     readOnly,
@@ -78,7 +73,6 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsTriggerState = bindTrigger(showViewsPopupState);
   const showViewsMenuState = bindMenu(showViewsPopupState);
 
-  const { setFocalboardViewsRecord } = useFocalboardViews();
   const views = viewsProp.filter((view) => !view.fields.inline);
   // Find the index of the current view
   const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
@@ -100,19 +94,17 @@ function ViewTabs(props: ViewTabsProps) {
 
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
-    const view = views.find((v) => v.id === event.currentTarget.id);
-    // eslint-disable-next-line no-unused-expressions
-    view && onViewTabClick?.(view.id);
-    if (readOnly) return;
-    if (event.currentTarget.id === activeView?.id) {
-      event.preventDefault();
-      setAnchorEl(event.currentTarget);
-      if (view) {
-        setDropdownView(view);
-      }
+    event.preventDefault();
+    const viewId = event.currentTarget.id;
+    const view = views.find((v) => v.id === viewId);
+    if (!view) {
+      return;
     }
-    if (view) {
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: view.id }));
+    if (view && !readOnly && event.currentTarget.id === activeView?.id) {
+      setAnchorEl(event.currentTarget);
+      setDropdownView(view);
+    } else {
+      showView(viewId);
     }
   }
 
@@ -143,7 +135,6 @@ function ViewTabs(props: ViewTabsProps) {
       'duplicate view',
       async (block) => {
         showView(block.id);
-        setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: newView.id }));
       },
       async () => {
         showView(dropdownView.id);
@@ -161,7 +152,6 @@ function ViewTabs(props: ViewTabsProps) {
     setAnchorEl(null);
     if (nextView) {
       showView(nextView.id);
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [viewsBoardId]: nextView.id }));
     }
   }, [views, dropdownView, showView]);
 
@@ -217,7 +207,7 @@ function ViewTabs(props: ViewTabsProps) {
                 size='small'
                 color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
                 id={view.id}
-                href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
+                href={activeView?.id === view.id ? null : getViewUrl(view.id)}
               >
                 {view.title}
               </StyledButton>
@@ -282,7 +272,7 @@ function ViewTabs(props: ViewTabsProps) {
             const content = (
               <MenuItem
                 onClick={() => {
-                  onViewTabClick?.(view.id);
+                  showView(view.id);
                   showViewsMenuState.onClose();
                 }}
                 component='a'
