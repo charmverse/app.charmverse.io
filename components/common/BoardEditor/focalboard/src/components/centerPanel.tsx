@@ -16,6 +16,7 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
+import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import type { CardPage } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import {
@@ -357,11 +358,7 @@ function CenterPanel(props: Props) {
   }
 
   async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
-    const view = createBoardView();
-    view.fields.viewType = 'board';
-    view.parentId = board.id;
-    view.rootId = board.id;
-    view.title = 'Board view';
+    const view = createTableView(board);
     // A new property to indicate that this view was creating for inline databases only
     view.fields.sourceType = 'board_page';
     view.fields.linkedSourceId = sourceBoardId;
