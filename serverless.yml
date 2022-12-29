@@ -1,4 +1,4 @@
-service: charmverse
+service: cvServerless
 
 frameworkVersion: '3'
 
