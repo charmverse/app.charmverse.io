@@ -30,7 +30,7 @@ custom:
 constructs:
   webhook-queue:
     type: queue
-    # Setup the queue as FIFO (First in - First out queue)
+    # Setup the queue as FIFO
     fifo: true
     # maxRetries: 5 <-- Adjust retries attempt if the job fails, default to 3
     worker:
