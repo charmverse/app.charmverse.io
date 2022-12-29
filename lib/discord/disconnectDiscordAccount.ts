@@ -38,6 +38,4 @@ export async function disconnectDiscordAccount({ userId }: DisconnectDiscordRequ
   });
 
   await updateUsedIdentity(user.id);
-
-  return softDeleteUserWithoutConnectableIdentities(user.id);
 }

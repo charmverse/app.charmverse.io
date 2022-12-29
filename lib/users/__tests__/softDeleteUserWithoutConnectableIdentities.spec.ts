@@ -14,7 +14,10 @@ describe('softDeleteUserWithoutConnectableIdentities', () => {
       include: sessionUserRelations
     });
 
-    const updatedUser = await softDeleteUserWithoutConnectableIdentities(user);
+    await softDeleteUserWithoutConnectableIdentities({ userId: user.id, newUserId: 'aaa' });
+    const updatedUser = await prisma.user.findFirstOrThrow({
+      where: { id: user.id }
+    });
 
     expect(updatedUser.deletedAt).toBeInstanceOf(Date);
   });
@@ -32,8 +35,10 @@ describe('softDeleteUserWithoutConnectableIdentities', () => {
       include: sessionUserRelations
     });
 
-    const updatedUser = await softDeleteUserWithoutConnectableIdentities(user);
-
+    await softDeleteUserWithoutConnectableIdentities({ userId: user.id, newUserId: 'aaa' });
+    const updatedUser = await prisma.user.findFirstOrThrow({
+      where: { id: user.id }
+    });
     expect(updatedUser.deletedAt).toBeNull();
 
     expect(updatedUser).toMatchObject(expect.objectContaining(user));

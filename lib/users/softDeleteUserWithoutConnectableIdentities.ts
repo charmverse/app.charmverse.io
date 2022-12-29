@@ -1,14 +1,16 @@
 import { prisma } from 'db';
-import { sessionUserRelations } from 'lib/session/config';
-import type { LoggedInUser } from 'models';
 
 import { countConnectableIdentities } from './countConnectableIdentities';
 import { getUserProfile } from './getUser';
 
-export async function softDeleteUserWithoutConnectableIdentities(
-  userOrUserId: string | LoggedInUser
-): Promise<LoggedInUser> {
-  const user = typeof userOrUserId === 'string' ? await getUserProfile('id', userOrUserId) : userOrUserId;
+export async function softDeleteUserWithoutConnectableIdentities({
+  userId,
+  newUserId
+}: {
+  userId: string;
+  newUserId: string;
+}) {
+  const user = await getUserProfile('id', userId);
 
   const connectableIdentities = await countConnectableIdentities(user);
 
@@ -19,11 +21,9 @@ export async function softDeleteUserWithoutConnectableIdentities(
         id: user.id
       },
       data: {
-        deletedAt: new Date()
-      },
-      include: sessionUserRelations
+        deletedAt: new Date(),
+        username: `Replaced with user id: ${newUserId}`
+      }
     });
   }
-
-  return user;
 }
