@@ -39,7 +39,7 @@ export type BountyEntity = {
   rewardAmount: number;
 };
 
-enum WebhookEventNames {
+export enum WebhookEventNames {
   DiscussionCreated = 'discussion.created',
   CommentCreated = 'comment.created',
   CommentUpvoted = 'comment.upvoted',

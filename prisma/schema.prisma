@@ -1083,7 +1083,6 @@ model WebhookSubscription {
 	id        String    @id @default(uuid()) @db.Uuid
 	url       String
 	spaceId   String    @db.Uuid
-	signature String
 
 	createdBy String    @db.Uuid
 	createdAt DateTime  @default(now())
