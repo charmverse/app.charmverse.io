@@ -9,7 +9,7 @@ import { useUser } from 'hooks/useUser';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 
-import type { AnyIdLogin } from '../Login';
+import type { AnyIdLogin } from '../components/login/Login';
 
 export function useGoogleAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));

@@ -10,6 +10,7 @@ import { usePages } from 'hooks/usePages';
 import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
 
+import { GoogleForms } from './googleDataSources';
 import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';
@@ -77,7 +78,7 @@ export function ViewSourceOptions(props: SourceTypesProps) {
             onCreate={props.onCreate}
           />
         )}
-        {formStep === 'configure_source' && sourceType === 'google_form' && <>connect google form!</>}
+        {formStep === 'configure_source' && sourceType === 'google_form' && <GoogleForms />}
       </Box>
     </>
   );

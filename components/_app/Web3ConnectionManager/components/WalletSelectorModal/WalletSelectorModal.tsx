@@ -3,6 +3,7 @@ import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Alert from '@mui/material/Alert';
+import type { IdentityType } from '@prisma/client';
 import UAuth from '@uauth/js';
 import type { AbstractConnector } from '@web3-react/abstract-connector';
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
@@ -14,7 +15,7 @@ import charmClient from 'charmClient';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import type { AnyIdPostLoginHandler } from 'components/login/Login';
+import type { AnyIdLogin } from 'components/login/Login';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { UnstoppableDomainsAuthSig } from 'lib/blockchain/unstoppableDomains';
 import { extractDomainFromProof } from 'lib/blockchain/unstoppableDomains/client';
@@ -26,6 +27,8 @@ import { Web3Connection } from '../../Web3ConnectionManager';
 
 import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
+
+type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 
 interface Props {
   loginSuccess: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;

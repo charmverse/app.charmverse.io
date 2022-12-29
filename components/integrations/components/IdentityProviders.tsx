@@ -7,8 +7,8 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
-import { useGoogleAuth } from 'components/login/hooks/useGoogleAuth';
 import { WalletConnect } from 'components/login/WalletConnect';
+import { useGoogleAuth } from 'hooks/useGoogleAuth';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
