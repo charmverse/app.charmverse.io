@@ -2,9 +2,9 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
-import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';

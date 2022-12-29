@@ -23,10 +23,9 @@ import { injectIntl } from 'react-intl';
 
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { formatViewTitle } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
+import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 
-import type { BoardView } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import { iconForViewType } from '../viewMenu';

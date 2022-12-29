@@ -4,10 +4,10 @@ import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import Button from 'components/common/Button';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { BoardView, ISortOption } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';

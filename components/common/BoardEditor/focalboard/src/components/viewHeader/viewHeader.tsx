@@ -9,11 +9,11 @@ import { mutate } from 'swr';
 import Button from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import type { PageMeta } from 'lib/pages';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';

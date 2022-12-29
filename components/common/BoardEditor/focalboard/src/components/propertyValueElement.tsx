@@ -3,9 +3,9 @@ import { useIntl } from 'react-intl';
 
 import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
 
-import type { Board, IPropertyTemplate, PropertyType } from '../blocks/board';
-import type { Card } from '../blocks/card';
 import mutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
 import Editable from '../widgets/editable';

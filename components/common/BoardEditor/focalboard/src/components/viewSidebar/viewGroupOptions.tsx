@@ -2,8 +2,9 @@ import { Delete } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 
-import type { IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 

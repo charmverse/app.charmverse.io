@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { createIntl } from 'react-intl';
 
-import type { IPropertyOption } from '../../blocks/board';
+import type { IPropertyOption } from 'lib/focalboard/board';
+
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';

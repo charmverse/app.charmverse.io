@@ -4,15 +4,15 @@ import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import { createBoard } from 'components/common/BoardEditor/focalboard/src/blocks/board';
-import { createBoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
+import { createBoard } from 'lib/focalboard/board';
 import type { Board } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { createCard } from 'lib/focalboard/card';
+import type { Card } from 'lib/focalboard/card';
 
 import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';

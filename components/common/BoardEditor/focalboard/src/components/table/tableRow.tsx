@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
-import type { BoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import Button from '../../widgets/buttons/button';

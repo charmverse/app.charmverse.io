@@ -16,10 +16,6 @@ import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 import charmClient from 'charmClient';
-import type { Board } from 'components/common/BoardEditor/focalboard/src/blocks/board';
-import type { BoardView } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
-import { createCard } from 'components/common/BoardEditor/focalboard/src/blocks/card';
-import type { Card } from 'components/common/BoardEditor/focalboard/src/blocks/card';
 import { sendFlashMessage } from 'components/common/BoardEditor/focalboard/src/components/flashMessages';
 import { CsvExporter } from 'components/common/BoardEditor/focalboard/src/csvExporter';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -37,6 +33,10 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useToggleFavorite } from 'hooks/useToggleFavorite';
 import { useUser } from 'hooks/useUser';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+import { createCard } from 'lib/focalboard/card';
 import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import {

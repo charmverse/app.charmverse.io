@@ -1,5 +1,5 @@
-import type { Block } from './block';
-import { createBlock } from './block';
+import type { Block } from 'lib/focalboard/block';
+import { createBlock } from 'lib/focalboard/block';
 
 type CardFields = {
   icon?: string;

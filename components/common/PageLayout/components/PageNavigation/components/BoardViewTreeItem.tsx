@@ -1,7 +1,7 @@
 import { forwardRef, memo } from 'react';
 
-import type { IViewType } from 'components/common/BoardEditor/focalboard/src/blocks/boardView';
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import type { IViewType } from 'lib/focalboard/boardView';
 
 import { StyledTreeItem, PageLink } from './PageTreeItem';
 

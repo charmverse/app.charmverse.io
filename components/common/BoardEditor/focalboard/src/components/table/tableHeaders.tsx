@@ -3,10 +3,11 @@ import IconButton from '@mui/material/IconButton';
 import React, { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, Board } from '../../blocks/board';
-import type { BoardView, ISortOption } from '../../blocks/boardView';
-import { createBoardView } from '../../blocks/boardView';
-import type { Card } from '../../blocks/card';
+import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
+import { createBoardView } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
+
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';

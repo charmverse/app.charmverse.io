@@ -1,7 +1,8 @@
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate } from '../../../blocks/board';
-import type { Card } from '../../../blocks/card';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
+
 import Button from '../../../widgets/buttons/button';
 import Calculations from '../../calculations/calculations';
 

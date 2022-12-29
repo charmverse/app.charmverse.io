@@ -1,11 +1,11 @@
+import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
-const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
-const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const;
-type ContentBlockTypes = typeof contentBlockTypes[number];
-type BlockTypes = typeof blockTypes[number];
+export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
+export const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'comment', 'unknown'] as const;
+export type BlockTypes = typeof blockTypes[number];
 
-interface BlockPatch {
+export type BlockPatch = {
   spaceId?: string;
   parentId?: string;
   rootId?: string;
@@ -16,9 +16,9 @@ interface BlockPatch {
   updatedFields?: Record<string, any>;
   deletedFields?: string[];
   deletedAt?: number;
-}
+};
 
-interface Block {
+export type Block = {
   id: string;
   spaceId: string;
   parentId: string;
@@ -35,9 +35,9 @@ interface Block {
   createdAt: number;
   updatedAt: number;
   deletedAt: number | null;
-}
+};
 
-function createBlock(block?: Partial<Block>): Block {
+export function createBlock(block?: Partial<Block>): Block {
   const now = Date.now();
   return {
     id: block?.id || v4(),
@@ -56,5 +56,48 @@ function createBlock(block?: Partial<Block>): Block {
   };
 }
 
-export type { ContentBlockTypes, BlockTypes, Block, BlockPatch };
-export { blockTypes, contentBlockTypes, createBlock };
+// createPatchesFromBlock creates two BlockPatch instances, one that
+// contains the delta to update the block and another one for the undo
+// action, in case it happens
+export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): BlockPatch[] {
+  const newDeletedFields = difference(Object.keys(newBlock.fields), Object.keys(oldBlock.fields));
+  const newUpdatedFields: Record<string, any> = {};
+  const newUpdatedData: Record<string, any> = {};
+  Object.keys(newBlock.fields).forEach((val) => {
+    if (oldBlock.fields[val] !== newBlock.fields[val]) {
+      newUpdatedFields[val] = newBlock.fields[val];
+    }
+  });
+  Object.keys(newBlock).forEach((val) => {
+    if (val !== 'fields' && (oldBlock as any)[val] !== (newBlock as any)[val]) {
+      newUpdatedData[val] = (newBlock as any)[val];
+    }
+  });
+
+  const oldDeletedFields = difference(Object.keys(oldBlock.fields), Object.keys(newBlock.fields));
+  const oldUpdatedFields: Record<string, any> = {};
+  const oldUpdatedData: Record<string, any> = {};
+  Object.keys(oldBlock.fields).forEach((val) => {
+    if (oldBlock.fields[val] !== newBlock.fields[val]) {
+      oldUpdatedFields[val] = oldBlock.fields[val];
+    }
+  });
+  Object.keys(oldBlock).forEach((val) => {
+    if (val !== 'fields' && (oldBlock as any)[val] !== (newBlock as any)[val]) {
+      oldUpdatedData[val] = (oldBlock as any)[val];
+    }
+  });
+
+  return [
+    {
+      ...newUpdatedData,
+      updatedFields: newUpdatedFields,
+      deletedFields: oldDeletedFields
+    },
+    {
+      ...oldUpdatedData,
+      updatedFields: oldUpdatedFields,
+      deletedFields: newDeletedFields
+    }
+  ];
+}

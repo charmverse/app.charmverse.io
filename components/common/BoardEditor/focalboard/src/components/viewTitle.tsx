@@ -12,10 +12,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import type { Board } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';
-import type { Board } from '../blocks/board';
 import mutator from '../mutator';
 import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
