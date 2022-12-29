@@ -1,25 +1,35 @@
-import { useEffect, useRef } from 'react';
-import { TbChevronsUpLeft } from 'react-icons/tb';
-
 import charmClient from 'charmClient';
+import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
-import current from 'pages/api/spaces/current';
+import { usePages } from 'hooks/usePages';
+import type { PagesMap } from 'lib/pages';
 
 export function UploadZippedMarkdown() {
   const space = useCurrentSpace();
+  const { mutatePagesList } = usePages();
 
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const { onFileChange } = useFilePicker((file) => {
-    charmClient.file.uploadZippedMarkdown({
-      spaceId: space!.id,
-      file
-    });
+  const { inputRef, onFileChange, openFilePicker } = useFilePicker((file) => {
+    charmClient.file
+      .uploadZippedMarkdown({
+        spaceId: space!.id,
+        file
+      })
+      .then((pages) => {
+        const pageMap = pages.reduce((acc, page) => {
+          acc[page.id] = page;
+          return acc;
+        }, {} as PagesMap);
+        mutatePagesList(pageMap);
+      });
   });
 
   return (
     <>
-      <input onChange={onFileChange} accept='.zip' id='file' name='file' type='file' />;
+      <Button size='snall' secondary onClick={openFilePicker}>
+        {inputRef.current?.files?.[0]?.name ?? 'Select file'}
+      </Button>
+      <input ref={inputRef} hidden onChange={onFileChange} accept='.zip' id='file' name='file' type='file' />;
     </>
   );
 }

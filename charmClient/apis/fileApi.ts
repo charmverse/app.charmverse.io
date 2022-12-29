@@ -1,5 +1,5 @@
 import * as http from 'adapters/http';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
+import type { PageMeta } from 'lib/pages';
 
 export class FileApi {
   async uploadZippedMarkdown({ file, spaceId }: { file: File; spaceId: string }) {
@@ -7,7 +7,7 @@ export class FileApi {
 
     const asBlob = new Blob([buff]);
 
-    return http.POST<ForumPostPage>(`/api/pages/import/${spaceId}/zipped`, asBlob, {
+    return http.POST<PageMeta[]>(`/api/pages/import/${spaceId}/zipped`, asBlob, {
       skipStringifying: true,
       headers: {
         'Content-Type': `application/octet-stream;`,
