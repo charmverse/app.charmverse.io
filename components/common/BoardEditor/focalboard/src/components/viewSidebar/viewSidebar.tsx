@@ -106,14 +106,14 @@ function ViewOptionsSidebar(props: Props) {
                   value={currentGroup ?? 'None'}
                 />
               )}
-              {/* {props.view.fields.sourceType && (
+              {props.view.fields.sourceType && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
                   icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
                   title='Source'
                   value={props.view.fields.source ?? 'None'}
                 />
-              )} */}
+              )}
             </>
           )}
           {sidebarView === 'layout' && (
