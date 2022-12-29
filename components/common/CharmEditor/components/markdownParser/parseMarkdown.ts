@@ -1,13 +1,14 @@
 import type { Page } from '@prisma/client';
-import { Prisma } from '@prisma/client';
 import markdownit from 'markdown-it/lib';
-import { MarkdownParser, schema, defaultMarkdownParser } from 'prosemirror-markdown';
+import { MarkdownParser } from 'prosemirror-markdown';
 
 import { specRegistry } from '../../specRegistry';
 import { listIsTight } from '../listItem/listIsTight';
 
+// eslint-disable-next-line import/order
+import { markdownContent } from './firstTestNote';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import { incrementalMarkdownContent } from './incrementalNote';
 
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },
@@ -34,7 +35,7 @@ const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonma
     })
   },
   hardbreak: { node: 'hardBreak' },
-  em: { mark: 'em' },
+  em: { mark: 'italic' },
   strong: { mark: 'bold' },
   link: {
     mark: 'link',
@@ -64,6 +65,6 @@ export function parseMarkdown(data: string): any {
 export async function parseMarkdownStub(): Promise<Pick<Page, 'content'>> {
   // const basicMarkdown = `# This is a test`;
 
-  const parsedNodes = parseMarkdown(incrementalMarkdownContent);
+  const parsedNodes = parseMarkdown(markdownContent);
   return parsedNodes;
 }
