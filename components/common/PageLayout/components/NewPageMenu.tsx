@@ -11,6 +11,7 @@ import type { Page } from '@prisma/client';
 import type { MouseEvent } from 'react';
 import { useState, memo } from 'react';
 
+import { MarkdownParser } from 'components/common/CharmEditor/components/markdownParser/MarkdownParser';
 import { greyColor2 } from 'theme/colors';
 
 import { StyledDatabaseIcon } from './PageIcon';

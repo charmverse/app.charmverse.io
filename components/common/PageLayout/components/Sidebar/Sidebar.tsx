@@ -21,6 +21,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
+import { MarkdownParser } from 'components/common/CharmEditor/components/markdownParser/MarkdownParser';
 import Link from 'components/common/Link';
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -223,6 +224,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
         createdBy: user.id,
         spaceId: space.id
       };
+
       addPageAndRedirect(newPage, router).then();
     }
   }, []);
@@ -334,11 +336,17 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             )}
             <WorkspaceLabel>
               <SectionName>WORKSPACE</SectionName>
+              {/** Test component */}
               {userSpacePermissions?.createPage && (
                 <div className='add-a-page'>
                   <NewPageMenu tooltip='Add a page' addPage={addPage} />
                 </div>
               )}
+            </WorkspaceLabel>
+            <WorkspaceLabel>
+              <SectionName>IMPORT</SectionName>
+              {/** Test component */}
+              <MarkdownParser addPage={addPage} />
             </WorkspaceLabel>
             <Box mb={6}>
               <PageNavigation onClick={closeSidebarIfIsMobile} />
