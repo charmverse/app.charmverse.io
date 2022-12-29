@@ -6,7 +6,7 @@ import { specRegistry } from '../../specRegistry';
 import { listIsTight } from '../listItem/listIsTight';
 
 // eslint-disable-next-line import/order
-import { markdownContent } from './firstTestNote';
+import { images, minutes, singularity } from './files';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 
@@ -65,6 +65,6 @@ export function parseMarkdown(data: string): any {
 export async function parseMarkdownStub(): Promise<Pick<Page, 'content'>> {
   // const basicMarkdown = `# This is a test`;
 
-  const parsedNodes = parseMarkdown(markdownContent);
+  const parsedNodes = parseMarkdown(images);
   return parsedNodes;
 }
