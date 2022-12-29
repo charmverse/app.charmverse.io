@@ -7,7 +7,7 @@ import { specRegistry } from '../../specRegistry';
 import { listIsTight } from '../listItem/listIsTight';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import { markdownContent } from './firstTestNote';
+import { incrementalMarkdownContent } from './incrementalNote';
 
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },
@@ -62,8 +62,8 @@ export function parseMarkdown(data: string): any {
 
 // Utility function to parse example markdown into prosemirror nodes
 export async function parseMarkdownStub(): Promise<Pick<Page, 'content'>> {
-  const basicMarkdown = `# This is a test`;
+  // const basicMarkdown = `# This is a test`;
 
-  const parsedNodes = parseMarkdown(basicMarkdown);
+  const parsedNodes = parseMarkdown(incrementalMarkdownContent);
   return parsedNodes;
 }
