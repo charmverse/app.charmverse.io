@@ -9,12 +9,20 @@ on:
       - serverless.yml
 
 jobs:
+  create_env_file_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create .env file
+        uses: ozaytsev86/create-env-file@v1
+        with:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
   deploy:
     if: |
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
       (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
     name: deploy
     runs-on: ubuntu-latest
+    needs: create_env_file_job
     strategy:
       matrix:
         node-version: [16.x]

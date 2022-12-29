@@ -2,6 +2,8 @@ service: charmverse
 
 frameworkVersion: '3'
 
+useDotenv: true
+
 # Create an optimized package for our functions
 package:
   patterns:
@@ -45,4 +47,6 @@ provider:
   name: aws
   runtime: nodejs14.x
   deploymentMethod: direct
-
+  environment:
+    # Used by prisma
+    DATABASE_URL: ${env:DATABASE_URL}
