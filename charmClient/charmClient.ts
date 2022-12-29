@@ -64,10 +64,12 @@ import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
 import { ForumApi } from './apis/forumApi';
+import { GoogleApi } from './apis/googleApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { TasksApi } from './apis/tasksApi';
+import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -86,6 +88,8 @@ class CharmClient {
 
   comments = new CommentsApi();
 
+  google = new GoogleApi();
+
   votes = new VotesApi();
 
   profile = new ProfileApi();
@@ -103,6 +107,8 @@ class CharmClient {
   forum = new ForumApi();
 
   mux = new MuxApi();
+
+  unstoppableDomains = new UnstoppableDomainsApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

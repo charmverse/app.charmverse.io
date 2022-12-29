@@ -4,7 +4,7 @@ import Button from 'components/common/Button';
 import { useGoogleAuth } from 'hooks/useGoogleAuth';
 
 export function GoogleForms() {
-  const { loginWithGoogle } = useGoogleAuth();
+  const { loginWithGoogle } = useGoogleAuth({ scope: 'google_forms' });
   return (
     <Box px={3} mt={3}>
       <Button onClick={loginWithGoogle} variant='outlined'>

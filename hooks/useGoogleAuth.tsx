@@ -11,18 +11,28 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 
 import type { AnyIdLogin } from '../components/login/Login';
 
-export function useGoogleAuth() {
+const scopeOptions = {
+  identity: ['openid', 'email', 'profile'],
+  google_forms: ['https://www.googleapis.com/auth/forms']
+};
+
+type ScopeOption = keyof typeof scopeOptions;
+
+export function useGoogleAuth({ scope = 'identity' }: { scope?: ScopeOption } = {}) {
+  const scopes = scopeOptions[scope];
+
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
   const { user, setUser } = useUser();
 
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
-
+  // console.log(firebaseApp);
   useEffect(() => {
-    provider.addScope('email');
-    provider.addScope('openid');
-    provider.addScope('profile');
+    scopes.forEach((_scope) => {
+      // console.log('add scope', _scope);
+      provider.addScope(_scope);
+    });
     provider.setCustomParameters({
       prompt: 'select_account'
     });
@@ -34,6 +44,7 @@ export function useGoogleAuth() {
       auth.languageCode = 'en';
 
       const result = await signInWithPopup(auth, provider);
+      // console.log('result', result);
 
       // This gives you a Google Access Token. You can use it to access the Google API.
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -74,7 +85,7 @@ export function useGoogleAuth() {
     setIsConnectingGoogle(true);
     try {
       const googleToken = await getGoogleToken();
-      const loggedInUser = await charmClient.profile.loginWithGoogle(googleToken);
+      const loggedInUser = await charmClient.google.login(googleToken);
       return { user: loggedInUser, identityType: 'Google', displayName: googleToken.displayName };
     } finally {
       setIsConnectingGoogle(false);
@@ -85,7 +96,7 @@ export function useGoogleAuth() {
     setIsConnectingGoogle(true);
     try {
       const googleToken = await getGoogleToken();
-      const loggedInUser = await charmClient.profile.connectGoogleAccount(googleToken);
+      const loggedInUser = await charmClient.google.connectAccount(googleToken);
       setUser(loggedInUser);
     } finally {
       setIsConnectingGoogle(false);
@@ -97,7 +108,7 @@ export function useGoogleAuth() {
       throw new InvalidInputError('No Google account connected to user');
     }
 
-    const loggedInUser = await charmClient.profile.disconnectGoogleAccount({
+    const loggedInUser = await charmClient.google.disconnectAccount({
       googleAccountEmail: user?.googleAccounts[0].email as string
     });
     setUser(loggedInUser);

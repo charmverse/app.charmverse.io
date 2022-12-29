@@ -17,6 +17,7 @@ export async function verifyGoogleToken(idToken: string): Promise<TokenPayload> 
   if (!payload) {
     throw new InvalidInputError('Invalid Google authentication token');
   }
+  // console.log('payload', payload);
 
   const now = Date.now();
   const { exp } = payload;

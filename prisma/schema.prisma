@@ -452,13 +452,14 @@ model User {
   unstoppableDomains   UnstoppableDomain[]
   PageComment          PageComment[]
   googleAccounts       GoogleAccount[]
+  GoogleCredential     GoogleCredential[]
 }
 
 model UserWallet {
-  address String @unique
-  userId  String @db.Uuid
+  address String  @unique
+  userId  String  @db.Uuid
   ensname String? @unique
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -1090,4 +1091,13 @@ model GoogleAccount {
   avatarUrl String
   userId    String @db.Uuid
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleCredential {
+  id     String   @id @default(uuid()) @db.Uuid
+  name   String
+  token  String
+  scopes String[]
+  userId String   @db.Uuid
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

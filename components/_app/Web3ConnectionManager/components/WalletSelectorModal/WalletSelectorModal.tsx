@@ -108,7 +108,7 @@ export function WalletSelector({ loginSuccess }: Props) {
     try {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
       showMessage(`Logged in with Unstoppable Domains. Redirecting you now.`, 'success');
-      const user = await charmClient.profile.loginWithUnstoppableDomains({ authSig });
+      const user = await charmClient.unstoppableDomains.login({ authSig });
 
       const domain = extractDomainFromProof(authSig);
 
