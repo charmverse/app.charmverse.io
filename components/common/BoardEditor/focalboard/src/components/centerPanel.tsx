@@ -46,9 +46,9 @@ import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
 import AddViewMenu from './addViewMenu';
+import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';
 import Kanban from './kanban/kanban';
-import SourceSelection from './SourceSelection';
 import Table from './table/table';
 import ViewHeader from './viewHeader/viewHeader';
 import ViewSidebar from './viewSidebar/viewSidebar';
@@ -356,11 +356,11 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function createLinkedView({ boardId: sourceBoardId }: { boardId: string }) {
+  async function createLinkedView(page: { id: string }) {
     const view = createTableView(board);
     // A new property to indicate that this view was creating for inline databases only
     view.fields.sourceType = 'board_page';
-    view.fields.linkedSourceId = sourceBoardId;
+    view.fields.linkedSourceId = page.id;
     await mutator.insertBlock(view);
     showView(view.id);
   }
@@ -491,11 +491,10 @@ function CenterPanel(props: Props) {
               </Button>
             )}
             {!activeView && state.showSettings === 'create-linked-view' && (
-              <SourceSelection
+              <CreateLinkedView
                 readOnly={props.readOnly}
-                onSelectSource={createLinkedView}
-                onCreateDatabase={createDatabase}
-                showCreateDatabase={views.length === 0}
+                onSelect={createLinkedView}
+                onCreate={views.length === 0 ? createDatabase : undefined}
               />
             )}
             {activeBoard && activeView?.fields.viewType === 'board' && (

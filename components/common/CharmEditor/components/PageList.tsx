@@ -7,11 +7,16 @@ import type { PageMeta } from 'lib/pages';
 
 interface Props {
   activeItemIndex?: number;
+  activePageId?: string;
   pages: PageMeta[];
   onSelectPage: (page: PageMeta) => void;
 }
 
-export default function PagesList({ activeItemIndex = -1, pages, onSelectPage }: Props) {
+export default function PagesList({ activeItemIndex = -1, activePageId, pages, onSelectPage }: Props) {
+  function isActive(pageId: string, index: number) {
+    return pageId === activePageId || index === activeItemIndex;
+  }
+
   return pages.length === 0 ? (
     <Typography
       style={{
@@ -30,10 +35,10 @@ export default function PagesList({ activeItemIndex = -1, pages, onSelectPage }:
           <MenuItem
             data-value={page.id}
             data-type='page'
-            className={pageIndex === activeItemIndex ? 'mention-selected' : ''}
+            className={isActive(page.id, pageIndex) ? 'mention-selected' : ''}
             onClick={() => onSelectPage(page)}
             key={page.id}
-            selected={pageIndex === activeItemIndex}
+            selected={isActive(page.id, pageIndex)}
           >
             <>
               <ListItemIcon>
@@ -45,7 +50,7 @@ export default function PagesList({ activeItemIndex = -1, pages, onSelectPage }:
                   fontWeight: 'bold'
                 }}
               >
-                {page.title.length !== 0 ? page.title : 'Untitled'}
+                {page.title.length > 0 ? page.title : 'Untitled'}
               </PageTitle>
             </>
           </MenuItem>

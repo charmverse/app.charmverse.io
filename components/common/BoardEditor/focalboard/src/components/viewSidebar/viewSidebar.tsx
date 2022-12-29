@@ -19,8 +19,14 @@ import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { RiFolder2Line } from 'react-icons/ri';
 
+import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
 import type { BoardView } from 'lib/focalboard/boardView';
+
+import mutator from '../../mutator';
+import { useAppDispatch } from '../../store/hooks';
+import { updateView } from '../../store/views';
 
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
@@ -35,7 +41,7 @@ interface Props {
   groupByProperty?: IPropertyTemplate;
 }
 
-const StyledSidebar = styled.div`
+export const StyledSidebar = styled.div`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;
@@ -54,11 +60,39 @@ const initialState: SidebarView = 'view-options';
 
 function ViewOptionsSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
+  const dispatch = useAppDispatch();
+  const { pages } = usePages();
 
   const withGroupBy = props.view.fields.viewType.match(/board/) || props.view.fields.viewType === 'table';
+  const currentGroup = props.board.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
+  const currentLayout = props.view.fields.viewType;
+  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
+  const currentProperties = visiblePropertyIds.filter((id) =>
+    props.board.fields.cardProperties.some((c) => c.id === id)
+  ).length;
+
+  let sourceTitle = 'None';
+  const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
+  if (sourcePage) {
+    sourceTitle = sourcePage.title;
+  } else if (props.view.fields.sourceType === 'google_form') {
+    sourceTitle = 'Google Form';
+  }
 
   function goBack() {
     setSidebarView(initialState);
+  }
+
+  async function selectDatabase(page: { id: string }) {
+    const newView = createBoardView(props.view);
+    newView.fields.sourceType = 'board_page';
+    newView.fields.linkedSourceId = page.id;
+    try {
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, props.view, 'change view source');
+    } catch {
+      dispatch(updateView(props.view));
+    }
   }
 
   useEffect(() => {
@@ -67,13 +101,6 @@ function ViewOptionsSidebar(props: Props) {
       setSidebarView(initialState);
     }
   }, [props.isOpen]);
-
-  const currentGroup = props.board.fields.cardProperties.find((prop) => prop.id === props.groupByProperty?.id)?.name;
-  const currentLayout = props.view.fields.viewType;
-  const visiblePropertyIds = props.view.fields.visiblePropertyIds ?? [];
-  const currentProperties = visiblePropertyIds.filter((id) =>
-    props.board.fields.cardProperties.some((c) => c.id === id)
-  ).length;
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
@@ -111,7 +138,7 @@ function ViewOptionsSidebar(props: Props) {
                   onClick={() => setSidebarView('source')}
                   icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
                   title='Source'
-                  value={props.view.fields.source ?? 'None'}
+                  value={sourceTitle}
                 />
               )}
             </>
@@ -139,10 +166,13 @@ function ViewOptionsSidebar(props: Props) {
             </>
           )}
           {sidebarView === 'source' && (
-            <>
-              <SidebarHeader goBack={goBack} title='Data source' closeSidebar={props.closeSidebar} />
-              <ViewSourceOptions view={props.view} />
-            </>
+            <ViewSourceOptions
+              title='Data source'
+              view={props.view}
+              goBack={goBack}
+              onSelect={selectDatabase}
+              closeSidebar={props.closeSidebar}
+            />
           )}
         </StyledSidebar>
       </Collapse>
