@@ -94,8 +94,6 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
           }
         }
 
-        const createdPages: PageMeta[] = [];
-
         if (pagesToCreate.length > 0) {
           const parentPage = await prisma.page.create({
             data: {
@@ -154,19 +152,18 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
             data: basePermissions
           });
 
-          const _createdPages = await prisma.page.findMany({
+          const createdPages = await prisma.page.findMany({
             where: {
               id: {
-                in: pagesToCreate.map((page) => page.id as string)
+                in: pageIds
               }
             },
             select: pageMetaSelect()
           });
-
-          createdPages.push(parentPage);
-          createdPages.push(..._createdPages);
+          res.status(201).send(createdPages);
+        } else {
+          res.status(200).send([]);
         }
-        res.status(201).send(createdPages);
       } catch (err) {
         log.error('Unable to import pages', { error: err, userId, spaceId });
         if (!res.headersSent) {
