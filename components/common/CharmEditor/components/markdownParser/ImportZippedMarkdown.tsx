@@ -8,12 +8,14 @@ import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
 
 export function ImportZippedMarkdown() {
   const space = useCurrentSpace();
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const { inputRef, onFileChange, openFilePicker } = useFilePicker((file) => {
     setIsUploading(true);
@@ -22,12 +24,16 @@ export function ImportZippedMarkdown() {
         spaceId: space!.id,
         file
       })
+
       .then((pages) => {
         const pageMap = pages.reduce((acc, page) => {
           acc[page.id] = page;
           return acc;
         }, {} as PagesMap);
         mutatePagesList(pageMap);
+      })
+      .catch((err) => {
+        showMessage(err.message, err.severity ?? 'error');
       })
       .finally(() => setIsUploading(false));
   });

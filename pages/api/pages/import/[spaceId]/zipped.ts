@@ -7,9 +7,11 @@ import { v4 } from 'uuid';
 import { parseMarkdown } from 'components/common/CharmEditor/components/markdownParser/parseMarkdown';
 import { prisma } from 'db';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import type { PageMeta } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataConflictError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
 export const config = {
@@ -31,56 +33,63 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
   const { id: userId } = req.session.user;
 
   req.on('data', async (chunk) => {
-    const content = await unzip.loadAsync(chunk);
+    try {
+      const content = await unzip.loadAsync(chunk);
 
-    const fileNames = typedKeys(content.files);
+      const fileNames = typedKeys(content.files);
 
-    const pagesToCreate: Prisma.PageCreateManyInput[] = [];
+      const pagesToCreate: Prisma.PageCreateManyInput[] = [];
 
-    for (const name of fileNames) {
-      if (name.toString().match('.md')) {
-        const file = content.files[name];
+      for (const name of fileNames) {
+        if (name.toString().match('.md')) {
+          const file = content.files[name];
 
-        const fileMarkdownContent = await file.async('string');
+          const fileMarkdownContent = await file.async('string');
 
-        try {
-          const parsedContent = parseMarkdown(fileMarkdownContent);
-          const pageToCreate: Prisma.PageCreateManyInput = {
-            id: v4(),
-            title: name.toString().replace('.md', ''),
-            content: parsedContent,
-            contentText: fileMarkdownContent,
-            path: getPagePath(),
-            type: 'page',
-            updatedBy: userId,
-            createdBy: userId,
-            spaceId: spaceId as string
-          };
+          try {
+            const parsedContent = parseMarkdown(fileMarkdownContent);
+            const pageToCreate: Prisma.PageCreateManyInput = {
+              id: v4(),
+              title: name.toString().replace('.md', ''),
+              content: parsedContent,
+              contentText: fileMarkdownContent,
+              path: getPagePath(),
+              type: 'page',
+              updatedBy: userId,
+              createdBy: userId,
+              spaceId: spaceId as string
+            };
 
-          pagesToCreate.push(pageToCreate);
-        } catch (err) {
-          // Do nothing
+            pagesToCreate.push(pageToCreate);
+          } catch (err) {
+            // Do nothing
+          }
         }
       }
+
+      const createdPages: PageMeta[] = [];
+
+      if (pagesToCreate.length > 0) {
+        await prisma.page.createMany({
+          data: pagesToCreate
+        });
+        const _createdPages = await prisma.page.findMany({
+          where: {
+            id: {
+              in: pagesToCreate.map((page) => page.id as string)
+            }
+          },
+          select: pageMetaSelect()
+        });
+
+        createdPages.push(..._createdPages);
+      }
+      res.status(201).send(createdPages);
+    } catch (err) {
+      if (!res.headersSent) {
+        res.status(406).send(new DataConflictError('Unable to import pages'));
+      }
     }
-
-    await prisma.page.createMany({
-      data: pagesToCreate
-    });
-
-    const createdPages =
-      pagesToCreate.length > 0
-        ? await prisma.page.findMany({
-            where: {
-              id: {
-                in: pagesToCreate.map((page) => page.id as string)
-              }
-            },
-            select: pageMetaSelect()
-          })
-        : [];
-
-    res.status(200).send(createdPages);
   });
 }
 
