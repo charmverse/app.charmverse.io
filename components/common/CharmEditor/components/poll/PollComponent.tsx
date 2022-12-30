@@ -9,23 +9,17 @@ import CreateVoteModal from 'components/votes/components/CreateVoteModal';
 import { useVotes } from 'hooks/useVotes';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
-import BlockAligner from '../BlockAligner';
-import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { EmptyEmbed } from '../common/EmptyEmbed';
 import VoteDetail from '../inlineVote/components/VoteDetail';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
-
-const StyledEmptyPollContainer = styled(Box)`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(1.5)};
-  width: 100%;
-  align-items: center;
-  opacity: 0.5;
-`;
 
 export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
   const { votes, cancelVote, castVote, deleteVote } = useVotes();
-  const [showModal, setShowModal] = useState(false);
+
+  const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
+
+  const [showModal, setShowModal] = useState(autoOpen);
 
   function onCreateVote(vote: ExtendedVote) {
     updateAttrs({
@@ -33,26 +27,34 @@ export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode
     });
     setShowModal(false);
   }
-
   if (!pollId || !votes[pollId]) {
     if (readOnly) {
       return <div />;
     }
     return (
-      <MediaSelectionPopup
-        node={node}
-        icon={<FormatListBulleted fontSize='small' />}
-        buttonText='Add a poll'
-        isSelected={selected}
-        onDelete={deleteNode}
-      >
+      <>
         <CreateVoteModal
+          open={showModal}
           onClose={() => {
             setShowModal(false);
           }}
           onCreateVote={onCreateVote}
         />
-      </MediaSelectionPopup>
+        <div
+          onClick={(e) => {
+            // e.stopPropagation();
+            // e.preventDefault();
+            setShowModal(true);
+          }}
+        >
+          <EmptyEmbed
+            buttonText='Add a poll'
+            icon={<FormatListBulleted fontSize='small' />}
+            isSelected={selected}
+            onDelete={deleteNode}
+          />
+        </div>
+      </>
     );
   }
 
