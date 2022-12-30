@@ -31,8 +31,7 @@ describe('softDeleteUserWithoutConnectableIdentities', () => {
             address: `0x${v4()}`
           }
         }
-      },
-      include: sessionUserRelations
+      }
     });
 
     await softDeleteUserWithoutConnectableIdentities({ userId: user.id, newUserId: 'aaa' });
