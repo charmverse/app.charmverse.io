@@ -10,6 +10,7 @@ import { useVotes } from 'hooks/useVotes';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 
 import BlockAligner from '../BlockAligner';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import VoteDetail from '../inlineVote/components/VoteDetail';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
@@ -20,35 +21,6 @@ const StyledEmptyPollContainer = styled(Box)`
   align-items: center;
   opacity: 0.5;
 `;
-
-function EmptyPollContainer({
-  onDelete,
-  isSelected,
-  ...props
-}: HTMLAttributes<HTMLDivElement> & { onDelete: () => void; readOnly: boolean; isSelected?: boolean }) {
-  const theme = useTheme();
-
-  return (
-    <BlockAligner onDelete={onDelete}>
-      <ListItem
-        button
-        disableTouchRipple
-        sx={{
-          backgroundColor: isSelected ? 'var(--charmeditor-active)' : theme.palette.background.light,
-          p: 2,
-          display: 'flex',
-          my: 2
-        }}
-        {...props}
-      >
-        <StyledEmptyPollContainer>
-          <FormatListBulleted fontSize='small' />
-          <Typography>Add a poll</Typography>
-        </StyledEmptyPollContainer>
-      </ListItem>
-    </BlockAligner>
-  );
-}
 
 export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
@@ -62,38 +34,26 @@ export function PollNodeView({ node, readOnly, updateAttrs, selected, deleteNode
     setShowModal(false);
   }
 
-  const emptyPollContainer = (
-    <EmptyPollContainer
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        setShowModal(true);
-      }}
-      readOnly={readOnly}
-      isSelected={selected}
-      onDelete={deleteNode}
-    />
-  );
-
-  if (showModal) {
+  if (!pollId || !votes[pollId]) {
+    if (readOnly) {
+      return <div />;
+    }
     return (
-      <>
+      <MediaSelectionPopup
+        node={node}
+        icon={<FormatListBulleted fontSize='small' />}
+        buttonText='Add a poll'
+        isSelected={selected}
+        onDelete={deleteNode}
+      >
         <CreateVoteModal
           onClose={() => {
             setShowModal(false);
           }}
           onCreateVote={onCreateVote}
         />
-        {emptyPollContainer}
-      </>
+      </MediaSelectionPopup>
     );
-  }
-
-  if (!pollId || !votes[pollId]) {
-    if (readOnly) {
-      return <div />;
-    }
-    return emptyPollContainer;
   }
 
   return (

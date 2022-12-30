@@ -8,6 +8,7 @@ import BlockAligner from '../BlockAligner';
 interface InputProps {
   node: NodeViewProps['node'];
   onDelete: () => void;
+  isSelected: boolean;
   buttonText: string;
   children: React.ReactNode;
   icon: JSX.Element;
@@ -22,7 +23,7 @@ export function MediaSelectionPopup(props: InputProps) {
         <ListItem
           button
           sx={{
-            backgroundColor: 'background.light',
+            backgroundColor: props.isSelected ? 'var(--charmeditor-active)' : 'background.light',
             p: 2,
             display: 'flex',
             borderRadius: 0.5,
