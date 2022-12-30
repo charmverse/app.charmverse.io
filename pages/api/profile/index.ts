@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -33,7 +34,9 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet({ address, id: req.session.anonymousUserId }, signupAnalytics);
+    user = await createUserFromWallet({ address, id: req.session.anonymousUserId, skipENS: true }, signupAnalytics);
+    // Do this separately from signup response to speed things up
+    refreshENSName({ address, userId: user.id });
     user.isNew = true;
 
     logSignupViaWallet();

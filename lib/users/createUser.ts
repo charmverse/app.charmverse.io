@@ -8,13 +8,18 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import { shortenHex, shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
 
 export async function createUserFromWallet(
-  { id = v4(), address = Wallet.createRandom().address, email }: { address?: string; email?: string; id?: string } = {},
+  {
+    id = v4(),
+    address = Wallet.createRandom().address,
+    email,
+    skipENS
+  }: { address?: string; email?: string; id?: string; skipENS?: boolean } = {},
   signupAnalytics: Partial<SignupAnalytics> = {}
 ): Promise<LoggedInUser> {
   const lowercaseAddress = address.toLowerCase();
@@ -23,7 +28,7 @@ export async function createUserFromWallet(
     const user = await getUserProfile('addresses', lowercaseAddress);
     return user;
   } catch (error) {
-    const ens: string | null = await getENSName(address);
+    const ens: string | null = skipENS ? null : await getENSName(address);
     const userPath = shortWalletAddress(address).replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
