@@ -1,5 +1,4 @@
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import Box from '@mui/material/Box';
 import SvgIcon from '@mui/material/SvgIcon';
 import { useState } from 'react';
 
@@ -39,7 +38,7 @@ export function ImportZippedMarkdown() {
   });
 
   return (
-    <Box display='inline'>
+    <>
       <Button
         startIcon={
           <SvgIcon>
@@ -54,6 +53,6 @@ export function ImportZippedMarkdown() {
       </Button>
       <br />
       <input ref={inputRef} hidden onChange={onFileChange} accept='.zip' id='file' name='file' type='file' />
-    </Box>
+    </>
   );
 }

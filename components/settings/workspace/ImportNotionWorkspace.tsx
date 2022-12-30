@@ -1,9 +1,12 @@
 import CompleteIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Dangerous';
 import WarningIcon from '@mui/icons-material/HourglassBottom';
-import { Alert, Box, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
 import SvgIcon from '@mui/material/SvgIcon';
+import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
@@ -18,7 +21,7 @@ import useIsAdmin from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 import type { FailedImportsError } from 'lib/notion/types';
-import { deleteCookie, getCookie } from 'lib/utilities/browser';
+import { deleteCookie, getCookie, isSmallScreen } from 'lib/utilities/browser';
 import NotionIcon from 'public/images/notion_logo.svg';
 
 interface NotionResponseState {
@@ -96,24 +99,28 @@ export default function ImportNotionWorkspace() {
 
   return (
     <div>
-      <Button
-        sx={{ mr: 3 }}
-        disabled={!isAdmin}
-        disabledTooltip='Only admins can import content from Notion'
-        loading={notionState.loading}
-        href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
-        variant='outlined'
-        startIcon={
-          <SvgIcon sx={{ color: 'text.primary' }}>
-            <NotionIcon />
-          </SvgIcon>
-        }
-      >
-        {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
-      </Button>
-
-      {/** This button handles all logic for uploading the markdown files */}
-      <ImportZippedMarkdown />
+      <Grid container spacing={2}>
+        <Grid item md={4} xs={12}>
+          <Button
+            disabled={!isAdmin}
+            disabledTooltip='Only admins can import content from Notion'
+            loading={notionState.loading}
+            href={`/api/notion/login?redirect=${encodeURIComponent(window.location.href.split('?')[0])}`}
+            variant='outlined'
+            startIcon={
+              <SvgIcon sx={{ color: 'text.primary' }}>
+                <NotionIcon />
+              </SvgIcon>
+            }
+          >
+            {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
+          </Button>
+        </Grid>
+        <Grid item md={4} xs={12}>
+          {/** This button handles all logic for uploading the markdown files */}
+          <ImportZippedMarkdown />
+        </Grid>
+      </Grid>
 
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
