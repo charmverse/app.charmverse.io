@@ -72,7 +72,7 @@ export class CharmverseDatabasePage {
       view.fields.viewType = 'board';
       view.parentId = board.id;
       view.rootId = board.rootId;
-      view.title = 'Board view';
+      view.title = '';
 
       const commonBlockData = {
         spaceId: this.notionPage.spaceId,

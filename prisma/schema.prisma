@@ -564,6 +564,7 @@ model SpaceRole {
   tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
   tokenGateId     String?           @db.Uuid
   joinedViaLink   Boolean?
+  onboarded       Boolean           @default(false)
 
   @@unique([spaceId, userId], name: "spaceUser")
   @@index([spaceId])

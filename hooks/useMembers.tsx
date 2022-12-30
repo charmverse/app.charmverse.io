@@ -12,17 +12,23 @@ import { useCurrentSpace } from './useCurrentSpace';
 type Context = {
   members: Member[];
   mutateMembers: KeyedMutator<Member[]>;
+  isLoading: boolean;
 };
 
 const MembersContext = createContext<Readonly<Context>>({
   members: [],
+  isLoading: false,
   mutateMembers: () => Promise.resolve(undefined)
 });
 
 export function MembersProvider({ children }: { children: ReactNode }) {
   const space = useCurrentSpace();
 
-  const { data: members, mutate: mutateMembers } = useSWR(
+  const {
+    data: members,
+    mutate: mutateMembers,
+    isLoading
+  } = useSWR(
     () => (space ? `members/${space?.id}` : null),
     () => {
       return charmClient.members.getMembers(space!.id).then((_members) =>
@@ -36,7 +42,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     }
   );
 
-  const value = useMemo(() => ({ members: members || [], mutateMembers } as Context), [members]);
+  const value = useMemo(() => ({ members: members || [], mutateMembers, isLoading } as Context), [members]);
 
   return <MembersContext.Provider value={value}>{children}</MembersContext.Provider>;
 }
