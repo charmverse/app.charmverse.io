@@ -1,17 +1,11 @@
-import { markdownContent } from './firstTestNote';
-import { parseMarkdown, parseMarkdownStub } from './parseMarkdown';
+import { singularity } from './files';
+import { parseMarkdown } from './parseMarkdown';
 
 describe('parseMarkdown', () => {
   it('should parse markdown into prosemirror nodes', async () => {
     // console.log('Markdown', markdown);
 
-    const parsedNodes = parseMarkdown(markdownContent);
-    // console.log('Parsed nodes', parsedNodes);
-  });
-  it('should parse markdown into prosemirror nodes', async () => {
-    // console.log('Markdown', markdown);
-
-    const parsedNodes = parseMarkdownStub();
+    const parsedNodes = parseMarkdown(singularity);
     // console.log('Parsed nodes', parsedNodes);
   });
 });

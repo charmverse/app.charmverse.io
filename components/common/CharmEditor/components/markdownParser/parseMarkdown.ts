@@ -1,14 +1,8 @@
-import type { Page } from '@prisma/client';
 import markdownit from 'markdown-it/lib';
 import { MarkdownParser } from 'prosemirror-markdown';
 
 import { specRegistry } from '../../specRegistry';
 import { listIsTight } from '../listItem/listIsTight';
-
-// eslint-disable-next-line import/order
-import { images, minutes, singularity } from './files';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },
@@ -57,14 +51,4 @@ export function parseMarkdown(data: string): any {
   }
 
   return baseDoc;
-}
-
-// Test function for now
-
-// Utility function to parse example markdown into prosemirror nodes
-export async function parseMarkdownStub(): Promise<Pick<Page, 'content'>> {
-  // const basicMarkdown = `# This is a test`;
-
-  const parsedNodes = parseMarkdown(images);
-  return parsedNodes;
 }
