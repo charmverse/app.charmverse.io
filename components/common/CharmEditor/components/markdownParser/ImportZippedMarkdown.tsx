@@ -6,6 +6,7 @@ import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
+import useIsAdmin from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PagesMap } from 'lib/pages';
@@ -15,6 +16,7 @@ export function ImportZippedMarkdown() {
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
   const { showMessage } = useSnackbar();
+  const isAdmin = useIsAdmin();
 
   const { inputRef, onFileChange, openFilePicker } = useFilePicker((file) => {
     setIsUploading(true);
@@ -45,6 +47,8 @@ export function ImportZippedMarkdown() {
             <DriveFolderUploadIcon sx={{ fontSize: 60 }} />
           </SvgIcon>
         }
+        disabled={!isAdmin}
+        disabledTooltip='Only admins can import a zipped markdown folder'
         loading={uploading}
         variant='outlined'
         onClick={openFilePicker}

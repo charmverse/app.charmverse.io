@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Space } from '@prisma/client';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,6 +11,8 @@ import type { PageMeta } from 'lib/pages';
 import { getPagePath } from 'lib/pages';
 import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { humanFriendlyDate } from 'lib/utilities/dates';
 import { DataConflictError } from 'lib/utilities/errors';
 
 export const config = {
@@ -31,6 +33,16 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
 
   const chunks: Buffer[] = [];
 
+  const { error } = await hasAccessToSpace({
+    userId,
+    adminOnly: true,
+    spaceId: spaceId as string
+  });
+
+  if (error) {
+    throw error;
+  }
+
   req
     .on('readable', () => {
       // read every incoming chunk. Every chunk is 64Kb data of Buffer
@@ -49,6 +61,8 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
 
         const pagesToCreate: Prisma.PageCreateManyInput[] = [];
 
+        const parentPageId: string | undefined = fileNames.length > 0 ? v4() : undefined;
+
         for (const name of fileNames) {
           // include Markdown but exclude MACOSX files
           const filename = name.split('/').pop() ?? '';
@@ -56,7 +70,6 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
             const file = content.files[name];
 
             const fileMarkdownContent = await file.async('string');
-
             try {
               const parsedContent = parseMarkdown(fileMarkdownContent);
               const pageToCreate: Prisma.PageCreateManyInput = {
@@ -69,6 +82,7 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
                 type: 'page',
                 updatedBy: userId,
                 createdBy: userId,
+                parentId: parentPageId,
                 spaceId: spaceId as string
               };
 
@@ -83,9 +97,63 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
         const createdPages: PageMeta[] = [];
 
         if (pagesToCreate.length > 0) {
+          const parentPage = await prisma.page.create({
+            data: {
+              id: parentPageId,
+              title: `Markdown import ${humanFriendlyDate(new Date(), { withTime: true, withYear: true })}`,
+              content: { type: 'doc', content: [] },
+              contentText: '',
+              hasContent: false,
+              path: getPagePath(),
+              type: 'page',
+              updatedBy: userId,
+              author: {
+                connect: {
+                  id: userId
+                }
+              },
+              space: {
+                connect: {
+                  id: spaceId as string
+                }
+              }
+            },
+            include: {
+              permissions: true
+            }
+          });
+
           await prisma.page.createMany({
             data: pagesToCreate
           });
+          const pageIds = [parentPageId as string, ...pagesToCreate.map((page) => page.id as string)];
+
+          const space = (await prisma.space.findUnique({
+            where: {
+              id: spaceId as string
+            }
+          })) as Space;
+
+          const basePermissions: Prisma.PagePermissionCreateManyInput[] = [];
+
+          pageIds.forEach((pageId) => {
+            basePermissions.push({
+              pageId,
+              permissionLevel: space.defaultPagePermissionGroup ?? 'full_access',
+              spaceId: spaceId as string
+            });
+
+            basePermissions.push({
+              pageId,
+              permissionLevel: 'full_access',
+              userId
+            });
+          });
+
+          await prisma.pagePermission.createMany({
+            data: basePermissions
+          });
+
           const _createdPages = await prisma.page.findMany({
             where: {
               id: {
@@ -95,6 +163,7 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
             select: pageMetaSelect()
           });
 
+          createdPages.push(parentPage);
           createdPages.push(..._createdPages);
         }
         res.status(201).send(createdPages);
