@@ -11,6 +11,7 @@ import charmClient from 'charmClient';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import Button from 'components/common/Button';
+import { ImportZippedMarkdown } from 'components/common/CharmEditor/components/markdownParser/ImportZippedMarkdown';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import useIsAdmin from 'hooks/useIsAdmin';
@@ -96,6 +97,7 @@ export default function ImportNotionWorkspace() {
   return (
     <div>
       <Button
+        sx={{ mr: 3 }}
         disabled={!isAdmin}
         disabledTooltip='Only admins can import content from Notion'
         loading={notionState.loading}
@@ -109,6 +111,10 @@ export default function ImportNotionWorkspace() {
       >
         {notionState.loading ? 'Importing pages from Notion' : 'Import pages from Notion'}
       </Button>
+
+      {/** This button handles all logic for uploading the markdown files */}
+      <ImportZippedMarkdown />
+
       <Modal open={modalOpen} onClose={closeModal} size='fluid'>
         <Box display='flex' alignItems='center' gap={2} flexDirection='column'>
           {notionState.loading && (

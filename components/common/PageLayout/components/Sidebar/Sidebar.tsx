@@ -21,7 +21,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
-import { UploadZippedMarkdown } from 'components/common/CharmEditor/components/markdownParser/UploadMarkdown';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -341,13 +340,6 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
                   <NewPageMenu tooltip='Add a page' addPage={addPage} />
                 </div>
               )}
-            </WorkspaceLabel>
-            <WorkspaceLabel>
-              <SectionName>IMPORT</SectionName>
-              {/* * Test component
-              <MarkdownParser addPage={addPage} />
-              <br /> */}
-              <UploadZippedMarkdown />
             </WorkspaceLabel>
             <Box mb={6}>
               <PageNavigation onClick={closeSidebarIfIsMobile} />
