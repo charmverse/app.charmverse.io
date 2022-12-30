@@ -62,7 +62,7 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
               const parsedContent = parseMarkdown(fileMarkdownContent);
               const pageToCreate: Prisma.PageCreateManyInput = {
                 id: v4(),
-                title: name.replace('.md', ''),
+                title: filename.replace('.md', ''),
                 content: parsedContent,
                 contentText: fileMarkdownContent,
                 hasContent: fileMarkdownContent.length > 0,
