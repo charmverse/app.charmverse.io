@@ -19,8 +19,6 @@ export const config = {
   }
 };
 
-const unzip = jsZip();
-
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
@@ -44,7 +42,8 @@ async function importZippedController(req: NextApiRequest, res: NextApiResponse)
     .on('end', async () => {
       try {
         const buf = Buffer.concat(chunks);
-        const content = await unzip.loadAsync(buf);
+
+        const content = await jsZip().loadAsync(buf);
 
         const fileNames = Object.keys(content.files);
 
