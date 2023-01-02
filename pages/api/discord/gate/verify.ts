@@ -14,7 +14,7 @@ handler.use(requireKeys([{ key: 'spaceId', truthy: true }], 'body')).post(verify
 
 async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { spaceId } = req.body as { spaceId: string };
-  const userId = req.session.user.id;
+  const userId = req.session?.user?.id;
 
   const space = await applyDiscordGate({ spaceId, userId });
 
