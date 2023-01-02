@@ -1,4 +1,5 @@
 import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
+import 'iron-session';
 
 declare module 'iron-session' {
   interface IronSessionData {

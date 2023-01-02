@@ -20,3 +20,5 @@ export type RoleWithMembers = Role & { users: User[] };
 export type Roleup = Pick<Role, 'id' | 'name'> & { members: number };
 
 export type RoleupWithMembers = Roleup & { users: (User | LoggedInUser | Member)[] };
+
+export type ExternalRole = { id: string | number; name: string };

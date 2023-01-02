@@ -63,6 +63,7 @@ import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
+import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
 import { GoogleApi } from './apis/googleApi';
 import { MembersApi } from './apis/membersApi';
@@ -107,6 +108,8 @@ class CharmClient {
   forum = new ForumApi();
 
   mux = new MuxApi();
+
+  file = new FileApi();
 
   unstoppableDomains = new UnstoppableDomainsApi();
 

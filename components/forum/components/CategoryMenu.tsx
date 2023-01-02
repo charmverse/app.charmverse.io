@@ -70,11 +70,10 @@ function ForumFilterListLink({ category, label }: { label: string; category?: Po
 }
 
 export function CategoryMenu() {
-  const { categories, error } = useForumCategories();
+  const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = isAdmin();
   const [forumCategoryName, setForumCategoryName] = useState('');
-  const { createForumCategory } = useForumCategories();
 
   function createCategory() {
     createForumCategory(forumCategoryName);

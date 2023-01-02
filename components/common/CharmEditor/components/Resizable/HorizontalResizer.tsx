@@ -16,17 +16,19 @@ interface ResizerProps {
 }
 
 function Resizer(props: ResizerProps) {
-  const height = props.aspectRatio ? props.width / props.aspectRatio : 0;
+  const width = Math.min(props.width, props.maxWidth || Infinity);
+  const height = props.aspectRatio ? width / props.aspectRatio : 0;
+
   return (
     <ResizableContainer>
       <ResizableBox
         onResize={props.onResize}
-        width={props.width}
+        width={width}
         // @ts-ignore - HACK: give a garbage value to height so react-resizable will not try to calculate it
         height={height || ''}
         resizeHandles={['w', 'e']}
         onResizeStop={props.onResizeStop}
-        minConstraints={[props.minWidth, Infinity]}
+        minConstraints={[props.minWidth, 10]}
         maxConstraints={
           props.maxWidth
             ? [props.maxWidth, props.aspectRatio ? props.maxWidth / props.aspectRatio : Infinity]

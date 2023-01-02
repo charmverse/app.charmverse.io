@@ -38,29 +38,6 @@ describe('disconnectGoogleAccount', () => {
     expect(userAfterDisconnect.googleAccounts.length).toEqual(0);
   });
 
-  it('should mark the user as deleted if the Google Account was their only identity', async () => {
-    const user = await prisma.user.create({
-      data: {
-        username: 'Test user',
-        googleAccounts: {
-          create: {
-            email: `test-${v4()}@example.com`,
-            name: 'Test User',
-            avatarUrl: 'https://example.com/avatar.png'
-          }
-        }
-      },
-      include: sessionUserRelations
-    });
-
-    const userAfterDisconnect = await disconnectGoogleAccount({
-      googleAccountEmail: user.googleAccounts[0].email,
-      userId: user.id
-    });
-
-    expect(userAfterDisconnect.deletedAt).toBeInstanceOf(Date);
-  });
-
   it('should update the users username and identity type to another connected identity, after deleting Google account', async () => {
     const user = await prisma.user.create({
       data: {

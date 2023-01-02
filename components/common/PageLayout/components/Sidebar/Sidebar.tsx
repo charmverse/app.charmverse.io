@@ -222,6 +222,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
         createdBy: user.id,
         spaceId: space.id
       };
+
       addPageAndRedirect(newPage, router).then();
     }
   }, []);
@@ -333,6 +334,7 @@ export default function Sidebar({ closeSidebar, favorites }: SidebarProps) {
             )}
             <WorkspaceLabel>
               <SectionName>WORKSPACE</SectionName>
+              {/** Test component */}
               {userSpacePermissions?.createPage && (
                 <div className='add-a-page'>
                   <NewPageMenu tooltip='Add a page' addPage={addPage} />

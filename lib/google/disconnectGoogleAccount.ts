@@ -1,6 +1,5 @@
 import { prisma } from 'db';
 import { sessionUserRelations } from 'lib/session/config';
-import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
@@ -42,7 +41,5 @@ export async function disconnectGoogleAccount({
     }
   });
 
-  await updateUsedIdentity(user.id);
-
-  return softDeleteUserWithoutConnectableIdentities(user.id);
+  return updateUsedIdentity(user.id);
 }

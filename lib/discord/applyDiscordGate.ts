@@ -2,6 +2,7 @@ import type { Space } from '@prisma/client';
 
 import { prisma } from 'db';
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
+import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 type Props = {
@@ -17,7 +18,11 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
     throw new InvalidInputError('Space not found');
   }
 
-  const { isEligible } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
+  if (!user) {
+    throw new InvalidInputError('User not found');
+  }
+
+  const { isEligible, roles } = await verifyDiscordGateForSpace({ space, discordUserId: user?.discordUser?.discordId });
 
   if (!isEligible) {
     return null;
@@ -47,6 +52,8 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
       }
     });
   }
+
+  await createAndAssignRoles({ userId, spaceId, roles });
 
   return space;
 }
