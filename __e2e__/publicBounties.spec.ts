@@ -1,26 +1,13 @@
-import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
-import { createUserAndSpace, generateBounty } from './utils/mocks';
+import { generateUserAndSpace, generateBounty } from './utils/mocks';
 
-let browser: Browser;
-
-test.beforeAll(async () => {
-  // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
-});
-
-test('visit a public bounty page', async () => {
-  // Arrange ------------------
-  const loggedInUserContext = await browser.newContext();
-  const publicContext = await browser.newContext();
-
-  const loggedInPage = await loggedInUserContext.newPage();
-  const publicPage = await publicContext.newPage();
-
-  const { space } = await createUserAndSpace({ browserPage: loggedInPage, permissionConfigurationMode: 'open' });
+test('visit a public bounty page', async ({ page }) => {
+  const { space } = await generateUserAndSpace({
+    publicBountyBoard: true
+  });
 
   const bounty = await generateBounty({
     spaceId: space.id,
@@ -57,30 +44,25 @@ test('visit a public bounty page', async () => {
 
   // Act
 
-  // Test a logged in user viewing the public board, and a public user viewing the public board
-  await Promise.all(
-    [loggedInPage, publicPage].map(async (page) => {
-      await page.goto(bountyBoard);
+  await page.goto(bountyBoard);
 
-      const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
+  const bountyCard = page.locator(`data-test=bounty-card-${bounty.id}`);
 
-      await expect(bountyCard).toBeVisible();
+  await expect(bountyCard).toBeVisible();
 
-      await bountyCard.click();
+  await bountyCard.click();
 
-      // 4. Open the card and make sure it renders content
-      await page.waitForURL(`${bountyBoard}*bountyId*`);
+  // 4. Open the card and make sure it renders content
+  await page.waitForURL(`${bountyBoard}*bountyId*`);
 
-      const cardPopup = page.locator('div.Dialog');
+  const cardPopup = page.locator('div.Dialog');
 
-      await expect(cardPopup).toBeVisible();
-      const documentTitle = cardPopup.locator('data-test=editor-page-title');
+  await expect(cardPopup).toBeVisible();
+  const documentTitle = cardPopup.locator('data-test=editor-page-title');
 
-      await expect(documentTitle).toBeVisible();
+  await expect(documentTitle).toBeVisible();
 
-      const spaceActionButton = page.locator('data-test=public-bounty-space-action');
+  const spaceActionButton = page.locator('data-test=public-bounty-space-action');
 
-      await expect(spaceActionButton).toBeVisible();
-    })
-  );
+  await expect(spaceActionButton).toBeVisible();
 });

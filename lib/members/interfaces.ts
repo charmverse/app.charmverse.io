@@ -38,6 +38,7 @@ export type Member = Omit<User, 'addresses'> & {
   profile: UserDetails | null;
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
+  onboarded: boolean;
 };
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;

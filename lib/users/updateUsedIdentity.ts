@@ -2,9 +2,10 @@ import type { Prisma } from '@prisma/client';
 import { IdentityType } from '@prisma/client';
 
 import { prisma } from 'db';
-import getENSName from 'lib/blockchain/getENSName';
+import { getENSName } from 'lib/blockchain/getENSName';
 import { sessionUserRelations } from 'lib/session/config';
 import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -33,7 +34,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
 
     if (identityType === 'Google' && !user.googleAccounts.some((acc) => acc.name === displayName)) {
       throw new InsecureOperationError(`User ${userId} does not have a Google account with name ${displayName}`);
-    } else if (identityType === 'Discord' && (!user.discordUser?.account as any)?.username !== displayName) {
+    } else if (identityType === 'Discord' && (user.discordUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Discord account with name ${displayName}`);
     } else if (
       identityType === 'UnstoppableDomain' &&
@@ -41,12 +42,8 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
     ) {
       throw new InsecureOperationError(`User ${userId} does not have an Unstoppable Domain with name ${displayName}`);
     } else if (identityType === 'Wallet') {
-      if (!user.wallets.some((wallet) => wallet.address === displayName)) {
-        const ensNames = await Promise.all(user.wallets.map((wallet) => getENSName(wallet.address)));
-        const matchingENSNameFound = ensNames.some((ensName) => ensName === displayName);
-        if (!matchingENSNameFound) {
-          throw new InsecureOperationError(`User ${userId} does not have a wallet with address ${displayName}`);
-        }
+      if (!user.wallets.some((wallet) => matchWalletAddress(displayName, wallet))) {
+        throw new InsecureOperationError(`User ${userId} does not have wallet with address or ensname ${displayName}`);
       }
     } else if (identityType === 'Telegram' && (user.telegramUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Telegram account with name ${displayName}`);
@@ -57,7 +54,7 @@ export async function updateUsedIdentity(userId: string, identityUpdate?: Identi
         id: userId
       },
       data: {
-        username: displayName,
+        username: shortWalletAddress(displayName),
         identityType
       },
       include: sessionUserRelations

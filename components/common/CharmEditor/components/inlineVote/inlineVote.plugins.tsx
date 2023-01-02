@@ -1,10 +1,10 @@
 import type { RawPlugins } from '@bangle.dev/core';
 import { Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
+import type { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import reactDOM from 'react-dom';
 
-import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
+import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineVoteRows } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
@@ -99,26 +99,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
           return tr.docChanged ? getDecorations({ schema: editorState.schema, doc: tr.doc }) : old;
         }
       },
-      props: {
-        decorations(state: EditorState) {
-          return this.getState(state);
-        },
-        handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          const inlineCommentContainer = (event.target as HTMLElement)?.closest('.charm-row-decoration-votes');
-          const ids = inlineCommentContainer?.getAttribute('data-ids')?.split(',') || [];
-          if (ids.length > 0) {
-            return highlightElement({
-              ids,
-              view,
-              elementId: 'page-action-sidebar',
-              key,
-              markName,
-              prefix: 'vote'
-            });
-          }
-          return false;
-        }
-      }
+      props: {}
     })
   ];
 }

@@ -16,7 +16,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { DialogTitle } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import Avatar from 'components/settings/workspace/LargeAvatar';
-import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import log from 'lib/log';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
@@ -62,7 +61,6 @@ export default function WorkspaceSettings({
     defaultValues: defaultValues || getDefaultName(),
     resolver: yupResolver(schema)
   });
-  const { showOnboarding } = useOnboarding();
 
   const watchName = watch('name');
   const watchDomain = watch('domain');
@@ -94,9 +92,6 @@ export default function WorkspaceSettings({
         },
         ...values
       });
-      if (space) {
-        showOnboarding(space.id);
-      }
     } catch (err) {
       log.error('Error creating space', err);
       setSaveError((err as Error).message || err);

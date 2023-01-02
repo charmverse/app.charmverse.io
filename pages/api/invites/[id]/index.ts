@@ -50,7 +50,6 @@ async function acceptInvite(req: NextApiRequest, res: NextApiResponse) {
         joinedViaLink: true
       }
     });
-
     logInviteAccepted({ spaceId: createdSpaceRole.spaceId });
 
     updateTrackUserProfileById(userId);

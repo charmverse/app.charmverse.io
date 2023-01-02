@@ -1,4 +1,5 @@
 import type { Page } from '@prisma/client';
+import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { SubmissionContent } from 'lib/applications/interfaces';
@@ -60,4 +61,7 @@ export function generateSubmissionContent(): SubmissionContent {
       '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission and all of its content"}]}]}',
     walletAddress: '0x123456789'
   };
+}
+export function randomETHWalletAddress() {
+  return Wallet.createRandom().address.toLowerCase();
 }

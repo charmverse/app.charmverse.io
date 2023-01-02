@@ -16,7 +16,6 @@ import type { IPagePermissionFlags } from 'lib/permissions/pages';
 
 import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
 import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
-import InlineVoteSubMenu from '../inlineVote/components/InlineVoteSubmenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
 import type { SubMenu } from './floating-menu';
@@ -29,7 +28,6 @@ import {
   FloatingLinkButton,
   HeadingButton,
   InlineCommentButton,
-  InlineVoteButton,
   ItalicButton,
   ParagraphButton,
   StrikeButton,
@@ -64,7 +62,6 @@ function MenuByType(props: MenuProps) {
     inline,
     pagePermissions,
     enableComments,
-    enableVoting,
     nestedPagePluginKey,
     disableNestedPage
   } = props;
@@ -73,7 +70,6 @@ function MenuByType(props: MenuProps) {
 
   const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
-  const displayInlineVoteButton = !inline && pagePermissions?.create_poll && enableVoting;
   const [activeItem, setActiveItem] = useState('Text');
   const handleActiveItem = (item: string) => setActiveItem(item);
   const view = useEditorViewContext();
@@ -87,7 +83,6 @@ function MenuByType(props: MenuProps) {
     return (
       <Menu hideMenu={hideMenu}>
         <InlineCommentButton enableComments menuKey={pluginKey} />
-        {enableVoting && <InlineVoteButton enableVotes menuKey={pluginKey} />}
       </Menu>
     );
   }
@@ -128,7 +123,6 @@ function MenuByType(props: MenuProps) {
           <CodeButton />
           <FloatingLinkButton menuKey={pluginKey} />
           {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
-          {displayInlineVoteButton && <InlineVoteButton enableVotes menuKey={pluginKey} />}
         </MenuGroup>
         {!inline && (
           <MenuGroup>
@@ -164,12 +158,5 @@ function MenuByType(props: MenuProps) {
     );
   }
 
-  if (type === 'inlineVoteSubMenu' && !inline) {
-    return (
-      <Menu hideMenu={hideMenu}>
-        <InlineVoteSubMenu pluginKey={pluginKey} />
-      </Menu>
-    );
-  }
   return null;
 }

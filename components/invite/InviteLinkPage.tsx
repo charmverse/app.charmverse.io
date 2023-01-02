@@ -2,14 +2,11 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
 
 import charmClient from 'charmClient';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/WalletSign';
 import WorkspaceAvatar from 'components/settings/workspace/LargeAvatar';
-import { useOnboarding } from 'hooks/useOnboarding';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { InviteLinkPopulated } from 'lib/invites';
@@ -18,9 +15,8 @@ import { CenteredBox } from './components/CenteredBox';
 
 export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
-  const { connectWallet, walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
+  const { walletAuthSignature, verifiableWalletDetected } = useWeb3AuthSig();
   const { loginFromWeb3Account } = useUser();
-  const { showOnboarding } = useOnboarding();
   const router = useRouter();
 
   async function joinSpace() {
@@ -29,7 +25,6 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
     }
     await charmClient.acceptInvite({ id: invite.id });
     window.location.href = `/${invite.space.domain}`;
-    showOnboarding(invite.space.id);
   }
 
   return (

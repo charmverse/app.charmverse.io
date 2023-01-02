@@ -19,11 +19,11 @@ import { useSWRConfig } from 'swr';
 import charmClient from 'charmClient';
 import CommentsSidebar from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
 import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
-import PageInlineVotesList from 'components/[pageId]/DocumentPage/components/VotesSidebar';
 import * as codeBlock from 'components/common/CharmEditor/components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { BangleEditor as ReactBangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import * as poll from 'components/common/CharmEditor/components/poll';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
@@ -57,7 +57,6 @@ import InlineDatabase from './components/inlineDatabase/components/InlineDatabas
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
-import InlineVoteList from './components/inlineVote/components/InlineVoteList';
 import * as listItem from './components/listItem/listItem';
 import Mention, { mentionPluginKeyName, mentionPlugins, MentionSuggest } from './components/mention';
 import NestedPage, { nestedPagePluginKeyName, nestedPagePlugins, NestedPagesList } from './components/nestedPage';
@@ -213,6 +212,10 @@ export function charmEditorPlugins({
       name: 'inlineDatabase',
       containerDOM: ['div', { draggable: 'false' }]
     }),
+    NodeView.createPlugin({
+      name: 'poll',
+      containerDOM: ['div', { draggable: 'false' }]
+    }),
     tabIndent.plugins(),
     table.tableEditing({ allowTableNodeSelection: true }),
     table.columnHandles(),
@@ -309,19 +312,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ disablePageSpecificF
       }
       cursor: pointer;
     }
-
-    .charm-inline-vote {
-      background: rgba(0,171,255,0.14);
-      border-bottom: 2px solid rgb(0,171,255);
-      padding-bottom: 2px;
-      // disable hover UX on ios which converts first click to a hover event
-      @media (pointer: fine) {
-        &:hover {
-          background: rgba(0,171,255,0.56) !important;
-        }
-      }
-      cursor: pointer;
-    }
   `}
 
   ${fiduswriterStyles}
@@ -394,10 +384,8 @@ function CharmEditor({
   const currentSpace = useCurrentSpace();
   const { setCurrentPageActionDisplay } = usePageActionDisplay();
   const { user } = useUser();
-
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate;
-
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
     const deletedThreadIds = extractDeletedThreadIds(specRegistry.schema, doc, prevDoc);
     if (deletedThreadIds.length) {
@@ -535,7 +523,7 @@ function CharmEditor({
       isContentControlled={isContentControlled}
       enableSuggestions={enableSuggestingMode}
       onParticipantUpdate={onParticipantUpdate}
-      trackChanges={true}
+      trackChanges
       readOnly={readOnly}
       style={{
         ...(style ?? {}),
@@ -622,6 +610,9 @@ function CharmEditor({
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
           }
+          case 'poll': {
+            return <poll.Component {...allProps} />;
+          }
           case 'inlineDatabase': {
             return <InlineDatabase containerWidth={containerWidth} {...allProps} />;
           }
@@ -676,10 +667,8 @@ function CharmEditor({
               />
             )}
             {pageActionDisplay === 'comments' && <CommentsSidebar />}
-            {pageActionDisplay === 'polls' && <PageInlineVotesList />}
           </SidebarDrawer>
           <InlineCommentThread pluginKey={inlineCommentPluginKey} />
-          {enableVoting && <InlineVoteList pluginKey={inlineVotePluginKey} />}
           {currentSpace && pageId && (
             <SuggestionsPopup
               pageId={pageId}

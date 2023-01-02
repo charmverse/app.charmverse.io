@@ -24,6 +24,7 @@ import { injectIntl } from 'react-intl';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { formatViewTitle } from 'lib/focalboard/boardView';
 
 import type { BoardView } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
@@ -219,7 +220,7 @@ function ViewTabs(props: ViewTabsProps) {
                 id={view.id}
                 href={!disableUpdatingUrl ? (activeView?.id === view.id ? null : getViewUrl(view.id)) : ''}
               >
-                {view.title}
+                {view.title || formatViewTitle(view)}
               </StyledButton>
             }
             sx={{ p: 0, mb: '5px' }}
@@ -290,7 +291,7 @@ function ViewTabs(props: ViewTabsProps) {
                 dense
               >
                 <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-                <ListItemText>{view.title}</ListItemText>
+                <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
               </MenuItem>
             );
             return disableUpdatingUrl ? (

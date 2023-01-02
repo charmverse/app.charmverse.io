@@ -1,5 +1,5 @@
 import { IdentityType } from '@prisma/client';
-import getENSName from 'lib/blockchain/getENSName';
+import {getENSName} from 'lib/blockchain/getENSName';
 import { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import log from 'lib/log';
 import { shortenHex } from 'lib/utilities/strings';
