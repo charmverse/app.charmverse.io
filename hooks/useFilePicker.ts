@@ -20,5 +20,11 @@ export function useFilePicker(onFile: (file: File) => void) {
     event.target.value = '';
   };
 
-  return { inputRef, openFilePicker, onFileChange };
+  const onFileChangeWithMultipart = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    onFile(formData as any);
+  };
+
+  return { inputRef, openFilePicker, onFileChange, onFileChangeWithMultipart };
 }

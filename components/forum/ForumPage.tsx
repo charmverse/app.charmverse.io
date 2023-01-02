@@ -12,6 +12,7 @@ import { useRef, useEffect, useState } from 'react';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -24,9 +25,11 @@ export default function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
-  const categoryId = router.query.categoryId as string | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
+  const { categories } = useForumCategories();
+  const categoryId = router.query.categoryId as string | undefined;
+  const currentCategory = categories.find((category) => category.id === categoryId);
 
   function handleCategoryUpdate(_categoryId?: string) {
     const pathname = `/${currentSpace?.domain}/forum`;
@@ -78,7 +81,7 @@ export default function ForumPage() {
   return (
     <CenteredPageContent>
       <Typography variant='h1' mb={2}>
-        Forum
+        {`${currentCategory ? `${currentCategory?.name} - ` : ''}Forum`}
       </Typography>
 
       <TextField
@@ -98,11 +101,11 @@ export default function ForumPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} lg={9}>
           <Box display={{ lg: 'none' }}>
-            <CategorySelect onSelect={handleCategoryUpdate} selectedCategory={categoryId} />
+            <CategorySelect onSelect={handleCategoryUpdate} selectedCategory={currentCategory?.id} />
           </Box>
           <CreateForumPost onClick={showNewPostPopup} />
           {currentSpace && <PostDialog open={showNewPostForm} onClose={hideNewPostPopup} spaceId={currentSpace.id} />}
-          <ForumPostList search={search} categoryId={categoryId} />
+          <ForumPostList search={search} categoryId={currentCategory?.id} />
         </Grid>
         <Grid item xs={12} lg={3} display={{ xs: 'none', lg: 'initial' }}>
           <CategoryMenu />

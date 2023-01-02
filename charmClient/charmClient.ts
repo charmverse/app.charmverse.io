@@ -63,6 +63,7 @@ import { BlockchainApi } from './apis/blockchainApi';
 import { BountiesApi } from './apis/bountiesApi';
 import { CollablandApi } from './apis/collablandApi';
 import { CommentsApi } from './apis/commentsApi';
+import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
 import { MembersApi } from './apis/membersApi';
 import { ProfileApi } from './apis/profileApi';
@@ -103,6 +104,8 @@ class CharmClient {
   forum = new ForumApi();
 
   mux = new MuxApi();
+
+  file = new FileApi();
 
   async socket() {
     return http.GET<SocketAuthReponse>('/api/socket');

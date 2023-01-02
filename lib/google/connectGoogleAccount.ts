@@ -63,13 +63,7 @@ export async function connectGoogleAccount({
     }
   });
   if (googleAccount && googleAccount.userId !== userId) {
-    const oldUser = await prisma.user.findUnique({
-      where: {
-        id: googleAccount.userId
-      },
-      include: sessionUserRelations
-    });
-    await softDeleteUserWithoutConnectableIdentities(oldUser as LoggedInUser);
+    await softDeleteUserWithoutConnectableIdentities({ userId: googleAccount.userId, newUserId: userId });
   }
   return getUserProfile('id', userId);
 }
