@@ -96,7 +96,7 @@ describe('listForumPosts', () => {
     const category2 = await createPostCategory({ spaceId: space.id, name: 'Test Category 2' });
     const category3 = await createPostCategory({ spaceId: space.id, name: 'Test Category 3' });
 
-    const forumPosts = await generateForumPosts({
+    const postsInCategory1 = await generateForumPosts({
       spaceId: extraSpace.id,
       createdBy: extraUser.id,
       count: 20,
