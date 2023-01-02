@@ -1,46 +1,42 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 
-import { useLocalStorage } from './useLocalStorage';
+import charmClient from 'charmClient';
+
+import { useCurrentSpace } from './useCurrentSpace';
+import { useMembers } from './useMembers';
 import { useUser } from './useUser';
 
 type IContext = {
-  onboarding: Record<string, boolean>;
-  showOnboarding: (spaceId: string) => void;
-  hideOnboarding: (spaceId: string) => void;
+  onboarded: boolean | null | undefined;
+  completeOnboarding(): Promise<void>;
 };
 
 export const OnboardingContext = createContext<Readonly<IContext>>({
-  onboarding: {},
-  showOnboarding: () => {},
-  hideOnboarding: () => {}
+  onboarded: null,
+  completeOnboarding: () => ({} as any)
 });
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
-  const [onboarding, setOnboarding] = useLocalStorage(user ? `onboarding-${user.id}` : null, {});
+  const currentSpace = useCurrentSpace();
+  const { members, mutateMembers, isLoading } = useMembers();
 
-  function showOnboarding(spaceId: string) {
-    setOnboarding((_onboarding) => ({
-      ..._onboarding,
-      [spaceId]: true
-    }));
-  }
-
-  function hideOnboarding(spaceId: string) {
-    setOnboarding((_onboarding) => ({
-      ..._onboarding,
-      [spaceId]: false
-    }));
+  async function completeOnboarding() {
+    if (currentSpace && user) {
+      await charmClient.completeOnboarding({
+        spaceId: currentSpace.id
+      });
+      mutateMembers(members.map((member) => (member.id === user.id ? { ...member, onboarded: true } : member)));
+    }
   }
 
   const value: IContext = useMemo(
     () => ({
-      onboarding,
-      showOnboarding,
-      hideOnboarding
+      onboarded: isLoading || !user ? null : members.find((member) => member.id === user.id)?.onboarded ?? false,
+      completeOnboarding
     }),
-    [onboarding]
+    [members]
   );
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;

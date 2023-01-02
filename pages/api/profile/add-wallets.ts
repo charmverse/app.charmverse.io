@@ -3,23 +3,21 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getUserProfile } from 'lib/users/getUser';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
-
-import { handleNoProfile } from './index';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.post(addWalletsController);
 
 async function addWalletsController(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
-  let user: LoggedInUser & { addressesToAdd?: AuthSig[] };
-
+  const userId = req.session.user.id;
   const addressesToAdd = req.body.addressesToAdd as AuthSig[];
 
   for (const addressToVerify of addressesToAdd) {
@@ -38,22 +36,15 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
     data: addressesToAdd.map((signature) => ({ userId: req.session.user.id, address: signature.address.toLowerCase() }))
   });
 
-  const updatedProfile = (await prisma.user.findUnique({
-    where: {
-      id: req.session.user.id
-    },
-    include: sessionUserRelations
-  })) as LoggedInUser;
-
-  if (!updatedProfile) {
-    return handleNoProfile(req, res);
-  } else {
-    user = updatedProfile;
+  for (const authSig of addressesToAdd) {
+    await refreshENSName({ userId, address: authSig.address });
   }
 
-  updateTrackUserProfile(user);
+  const updatedProfile = await getUserProfile('id', userId);
 
-  return res.status(200).json(user);
+  updateTrackUserProfile(updatedProfile);
+
+  return res.status(200).json(updatedProfile);
 }
 
 export default withSessionRoute(handler);

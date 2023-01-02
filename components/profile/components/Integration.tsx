@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, Divider, Grid, Typography } from '@mui/material';
+import { Box, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import type { IdentityType } from '@prisma/client';
 import type { ReactNode } from 'react';
 
@@ -20,27 +20,34 @@ type IntegrationProps = {
   identityType: IdentityType;
   name: string;
   username: string;
+  // Used for showing email for Google accounts, and wallet address for shortened wallet names or ens names
+  secondaryUserName?: string;
   useIntegration: (id: string, type: IdentityType) => void;
 };
 
 function Integration(props: IntegrationProps) {
-  const { isInUse, icon, action, username, name, identityType, useIntegration } = props;
+  const { isInUse, icon, action, username, name, identityType, useIntegration, secondaryUserName } = props;
 
   return (
     <Grid container>
-      <Grid item xs={10}>
+      <Grid container item xs={10}>
         <Box py={2} px={1}>
           <Box display='flex' gap={1} alignItems='flex-end' mb={1}>
             {icon}
             {/* use smaller font size fofr wallet addresses and larger strings */}
-            <Typography component='span' fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
-              {username}
-              {action}
-            </Typography>
+            <Tooltip title={secondaryUserName ?? ''}>
+              <Typography component='span' fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
+                {username}
+                {action}
+              </Typography>
+            </Tooltip>
           </Box>
           <IntegrationName variant='caption'>{name}</IntegrationName>
         </Box>
+
+        <Grid item></Grid>
       </Grid>
+
       <Grid item container direction='column' xs={2}>
         <Box display='flex' alignItems='center' justifyContent='flex-end' height='100%'>
           {isInUse ? (

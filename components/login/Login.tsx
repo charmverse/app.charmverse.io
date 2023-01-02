@@ -114,7 +114,13 @@ export function Login() {
 
   return (
     <div>
-      <Button onClick={handleClickOpen} data-test='universal-connect-button' size='large' primary>
+      <Button
+        sx={{ width: '100%' }}
+        onClick={handleClickOpen}
+        data-test='universal-connect-button'
+        size='large'
+        primary
+      >
         Connect
       </Button>
       <LoginHandler selectedValue={selectedValue} open={open} onClose={handleClose} />

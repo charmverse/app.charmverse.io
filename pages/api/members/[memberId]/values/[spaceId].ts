@@ -4,8 +4,9 @@ import nc from 'next-connect';
 import { getSpacePropertyValues } from 'lib/members/getSpacePropertyValues';
 import type { PropertyValue, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import { updateMemberPropertyValues } from 'lib/members/updateMemberPropertyValues';
-import { hasAccessToSpace, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

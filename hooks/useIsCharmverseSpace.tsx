@@ -10,5 +10,5 @@ import { useCurrentSpace } from './useCurrentSpace';
 export function useIsCharmverseSpace() {
   const currentSpace = useCurrentSpace();
 
-  return !isProdEnv || (isProdEnv && currentSpace?.domain === 'charmverse');
+  return !isProdEnv || currentSpace?.domain === 'charmverse' || currentSpace?.domain.startsWith('cvt-');
 }
