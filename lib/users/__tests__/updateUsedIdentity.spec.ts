@@ -1,0 +1,322 @@
+import { v4 } from 'uuid';
+
+import { prisma } from 'db';
+import { sessionUserRelations } from 'lib/session/config';
+import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { shortWalletAddress } from 'lib/utilities/strings';
+import { randomETHWalletAddress } from 'testing/generate-stubs';
+
+import { updateUsedIdentity } from '../updateUsedIdentity';
+
+describe('updateUsedIdentity', () => {
+  it('should update the user identity type and username to the first connected identity if no identity is provided in this order: [wallet, discord, unstoppable domain, google account]', async () => {
+    const userWithWalletAndDiscord = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        wallets: {
+          create: {
+            address: `0x${v4()}`
+          }
+        },
+        discordUser: {
+          create: {
+            discordId: `1234567890-${v4()}`,
+            account: {}
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userWithWalletAndDiscordAfterUpdate = await updateUsedIdentity(userWithWalletAndDiscord.id);
+
+    expect(userWithWalletAndDiscordAfterUpdate.username).toBe(userWithWalletAndDiscord.wallets[0].address);
+    expect(userWithWalletAndDiscordAfterUpdate.identityType).toBe(`Wallet`);
+
+    // --------------
+    const userWithDiscordAndUnstoppableDomain = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        discordUser: {
+          create: {
+            discordId: `1234567890-${v4()}`,
+            account: {
+              username: 'Discord Pseudonym'
+            }
+          }
+        },
+        unstoppableDomains: {
+          create: {
+            domain: `example-${v4()}.nft`
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userWithDiscordAndUnstoppableDomainAfterUpdate = await updateUsedIdentity(
+      userWithDiscordAndUnstoppableDomain.id
+    );
+
+    expect(userWithDiscordAndUnstoppableDomainAfterUpdate.username).toBe(
+      (userWithDiscordAndUnstoppableDomain.discordUser?.account as any).username
+    );
+    expect(userWithDiscordAndUnstoppableDomainAfterUpdate.identityType).toBe(`Discord`);
+
+    // --------------
+    const userWithUnstoppableDomainAndGoogle = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        unstoppableDomains: {
+          create: {
+            domain: `example-${v4()}.nft`
+          }
+        },
+        googleAccounts: {
+          create: {
+            email: `test-${v4()}@example.com`,
+            name: 'Test User Google profile',
+            avatarUrl: 'https://example.com/avatar.png'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userWithUnstoppableDomainAndGoogleAfterUpdate = await updateUsedIdentity(
+      userWithUnstoppableDomainAndGoogle.id
+    );
+
+    expect(userWithUnstoppableDomainAndGoogleAfterUpdate.username).toBe(
+      userWithUnstoppableDomainAndGoogle.unstoppableDomains[0].domain
+    );
+    expect(userWithUnstoppableDomainAndGoogleAfterUpdate.identityType).toBe(`UnstoppableDomain`);
+
+    // --------------
+    const userWithGoogle = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        googleAccounts: {
+          create: {
+            email: `test-${v4()}@example.com`,
+            name: 'Test User Google profile',
+            avatarUrl: 'https://example.com/avatar.png'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userWithGoogleAfterUpdate = await updateUsedIdentity(userWithGoogle.id);
+
+    expect(userWithGoogleAfterUpdate.username).toBe(userWithGoogle.googleAccounts[0].name);
+    expect(userWithGoogleAfterUpdate.identityType).toBe(`Google`);
+  });
+
+  it('should update a user identity to the short version of the specified Wallet address', async () => {
+    const address = randomETHWalletAddress();
+
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        wallets: {
+          create: {
+            address
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Wallet',
+      displayName: user.wallets[0].address
+    });
+
+    expect(userAfterUpdate.username).toBe(shortWalletAddress(user.wallets[0].address));
+    expect(userAfterUpdate.identityType).toBe(`Wallet`);
+
+    // Reset identity
+    await updateUsedIdentity(user.id, {
+      identityType: 'RandomName',
+      displayName: 'random name'
+    });
+
+    // Make sure we support update using shortform version of address
+    const userAfterSecondUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Wallet',
+      displayName: shortWalletAddress(user.wallets[0].address)
+    });
+
+    expect(userAfterSecondUpdate.username).toBe(shortWalletAddress(user.wallets[0].address));
+    expect(userAfterSecondUpdate.identityType).toBe(`Wallet`);
+  });
+
+  it('should update a user identity to their connected ENS name', async () => {
+    const ensname = `example-${v4()}.nft`;
+
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        wallets: {
+          create: {
+            address: v4(),
+            ensname
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Wallet',
+      displayName: ensname
+    });
+
+    expect(userAfterUpdate.username).toBe(ensname);
+    expect(userAfterUpdate.identityType).toBe(`Wallet`);
+  });
+
+  it('should update a user identity to their connected Unstoppable Domain', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        unstoppableDomains: {
+          create: {
+            domain: `example-${v4()}.nft`
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'UnstoppableDomain',
+      displayName: user.unstoppableDomains[0].domain
+    });
+
+    expect(userAfterUpdate.username).toBe(user.unstoppableDomains[0].domain);
+    expect(userAfterUpdate.identityType).toBe(`UnstoppableDomain`);
+  });
+
+  it('should update a user identity to their connected Google Account username', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        googleAccounts: {
+          create: {
+            avatarUrl: 'https://example.com/avatar.png',
+            email: `test-${v4()}@example.com`,
+            name: 'Test User Google profile'
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Google',
+      displayName: user.googleAccounts[0].name
+    });
+
+    expect(userAfterUpdate.username).toBe(user.googleAccounts[0].name);
+    expect(userAfterUpdate.identityType).toBe(`Google`);
+  });
+
+  it('should update a user identity to their connected Telegram username', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName',
+        telegramUser: {
+          create: {
+            account: {
+              username: `Telegram User ${v4()}`
+            },
+            telegramId: Math.round(Math.random() * 1000000)
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    const userAfterUpdate = await updateUsedIdentity(user.id, {
+      identityType: 'Telegram',
+      displayName: (user.telegramUser?.account as any).username
+    });
+
+    expect(userAfterUpdate.username).toBe((user.telegramUser?.account as any).username);
+    expect(userAfterUpdate.identityType).toBe(`Telegram`);
+  });
+
+  it('should throw an error if user does not exist', async () => {
+    await expect(updateUsedIdentity(v4())).rejects.toBeInstanceOf(MissingDataError);
+  });
+  it('should throw an error if passing an empty display name', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name'
+      }
+    });
+    await expect(
+      updateUsedIdentity(user.id, { displayName: null as any, identityType: 'Google' })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should throw an error if passing an invalid identity type', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name'
+      }
+    });
+    await expect(
+      updateUsedIdentity(user.id, { displayName: 'Test', identityType: 'invalid' as any })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should throw an error if trying to update identity to a non connected identity', async () => {
+    const user = await prisma.user.create({
+      data: {
+        username: 'random-name',
+        identityType: 'RandomName'
+      },
+      include: sessionUserRelations
+    });
+
+    await expect(
+      updateUsedIdentity(user.id, {
+        identityType: 'Google',
+        displayName: 'test@example.com'
+      })
+    ).rejects.toBeInstanceOf(InsecureOperationError);
+
+    await expect(
+      updateUsedIdentity(user.id, {
+        identityType: 'UnstoppableDomain',
+        displayName: 'test.nft'
+      })
+    ).rejects.toBeInstanceOf(InsecureOperationError);
+
+    await expect(
+      updateUsedIdentity(user.id, {
+        identityType: 'Wallet',
+        displayName: '0x123'
+      })
+    ).rejects.toBeInstanceOf(InsecureOperationError);
+
+    await expect(
+      updateUsedIdentity(user.id, {
+        identityType: 'Telegram',
+        displayName: 'telegram name'
+      })
+    ).rejects.toBeInstanceOf(InsecureOperationError);
+  });
+});

@@ -3,11 +3,12 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireCustomPermissionMode } from 'lib/middleware/requireCustomPermissionMode';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

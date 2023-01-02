@@ -4,8 +4,10 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
@@ -68,6 +70,14 @@ export default function ForumPage() {
     }
   }, [router.query.pageId]);
 
+  const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
+
+  useEffect(() => {
+    return () => {
+      debounceSearch.cancel();
+    };
+  }, [debounceSearch]);
+
   return (
     <CenteredPageContent>
       <Typography variant='h1' mb={2}>
@@ -77,9 +87,7 @@ export default function ForumPage() {
       <TextField
         variant='outlined'
         placeholder='Search posts'
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
+        onChange={debounceSearch}
         fullWidth
         sx={{ padding: '20px 0' }}
         InputProps={{

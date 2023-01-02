@@ -11,7 +11,7 @@ export async function voteForumPost({
 }: {
   pageId: string;
   userId: string;
-  upvoted?: boolean;
+  upvoted: boolean | null;
 }) {
   const page = await getForumPost({ pageId, userId });
 
@@ -19,7 +19,7 @@ export async function voteForumPost({
     throw new PageNotFoundError(pageId);
   }
 
-  if (upvoted === undefined) {
+  if (upvoted === null) {
     await prisma.pageUpDownVote.delete({
       where: {
         createdBy_pageId: {

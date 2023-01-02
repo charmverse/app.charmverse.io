@@ -238,7 +238,7 @@ function CenterPanel(props: Props) {
           if (space) {
             await mutate(
               `pages/${space.id}`,
-              async (_pages: Record<string, Page>): Promise<Record<string, Page>> => {
+              async (_pages: Record<string, Page> | undefined): Promise<Record<string, Page>> => {
                 const newPage = await charmClient.pages.getPage(block.id);
 
                 return { ..._pages, [newPage.id]: newPage };
@@ -386,7 +386,7 @@ function CenterPanel(props: Props) {
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.id;
-    view.title = 'Board view';
+    view.title = '';
     // A new property to indicate that this view was creating for inline databases only
     view.fields.sourceType = 'board_page';
     view.fields.linkedSourceId = sourceBoardId;

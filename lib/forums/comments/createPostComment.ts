@@ -15,10 +15,19 @@ export async function createPostComment({
   return prisma.pageComment.create({
     data: {
       content,
-      contentText,
+      contentText: contentText.trim(),
       createdBy: userId,
       pageId: postId,
       parentId
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          avatar: true,
+          username: true
+        }
+      }
     }
   });
 }

@@ -11,7 +11,7 @@ import type { ForumPostMeta } from './interfaces';
 // Maxium posts we want per response
 export const defaultPostsPerResult = 5;
 
-export type PaginatedPostList = PaginatedResponse<ForumPostMeta> & { cursor: number };
+export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
 /**
  * @sort ignored for now - the server sorts posts by most recent
@@ -86,10 +86,27 @@ export async function listForumPosts(
           })
         ).length === 1;
 
+  const comments = await prisma.pageComment.groupBy({
+    _count: {
+      _all: true
+    },
+    by: ['pageId'],
+    where: {
+      pageId: {
+        in: pages.map((_page) => _page.id)
+      }
+    }
+  });
+
   const data = pages
     .map((_page) => {
       if (_page.post) {
-        return getPostMeta({ page: _page as PageWithRelations, userId });
+        const comment = comments.find((_comment) => _comment.pageId === _page.id);
+        const postMeta = getPostMeta({ page: _page as PageWithRelations, userId });
+        return {
+          ...postMeta,
+          totalComments: comment?._count._all ?? 0
+        };
       }
       return null;
     })

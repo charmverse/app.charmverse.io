@@ -4,8 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import charmClient from 'charmClient';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 type IContext = {
@@ -115,6 +115,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setLoggedInUserForWeb3Hook(user);
+
+    if (user?.deletedAt) {
+      charmClient.logout().then(() => {
+        window.location.href = window.location.origin;
+      });
+    }
   }, [user]);
 
   const value = useMemo<IContext>(() => {

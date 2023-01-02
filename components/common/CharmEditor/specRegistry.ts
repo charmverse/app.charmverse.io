@@ -25,6 +25,7 @@ import { nestedPageSpec } from './components/nestedPage';
 import * as nft from './components/nft/nftSpec';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
+import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote';
 import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
@@ -85,5 +86,6 @@ export const specRegistry = new SpecRegistry([
   formatChange,
   video.spec(),
   textColor.spec(),
-  nft.spec()
+  nft.spec(),
+  poll.spec()
 ]);

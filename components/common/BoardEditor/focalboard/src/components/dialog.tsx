@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import Modal from '@mui/material/Modal';
+import clsx from 'clsx';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useIntl } from 'react-intl';
@@ -13,11 +14,11 @@ type Props = {
   hideCloseButton?: boolean;
   className?: string;
   onClose: () => void;
+  fullWidth?: boolean;
 };
 
 const Dialog = React.memo((props: Props) => {
-  const { toolsMenu } = props;
-  const { toolbar } = props;
+  const { toolbar, toolsMenu, fullWidth = false } = props;
   const intl = useIntl();
 
   const closeDialogText = intl.formatMessage({
@@ -38,7 +39,7 @@ const Dialog = React.memo((props: Props) => {
             }
           }}
         >
-          <div role='dialog' className='dialog'>
+          <div role='dialog' className={clsx('dialog', { fullWidth })}>
             <div className='toolbar'>
               {!props.hideCloseButton && (
                 <IconButton

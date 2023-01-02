@@ -75,8 +75,12 @@ export class ForumApi {
     return http.DELETE(`/api/spaces/${spaceId}/post-categories/${id}`);
   }
 
-  voteOnPost({ postId, upvoted }: { upvoted?: boolean; postId: string }) {
+  voteOnPost({ postId, upvoted }: { upvoted: boolean | null; postId: string }) {
     return http.PUT(`/api/forums/posts/${postId}/vote`, { upvoted });
+  }
+
+  upOrDownVoteComment({ postId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; postId: string }) {
+    return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}/vote`, { upvoted });
   }
 
   deletePostComment({ commentId, postId }: { postId: string; commentId: string }): Promise<void> {

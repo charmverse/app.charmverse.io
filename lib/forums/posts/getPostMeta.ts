@@ -19,7 +19,7 @@ export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId: string
   return {
     downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
     upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-    upvoted: userVote ? userVote.upvoted : undefined
+    upvoted: userVote ? userVote.upvoted : null
   };
 }
 

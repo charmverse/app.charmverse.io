@@ -1,14 +1,14 @@
 import { useTreeItem } from '@mui/lab/TreeItem';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { Page } from '@prisma/client';
-import { useCallback, useRef, memo, useEffect } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
+import { formatViewTitle } from 'lib/focalboard/boardView';
 import { mergeRefs } from 'lib/utilities/react';
 import { greyColor2 } from 'theme/colors';
 
@@ -183,7 +183,7 @@ function DraggableTreeNode({
               <BoardViewTreeItem
                 key={view.id}
                 href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                label={view.title}
+                label={view.title || formatViewTitle(view)}
                 nodeId={view.id}
                 viewType={view.fields.viewType}
                 onClick={onClick}

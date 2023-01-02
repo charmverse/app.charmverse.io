@@ -99,7 +99,7 @@ describe('DELETE /api/forums/posts/[postId] - Delete a post', () => {
     await request(baseUrl).delete(`/api/forums/posts/${page.id}`).set('Cookie', adminUserCookie).send().expect(200);
   });
 
-  it('should fail to update the post if the user did not create it, responding with 401', async () => {
+  it('should fail to delete the post if the user did not create it, responding with 401', async () => {
     const page = await generateForumPost(createInput);
 
     await request(baseUrl)

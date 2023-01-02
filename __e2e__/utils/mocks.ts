@@ -262,10 +262,18 @@ export async function generateSpaceRole({ spaceId, userId }: { userId: string; s
   });
 }
 
+type UserAndSpaceInput = {
+  isAdmin?: boolean;
+  onboarded?: boolean;
+  spaceName?: string;
+  publicBountyBoard?: boolean;
+};
+
 export async function generateUserAndSpace({
   isAdmin,
-  spaceName = 'Example Space'
-}: { isAdmin?: boolean; spaceName?: string } = {}) {
+  spaceName = 'Example Space',
+  publicBountyBoard
+}: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
@@ -291,12 +299,15 @@ export async function generateUserAndSpace({
             id: user.id
           }
         },
+        publicBountyBoard,
         updatedBy: user.id,
         updatedAt: new Date().toISOString(),
         spaceRoles: {
           create: {
             userId: user.id,
-            isAdmin
+            isAdmin,
+            // skip onboarding for normal test users
+            onboarded: true
           }
         }
       }

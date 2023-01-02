@@ -8,6 +8,7 @@ import Avatar from 'components/common/Avatar';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { conditionalPlural } from 'lib/utilities/strings';
 
 const TasksPageHeaderContainer = styled.div`
   display: flex;
@@ -30,7 +31,10 @@ export default function TasksPageHeader() {
   const metamaskConnected = user && user?.wallets.length > 0;
   const discordConnected = user?.discordUser;
   const telegramConnected = user?.telegramUser;
-  const totalIntegrations = (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0);
+  // False if undefined or 0, true if 1 or more
+  const googleConnected = !!user?.googleAccounts.length;
+  const totalIntegrations =
+    (metamaskConnected ? 1 : 0) + (discordConnected ? 1 : 0) + (telegramConnected ? 1 : 0) + (googleConnected ? 1 : 0);
   const { data: safes } = useMultiWalletSigs();
 
   return (
@@ -86,7 +90,8 @@ export default function TasksPageHeader() {
                         fontWeight: 500
                       }}
                     >
-                      Connected Identities
+                      Connected{' '}
+                      {conditionalPlural({ word: 'Identity', plural: 'Identities', count: totalIntegrations })}
                     </Typography>
                   </Box>
                   <Box
@@ -141,6 +146,18 @@ export default function TasksPageHeader() {
                         width={22.5}
                         height={22.5}
                         src={telegramConnected ? '/images/telegram-logo.png' : '/images/telegram-logo-greyscale.png'}
+                      />
+                    </Tooltip>
+                    <Tooltip
+                      title={googleConnected ? 'Google connected' : 'Google not connected'}
+                      arrow
+                      placement='top'
+                    >
+                      <img
+                        className='logo-image'
+                        width={22.5}
+                        height={22.5}
+                        src={googleConnected ? '/images/Google_G.png' : '/images/Google_G-grayscale.png'}
                       />
                     </Tooltip>
                   </Box>

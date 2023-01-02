@@ -6,10 +6,11 @@ import { prisma } from 'db';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
 import { createApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

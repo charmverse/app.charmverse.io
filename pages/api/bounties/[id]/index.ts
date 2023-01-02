@@ -4,9 +4,10 @@ import nc from 'next-connect';
 import type { UpdateableBountyFields, BountyWithDetails } from 'lib/bounties';
 import { getBounty, updateBountySettings } from 'lib/bounties';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
-import { hasAccessToSpace, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeUserPagePermissions } from 'lib/permissions/pages';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

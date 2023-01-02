@@ -15,7 +15,7 @@ export async function updatePostComment({
     },
     data: {
       content,
-      contentText
+      contentText: contentText.trim()
     }
   });
 }
