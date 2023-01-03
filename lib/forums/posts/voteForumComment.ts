@@ -1,7 +1,10 @@
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import { getComment } from '../comments/getComment';
+
+import { getForumPost } from './getForumPost';
 
 export async function voteForumComment({
   upvoted,
@@ -30,6 +33,37 @@ export async function voteForumComment({
       }
     });
   } else {
+    const page = await getForumPost({ pageId, userId });
+
+    const category = await prisma.postCategory.findUnique({
+      where: {
+        id: page.post.categoryId
+      },
+      select: {
+        name: true
+      }
+    });
+
+    if (category) {
+      if (upvoted) {
+        trackUserAction('upvote_comment', {
+          resourceId: commentId,
+          spaceId: page.spaceId,
+          userId,
+          categoryName: category.name,
+          postId: page.id
+        });
+      } else {
+        trackUserAction('downvote_comment', {
+          resourceId: commentId,
+          spaceId: page.spaceId,
+          userId,
+          categoryName: category.name,
+          postId: page.id
+        });
+      }
+    }
+
     await prisma.pageCommentUpDownVote.upsert({
       create: {
         createdBy: userId,

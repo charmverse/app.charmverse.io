@@ -1,6 +1,7 @@
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 import { getForumPost } from './getForumPost';
 
@@ -29,6 +30,32 @@ export async function voteForumPost({
       }
     });
   } else {
+    const category = await prisma.postCategory.findUnique({
+      where: {
+        id: page.post.categoryId
+      },
+      select: {
+        name: true
+      }
+    });
+
+    if (category) {
+      if (upvoted) {
+        trackUserAction('upvote_post', {
+          resourceId: page.id,
+          spaceId: page.spaceId,
+          userId,
+          categoryName: category.name
+        });
+      } else {
+        trackUserAction('downvote_post', {
+          resourceId: page.id,
+          spaceId: page.spaceId,
+          userId,
+          categoryName: category.name
+        });
+      }
+    }
     await prisma.pageUpDownVote.upsert({
       create: {
         createdBy: userId,

@@ -1,12 +1,55 @@
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
-export async function deletePostComment({ commentId, userId }: { commentId: string; userId: string }) {
-  const updatedComment = await prisma.pageComment.updateMany({
+import { getForumPost } from '../posts/getForumPost';
+
+export async function deletePostComment({
+  postId,
+  commentId,
+  userId
+}: {
+  postId: string;
+  commentId: string;
+  userId: string;
+}) {
+  const pageComment = await prisma.pageComment.findFirst({
     where: {
       id: commentId,
       createdBy: userId,
       deletedAt: null
+    }
+  });
+
+  if (!pageComment) {
+    throw new UnauthorisedActionError();
+  }
+
+  const page = await getForumPost({ pageId: postId, userId });
+
+  const category = await prisma.postCategory.findUnique({
+    where: {
+      id: page.post.categoryId
+    },
+    select: {
+      name: true
+    }
+  });
+
+  if (category) {
+    trackUserAction('delete_comment', {
+      categoryName: category.name,
+      commentedOn: pageComment.parentId === postId ? 'post' : 'comment',
+      postId,
+      resourceId: commentId,
+      spaceId: page.spaceId,
+      userId
+    });
+  }
+
+  await prisma.pageComment.update({
+    where: {
+      id: commentId
     },
     data: {
       deletedAt: new Date(),
@@ -14,8 +57,4 @@ export async function deletePostComment({ commentId, userId }: { commentId: stri
       contentText: ''
     }
   });
-
-  if (updatedComment.count !== 1) {
-    throw new UnauthorisedActionError();
-  }
 }

@@ -72,7 +72,7 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new UserIsNotSpaceMemberError();
   }
 
-  await deletePostComment({ commentId, userId });
+  await deletePostComment({ commentId, userId, postId: pageId });
 
   res.status(200).end();
 }

@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 describe('deletePostComment', () => {
   it('should delete a post comment if the user is the creator', async () => {
-    const { comment } = await generatePostWithComment({
+    const { comment, post } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });
@@ -26,13 +26,14 @@ describe('deletePostComment', () => {
     await expect(
       deletePostComment({
         commentId: comment.id,
-        userId: user.id
+        userId: user.id,
+        postId: post.id
       })
     ).resolves.not.toThrowError();
   });
 
   it('should throw error when deleting a post comment if the user is not the creator', async () => {
-    const { comment } = await generatePostWithComment({
+    const { comment, post } = await generatePostWithComment({
       userId: user.id,
       spaceId: space.id
     });
@@ -40,7 +41,8 @@ describe('deletePostComment', () => {
     await expect(async () => {
       await deletePostComment({
         commentId: comment.id,
-        userId: v4()
+        userId: v4(),
+        postId: post.id
       });
     }).rejects.toBeInstanceOf(UnauthorisedActionError);
   });

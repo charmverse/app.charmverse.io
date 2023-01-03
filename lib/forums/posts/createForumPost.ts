@@ -2,6 +2,7 @@ import type { Page, Post, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPagePath } from 'lib/pages/utils';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
@@ -72,4 +73,35 @@ export async function createForumPost({
     ...selectPageValues(createdPost),
     post: createdPost.post!
   };
+}
+
+export async function trackCreateForumPostEvent({
+  categoryId,
+  pageId,
+  spaceId,
+  userId
+}: {
+  categoryId: string;
+  pageId: string;
+  spaceId: string;
+  userId: string;
+}) {
+  const category = await prisma.postCategory.findUnique({
+    where: {
+      id: categoryId
+    },
+    select: {
+      name: true
+    }
+  });
+
+  if (category) {
+    trackUserAction('create_a_post', {
+      categoryName: category.name,
+      resourceId: pageId,
+      spaceId,
+      userId,
+      hasImage: false
+    });
+  }
 }

@@ -1,10 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createForumPost } from 'lib/forums/posts/createForumPost';
+import { prisma } from 'db';
+import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -38,6 +40,14 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
     },
     createdPage.spaceId
   );
+
+  await trackCreateForumPostEvent({
+    categoryId: createdPage.post.categoryId,
+    pageId: createdPage.id,
+    spaceId: createdPage.spaceId,
+    userId: req.session.user.id
+  });
+
   return res.status(201).json(createdPage);
 }
 

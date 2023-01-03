@@ -7,12 +7,14 @@ import CardContent from '@mui/material/CardContent';
 import type { PostCategory } from '@prisma/client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
 
@@ -75,7 +77,8 @@ export function CategoryMenu() {
   const admin = isAdmin();
   const [forumCategoryName, setForumCategoryName] = useState('');
   const { createForumCategory } = useForumCategories();
-
+  const router = useRouter();
+  const currentSpace = useCurrentSpace();
   function createCategory() {
     createForumCategory(forumCategoryName);
     setForumCategoryName('');
@@ -85,6 +88,16 @@ export function CategoryMenu() {
   if (error) {
     return <Alert severity='error'>An error occurred while loading the categories</Alert>;
   }
+
+  useEffect(() => {
+    const selectedCategory = categories.find((category) => category.id === router.query.categoryId);
+    if (selectedCategory && currentSpace?.id) {
+      charmClient.track.trackAction('main_feed_filtered', {
+        categoryName: selectedCategory.name,
+        spaceId: currentSpace.id
+      });
+    }
+  }, [router.query.categoryId, currentSpace]);
 
   return (
     <Card variant='outlined'>
