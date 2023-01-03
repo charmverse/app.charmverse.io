@@ -9,6 +9,7 @@ import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
 // TODO: frontend should tell us which space to use
@@ -74,7 +75,7 @@ async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { e
   }
 }
 
-async function createBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
+async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block, ServerBlockFields>[]>) {
   const data = req.body as Omit<Block, ServerBlockFields>[];
   const referer = req.headers.referer as string;
   const url = new URL(referer);
@@ -82,113 +83,121 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   url.search = '';
   const spaceDomain = referer ? url.pathname.split('/')[1] : null;
 
-  if (spaceDomain) {
-    const space = await prisma.space.findUnique({
-      where: {
-        domain: spaceDomain
+  if (!spaceDomain) {
+    return res.status(200).json(data);
+  }
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      domain: spaceDomain
+    }
+  });
+  const newBlocks = data.map((block) => ({
+    ...block,
+    fields: block.fields,
+    spaceId: space.id,
+    createdBy: req.session.user.id,
+    updatedBy: req.session.user.id,
+    deletedAt: null
+  }));
+  const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
+
+  const parentBoardIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
+
+  const parentPages = await prisma.page.findMany({
+    where: {
+      id: {
+        in: parentBoardIds
       }
-    });
-    if (space) {
-      const newBlocks = data.map((block) => ({
-        ...block,
-        fields: block.fields as any,
-        spaceId: space.id,
-        createdBy: req.session.user.id,
-        updatedBy: req.session.user.id,
-        deletedAt: null
-      }));
-      const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
+    },
+    select: {
+      id: true,
+      permissions: {
+        include: {
+          sourcePermission: true
+        }
+      }
+    }
+  });
 
-      const parentBoardIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
+  const cardPages: Prisma.PageCreateInput[] = cardBlocks
+    .map((cardBlock) => {
+      const parentBoard = parentPages.find((p) => p.id === cardBlock.parentId);
 
-      const parentPages = await prisma.page.findMany({
-        where: {
-          id: {
-            in: parentBoardIds
+      if (!parentBoard) {
+        return null;
+      }
+
+      // Since we are certain the card is leaf node, we can instantiate permissions directly here without the need for complex checks
+      const initialPermissions = copyAllPagePermissions({
+        permissions: parentBoard.permissions,
+        inheritFrom: true,
+        newPageId: cardBlock.id
+      });
+
+      initialPermissions.data = (initialPermissions.data as any[]).map((permission) => {
+        delete permission.pageId;
+
+        return {
+          ...permission
+        };
+      });
+
+      const cardFields = cardBlock.fields as any;
+
+      const cardPage: Prisma.PageCreateInput = {
+        author: {
+          connect: {
+            id: cardBlock.createdBy
           }
         },
-        select: {
-          id: true,
-          permissions: {
-            include: {
-              sourcePermission: true
-            }
+        updatedBy: cardBlock.updatedBy,
+        id: cardBlock.id,
+        space: {
+          connect: {
+            id: cardBlock.spaceId
           }
-        }
-      });
-
-      const cardPages: (Prisma.PageCreateInput | null)[] = cardBlocks.map((cardBlock) => {
-        const parentBoard = parentPages.find((p) => p.id === cardBlock.parentId);
-
-        if (!parentBoard) {
-          return null;
-        }
-
-        // Since we are certain the card is leaf node, we can instantiate permissions directly here without the need for complex checks
-        const initialPermissions = copyAllPagePermissions({
-          permissions: parentBoard.permissions,
-          inheritFrom: true,
-          newPageId: cardBlock.id
-        });
-
-        initialPermissions.data = (initialPermissions.data as any[]).map((permission) => {
-          delete permission.pageId;
-
-          return {
-            ...permission
-          };
-        });
-
-        const cardPage: Prisma.PageCreateInput = {
-          author: {
-            connect: {
-              id: cardBlock.createdBy
-            }
-          },
-          updatedBy: cardBlock.updatedBy,
-          id: cardBlock.id,
-          space: {
-            connect: {
-              id: cardBlock.spaceId
-            }
-          },
-          card: {
-            connect: {
-              id: cardBlock.id
-            }
-          },
-          createdAt: cardBlock.createdAt,
-          path: getPagePath(),
-          title: cardBlock.title,
-          icon: cardBlock.fields.icon,
-          type: cardBlock.fields.isTemplate ? 'card_template' : 'card',
-          headerImage: cardBlock.fields.headerImage,
-          contentText: cardBlock.fields.contentText || '',
-          parentId: cardBlock.parentId,
-          updatedAt: cardBlock.updatedAt,
-          content: cardBlock.fields.content ?? undefined,
-          permissions: {
-            createMany: initialPermissions
+        },
+        card: {
+          connect: {
+            id: cardBlock.id
           }
-        };
-        delete cardBlock.fields.content;
-        delete cardBlock.fields.contentText;
-        delete cardBlock.fields.headerImage;
-        delete cardBlock.fields.icon;
-        return cardPage;
-      });
-      await prisma.block.createMany({
-        data: newBlocks
-      });
-
-      for (const cardPage of cardPages) {
-        if (cardPage) {
-          await createPage({
-            data: cardPage
-          });
+        },
+        createdAt: cardBlock.createdAt,
+        path: getPagePath(),
+        title: cardBlock.title,
+        icon: cardFields.icon,
+        type: cardFields.isTemplate ? 'card_template' : 'card',
+        headerImage: cardFields.headerImage,
+        contentText: cardFields.contentText || '',
+        parentId: cardBlock.parentId,
+        updatedAt: cardBlock.updatedAt,
+        content: cardFields.content ?? undefined,
+        permissions: {
+          createMany: initialPermissions
         }
-      }
+      };
+      delete cardFields.content;
+      delete cardFields.contentText;
+      delete cardFields.headerImage;
+      delete cardFields.icon;
+      return cardPage;
+    })
+    .filter(isTruthy);
 
+  await prisma.$transaction([
+    prisma.block.createMany({
+      // @ts-ignore - cant fix type for json field "fields"
+      data: newBlocks
+    }),
+    ...cardPages.map((cardPage) =>
+      createPage({
+        data: cardPage
+      })
+    )
+  ]);
+
+  await Promise.all([
+    async () => {
       const blocksToNotify = await prisma.block.findMany({
         where: {
           id: {
@@ -204,7 +213,8 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
         },
         space.id
       );
-
+    },
+    async () => {
       const createdPages = await getPageMetaList(newBlocks.map((b) => b.id));
 
       if (createdPages.length) {
@@ -216,15 +226,10 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
           space.id
         );
       }
-
-      return res.status(200).json(newBlocks);
     }
-  }
+  ]);
 
-  // @ts-ignore - JsonValue is not compatible with InputJsonValue :(
-  // const blocks = await prisma.block.createMany({ data });
-  // console.log('blocks', blocks);
-  return res.status(200).json(data);
+  return res.status(200).json(newBlocks);
 }
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
