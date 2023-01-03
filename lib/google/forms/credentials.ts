@@ -52,3 +52,21 @@ export async function deleteCredential({ credentialId }: AccountRequest) {
     }
   });
 }
+
+export async function invalidateCredential({ credentialId, error }: AccountRequest & { error?: any }) {
+  try {
+    await prisma.googleCredential.update({
+      where: {
+        id: credentialId,
+        expiredAt: null
+      },
+      data: {
+        error,
+        expiredAt: new Date()
+      }
+    });
+    log.info('Invalidated Google credential for user', { credentialId, error });
+  } catch (err) {
+    // this error is expected behavior when the credential is already expired
+  }
+}

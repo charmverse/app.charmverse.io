@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -47,7 +48,9 @@ async function createCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
     },
     update: {
       refreshToken: credential.tokens.refresh_token,
-      scope: query.scope
+      scope: query.scope,
+      error: Prisma.DbNull,
+      expiredAt: null
     },
     create: {
       userId,

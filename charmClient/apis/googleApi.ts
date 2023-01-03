@@ -5,7 +5,7 @@ import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccoun
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { LoggedInUser } from 'models';
-import type { GetFormsRequest } from 'pages/api/google/forms';
+import type { GoogleFormItem, GetFormsRequest } from 'pages/api/google/forms';
 import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/forms/credentials';
 
 export interface UpdateProfileItemRequest {
@@ -30,7 +30,7 @@ export class GoogleApi {
       return http.GET<CredentialItem[]>('/api/google/forms/credentials');
     },
     getForms(params: GetFormsRequest) {
-      return http.GET<CredentialItem[]>('/api/google/forms', params);
+      return http.GET<GoogleFormItem[]>('/api/google/forms', params);
     },
     deleteCredential() {
       return http.DELETE<CredentialRequest[]>('/api/google/forms/credentials');

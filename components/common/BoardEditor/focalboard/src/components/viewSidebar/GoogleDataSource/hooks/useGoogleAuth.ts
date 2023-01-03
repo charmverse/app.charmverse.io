@@ -13,7 +13,7 @@ export const googleIdentityServiceScript = 'https://accounts.google.com/gsi/clie
 export function useGoogleAuth(props: { onConnect?: () => void }) {
   const [loaded, setLoaded] = useState(false);
 
-  function initClient() {
+  function initClient({ hint }: { hint?: string } = {}) {
     if (!googleOAuthClientId) {
       log.error('Google OAuth Client ID is not set');
       return;
@@ -21,6 +21,7 @@ export function useGoogleAuth(props: { onConnect?: () => void }) {
     // docs: https://developers.google.com/identity/oauth2/web/reference/js-reference
     const client = google.accounts.oauth2.initCodeClient({
       client_id: googleOAuthClientId,
+      hint,
       scope: formScopes,
       ux_mode: 'popup',
       callback: async (response) => {
@@ -35,11 +36,11 @@ export function useGoogleAuth(props: { onConnect?: () => void }) {
     setLoaded(true);
   }
 
-  function loginWithGoogle() {
+  function loginWithGoogle({ hint }: { hint?: string } = {}) {
     if (!loaded) {
       throw new Error('Google Identity Service script is not loaded yet');
     }
-    const client = initClient();
+    const client = initClient({ hint });
     // Request authorization code and obtain user consent
     client?.requestCode();
   }

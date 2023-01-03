@@ -1,7 +1,10 @@
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { Box, MenuItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
+import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
+import { Box, MenuItem, ListItemIcon, ListItem, ListItemText, Tooltip, Typography, Link } from '@mui/material';
 import Script from 'next/script';
+import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import useSwr from 'swr';
 
 import charmClient from 'charmClient';
@@ -11,12 +14,13 @@ import type { CredentialItem } from 'pages/api/google/forms/credentials';
 import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 
 export function GoogleDataSource() {
-  const { data: credentials, mutate } = useSwr('google_credentials', () => charmClient.google.forms.getCredentials());
+  const { data: credentials, mutate } = useSwr('google-credentials', () => charmClient.google.forms.getCredentials());
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
-  const { loginWithGoogle, onLoadScript } = useGoogleAuth({ onConnect });
-  function onConnect() {
-    mutate();
-  }
+  const { loginWithGoogle, onLoadScript } = useGoogleAuth({
+    onConnect: () => {
+      mutate();
+    }
+  });
 
   function selectCredential(credential: CredentialItem) {
     setSelectedCredential(credential);
@@ -29,42 +33,93 @@ export function GoogleDataSource() {
   if (!credentials) return <LoadingComponent />;
   if (credentials.length === 0) {
     return (
-      <Box px={3} mt={3}>
+      <>
         <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
-        <MenuItem onClick={loginWithGoogle} color='primary'>
-          Connect Google Account
-        </MenuItem>
-        <Typography variant='caption'>Find and embed your Google forms</Typography>
-      </Box>
+        <ConnectButton onClick={() => loginWithGoogle()} label='Connect Google Account' />
+        <ListItem>
+          <Typography variant='caption'>Find and embed your Google forms</Typography>
+        </ListItem>
+      </>
     );
   } else if (selectedCredential) {
-    return <GoogleFormSelect credential={selectedCredential} onSelect={selectForm} />;
+    return <GoogleFormSelect credential={selectedCredential} loginWithGoogle={loginWithGoogle} onSelect={selectForm} />;
   }
   return (
     <>
       <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
       {credentials.map((credential) => (
         <MenuItem divider dense key={credential.id} onClick={() => selectCredential(credential)}>
-          Choose from {credential.name}
+          Choose from&nbsp;
+          <Tooltip title={credential.name}>
+            <span> {credential.name}</span>
+          </Tooltip>
         </MenuItem>
       ))}
-      <MenuItem dense sx={{ color: 'text.secondary' }} onClick={loginWithGoogle} color='secondary'>
+      <MenuItem dense sx={{ color: 'text.secondary' }} onClick={() => loginWithGoogle()} color='secondary'>
         Connect another account
       </MenuItem>
     </>
   );
 }
 
+function ConnectButton({
+  label = 'Connect Google Account',
+  onClick
+}: {
+  label?: string;
+  onClick?: MouseEventHandler<HTMLLIElement>;
+}) {
+  return (
+    <MenuItem onClick={onClick}>
+      <ListItemIcon>
+        <FcGoogle fontSize='large' />
+      </ListItemIcon>
+      <Typography color='primary' variant='body2' fontWeight='bold'>
+        {label}
+      </Typography>
+    </MenuItem>
+  );
+}
+
 function GoogleFormSelect({
   credential,
+  loginWithGoogle,
   onSelect
 }: {
   credential: CredentialItem;
+  loginWithGoogle: (options: { hint?: string }) => void;
   onSelect: (form: { id: string }) => void;
 }) {
-  const { data: forms, mutate } = useSwr(`google_credentials/${credential.id}`, () =>
+  const {
+    data: forms,
+    error,
+    mutate
+  } = useSwr(`google-credentials/${credential.id}`, () =>
     charmClient.google.forms.getForms({ credentialId: credential.id })
   );
+
+  if (error) {
+    if (error.status === 401) {
+      return (
+        <>
+          <ConnectButton label='Reconnect Account' onClick={() => loginWithGoogle({ hint: credential.name })} />
+          <ListItem>
+            <Box display='flex' gap={2} justifyContent='center'>
+              <ReportProblemIcon sx={{ color: 'var(--danger-text)' }} fontSize='small' />
+              <Typography color='secondary' variant='caption'>
+                Authentication has expired. Please reconnect your Google account
+              </Typography>
+            </Box>
+          </ListItem>
+        </>
+      );
+    }
+    return (
+      <Typography color='error' variant='caption'>
+        Error loading forms
+      </Typography>
+    );
+  }
   if (!forms) return <LoadingComponent />;
   return (
     <>
@@ -74,7 +129,13 @@ function GoogleFormSelect({
             <ListItemIcon>
               <FormatListBulletedIcon fontSize='small' />
             </ListItemIcon>
-            <ListItemText primary={form.name} />
+            <ListItemText
+              primary={
+                <Link onClick={(e) => e.preventDefault()} href={form.url}>
+                  {form.name}
+                </Link>
+              }
+            />
           </MenuItem>
         </Tooltip>
       ))}

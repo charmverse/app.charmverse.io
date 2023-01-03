@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["linux-musl", "darwin", "native"]
-  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch", "extendedWhereUnique"]
 }
 
 datasource db {
@@ -1100,6 +1100,7 @@ model GoogleCredential {
   updatedAt    DateTime  @updatedAt
   id           String    @id @default(uuid()) @db.Uuid
   expiredAt    DateTime?
+  error        Json?
   name         String
   refreshToken String
   scope        String
