@@ -19,10 +19,10 @@ import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
 import { RiFolder2Line } from 'react-icons/ri';
 
+import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
@@ -83,10 +83,10 @@ function ViewOptionsSidebar(props: Props) {
     setSidebarView(initialState);
   }
 
-  async function selectDatabase(page: { id: string }) {
-    const newView = createBoardView(props.view);
-    newView.fields.sourceType = 'board_page';
-    newView.fields.linkedSourceId = page.id;
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceType'>) {
+    const newView = createTableView(props.board, props.view);
+    newView.fields.sourceType = fields.sourceType;
+    newView.fields.linkedSourceId = fields.linkedSourceId;
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, props.view, 'change view source');
@@ -94,7 +94,6 @@ function ViewOptionsSidebar(props: Props) {
       dispatch(updateView(props.view));
     }
   }
-
   useEffect(() => {
     // reset state on close
     if (!props.isOpen) {
@@ -170,7 +169,7 @@ function ViewOptionsSidebar(props: Props) {
               title='Data source'
               view={props.view}
               goBack={goBack}
-              onSelect={selectDatabase}
+              onSelect={selectViewSource}
               closeSidebar={props.closeSidebar}
             />
           )}

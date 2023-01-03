@@ -7,6 +7,7 @@ import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { LoggedInUser } from 'models';
 import type { GoogleFormItem, GetFormsRequest } from 'pages/api/google/forms';
 import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/forms/credentials';
+import type { RefreshFormsRequest } from 'pages/api/google/forms/sync-responses';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -31,6 +32,9 @@ export class GoogleApi {
     },
     getForms(params: GetFormsRequest) {
       return http.GET<GoogleFormItem[]>('/api/google/forms', params);
+    },
+    syncFormResponses(params: RefreshFormsRequest) {
+      return http.POST('/api/google/forms/sync-responses', params);
     },
     deleteCredential() {
       return http.DELETE<CredentialRequest[]>('/api/google/forms/credentials');

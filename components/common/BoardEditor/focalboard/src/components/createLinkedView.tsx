@@ -5,12 +5,13 @@ import { useState } from 'react';
 import Button from 'components/common/Button';
 
 import { StyledSidebar } from './viewSidebar/viewSidebar';
-import type { Props } from './viewSidebar/viewSourceOptions';
+import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions';
 import { ViewSourceOptions } from './viewSidebar/viewSourceOptions';
 
-type CreateLinkedViewProps = Props & { readOnly: boolean };
+type CreateLinkedViewProps = DatabaseSourceProps & { readOnly: boolean };
 
 type SidebarState = 'select-source' | null;
+
 export function CreateLinkedView(props: CreateLinkedViewProps) {
   const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
   function openSidebar() {

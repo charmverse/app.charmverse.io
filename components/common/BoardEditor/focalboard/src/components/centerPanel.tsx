@@ -34,7 +34,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { createNewDataSource } from 'lib/pages/createNewDataSource';
@@ -356,11 +356,11 @@ function CenterPanel(props: Props) {
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
 
-  async function createLinkedView(page: { id: string }) {
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
     const view = createTableView(board);
-    // A new property to indicate that this view was creating for inline databases only
-    view.fields.sourceType = 'board_page';
-    view.fields.linkedSourceId = page.id;
+    view.fields.sourceData = fields.sourceData;
+    view.fields.sourceType = fields.sourceType;
+    view.fields.linkedSourceId = fields.linkedSourceId;
     await mutator.insertBlock(view);
     showView(view.id);
   }
@@ -493,7 +493,7 @@ function CenterPanel(props: Props) {
             {!activeView && state.showSettings === 'create-linked-view' && (
               <CreateLinkedView
                 readOnly={props.readOnly}
-                onSelect={createLinkedView}
+                onSelect={selectViewSource}
                 onCreate={views.length === 0 ? createDatabase : undefined}
               />
             )}

@@ -22,7 +22,13 @@ export async function getForms(credential: Credential) {
 }
 
 // Requires 'https://www.googleapis.com/auth/forms.responses.readonly' scope
-export async function refreshResponses({ googleFormId, credential }: { googleFormId: string; credential: Credential }) {
+export async function syncFormResponses({
+  googleFormId,
+  credential
+}: {
+  googleFormId: string;
+  credential: Credential;
+}) {
   const forms = _getFormsClient(credential.refreshToken);
 
   const res = await forms.forms.responses.list({

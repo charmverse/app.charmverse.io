@@ -1,11 +1,10 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import Box from '@mui/material/Box';
+import { Tooltip } from '@mui/material';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
 import Button from 'components/common/Button';
-import { DownIcon } from 'components/common/Icons/DownIcon';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
@@ -22,6 +21,7 @@ type Props = {
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
   boardId: string;
+  disabledMessage?: string;
 };
 
 const NewCardButton = React.memo(
@@ -30,6 +30,7 @@ const NewCardButton = React.memo(
     addCardFromTemplate,
     addCardTemplate,
     deleteCardTemplate,
+    disabledMessage,
     editCardTemplate,
     showCard,
     boardId
@@ -48,12 +49,14 @@ const NewCardButton = React.memo(
 
     return (
       <>
-        <ButtonGroup variant='contained' ref={buttonRef}>
-          <Button onClick={addCard}>New</Button>
-          <Button size='small' onClick={popupState.open}>
-            <KeyboardArrowDown />
-          </Button>
-        </ButtonGroup>
+        <Tooltip title={disabledMessage ?? ''}>
+          <ButtonGroup disabled={!!disabledMessage} variant='contained' ref={buttonRef}>
+            <Button onClick={addCard}>New</Button>
+            <Button size='small' onClick={popupState.open}>
+              <KeyboardArrowDown />
+            </Button>
+          </ButtonGroup>
+        </Tooltip>
 
         <TemplatesMenu
           addPageFromTemplate={addCardFromTemplate}

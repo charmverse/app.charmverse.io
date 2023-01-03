@@ -9,11 +9,17 @@ import useSwr from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { GoogleFormItem } from 'pages/api/google/forms';
 import type { CredentialItem } from 'pages/api/google/forms/credentials';
 
 import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 
-export function GoogleDataSource() {
+type Props = {
+  onSelect: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
+};
+
+export function GoogleDataSource(props: Props) {
   const { data: credentials, mutate } = useSwr('google-credentials', () => charmClient.google.forms.getCredentials());
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
   const { loginWithGoogle, onLoadScript } = useGoogleAuth({
@@ -25,11 +31,6 @@ export function GoogleDataSource() {
   function selectCredential(credential: CredentialItem) {
     setSelectedCredential(credential);
   }
-
-  function selectForm(form: { id: string }) {
-    setSelectedCredential(null);
-  }
-
   if (!credentials) return <LoadingComponent />;
   if (credentials.length === 0) {
     return (
@@ -42,17 +43,21 @@ export function GoogleDataSource() {
       </>
     );
   } else if (selectedCredential) {
-    return <GoogleFormSelect credential={selectedCredential} loginWithGoogle={loginWithGoogle} onSelect={selectForm} />;
+    return (
+      <GoogleFormSelect credential={selectedCredential} loginWithGoogle={loginWithGoogle} onSelect={props.onSelect} />
+    );
   }
   return (
     <>
       <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
       {credentials.map((credential) => (
         <MenuItem divider dense key={credential.id} onClick={() => selectCredential(credential)}>
-          Choose from&nbsp;
-          <Tooltip title={credential.name}>
-            <span> {credential.name}</span>
-          </Tooltip>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Choose from&nbsp;
+            <Tooltip title={credential.name}>
+              <span> {credential.name}</span>
+            </Tooltip>
+          </span>
         </MenuItem>
       ))}
       <MenuItem dense sx={{ color: 'text.secondary' }} onClick={() => loginWithGoogle()} color='secondary'>
@@ -88,7 +93,7 @@ function GoogleFormSelect({
 }: {
   credential: CredentialItem;
   loginWithGoogle: (options: { hint?: string }) => void;
-  onSelect: (form: { id: string }) => void;
+  onSelect: Props['onSelect'];
 }) {
   const {
     data: forms,
@@ -97,6 +102,16 @@ function GoogleFormSelect({
   } = useSwr(`google-credentials/${credential.id}`, () =>
     charmClient.google.forms.getForms({ credentialId: credential.id })
   );
+
+  function selectForm(form: GoogleFormItem) {
+    const sourceData: { credentialId: string; formId: string; formName: string; formUrl: string } = {
+      credentialId: credential.id,
+      formId: form.id,
+      formName: form.name,
+      formUrl: form.url
+    };
+    onSelect({ sourceData, sourceType: 'google_form' });
+  }
 
   if (error) {
     if (error.status === 401) {
@@ -125,13 +140,13 @@ function GoogleFormSelect({
     <>
       {forms.map((form) => (
         <Tooltip key={form.id} title={form.name} enterDelay={1000}>
-          <MenuItem dense onClick={() => onSelect(form)}>
+          <MenuItem dense onClick={() => selectForm(form)}>
             <ListItemIcon>
               <FormatListBulletedIcon fontSize='small' />
             </ListItemIcon>
             <ListItemText
               primary={
-                <Link onClick={(e) => e.preventDefault()} href={form.url}>
+                <Link onClick={(e) => e.nativeEvent.preventDefault()} href={form.url}>
                   {form.name}
                 </Link>
               }

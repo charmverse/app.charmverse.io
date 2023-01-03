@@ -7,7 +7,8 @@ import { TbDatabase } from 'react-icons/tb';
 
 import PagesList from 'components/common/CharmEditor/components/PageList';
 import { usePages } from 'hooks/usePages';
-import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
+import type { BoardView, ViewSourceType, BoardViewFields } from 'lib/focalboard/boardView';
+import type { PageMeta } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 
 import { GoogleDataSource } from './GoogleDataSource/GoogleDataSource';
@@ -15,12 +16,12 @@ import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';
 
-export type Props = {
+export type DatabaseSourceProps = {
   onCreate?: () => void;
-  onSelect: (page: { id: string }) => void;
+  onSelect: (source: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) => void;
 };
 
-type SourceTypesProps = Props & {
+type ViewSourceOptionsProps = DatabaseSourceProps & {
   closeSidebar: () => void;
   goBack?: () => void;
   title: string;
@@ -33,7 +34,7 @@ const SidebarContent = styled.div`
   border-bottom: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
 `;
 
-export function ViewSourceOptions(props: SourceTypesProps) {
+export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const activeView = props.view;
   const activeSourceType = activeView?.fields.sourceType;
 
@@ -78,7 +79,9 @@ export function ViewSourceOptions(props: SourceTypesProps) {
             onCreate={props.onCreate}
           />
         )}
-        {formStep === 'configure_source' && sourceType === 'google_form' && <GoogleDataSource />}
+        {formStep === 'configure_source' && sourceType === 'google_form' && (
+          <GoogleDataSource onSelect={props.onSelect} />
+        )}
       </Box>
     </>
   );
@@ -122,15 +125,22 @@ function SourceType({
   );
 }
 
-function CharmVerseDatabases(props: Props & { activePageId?: string }) {
+function CharmVerseDatabases(props: DatabaseSourceProps & { activePageId?: string }) {
   const { pages } = usePages();
   const boardPages = Object.values(pages)
     .filter((p) => p?.type === 'board' || p?.type === 'inline_board')
     .filter(isTruthy);
+
+  function onSelect(page: PageMeta) {
+    props.onSelect({
+      linkedSourceId: page.id,
+      sourceType: 'board_page'
+    });
+  }
   return (
     <>
       <SidebarContent>
-        <PagesList pages={boardPages} activePageId={props.activePageId} onSelectPage={(page) => props.onSelect(page)} />
+        <PagesList pages={boardPages} activePageId={props.activePageId} onSelectPage={onSelect} />
       </SidebarContent>
       {props.onCreate && (
         <MenuItem onClick={props.onCreate}>

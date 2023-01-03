@@ -187,6 +187,9 @@ function ViewHeader(props: Props) {
 
             <NewCardButton
               addCard={props.addCard}
+              disabledMessage={
+                activeView.fields.sourceType === 'google_form' ? 'Cannot add cards to a synced data source' : ''
+              }
               addCardFromTemplate={addPageFromTemplate}
               addCardTemplate={props.addCardTemplate}
               editCardTemplate={props.editCardTemplate}

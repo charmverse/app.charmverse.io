@@ -3,7 +3,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { getCredentialMaybe } from 'lib/google/forms/credentials';
-import { refreshResponses } from 'lib/google/forms/forms';
+import { syncFormResponses } from 'lib/google/forms/forms';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -16,9 +16,9 @@ export type RefreshFormsRequest = {
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(refreshResponsesResponse);
+handler.use(requireUser).post(syncResponsesResponse);
 
-async function refreshResponsesResponse(req: NextApiRequest, res: NextApiResponse) {
+async function syncResponsesResponse(req: NextApiRequest, res: NextApiResponse) {
   const boardId = req.query.boardId;
 
   if (typeof boardId !== 'string') {
@@ -34,7 +34,7 @@ async function refreshResponsesResponse(req: NextApiRequest, res: NextApiRespons
   }
   const credential = await getCredentialMaybe({ credentialId });
   if (credential) {
-    await refreshResponses({ googleFormId, credential });
+    await syncFormResponses({ googleFormId, credential });
   } else {
     log.warn('Could not find valid credentials to refresh form responses for board', {
       boardId,
