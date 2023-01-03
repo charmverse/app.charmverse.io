@@ -10,7 +10,7 @@ import { usePages } from 'hooks/usePages';
 import type { BoardView, ViewSourceType } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
 
-import { GoogleForms } from './googleDataSources';
+import { GoogleForms } from './GoogleDataSources';
 import { SidebarHeader } from './viewSidebar';
 
 type FormStep = 'select_source' | 'configure_source';

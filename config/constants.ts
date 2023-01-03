@@ -14,7 +14,7 @@ export const cookieName = 'charm.sessionId';
 // web sockets
 export const websocketsHost = process.env.NEXT_PUBLIC_WEBSOCKETS_HOST;
 // Google config
-export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID;
 export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
 // Google client
 // To retrieve these values, go to Firebase, then project settings, and retrieve the JSON for the web client. You can then assign the values for each key in the client secrets area.
