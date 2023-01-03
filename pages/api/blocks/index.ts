@@ -101,12 +101,12 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   }));
   const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
 
-  const parentBoardIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
+  const parentPageIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
 
   const parentPages = await prisma.page.findMany({
     where: {
       id: {
-        in: parentBoardIds
+        in: parentPageIds
       }
     },
     select: {
@@ -119,17 +119,17 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }
   });
 
-  const cardPages: Prisma.PageCreateInput[] = cardBlocks
+  const cardPageQueries = cardBlocks
     .map((cardBlock) => {
-      const parentBoard = parentPages.find((p) => p.id === cardBlock.parentId);
+      const parentPage = parentPages.find((p) => p.id === cardBlock.parentId);
 
-      if (!parentBoard) {
+      if (!parentPage) {
         return null;
       }
 
       // Since we are certain the card is leaf node, we can instantiate permissions directly here without the need for complex checks
       const initialPermissions = copyAllPagePermissions({
-        permissions: parentBoard.permissions,
+        permissions: parentPage.permissions,
         inheritFrom: true,
         newPageId: cardBlock.id
       });
@@ -182,18 +182,19 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       delete cardFields.icon;
       return cardPage;
     })
-    .filter(isTruthy);
+    .filter(isTruthy)
+    .map((_data) =>
+      createPage({
+        data: _data
+      })
+    );
 
   await prisma.$transaction([
     prisma.block.createMany({
       // @ts-ignore - cant fix type for json field "fields"
       data: newBlocks
     }),
-    ...cardPages.map((cardPage) =>
-      createPage({
-        data: cardPage
-      })
-    )
+    ...cardPageQueries
   ]);
 
   await Promise.all([
