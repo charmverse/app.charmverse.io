@@ -150,7 +150,7 @@ function TableHeaders(props: Props): JSX.Element {
         activeView={activeView}
         cards={cards}
         views={views}
-        template={{ id: Constants.titleColumnId, name: 'title', type: 'title', options: [] }}
+        template={{ id: Constants.titleColumnId, name: 'title', type: 'text', options: [] }}
         offset={resizingColumn === Constants.titleColumnId ? offset : 0}
         onDrop={onDropToColumn}
         onAutoSizeColumn={onAutoSizeColumn}
