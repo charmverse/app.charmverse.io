@@ -11,16 +11,9 @@ import { ExternalServiceError, InvalidInputError, SystemError } from 'lib/utilit
 
 import type { AnyIdLogin } from '../components/login/Login';
 
-const scopeOptions = {
-  identity: ['openid', 'email', 'profile'],
-  google_forms: ['https://www.googleapis.com/auth/forms']
-};
+const scopes = ['openid', 'email', 'profile'];
 
-type ScopeOption = keyof typeof scopeOptions;
-
-export function useGoogleAuth({ scope = 'identity' }: { scope?: ScopeOption } = {}) {
-  const scopes = scopeOptions[scope];
-
+export function useFirebaseAuth() {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());

@@ -1,17 +1,19 @@
-import { Card, Grid, Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import { Box, MenuItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
+import Script from 'next/script';
 import { useState } from 'react';
 import useSwr from 'swr';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { CredentialItem } from 'pages/api/google/forms/credentials';
 
-import { GoogleConnectButton } from './GoogleConnectButton';
+import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 
-export function GoogleForms() {
+export function GoogleDataSource() {
   const { data: credentials, mutate } = useSwr('google_credentials', () => charmClient.google.forms.getCredentials());
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
+  const { loginWithGoogle, onLoadScript } = useGoogleAuth({ onConnect });
   function onConnect() {
     mutate();
   }
@@ -28,7 +30,10 @@ export function GoogleForms() {
   if (credentials.length === 0) {
     return (
       <Box px={3} mt={3}>
-        <GoogleConnectButton onConnect={onConnect} />
+        <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
+        <MenuItem onClick={loginWithGoogle} color='primary'>
+          Connect Google Account
+        </MenuItem>
         <Typography variant='caption'>Find and embed your Google forms</Typography>
       </Box>
     );
@@ -37,12 +42,15 @@ export function GoogleForms() {
   }
   return (
     <>
+      <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
       {credentials.map((credential) => (
-        <MenuItem key={credential.id} onClick={() => selectCredential(credential)}>
+        <MenuItem divider dense key={credential.id} onClick={() => selectCredential(credential)}>
           Choose from {credential.name}
         </MenuItem>
       ))}
-      <GoogleConnectButton onConnect={onConnect} />
+      <MenuItem dense sx={{ color: 'text.secondary' }} onClick={loginWithGoogle} color='secondary'>
+        Connect another account
+      </MenuItem>
     </>
   );
 }
@@ -61,9 +69,14 @@ function GoogleFormSelect({
   return (
     <>
       {forms.map((form) => (
-        <MenuItem key={form.id} onClick={() => onSelect(form)}>
-          Choose from {form.name}
-        </MenuItem>
+        <Tooltip key={form.id} title={form.name} enterDelay={1000}>
+          <MenuItem dense onClick={() => onSelect(form)}>
+            <ListItemIcon>
+              <FormatListBulletedIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText primary={form.name} />
+          </MenuItem>
+        </Tooltip>
       ))}
     </>
   );

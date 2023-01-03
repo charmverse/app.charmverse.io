@@ -8,7 +8,7 @@ import { useState } from 'react';
 import charmClient from 'charmClient';
 import Button from 'components/common/Button';
 import { WalletConnect } from 'components/login/WalletConnect';
-import { useGoogleAuth } from 'hooks/useGoogleAuth';
+import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
@@ -49,7 +49,7 @@ export default function IdentityProviders() {
   const { connector } = useWeb3AuthSig();
   const { user, setUser } = useUser();
   const [isConnectingTelegram, setIsConnectingTelegram] = useState(false);
-  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle } = useGoogleAuth();
+  const { connectGoogleAccount, disconnectGoogleAccount, isConnectingGoogle } = useFirebaseAuth();
   const [isLoggingOut] = useState(false);
   const [telegramError, setTelegramError] = useState('');
 

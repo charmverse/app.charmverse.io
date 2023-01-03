@@ -1,18 +1,16 @@
 /// <reference types="google.accounts" />
 
-import Script from 'next/script';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
 import { googleOAuthClientId } from 'config/constants';
 import { formScopes } from 'lib/google/forms/scope';
 import log from 'lib/log';
 
 // login flow example: https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#authorization_code_flow_examples
-export const googleIdentityServiceUrl = 'https://accounts.google.com/gsi/client';
+export const googleIdentityServiceScript = 'https://accounts.google.com/gsi/client';
 
-export function GoogleConnectButton(props: { onConnect?: () => void }) {
+export function useGoogleAuth(props: { onConnect?: () => void }) {
   const [loaded, setLoaded] = useState(false);
 
   function initClient() {
@@ -46,12 +44,8 @@ export function GoogleConnectButton(props: { onConnect?: () => void }) {
     client?.requestCode();
   }
 
-  return (
-    <>
-      <Script src={googleIdentityServiceUrl} onReady={onLoadScript} />
-      <Button onClick={loginWithGoogle} variant='outlined'>
-        Connect Google Account
-      </Button>
-    </>
-  );
+  return {
+    loginWithGoogle,
+    onLoadScript
+  };
 }

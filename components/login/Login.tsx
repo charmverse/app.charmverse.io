@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import Button from 'components/common/Button';
-import { useGoogleAuth } from 'hooks/useGoogleAuth';
+import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
@@ -35,7 +35,7 @@ function LoginHandler(props: DialogProps) {
 
   const { showMessage } = useSnackbar();
 
-  const { loginWithGoogle } = useGoogleAuth();
+  const { loginWithGoogle } = useFirebaseAuth();
   const { verifiableWalletDetected } = useWeb3AuthSig();
   async function handleLogin(loggedInUser: AnyIdLogin) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
