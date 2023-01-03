@@ -14,7 +14,7 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { SortPosts } from 'lib/forums/posts/listForumPosts';
+import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
@@ -23,7 +23,7 @@ import { PostSkeleton } from './components/PostSkeleton';
 interface ForumPostsProps {
   search: string;
   categoryId?: string;
-  sort?: string;
+  sort?: PostOrder;
 }
 
 const resultsPerQuery = 10;
@@ -31,13 +31,6 @@ const resultsPerQuery = 10;
 const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
-
-function getSortPost(item: string | undefined): SortPosts {
-  if (item === 'newest' || item === 'most_voted' || item === 'most_commented') {
-    return item;
-  }
-  return 'newest';
-}
 
 export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
   const ref = useRef();
@@ -63,7 +56,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
         categoryId: args.arguments.categoryId,
         count: resultsPerQuery,
         page: args.arguments.page,
-        sort: getSortPost(args.arguments.sort)
+        sort: args.arguments.sort
       })
   );
 

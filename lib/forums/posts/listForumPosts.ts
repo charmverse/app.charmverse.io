@@ -13,14 +13,15 @@ export const defaultPostsPerResult = 5;
 
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
-export type SortPosts = 'newest' | 'most_commented' | 'most_voted';
+export const postOrderOptions = ['newest', 'most_commented', 'most_voted'] as const;
+export type PostOrder = typeof postOrderOptions[number];
 
 export interface ListForumPostsRequest {
   spaceId: string;
   categoryId?: string;
   page?: number;
   count?: number;
-  sort?: SortPosts;
+  sort?: PostOrder;
 }
 
 export async function listForumPosts(
@@ -42,25 +43,25 @@ export async function listForumPosts(
   const toSkip = Math.max(page, page - 1) * count;
 
   const orderByNewest: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
-    createdAt: 'desc' as const
+    createdAt: 'desc'
   };
 
   const orderByMostCommmented: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
     comments: {
-      _count: 'desc' as const
+      _count: 'desc'
     }
   };
 
   const orderByMostVoted: Prisma.PageOrderByWithRelationAndSearchRelevanceInput = {
     upDownVotes: {
-      _count: 'desc' as const
+      _count: 'desc'
     }
   };
 
   const orderQuery: Prisma.PageFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
-      ...((sort === 'newest' || !sort) && orderByNewest),
+      ...((sort === 'newest' || !sort || !postOrderOptions.includes(sort)) && orderByNewest),
       ...(sort === 'most_commented' && orderByMostCommmented),
       ...(sort === 'most_voted' && orderByMostVoted)
     }

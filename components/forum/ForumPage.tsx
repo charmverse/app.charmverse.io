@@ -13,6 +13,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
+import type { PostOrder } from 'lib/forums/posts/listForumPosts';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
@@ -26,7 +27,7 @@ export default function ForumPage() {
   const router = useRouter();
   const currentSpace = useCurrentSpace();
   const categoryId = router.query.categoryId as string | undefined;
-  const sort = router.query.sort as string | undefined;
+  const sort = router.query.sort as PostOrder | undefined;
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const { showPost } = usePostDialog();
   const { categories } = useForumCategories();
