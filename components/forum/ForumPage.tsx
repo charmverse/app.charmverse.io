@@ -21,7 +21,7 @@ import CreateForumPost from './components/CreateForumPost';
 import PostDialog from './components/PostDialog';
 import { ForumPostList } from './components/PostList/PostList';
 
-export default function ForumPage() {
+export function ForumPage() {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const currentSpace = useCurrentSpace();
