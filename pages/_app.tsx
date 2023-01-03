@@ -57,9 +57,6 @@ import '@skiff-org/prosemirror-tables/style/tables.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
-// fullcalendar css
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
 // init focalboard
 import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
