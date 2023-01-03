@@ -60,7 +60,7 @@ function render(tweetId: string, el: HTMLElement, options: TweetOptions) {
   window.twttr.widgets.createTweet(tweetId, el, options);
 }
 
-export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
+export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const theme = useTheme();
   const attrs = node.attrs as Partial<TweetNodeAttrs>;
@@ -81,6 +81,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, updateAttrs }: Charm
         <MediaSelectionPopup
           node={node}
           icon={<TwitterIcon fontSize='small' />}
+          isSelected={selected}
           buttonText='Embed a Tweet'
           onDelete={deleteNode}
         >

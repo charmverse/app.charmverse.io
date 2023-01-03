@@ -24,7 +24,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNodeViewProps) {
+export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs }: CharmNodeViewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const attrs = node.attrs as Partial<NodeAttrs>;
   const [width, setWidth] = useState(0);
@@ -51,6 +51,7 @@ export function NFTNodeView({ deleteNode, readOnly, node, updateAttrs }: CharmNo
           node={node}
           icon={<EmbedIcon icon={OpenSeaIcon} size='large' />}
           buttonText='Embed an NFT'
+          isSelected={selected}
           onDelete={deleteNode}
         >
           <Box py={3}>

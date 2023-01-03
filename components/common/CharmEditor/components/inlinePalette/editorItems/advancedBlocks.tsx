@@ -103,10 +103,18 @@ export function items(): PaletteItemTypeNoGroup[] {
         return (state, dispatch, view) => {
           if (view) {
             rafCommandExec(view!, (_state, _dispatch) => {
-              const node = _state.schema.nodes.poll.create();
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.poll.create(
+                {
+                  src: null
+                },
+                null,
+                [tooltipMark]
+              );
 
               if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
                 return true;
               }
               return insertNode(_state, _dispatch, node);
