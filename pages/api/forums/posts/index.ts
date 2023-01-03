@@ -42,9 +42,7 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
   );
 
   await trackCreateForumPostEvent({
-    categoryId: createdPage.post.categoryId,
-    pageId: createdPage.id,
-    spaceId: createdPage.spaceId,
+    page: createdPage,
     userId: req.session.user.id
   });
 
