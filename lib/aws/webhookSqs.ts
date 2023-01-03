@@ -10,14 +10,14 @@ type ProcessMssagesInput = {
 
 const SQS_KEY = process.env.SQS_KEY as string;
 const SQS_SECRET = process.env.SQS_SECRET as string;
-const SQS_REGION = process.env.SQS_REGION as string;
+const SQS_REGION = 'us-east-1';
+
 const SQS_NAME = process.env.SQS_NAME as string;
 const client = new SQSClient({
   region: SQS_REGION,
   credentials: { accessKeyId: SQS_KEY, secretAccessKey: SQS_SECRET }
 });
-
-let queueUrl = '';
+let queueUrl = 'https://sqs.us-east-1.amazonaws.com/310849459438/stg-webhook-collabland.fifo';
 
 export async function getQueueUrl() {
   if (queueUrl) {
@@ -27,7 +27,6 @@ export async function getQueueUrl() {
   const command = new GetQueueUrlCommand({ QueueName: SQS_NAME });
   const res = await client.send(command);
   queueUrl = res.QueueUrl || '';
-
   return queueUrl;
 }
 
@@ -53,27 +52,28 @@ export async function deleteMessage(receipt: string) {
 
 export async function processMessages({ processorFn }: ProcessMssagesInput) {
   const message = await getNextMessage();
+  // eslint-disable-next-line no-console
+  console.log('🔥 fetched message:', message);
+  // if (!message) {
+  //   return false;
+  // }
 
-  if (!message) {
-    return false;
-  }
+  // let msgBody: Record<string, any> | string = '';
+  // try {
+  //   msgBody = JSON.parse(message.Body || '');
+  //   // eslint-disable-next-line no-empty
+  // } catch (e) {}
 
-  let msgBody: Record<string, any> | string = '';
-  try {
-    msgBody = JSON.parse(message.Body || '');
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
+  // try {
+  //   // process message
+  //   await processorFn(msgBody as WebhookMessage);
+  //   // delete if processed correctly
+  //   await deleteMessage(message.ReceiptHandle || '');
+  // } catch (e) {
+  //   log.error('Failed to process webhook message', e);
+  // }
 
-  try {
-    // process message
-    await processorFn(msgBody as WebhookMessage);
-    // delete if processed correctly
-    await deleteMessage(message.ReceiptHandle || '');
-  } catch (e) {
-    log.error('Failed to process webhook message', e);
-  }
-
-  // process next message
-  setTimeout(() => processMessages({ processorFn }), 1000);
-  return true;
+  // // process next message
+  // setTimeout(() => processMessages({ processorFn }), 1000);
+  // return true;
 }
