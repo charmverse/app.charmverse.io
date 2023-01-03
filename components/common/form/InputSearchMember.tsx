@@ -134,6 +134,7 @@ export function InputSearchMemberMultiple({
   }, [defaultValue, members]);
 
   return (
+    // @ts-ignore - TODO: Check this works for React 18
     <InputSearchMemberBase
       filterSelectedOptions
       multiple

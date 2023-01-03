@@ -1,15 +1,9 @@
 // the fullcalendar lib most be loaded before any plugins
 // eslint-disable-next-line import/order
-import FullCalendar from '@fullcalendar/react';
+import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type {
-  EventClickArg,
-  EventChangeArg,
-  EventInput,
-  EventContentArg,
-  DayCellContentArg
-} from '@fullcalendar/react';
+import FullCalendar from '@fullcalendar/react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 

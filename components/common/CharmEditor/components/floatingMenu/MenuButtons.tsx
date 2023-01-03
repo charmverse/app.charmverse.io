@@ -50,7 +50,7 @@ interface ButtonProps {
 export function BoldButton({ hints = ['Bold', boldKeys.toggleBold], children = <BoldIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleBold()(view.state, view.dispatch, view)) {
         view.focus();
@@ -81,7 +81,7 @@ export function InlineActionButton({
   const view = useEditorViewContext();
 
   const onMouseDown = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       const command = filter(
         (state: EditorState) => commandFn()(state),
@@ -143,7 +143,7 @@ export function StrikeButton({
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleStrike()(view.state, view.dispatch, view)) {
         view.focus();
@@ -169,7 +169,7 @@ export function UnderlineButton({
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleUnderline()(view.state, view.dispatch, view)) {
         view.focus();
@@ -199,7 +199,7 @@ export function CalloutButton({
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (blockquote.commands.wrapInBlockquote()(view.state, view.dispatch, view)) {
         view.focus();
@@ -222,7 +222,7 @@ export function CalloutButton({
 export function ItalicButton({ hints = ['Italic', italicKeys.toggleItalic], children = <ItalicIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleItalic()(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -247,7 +247,7 @@ export function ItalicButton({ hints = ['Italic', italicKeys.toggleItalic], chil
 export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <UndoIcon /> }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (undo()(view.state, view.dispatch)) {
         if (view.dispatch as any) {
@@ -270,7 +270,7 @@ export function CodeButton({
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleCode()(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -300,7 +300,7 @@ export function HeadingButton({
   const view = useEditorViewContext();
 
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (toggleHeading(level)(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -328,7 +328,7 @@ export function ParagraphButton({
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       if (convertToParagraph()(view.state, view.dispatch, view)) {
         if (view.dispatch as any) {
@@ -359,7 +359,7 @@ export function FloatingLinkButton({
   const view = useEditorViewContext();
 
   const onMouseDown = useCallback(
-    (e) => {
+    (e: any) => {
       e.preventDefault();
       const command = filter(
         (state: EditorState) => createLink('')(state),

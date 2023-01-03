@@ -173,7 +173,8 @@ export default function GuildsAutocomplete({
           placeholder='Type Guild name...'
         />
       )}
-      renderOption={(props, guildName) => [props, guildRecord[guildName]]}
+      // used to be: => [props, guildRecord[guildName]]
+      renderOption={(props, guildName) => <span>{guildName}</span>}
     />
   );
 }
