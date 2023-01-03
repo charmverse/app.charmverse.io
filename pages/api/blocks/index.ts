@@ -3,6 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
+import type { BoardViewFields, GoogleFormSourceData } from 'lib/focalboard/boardView';
+import { getCredentialMaybe } from 'lib/google/forms/credentials';
+import { syncFormResponses } from 'lib/google/forms/forms';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
@@ -229,6 +232,25 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       }
     }
   ]);
+
+  const linkedViewBlocks = newBlocks.filter(
+    (newBlock) => newBlock.type === 'view' && (newBlock.fields as BoardViewFields)?.sourceType === 'google_form'
+  );
+
+  if (linkedViewBlocks.length) {
+    Promise.all(
+      linkedViewBlocks.map(async (view) => {
+        const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
+        const credential = await getCredentialMaybe({ credentialId: sourceData.credentialId });
+        if (credential) {
+          await syncFormResponses({ googleFormId: sourceData.formId, credential });
+        }
+      })
+    ).catch((error) => {
+      const viewIds = linkedViewBlocks.map((block) => block.id);
+      log.error('Could not sync google form', { viewIds, error });
+    });
+  }
 
   return res.status(200).json(newBlocks);
 }
