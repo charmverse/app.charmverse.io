@@ -4,8 +4,9 @@ import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
+import { defaultPostsPerResult } from '../constants';
 import type { ForumPostPage } from '../interfaces';
-import { defaultPostsPerResult, searchForumPosts } from '../searchForumPosts';
+import { searchForumPosts } from '../searchForumPosts';
 
 let space: Space;
 let user: User;
