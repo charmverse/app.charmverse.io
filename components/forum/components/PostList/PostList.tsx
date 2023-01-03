@@ -77,6 +77,9 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
       })
   );
 
+  const dataError =
+    postsError?.message ?? searchError?.message ?? 'There was an unexpected error while loading the posts';
+
   const hasNext = useMemo(
     () => (search && searchData ? searchData.at(-1)?.hasNext === true : postsData?.at(-1)?.hasNext === true),
     [search, postsData, searchData]
@@ -135,9 +138,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
 
   return (
     <>
-      {(postsError || searchError) && (
-        <Alert severity='error'>There was an unexpected error while loading the posts</Alert>
-      )}
+      {(postsError || searchError) && <Alert severity='error'>{dataError}</Alert>}
       {postsToShow.map((post) => (
         <PostCard key={post.id} user={members.find((item) => item.id === post.createdBy)} post={post} />
       ))}

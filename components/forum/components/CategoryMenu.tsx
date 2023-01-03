@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import type { PostCategory } from '@prisma/client';
+import startCase from 'lodash/startCase';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -20,10 +21,9 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
 import isAdmin from 'hooks/useIsAdmin';
+import { postSortOptions } from 'lib/forums/posts/constants';
 
 import { ForumFilterCategory } from './CategoryPopup';
-
-const sortList = ['Newest', 'Most Voted', 'Most Commented'] as const;
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ marginForIcons: false })}
@@ -108,9 +108,9 @@ export function CategoryMenu() {
         }}
       >
         <Stack gap={1} my={1}>
-          {sortList.map((sort) => (
+          {postSortOptions.map((sort) => (
             <StyledBox key={sort}>
-              <ForumFilterListLink label={sort} sort={sort.toLowerCase().replace(' ', '_')} />
+              <ForumFilterListLink label={startCase(sort.replace('_', ' '))} sort={sort} />
             </StyledBox>
           ))}
         </Stack>

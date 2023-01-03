@@ -2,19 +2,17 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from 'db';
 import type { PaginatedResponse } from 'lib/public-api';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
+import { defaultPostsPerResult, postSortOptions } from './constants';
 import type { PageWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
 import type { ForumPostMeta } from './interfaces';
 
-// Maxium posts we want per response
-export const defaultPostsPerResult = 5;
-
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
-export const postOrderOptions = ['newest', 'most_commented', 'most_voted'] as const;
-export type PostOrder = typeof postOrderOptions[number];
+export type PostOrder = typeof postSortOptions[number];
 
 export interface ListForumPostsRequest {
   spaceId: string;
@@ -58,10 +56,14 @@ export async function listForumPosts(
     }
   };
 
+  if (sort && !postSortOptions.includes(sort)) {
+    throw new InvalidInputError(`This type of sort does not exist.`);
+  }
+
   const orderQuery: Prisma.PageFindManyArgs = {
     // Return posts ordered from most recent to oldest
     orderBy: {
-      ...((sort === 'newest' || !sort || !postOrderOptions.includes(sort)) && orderByNewest),
+      ...((sort === 'newest' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
       ...(sort === 'most_commented' && orderByMostCommmented),
       ...(sort === 'most_voted' && orderByMostVoted)
     }
