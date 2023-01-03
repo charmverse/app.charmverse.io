@@ -7,10 +7,21 @@ import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
-import React, { useMemo, useState } from 'react';
-
-import PopperPopup from 'components/common/PopperPopup';
+import type { PopoverProps } from '@mui/material';
+import {
+  Divider,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popover,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
+import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useMemo, useRef, useState } from 'react';
 
 import type { Board, IPropertyTemplate, PropertyType } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
@@ -27,7 +38,7 @@ import HorizontalGrip from './horizontalGrip';
 type Props = {
   readOnly: boolean;
   sorted: 'up' | 'down' | 'none';
-  name: React.ReactNode;
+  name: string;
   board: Board;
   activeView: BoardView;
   cards: Card[];
@@ -40,22 +51,45 @@ type Props = {
 };
 
 function TableHeader(props: Props): JSX.Element {
-  const {
-    activeView,
-    board,
-    views,
-    cards,
-    sorted,
-    name,
-    type,
-    template: { id: templateId },
-    readOnly
-  } = props;
+  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
+  const { id: templateId } = template;
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
   const [tempName, setTempName] = useState(props.name || '');
+
+  const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
+  const toggleRef = useRef(null);
+
+  const popover = bindPopover(popupState);
+  const popoverProps: PopoverProps = {
+    ...popover,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    transformOrigin: {
+      vertical: 'top',
+      horizontal: 'center'
+    },
+    onClick: (e) => {
+      e.stopPropagation();
+    }
+  };
+
+  const popoverToggle = bindToggle(popupState);
+  const popoverToggleProps: typeof popoverToggle = {
+    ...popoverToggle,
+    onClick: (e) => {
+      e.stopPropagation();
+      popoverToggle.onClick(e);
+    }
+  };
+
+  popoverProps.onClick = () => {
+    popupState.close();
+  };
 
   const onAutoSizeColumn = React.useCallback((_templateId: string) => {
     let width = Constants.minColumnWidth;
@@ -88,20 +122,18 @@ function TableHeader(props: Props): JSX.Element {
               value={tempName}
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
               }}
               onChange={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 setTempName(e.target.value);
               }}
               autoFocus
-              onKeyDown={(e) => {
+              onKeyDown={async (e) => {
                 e.stopPropagation();
-
-                // if (e.code === 'Enter') {
-                //   onSave();
-                // }
+                if (e.code === 'Enter' && tempName.length !== 0) {
+                  await mutator.changePropertyTypeAndName(board, cards, template, type, tempName);
+                  popupState.close();
+                }
               }}
             />
           </Stack>
@@ -212,15 +244,13 @@ function TableHeader(props: Props): JSX.Element {
   const label = useMemo(
     () => (
       <Label>
-        <div>
-          <div style={{ marginRight: 4, display: 'flex' }}>
-            {iconForPropertyType(type, {
-              sx: {
-                width: 18,
-                height: 18
-              }
-            })}
-          </div>
+        <div style={{ marginRight: 4, display: 'flex' }}>
+          {iconForPropertyType(type, {
+            sx: {
+              width: 18,
+              height: 18
+            }
+          })}
         </div>
         <Typography
           component='span'
@@ -250,13 +280,20 @@ function TableHeader(props: Props): JSX.Element {
       style={{ overflow: 'unset', width: columnWidth(templateId), opacity: isDragging ? 0.5 : 1 }}
       ref={templateId === Constants.titleColumnId ? () => null : columnRef}
     >
-      {readOnly ? (
-        label
-      ) : (
-        <PopperPopup closeOnClick popupContent={popupContent}>
-          {label}
-        </PopperPopup>
-      )}
+      <Stack width='100%' justifyContent='center'>
+        {readOnly ? (
+          label
+        ) : (
+          <div ref={toggleRef}>
+            <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()}>
+              {label}
+            </div>
+            <Popover disableRestoreFocus {...popoverProps}>
+              <Paper>{popupContent}</Paper>
+            </Popover>
+          </div>
+        )}
+      </Stack>
       {!readOnly && <HorizontalGrip templateId={templateId} onAutoSizeColumn={onAutoSizeColumn} />}
     </div>
   );
