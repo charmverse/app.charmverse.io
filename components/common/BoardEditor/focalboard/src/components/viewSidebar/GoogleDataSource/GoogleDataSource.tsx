@@ -95,11 +95,7 @@ function GoogleFormSelect({
   loginWithGoogle: (options: { hint?: string }) => void;
   onSelect: Props['onSelect'];
 }) {
-  const {
-    data: forms,
-    error,
-    mutate
-  } = useSwr(`google-credentials/${credential.id}`, () =>
+  const { data: forms, error } = useSwr(`google-credentials/${credential.id}`, () =>
     charmClient.google.forms.getForms({ credentialId: credential.id })
   );
 

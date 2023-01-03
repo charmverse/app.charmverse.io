@@ -83,8 +83,9 @@ function ViewOptionsSidebar(props: Props) {
     setSidebarView(initialState);
   }
 
-  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceType'>) {
+  async function selectViewSource(fields: Pick<BoardViewFields, 'linkedSourceId' | 'sourceData' | 'sourceType'>) {
     const newView = createTableView(props.board, props.view);
+    newView.fields.sourceData = fields.sourceData;
     newView.fields.sourceType = fields.sourceType;
     newView.fields.linkedSourceId = fields.linkedSourceId;
     try {
