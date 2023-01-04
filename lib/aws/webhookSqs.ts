@@ -8,14 +8,14 @@ type ProcessMssagesInput = {
   processorFn: (messageBody: WebhookMessage) => Promise<boolean>;
 };
 
-const SQS_KEY = process.env.SQS_KEY as string;
-const SQS_SECRET = process.env.SQS_SECRET as string;
+const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
+const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
 const SQS_REGION = 'us-east-1';
 
 const SQS_NAME = process.env.SQS_NAME as string;
 const client = new SQSClient({
   region: SQS_REGION,
-  credentials: { accessKeyId: SQS_KEY, secretAccessKey: SQS_SECRET }
+  credentials: { accessKeyId: AWS_API_KEY, secretAccessKey: AWS_API_SECRET }
 });
 let queueUrl = 'https://sqs.us-east-1.amazonaws.com/310849459438/stg-webhook-collabland.fifo';
 
