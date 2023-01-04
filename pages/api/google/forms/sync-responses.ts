@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getCredentialMaybe } from 'lib/google/forms/credentials';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
+import { getCredentialMaybe } from 'lib/google/credentials';
 import { syncFormResponses } from 'lib/google/forms/forms';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -26,22 +27,13 @@ async function syncResponsesResponse(req: NextApiRequest, res: NextApiResponse) 
   }
 
   const block = await prisma.block.findUniqueOrThrow({ where: { id: boardId } });
-  const fields = block.fields as any;
-  const credentialId = fields.googleCredentialId;
-  const googleFormId = fields.googleFormId;
-  if (typeof credentialId !== 'string' || typeof googleFormId !== 'string') {
+  const fields = block.fields as BoardViewFields;
+  const sourceData = fields.sourceData;
+  if (!sourceData) {
     throw new WrongStateError('Board is not set up to connect to Google');
   }
-  const credential = await getCredentialMaybe({ credentialId });
-  if (credential) {
-    await syncFormResponses({ googleFormId, credential });
-  } else {
-    log.warn('Could not find valid credentials to refresh form responses for board', {
-      boardId,
-      credentialId,
-      googleFormId
-    });
-  }
+
+  await syncFormResponses({ sourceData });
 
   res.status(200).end();
 }

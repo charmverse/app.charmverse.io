@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-shadow */
-import styled from '@emotion/styled';
+
 import { Add } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -58,7 +57,7 @@ function AddViewMenu(props: AddViewProps) {
   });
 
   const handleAddViewBoard = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
     Utils.log('addview-board');
     // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
     const view = createBoardView();
@@ -89,7 +88,7 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewTable = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-table');
     const view = createTableView(board, activeView, intl);
@@ -115,7 +114,7 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.activeView, props.board, props.intl, showView]);
 
   const handleAddViewGallery = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-gallery');
     const view = createBoardView();
@@ -146,7 +145,7 @@ function AddViewMenu(props: AddViewProps) {
   }, [props.board, props.activeView, props.intl, showView]);
 
   const handleAddViewCalendar = useCallback(() => {
-    const { board, activeView, intl } = props;
+    const { board, activeView } = props;
 
     Utils.log('addview-calendar');
     const view = createBoardView();
@@ -225,7 +224,7 @@ function AddViewMenu(props: AddViewProps) {
 }
 
 export function createTableView(board: Board, activeView?: BoardView, intl?: IntlShape) {
-  const view = createBoardView();
+  const view = createBoardView(activeView);
   view.title = '';
   view.fields.viewType = 'table';
   view.parentId = board.id;
@@ -236,4 +235,5 @@ export function createTableView(board: Board, activeView?: BoardView, intl?: Int
   view.fields.cardOrder = activeView?.fields.cardOrder ?? [];
   return view;
 }
+
 export default injectIntl(AddViewMenu);

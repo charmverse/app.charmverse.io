@@ -16,6 +16,8 @@ import type { CredentialItem } from 'pages/api/google/forms/credentials';
 import { googleIdentityServiceScript, useGoogleAuth } from './hooks/useGoogleAuth';
 
 type Props = {
+  activeCredential?: string;
+  activeFormId?: string;
   onSelect: (source: Required<Pick<BoardViewFields, 'sourceData' | 'sourceType'>>) => void;
 };
 
@@ -44,14 +46,25 @@ export function GoogleDataSource(props: Props) {
     );
   } else if (selectedCredential) {
     return (
-      <GoogleFormSelect credential={selectedCredential} loginWithGoogle={loginWithGoogle} onSelect={props.onSelect} />
+      <GoogleFormSelect
+        activeFormId={props.activeFormId}
+        credential={selectedCredential}
+        loginWithGoogle={loginWithGoogle}
+        onSelect={props.onSelect}
+      />
     );
   }
   return (
     <>
       <Script src={googleIdentityServiceScript} onReady={onLoadScript} />
       {credentials.map((credential) => (
-        <MenuItem divider dense key={credential.id} onClick={() => selectCredential(credential)}>
+        <MenuItem
+          selected={props.activeCredential === credential.id}
+          divider
+          dense
+          key={credential.id}
+          onClick={() => selectCredential(credential)}
+        >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
             Choose from&nbsp;
             <Tooltip title={credential.name}>
@@ -87,10 +100,12 @@ function ConnectButton({
 }
 
 function GoogleFormSelect({
+  activeFormId,
   credential,
   loginWithGoogle,
   onSelect
 }: {
+  activeFormId?: string;
   credential: CredentialItem;
   loginWithGoogle: (options: { hint?: string }) => void;
   onSelect: Props['onSelect'];
@@ -136,13 +151,13 @@ function GoogleFormSelect({
     <>
       {forms.map((form) => (
         <Tooltip key={form.id} title={form.name} enterDelay={1000}>
-          <MenuItem dense onClick={() => selectForm(form)}>
+          <MenuItem dense selected={form.id === activeFormId} onClick={() => selectForm(form)}>
             <ListItemIcon>
               <FormatListBulletedIcon fontSize='small' />
             </ListItemIcon>
             <ListItemText
               primary={
-                <Link onClick={(e) => e.nativeEvent.preventDefault()} href={form.url}>
+                <Link color='inherit' onClick={(e) => e.nativeEvent.preventDefault()} href={form.url}>
                   {form.name}
                 </Link>
               }

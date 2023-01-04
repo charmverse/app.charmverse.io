@@ -2,7 +2,7 @@ import { GaxiosError } from 'gaxios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getCredential, invalidateCredential } from 'lib/google/forms/credentials';
+import { getCredential, invalidateCredential } from 'lib/google/credentials';
 // import type { GoogleForm } from 'lib/google/forms/forms';
 import { getForms } from 'lib/google/forms/forms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

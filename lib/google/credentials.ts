@@ -1,7 +1,7 @@
 import { prisma } from 'db';
 import log from 'lib/log';
 
-import { getClient } from '../authClient';
+import { getClient } from './authClient';
 
 type AccountRequest = {
   credentialId: string;

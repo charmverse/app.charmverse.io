@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { BoardViewFields, GoogleFormSourceData } from 'lib/focalboard/boardView';
-import { getCredentialMaybe } from 'lib/google/forms/credentials';
+import { getCredentialMaybe } from 'lib/google/credentials';
 import { syncFormResponses } from 'lib/google/forms/forms';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
@@ -233,21 +233,18 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }
   ]);
 
-  const linkedViewBlocks = newBlocks.filter(
+  const viewsLinkedToGoogleForm = newBlocks.filter(
     (newBlock) => newBlock.type === 'view' && (newBlock.fields as BoardViewFields)?.sourceType === 'google_form'
   );
 
-  if (linkedViewBlocks.length) {
+  if (viewsLinkedToGoogleForm.length) {
     Promise.all(
-      linkedViewBlocks.map(async (view) => {
+      viewsLinkedToGoogleForm.map((view) => {
         const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
-        const credential = await getCredentialMaybe({ credentialId: sourceData.credentialId });
-        if (credential) {
-          await syncFormResponses({ googleFormId: sourceData.formId, credential });
-        }
+        return syncFormResponses({ sourceData });
       })
     ).catch((error) => {
-      const viewIds = linkedViewBlocks.map((block) => block.id);
+      const viewIds = viewsLinkedToGoogleForm.map((block) => block.id);
       log.error('Could not sync google form', { viewIds, error });
     });
   }
@@ -294,6 +291,25 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
       spaceId
     );
   });
+
+  const newViewsLinkedToGoogleForm = updatedBlocks.filter(
+    (newBlock) =>
+      newBlock.type === 'view' &&
+      (newBlock.fields as BoardViewFields)?.sourceType === 'google_form' &&
+      !(newBlock.fields as BoardViewFields)?.sourceData?.boardId
+  );
+
+  if (newViewsLinkedToGoogleForm.length) {
+    Promise.all(
+      newViewsLinkedToGoogleForm.map(async (view) => {
+        const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
+        await syncFormResponses({ sourceData });
+      })
+    ).catch((error) => {
+      const viewIds = newViewsLinkedToGoogleForm.map((block) => block.id);
+      log.error('Could not sync google form', { viewIds, error });
+    });
+  }
 
   return res.status(200).json(updatedBlocks);
 }

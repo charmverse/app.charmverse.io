@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 import CallMadeIcon from '@mui/icons-material/CallMade';
-import { Box } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
+import { Box, Typography, Link } from '@mui/material';
 import type { Page } from '@prisma/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -66,6 +67,7 @@ type Props = WrappedComponentProps &
     views: BoardView[];
     hideBanner?: boolean;
     readOnly: boolean;
+    readOnlyData: boolean;
     addCard: (card: Card) => void;
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
@@ -142,7 +144,7 @@ function CenterPanel(props: Props) {
 
   const backgroundRef = React.createRef<HTMLDivElement>();
   const keydownHandler = (keyName: string, e: KeyboardEvent) => {
-    if (e.target !== document.body || props.readOnly) {
+    if (e.target !== document.body || props.readOnly || props.readOnlyData) {
       return;
     }
 
@@ -455,7 +457,6 @@ function CenterPanel(props: Props) {
           toggleViewOptions={toggleViewOptions}
           cards={cards}
           views={props.views}
-          groupByProperty={groupByProperty}
           dateDisplayProperty={dateDisplayProperty}
           addCard={() => addCard('', true)}
           showCard={showCard}
@@ -463,6 +464,7 @@ function CenterPanel(props: Props) {
           addCardTemplate={() => addCard('', true, {}, false, true)}
           editCardTemplate={editCardTemplate}
           readOnly={props.readOnly}
+          readOnlyData={props.readOnlyData}
           embeddedBoardPath={props.embeddedBoardPath}
         />
       </div>
@@ -477,6 +479,19 @@ function CenterPanel(props: Props) {
                 readOnly={props.readOnly}
                 setPage={props.setPage}
               />
+            )}
+            {activeBoard && activePage && activeView?.fields.sourceType === 'google_form' && (
+              <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                Form responses to{' '}
+                <Link
+                  target='_blank'
+                  href={`${activeView?.fields.sourceData?.formUrl}/edit#responses`}
+                  sx={{ color: 'inherit', fontWeight: 700 }}
+                >
+                  {activeView?.fields.sourceData?.formName || 'Untitled'}
+                  <LaunchIcon fontSize='small' sx={{ ml: 0.5 }} />
+                </Link>
+              </Typography>
             )}
             {activePage && boardPageType === 'inline_linked_board' && (
               <Button
@@ -506,7 +521,7 @@ function CenterPanel(props: Props) {
                 visibleGroups={visibleGroups}
                 hiddenGroups={hiddenGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlyData}
                 onCardClicked={cardClicked}
                 addCard={addCard}
                 showCard={showCard}
@@ -521,7 +536,7 @@ function CenterPanel(props: Props) {
                 views={props.views}
                 visibleGroups={visibleGroups}
                 selectedCardIds={state.selectedCardIds}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlyData}
                 cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                 showCard={showCard}
                 addCard={addCard}
@@ -533,7 +548,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlyData}
                 dateDisplayProperty={dateDisplayProperty}
                 showCard={showCard}
                 addCard={(properties: Record<string, string>) => {
@@ -547,7 +562,7 @@ function CenterPanel(props: Props) {
                 board={activeBoard}
                 cards={cards}
                 activeView={activeView}
-                readOnly={props.readOnly}
+                readOnly={props.readOnly || props.readOnlyData}
                 onCardClicked={cardClicked}
                 selectedCardIds={state.selectedCardIds}
                 addCard={(show) => addCard('', show)}

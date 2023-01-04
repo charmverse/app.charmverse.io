@@ -1,6 +1,5 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
-import ButtonGroup from '@mui/material/ButtonGroup';
+import { ButtonGroup, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
@@ -21,7 +20,6 @@ type Props = {
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
   boardId: string;
-  disabledMessage?: string;
 };
 
 const NewCardButton = React.memo(
@@ -30,7 +28,6 @@ const NewCardButton = React.memo(
     addCardFromTemplate,
     addCardTemplate,
     deleteCardTemplate,
-    disabledMessage,
     editCardTemplate,
     showCard,
     boardId
@@ -49,14 +46,16 @@ const NewCardButton = React.memo(
 
     return (
       <>
-        <Tooltip title={disabledMessage ?? ''}>
-          <ButtonGroup disabled={!!disabledMessage} variant='contained' ref={buttonRef}>
-            <Button onClick={addCard}>New</Button>
-            <Button size='small' onClick={popupState.open}>
-              <KeyboardArrowDown />
-            </Button>
-          </ButtonGroup>
-        </Tooltip>
+        <ButtonGroup size='small' disableElevation variant='contained' ref={buttonRef}>
+          <Button onClick={addCard}>
+            <Typography fontWeight={700} variant='subtitle1'>
+              New
+            </Typography>
+          </Button>
+          <Button sx={{ minWidth: '30px !important', px: 0 }} onClick={popupState.open}>
+            <KeyboardArrowDown fontSize='small' />
+          </Button>
+        </ButtonGroup>
 
         <TemplatesMenu
           addPageFromTemplate={addCardFromTemplate}

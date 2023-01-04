@@ -1,6 +1,6 @@
 import { Delete } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import { Box, Divider, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -45,9 +45,11 @@ function GroupByOptions(props: LayoutOptionsProps) {
           </MenuItem>
         ))}
       {!hasPropertiesToGroupBy && (
-        <div className='MenuOption TextOption menu-option disabled-option'>
-          <div className='menu-name'>Add a Select type property to group cards</div>
-        </div>
+        <ListItem>
+          <Typography variant='body2'>
+            Add a <em>Select type</em> property to group cards
+          </Typography>
+        </ListItem>
       )}
       {showTableUngroup && (
         <>

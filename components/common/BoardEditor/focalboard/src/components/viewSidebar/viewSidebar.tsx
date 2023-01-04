@@ -17,12 +17,14 @@ import {
 } from '@mui/material';
 import { capitalize } from 'lodash';
 import { memo, useEffect, useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
 import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
+import log from 'lib/log';
 
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
@@ -58,7 +60,7 @@ type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 
 
 const initialState: SidebarView = 'view-options';
 
-function ViewOptionsSidebar(props: Props) {
+function ViewSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(initialState);
   const dispatch = useAppDispatch();
   const { pages } = usePages();
@@ -71,12 +73,14 @@ function ViewOptionsSidebar(props: Props) {
     props.board.fields.cardProperties.some((c) => c.id === id)
   ).length;
 
+  let SourceIcon = RiFolder2Line;
   let sourceTitle = 'None';
   const sourcePage = pages[props.view.fields.linkedSourceId ?? ''];
   if (sourcePage) {
     sourceTitle = sourcePage.title;
   } else if (props.view.fields.sourceType === 'google_form') {
-    sourceTitle = 'Google Form';
+    sourceTitle = props.view.fields.sourceData?.formName ?? 'Google Form';
+    SourceIcon = FcGoogle;
   }
 
   function goBack() {
@@ -91,7 +95,8 @@ function ViewOptionsSidebar(props: Props) {
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, props.view, 'change view source');
-    } catch {
+    } catch (error) {
+      log.warn('Undo view source selection', error);
       dispatch(updateView(props.view));
     }
   }
@@ -136,7 +141,7 @@ function ViewOptionsSidebar(props: Props) {
               {props.view.fields.sourceType && (
                 <MenuRow
                   onClick={() => setSidebarView('source')}
-                  icon={<RiFolder2Line style={{ color: 'var(--secondary-text)' }} />}
+                  icon={<SourceIcon style={{ color: 'var(--secondary-text)' }} />}
                   title='Source'
                   value={sourceTitle}
                 />
@@ -195,10 +200,22 @@ function MenuRow({
     <MenuItem dense onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText>{title}</ListItemText>
-      <Typography component='div' color='secondary' variant='body2' sx={{ display: 'flex', alignItems: 'center' }}>
+      <Typography
+        component='div'
+        color='secondary'
+        variant='body2'
+        sx={{
+          flexGrow: 1,
+          maxWidth: '45%',
+          textAlign: 'right',
+          whitespace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
         {value}
-        <ArrowRightIcon />
       </Typography>
+      <ArrowRightIcon color='secondary' />
     </MenuItem>
   );
 }
@@ -231,4 +248,4 @@ export function SidebarHeader({
   );
 }
 
-export default memo(ViewOptionsSidebar);
+export default memo(ViewSidebar);

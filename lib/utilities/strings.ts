@@ -77,6 +77,10 @@ export function isUUID(uuid: string) {
   return validate(uuid);
 }
 
+// use this to generate smaller unique ids than uuid for storage
+export function uid() {
+  return Math.round(Date.now()).toString(36);
+}
 /**
  * Converts a list of string to human friendly gramatically correct comma list, with an and / or at the end
  * Won't add the conjunction if there is less than 2 items in the list

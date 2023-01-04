@@ -80,7 +80,11 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           />
         )}
         {formStep === 'configure_source' && sourceType === 'google_form' && (
-          <GoogleDataSource onSelect={props.onSelect} />
+          <GoogleDataSource
+            activeFormId={activeView?.fields.sourceData?.formId}
+            activeCredential={activeView?.fields.sourceData?.credentialId}
+            onSelect={props.onSelect}
+          />
         )}
       </Box>
     </>

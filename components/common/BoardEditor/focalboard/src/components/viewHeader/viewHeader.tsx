@@ -32,13 +32,13 @@ type Props = {
   views: BoardView[];
   viewsBoardId: string;
   cards: Card[];
-  groupByProperty?: IPropertyTemplate;
   addCard: () => void;
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
+  readOnlyData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   addViewButton?: ReactNode;
   disableUpdatingUrl?: boolean;
@@ -65,7 +65,6 @@ function ViewHeader(props: Props) {
     viewsBoardId,
     activeBoard,
     activeView,
-    groupByProperty,
     cards,
     dateDisplayProperty
   } = props;
@@ -185,18 +184,17 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            <NewCardButton
-              addCard={props.addCard}
-              disabledMessage={
-                activeView.fields.sourceType === 'google_form' ? 'Cannot add cards to a synced data source' : ''
-              }
-              addCardFromTemplate={addPageFromTemplate}
-              addCardTemplate={props.addCardTemplate}
-              editCardTemplate={props.editCardTemplate}
-              showCard={props.showCard}
-              deleteCardTemplate={deleteCardTemplate}
-              boardId={viewsBoardId}
-            />
+            {!props.readOnlyData && (
+              <NewCardButton
+                addCard={props.addCard}
+                addCardFromTemplate={addPageFromTemplate}
+                addCardTemplate={props.addCardTemplate}
+                editCardTemplate={props.editCardTemplate}
+                showCard={props.showCard}
+                deleteCardTemplate={deleteCardTemplate}
+                boardId={viewsBoardId}
+              />
+            )}
           </>
         )}
       </div>

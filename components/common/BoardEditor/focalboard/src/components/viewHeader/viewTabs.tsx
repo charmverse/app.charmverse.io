@@ -286,7 +286,7 @@ function ViewTabs(props: ViewTabsProps) {
             return disableUpdatingUrl ? (
               content
             ) : (
-              <Link href={getViewUrl(view.id)} passHref>
+              <Link key={view.id} href={getViewUrl(view.id)} passHref>
                 {content}
               </Link>
             );
