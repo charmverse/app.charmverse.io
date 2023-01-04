@@ -99,6 +99,7 @@ export function PostPage({ post, spaceId, onSave }: Props) {
   useEffect(() => {
     if (post) {
       setTitleState(post.title);
+      setForm((_form) => ({ ...form, content: post.content, contentText: post.contentText }));
     }
   }, [post]);
 
