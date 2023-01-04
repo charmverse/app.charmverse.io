@@ -87,7 +87,7 @@ function TableRow(props: Props) {
       ? visiblePropertyIds
       : [Constants.titleColumnId, ...visiblePropertyIds];
 
-    return activeView.fields.visiblePropertyIds
+    return visiblePropertyIds
       .map((id) =>
         id === Constants.titleColumnId ? titleProperty : board.fields.cardProperties.find((t) => t.id === id)
       )
