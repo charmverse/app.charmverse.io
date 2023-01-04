@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
-import IconButton from '@mui/material/IconButton';
 import React, { useCallback, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, Board } from '../../blocks/board';
+import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView, ISortOption } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
@@ -14,7 +13,7 @@ import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import PropertyMenu, { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
+import { PropertyTypes, typeDisplayName } from '../../widgets/propertyMenu';
 
 import TableHeader from './tableHeader';
 
@@ -119,19 +118,33 @@ function TableHeaders(props: Props): JSX.Element {
     [activeView, board, cards]
   );
 
-  const visiblePropertyTemplates = useMemo(
-    () =>
-      activeView.fields.visiblePropertyIds
-        .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
-    [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
-  );
+  const visiblePropertyTemplates = useMemo(() => {
+    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'title', type: 'text', options: [] };
+    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
+    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
+      ? visiblePropertyIds
+      : [Constants.titleColumnId, ...visiblePropertyIds];
+    return visiblePropertyIds
+      .map((id) =>
+        id === Constants.titleColumnId ? titleProperty : board.fields.cardProperties.find((t) => t.id === id)
+      )
+      .filter((i) => i) as IPropertyTemplate[];
+  }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
     Utils.log(`ondrop. Source column: ${sourceProperty.name}, dest column: ${destinationProperty.name}`);
     // Move template to new index
-    const destIndex = destinationProperty ? activeView.fields.visiblePropertyIds.indexOf(destinationProperty.id) : 0;
-    await mutator.changeViewVisiblePropertiesOrder(activeView, sourceProperty, destIndex >= 0 ? destIndex : 0);
+    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
+    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
+      ? [Constants.titleColumnId, ...visiblePropertyIds]
+      : visiblePropertyIds;
+    const destIndex = destinationProperty ? visiblePropertyIds.indexOf(destinationProperty.id) : 0;
+    await mutator.changeViewVisiblePropertiesOrder(
+      activeView.id,
+      visiblePropertyIds,
+      sourceProperty,
+      destIndex >= 0 ? destIndex : 0
+    );
   };
 
   const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
@@ -142,22 +155,6 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
-      <TableHeader
-        type='text'
-        name='Title'
-        sorted={titleSorted}
-        readOnly={props.readOnly}
-        board={board}
-        activeView={activeView}
-        cards={cards}
-        views={views}
-        template={{ id: Constants.titleColumnId, name: 'title', type: 'text', options: [] }}
-        offset={resizingColumn === Constants.titleColumnId ? offset : 0}
-        onDrop={onDropToColumn}
-        onAutoSizeColumn={onAutoSizeColumn}
-      />
-
-      {/* Table header row */}
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
         const sortOption = activeView.fields.sortOptions.find((o: ISortOption) => o.propertyId === template.id);

@@ -70,7 +70,7 @@ function TableHeader(props: Props): JSX.Element {
         transition: `background-color 150ms ease-in-out`,
         backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
       }}
-      ref={props.template.id === Constants.titleColumnId ? () => null : columnRef}
+      ref={columnRef}
     >
       <MenuWrapper disabled={props.readOnly}>
         <Label>
