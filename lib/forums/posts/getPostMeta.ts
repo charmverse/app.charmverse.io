@@ -1,4 +1,4 @@
-import type { Page, PageUpDownVote } from '@prisma/client';
+import type { Page, PostUpDownVote } from '@prisma/client';
 
 import { extractSummary } from 'lib/prosemirror/extractSummary';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -7,19 +7,19 @@ import type { ForumPostMeta, ForumVotes } from './interfaces';
 
 type PageData = Pick<Page, 'id' | 'title' | 'content' | 'createdAt' | 'createdBy' | 'updatedAt'>;
 
-type UpDownVoteData = Pick<PageUpDownVote, 'createdBy' | 'upvoted'>;
+type UpDownVoteData = Pick<PostUpDownVote, 'createdBy' | 'upvoted'>;
 
 export type PageWithRelations = PageData & {
   post: { categoryId: string };
   upDownVotes: UpDownVoteData[];
 };
 
-export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId: string): ForumVotes {
-  const userVote = upDownVotes.find((vote) => vote.createdBy === userId);
+export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId?: string): ForumVotes {
+  const userVote = userId ? upDownVotes.find((vote) => vote.createdBy === userId) : undefined;
   return {
     downvotes: upDownVotes.filter((vote) => !vote.upvoted).length,
     upvotes: upDownVotes.filter((vote) => vote.upvoted).length,
-    upvoted: userVote ? userVote.upvoted : null
+    upvoted: userVote ? userVote.upvoted : false
   };
 }
 

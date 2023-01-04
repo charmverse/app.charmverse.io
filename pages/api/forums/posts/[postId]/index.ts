@@ -7,8 +7,9 @@ import { deleteForumPost } from 'lib/forums/posts/deleteForumPost';
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,10 +20,14 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  await canEditPost({
+  const canEdit = await canEditPost({
     postId,
     userId
   });
+
+  if (!canEdit) {
+    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
+  }
 
   await updateForumPost(postId, req.body);
 
@@ -33,10 +38,14 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  await canEditPost({
+  const canDelete = await canEditPost({
     postId,
     userId
   });
+
+  if (!canDelete) {
+    throw new UnauthorisedActionError(`User ${userId} cannot edit post ${postId}`);
+  }
 
   await deleteForumPost(postId);
 
@@ -44,20 +53,21 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
 }
 
 async function getForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
-  const { pageId } = req.query as any as { pageId: string };
+  const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ userId, pageId });
+  const post = await getForumPost({ userId, postId });
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
+  const { error } = await hasAccessToSpace({
+    spaceId: post.spaceId,
+    userId
+  });
+
+  if (error) {
+    throw error;
   }
 
-  // if (page.post.status === 'draft' && page.createdBy !== userId) {
-  //   throw new UnauthorisedActionError();
-  // }
-
-  res.status(200).json(page);
+  res.status(200).json(post);
 }
 
 export default withSessionRoute(handler);

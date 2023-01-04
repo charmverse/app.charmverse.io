@@ -8,7 +8,6 @@ import { typedKeys } from 'lib/utilities/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
-import { getForumPost } from '../getForumPost';
 import { updateForumPost } from '../updateForumPost';
 
 let space: Space;
@@ -21,69 +20,52 @@ beforeAll(async () => {
 });
 
 describe('updateForumPost', () => {
-  it('should only update page.content, page.contentText, page.title, and post.categoryId', async () => {
+  it('should only update post.content, post.contentText, post.title, and post.categoryId', async () => {
     const [category1, category2] = await Promise.all([
       createPostCategory({ name: 'First', spaceId: space.id }),
       createPostCategory({ name: 'Second', spaceId: space.id })
     ]);
 
-    const createdPage = await generateForumPost({
+    const createdPost = await generateForumPost({
       userId: user.id,
       spaceId: space.id,
       categoryId: category1.id
     });
 
-    const droppedPageUpdate = {
+    const droppedPostUpdate: Partial<Post> = {
       createdAt: new Date(),
-      deletedAt: new Date(),
-      postId: v4(),
       createdBy: v4(),
-      path: `new-path-${v4()}`
-    };
-
-    const droppedPostUpdate = {
+      path: `new-path-${v4()}`,
       locked: true,
       pinned: true
     };
 
-    const pageUpdate = {
+    const postUpdate: Partial<Post> = {
       content: { type: 'doc', content: [] } as any,
       contentText: 'New content text',
-      title: 'New post title'
-    };
-
-    const postUpdate: Partial<Post> = {
+      title: 'New post title',
       categoryId: category2.id
     };
 
     const groupedUpdate = {
-      ...droppedPageUpdate,
       ...droppedPostUpdate,
-      ...pageUpdate,
       ...postUpdate
     };
 
-    await updateForumPost({
-      ...(groupedUpdate as any),
-      postId: createdPage.id,
-      userId: user.id
-    });
+    await updateForumPost(createdPost.id, groupedUpdate);
 
-    const updatedPage = await prisma.page.findUniqueOrThrow({
+    const updatedPost = await prisma.post.findUniqueOrThrow({
       where: {
-        id: createdPage.id
-      },
-      include: {
-        post: true
+        id: createdPost.id
       }
     });
 
-    typedKeys(pageUpdate).forEach((key) => {
-      expect(updatedPage[key]).toEqual(pageUpdate[key]);
+    typedKeys(postUpdate).forEach((key) => {
+      expect(updatedPost[key]).toEqual(postUpdate[key]);
     });
 
-    typedKeys(postUpdate).forEach((key) => {
-      expect(updatedPage.post?.[key]).toEqual(postUpdate[key]);
+    typedKeys(droppedPostUpdate).forEach((key) => {
+      expect(updatedPost[key]).not.toEqual(postUpdate[key]);
     });
   });
 
@@ -95,7 +77,7 @@ describe('updateForumPost', () => {
       createPostCategory({ name: 'Fourth', spaceId: secondSpace.id })
     ]);
 
-    const createdPage = await generateForumPost({
+    const createdPost = await generateForumPost({
       userId: user.id,
       spaceId: space.id,
       categoryId: category1.id
@@ -105,20 +87,18 @@ describe('updateForumPost', () => {
       categoryId: otherSpaceCategory.id
     };
 
-    await expect(
-      updateForumPost({ postId: createdPage.id, userId: user.id, ...(postUpdate as any) })
-    ).rejects.toBeInstanceOf(InsecureOperationError);
+    await expect(updateForumPost(createdPost.id, postUpdate)).rejects.toBeInstanceOf(InsecureOperationError);
   });
 
   it('should fail to update if the post is locked', async () => {
-    const createdPage = await generateForumPost({
+    const createdPost = await generateForumPost({
       userId: user.id,
       spaceId: space.id
     });
 
     await prisma.post.update({
       where: {
-        id: createdPage.post.id
+        id: createdPost.id
       },
       data: {
         locked: true
@@ -131,8 +111,6 @@ describe('updateForumPost', () => {
       title: 'New post title'
     };
 
-    await expect(updateForumPost({ ...pageUpdate, userId: user.id, postId: createdPage.id })).rejects.toBeInstanceOf(
-      UndesirableOperationError
-    );
+    await expect(updateForumPost(createdPost.id, pageUpdate)).rejects.toBeInstanceOf(UndesirableOperationError);
   });
 });
