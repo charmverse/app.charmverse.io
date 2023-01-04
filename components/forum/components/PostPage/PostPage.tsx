@@ -1,5 +1,6 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import type { Post } from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -14,7 +15,6 @@ import { ScrollableWindow } from 'components/common/PageLayout';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -25,7 +25,7 @@ import { PostCommentSort } from './components/PostCommentSort';
 
 type Props = {
   spaceId: string;
-  page: ForumPostPage | null;
+  post: Post | null;
   onSave?: () => void;
 };
 
@@ -37,8 +37,10 @@ type FormInputs = {
 };
 
 function processComments({ postComments, rootPageId }: { postComments: PostCommentWithVote[]; rootPageId: string }) {
+  // Get top level comments
   const topLevelComments: PostCommentWithVoteAndChildren[] = [];
 
+  // Create the map
   const postCommentsRecord: Record<string, PostCommentWithVoteAndChildren> = {};
   postComments.forEach((postComment) => {
     postCommentsRecord[postComment.id] = {
@@ -46,14 +48,16 @@ function processComments({ postComments, rootPageId }: { postComments: PostComme
       children: []
     };
   });
+
+  // Push child-level comments into their parents
   postComments.forEach((postComment) => {
-    if (postComment.parentId !== rootPageId) {
+    if (postComment.parentId) {
       postCommentsRecord[postComment.parentId].children.push(postCommentsRecord[postComment.id]);
     }
   });
   Object.values(postCommentsRecord).forEach((comment) => {
     comment.children = comment.children.sort((c1, c2) => (c1.createdAt < c2.createdAt ? 1 : -1));
-    if (comment.parentId === rootPageId) {
+    if (!comment.parentId) {
       topLevelComments.push(comment);
     }
   });
@@ -70,16 +74,16 @@ function sortComments({ comments, sort }: { comments: PostCommentWithVoteAndChil
   return comments;
 }
 
-export function PostPage({ page, spaceId, onSave }: Props) {
+export function PostPage({ post, spaceId, onSave }: Props) {
   const { user } = useUser();
-  const [form, setForm] = useState<FormInputs>(page ?? { title: '', content: null, contentText: '' });
-  const [categoryId, setCategoryId] = useState(page?.post.categoryId ?? null);
+  const [form, setForm] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const [categoryId, setCategoryId] = useState(post?.categoryId ?? null);
   const {
     data: postComments,
     mutate: setPostComments,
     isValidating
-  } = useSWR(page ? `${page.id}/comments` : null, () =>
-    page ? charmClient.forum.listPostComments(page.id) : undefined
+  } = useSWR(post ? `${post.id}/comments` : null, () =>
+    post ? charmClient.forum.listPostComments(post.id) : undefined
   );
   const [, setTitleState] = usePageTitle();
 
@@ -93,17 +97,17 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }
 
   useEffect(() => {
-    if (page) {
-      setTitleState(page.title);
+    if (post) {
+      setTitleState(post.title);
     }
-  }, [page]);
+  }, [post]);
 
   async function publishForumPost() {
     if (checkIsContentEmpty(form.content) || !categoryId) {
       throw new Error('Missing required fields to save forum post');
     }
-    if (page) {
-      await charmClient.forum.updateForumPost(page.id, {
+    if (post) {
+      await charmClient.forum.updateForumPost(post.id, {
         categoryId,
         content: form.content,
         contentText: form.contentText,
@@ -132,7 +136,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
       contentText: rawText
     }));
   }
-  const isMyPost = !page || page.createdBy === user?.id;
+  const isMyPost = !post || post.createdBy === user?.id;
   const readOnly = !isMyPost;
 
   let disabledTooltip = '';
@@ -145,17 +149,17 @@ export function PostPage({ page, spaceId, onSave }: Props) {
   }
 
   const topLevelComments = useMemo(() => {
-    if (postComments && page) {
+    if (postComments && post) {
       return sortComments({
         comments: processComments({
           postComments,
-          rootPageId: page.id
+          rootPageId: post.id
         }),
         sort: commentSort
       });
     }
     return [];
-  }, [postComments, page, commentSort]);
+  }, [postComments, post, commentSort]);
 
   return (
     <ScrollableWindow>
@@ -164,9 +168,8 @@ export function PostPage({ page, spaceId, onSave }: Props) {
           <CharmEditor
             readOnly={readOnly}
             pageActionDisplay={null}
-            pageId={page?.id}
+            pageId={post?.id}
             disablePageSpecificFeatures
-            pageType='post'
             isContentControlled
             key={user?.id}
             content={form.content as PageContent}
@@ -181,14 +184,14 @@ export function PostPage({ page, spaceId, onSave }: Props) {
         {isMyPost && (
           <Box display='flex' flexDirection='row' justifyContent='right' my={2}>
             <Button disabled={Boolean(disabledTooltip)} disabledTooltip={disabledTooltip} onClick={publishForumPost}>
-              {page ? 'Update' : 'Post'}
+              {post ? 'Update' : 'Post'}
             </Button>
           </Box>
         )}
 
-        {page?.post && (
+        {post && (
           <Box my={2}>
-            <PostCommentForm setPostComments={setPostComments} postId={page.post.id} />
+            <PostCommentForm setPostComments={setPostComments} postId={post.id} />
           </Box>
         )}
         <Divider
@@ -201,7 +204,7 @@ export function PostPage({ page, spaceId, onSave }: Props) {
             <LoadingComponent size={24} isLoading label='Fetching comments' />
           </Box>
         ) : (
-          page?.post && (
+          post && (
             <>
               <Stack gap={1}>
                 <PostCommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
