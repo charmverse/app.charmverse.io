@@ -2,49 +2,51 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
+import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
-import { getPostComments } from 'lib/forums/comments/getPostComments';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
-import { getForumPost } from 'lib/forums/posts/getForumPost';
+import { listPostComments } from 'lib/forums/comments/listPostComments';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getPostCommentsHandler).post(createPostCommentHandler);
+handler.use(requireUser).get(listPostCommentsHandler).post(createPostCommentHandler);
 
-async function getPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
-  const { pageId } = req.query as any as { pageId: string };
+async function listPostCommentsHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote[]>) {
+  const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
 
-  const postCommentsWithVotes = await getPostComments({ postId: pageId, userId });
+  const postCommentsWithVotes = await listPostComments({ postId, userId });
 
   res.status(200).json(postCommentsWithVotes);
 }
 
 async function createPostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostCommentWithVote>) {
-  const { pageId } = req.query as any as { pageId: string };
+  const { postId } = req.query as any as { postId: string };
   const body = req.body as CreatePostCommentInput;
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ pageId, userId });
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    select: { spaceId: true }
+  });
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
+  if (!post) {
+    throw new PageNotFoundError(postId);
   }
 
-  const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
+  const { error } = await hasAccessToSpace({
+    spaceId: post.spaceId,
     userId
   });
 
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
+  if (error) {
+    throw error;
   }
 
-  const postComment = await createPostComment({ postId: pageId, userId, ...body });
+  const postComment = await createPostComment({ postId, userId, ...body });
 
   res.status(200).json({
     ...postComment,

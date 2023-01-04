@@ -1,44 +1,25 @@
-import type { PageComment } from '@prisma/client';
+import type { PostComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
-import { getComment } from 'lib/forums/comments/getComment';
+import { getPostComment } from 'lib/forums/comments/getPostComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
-import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(updatePostCommentHandler).delete(deletePostCommentHandler);
 
-async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PageComment>) {
-  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
+async function updatePostCommentHandler(req: NextApiRequest, res: NextApiResponse<PostComment>) {
+  const { commentId } = req.query as any as { postId: string; commentId: string };
   const body = req.body as UpdatePostCommentInput;
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ pageId, userId });
-
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
-    userId
-  });
-
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
-  }
-
-  const comment = await getComment(commentId);
+  const comment = await getPostComment(commentId);
 
   if (comment?.createdBy !== userId) {
     throw new UnauthorisedActionError();
@@ -54,22 +35,13 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
 }
 
 async function deletePostCommentHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
+  const { commentId } = req.query as any as { postId: string; commentId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ pageId, userId });
+  const postComment = await getPostComment(commentId);
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  const spaceRole = await hasAccessToSpace({
-    spaceId: page.spaceId,
-    userId
-  });
-
-  if (!spaceRole.success) {
-    throw new UserIsNotSpaceMemberError();
+  if (postComment?.createdBy !== userId) {
+    throw new UnauthorisedActionError();
   }
 
   await deletePostComment({ commentId, userId });

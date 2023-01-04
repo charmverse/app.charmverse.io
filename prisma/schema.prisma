@@ -1057,7 +1057,7 @@ model PostComment {
   contentText String
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
-  parentId    String
+  parentId    String?
 
   postId String                  @db.Uuid
   post   Post                    @relation(fields: [postId], references: [id], onDelete: Cascade)

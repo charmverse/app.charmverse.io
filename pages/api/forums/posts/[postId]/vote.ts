@@ -10,12 +10,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(voteForumPostHandler);
 
 async function voteForumPostHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { pageId } = req.query as any as { pageId: string };
+  const { postId } = req.query as any as { postId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
 
   await voteForumPost({
-    pageId,
+    postId,
     userId,
     upvoted
   });

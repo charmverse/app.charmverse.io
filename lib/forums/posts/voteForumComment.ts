@@ -1,7 +1,6 @@
 import { prisma } from 'db';
-import { DataNotFoundError } from 'lib/utilities/errors';
 
-import { getComment } from '../comments/getComment';
+import { getPostComment } from '../comments/getPostComment';
 
 type CommentVote = {
   commentId: string;
@@ -11,11 +10,7 @@ type CommentVote = {
 };
 
 export async function voteForumComment({ upvoted, userId, commentId, postId }: CommentVote) {
-  const comment = await getComment(commentId);
-
-  if (!comment) {
-    throw new DataNotFoundError(commentId);
-  }
+  const comment = await getPostComment(commentId);
 
   if (upvoted === null) {
     await prisma.postCommentUpDownVote.delete({
