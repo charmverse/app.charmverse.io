@@ -119,7 +119,7 @@ function TableHeaders(props: Props): JSX.Element {
   );
 
   const visiblePropertyTemplates = useMemo(() => {
-    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'title', type: 'text', options: [] };
+    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     let visiblePropertyIds = activeView.fields.visiblePropertyIds;
     visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
       ? visiblePropertyIds
@@ -136,8 +136,8 @@ function TableHeaders(props: Props): JSX.Element {
     // Move template to new index
     let visiblePropertyIds = activeView.fields.visiblePropertyIds;
     visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
-      ? [Constants.titleColumnId, ...visiblePropertyIds]
-      : visiblePropertyIds;
+      ? visiblePropertyIds
+      : [Constants.titleColumnId, ...visiblePropertyIds];
     const destIndex = destinationProperty ? visiblePropertyIds.indexOf(destinationProperty.id) : 0;
     await mutator.changeViewVisiblePropertiesOrder(
       activeView.id,

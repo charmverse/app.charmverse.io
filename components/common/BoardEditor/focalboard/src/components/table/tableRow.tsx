@@ -80,13 +80,19 @@ function TableRow(props: Props) {
     setTitle(pageTitle);
   }, [pageTitle]);
 
-  const visiblePropertyTemplates = useMemo(
-    () =>
-      activeView.fields.visiblePropertyIds
-        .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
-    [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
-  );
+  const visiblePropertyTemplates = useMemo(() => {
+    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'title', type: 'text', options: [] };
+    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
+    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
+      ? visiblePropertyIds
+      : [Constants.titleColumnId, ...visiblePropertyIds];
+
+    return activeView.fields.visiblePropertyIds
+      .map((id) =>
+        id === Constants.titleColumnId ? titleProperty : board.fields.cardProperties.find((t) => t.id === id)
+      )
+      .filter((i) => i) as IPropertyTemplate[];
+  }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
   if (isOver) {
@@ -108,43 +114,48 @@ function TableRow(props: Props) {
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {/* Name / title */}
-      <div
-        className='octo-table-cell title-cell'
-        id='mainBoardHeader'
-        style={{
-          width: columnWidth(
-            props.resizingColumn,
-            props.activeView.fields.columnWidths,
-            props.offset,
-            Constants.titleColumnId
-          )
-        }}
-        ref={columnRefs.get(Constants.titleColumnId)}
-      >
-        <div className='octo-icontitle'>
-          <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-
-          <Editable
-            ref={titleRef}
-            value={title}
-            placeholderText='Untitled'
-            onChange={(newTitle: string) => setTitle(newTitle)}
-            onSave={(saveType) => saveTitle(saveType, card.id, title)}
-            onCancel={() => setTitle(card.title || '')}
-            readOnly={props.readOnly}
-            spellCheck={true}
-          />
-        </div>
-
-        <div className='open-button'>
-          <Button onClick={() => props.showCard(props.card.id || '')}>
-            <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-          </Button>
-        </div>
-      </div>
 
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template) => {
+        if (template.id === Constants.titleColumnId) {
+          return (
+            <div
+              className='octo-table-cell title-cell'
+              id='mainBoardHeader'
+              style={{
+                width: columnWidth(
+                  props.resizingColumn,
+                  props.activeView.fields.columnWidths,
+                  props.offset,
+                  Constants.titleColumnId
+                )
+              }}
+              ref={columnRefs.get(Constants.titleColumnId)}
+              key={template.id}
+            >
+              <div className='octo-icontitle'>
+                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+
+                <Editable
+                  ref={titleRef}
+                  value={title}
+                  placeholderText='Untitled'
+                  onChange={(newTitle: string) => setTitle(newTitle)}
+                  onSave={(saveType) => saveTitle(saveType, card.id, title)}
+                  onCancel={() => setTitle(card.title || '')}
+                  readOnly={props.readOnly}
+                  spellCheck={true}
+                />
+              </div>
+
+              <div className='open-button'>
+                <Button onClick={() => props.showCard(props.card.id || '')}>
+                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                </Button>
+              </div>
+            </div>
+          );
+        }
         return (
           <div
             className='octo-table-cell'
