@@ -1,1 +1,2 @@
-export { default as webhookWorker } from './webhook';
+export { webhookWorker } from './webhook/worker';
+export { webhookEndpoint } from './webhook/endpoint';

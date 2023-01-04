@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 /**
  * SQS worker logic goes there
  */
-const webhookWorker: SQSHandler = async (event: SQSEvent, context: Context) => {
+export const webhookWorker: SQSHandler = async (event: SQSEvent, context: Context) => {
   try {
     // SQS may be invoked with multiple messages
     for (const message of event.Records) {
@@ -30,5 +30,3 @@ const webhookWorker: SQSHandler = async (event: SQSEvent, context: Context) => {
     };
   }
 };
-
-export default webhookWorker;
