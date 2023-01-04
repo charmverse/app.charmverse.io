@@ -13,6 +13,9 @@ export const webhookEndpoint = async (event: APIGatewayProxyEvent): Promise<APIG
 
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         success: true
       })
@@ -20,6 +23,9 @@ export const webhookEndpoint = async (event: APIGatewayProxyEvent): Promise<APIG
   } catch (e) {
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(e)
     };
   }
