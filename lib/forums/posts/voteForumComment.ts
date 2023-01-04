@@ -1,3 +1,5 @@
+import type { PostCommentUpDownVote } from '@prisma/client';
+
 import { prisma } from 'db';
 
 import { getPostComment } from '../comments/getPostComment';
@@ -9,20 +11,29 @@ type CommentVote = {
   upvoted: boolean | null;
 };
 
-export async function voteForumComment({ upvoted, userId, commentId, postId }: CommentVote) {
-  const comment = await getPostComment(commentId);
-
+export async function voteForumComment({
+  upvoted,
+  userId,
+  commentId,
+  postId
+}: CommentVote): Promise<PostCommentUpDownVote | null> {
   if (upvoted === null) {
-    await prisma.postCommentUpDownVote.delete({
-      where: {
-        createdBy_commentId: {
-          createdBy: userId,
-          commentId
+    try {
+      await prisma.postCommentUpDownVote.delete({
+        where: {
+          createdBy_commentId: {
+            createdBy: userId,
+            commentId
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      // Comment not found
+    }
+
+    return null;
   } else {
-    await prisma.postCommentUpDownVote.upsert({
+    const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
@@ -39,5 +50,7 @@ export async function voteForumComment({ upvoted, userId, commentId, postId }: C
         }
       }
     });
+
+    return commentVote;
   }
 }
