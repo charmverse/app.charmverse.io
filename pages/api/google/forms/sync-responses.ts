@@ -3,8 +3,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
-import { getCredentialMaybe } from 'lib/google/credentials';
-import { syncFormResponses } from 'lib/google/forms/forms';
+import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -4,7 +4,7 @@ import { googleOAuthClientId } from 'config/constants';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 
-import { getClient } from './authClient';
+import { getClient } from './authorization/authClient';
 
 // https://developers.google.com/people/quickstart/nodejs
 export async function verifyGoogleToken(idToken: string): Promise<TokenPayload> {

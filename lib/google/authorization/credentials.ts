@@ -15,20 +15,6 @@ export async function getCredential({ credentialId }: AccountRequest) {
   });
 }
 
-// get credentials without throwing an error
-export async function getCredentialMaybe({ credentialId }: AccountRequest) {
-  const creds = await prisma.googleCredential.findUnique({
-    where: {
-      id: credentialId
-    }
-  });
-  if (!creds ?? creds?.expiredAt) {
-    log.warn('No valid credentials found for account', { credentialId, expiredAt: creds?.expiredAt });
-    return null;
-  }
-  return creds;
-}
-
 export async function getCredentialsForUser({ userId }: { userId: string }) {
   return prisma.googleCredential.findMany({
     where: {

@@ -1,33 +1,18 @@
-import * as googleDrive from '@googleapis/drive';
 import * as googlForms from '@googleapis/forms';
 
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { prisma } from 'db';
+import type { Block } from 'lib/focalboard/block';
+import { createBoard } from 'lib/focalboard/board';
+import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { GoogleFormSourceData } from 'lib/focalboard/boardView';
+import { createCard } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
-import { getClient } from '../authClient';
-import { getCredential } from '../credentials';
+import { getClient } from '../authorization/authClient';
+import { getCredential } from '../authorization/credentials';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
-
-type Credential = {
-  refreshToken: string;
-};
-
-// export type GoogleForm = googlForms.forms_v1.Schema$Form;
-
-// Requires 'https://www.googleapis.com/auth/forms.body.readonly' scope
-export async function getForms(credential: Credential) {
-  const forms = _getDriveClient(credential.refreshToken);
-
-  // how to search files: https://developers.google.com/drive/api/guides/search-files
-  const res = await forms.files.list({
-    q: 'mimeType = "application/vnd.google-apps.form"'
-  });
-
-  return res.data;
-}
 
 // Requires 'https://www.googleapis.com/auth/forms.responses.readonly' scope
 export async function syncFormResponses({ sourceData }: { sourceData: GoogleFormSourceData }) {
@@ -39,27 +24,53 @@ export async function syncFormResponses({ sourceData }: { sourceData: GoogleForm
     formId
   });
 
-  const cardProperties = getCardProperties(form);
-
   const res = await forms.forms.responses.list({
     formId
   });
   const { responses } = res.data;
+  const boardBlock = await prisma.block.findUnique({ where: { id: sourceData.boardId } });
+  const board = (boardBlock ?? createBoard()) as Block;
+
+  const cardProperties = getCardProperties(form);
+  board.fields.cardProperties = cardProperties;
+
+  const cardBlocks: Block[] = [];
+
   if (responses) {
     for (const response of responses) {
       const responseId = response.responseId;
-      const createdAt = response.createTime;
+      const createdAt = response.createTime ?? new Date().toISOString();
       const properties = getValuesFromResponse({ formId, properties: cardProperties, response });
-      const cardBlock = {
-        createdAt,
+      const cardBlock = createCard({
+        createdAt: new Date(createdAt).getTime(),
+        parentId: board.id,
+        rootId: board.id,
         fields: {
           properties,
           responseId
         }
-      };
+      });
+      cardBlocks.push(cardBlock);
     }
   }
-  return res.data;
+
+  const boardCreateOrUpdate = prisma.block.upsert({
+    where: {
+      id: board.id
+    },
+    create: board,
+    update: {
+      fields: board.fields
+    }
+  });
+  const deleteCards = prisma.block.deleteMany({
+    where: {
+      rootId: board.id
+    }
+  });
+  const createCards = prisma.block.createMany({ data: cardBlocks });
+
+  await prisma.$transaction([boardCreateOrUpdate, deleteCards, createCards]);
 }
 
 const userEmailProperty = 'user_email';
@@ -125,8 +136,8 @@ function getValuesFromResponse({
   formId?: string;
   properties: IPropertyTemplate[];
   response: GoogleFormResponse;
-}): Record<string, number | string | string[]> {
-  const values: Record<string, number | string | string[]> = {};
+}): Record<string, string | string[]> {
+  const values: Record<string, string | string[]> = {};
 
   if (response.respondentEmail) {
     values[userEmailProperty] = response.respondentEmail;
@@ -141,9 +152,9 @@ function getValuesFromResponse({
       const propId = question.id;
       if (question.type === 'number' && answer.grade) {
         if (answer.grade.score) {
-          values[propId] = answer.grade.score;
+          values[propId] = answer.grade.score?.toString() ?? '';
         } else {
-          values[propId] = answer.grade.correct ? 1 : 0;
+          values[propId] = answer.grade.correct ? 'Correct' : 'Incorrect';
         }
       } else if (question.type === 'select' || question.type === 'multiSelect') {
         values[propId] = (answer.textAnswers?.answers ?? []).map((a) => a.value).filter(isTruthy);
@@ -167,17 +178,6 @@ function _getFormsClient(refreshToken: string) {
   });
   return googlForms.forms({
     version: 'v1',
-    auth
-  });
-}
-
-function _getDriveClient(refreshToken: string) {
-  const auth = getClient();
-  auth.setCredentials({
-    refresh_token: refreshToken
-  });
-  return googleDrive.drive({
-    version: 'v3',
     auth
   });
 }

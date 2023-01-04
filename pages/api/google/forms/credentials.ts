@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prisma } from 'db';
-import { getCredentialsFromGoogleCode } from 'lib/google/authClient';
-import { deleteCredential } from 'lib/google/credentials';
+import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
+import { deleteCredential, getCredentialsForUser } from 'lib/google/credentials';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -66,10 +66,8 @@ async function createCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
 async function getCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
 
-  const creds = await prisma.googleCredential.findMany({
-    where: {
-      userId
-    }
+  const creds = await getCredentialsForUser({
+    userId
   });
 
   const credentials: CredentialItem[] = creds.map((cred) => ({
@@ -89,14 +87,15 @@ async function deleteCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new InvalidInputError('Credential id is required');
   }
 
-  const credential = await prisma.googleCredential.findFirstOrThrow({
+  // make sure the credential exists and that this user has permission
+  await prisma.googleCredential.findFirstOrThrow({
     where: {
       userId,
       id: query.credentialId
     }
   });
 
-  await deleteCredential({ credentialId: credential.id });
+  await deleteCredential({ credentialId: query.credentialId });
 
   res.status(200).end();
 }

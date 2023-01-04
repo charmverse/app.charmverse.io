@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { getCredential, invalidateCredential } from 'lib/google/credentials';
 // import type { GoogleForm } from 'lib/google/forms/forms';
-import { getForms } from 'lib/google/forms/forms';
+import { getForms } from 'lib/google/forms/getForms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';

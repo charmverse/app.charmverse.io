@@ -4,8 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import type { BoardViewFields, GoogleFormSourceData } from 'lib/focalboard/boardView';
-import { getCredentialMaybe } from 'lib/google/credentials';
-import { syncFormResponses } from 'lib/google/forms/forms';
+import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
 import { InvalidStateError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
