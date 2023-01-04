@@ -34,12 +34,16 @@ function CalculationRow(props: Props): JSX.Element {
     id: Constants.titleColumnId
   } as IPropertyTemplate;
 
-  const templates: IPropertyTemplate[] = [
-    titleTemplate,
-    ...props.board.fields.cardProperties.filter((template) =>
-      props.activeView.fields.visiblePropertyIds.includes(template.id)
+  let visiblePropertyIds = props.activeView.fields.visiblePropertyIds;
+  visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
+    ? visiblePropertyIds
+    : [Constants.titleColumnId, ...visiblePropertyIds];
+
+  const templates: IPropertyTemplate[] = visiblePropertyIds
+    .map((id) =>
+      id === Constants.titleColumnId ? titleTemplate : props.board.fields.cardProperties.find((t) => t.id === id)
     )
-  ];
+    .filter((i) => i) as IPropertyTemplate[];
 
   const selectedCalculations = props.board.fields.columnCalculations || [];
 
