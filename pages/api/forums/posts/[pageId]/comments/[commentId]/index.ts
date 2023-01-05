@@ -1,7 +1,6 @@
 import type { PageComment } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
@@ -9,6 +8,7 @@ import { getComment } from 'lib/forums/comments/getComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { PageNotFoundError } from 'lib/pages/server';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
