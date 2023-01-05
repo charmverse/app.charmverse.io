@@ -2,8 +2,6 @@ import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
-import { getForumPost } from '../posts/getForumPost';
-
 export async function deletePostComment({
   postId,
   commentId,
@@ -25,16 +23,18 @@ export async function deletePostComment({
     throw new UnauthorisedActionError();
   }
 
-  const page = await getForumPost({ pageId: postId, userId });
-
-  const category = await prisma.postCategory.findUnique({
-    where: {
-      id: page.post.categoryId
-    },
-    select: {
-      name: true
+  const page = await prisma.page.findUnique({
+    where: { id: postId },
+    include: {
+      post: {
+        include: {
+          category: true
+        }
+      }
     }
   });
+
+  const category = page?.post?.category;
 
   if (category) {
     trackUserAction('delete_comment', {

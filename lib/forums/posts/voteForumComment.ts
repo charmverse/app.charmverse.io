@@ -4,8 +4,6 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 
 import { getComment } from '../comments/getComment';
 
-import { getForumPost } from './getForumPost';
-
 export async function voteForumComment({
   upvoted,
   userId,
@@ -33,16 +31,18 @@ export async function voteForumComment({
       }
     });
   } else {
-    const page = await getForumPost({ pageId, userId });
-
-    const category = await prisma.postCategory.findUnique({
-      where: {
-        id: page.post.categoryId
-      },
-      select: {
-        name: true
+    const page = await prisma.page.findUnique({
+      where: { id: pageId },
+      include: {
+        post: {
+          include: {
+            category: true
+          }
+        }
       }
     });
+
+    const category = page?.post?.category;
 
     if (category) {
       if (upvoted) {

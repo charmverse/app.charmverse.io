@@ -15,14 +15,14 @@ export async function createPostComment({
   postId: string;
   userId: string;
 }) {
-  const page = await getForumPost({ pageId: postId, userId });
-
-  const category = await prisma.postCategory.findUnique({
-    where: {
-      id: page.post.categoryId
-    },
-    select: {
-      name: true
+  const page = await prisma.page.findUnique({
+    where: { id: postId },
+    include: {
+      post: {
+        include: {
+          category: true
+        }
+      }
     }
   });
 
@@ -44,6 +44,8 @@ export async function createPostComment({
       }
     }
   });
+
+  const category = page?.post?.category;
 
   if (category) {
     trackUserAction('create_comment', {

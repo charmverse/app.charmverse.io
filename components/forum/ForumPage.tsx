@@ -77,7 +77,7 @@ export default function ForumPage() {
         spaceId: currentSpace.id
       });
     }
-  }, [currentSpace]);
+  }, [Boolean(currentSpace)]);
 
   const debounceSearch = useRef(debounce((e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value), 400)).current;
 

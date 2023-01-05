@@ -1,12 +1,16 @@
+import { prisma } from 'db';
 import { PageNotFoundError } from 'lib/public-api';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
-import { getForumPost } from './getForumPost';
-
 export async function checkPostAccess({ pageId, userId }: { pageId: string; userId: string }) {
-  const page = await getForumPost({ pageId, userId });
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    include: {
+      post: true
+    }
+  });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);

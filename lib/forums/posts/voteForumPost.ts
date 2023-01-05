@@ -3,8 +3,6 @@ import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 import { prisma } from 'db';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
-import { getForumPost } from './getForumPost';
-
 export async function voteForumPost({
   upvoted,
   userId,
@@ -14,7 +12,12 @@ export async function voteForumPost({
   userId: string;
   upvoted: boolean | null;
 }) {
-  const page = await getForumPost({ pageId, userId });
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    include: {
+      post: true
+    }
+  });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);

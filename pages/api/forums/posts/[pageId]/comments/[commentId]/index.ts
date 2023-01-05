@@ -3,11 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
+import { prisma } from 'db';
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { getComment } from 'lib/forums/comments/getComment';
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import { updatePostComment } from 'lib/forums/comments/updatePostComment';
-import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
@@ -23,7 +23,12 @@ async function updatePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const body = req.body as UpdatePostCommentInput;
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ pageId, userId });
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    include: {
+      post: true
+    }
+  });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);
@@ -57,7 +62,12 @@ async function deletePostCommentHandler(req: NextApiRequest, res: NextApiRespons
   const { pageId, commentId } = req.query as any as { pageId: string; commentId: string };
   const userId = req.session.user.id;
 
-  const page = await getForumPost({ pageId, userId });
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    include: {
+      post: true
+    }
+  });
 
   if (!page || !page.post) {
     throw new PageNotFoundError(pageId);
