@@ -108,6 +108,7 @@ export type WebhookPayload<T = WebhookEventNames> = {
   createdAt: string;
   event: WebhookEvent<T>;
   spaceId: Space['id'];
+  webhookURL: string;
   // resource: {
   //   id: string;
   //   type: T;
