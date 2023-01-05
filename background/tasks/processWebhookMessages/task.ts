@@ -6,7 +6,7 @@ export async function task() {
   log.debug('Running process webhook messages cron job');
 
   try {
-    await processMessages({ processorFn: processWebhookMessage, maxNumOfMessages: 5 });
+    await processMessages({ processorFn: processWebhookMessage });
   } catch (error: any) {
     log.error(`Error processing webhook messages: ${error.stack || error.message || error}`, { error });
   }

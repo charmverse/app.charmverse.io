@@ -52,6 +52,8 @@ const SelectPreviewContainer = styled(Stack, {
   div {
     pointer-events: none;
   }
+
+  width: 100%;
 `;
 
 const StyledSelect = styled(SelectField)`

@@ -307,14 +307,6 @@ export function generateTransaction({
   });
 }
 
-type BountyAndApplicationProps = {
-  applicationStatus: ApplicationStatus;
-  bountyCap: number | null;
-  userId: string;
-  spaceId: string;
-  bountyStatus?: BountyStatus;
-};
-
 export async function generateBountyWithSingleApplication({
   applicationStatus,
   bountyCap,
@@ -820,8 +812,16 @@ export async function generateBoard({
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
+  const pagePermissions = pageArgs.map((createArg) => ({
+    pageId: createArg.data.id as string,
+    permissionLevel: 'full_access' as const,
+    userId: createdBy
+  }));
+  const permissions = prisma.pagePermission.createMany({
+    data: pagePermissions
+  });
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs)])
+    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
     .then((result) => result[0] as Page);
 }
 

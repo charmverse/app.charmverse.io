@@ -386,7 +386,7 @@ function CenterPanel(props: Props) {
     view.fields.viewType = 'board';
     view.parentId = board.id;
     view.rootId = board.id;
-    view.title = 'Board view';
+    view.title = '';
     // A new property to indicate that this view was creating for inline databases only
     view.fields.sourceType = 'board_page';
     view.fields.linkedSourceId = sourceBoardId;

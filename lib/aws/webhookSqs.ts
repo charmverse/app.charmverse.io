@@ -31,15 +31,16 @@ export async function getQueueUrl() {
   return queueUrl;
 }
 
-export async function getMessages(maxNumOfMessages = 5) {
+export async function getNextMessage() {
   const QueueUrl = await getQueueUrl();
   if (QueueUrl) {
-    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: maxNumOfMessages });
+    const command = new ReceiveMessageCommand({ QueueUrl, MaxNumberOfMessages: 1 });
     const res = await client.send(command);
-    return res.Messages || [];
+
+    return res?.Messages?.[0] || null;
   }
 
-  return [];
+  return null;
 }
 
 export async function deleteMessage(receipt: string) {
@@ -50,24 +51,29 @@ export async function deleteMessage(receipt: string) {
   return res.$metadata.httpStatusCode === 200;
 }
 
-export async function processMessages({ processorFn, maxNumOfMessages = 5 }: ProcessMssagesInput) {
-  const messages = await getMessages(maxNumOfMessages);
-  for (const message of messages) {
-    let msgBody: Record<string, any> | string = '';
-    try {
-      msgBody = JSON.parse(message.Body || '');
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
+export async function processMessages({ processorFn }: ProcessMssagesInput) {
+  const message = await getNextMessage();
 
-    try {
-      // process message
-      const isProcessed = await processorFn(msgBody as WebhookMessage);
-      // delete if processed correctly
-      if (isProcessed) {
-        // await deleteMessage(message.ReceiptHandle || '');
-      }
-    } catch (e) {
-      log.error('Failed to process webhook message', e);
-    }
+  if (!message) {
+    return false;
   }
+
+  let msgBody: Record<string, any> | string = '';
+  try {
+    msgBody = JSON.parse(message.Body || '');
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+
+  try {
+    // process message
+    await processorFn(msgBody as WebhookMessage);
+    // delete if processed correctly
+    await deleteMessage(message.ReceiptHandle || '');
+  } catch (e) {
+    log.error('Failed to process webhook message', e);
+  }
+
+  // process next message
+  setTimeout(() => processMessages({ processorFn }), 1000);
+  return true;
 }

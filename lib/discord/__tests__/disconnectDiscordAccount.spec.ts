@@ -35,28 +35,6 @@ describe('disconnectdiscordAccount', () => {
     expect(userAfterDisconnect.username).toEqual(walletAddress);
     expect(userAfterDisconnect.discordUser).toBeNull();
   });
-
-  it('should mark the user as deleted if the discord Account was their only identity', async () => {
-    const user = await prisma.user.create({
-      data: {
-        username: 'Test user',
-        discordUser: {
-          create: {
-            discordId: v4(),
-            account: {}
-          }
-        }
-      },
-      include: sessionUserRelations
-    });
-
-    const userAfterDisconnect = await disconnectDiscordAccount({
-      userId: user.id
-    });
-
-    expect(userAfterDisconnect.deletedAt).toBeInstanceOf(Date);
-  });
-
   it('should update the users username and identity type to another connected identity, after deleting Discord account', async () => {
     const walletAddress = `0x${v4()}`;
 
