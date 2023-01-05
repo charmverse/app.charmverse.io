@@ -2,6 +2,8 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+
 import type { Board, IPropertyTemplate } from '../../blocks/board';
 import type { BoardView, ISortOption } from '../../blocks/boardView';
 import { createBoardView } from '../../blocks/boardView';
@@ -119,16 +121,7 @@ function TableHeaders(props: Props): JSX.Element {
   );
 
   const visiblePropertyTemplates = useMemo(() => {
-    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
-    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
-    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
-      ? visiblePropertyIds
-      : [Constants.titleColumnId, ...visiblePropertyIds];
-    return visiblePropertyIds
-      .map((id) =>
-        id === Constants.titleColumnId ? titleProperty : board.fields.cardProperties.find((t) => t.id === id)
-      )
-      .filter((i) => i) as IPropertyTemplate[];
+    return filterPropertyTemplates(activeView.fields.visiblePropertyIds, board.fields.cardProperties);
   }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {

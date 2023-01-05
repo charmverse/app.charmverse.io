@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import PageIcon from 'components/common/PageLayout/components/PageIcon';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import type { Board, IPropertyTemplate } from '../../blocks/board';
+import type { Board } from '../../blocks/board';
 import type { BoardView } from '../../blocks/boardView';
 import type { Card } from '../../blocks/card';
 import { Constants } from '../../constants';
@@ -81,17 +82,7 @@ function TableRow(props: Props) {
   }, [pageTitle]);
 
   const visiblePropertyTemplates = useMemo(() => {
-    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'title', type: 'text', options: [] };
-    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
-    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
-      ? visiblePropertyIds
-      : [Constants.titleColumnId, ...visiblePropertyIds];
-
-    return visiblePropertyIds
-      .map((id) =>
-        id === Constants.titleColumnId ? titleProperty : board.fields.cardProperties.find((t) => t.id === id)
-      )
-      .filter((i) => i) as IPropertyTemplate[];
+    return filterPropertyTemplates(activeView.fields.visiblePropertyIds, board.fields.cardProperties);
   }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
@@ -113,8 +104,6 @@ function TableRow(props: Props) {
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
-      {/* Name / title */}
-
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template) => {
         if (template.id === Constants.titleColumnId) {

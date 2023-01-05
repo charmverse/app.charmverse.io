@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import type { Board, IPropertyTemplate } from '../../../blocks/board';
+import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+
+import type { Board } from '../../../blocks/board';
 import { createBoard } from '../../../blocks/board';
 import type { BoardView } from '../../../blocks/boardView';
 import type { Card } from '../../../blocks/card';
@@ -30,20 +32,10 @@ function CalculationRow(props: Props): JSX.Element {
     setShowOptions(newShowOptions);
   };
 
-  const titleTemplate: IPropertyTemplate = {
-    id: Constants.titleColumnId
-  } as IPropertyTemplate;
-
-  let visiblePropertyIds = props.activeView.fields.visiblePropertyIds;
-  visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
-    ? visiblePropertyIds
-    : [Constants.titleColumnId, ...visiblePropertyIds];
-
-  const templates: IPropertyTemplate[] = visiblePropertyIds
-    .map((id) =>
-      id === Constants.titleColumnId ? titleTemplate : props.board.fields.cardProperties.find((t) => t.id === id)
-    )
-    .filter((i) => i) as IPropertyTemplate[];
+  const templates = filterPropertyTemplates(
+    props.activeView.fields.visiblePropertyIds,
+    props.board.fields.cardProperties
+  );
 
   const selectedCalculations = props.board.fields.columnCalculations || [];
 
