@@ -717,12 +717,13 @@ class Mutator {
   }
 
   async changeViewVisiblePropertiesOrder(
-    view: BoardView,
+    viewId: string,
+    visiblePropertyIds: string[],
     template: IPropertyTemplate,
     destIndex: number,
     description = 'change property order'
   ): Promise<void> {
-    const oldVisiblePropertyIds = view.fields.visiblePropertyIds;
+    const oldVisiblePropertyIds = visiblePropertyIds;
     const newOrder = oldVisiblePropertyIds.slice();
 
     const srcIndex = oldVisiblePropertyIds.indexOf(template.id);
@@ -733,14 +734,14 @@ class Mutator {
     await undoManager.perform(
       async () => {
         await charmClient.patchBlock(
-          view.id,
+          viewId,
           { updatedFields: { visiblePropertyIds: newOrder } },
           publishIncrementalUpdate
         );
       },
       async () => {
         await charmClient.patchBlock(
-          view.id,
+          viewId,
           { updatedFields: { visiblePropertyIds: oldVisiblePropertyIds } },
           publishIncrementalUpdate
         );
