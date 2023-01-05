@@ -41,8 +41,7 @@ export function PostCommentForm({
   async function createPostComment() {
     const postComment = await charmClient.forum.createPostComment(postId, {
       content: postContent.doc,
-      contentText: postContent.rawText,
-      parentId: postId
+      contentText: postContent.rawText
     });
     setPostComments((postComments) => (postComments ? [postComment, ...postComments] : [postComment]));
     setPostContent({ ...defaultCharmEditorOutput });

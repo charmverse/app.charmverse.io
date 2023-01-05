@@ -1,8 +1,8 @@
+import type { Post } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
@@ -25,20 +25,20 @@ async function getPosts(req: NextApiRequest, res: NextApiResponse<PaginatedPostL
   return res.status(200).json(posts);
 }
 
-async function createForumPostController(req: NextApiRequest, res: NextApiResponse<ForumPostPage>) {
-  const createdPage = await createForumPost({ ...req.body, createdBy: req.session.user.id });
+async function createForumPostController(req: NextApiRequest, res: NextApiResponse<Post>) {
+  const createdPost = await createForumPost({ ...req.body, createdBy: req.session.user.id });
 
   relay.broadcast(
     {
       type: 'post_published',
       payload: {
-        createdBy: createdPage.createdBy,
-        categoryId: createdPage.post.categoryId
+        createdBy: createdPost.createdBy,
+        categoryId: createdPost.categoryId
       }
     },
-    createdPage.spaceId
+    createdPost.spaceId
   );
-  return res.status(201).json(createdPage);
+  return res.status(201).json(createdPost);
 }
 
 export default withSessionRoute(handler);

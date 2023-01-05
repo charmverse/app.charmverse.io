@@ -1,4 +1,4 @@
-import type { PageComment, PostCategory } from '@prisma/client';
+import type { PostComment, PostCategory, Post } from '@prisma/client';
 
 import * as http from 'adapters/http';
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
@@ -9,14 +9,14 @@ import type {
   UpdatePostCommentInput
 } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage, ForumPostPageWithVotes } from 'lib/forums/posts/interfaces';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 
 export class ForumApi {
   createForumPost(payload: Omit<CreateForumPostInput, 'createdBy'>) {
-    return http.POST<ForumPostPage>(`/api/forums/posts`, payload);
+    return http.POST<Post>(`/api/forums/posts`, payload);
   }
 
   listForumPosts({ spaceId, count, page, sort, categoryId }: ListForumPostsRequest): Promise<PaginatedPostList> {
@@ -31,12 +31,12 @@ export class ForumApi {
     return http.PUT(`/api/forums/posts/${postId}`, payload);
   }
 
-  deleteForumPost(pageId: string) {
-    return http.DELETE(`/api/forums/posts/${pageId}`);
+  deleteForumPost(postId: string) {
+    return http.DELETE(`/api/forums/posts/${postId}`);
   }
 
-  getForumPost(pageId: string) {
-    return http.GET<ForumPostPageWithVotes>(`/api/forums/posts/${pageId}`);
+  getForumPost(postId: string) {
+    return http.GET<PostWithVotes>(`/api/forums/posts/${postId}`);
   }
 
   listPostCategories(spaceId: string): Promise<PostCategory[]> {
@@ -67,7 +67,7 @@ export class ForumApi {
     postId,
     commentId,
     ...body
-  }: UpdatePostCommentInput & { postId: string; commentId: string }): Promise<PageComment> {
+  }: UpdatePostCommentInput & { postId: string; commentId: string }): Promise<PostComment> {
     return http.PUT(`/api/forums/posts/${postId}/comments/${commentId}`, body);
   }
 

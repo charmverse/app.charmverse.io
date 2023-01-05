@@ -68,8 +68,6 @@ function LoginHandler(props: DialogProps) {
         {/** Web 3 login methods */}
         <ListItem>
           <WalletSelector loginSuccess={handleLogin} />
-
-          {/* <WalletSign signSuccess={handleWalletSign} /> */}
         </ListItem>
         {verifiableWalletDetected && (
           <ListItem>
@@ -99,6 +97,8 @@ function LoginHandler(props: DialogProps) {
 
 export function Login() {
   const [open, setOpen] = useState(false);
+  const { resetSigning } = useWeb3AuthSig();
+
   const [selectedValue, setSelectedValue] = useState('');
 
   const handleClickOpen = () => {
@@ -108,6 +108,7 @@ export function Login() {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
+    resetSigning();
   };
 
   return (

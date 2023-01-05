@@ -1,15 +1,15 @@
-import type { Space, User } from '@prisma/client';
+import type { Post, Space, User } from '@prisma/client';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import { generateForumPosts } from 'testing/forums';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ForumPostPage } from '../interfaces';
-import { defaultPostsPerResult, searchForumPosts } from '../searchForumPosts';
+import { defaultPostsPerResult } from '../constants';
+import { searchForumPosts } from '../searchForumPosts';
 
 let space: Space;
 let user: User;
-let spacePosts: ForumPostPage[];
+let spacePosts: Post[];
 
 const rootPostTitle = `Top level`;
 

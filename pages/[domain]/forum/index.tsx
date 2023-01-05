@@ -1,11 +1,11 @@
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { PostDialogProvider } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import PostDialogGlobal from 'components/forum/components/PostDialog/PostDialogGlobal';
-import ForumPageComponent from 'components/forum/ForumPage';
+import { ForumPage } from 'components/forum/ForumPage';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { setTitle } from 'hooks/usePageTitle';
 
-export default function ForumPage() {
+export default function ForumPageComponent() {
   setTitle('Forum');
   const isCharmVerseSpace = useIsCharmverseSpace();
 
@@ -16,10 +16,10 @@ export default function ForumPage() {
 
   return (
     <PostDialogProvider>
-      <ForumPageComponent />
+      <ForumPage />
       <PostDialogGlobal />
     </PostDialogProvider>
   );
 }
 
-ForumPage.getLayout = getPageLayout;
+ForumPageComponent.getLayout = getPageLayout;

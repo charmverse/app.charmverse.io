@@ -4,7 +4,6 @@ import request from 'supertest';
 
 import { createPostCategory } from 'lib/forums/categories/createPostCategory';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import type { ForumPostPage } from 'lib/forums/posts/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -47,16 +46,14 @@ describe('POST /api/forums/posts - Create a post', () => {
 
     const post = (
       await request(baseUrl).post(`/api/forums/posts`).set('Cookie', userCookie).send(createInput).expect(201)
-    ).body as ForumPostPage;
+    ).body as Post;
 
     expect(post).toMatchObject(
-      expect.objectContaining<Partial<ForumPostPage>>({
+      expect.objectContaining<Partial<Post>>({
         id: expect.any(String),
         content: expect.any(Object),
-        post: expect.objectContaining<Partial<Post>>({
-          locked: false,
-          pinned: false
-        })
+        locked: false,
+        pinned: false
       })
     );
   });

@@ -2,16 +2,15 @@ import { prisma } from 'db';
 
 import type { PostCommentWithVote } from './interface';
 
-export async function getPostComments({
-  postId,
-  userId
-}: {
-  userId: string;
+type ListPostCommentsRequest = {
+  userId?: string;
   postId: string;
-}): Promise<PostCommentWithVote[]> {
-  const comments = await prisma.pageComment.findMany({
+};
+
+export async function listPostComments({ postId, userId }: ListPostCommentsRequest): Promise<PostCommentWithVote[]> {
+  const comments = await prisma.postComment.findMany({
     where: {
-      pageId: postId
+      postId
     },
     include: {
       votes: true
