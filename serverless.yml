@@ -41,9 +41,6 @@ provider:
   name: aws
   runtime: nodejs14.x
   deploymentMethod: direct
-  environment:
-    # Used by prisma
-    DATABASE_URL: ${env:DATABASE_URL}
 
 functions:
   # This function is purely for testing our implementation, it received a webhook call and logs it
