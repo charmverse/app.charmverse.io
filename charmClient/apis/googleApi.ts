@@ -5,8 +5,8 @@ import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccoun
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import type { LoggedInUser } from 'models';
+import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem, GetFormsRequest } from 'pages/api/google/forms';
-import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/forms/credentials';
 import type { RefreshFormsRequest } from 'pages/api/google/forms/sync-responses';
 
 export interface UpdateProfileItemRequest {
@@ -28,7 +28,7 @@ export class GoogleApi {
 
   forms = {
     getCredentials() {
-      return http.GET<CredentialItem[]>('/api/google/forms/credentials');
+      return http.GET<CredentialItem[]>('/api/google/credentials');
     },
     getForms(params: GetFormsRequest) {
       return http.GET<GoogleFormItem[]>('/api/google/forms', params);
@@ -37,10 +37,10 @@ export class GoogleApi {
       return http.POST('/api/google/forms/sync-responses', params);
     },
     deleteCredential() {
-      return http.DELETE<CredentialRequest[]>('/api/google/forms/credentials');
+      return http.DELETE<CredentialRequest[]>('/api/google/credentials');
     },
     createCredential(credential: CreateCredentialRequest) {
-      return http.POST('/api/google/forms/credentials', credential);
+      return http.POST('/api/google/credentials', credential);
     }
   };
 }

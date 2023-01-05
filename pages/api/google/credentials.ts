@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { prisma } from 'db';
 import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
-import { deleteCredential, getCredentialsForUser } from 'lib/google/credentials';
+import { deleteCredential, getCredentialsForUser } from 'lib/google/authorization/credentials';
 import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
