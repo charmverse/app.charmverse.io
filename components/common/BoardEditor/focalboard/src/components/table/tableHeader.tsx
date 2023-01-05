@@ -87,9 +87,14 @@ function TableHeader(props: Props): JSX.Element {
     }
   };
 
-  popoverProps.onClick = () => {
+  async function renameColumn() {
+    if (tempName !== template.name) {
+      mutator.changePropertyTypeAndName(board, cards, template, type, tempName);
+    }
     popupState.close();
-  };
+  }
+
+  popoverProps.onClick = renameColumn;
 
   const onAutoSizeColumn = React.useCallback((_templateId: string) => {
     let width = Constants.minColumnWidth;
@@ -128,11 +133,10 @@ function TableHeader(props: Props): JSX.Element {
                 setTempName(e.target.value);
               }}
               autoFocus
-              onKeyDown={async (e) => {
+              onKeyDown={(e) => {
                 e.stopPropagation();
                 if (e.code === 'Enter' && tempName.length !== 0) {
-                  await mutator.changePropertyTypeAndName(board, cards, template, type, tempName);
-                  popupState.close();
+                  renameColumn();
                 }
               }}
             />
