@@ -16,7 +16,7 @@ describe('checkDiscordGate', () => {
       data: { discordUser: { create: { discordId: '456', account: {} } } }
     });
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValue(true);
+    const canJoinSpaceMock = jest.fn().mockResolvedValue({ isEligible: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));
@@ -33,7 +33,7 @@ describe('checkDiscordGate', () => {
   it('should not make user eligible to join space that does not have discord server id', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce(true);
+    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isEligible: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));
@@ -52,7 +52,7 @@ describe('checkDiscordGate', () => {
 
     await prisma.space.update({ where: { id: space.id }, data: { discordServerId: '123' } });
 
-    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce(true);
+    const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isEligible: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
       canJoinSpaceViaDiscord: canJoinSpaceMock
     }));

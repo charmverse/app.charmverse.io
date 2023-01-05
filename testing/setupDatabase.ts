@@ -307,14 +307,6 @@ export function generateTransaction({
   });
 }
 
-type BountyAndApplicationProps = {
-  applicationStatus: ApplicationStatus;
-  bountyCap: number | null;
-  userId: string;
-  spaceId: string;
-  bountyStatus?: BountyStatus;
-};
-
 export async function generateBountyWithSingleApplication({
   applicationStatus,
   bountyCap,
@@ -378,18 +370,22 @@ export async function generateBountyWithSingleApplication({
  * @roleName uses UUID to ensure role names do not conflict
  */
 export async function generateRole({
+  externalId,
   spaceId,
   createdBy,
   roleName = `role-${v4()}`,
   source
 }: {
+  externalId?: string;
   spaceId: string;
   roleName?: string;
   createdBy: string;
   source?: RoleSource;
+  id?: string;
 }): Promise<Role> {
   const role = await prisma.role.create({
     data: {
+      externalId,
       name: roleName,
       createdBy,
       space: {
@@ -816,8 +812,16 @@ export async function generateBoard({
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({ createdBy, spaceId, parentId, cardCount });
 
+  const pagePermissions = pageArgs.map((createArg) => ({
+    pageId: createArg.data.id as string,
+    permissionLevel: 'full_access' as const,
+    userId: createdBy
+  }));
+  const permissions = prisma.pagePermission.createMany({
+    data: pagePermissions
+  });
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs)])
+    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
     .then((result) => result[0] as Page);
 }
 

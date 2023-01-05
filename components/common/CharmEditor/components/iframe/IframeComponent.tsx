@@ -16,7 +16,16 @@ import type { IframeNodeAttrs, Embed, EmbedType } from './config';
 import { embeds, MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, MAX_EMBED_HEIGHT } from './config';
 import { extractEmbedType } from './utils';
 
-function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs, onResizeStop }: CharmNodeViewProps) {
+function IframeComponent({
+  readOnly,
+  node,
+  getPos,
+  view,
+  deleteNode,
+  selected,
+  updateAttrs,
+  onResizeStop
+}: CharmNodeViewProps) {
   const attrs = node.attrs as IframeNodeAttrs;
 
   const [height, setHeight] = useState(attrs.height);
@@ -32,6 +41,7 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, updateAttrs
       <MediaSelectionPopup
         node={node}
         icon={<EmbedIcon {...config} size='small' />}
+        isSelected={selected}
         buttonText={config.text}
         onDelete={deleteNode}
       >

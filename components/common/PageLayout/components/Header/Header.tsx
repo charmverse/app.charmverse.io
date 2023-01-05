@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoonIcon from '@mui/icons-material/DarkMode';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -187,20 +186,6 @@ export default function Header({ open, openSidebar }: HeaderProps) {
           }}
         />
         <ListItemText primary='View suggestions' />
-      </ListItemButton>
-      <ListItemButton
-        onClick={() => {
-          setCurrentPageActionDisplay('polls');
-          setPageMenuOpen(false);
-        }}
-      >
-        <FormatListBulletedOutlinedIcon
-          fontSize='small'
-          sx={{
-            mr: 1
-          }}
-        />
-        <ListItemText primary='View polls' />
       </ListItemButton>
       <Divider />
       <ListItemButton
@@ -387,7 +372,7 @@ export default function Header({ open, openSidebar }: HeaderProps) {
                     setPageMenuAnchorElement(pageMenuAnchor.current || null);
                   }}
                 >
-                  <Tooltip title='View comments, polls, export content and more' arrow>
+                  <Tooltip title='View comments, export content and more' arrow>
                     <MoreHorizIcon color='secondary' />
                   </Tooltip>
                 </IconButton>

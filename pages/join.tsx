@@ -4,14 +4,13 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
 import Button from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import { JoinDynamicSpaceForm } from 'components/common/TokenGateForm/JoinDynamicSpaceForm';
 import { JoinPredefinedSpaceDomain } from 'components/common/TokenGateForm/JoinPredefinedSpaceDomain';
-import { useOnboarding } from 'hooks/useOnboarding';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
@@ -35,13 +34,11 @@ export default function JoinWorkspace() {
   const router = useRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
-  const { showOnboarding } = useOnboarding();
 
   useEffect(() => {
     const space = spaces.find((_space) => _space.domain === router.query.domain);
     if (space) {
       router.push(`/${router.query.domain}`);
-      showOnboarding(space.id);
     }
   }, [spaces]);
 

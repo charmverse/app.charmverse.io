@@ -1,6 +1,7 @@
 import type { Node } from '@bangle.dev/pm';
 import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
+import { FormatListBulleted } from '@mui/icons-material';
 import CodeIcon from '@mui/icons-material/Code';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { TextSelection } from 'prosemirror-state';
@@ -81,6 +82,42 @@ export function items(): PaletteItemTypeNoGroup[] {
                 _dispatch,
                 state.schema.nodes.codeBlock.create({ language: 'Javascript' }, Fragment.fromArray([]))
               );
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
+    {
+      uid: 'poll',
+      title: 'Poll',
+      icon: (
+        <FormatListBulleted
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
+      description: 'Insert an embedded poll',
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          if (view) {
+            rafCommandExec(view!, (_state, _dispatch) => {
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.poll.create(
+                {
+                  src: null
+                },
+                null,
+                [tooltipMark]
+              );
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
             });
           }
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);

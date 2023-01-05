@@ -20,7 +20,15 @@ import { VIDEO_ASPECT_RATIO } from './videoSpec';
 import type { VideoNodeAttrs } from './videoSpec';
 import { VideoUploadForm } from './VideoUploadForm';
 
-export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop, updateAttrs }: CharmNodeViewProps) {
+export function VideoNodeView({
+  deleteNode,
+  pageId,
+  readOnly,
+  node,
+  onResizeStop,
+  selected,
+  updateAttrs
+}: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
 
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
@@ -60,6 +68,7 @@ export function VideoNodeView({ deleteNode, pageId, readOnly, node, onResizeStop
           onDelete={deleteNode}
           node={node}
           icon={<VideoLibraryIcon fontSize='small' />}
+          isSelected={selected}
           buttonText='Embed a Video'
         >
           <MultiTabs

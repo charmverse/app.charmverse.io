@@ -3,14 +3,11 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from 'db';
 import { isTruthy } from 'lib/utilities/types';
 
+import { defaultPostsPerResult } from './constants';
 import type { PageWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
 import type { PaginatedPostList } from './listForumPosts';
-// Maxium posts we want per response
-export const defaultPostsPerResult = 5;
-/**
- * @sort ignored for now - the server sorts posts by most recent
- */
+
 export interface SearchForumPostsRequest {
   spaceId: string;
   search?: string;

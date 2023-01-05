@@ -116,8 +116,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setLoggedInUserForWeb3Hook(user);
 
-    if (user && (countConnectableIdentities(user) === 0 || !!user.deletedAt)) {
-      charmClient.logout().finally(() => {
+    if (user?.deletedAt) {
+      charmClient.logout().then(() => {
         window.location.href = window.location.origin;
       });
     }

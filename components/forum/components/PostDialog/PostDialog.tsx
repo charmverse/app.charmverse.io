@@ -4,7 +4,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
 
-import charmClient from 'charmClient';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
@@ -47,13 +46,6 @@ export default function PostDialog(props: Props) {
     }
   }, [props.open]);
 
-  async function onClickDelete() {
-    if (page) {
-      await charmClient.forum.deleteForumPost(page.id);
-      onClose();
-    }
-  }
-
   function onClose() {
     popupState.close();
     props.onClose();
@@ -63,6 +55,7 @@ export default function PostDialog(props: Props) {
     <RootPortal>
       {popupState.isOpen && (
         <Dialog
+          fullWidth
           hideCloseButton
           // toolsMenu={
           //   page && (
