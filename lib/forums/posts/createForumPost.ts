@@ -1,9 +1,10 @@
-import type { Page, Post, Prisma } from '@prisma/client';
+import type { Post, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { prisma } from 'db';
-import { getPagePath } from 'lib/pages/utils';
 import { InsecureOperationError } from 'lib/utilities/errors';
+
+import { getPostPath } from './getPostPath';
 
 export type CreateForumPostInput = Pick<
   Post,
@@ -56,7 +57,7 @@ export async function createForumPost({
           id: spaceId
         }
       },
-      path: getPagePath()
+      path: getPostPath(title)
     }
   });
 
