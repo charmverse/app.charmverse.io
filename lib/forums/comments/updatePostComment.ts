@@ -9,7 +9,7 @@ export async function updatePostComment({
 }: UpdatePostCommentInput & {
   commentId: string;
 }) {
-  return prisma.pageComment.update({
+  return prisma.postComment.update({
     where: {
       id: commentId
     },

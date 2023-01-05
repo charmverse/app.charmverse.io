@@ -3,7 +3,6 @@ import { v4 } from 'uuid';
 import { prisma } from 'db';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
-import { createForumPost } from 'lib/forums/posts/createForumPost';
 
 export async function generatePostCategory({
   spaceId,
@@ -49,24 +48,44 @@ export async function generatePostWithComment({ userId, spaceId }: { spaceId: st
 export async function generateForumPost({
   categoryId,
   userId,
-  spaceId
+  spaceId,
+  path = `post-${v4()}`,
+  title = 'Test post'
 }: {
   categoryId?: string;
   userId: string;
   spaceId: string;
+  path?: string;
+  title?: string;
 }) {
   if (!categoryId) {
     const category = await generatePostCategory({ spaceId });
     categoryId = category.id;
   }
-  return createForumPost({
-    categoryId,
-    content: {
-      type: ''
-    },
-    contentText: '',
-    createdBy: userId,
-    spaceId,
-    title: 'Title'
+  return prisma.post.create({
+    data: {
+      title,
+      path,
+      contentText: '',
+      content: {
+        type: 'doc',
+        content: []
+      },
+      space: {
+        connect: {
+          id: spaceId
+        }
+      },
+      author: {
+        connect: {
+          id: userId
+        }
+      },
+      category: {
+        connect: {
+          id: categoryId
+        }
+      }
+    }
   });
 }

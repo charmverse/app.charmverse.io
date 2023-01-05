@@ -69,38 +69,15 @@ async function wipePosts({spaceDomain}: {spaceDomain: string}) {
 
   await prisma.post.deleteMany({
     where: {
-      page: {
-        spaceId: space.id
-      }
-    }
-  })
-
-  await prisma.page.deleteMany({
-    where: {
-      type: 'post',
       spaceId: space.id
     }
   })
 
 }
 
-const spaceDomain = 'shivering-solana-rooster'
-
-// Step 1 - wipe posts
-wipePosts({
-  spaceDomain
-}).then(posts => {
-  autogeneratePosts().then(() => console.log('done'))
-}).catch(err => {
-  console.log(err);
-})
-
-const postsPerCategory = 40;
-
-const withImageRatio = 55;
 // Step 2 - generate posts in different categories
 
-function autogeneratePosts() {
+function autogeneratePosts({spaceDomain, postsPerCategory = 10, withImageRatio = 50}: {spaceDomain: string, postsPerCategory?: number, withImageRatio?: number}) {
   return listCategories({spaceDomain}).then(async categories => {
     for (let i = 0; i <= categories.length; i++) {
       if (i === categories.length) {
@@ -130,9 +107,23 @@ function autogeneratePosts() {
 }
 
 
+const spaceDomain = 'shivering-solana-rooster';
 
-autogeneratePosts().then(() => console.log('done')).catch(err => {
-  console.log(err);
-})
+const postsPerCategory = 40;
+
+const withImageRatio = 55;
+
+// wipePosts({
+//   spaceDomain
+// }).then(posts => {
+//   autogeneratePosts({
+//     spaceDomain,
+//     postsPerCategory,
+//     withImageRatio
+//   }).then(() => console.log('done'))
+// }).catch(err => {
+//   console.log(err);
+// })
+
 
 

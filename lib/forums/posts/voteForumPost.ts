@@ -1,47 +1,50 @@
-import { PageNotFoundError } from 'next/dist/shared/lib/utils';
-
 import { prisma } from 'db';
 
-import { getForumPost } from './getForumPost';
+import { PostNotFoundError } from './errors';
 
-export async function voteForumPost({
-  upvoted,
-  userId,
-  pageId
-}: {
-  pageId: string;
+type PostVote = {
+  postId: string;
   userId: string;
   upvoted: boolean | null;
-}) {
-  const page = await getForumPost({ pageId, userId });
+};
 
-  if (!page || !page.post) {
-    throw new PageNotFoundError(pageId);
+export async function voteForumPost({ upvoted, userId, postId }: PostVote) {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: postId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (!post) {
+    throw new PostNotFoundError(postId);
   }
 
   if (upvoted === null) {
-    await prisma.pageUpDownVote.delete({
+    await prisma.postUpDownVote.delete({
       where: {
-        createdBy_pageId: {
+        createdBy_postId: {
           createdBy: userId,
-          pageId
+          postId
         }
       }
     });
   } else {
-    await prisma.pageUpDownVote.upsert({
+    await prisma.postUpDownVote.upsert({
       create: {
         createdBy: userId,
         upvoted,
-        pageId
+        postId
       },
       update: {
         upvoted
       },
       where: {
-        createdBy_pageId: {
+        createdBy_postId: {
           createdBy: userId,
-          pageId
+          postId
         }
       }
     });
