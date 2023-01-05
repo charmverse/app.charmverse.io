@@ -37,7 +37,7 @@ type FormInputs = {
   id?: string;
 };
 
-function processComments({ postComments, rootPageId }: { postComments: PostCommentWithVote[]; rootPageId: string }) {
+function processComments({ postComments }: { postComments: PostCommentWithVote[] }) {
   // Get top level comments
   const topLevelComments: PostCommentWithVoteAndChildren[] = [];
 
@@ -154,8 +154,7 @@ export function PostPage({ post, spaceId, onSave }: Props) {
     if (postComments && post) {
       return sortComments({
         comments: processComments({
-          postComments,
-          rootPageId: post.id
+          postComments
         }),
         sort: commentSort
       });
