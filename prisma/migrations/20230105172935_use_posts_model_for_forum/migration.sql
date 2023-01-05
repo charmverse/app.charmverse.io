@@ -6,6 +6,7 @@
   - You are about to drop the `PageComment` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PageCommentUpDownVote` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PageUpDownVote` table. If the table is not empty, all the data it contains will be lost.
+  - A unique constraint covering the columns `[path]` on the table `Post` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `content` to the `Post` table without a default value. This is not possible if the table is not empty.
   - Added the required column `contentText` to the `Post` table without a default value. This is not possible if the table is not empty.
   - Added the required column `createdBy` to the `Post` table without a default value. This is not possible if the table is not empty.
@@ -118,6 +119,9 @@ CREATE INDEX "PostCommentUpDownVote_postId_idx" ON "PostCommentUpDownVote"("post
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PostCommentUpDownVote_createdBy_commentId_key" ON "PostCommentUpDownVote"("createdBy", "commentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Post_path_key" ON "Post"("path");
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

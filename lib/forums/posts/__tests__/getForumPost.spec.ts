@@ -95,7 +95,7 @@ describe('getForumPost', () => {
     );
   });
 
-  it('should allow looking up a post via path + spaceId', async () => {
+  it('should allow looking up a post via path', async () => {
     const postPath = `post-path-${v4()}`;
 
     const createdPost = await generateForumPost({
@@ -104,7 +104,7 @@ describe('getForumPost', () => {
       path: postPath
     });
 
-    const retrievedPost = await getForumPost({ postId: postPath, spaceId: createdPost.spaceId });
+    const retrievedPost = await getForumPost({ postId: postPath });
 
     expect(retrievedPost).toMatchObject(
       expect.objectContaining<Partial<PostWithVotes>>({
@@ -117,9 +117,6 @@ describe('getForumPost', () => {
     );
   });
 
-  it('should throw an error if a path is provided without a spaceId', async () => {
-    await expect(getForumPost({ postId: `post-path`, spaceId: undefined })).rejects.toBeInstanceOf(InvalidInputError);
-  });
   it('should throw an error if the post does not exist', async () => {
     await expect(getForumPost({ postId: v4() })).rejects.toBeInstanceOf(PostNotFoundError);
   });

@@ -1022,7 +1022,7 @@ model Post {
   title      String
   content     Json
   contentText String
-  path        String
+  path        String      @unique
   categoryId String       @db.Uuid
   createdBy  String       @db.Uuid
   author     User         @relation(fields: [createdBy], references: [id], onDelete: Cascade)
