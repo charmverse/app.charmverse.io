@@ -291,15 +291,14 @@ function TableHeader(props: Props): JSX.Element {
           label
         ) : (
           <div ref={toggleRef}>
-            <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()}>
-              {label}
-            </div>
+            <div {...popoverToggleProps}>{label}</div>
             <Popover disableRestoreFocus {...popoverProps}>
               <Paper>{popupContent}</Paper>
             </Popover>
           </div>
         )}
       </Stack>
+      <div className='octo-spacer' />
       {!readOnly && <HorizontalGrip templateId={templateId} onAutoSizeColumn={onAutoSizeColumn} />}
     </div>
   );
