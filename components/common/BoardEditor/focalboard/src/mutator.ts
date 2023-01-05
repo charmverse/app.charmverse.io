@@ -14,15 +14,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import type { Block, BlockPatch } from './blocks/block';
-import { createPatchesFromBlocks } from './blocks/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from './blocks/board';
-import { createBoard } from './blocks/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from './blocks/boardView';
-import { createBoardView } from './blocks/boardView';
-import type { Card } from './blocks/card';
-import { createCard } from './blocks/card';
-import type { FilterGroup } from './blocks/filterGroup';
 import { Constants } from './constants';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
