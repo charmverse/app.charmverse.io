@@ -14,6 +14,7 @@ import { createBoardView } from './blocks/boardView';
 import type { Card } from './blocks/card';
 import { createCard } from './blocks/card';
 import type { FilterGroup } from './blocks/filterGroup';
+import { Constants } from './constants';
 import octoClient, { OctoClient } from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
@@ -570,12 +571,21 @@ class Mutator {
     newType: PropertyType,
     newName: string
   ) {
+    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
       return;
     }
-
     const newBoard = createBoard({ block: board });
-    const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id)!;
+    const cardProperty = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id);
+    const newTemplate = propertyTemplate.id === Constants.titleColumnId ? cardProperty || titleProperty : cardProperty;
+
+    if (!newTemplate) {
+      return;
+    }
+
+    if (!cardProperty && propertyTemplate.id === Constants.titleColumnId) {
+      newBoard.fields.cardProperties = [newTemplate, ...newBoard.fields.cardProperties];
+    }
 
     if (propertyTemplate.type !== newType) {
       newTemplate.options = [];

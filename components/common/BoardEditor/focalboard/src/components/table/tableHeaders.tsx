@@ -33,7 +33,6 @@ type Props = {
 function TableHeaders(props: Props): JSX.Element {
   const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
   const intl = useIntl();
-
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
