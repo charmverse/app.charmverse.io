@@ -3,43 +3,38 @@ import type { ResourceEvent } from './ResourceEvent';
 
 type PostEvent = BaseEvent & ResourceEvent;
 
-export interface PostPageLoadEvent extends PostEvent {}
+type PostPageLoadEvent = PostEvent;
 
-export interface MainFeedLoadEvent {
-  spaceId: string;
-  userId: string;
-}
+type MainFeedLoadEvent = BaseEvent;
 
-export interface MainFeedFilteredEvent {
-  spaceId: string;
-  userId: string;
+type MainFeedFilteredEvent = BaseEvent & {
   categoryName: string;
-}
+};
 
-export interface PostCreateEvent extends PostEvent {
+type PostCreateEvent = PostEvent & {
   categoryName: string;
   hasImage: boolean;
-}
+};
 
-export interface PostDeleteEvent extends PostEvent {
+type PostDeleteEvent = PostEvent & {
   categoryName: string;
   hasImage: string;
-}
+};
 
-export interface PostVoteEvent extends PostEvent {
+type PostVoteEvent = PostEvent & {
   categoryName: string;
-}
+};
 
-export interface CommentVoteEvent extends PostEvent {
+type CommentVoteEvent = PostEvent & {
   categoryName: string;
   postId: string;
-}
+};
 
-export interface CommentCreateEvent extends PostEvent {
+type CommentCreateEvent = PostEvent & {
   categoryName: string;
   postId: string;
   commentedOn: 'post' | 'comment';
-}
+};
 
 export interface ForumEventMap {
   main_feed_page_load: MainFeedLoadEvent;

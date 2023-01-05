@@ -1,6 +1,7 @@
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { prisma } from 'db';
+import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 export async function voteForumPost({
@@ -43,21 +44,13 @@ export async function voteForumPost({
     });
 
     if (category) {
-      if (upvoted) {
-        trackUserAction('upvote_post', {
-          resourceId: page.id,
-          spaceId: page.spaceId,
-          userId,
-          categoryName: category.name
-        });
-      } else {
-        trackUserAction('downvote_post', {
-          resourceId: page.id,
-          spaceId: page.spaceId,
-          userId,
-          categoryName: category.name
-        });
-      }
+      const userAction: MixpanelEventName = upvoted ? 'upvote_post' : 'downvote_post';
+      trackUserAction(userAction, {
+        resourceId: page.id,
+        spaceId: page.spaceId,
+        userId,
+        categoryName: category.name
+      });
     }
     await prisma.pageUpDownVote.upsert({
       create: {

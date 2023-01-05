@@ -36,17 +36,6 @@ export async function deletePostComment({
 
   const category = page?.post?.category;
 
-  if (category) {
-    trackUserAction('delete_comment', {
-      categoryName: category.name,
-      commentedOn: pageComment.parentId === postId ? 'post' : 'comment',
-      postId,
-      resourceId: commentId,
-      spaceId: page.spaceId,
-      userId
-    });
-  }
-
   await prisma.pageComment.update({
     where: {
       id: commentId
@@ -57,4 +46,15 @@ export async function deletePostComment({
       contentText: ''
     }
   });
+
+  if (category) {
+    trackUserAction('delete_comment', {
+      categoryName: category.name,
+      commentedOn: pageComment.parentId === postId ? 'post' : 'comment',
+      postId,
+      resourceId: commentId,
+      spaceId: page.spaceId,
+      userId
+    });
+  }
 }
