@@ -4,14 +4,13 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { syncFormResponses } from 'lib/google/forms/syncFormResponses';
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
 import { WrongStateError } from 'lib/utilities/errors/invalidData';
 
 export type RefreshFormsRequest = {
-  boardId: string;
+  viewId: string;
 };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,13 +18,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(syncResponsesResponse);
 
 async function syncResponsesResponse(req: NextApiRequest, res: NextApiResponse) {
-  const boardId = req.query.boardId;
+  const viewId = req.query.viewId;
 
-  if (typeof boardId !== 'string') {
-    throw new InvalidInputError('Board id is required');
+  if (typeof viewId !== 'string') {
+    throw new InvalidInputError('View id is required');
   }
 
-  const block = await prisma.block.findUniqueOrThrow({ where: { id: boardId } });
+  const block = await prisma.block.findUniqueOrThrow({ where: { id: viewId } });
   const fields = block.fields as BoardViewFields;
   const sourceData = fields.sourceData;
   if (!sourceData) {

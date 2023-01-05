@@ -11,6 +11,8 @@ import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { copyAllPagePermissions } from 'lib/permissions/pages/actions/copyPermission';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -92,6 +94,12 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       domain: spaceDomain
     }
   });
+
+  const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId: space.id });
+  if (error) {
+    throw new UnauthorisedActionError();
+  }
+
   const newBlocks = data.map((block) => ({
     ...block,
     fields: block.fields,
@@ -241,9 +249,9 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
         const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
         return syncFormResponses({ sourceData });
       })
-    ).catch((error) => {
+    ).catch((err) => {
       const viewIds = viewsLinkedToGoogleForm.map((block) => block.id);
-      log.error('Could not sync google form', { viewIds, error });
+      log.error('Could not sync google form', { viewIds, error: err });
     });
   }
 
@@ -253,61 +261,34 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
 
-  const blockOps = blocks.map((block) => {
-    return prisma.block.update({
-      where: { id: block.id },
-      data: {
-        ...block,
-        fields: block.fields as any,
-        updatedAt: new Date(),
-        updatedBy: req.session.user.id
-      }
-    });
-  });
+  const spaceId = blocks[0].spaceId;
 
-  const updatedBlocks = await prisma.$transaction(blockOps);
+  const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
+  if (error) {
+    throw new UnauthorisedActionError();
+  }
 
-  // We expect blocks to only be updated in a single space, but some future-proofing doesn't hurt
-  const bySpaceId = blocks.reduce((acc, block, index) => {
-    const spaceId = updatedBlocks[index].spaceId;
-
-    if (!acc[spaceId]) {
-      acc[spaceId] = [];
-    }
-
-    acc[spaceId].push(block);
-
-    return acc;
-  }, {} as Record<string, Block[]>);
-
-  Object.entries(bySpaceId).forEach(([spaceId, blockList]) => {
-    relay.broadcast(
-      {
-        type: 'blocks_updated',
-        payload: blockList
-      },
-      spaceId
-    );
-  });
-
-  const newViewsLinkedToGoogleForm = updatedBlocks.filter(
-    (newBlock) =>
-      newBlock.type === 'view' &&
-      (newBlock.fields as BoardViewFields)?.sourceType === 'google_form' &&
-      !(newBlock.fields as BoardViewFields)?.sourceData?.boardId
+  const updatedBlocks = await prisma.$transaction(
+    blocks.map((block) => {
+      return prisma.block.update({
+        where: { id: block.id },
+        data: {
+          ...block,
+          fields: block.fields as any,
+          updatedAt: new Date(),
+          updatedBy: req.session.user.id
+        }
+      });
+    })
   );
 
-  if (newViewsLinkedToGoogleForm.length) {
-    Promise.all(
-      newViewsLinkedToGoogleForm.map(async (view) => {
-        const sourceData = (view.fields as any).sourceData as GoogleFormSourceData;
-        await syncFormResponses({ sourceData });
-      })
-    ).catch((error) => {
-      const viewIds = newViewsLinkedToGoogleForm.map((block) => block.id);
-      log.error('Could not sync google form', { viewIds, error });
-    });
-  }
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: updatedBlocks
+    },
+    updatedBlocks[0].spaceId
+  );
 
   return res.status(200).json(updatedBlocks);
 }

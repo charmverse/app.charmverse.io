@@ -30,7 +30,7 @@ export async function syncFormResponses({ sourceData }: { sourceData: GoogleForm
     formId
   });
   const { responses } = res.data;
-  const boardBlock = await prisma.block.findUnique({ where: { id: sourceData.boardId } });
+  const boardBlock = sourceData.boardId ? await prisma.block.findUnique({ where: { id: sourceData.boardId } }) : null;
   const board = (boardBlock ?? createBoard()) as Block;
 
   const cardProperties = getCardProperties(form);

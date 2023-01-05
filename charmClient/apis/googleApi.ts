@@ -40,7 +40,7 @@ export class GoogleApi {
       return http.DELETE<CredentialRequest[]>('/api/google/credentials');
     },
     createCredential(credential: CreateCredentialRequest) {
-      return http.POST('/api/google/credentials', credential);
+      return http.POST<CredentialItem>('/api/google/credentials', credential);
     }
   };
 }

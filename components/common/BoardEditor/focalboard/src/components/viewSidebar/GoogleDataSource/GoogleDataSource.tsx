@@ -25,15 +25,20 @@ export function GoogleDataSource(props: Props) {
   const { data: credentials, mutate } = useSwr('google-credentials', () => charmClient.google.forms.getCredentials());
   const [selectedCredential, setSelectedCredential] = useState<CredentialItem | null>(null);
   const { loginWithGoogle, onLoadScript } = useGoogleAuth({
-    onConnect: () => {
-      mutate();
+    onConnect: async (credential) => {
+      const result = await mutate();
+      selectCredential(credential);
     }
   });
 
   function selectCredential(credential: CredentialItem) {
     setSelectedCredential(credential);
   }
-  if (!credentials) return <LoadingComponent />;
+
+  if (!credentials) {
+    return <LoadingComponent />;
+  }
+
   if (credentials.length === 0) {
     return (
       <>
@@ -66,7 +71,7 @@ export function GoogleDataSource(props: Props) {
           onClick={() => selectCredential(credential)}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Choose from&nbsp;
+            Choose from
             <Tooltip title={credential.name}>
               <span> {credential.name}</span>
             </Tooltip>

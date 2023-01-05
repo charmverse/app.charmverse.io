@@ -5,7 +5,6 @@ import nc from 'next-connect';
 import { prisma } from 'db';
 import { getCredentialsFromGoogleCode } from 'lib/google/authorization/authClient';
 import { deleteCredential, getCredentialsForUser } from 'lib/google/authorization/credentials';
-import log from 'lib/log';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors/errors';
@@ -39,7 +38,7 @@ async function createCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
   if (!credential?.email) {
     throw new InvalidInputError('No email found');
   }
-  await prisma.googleCredential.upsert({
+  const { id, name } = await prisma.googleCredential.upsert({
     where: {
       userId_name: {
         userId,
@@ -60,7 +59,12 @@ async function createCredentialEndpoint(req: NextApiRequest, res: NextApiRespons
     }
   });
 
-  res.status(200).end();
+  const response: CredentialItem = {
+    id,
+    name
+  };
+
+  res.send(response);
 }
 
 async function getCredentialEndpoint(req: NextApiRequest, res: NextApiResponse) {
