@@ -1,8 +1,8 @@
-import type { PageComment, User } from '@prisma/client';
+import type { PostComment, User } from '@prisma/client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export type PostCommentWithVote = PageComment & {
+export type PostCommentWithVote = PostComment & {
   upvotes: number;
   downvotes: number;
   upvoted: null | boolean;
@@ -29,9 +29,9 @@ export type ForumCommentTask = {
   spaceId: string;
   spaceDomain: string;
   spaceName: string;
-  pageId: string;
-  pagePath: string;
-  pageTitle: string;
+  postId: string;
+  postPath: string;
+  postTitle: string;
   createdBy: User | null;
   createdAt: string;
   commentId: string;

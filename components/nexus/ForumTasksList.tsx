@@ -26,13 +26,13 @@ function ForumTaskRow({
   createdAt,
   marked,
   commentText,
-  pagePath,
+  postPath,
   spaceDomain,
   spaceName,
-  pageTitle
+  postTitle
 }: ForumCommentTask & { marked: boolean }) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : null;
-  const commentLink = `${baseUrl}/${spaceDomain}/forum/post/${pagePath}`;
+  const commentLink = `${baseUrl}/${spaceDomain}/forum/post/${postPath}`;
 
   return (
     <TableRow>
@@ -77,7 +77,7 @@ function ForumTaskRow({
       </TableCell>
       <TableCell>
         <Link color='inherit' href={commentLink} variant='body1' noWrap>
-          {pageTitle}
+          {postTitle}
         </Link>
       </TableCell>
       <TableCell align='center'>

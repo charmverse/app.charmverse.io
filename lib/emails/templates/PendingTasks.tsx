@@ -409,8 +409,8 @@ function MultisigTask({ task }: { task: GnosisSafeTasks }) {
   );
 }
 
-function ForumTask({ task: { commentText, spaceName, pageTitle } }: { task: ForumCommentTask }) {
-  const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
+function ForumTask({ task: { commentText, spaceName, postTitle } }: { task: ForumCommentTask }) {
+  const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
       <div style={{ fontWeight: 'bold', marginBottom: 5 }}>

@@ -5,7 +5,8 @@ import type {
   BountyStatus,
   Comment,
   Page,
-  PageComment,
+  Post,
+  PostComment,
   Prisma,
   ProposalStatus,
   Role,
@@ -35,6 +36,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 
 import { boardWithCardsArgs } from './generate-board-stub';
+import { generatePostCategory } from './utils/forums';
 
 export async function generateSpaceUser({
   spaceId,
@@ -844,12 +846,12 @@ export async function generateWorkspaceEvents({
 }
 
 export async function generateForumComment({
-  pageId,
+  postId,
   createdBy,
   contentText,
   parentId
-}: Pick<PageComment, 'contentText' | 'pageId' | 'createdBy' | 'parentId'>): Promise<PageComment> {
-  const comment = await prisma.pageComment.create({
+}: Pick<PostComment, 'contentText' | 'postId' | 'createdBy' | 'parentId'>): Promise<PostComment> {
+  const comment = await prisma.postComment.create({
     data: {
       createdAt: new Date(),
       createdBy,
@@ -858,8 +860,31 @@ export async function generateForumComment({
       updatedAt: new Date(),
       deletedAt: null,
       parentId,
-      pageId
+      postId
     }
   });
   return comment;
+}
+
+export async function createPost(
+  options: Partial<Post> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
+): Promise<Post> {
+  const forumPost = await prisma.post.create({
+    data: {
+      createdAt: options.createdAt || new Date(),
+      updatedAt: options.updatedAt || new Date(),
+      deletedAt: options.deletedAt || null,
+      id: options.id || v4(),
+      title: options.title || 'New Forum Post',
+      content: options.content || {},
+      contentText: options.contentText || 'Some text in the forum',
+      path: options.path || getPagePath(),
+      categoryId: options.categoryId || v4(),
+      createdBy: options.createdBy || v4(),
+      spaceId: options.spaceId || v4(),
+      pinned: options.pinned ?? false,
+      locked: options.locked ?? false
+    }
+  });
+  return forumPost;
 }

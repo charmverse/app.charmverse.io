@@ -1,4 +1,4 @@
-import type { PageComment, Space, User } from '@prisma/client';
+import type { PostComment, Space, User } from '@prisma/client';
 
 import { prisma } from 'db';
 
@@ -78,12 +78,12 @@ export async function getForumCommentsTasks(userId: string): Promise<ForumCommen
   const commentTasks = comments.reduce<ForumCommentTasksGroup>(
     (acc, commentWithoutUser) => {
       const commentTask: ForumCommentTask = {
-        spaceId: commentWithoutUser.page.spaceId,
-        spaceDomain: spaceRecord[commentWithoutUser.page.spaceId].domain,
-        spaceName: spaceRecord[commentWithoutUser.page.spaceId].name,
-        pageId: commentWithoutUser.pageId,
-        pagePath: commentWithoutUser.page.path,
-        pageTitle: commentWithoutUser.page.title,
+        spaceId: commentWithoutUser.post.spaceId,
+        spaceDomain: spaceRecord[commentWithoutUser.post.spaceId].domain,
+        spaceName: spaceRecord[commentWithoutUser.post.spaceId].name,
+        postId: commentWithoutUser.postId,
+        postPath: commentWithoutUser.post.path,
+        postTitle: commentWithoutUser.post.title,
         createdBy: usersRecord[commentWithoutUser.createdBy],
         createdAt: new Date(commentWithoutUser.createdAt).toISOString(),
         commentId: commentWithoutUser.id,
@@ -111,8 +111,8 @@ export async function getForumCommentsTasks(userId: string): Promise<ForumCommen
  * 2. Not my page, just comments that are direct replies after my comment
  */
 async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Promise<
-  (PageComment & {
-    page: {
+  (PostComment & {
+    post: {
       createdBy: string;
       title: string;
       path: string;
@@ -120,13 +120,13 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
     };
   })[]
 > {
-  const comments = await prisma.pageComment.findMany({
+  const comments = await prisma.postComment.findMany({
     where: {
       createdBy: {
         not: userId
       },
       deletedAt: null,
-      page: {
+      post: {
         spaceId: {
           in: spaceIds
         },
@@ -134,7 +134,7 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
       }
     },
     include: {
-      page: {
+      post: {
         select: {
           createdBy: true,
           path: true,
@@ -146,16 +146,16 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
   });
 
   // Comments that are not created by the user but are on a post page created by the user
-  const commentsOnTheUserPage = comments.filter((comment) => comment.page.createdBy === userId);
+  const commentsOnTheUserPage = comments.filter((comment) => comment.post.createdBy === userId);
 
-  const parentComments = await prisma.pageComment.findMany({
+  const parentComments = await prisma.postComment.findMany({
     where: {
       id: {
-        in: comments.map((c) => c.parentId)
+        in: comments.map((c) => c.parentId ?? '')
       },
       createdBy: userId,
       deletedAt: null,
-      page: {
+      post: {
         spaceId: {
           in: spaceIds
         },
@@ -170,7 +170,7 @@ async function getPostComments({ userId, spaceIds }: GetForumCommentsInput): Pro
 
   // Comments that are not created by the user, are on a post page that is not created by the user and the parent is the user
   const commentReplies = comments.filter(
-    (comment) => comment.page.createdBy !== userId && parentCommentIds.includes(comment.parentId)
+    (comment) => comment.post.createdBy !== userId && parentCommentIds.includes(comment.parentId ?? '')
   );
 
   return commentsOnTheUserPage.concat(commentReplies);
