@@ -6,7 +6,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { PostPage } from 'components/forum/components/PostPage/PostPage';
 
-export default function BlocksEditorPage() {
+export default function ForumPostPage() {
   const router = useRouter();
   const pagePath = router.query.pagePath as string;
 
@@ -16,7 +16,7 @@ export default function BlocksEditorPage() {
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;
   }
 
-  return data ? <PostPage page={data} spaceId={data.spaceId} /> : null;
+  return data ? <PostPage post={data} spaceId={data.spaceId} /> : null;
 }
 
-BlocksEditorPage.getLayout = getPageLayout;
+ForumPostPage.getLayout = getPageLayout;

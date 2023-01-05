@@ -8,11 +8,12 @@ import { useEffect, useRef } from 'react';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import RootPortal from 'components/common/BoardEditor/focalboard/src/components/rootPortal';
 import Button from 'components/common/Button';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { PostPage } from '../PostPage/PostPage';
 
 interface Props {
-  post?: Post | null;
+  post?: PostWithVotes | null;
   spaceId: string;
   onClose: () => void;
   open?: boolean;

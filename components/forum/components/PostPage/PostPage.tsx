@@ -15,6 +15,7 @@ import { ScrollableWindow } from 'components/common/PageLayout';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVote, PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
+import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -25,7 +26,7 @@ import { PostCommentSort } from './components/PostCommentSort';
 
 type Props = {
   spaceId: string;
-  post: Post | null;
+  post: PostWithVotes | null;
   onSave?: () => void;
 };
 
